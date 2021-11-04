@@ -1,0 +1,114 @@
+#include <stdio.h>
+#include <fstream>
+#include "../include/http_client.h"
+#include "../include/log.h"
+
+
+using namespace ZED;
+
+
+
+bool HttpClient::SendGETRequest(const char* Path)
+{
+	if (!m_Socket.IsConnected())
+		return false;
+	
+
+	char request[512] = {};
+	strcpy_s(request, sizeof(request), "GET ");
+	strcat_s(request, sizeof(request), Path);
+	strcat_s(request, sizeof(request), " HTTP/1.1\r\nHost: ");
+	strcat_s(request, sizeof(request), m_Hostname.c_str());
+	strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
+
+	return m_Socket.Send(request, strlen(request));
+}
+
+
+
+bool HttpClient::SendFile(const char* Path, const char* Filename)
+{
+	std::ifstream file(Filename, std::ios::binary);
+
+	if (!file)
+		return false;
+
+	file.seekg(0, std::ios::end);
+	auto length = file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	char request[512] = {};
+	strcpy_s(request, sizeof(request), "GET ");
+	strcat_s(request, sizeof(request), Path);
+	strcat_s(request, sizeof(request), " HTTP/1.1\r\nHost: ");
+	strcat_s(request, sizeof(request), m_Hostname.c_str());
+	strcpy_s(request, sizeof(request), "Content-Length: ");
+	strcpy_s(request, sizeof(request), std::to_string(length).c_str());
+	strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
+
+	if (!m_Socket.Send(request, strlen(request)))
+		return false;
+
+	while (file)
+	{
+		char buffer[1024];
+		//file.read(buffer, 1024);
+
+		auto read = file.readsome(buffer, 1024);
+
+		//if (!m_Socket.Send(buffer, (uint32_t)file.gcount()))
+		if (!m_Socket.Send(buffer, (uint32_t)read))
+			return false;
+	}
+
+	return true;
+}
+
+
+
+HttpClient::Packet HttpClient::RecvResponse()
+{
+	std::string response;
+	int content_length = -1;
+	int header_length  = -1;
+	uint32_t downloaded = 0;
+
+	if (!m_Socket.IsConnected())//Not connected
+		return Packet("", "");//Return empty packet
+
+	while (m_Socket.Recv())
+	{
+		const char* buffer = m_Socket.GetBuffer();
+		int end = m_Socket.GetBufferLength();
+
+		if (end > 0)
+		{
+			response   += m_Socket;
+			downloaded += end;
+
+			if (content_length == -1)
+			{
+				auto pos = response.find("Content-Length: ");
+
+				if (pos != std::string::npos)
+				{
+					pos += sizeof("Content-Length: ") - 1;
+					content_length = Core::ToInt(&response[pos]);
+				}
+			}
+
+			if (header_length == -1)
+			{
+				auto pos = response.find("\r\n\r\n");
+
+				if (pos != std::string::npos)
+					header_length = pos + sizeof("\r\n\r\n") - 1;
+			}
+
+			if (downloaded >= (uint32_t)header_length + (uint32_t)content_length)
+				break;
+		}
+	}
+
+	return Packet(std::string(response.c_str(), header_length), std::string(response.c_str() + header_length, content_length));
+}
