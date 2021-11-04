@@ -1,0 +1,1 @@
+./Judoboard_GTest --gtest_output=xml
