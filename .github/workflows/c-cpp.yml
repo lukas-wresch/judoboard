@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: configure
-      run: chmod u+X *.sh && ./dependencies.sh
+      run: chmod u+x *.sh && ./dependencies.sh
     - name: make
       run: ./compile.sh
     - name: run tests
