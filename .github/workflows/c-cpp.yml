@@ -9,6 +9,17 @@ on:
 jobs:
   build:
 
+    runs-on: [ubuntu-latest, ubuntu-18.04]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: chmod u+x *.sh && ./dependencies.sh
+    - name: make
+      run: ./compile.sh
+
+test:
+
     runs-on: ubuntu-latest
 
     steps:
