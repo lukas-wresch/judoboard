@@ -31,10 +31,10 @@ void Log::Add(const std::string& LogMessage, Type Type)
 {
 	Open();
 
-	g_lock.lock();
-
 	if (!g_LogFile)
 		return;//No access to log file
+
+	g_lock.lock();
 
 	std::string type_string = "[???] ";
 	if (Type == Type::Error)

@@ -150,7 +150,10 @@ bool RendererSDL2::InitFonts(const char* FontFile, int Small, int Middle, int La
 	if (!TTF_WasInit())
 	{
 		if (TTF_Init() != 0)
+		{
+			Log::Error("SDL TTF could not be initialized");
 			return false;
+		}
 	}
 
 	m_ttf_font_small  = TTF_OpenFont(FontFile, Small);
@@ -161,7 +164,12 @@ bool RendererSDL2::InitFonts(const char* FontFile, int Small, int Middle, int La
 		m_ttf_font_gigantic = TTF_OpenFont(FontFile, Gigantic);
 	if (Gigantic2 > 0)
 		m_ttf_font_gigantic2 = TTF_OpenFont(FontFile, Gigantic2);
-	Log::Info("Fonts initialized");
+
+	if (!m_ttf_font_small || !m_ttf_font_medium || !m_ttf_font_large || !m_ttf_font_huge)
+		Log::Warn("Font file could not be opened");
+	else
+		Log::Info("Fonts initialized");
+
 	return true;
 }
 
@@ -180,38 +188,44 @@ Ref<Texture> RendererSDL2::RenderFont(FontSize Size, const std::string& Text, ZE
 	switch (Size)
 	{
 		case FontSize::Small:
-			//ret = new TextureSDL2(TTF_RenderText_Solid(m_ttf_font_small, Text.c_str(), color));
-			if (m_ttf_font_small)
-				ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_small, Text.c_str(), color));
+			ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_small, Text.c_str(), color));
+			//if (m_ttf_font_small)
+				//ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_small, Text.c_str(), color));
 			break;
 		case FontSize::Middle:
-			//ret = new TextureSDL2(TTF_RenderText_Solid(m_ttf_font_medium, Text.c_str(), color));
-			if (m_ttf_font_medium)
-				ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_medium, Text.c_str(), color));
+			ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_medium, Text.c_str(), color));
+			//if (m_ttf_font_medium)
+				//ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_medium, Text.c_str(), color));
 			break;
 		case FontSize::Large:
-			//ret = new TextureSDL2(TTF_RenderText_Solid(m_ttf_font_large, Text.c_str(), color));
-			if (m_ttf_font_large)
-				ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_large, Text.c_str(), color));
+			ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_large, Text.c_str(), color));
+			//if (m_ttf_font_large)
+				//ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_large, Text.c_str(), color));
 			break;
 		case FontSize::Huge:
-			//ret = new TextureSDL2(TTF_RenderText_Solid(m_ttf_font_huge, Text.c_str(), color));
-			if (m_ttf_font_huge)
-				ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_huge, Text.c_str(), color));
+			ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_huge, Text.c_str(), color));
+			//if (m_ttf_font_huge)
+				//ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_huge, Text.c_str(), color));
 			break;
 		case FontSize::Gigantic:
-			//ret = new TextureSDL2(TTF_RenderText_Solid(m_ttf_font_gigantic, Text.c_str(), color));
-			if (m_ttf_font_gigantic)
-				ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_gigantic, Text.c_str(), color));
+			ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_gigantic, Text.c_str(), color));
+			//if (m_ttf_font_gigantic)
+				//ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_gigantic, Text.c_str(), color));
 			break;
 		case FontSize::Gigantic2:
-			//ret = new TextureSDL2(TTF_RenderText_Solid(m_ttf_font_gigantic2, Text.c_str(), color));
-			if (m_ttf_font_gigantic2)
-				ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_gigantic2, Text.c_str(), color));
+			ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_gigantic2, Text.c_str(), color));
+			//if (m_ttf_font_gigantic2)
+				//ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_gigantic2, Text.c_str(), color));
 			break;
 	}
 
-	strcpy_s(ret->m_image_filename, sizeof(ret->m_image_filename), Text.c_str());
+	if (ret)
+	{
+		Log::Debug("Text rendered to texture, width=" + std::to_string(ret->GetWidth()));
+		strcpy_s(ret->m_image_filename, sizeof(ret->m_image_filename), Text.c_str());
+	}
+	else
+		Log::Warn("Failed to create texture for text");
 
 	return ret;
 }
@@ -323,16 +337,6 @@ TextureSDL2::TextureSDL2(SDL_Surface* Surface) : Texture()
 	//convert to a guaranteed good format
 	SDL_Surface* new_ret;
 
-	//if (image_filename.find("fort/flag") != std::string::npos)//HACK, if is fort/flag
-		//new_ret = SDL_ConvertSurfaceFormat(sdl_surface, SDL_PIXELFORMAT_ARGB8888, NULL);
-		//new_ret = sdl_surface_;
-	//else
-		//new_ret = SDL_ConvertSurface(sdl_surface, g_SDL_screen->format, NULL);
-
-	//if (sdl_surface_->format && sdl_surface_->format->BitsPerPixel == 32)//Already loaded as 32-bit image
-		//new_ret = sdl_surface_;//Do nothing
-	//else//Convert
-
 #ifdef SDL1
 	new_ret = SDL_DisplayFormatAlpha(m_surface);//SDL 1.2 -> 2.0
 #else
@@ -341,20 +345,11 @@ TextureSDL2::TextureSDL2(SDL_Surface* Surface) : Texture()
 	new_ret = SDL_ConvertSurfaceFormat(m_surface, SDL_PIXELFORMAT_RGBA32, NULL);
 #endif
 
-	//if (delete_surface)
-		SDL_FreeSurface(m_surface);
+	SDL_FreeSurface(m_surface);
 
 	m_surface = new_ret;
 
 	//SDL_SetSurfaceBlendMode(m_surface, SDL_BLENDMODE_BLEND);
-
-	//checks
-	//if ( (m_surface->w & (m_surface->w - 1)) != 0 )
-		//OutputDebugStringA("warning: %s's width is not a power of 2\n", image_filename.c_str());
-
-	// Also check if the height is a power of 2
-	//if ( (m_surface->h & (m_surface->h - 1)) != 0 )
-		//OutputDebugStringA("warning: %s's height is not a power of 2\n", image_filename.c_str());
 
 	/*if (!delete_surface)
 		m_sdl_texture = SDL_CreateTextureFromSurface(g_SDL_renderer, m_surface);*/

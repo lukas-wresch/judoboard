@@ -79,7 +79,7 @@ bool ZED::RendererOpenGL::Init(GtkWindow* DrawingArea)
 
 	glEnable(GL_TEXTURE_2D);//Enable Texture Mapping
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);//Clear The Background Color To Black 
-	glClearDepth(0.0f);//Disables(?) Clearing Of The Depth Buffer
+	glClearDepth(0.0f);//Clearing Of The Depth Buffer
 	glDepthFunc(GL_ALWAYS);
 	//glEnable(GL_DEPTH_TEST);//Enables Depth Testing
 	glDisable(GL_DEPTH_TEST);//Disable Depth test
@@ -713,7 +713,7 @@ ZED::TextureOpenGL::TextureOpenGL(const TextureSDL2& Surface) : ZED::TextureSDL2
 	Surface.CloneTo(*this);
 	if (m_surface)
 	{
-		m_Width = m_surface->w;
+		m_Width  = m_surface->w;
 		m_Height = m_surface->h;
 	}
 }
