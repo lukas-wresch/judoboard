@@ -90,7 +90,7 @@ bool Database::Save(const std::string& Filename) const
 	
 	StandingData::operator>>(csv);
 
-	csv << m_Accounts.size();
+	csv << (uint32_t)m_Accounts.size();
 
 	for (auto account : m_Accounts)
 	{

@@ -1654,10 +1654,10 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return std::string("Invalid tournament id");
 
 		ZED::CSV ret;
-		ret << m_Tournaments[index]->GetName() << m_Tournaments[index]->GetParticipants().size();
+		ret << m_Tournaments[index]->GetName() << (uint32_t)m_Tournaments[index]->GetParticipants().size();
 		ret << m_Tournaments[index]->GetSchedule().size() << m_Tournaments[index]->GetStatus();
 		ret << m_Tournaments[index]->GetDefaultRuleSet()->GetID();
-		return (std::string)ret;
+		return ret;
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/open", [this](auto Request) -> std::string {
