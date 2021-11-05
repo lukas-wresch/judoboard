@@ -23,7 +23,7 @@ namespace Judoboard
 	class Color
 	{
 	public:
-		enum class Name : unsigned int
+		enum class Name : uint32_t
 		{
 			White, Blue, Red, Green, Yellow, Magenta, Brown, Turquoise, Salmon, Purple, Khaki,
 			Max
