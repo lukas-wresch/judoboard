@@ -26,8 +26,8 @@ void Localizer::Initialize(Language NewLanguage)
 			//German
 			s_de["Mat"] = "Matte";
 			s_de["Weightclass"] = "Gewichtsklasse";
-			s_de["Next Match"] = u8"Nächster Kampf";
-			s_de["Following Matches"] = u8"Nachfolgende Kämpfe";
+			s_de["Next Match"]  = u8"N\u00e4chster Kampf";
+			s_de["Following Matches"] = u8"Nachfolgende K\u00e4mpfe";
 			s_de["Following Match"] = "Nachfolgender Kampf";
 			s_de["Default"] = "Standard";
 			
