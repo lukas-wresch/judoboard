@@ -106,7 +106,7 @@ namespace ZED
 		CSV& operator >> (T& Value)
 		{
 			if constexpr (std::is_enum<T>::value)
-				Read((std::underlying_type_t<T>)Value);
+				Read((std::underlying_type_t<T>&)Value);
 			else
 				Read(Value);
 			return *this;
