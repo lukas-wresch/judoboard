@@ -2313,7 +2313,7 @@ void Application::Run()
 ZED::CSV Application::Mats2String() const
 {
 	ZED::CSV ret;
-	ret << m_Mats.size();
+	ret << (uint32_t)m_Mats.size();
 
 	for (auto mat : m_Mats)
 		if (mat)
