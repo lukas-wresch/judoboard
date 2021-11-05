@@ -106,7 +106,7 @@ namespace ZED
 		CSV& operator >> (T& Value)
 		{
 			if constexpr (std::is_enum<T>::value)
-				Read((std::underlying_type_t<T> &)Value);
+				Read((std::underlying_type_t<T>)Value);
 			else
 				Read(Value);
 			return *this;
@@ -133,7 +133,7 @@ namespace ZED
 		DLLEXPORT void AppendImpl(const char* Value);
 
 		void Append(const std::string& Value) { AppendImpl(Value.c_str()); }
-		//void Append(uint32_t Value) { AppendImpl(std::to_string(Value).c_str()); }
+		void Append(uint32_t Value) { AppendImpl(std::to_string(Value).c_str()); }
 		void Append(int Value)  { AppendImpl(std::to_string(Value).c_str()); }
 		void Append(char* Value) { AppendImpl(Value); }
 		void Append(const char Value[]) { AppendImpl(Value); }
