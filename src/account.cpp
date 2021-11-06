@@ -22,8 +22,17 @@ Account::Nonce::Nonce(uint32_t IP, uint16_t RemotePort) : m_IP(IP)
 
 	std::string entropyInput = std::to_string(m_IP) + std::to_string(RemotePort) + std::to_string(Timer::GetTimestamp());
 
-	for (int bits = 0; bits < 512; bits += (int)rd.entropy())
-		entropyInput += std::to_string(rd());
+	if (rd.entropy() < 1.0)//No entropy source. For example if we are running in the cloud
+	{
+		srand(Timer::GetTimestamp());
+		for (int bits = 0; bits < 512; bits += 15)
+			entropyInput += std::to_string(rand());
+	}
+	else
+	{
+		for (int bits = 0; bits < 512; bits += (int)rd.entropy())
+			entropyInput += std::to_string(rd());
+	}
 
 	ZED::SHA512 hash(entropyInput);
 	m_Challenge = hash;

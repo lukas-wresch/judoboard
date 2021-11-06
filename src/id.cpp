@@ -53,12 +53,21 @@ const UUID ID::GenerateUUID()
 		return std::string();
 	}
 
-	for (int i = 0; true; i++)
+	for (int i = 0; true; i++)//Generate ID until we don't have a collision
 	{
 		std::string entropyInput = std::to_string(Timer::GetTimestamp() + i);
 
-		for (int bits = 0; bits < 512; bits += (int)rd.entropy())
-			entropyInput += std::to_string(rd());
+		if (rd.entropy() < 1.0)//No entropy source. For example if we are running in the cloud
+		{
+			srand(Timer::GetTimestamp());
+			for (int bits = 0; bits < 512; bits += 15)
+				entropyInput += std::to_string(rand());
+		}
+		else
+		{
+			for (int bits = 0; bits < 512; bits += (int)rd.entropy())
+				entropyInput += std::to_string(rd());
+		}
 
 		ZED::SHA512 hash(entropyInput);
 		const UUID uuid(hash);
