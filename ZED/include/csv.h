@@ -135,6 +135,7 @@ namespace ZED
 		void Append(const std::string& Value) { AppendImpl(Value.c_str()); }
 		void Append(uint32_t Value) { AppendImpl(std::to_string(Value).c_str()); }
 		void Append(int Value)  { AppendImpl(std::to_string(Value).c_str()); }
+		void Append(long unsigned int Value) { AppendImpl(std::to_string(Value).c_str()); }
 		void Append(char* Value) { AppendImpl(Value); }
 		void Append(const char Value[]) { AppendImpl(Value); }
 		void Append(bool Value) { AppendImpl(Value ? std::to_string(1).c_str() : std::to_string(0).c_str()); }
