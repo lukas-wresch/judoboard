@@ -174,7 +174,7 @@ bool Window::OpenWindow()
 		winclass.cbWndExtra = 0;
 		winclass.hInstance = GetModuleHandle(NULL);
 		//winclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-		winclass.hIcon  = (HICON)LoadImage(NULL, L"assets\\score_UIR_icon.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_SHARED | LR_LOADTRANSPARENT);
+		winclass.hIcon  = (HICON)LoadImage(NULL, L"assets\\icon.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_SHARED | LR_LOADTRANSPARENT);
 		//winclass.hIcon = (HICON)LoadImage(hInstance, L"AAA", IMAGE_ICON, 48, 48, 0);
 		winclass.hCursor = LoadCursor(NULL, IDC_ARROW);
 		//winclass.hCursor = NULL;
@@ -182,7 +182,7 @@ bool Window::OpenWindow()
 		winclass.lpszMenuName = NULL;
 		winclass.lpszClassName = title;
 		//winclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-		winclass.hIconSm = (HICON)LoadImage(NULL, L"assets\\score_UIR_icon.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_SHARED | LR_LOADTRANSPARENT);
+		winclass.hIconSm = (HICON)LoadImage(NULL, L"assets\\icon.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_SHARED | LR_LOADTRANSPARENT);
 		//winclass.hIconSm = (HICON)LoadImage(hInstance, L"AAA", IMAGE_ICON, 32, 32, 0);
 
 		if (!RegisterClassEx(&winclass))

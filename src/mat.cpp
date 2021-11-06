@@ -73,7 +73,7 @@ bool Mat::Open()
 		ZED::Log::Info("Background created");
 
 		if (!m_Logo)
-			m_Logo = m_Window.GetRenderer().CreateTexture("assets/judoboard2-alpha.png");
+			m_Logo = m_Window.GetRenderer().CreateTexture("assets/logo.png");
 
 		ZED::Log::Info("Logo loaded");
 
