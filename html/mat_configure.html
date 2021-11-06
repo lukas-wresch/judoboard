@@ -1,0 +1,103 @@
+<!--<button class="neutral" id="new_match" onclick="return OpenMat(0);">Create new mat</button>-->
+
+
+<h2 id="headline">Mats</h2>
+<table id="mats" border="1" rules="all" style="margin-bottom: 1cm;">
+  <tr>
+    <th style="width: 3cm;" id="num">Mat Number</th>
+    <th style="width: 2cm;" id="matches">#Matches</th>
+    <th style="width: 3cm;" id="type">Type</th>
+    <th style="width: 5cm;" id="options">Options</th>
+  </tr>
+</table>
+
+
+<script>
+
+
+
+function OpenMat(id)
+{
+  Ajax('/ajax/config/open_mat?id=' + id, function() {
+    Update();
+  });
+  return false;
+}
+
+
+function CloseMat(id)
+{
+  AjaxCallback('/ajax/config/close_mat?id=' + id, function() {
+    Update();
+  });
+  return false;
+}
+
+
+
+function Update()
+{
+  AjaxCallback("ajax/config/get_mats", function(response) {
+    console.log(response);
+    var res = response.split(",");
+
+    if (res.length < 2)
+      return;
+
+    var table = document.getElementById("mats");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    for (var i=1; i < res.length;)
+    {
+      var matID   = res[i++];
+      var type    = res[i++];
+      var is_open = res[i++];
+      var name    = res[i++];
+      var showIpponAsTwoWazaari = res[i++];
+
+
+      var row = table.insertRow(-1);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+      var cell4 = row.insertCell(3);
+
+      cell1.innerHTML = matID;
+      cell2.innerHTML = "???";
+
+      cell4.innerHTML = "";
+
+      if (type == 0)
+        cell3.innerHTML = "Not available";
+      else if (type == 1)
+      {
+        cell3.innerHTML = "Local mat";
+        if (is_open == 1)
+          cell4.innerHTML = "<button class=\"neutral\" onclick=\"navigate('mat_edit.html?id=" + matID + "');\">Edit</button>" + "<button class=\"remove\" onclick=\"return CloseMat(" + matID + ");\">Close</button>";
+        else
+          cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenMat(" + matID + ");\">Start</button>" + "<button class=\"neutral\" onclick=\"navigate('mat_edit.html?id=" + matID + "');\">Edit</button>";
+      }
+      else if (type == 2)
+      {
+        cell3.innerHTML = "Virtual mat";
+        //if (res[i+2] == 1)
+          cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseMat(" + matID + ");\">Destroy</button>";
+        //else
+          //cell4.innerHTML = "<button class=\"neutral\" onclick=\"return OpenMat(" + matID + ");\">Start</button>";
+      }
+      else if (type == 3)
+        cell3.innerHTML = "Remote mat";
+    }
+  });
+}
+
+
+
+Update();
+TimerID = window.setInterval(Update, 2000);
+
+document.getElementById("headline").innerHTML = lang.mats;
+
+</script>

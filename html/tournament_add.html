@@ -1,0 +1,144 @@
+<h2 id="headline">New Tournament</h2>
+
+<form>
+
+<div>
+    <label style="width:200px;float:left; margin-top:4px;" id="label_name">Name</label>
+    <input style="margin-bottom:20px;" type="text" id="name" value="" size="30" maxlength="64"/>
+</div>
+
+<div id="div_status">
+    <label style="width:200px; float:left; margin-top:4px;" id="label_status">Status</label>
+    <p style="padding-top:5px; margin-bottom:20px;" id="status">- - -</p>
+</div>
+
+<div>
+  <label style="width:200px; float:left; margin-top:4px;" id="label_rules">Default Rule Set</label>
+  <select style="margin-bottom:20px; width: 1.8cm;" id="rule">
+  </select>
+</div>
+
+<button class="add" style="margin-top: 0.8cm;" onclick="return AddTournament()" id="add">New Tournament</button>
+<button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateTournament()" id="update">Update Tournament</button>
+<button class="remove"  style="margin-top: 0.8cm;" onclick="return EmptyTournament()"  id="empty">Delete Match Results</button>
+<button class="remove"  style="margin-top: 0.8cm;" onclick="return DeleteTournament()" id="delete">Delete Tournament</button>
+
+</form>
+
+
+<script>
+
+function AddTournament()
+{
+  var params = URLEncode({
+    name:        document.getElementById("name").value,
+    rules:       document.getElementById("rules").value
+  });
+
+  AjaxPost('ajax/tournament/add', params, function() {
+    navigate("tournament_list.html");
+  });
+
+  return false;
+}
+
+
+function UpdateTournament()
+{
+  var params = URLEncode({
+    name:        document.getElementById("name").value,
+    rules:       document.getElementById("rules").value
+  });
+
+  AjaxPost('ajax/tournament/update?id='+id, params, function() {
+    navigate("tournament_list.html");
+  });
+
+  return false;
+}
+
+
+function EmptyTournament()
+{
+  if (confirm(lang.empty_tournament_confirm))
+  {
+    AjaxCallback('ajax/tournament/empty?id='+id, function(response) {
+      if (response == "ok")
+        navigate("tournament_list.html");
+      else
+        alert("Error: " + response);
+    });
+  }
+
+  return false;
+}
+
+
+function DeleteTournament()
+{
+  if (confirm(lang.delete_tournament_confirm))
+  {
+    AjaxCallback('ajax/tournament/delete?id='+id, function(response) {
+      if (response == "ok")
+        navigate("tournament_list.html");
+      else
+        alert("Error: " + response);
+    });
+  }
+
+  return false;
+}
+
+
+function GetTournament(id)
+{
+  AjaxCallback("ajax/tournament/get?id="+id, function(response) {
+    var res = response.split(",");
+    console.log(response);
+
+    var status = res[3];
+    var rules  = res[4];
+
+    if (status == 0)
+      document.getElementById("status").innerHTML = lang.scheduled;
+    else if (status == 1)
+      document.getElementById("status").innerHTML = lang.running;
+    else if (status == 2)
+      document.getElementById("status").innerHTML = lang.concluded;
+
+    document.getElementById("name").value  = res[0];
+
+    GetRuleSets(function() {
+      console.log(rules);
+      document.getElementById("rule").value = rules;
+    });
+  });
+}
+
+
+
+document.getElementById("add").innerHTML    = lang.new_tournament;
+document.getElementById("update").innerHTML = lang.update_tournament;
+document.getElementById("label_name").innerHTML             = lang.name;
+
+
+var id = URLDecode(URL, "id");
+
+if (id)
+{
+  document.getElementById("headline").innerHTML = lang.update_tournament;
+  document.getElementById("add").style.display = "none";
+  GetTournament(id);
+}
+else
+{
+  document.getElementById("headline").innerHTML = lang.new_tournament;
+  document.getElementById("update").style.display = "none";
+  document.getElementById("div_status").style.display = "none";
+  document.getElementById("empty").style.display = "none";
+  document.getElementById("delete").style.display = "none";
+
+  GetRuleSets();
+}
+
+</script>

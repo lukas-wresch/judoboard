@@ -1,0 +1,114 @@
+<h1>Edit Weightclass</h1>
+
+<form>
+
+<div>
+    <label style="width:150px;float:left;margin-top:5px;" id="label_min_weight">Min Weight</label>
+    <input style="margin-bottom:20px;" type="number" id="min_weight" value="" min="10" max="500" />
+</div>
+
+<div>
+    <label style="width:150px;float:left;margin-top:5px;" id="label_min_weight">Max Weight</label>
+    <input style="margin-bottom:20px;" type="number" id="max_weight" value="" min="10" max="500" />
+</div>
+
+<div>
+  <label style="width:150px;float:left;margin-top:5px;" id="label_gender">Gender</label>
+  <select style="margin-bottom:20px;" id="gender">
+    <option selected value="2" id="all">All</option>
+    <option value="0" id="male">Male</option>
+    <option value="1" id="female">Female</option>
+  </select>
+</div>
+
+<div>
+  <label id="label_mat" style="width:150px;float:left;margin-top:5px;">Mat</label>
+  <select style="padding-top:5px;margin-bottom:20px;width: 2cm;" id="mat" onchange="return SetMat();">
+  </select>
+</div>
+
+<button class="neutral" onclick="return UpdateWeightclass()">Update Weightclass</button> 
+
+</form>
+
+
+<script>
+
+function SetMat()
+{
+  var params = URLEncode({
+    mat: document.getElementById("mat").value
+  });
+
+  AjaxPost('ajax/matchtable/set_mat?id='+id, params, function() {
+  });
+
+  return false;
+}
+
+
+function SetRuleSets()
+{
+  var params = URLEncode({
+    mat: document.getElementById("rule").value
+  });
+
+  AjaxPost('ajax/matchtable/set_rule?id='+id, params, function() {
+  });
+
+  return false;
+}
+
+
+function UpdateWeightclass()
+{
+  var params = URLEncode({
+    id:  id,
+    minWeight: document.getElementById("min_weight").value,
+    maxWeight: document.getElementById("max_weight").value,
+    gender:    document.getElementById("gender").value
+  });
+
+  AjaxPost('ajax/weightclass/update', params, function() {
+    navigate("class_list.html");
+  });
+
+  return false;
+}
+
+
+function GetWeightclass(id)
+{
+  AjaxCallback("ajax/weightclass/get?id="+id, function(response) {
+    var res = response.split(",");
+
+    var mat_count = parseInt(res[0]);
+    var mat = document.getElementById("mat");
+
+    for (var i=1;i <= mat_count;i++)
+    {
+      var option = document.createElement("option");
+      option.text  = lang.mat + " " + res[i];
+      option.value = res[i];
+      mat.add(option);
+    }
+
+    var data_index = 1+mat_count;
+
+    document.getElementById("min_weight").value = res[data_index+0];
+    document.getElementById("max_weight").value = res[data_index+1];
+    document.getElementById("gender").value     = res[data_index+2];
+    document.getElementById("mat").value        = res[data_index+3];
+  });
+}
+
+
+var id = URLDecode(URL, "id");
+
+GetWeightclass(id);
+
+document.getElementById("label_gender").innerHTML  = lang.gender;
+document.getElementById("male").innerHTML  = lang.male;
+document.getElementById("female").innerHTML  = lang.female;
+
+</script>

@@ -1,0 +1,60 @@
+<h1 id="headline">New Participant</h1>
+
+<form>
+
+<div>
+    <label id="label_white" style="width:150px;float:left;margin-top:5px;">Name</label>
+    <input style="margin-bottom:20px;" size="50" id="white" value="">
+    <input type="hidden" id="white_id" value=""/>
+</div>
+
+<div id="note" style="display: none; font-weight: bold;">
+</div>
+
+<button class="add" id="add" onclick="return AddParticipant()">Add Participant</button> 
+
+</form>
+
+
+<script>
+
+function AddParticipant()
+{
+  var params = URLEncode({
+    id: document.getElementById("white_id").value
+  });
+
+  AjaxPost('ajax/participant/add', params, function() {
+    $("#note").text(document.getElementById("white").value + " added to tournament.");
+    $("#note").show(1000).delay(3000).hide(2000);
+
+    document.getElementById("white").value = "";
+    document.getElementById("white_id").value = "";
+  });
+
+  return false;
+}
+
+
+$("#white").autocomplete({
+    minLength: 1 ,
+    focus:  function( event, ui ) { this.value = ui.item.label; return false; },
+    select: function( event, ui ) { this.value = ui.item.label; $( "#white_id" ).val(ui.item.value);return false; }
+});
+
+
+$.ajax({
+      url: "ajax/judoka/autocomplete",
+      success: function(data)
+      {
+        var obj = jQuery.parseJSON(data);
+
+        $("#white").autocomplete( "option", "source", obj );
+      }
+    }); 
+
+
+document.getElementById("add").innerHTML       = lang.add_participant;
+document.getElementById("headline").innerHTML  = lang.new_participant;
+
+</script>

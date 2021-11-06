@@ -1,0 +1,345 @@
+<button class="add" id="new_participant" onclick="navigate('participant_add.html')">New Participant</button>
+
+<button class="add" id="new_match" onclick="navigate('add_fight.html')">New Match</button>
+
+<h2 id="headline-master-schedule">Overview</h2>
+<table id="master-schedule" border="1" rules="all" style="margin-bottom: 1cm;">
+</table>
+
+
+<h2 id="headline">Schedule</h2>
+<table id="schedule" border="1" rules="all" style="margin-bottom: 1cm;">
+  <tr>
+    <th style="width: 0.5cm;" id="no">No.</th>
+    <th style="width: 4cm;" id="white">White</th>
+    <th style="width: 4cm;" id="blue">Blue</th>
+    <th style="width: 2cm; text-align: center;" id="class">Class</th>
+    <th style="width: 1cm;" id="mat">Mat</th>
+    <th style="width: 2.5cm; text-align: center;" id="mat">Status</th>
+    <th style="width: 2.5cm; text-align: center;">Options</th>
+  </tr>
+</table>
+  
+
+<h2 id="headline-participants">Participants</h2>
+<table id="participants" border="1" rules="all" style="margin-bottom: 1cm;">
+  <tr>
+    <th style="width: 0.5cm;" id="no">No.</th>
+    <th style="width: 4cm;" id="name">Name</th>
+    <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
+    <th style="width: 2cm; text-align: center;" id="matches">#Matches</th>
+    <th style="width: 3.0cm; text-align: center;">Options</th>
+  </tr>
+</table>
+
+<script>
+
+
+function MoveEntryUp(id)
+{
+  AjaxCallback('/ajax/masterschedule/move_up?id=' + id, function() {
+    Update();
+  });
+  return false;
+}
+
+
+function MoveEntryDown(id)
+{
+  AjaxCallback('/ajax/masterschedule/move_down?id=' + id, function() {
+    Update();
+  });
+  return false;
+}
+
+
+
+function SetEntryMat(index, mat)
+{
+  AjaxCallback('ajax/masterschedule/set_mat?index='+index+'&mat='+mat, function() {
+    Update();
+  });
+
+  return false;
+}
+
+
+
+function MoveUp(id)
+{
+  AjaxCallback('/ajax/match/move_up?id=' + id, function() {
+    Update();
+  });
+  return false;
+}
+
+
+function MoveDown(id)
+{
+  AjaxCallback('/ajax/match/move_down?id=' + id, function() {
+    Update();
+  });
+  return false;
+}
+
+
+
+function RemoveParticipant(id)
+{
+  AjaxCallback('/ajax/participant/remove?id=' + id, function() {
+    Update();
+  });
+  return false;
+}
+
+
+function Update()
+{
+  AjaxCallback("ajax/get_masterschedule", function(response) {
+    console.log(response);
+
+    var res = response.split(",");
+
+    if (res.length < 2)
+      return;
+
+    console.log(res);
+
+    var table = document.getElementById("master-schedule");
+
+    while (table.rows.length > 0)
+      table.deleteRow(table.rows.length-1);
+
+    var i = 0;
+    var mat_count = res[i++];
+
+    var row = table.insertRow(-1);
+    for (var j=0; j < mat_count; j++)
+    {
+      var cell = row.insertCell(j);
+      var colspan = res[i++];
+      var id = res[i++];
+
+      cell.innerHTML = lang.mat + " " + id;
+      cell.style.backgroundColor = Color(id);
+      cell.colSpan = colspan;
+      cell.style.textAlign = "center";
+      cell.style.fontSize  = "16pt";
+      cell.style.height = "1.3cm";
+    }
+
+    while (i < res.length)
+    {
+      var row = table.insertRow(-1);
+
+      for (var mat=1; mat <= mat_count;mat++)
+      {
+        var max         = res[i++];
+        var entry_count = res[i++];
+
+        for (var entry=0; entry < entry_count;entry++)
+        {
+          var editable = res[i++];
+          var index    = res[i++];
+          var id    = res[i++];
+          var color = res[i++];
+          var matID = parseInt(res[i++]);
+          var name  = res[i++];
+
+          var cell = row.insertCell(-1);
+
+          var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px; margin-left: 4mm; margin-right: 3mm;";
+          var contents;
+
+          if (editable)
+            contents = "<a href=\"#matchtable_add.html?id=" + id + "\">" + name + "</a><br/><br/>";
+          else
+            contents = name + "<br/>";
+
+          contents += "<table><tr><td rowspan=\"2\"><a style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat(" + index + "," + (matID-1) + ");\"></a></td>";
+          contents += "           <td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp("   + index + ");\"></a></td>";
+          contents += "           <td rowspan=\"2\"><a style=\"" + style + "transform: rotate(-45deg); \" href=\"#\" onclick=\"SetEntryMat(" + index + "," + (matID+1) + ");\"></a></td></tr>";
+          contents += "       <tr><td><a style=\"" + style + "transform: rotate(45deg);\"    href=\"#\" onclick=\"return MoveEntryDown(" + index + ");\"></a></td></tr></table>";
+
+
+          cell.innerHTML = contents;
+          cell.style.backgroundColor = color;
+          cell.style.textAlign = "center";
+        }
+
+        if (entry_count < max || max == 0)
+        {
+          var cell = row.insertCell(-1);
+          if (entry_count == 0)
+            cell.innerHTML = "";
+          else
+            cell.innerHTML = "";
+
+          cell.style.textAlign = "center";
+          cell.colSpan = max - entry_count;
+          cell.style.height = "1.3cm";
+        }
+      }
+    }
+  });
+
+
+
+  AjaxCallback("ajax/get_schedule", function(response) {
+    var res = response.split(",");
+
+    if (res.length < 4)
+      return;
+
+    var table = document.getElementById("schedule");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    for (var i=0; i < res.length;)
+    {
+      var row = table.insertRow(-1);
+      var cell0 = row.insertCell(0);
+      var cell1 = row.insertCell(1);
+      var cell2 = row.insertCell(2);
+      var cell3 = row.insertCell(3);
+      var cell4 = row.insertCell(4);
+      var cell5 = row.insertCell(5);
+      var cell6 = row.insertCell(6);
+
+      if ((i/8)%2 == 0)
+        row.style.backgroundColor = "#eee";
+
+      var id    = res[i++];
+      var white = res[i++];
+      var blue  = res[i++];
+      var matID = res[i++];
+      var state = res[i++];
+      var color = res[i++];
+      var matchtableID   = res[i++];
+      var matchtableName = res[i++];
+
+      cell0.innerHTML = i/8;
+      cell0.style.textAlign = "center";
+      cell0.style.fontSize  = "14pt";
+      cell0.style.height    = "1.5cm";
+
+      cell1.innerHTML = white;
+      cell2.innerHTML = blue;
+
+      if (matchtableID > 0)
+        cell3.innerHTML = "<a href=\"#matchtable_add.html?id="+matchtableID+"\">" + matchtableName + "</a>";
+      else
+        cell3.innerHTML = matchtableName;
+
+      cell3.style.backgroundColor = color;
+      cell3.style.textAlign = "center";
+
+      if (matID <= 0)
+      {
+        cell4.style.fontWeight = "bold";
+        cell4.innerHTML = "None";
+      }
+      else
+        cell4.innerHTML = matID;
+
+      cell4.style.backgroundColor = Color(matID);
+      cell4.style.textAlign = "center";
+      cell4.style.fontSize  = "16pt";
+
+      if (state == 0)
+        cell5.innerHTML = lang.scheduled;
+      else if (state == 1)
+      {
+        cell5.style.color = "red";
+        cell5.innerHTML = lang.running;
+      }
+      else if (state == 2)
+      {
+        cell5.style.color = "green";
+        cell5.innerHTML = lang.concluded;
+      }
+      else
+        cell5.innerHTML = "Unknown";
+
+      cell5.style.textAlign = "center";
+
+      var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
+
+
+      var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 1.8cm; margin-right: 2mm;\" onclick=navigate(\"edit_match.html?id="+id+"\");>" + lang.details + "</button></td>";
+
+      if (state == 0)
+        options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveUp("+id+")\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return MoveDown("+id+");\"></a></td></tr></table>";
+      else
+        options += "<td></td></tr><tr><td></td></tr></table>";
+
+      cell6.innerHTML = options;
+    }
+  });
+
+
+
+  AjaxCallback("ajax/participants/get", function(response) {
+    console.log(response);
+    var res = response.split(",");
+
+    if (res.length < 4)
+      return;
+
+    var table = document.getElementById("participants");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    for (var i=0; i < res.length; i+=4)
+    {
+      var row = table.insertRow(-1);
+      var cell0 = row.insertCell(0);
+      var cell1 = row.insertCell(1);
+      var cell2 = row.insertCell(2);
+      var cell3 = row.insertCell(3);
+      var cell4 = row.insertCell(4);
+
+      if ((i/4)%2 == 0)
+        row.style.backgroundColor = "#eee";
+
+      cell0.innerHTML = i/4+1;
+      cell0.style.textAlign = "center";
+      cell0.style.fontSize  = "14pt";
+
+      cell1.innerHTML = "<a href=\"#judoka_edit.html?id=" + res[i] + "\">" + res[i+1] + "</a>";
+      cell2.innerHTML = res[i+2] + " kg";
+      cell2.style.textAlign = "center";
+      cell2.style.fontSize  = "16pt";
+
+      cell3.innerHTML = res[i+3];
+      cell3.style.textAlign = "center";
+      cell3.style.fontSize  = "16pt";
+
+      cell4.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+res[i]+")\">" + lang.remove + "</button>";
+      cell4.style.textAlign = "center";
+    }
+  });
+}
+
+
+Update();
+TimerID = window.setInterval(Update, 5000);
+
+
+document.getElementById("headline").innerHTML = lang.schedule;
+
+document.getElementById("headline-master-schedule").innerHTML = lang.overview;
+document.getElementById("headline-participants").innerHTML = lang.participants;
+
+document.getElementById("new_participant").innerHTML = lang.new_participant;
+document.getElementById("new_match").innerHTML = lang.new_match;
+
+document.getElementById("white").innerHTML = lang.white;
+document.getElementById("blue").innerHTML  = lang.blue;
+document.getElementById("mat").innerHTML   = lang.mat;
+
+document.getElementById("button_mat").innerHTML = lang.mat;
+document.getElementById("new_participant").innerHTML  = lang.new_participant;
+document.getElementById("new_match").innerHTML  = lang.new_match;

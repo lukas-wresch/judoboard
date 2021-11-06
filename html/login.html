@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+<script type="text/javascript" src="slideout.min.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<script type="text/javascript" src="sha512.min.js"></script>
+<meta http-equiv="refresh" content="280">
+</head>
+<body>
+
+<nav id="menu" class="menu">
+
+  <section class="menu-section">
+    <h3 class="menu-section-title">Tournament</h3>
+    <ul class="menu-section-list">
+      <li><a id="navi_schedule" href="#schedule.html">Schedule</a></li>
+      <li><a id="navi_mat" href="#mat.html">Mat</a></li>
+      <li><a id="navi_new_match" href="#add_fight.html">New Match</a></li>
+    </ul>
+  </section>
+
+</nav>
+
+
+
+
+<main id="panel" class="panel">
+
+  <header class="panel-header">
+    <button class="btn-hamburger js-slideout-toggle"></button>
+    <div style="font-size: 25pt; margin-top: 4mm;">Judoboard</div>    
+  </header>
+      
+
+      
+  <section id="main" class="main-section">
+    <h2>Login</h2>
+
+    <form>
+
+      <div>
+        <label id="label_username" style="width:150px;float:left;margin-top:5px;">Username</label>
+        <input style="margin-bottom:20px;" size="25" id="username" value="">
+      </div>
+
+      <div>
+        <label id="label_password" style="width:150px;float:left;margin-top:5px;">Password</label>
+        <input type="password" style="margin-bottom:20px;" size="25" id="password" value="">
+      </div>
+
+      <button class="neutral" onclick="return Login()">Login</button> 
+
+    </form>
+
+  </section>
+</main>
+
+
+
+<script>
+
+var slideout = new Slideout(
+{
+  'panel': window.document.getElementById('panel'),
+  'menu':  window.document.getElementById('menu'),
+  'padding': 200,
+  'duration' : 500
+});
+
+if (window.innerWidth > 900)
+    slideout.open();
+
+
+document.querySelector('.js-slideout-toggle').addEventListener('click', function() {
+    slideout.toggle();
+});
+
+
+
+async function sha(message)
+{
+  const encoder = new TextEncoder();
+  const data = encoder.encode(message);
+  const hash = await crypto.subtle.digest('SHA-512', data);
+  return hash;
+}
+
+
+
+function Login()
+{
+  var username = document.getElementById("username").value;
+  var password = document.getElementById("password").value;
+
+  var response = sha512(document.getElementById("username").value + challenge + password)
+
+    var params = URLEncode({
+      username:  username,
+      challenge: challenge,
+      response:  response
+    });
+
+    AjaxPost('ajax/login', params, function(resp) {
+      window.location = '/';
+    });
+
+  return false;
+}
+
+
+var challenge;
+
+AjaxCallback('ajax/get_nonce', function(resp) {
+  challenge = resp;
+});
+
+</script>
+
+</body>
+</html>

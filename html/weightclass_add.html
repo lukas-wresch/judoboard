@@ -1,0 +1,54 @@
+<h1>New Weightclass</h1>
+
+<form>
+
+<div>
+    <label style="width:150px;float:left;margin-top:5px;" id="label_min_weight">Min Weight</label>
+    <input style="margin-bottom:20px;" type="number" id="min_weight" value="" min="10" max="500" />
+</div>
+
+<div>
+    <label style="width:150px;float:left;margin-top:5px;" id="label_min_weight">Max Weight</label>
+    <input style="margin-bottom:20px;" type="number" id="max_weight" value="" min="10" max="500" />
+</div>
+
+<div>
+  <label style="width:150px;float:left;margin-top:5px;" id="label_gender">Gender</label>
+  <select style="margin-bottom:20px;" id="gender">
+    <option selected value="2" id="all">All</option>
+    <option value="0" id="male">Male</option>
+    <option value="1" id="female">Female</option>
+  </select>
+</div>
+
+<button class="add" onclick="return AddWeightclass()">New Weightclass</button> 
+
+</form>
+
+
+<script>
+
+function AddWeightclass()
+{
+  var params = URLEncode({
+    minWeight: document.getElementById("min_weight").value,
+    maxWeight: document.getElementById("max_weight").value,
+    gender:    document.getElementById("gender").value
+  });
+
+  AjaxPost('ajax/weightclass/add', params, function() {
+    document.getElementById("min_weight").value = "";
+    document.getElementById("max_weight").value = "";
+    navigate("class_list.html");
+  });
+
+  return false;
+}
+
+
+
+document.getElementById("label_gender").innerHTML  = lang.gender;
+document.getElementById("male").innerHTML  = lang.male;
+document.getElementById("female").innerHTML  = lang.female;
+
+</script>

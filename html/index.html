@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="jquery-ui.css">
+<script type="text/javascript" src="jquery-latest.min.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<script type="text/javascript" src="slideout.min.js"></script>
+<script type="text/javascript" src="jquery-ui.min.js"></script>
+</head>
+<body>
+
+<nav id="menu" class="menu">
+
+  <section class="menu-section">
+    <h3 class="menu-section-title" id="navi_tournament">Tournament</h3>
+    <ul class="menu-section-list">
+      <li><a id="navi_schedule" href="#schedule.html">Schedule</a></li>
+      <li><a id="navi_list_class" href="#class_list.html">List Classes</a></li>
+      <li><a id="navi_new_participant" href="#participant_add.html">New Participant</a></li>
+      <li><a id="navi_new_match" href="#add_fight.html">New Match</a></li>
+    </ul>
+  </section>
+
+
+  <section class="menu-section">
+    <h3 class="menu-section-title" id="navi_label_mats">Mats</h3>
+    <ul class="menu-section-list" id="navi_mats">
+    </ul>
+    <ul class="menu-section-list">
+      <li><a id="navi_configure_mats" href="#mat_configure.html">Settings</a></li>
+    </ul>
+  </section>
+
+
+  <section class="menu-section">
+    <h3 class="menu-section-title">Streaming</h3>
+    <ul class="menu-section-list">
+      <li><a id="navi_show_mats" href="#" onclick="return ShowMats();">Show Mats</a></li>
+    </ul>
+  </section>
+
+  <section class="menu-section">
+    <h3 class="menu-section-title" id="navi_database">Database</h3>
+    <ul class="menu-section-list">
+      <li><a id="navi_add_judoka" href="#add_judoka.html">New Judoka</a></li>
+      <li><a id="navi_list_judoka" href="#list_judoka.html">List Judokas</a></li>
+      <li><a id="navi_list_judoka" href="#club_list.html">List Clubs</a></li>
+      <li><a id="navi_list_account" href="#account_list.html">List Accounts</a></li>
+      <li><a id="navi_list_tournament" href="#tournament_list.html">Tournaments</a></li>
+      <li><a id="navi_list_rule" href="#rule_list.html">Rule Sets</a></li>
+    </ul>
+  </section>
+
+  <section class="menu-section">
+    <h3 class="menu-section-title">Server</h3>
+    <ul class="menu-section-list">
+      <li><a id="navi_add_judoka" href="#server_config.html">Configuration</a></li>
+    </ul>
+  </section>
+
+</nav>
+
+
+
+<main id="panel" class="panel">
+
+  <header class="panel-header">
+    <button class="btn-hamburger js-slideout-toggle"></button>
+    <div style="font-size: 25pt; margin-top: 4mm;">Judoboard</div>
+
+    <div id="streaming" style="display: none; float:right; width:10cm; height: 17cm; background-color: gray;">
+        <img id="img" width="100%" src="ajax/screenshot"/>
+    </div>
+  </header>
+      
+
+      
+  <section id="main" class="main-section"/>
+</main>
+
+
+
+<script>
+
+var slideout = new Slideout(
+{
+  'panel': window.document.getElementById('panel'),
+  'menu':  window.document.getElementById('menu'),
+  'padding': 200,
+  'duration' : 500
+});
+
+if (window.innerWidth > 900)
+    slideout.open();
+
+
+document.querySelector('.js-slideout-toggle').addEventListener('click', function() {
+    slideout.toggle();
+});
+
+
+
+
+function ShowMats()
+{
+  $("#streaming").fadeToggle(1000);
+  Streaming = !Streaming;
+
+  if (Streaming)
+  {
+    StreamTimer = window.setInterval(Stream, 800);
+    $("#navi_show_mats").text(lang.hide_mats);
+  }
+  else
+  {
+    window.clearInterval(StreamTimer);
+    $("#navi_show_mats").text(lang.show_mats);
+  }
+
+  return false;
+}
+
+
+function Update_MatCount()
+{
+  AjaxCallback("ajax/config/get_mats", function(response) {
+    console.log(response);
+    var res = response.split(",");
+
+    if (res.length < 2)
+      return;
+
+    var matlist = document.getElementById("navi_mats");
+
+    matlist.innerHTML = "";
+
+    for (var i=1; i < res.length; i+=5)
+    {
+      if ( (res[i+1] == 1 || res[i+1] == 3) && res[i+2] == 1)//Local or remote mat and is open
+        matlist.innerHTML += "<li><a href=\"#mat.html?id=" + res[i] + "\">" + lang.mat + " " + res[i] + "</a></li>"
+    }
+  });
+}
+
+
+
+var TimerID = 0;
+var Streaming = false;
+var URL;
+
+console.log(window.location.hash.slice(1));
+
+if (window.location.hash.slice(1).length > 1)
+{
+  var URL = window.location.hash.slice(1);
+  $( "#main" ).load(window.location.hash.slice(1));
+  //navigate(window.location.hash.slice(1));
+}
+else
+  $( "#main" ).load('schedule.html');
+  //navigate('schedule.html');
+
+document.getElementById("navi_tournament").innerHTML = lang.tournament;
+
+document.getElementById("navi_schedule").innerHTML = lang.schedule;
+document.getElementById("navi_new_participant").innerHTML = lang.new_participant;
+document.getElementById("navi_label_mats").innerHTML = lang.mats;
+document.getElementById("navi_new_match").innerHTML = lang.new_match;
+
+document.getElementById("navi_configure_mats").innerHTML = lang.settings;
+
+document.getElementById("navi_show_mats").innerHTML = lang.show_mats;
+
+document.getElementById("navi_database").innerHTML = lang.database;
+document.getElementById("navi_add_judoka").innerHTML = lang.new_judoka;
+document.getElementById("navi_list_judoka").innerHTML = lang.list_judokas;
+document.getElementById("navi_list_account").innerHTML = lang.list_accounts;
+document.getElementById("navi_list_rule").innerHTML = lang.rule_sets;
+document.getElementById("navi_list_tournament").innerHTML = lang.tournaments;
+
+document.getElementById("navi_list_class").innerHTML = lang.match_tables;
+
+
+Update_MatCount();
+window.setInterval(Update_MatCount, 20*1000);
+
+
+</script>
+
+</body>
+</html>

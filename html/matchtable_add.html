@@ -1,0 +1,214 @@
+<h1 id="headline">New Matchtable</h1>
+
+
+<div id="div_type">
+  <label style="width:100px;float:left;margin-top:4px;" id="label_type">Type</label>
+  <select style="margin-bottom:20px; width: 5.5cm;" id="type" onchange="GetForm();">
+    <option selected value="1" id="label_weightclass">Weightclass</option>
+  </select>
+</div>
+
+<div id="div_name">
+    <label style="width:100px;float:left;margin-top:4px;" id="label_name">Name</label>
+    <input style="margin-bottom:20px;" type="text" id="name" value="" size="40" maxlength="64"/>
+</div>
+
+<div id="div_color">
+    <label style="width:100px;float:left;margin-top:4px;" id="label_color">Color</label>
+    <select style="padding-top:5px;margin-bottom:20px; width: 2.5cm;" id="color">
+      <option value="1">Blue</option>
+    </select>
+</div>
+
+
+<div>
+  <label id="label_mat" style="width:100px;float:left;margin-top:5px;">Mat</label>
+  <select style="padding-top:5px;margin-bottom:20px; width: 5.5cm;" id="mat">
+  </select>
+</div>
+
+<div>
+  <label id="label_rule_set" style="width:100px;float:left;margin-top:5px;">Rule Set</label>
+  <select style="padding-top:5px;margin-bottom:20px; width: 5.5cm;" id="rule">
+  </select>
+</div>
+
+
+<div style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
+  <form id="form">
+  </form>
+</div>
+
+
+<button id="add" class="add" onclick="return AddMatchtable();">Add Match Table</button>
+<button id="update" class="neutral" onclick="return UpdateMatchtable();">Update Match Table</button>
+
+<div id="div_delete" style="margin-top: 5mm;">
+  <button id="delete" class="remove" onclick="return DeleteMatchtable();">Delete Match Table</button>
+</div>
+
+<script>
+
+
+function GetForm(callback)
+{
+  AjaxCallback('ajax/matchtable/get_form?type=' + document.getElementById("type").value, function(response) {
+    document.getElementById("form").innerHTML = response;
+
+    document.getElementById("label_min_weight").innerHTML = lang.min_weight;
+    document.getElementById("label_max_weight").innerHTML = lang.max_weight;
+    document.getElementById("label_gender").innerHTML     = lang.gender;
+    document.getElementById("all").innerHTML     = lang.all;
+    document.getElementById("male").innerHTML    = lang.male;
+    document.getElementById("female").innerHTML  = lang.female;
+
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+
+  return false;
+}
+
+
+function AddMatchtable()
+{
+  var elements = document.getElementById("form").elements;
+  var data = [];
+
+  for (var i = 0, element; element = elements[i++];)
+  {
+      data[element.id] = element.value;
+  }
+
+  data["mat"]  = document.getElementById("mat").value;
+  data["rule"] = document.getElementById("rule").value;
+
+  console.log(data);
+
+  var params = URLEncode(data);
+  console.log(params);
+
+  AjaxPost('ajax/matchtable/add?type=' + document.getElementById("type").value, params, function() {
+    navigate("class_list.html");
+  });
+
+  return false;
+}
+
+
+
+function UpdateMatchtable()
+{
+  var elements = document.getElementById("form").elements;
+  var data = [];
+
+  for (var i = 0, element; element = elements[i++];)
+      data[element.id] = element.value;
+
+  data["name"]  = document.getElementById("name").value;
+  data["color"] = document.getElementById("color").value;
+  data["mat"]   = document.getElementById("mat").value;
+  data["rule"]  = document.getElementById("rule").value;
+
+  var params = URLEncode(data);
+
+  AjaxPost('ajax/matchtable/update?id=' + id, params, function() {
+    navigate("class_list.html");
+  });
+
+  return false;
+}
+
+
+
+function DeleteMatchtable()
+{
+  if (confirm(lang.delete_matchtable_confirm))
+  {
+    AjaxCallback('ajax/matchtable/delete?id=' + id, function() {
+      navigate("class_list.html");
+    });
+  }
+
+  return false;
+}
+
+
+
+function GetMatchTable(id)
+{
+  AjaxCallback("ajax/matchtable/get?id="+id, function(response) {
+    console.log(response);
+    var res = response.split(",");
+
+    var elements = document.getElementById("form").elements;
+
+    var i = 0;
+    var id = res[i++];
+    var schedule_index = res[i++];
+    var matID  = res[i++];
+    var color  = res[i++];
+    var ruleID = res[i++];
+    var name   = res[i++];
+
+    document.getElementById("name").value = name;
+    console.log(elements);
+
+    for (var j=i;j < res.length;j++)
+    {
+      console.log(elements[j-i]);
+      elements[j-i].value = res[j];
+    }
+
+    GetMats(function() {
+      document.getElementById("mat").value = matID;
+    });
+
+    GetRuleSets(function() {
+      document.getElementById("rule").value = ruleID;
+    });
+
+    GetColors(function() {
+      document.getElementById("color").value = color;
+      document.getElementById("color").onchange();
+    });
+  });
+}
+
+
+
+
+var id = URLDecode(URL, "id");
+
+
+if (id)
+{
+  GetForm(function (){
+    GetMatchTable(id);  
+  });
+ 
+  document.getElementById("headline").innerHTML = lang.update_matchtable; 
+  document.getElementById("add").style.display = "none";
+  document.getElementById("div_type").style.display = "none";
+}
+else
+{
+  document.getElementById("headline").innerHTML = lang.add_matchtable;
+  document.getElementById("update").style.display = "none";
+  document.getElementById("delete").style.display = "none";
+  document.getElementById("div_name").style.display = "none";
+
+  GetForm();
+  GetRuleSets();
+  GetMats();
+}
+
+document.getElementById("add").innerHTML = lang.add_matchtable;
+document.getElementById("update").innerHTML = lang.update_matchtable;
+document.getElementById("delete").innerHTML = lang.delete_matchtable;
+document.getElementById("label_type").innerHTML = lang.type;
+document.getElementById("label_mat").innerHTML = lang.mat;
+document.getElementById("label_rule_set").innerHTML = lang.rule_set;
+document.getElementById("label_weightclass").innerHTML = lang.weightclass;
+
+</script>

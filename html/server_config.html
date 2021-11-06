@@ -1,0 +1,117 @@
+<h2 id="headline">Server Configuration</h2>
+
+
+<div>
+    <label style="width:250px;float:left;margin-top:4px;" id="label_firstname">Master Server Name/IP Address</label>
+    <input style="margin-bottom:20px;" type="text" id="ip" value="" size="40" maxlength="64"/>
+</div>
+
+<button class="neutral" onclick="return TestConnection()">Test Connection</button>
+
+<button class="neutral" onclick="return ConnectToMaster()">Connect to Master</button>
+
+<br/>
+
+<div style="margin-top: 2cm;">
+    <label style="width:150px;float:left;" id="label_uptime">Uptime</label>
+    <span  id="uptime">???</span>
+</div>
+
+<br/>
+
+<button style="margin-top: 8mm;" class="remove" onclick="return Shutdown()">Shutdown Judoboard</button>
+
+<button style="margin-top: 8mm;" class="remove" onclick="return RunDemo()">Run Demo</button>
+
+<button style="margin-top: 8mm;" class="remove" onclick="return RunTestscreen()">Run Testscreen</button>
+
+<script>
+
+
+
+function TestConnection()
+{
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function()
+  {
+    if (this.readyState == 4 && this.status == 200)
+    {
+      if (this.responseText == "ok")
+        alert("Connection to master server OK!");
+      else
+        alert(this.responseText);
+    }
+    else if (this.readyState == 4)
+      alert("Could not connect to server!");
+  };
+
+  xhttp.open("GET", "http://" + document.getElementById("ip").value + ":8080/ajax/master/connection_test");
+  xhttp.send();
+}
+
+
+
+function ConnectToMaster()
+{
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function()
+  {
+    if (this.readyState == 4 && this.status == 200)
+    {
+      if (this.responseText == "ok")
+        alert("Connection to master server OK!");
+      else
+        alert(this.responseText);
+    }
+    else if (this.readyState == 4)
+      alert("Could not connect to server!");
+  };
+
+  xhttp.open("GET", "http://" + document.getElementById("ip").value + ":8080/ajax/config/connect_to_master");
+  xhttp.send();
+}
+
+
+
+function Shutdown()
+{
+  if (confirm(lang.shutdown_confirm))
+  {
+    Ajax("ajax/config/shutdown");
+  }
+}
+
+
+
+function RunDemo()
+{
+  Ajax("ajax/config/demo");
+}
+
+
+
+function RunTestscreen()
+{
+  Ajax("ajax/config/testscreen");
+}
+
+
+
+
+function GetUptime()
+{
+  AjaxCallback("ajax/config/uptime", function(response) {
+    var res = response.split(",");
+
+    if (res.length < 1)
+      return;
+
+    var uptime = res[0];
+
+    document.getElementById("uptime").innerHTML = NiceLargeTime(uptime);
+  });
+}
+
+
+
+GetUptime();

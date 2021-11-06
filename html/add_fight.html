@@ -1,0 +1,111 @@
+<h1 id="headline">New Match</h1>
+
+<form>
+
+<div style="display: none;" id="div_showParticipantsOnly">
+  <label style="width:200px;float:left;margin-top:4px;" id="label_showParticipantsOnly">Show only participants</label>
+  <input type="checkbox" id="showParticipantsOnly" class="switch-input" onclick="ToggleFilter();">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="showParticipantsOnly">
+    <span class="toggle-on" id="showParticipantsOnly_enabled"></span><span class="toggle-off" id="showParticipantsOnly_disabled"></span>
+  </label>
+</div>
+
+<div>
+    <label id="label_white" style="width:150px;float:left;margin-top:5px;">Name (white)</label>
+    <input style="margin-bottom:20px;" size="50" id="white" value=""/>
+    <input type="hidden" id="white_id" value=""/>
+</div>
+
+<div>
+    <label id="label_blue" style="width:150px;float:left;margin-top:5px;">Name (blue)</label>
+    <input style="margin-bottom:20px;" size="50" id="blue" value=""/>
+    <input type="hidden" id="blue_id" value=""/>
+</div>
+
+<div id="note" style="display: none; font-weight: bold;">
+</div>
+
+<button class="add" onclick="return AddMatch()" id="add">Add Match</button> 
+
+</form>
+
+
+<script>
+
+function AddMatch()
+{
+  var params = URLEncode({
+    white: document.getElementById("white_id").value,
+    blue:  document.getElementById("blue_id").value
+  });
+
+  AjaxPost('ajax/match/add', params, function() {
+    $("#note").text("Match added to tournament.");
+    $("#note").show(1000).delay(3000).hide(2000);
+
+    document.getElementById("white").value = "";
+    document.getElementById("blue").value  = "";
+    document.getElementById("white_id").value = "";
+    document.getElementById("blue_id").value  = "";
+  });
+
+  return false;
+}
+
+
+function ToggleFilter()
+{
+  filter = !filter;
+
+  $.ajax({
+      url: "ajax/judoka/autocomplete?filter=" + filter,
+      success: function(data)
+      {
+        console.log(data);
+        var obj = jQuery.parseJSON(data);
+
+        console.log(obj);
+        $("#white").autocomplete( "option", "source", obj );
+        $("#blue" ).autocomplete( "option", "source", obj );
+      }
+    });
+}
+
+
+$("#white").autocomplete({
+    minLength: 1 ,
+    focus:  function( event, ui ) { this.value = ui.item.label; return false; },
+    select: function( event, ui ) { this.value = ui.item.label; $( "#white_id" ).val(ui.item.value); return false; }
+});
+
+
+$("#blue").autocomplete({
+    minLength: 1 ,
+    focus:  function( event, ui ) { this.value = ui.item.label; return false; },
+    select: function( event, ui ) { this.value = ui.item.label; $( "#blue_id" ).val(ui.item.value); return false; }
+});
+
+
+
+var filter = true;
+
+
+AjaxCallback('ajax/tournament/is_open', function(response) {
+    if (response == 'ok')
+    {
+      $("#div_showParticipantsOnly").show();
+      filter = false;  
+      showParticipantsOnly.checked = true;
+    }
+    
+    ToggleFilter();
+  });
+
+
+document.getElementById("headline").innerHTML    = lang.new_match;
+document.getElementById("label_white").innerHTML = lang.name_white;
+document.getElementById("label_blue").innerHTML  = lang.name_blue;
+document.getElementById("add").innerHTML         = lang.add_match;
+
+
+</script>

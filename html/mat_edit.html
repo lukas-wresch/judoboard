@@ -1,0 +1,113 @@
+<h2 id="headline">Edit Mat</h2>
+
+<form>
+
+<div>
+  <label id="label_id" style="width:250px;float:left;margin-top:5px;">No.</label>
+  <select style="padding-top:5px;margin-bottom:20px;width: 1.5cm;" id="id">
+  </select>
+</div>
+
+<div>
+  <label style="width:250px;float:left; margin-top:4px;" id="label_name">Name</label>
+  <input style="margin-bottom:20px;" type="text" id="name" value="" size="30" maxlength="64"/>
+</div>
+
+<div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_ipponStyle">Ippon/Waza-Ari Style</label>
+  <select style="margin-bottom:20px;" id="ipponStyle">
+    <option selected value="0" id="two_digits">Two Digits</option>
+    <option value="1" id="single_digit">One Digit</option>
+    <option value="2" id="spelled_out">Spelled Out</option>
+  </select>
+</div>
+
+<button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateMat()" id="update">Update Mat</button>
+
+</form>
+
+
+<script>
+
+
+
+function OpenMat()
+{
+  Ajax('/ajax/config/open_mat?id=' + id, function() {
+    Update();
+  });
+  return false;
+}
+
+
+function CloseMat()
+{
+  AjaxCallback('/ajax/config/close_mat?id=' + id, function() {
+    Update();
+  });
+  return false;
+}
+
+
+function UpdateMat()
+{
+  var params = URLEncode({
+    id:          document.getElementById("id").value,
+    name:        document.getElementById("name").value,
+    ipponStyle:  document.getElementById("ipponStyle").value,
+  });
+
+  AjaxPost('/ajax/config/set_mat?id=' + id, params, function() {
+    navigate("mat_configure.html");
+  });
+
+  return false;
+}
+
+
+
+function GetMat(id)
+{
+  AjaxCallback("ajax/config/get_mats", function(response) {
+    console.log(response);
+    var res = response.split(",");
+
+    if (res.length < 3)
+      return;
+
+    var maxID = res[0];
+
+    for (var i=1; i < res.length;)
+    {
+      var matID   = res[i++];
+      var type    = res[i++];
+      var is_open = res[i++];
+      var name    = res[i++];
+      var ipponStyle = res[i++];
+
+      if (matID == id)
+      {
+        document.getElementById("name").value = name;
+        document.getElementById("ipponStyle").value = ipponStyle;
+      }
+    }
+
+    for (var i=1; i <= maxID; i++)
+    {
+      var option = document.createElement("option");
+      option.text  = i;
+      option.value = i;
+      document.getElementById("id").add(option);
+    }
+
+    document.getElementById("id").value = id;
+  });
+}
+
+
+
+var id = URLDecode(URL, "id");
+GetMat(id);
+
+
+</script>

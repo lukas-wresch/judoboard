@@ -1,0 +1,558 @@
+<div style="margin-left: 5.5cm;">
+  <h2><label id="mat">Mat</label></h2>
+  <h2><label id="time">Time</label>: <span id="hajimetime">0:00.0</span></h2>
+</div>
+
+<table border="1" rules="all" style="margin-bottom: 3mm;">
+  <tr>
+    <td style="text-align: center; font-size: 16pt;" id="white_name">- - -</td>
+    <td style="text-align: center; font-size: 16pt; background-color: rgba(30, 30, 255, 1.0); color: white;" id="blue_name" >- - -</td>
+  </tr>
+
+  <tr>
+    <td style="width: 65mm; text-align: center; background-color: rgba(255, 255, 255, 0.9)">
+      <span class="score" id="white_ippon">0</span> <span class="score" id="white_wazaari">0</span>
+    </td>
+
+    <td style="width: 65mm; text-align: center; background-color: rgba(30, 30, 255, 1.0); color: white;">
+      <span class="score" id="blue_ippon">0</span> <span class="score" id="blue_wazaari">0</span>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="text-align: center;">
+      <button class="add" onclick="SetScore('white', '+ippon');">+Ippon</button>
+      <button class="add" onclick="SetScore('white', '+wazaari');">+Waza-Ari</button>
+      <br/>
+      <button class="remove" onclick="SetScore('white', '-ippon');">-Ippon</button>
+      <button class="remove" onclick="SetScore('white', '-wazaari');">-Waza-Ari</button>
+      <br/>
+      <button disabled class="neutral" id="white_osaekomi" onclick="Osaekomi('white');">Osaekomi</button>
+    </td>
+
+    <td style="text-align: center;">
+      <button class="add" onclick="SetScore('blue', '+ippon');">+Ippon</button>
+      <button class="add" onclick="SetScore('blue', '+wazaari');">+Waza-Ari</button>
+      <br/>
+      <button class="remove" onclick="SetScore('blue', '-ippon');">-Ippon</button>
+      <button class="remove" onclick="SetScore('blue', '-wazaari');">-Waza-Ari</button>
+      <br/>
+      <button disabled class="neutral" id="blue_osaekomi" onclick="Osaekomi('blue');">Osaekomi</button>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="text-align: center;">
+      <h2>Osaekomi: <span id="white_osaekomitime">0.0</span></h2>
+    </td>
+    <td style="text-align: center;">
+      <h2>Osaekomi: <span id="blue_osaekomitime">0.0</span></h2>
+    </td>
+  </tr>
+
+  <tr>
+    <td colspan="2">
+      <button class="neutral" id="hajime" onclick="Hajime()">Hajime</button>
+      <button disabled class="neutral" id="mate" onclick="Mate()">Mate</button>
+      <button disabled class="neutral" style="margin-left: 20mm;" id="tokeda" onclick="Tokeda();">Tokeda</button>
+      <button class="additional" id="more" onclick="More();">More</button>
+    </td>
+  </tr>
+
+  <tr id="row_additional1" style="display: none;">
+
+    <td style="text-align: center;">
+      <div id="additional2" style="display: none; height: 0px;">
+        <div style="font-size: 18pt;">
+          <label>Shidos:</label> <span id="white_shidos">0</span></h2>
+        </div>
+        <button class="add" onclick="SetScore('white', '+shido');">+Shido</button>
+        <button class="add" onclick="SetScore('white', '+hansokumake');">+Hansoku-Make</button>
+        <br/>
+        <button class="remove" onclick="SetScore('white', '-shido');">-Shido</button>
+        <button class="remove" onclick="SetScore('white', '-hansokumake');">-Hansoku-Make</button>
+        <br/>
+      </div>
+    </td>
+
+    <td style="text-align: center;">
+      <div id="additional1" style="display: none; height: 0px;">
+        <div style="font-size: 18pt;">
+          <label>Shidos:</label> <span id="blue_shidos">0</span></h2>
+        </div>
+        <br/>
+        <button class="add" onclick="SetScore('blue', '+shido');">+Shido</button>
+        <button class="add" onclick="SetScore('blue', '+hansokumake');">+Hansoku-Make</button>
+        <br/>
+        <button class="remove" onclick="SetScore('blue', '-shido');">-Shido</button>
+        <button class="remove" onclick="SetScore('blue', '-hansokumake');">-Hansoku-Make</button>
+        <br/>
+      </div>
+    </td>
+
+  </tr>
+
+  <tr id="row_additional2" style="display: none;">
+
+    <td style="text-align: center;">
+      <div id="additional4" style="display: none; height: 0px;">
+        <div style="font-size: 16pt;">
+          <label>Medical Examinations:</label> <span id="white_medics">0</span></h2>
+        </div>
+        <button class="add"    style="width: 5.5cm;" onclick="SetScore('white', '+medic');">+Medical Examination</button>
+        <br/>
+        <button class="remove" style="width: 5.5cm;" onclick="SetScore('white', '-medic');">-Medical Examination</button>
+        <br/>
+      </div>
+    </td>
+
+    <td style="text-align: center;">
+      <div id="additional3" style="display: none; height: 0px;">
+        <div style="font-size: 16pt;">
+          <label>Medical Examinations:</label> <span id="blue_medics">0</span></h2>
+        </div>
+        <button class="add"    style="width: 5.5cm;" onclick="SetScore('blue', '+medic');">+Medical Examination</button>
+        <br/>
+        <button class="remove" style="width: 5.5cm;" onclick="SetScore('blue', '-medic');">-Medical Examination</button>
+        <br/>
+      </div>
+    </td>
+
+  </tr>
+
+  <tr id="row_decision" style="display: none;">
+    <td colspan="2">
+      <div id="div_decision" style="display: none; height: 0px;">
+        <button class="white"   style="width: 3.5cm;" onclick="SetScore('white', 'hantei'); ShowHantei(false);">White wins</button>
+        <button class="add"     style="width: 2.5cm;" onclick="SetScore('', '+draw'); ShowHantei(false);">Draw</button>
+        <button class="additional" style="width: 3.5cm;" onclick="SetScore('blue', 'hantei'); ShowHantei(false);">Blue wins</button>
+        <button class="neutral" style="width: 3.5cm;" onclick="SetScore('', '+golden_score'); ShowHantei(false);" id="golden_score">Golden Score</button>
+      </div>
+    </td>
+  </tr>
+</table>
+
+
+<table>
+  <tr>
+    <td style="width: 12.0cm;">
+      <button disabled class="neutral" style="width: 45mm; margin-top: 8mm;" id="next_fight" onclick="StartNextMatch()">Start next match</button>
+
+      <button disabled class="neutral" style="width: 45mm; margin-left: 22mm;" id="end_match" onclick="EndMatch()">End match</button>
+
+      <p style="font-size: 16pt; text-decoration: underline;" id="next_matches">Next Matches</p>
+      <table id="waiting_list" border="1" rules="all">
+        <tr><th style="width: 5.0cm;" id="waiting_blue">Blue</th><th style="width: 5.0cm;" id="waiting_white">White</th></tr>
+      </table>
+    </td>
+
+    <td style="vertical-align: top;">
+      <div style="margin-bottom: 3mm;">
+        <label style="font-size: 14pt; text-decoration: underline;">Osaekomis:</label>
+      </div>
+      <table id="osaekomi_list" border="1" rules="all">
+        <tr><th style="width: 2.0cm;" id="osaekomi_for">For</th><th style="width: 2.0cm;" id="osaekomi_time">Time</th></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+
+<script>
+var HajimeTimer = 0;
+var HajimeTimer_Running = false;
+
+var OsaekomiWhiteTimer = 0;
+var OsaekomiWhiteTimer_Running = false;
+
+var OsaekomiBlueTimer = 0;
+var OsaekomiBlueTimer_Running = false;
+
+var ScoreUpdate_Counter = 10;
+
+
+
+function Hajime()
+{
+  HajimeTimer_Running = true;
+  AjaxCallback('ajax/mat/hajime?id='+id, function(response) {
+    GetScore();
+  });
+}
+
+
+function Mate()
+{
+  HajimeTimer_Running = false;
+  AjaxCallback('ajax/mat/pause?id='+id, function(response) {
+    GetScore();
+  });
+
+  document.getElementById("blue_osaekomi").disabled  = true;
+  document.getElementById("white_osaekomi").disabled = true;
+}
+
+
+function SetScore(who, command)
+{
+  if (who.length >= 1)
+    Ajax('ajax/mat/' + who + '/' + command + '?id='+id);
+  else
+    Ajax('ajax/mat/' + command + '?id='+id);
+
+  GetScore();
+}
+
+
+function Osaekomi(who)
+{
+  AjaxCallback('ajax/mat/' + who + '/osaekomi?id='+id, function(response) {
+    GetScore();
+  });
+
+  document.getElementById(who+"_osaekomi").disabled = true;
+  document.getElementById("tokeda").disabled = false;
+}
+
+
+function Tokeda()
+{
+  Ajax('ajax/mat/tokeda?id='+id);
+  OsaekomiWhiteTimer = false;
+  OsaekomiBlueTimer  = false;
+  document.getElementById("white_osaekomi").disabled = false;
+  document.getElementById("blue_osaekomi").disabled  = false;
+  document.getElementById("tokeda").disabled = true;
+
+  GetScore();
+}
+
+
+function StartNextMatch()
+{
+  AjaxCallback('ajax/mat/start_match?id='+id, function(response) {
+    if (response != "ok")
+        alert("Error: " + response);
+  });
+  GetScore();
+}
+
+
+function EndMatch()
+{
+  Ajax('ajax/mat/end_match?id='+id);
+  GetScore();
+}
+
+
+function More()
+{
+  if (more)
+  {
+    $("#additional1").animate({height: '0px', opacity: 0}, 1000);
+    $("#additional2").animate({height: '0px', opacity: 0}, 1000);
+    $("#additional3").animate({height: '0px', opacity: 0}, 1000);
+    $("#additional4").animate({height: '0px', opacity: 0}, 1000);
+
+    $("#row_additional1").hide(1000);
+    $("#row_additional2").hide(1000);
+
+    $("#more").text(lang.more);
+  }
+  else
+  {
+    $("#row_additional1").show();
+    $("#row_additional2").show();
+
+    $("#additional1").show().animate({height: '180px', opacity: 100}, 1000);
+    $("#additional2").show().animate({height: '180px', opacity: 100}, 1000);
+    $("#additional3").show().animate({height: '120px', opacity: 100}, 1000);
+    $("#additional4").show().animate({height: '120px', opacity: 100}, 1000);
+
+    $("#more").text(lang.less);
+  }
+
+  more = !more;
+}
+
+
+
+function ShowHantei(show)
+{
+  if (show == showHantei)
+    return;
+
+  if (show)
+  {
+    $("#row_decision").show();
+    $("#div_decision").show().animate({height: '80px', opacity: 100}, 1000);
+  }
+  else
+  {
+    $("#div_decision").animate({height: '0px', opacity: 0}, 1000);
+    $("#row_decision").hide(1000);
+  }
+
+  showHantei = show;
+}
+
+
+function GetScore()
+{
+  AjaxCallback("ajax/mat/get_score?id="+id, function(response) {
+    console.log(response);
+    var res = response.split(",");
+
+    document.getElementById("white_ippon").innerHTML   = res[0];
+    document.getElementById("white_wazaari").innerHTML = res[1];
+    document.getElementById("blue_ippon").innerHTML    = res[2];
+    document.getElementById("blue_wazaari").innerHTML  = res[3];
+
+    document.getElementById("white_shidos").innerHTML = res[4];
+    document.getElementById("blue_shidos").innerHTML  = res[5];
+
+    document.getElementById("white_medics").innerHTML = res[6];
+    document.getElementById("blue_medics").innerHTML  = res[7];
+
+    HajimeTimer = parseInt(res[8]);
+    isHajime    = parseInt(res[9]);
+
+    OsaekomiWhiteTimer = parseInt(res[10]);
+    OsaekomiWhiteTimer_Running = parseInt(res[11]);
+    OsaekomiBlueTimer  = parseInt(res[12]);
+    OsaekomiBlueTimer_Running = parseInt(res[13]);
+
+    canNextMatchStart = parseInt(res[14]);
+    hasConcluded      = parseInt(res[15]);
+    isOutOfTime       = parseInt(res[16]);
+    isGoldenScore     = parseInt(res[17]);
+    areFightersOnMat  = parseInt(res[18]);
+
+    if (isHajime == 1)
+    {
+      HajimeTimer_Running = true;
+      document.getElementById("hajime").innerHTML = "Hajime";
+      document.getElementById("hajime").disabled = true;
+      document.getElementById("mate").disabled   = false;
+      document.getElementById("blue_osaekomi").disabled  = false;
+      document.getElementById("white_osaekomi").disabled = false;
+    }
+    else
+    {
+      HajimeTimer_Running = false;
+      if (OsaekomiWhiteTimer > 0 || OsaekomiBlueTimer > 0)
+        document.getElementById("hajime").innerHTML = "Yoshi";
+      else
+        document.getElementById("hajime").innerHTML = "Hajime";
+
+      if (areFightersOnMat == 1 && hasConcluded == 0)
+        document.getElementById("hajime").disabled = false;
+      else
+        document.getElementById("hajime").disabled = true;
+
+      document.getElementById("mate").disabled   = true;
+      document.getElementById("blue_osaekomi").disabled  = true;
+      document.getElementById("white_osaekomi").disabled = true;
+    }
+
+
+    if (OsaekomiWhiteTimer_Running == 1)
+      OsaekomiWhiteTimer_Running = true;
+    else
+      OsaekomiWhiteTimer_Running = false;
+
+    if (OsaekomiBlueTimer_Running == 1)
+      OsaekomiBlueTimer_Running = true;
+    else
+      OsaekomiBlueTimer_Running = false;
+
+    if (OsaekomiWhiteTimer > 0 || OsaekomiBlueTimer > 0)
+    {
+      document.getElementById("tokeda").disabled = false;
+      document.getElementById("mate").innerHTML = "Sonomama";
+    }
+    else
+    {
+      document.getElementById("tokeda").disabled = true;
+      document.getElementById("mate").innerHTML = "Mate";
+    }
+
+    if (canNextMatchStart == 1)
+    {
+      document.getElementById("next_fight").disabled = false;
+      document.getElementById("hajime").disabled = true;
+    }
+    else
+      document.getElementById("next_fight").disabled = true;
+
+    if (hasConcluded == 1)
+      document.getElementById("end_match").disabled = false;
+    else
+      document.getElementById("end_match").disabled = true;
+
+    if (hasConcluded == 0 && isOutOfTime == 1)
+      ShowHantei(true);
+
+    if (isGoldenScore == 1)
+      document.getElementById("golden_score").disabled = true;
+    else
+      document.getElementById("golden_score").disabled = false;
+
+    DisplayTimer();
+  });
+}
+
+
+function GetJudokaName()
+{
+  AjaxCallback("ajax/mat/names_on_mat?id="+id, function(response) {
+    console.log(response);
+    var res = response.split(",");
+
+    var table2 = document.getElementById("waiting_list");
+
+    while (table2.rows.length > 1)
+      table2.deleteRow(table2.rows.length-1);
+
+    for (var i=0; i < res.length; i+=2)
+    {
+      if (i == 0)
+      {
+        document.getElementById("white_name").innerHTML = res[i];
+        document.getElementById("blue_name").innerHTML  = res[i+1];
+      }
+      else
+      {
+        var row = table2.insertRow(-1);
+
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+
+        cell1.innerHTML = res[i+1];
+        cell2.innerHTML = res[i];
+      }
+    }
+
+  });
+}
+
+
+function GetOsaekomiList()
+{
+  AjaxCallback("ajax/mat/get_osaekomilist?id="+id, function(response) {
+    console.log(response);
+    var res = response.split(",");
+
+    var table = document.getElementById("osaekomi_list");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    if (res.length <= 1)
+      return;
+
+    for (var i=0; i < res.length; i+=2)
+    {
+      var row = table.insertRow(-1);
+
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+
+      if (res[i] == 0)
+        cell1.innerHTML = lang.white; 
+      else
+        cell1.innerHTML = lang.blue;
+      
+      cell2.innerHTML = Math.floor((res[i+1]/1000)) + '.' + Math.floor((res[i+1]%1000)/100);
+    }
+
+  });
+}
+
+
+function DisplayTimer()
+{
+  document.getElementById("hajimetime").innerHTML = Math.floor(HajimeTimer/(1000*60)) + ':' + zeroPad(Math.floor((HajimeTimer/1000))%60, 2) + '.' + Math.floor((HajimeTimer%1000)/100);
+
+  document.getElementById("white_osaekomitime").innerHTML = Math.floor((OsaekomiWhiteTimer/1000)) + '.' + Math.floor((OsaekomiWhiteTimer%1000)/100);
+
+  document.getElementById("blue_osaekomitime").innerHTML = Math.floor((OsaekomiBlueTimer/1000)) + '.' + Math.floor((OsaekomiBlueTimer%1000)/100);
+}
+
+
+function GetTimer()
+{
+  AjaxCallback("ajax/mat/current_time?id="+id, function(response) {
+    var res = response.split(",");
+
+    HajimeTimer = parseInt(res[0]);
+
+    if (parseInt(res[1]) == 1)
+      HajimeTimer_Running = true;
+    else
+      HajimeTimer_Running = false;
+
+    DisplayTimer();
+  });
+}
+
+
+function UpdateTimer()
+{
+  if (HajimeTimer_Running)
+  {
+    HajimeTimer -= 100;
+    if (HajimeTimer < 0)
+      HajimeTimer = 0;
+    DisplayTimer();
+  }
+
+  if (OsaekomiWhiteTimer_Running)
+  {
+    OsaekomiWhiteTimer += 100;
+    DisplayTimer();
+  }
+
+  if (OsaekomiBlueTimer_Running)
+  {
+    OsaekomiBlueTimer += 100;
+    DisplayTimer();
+  }
+
+  ScoreUpdate_Counter--;
+  if (ScoreUpdate_Counter <= 0)
+  {
+    GetScore();
+    GetJudokaName();
+    GetOsaekomiList();
+    ScoreUpdate_Counter = 5;
+  }
+}
+
+
+var id = URLDecode(URL, "id");
+
+GetScore();
+GetJudokaName();
+TimerID = window.setInterval(UpdateTimer, 100);
+
+
+var more = false;
+var showHantei = false;
+
+document.getElementById("time").innerHTML = lang.time;
+document.getElementById("mat").innerHTML  = lang.mat + ' ' + id;
+
+document.getElementById("next_fight").innerHTML = lang.start_next_match;
+document.getElementById("end_match").innerHTML  = lang.end_match;
+
+document.getElementById("more").innerHTML = lang.more;
+
+document.getElementById("next_matches").innerHTML  = lang.next_matches;
+document.getElementById("waiting_white").innerHTML = lang.white;
+document.getElementById("waiting_blue").innerHTML  = lang.blue;
+
+document.getElementById("osaekomi_time").innerHTML = lang.time;
+document.getElementById("osaekomi_for").innerHTML  = lang.for;
+
+</script>

@@ -1,0 +1,69 @@
+<h1 id="headline">New Judoka</h1>
+
+<form>
+
+<div>
+    <label style="width:150px;float:left;margin-top:4px;" id="label_firstname">Given name</label>
+    <input style="margin-bottom:20px;" type="text" id="firstname" value="" size="40" maxlength="64"/>
+</div>
+
+<div>
+    <label style="width:150px;float:left;margin-top:4px;" id="label_lastname">Family name</label>
+    <input style="margin-bottom:20px;" type="text" id="lastname" value="" size="40" maxlength="64"/>
+</div>
+
+<div>
+    <label style="width:150px;float:left;margin-top:4px;" id="label_weight">Weight</label>
+    <input style="margin-bottom:20px;" type="number" id="weight" value="" min="10" max="500" />
+</div>
+
+<div>
+  <label style="width:150px;float:left;margin-top:4px;" id="label_gender">Gender</label>
+  <select style="margin-bottom:20px;" id="gender">
+    <option selected value="0" id="male">Male</option>
+    <option value="1" id="female">Female</option>
+  </select>
+</div>
+
+<div id="note" style="display: none; font-weight: bold;">
+</div>
+
+<button class="add" id="add" onclick="return AddJudoka()">New Judoka</button>
+
+</form>
+
+
+<script>
+
+function AddJudoka()
+{
+  var params = URLEncode({
+    firstname: document.getElementById("firstname").value,
+    lastname:  document.getElementById("lastname").value,
+    weight:    document.getElementById("weight").value,
+    gender:    document.getElementById("gender").value
+  });
+
+  AjaxPost('ajax/judoka/add', params, function() {
+    $("#note").text(document.getElementById("firstname").value + " " + document.getElementById("lastname").value + " added to database.");
+    $("#note").show(1000).delay(3000).hide(2000);
+
+    document.getElementById("firstname").value = "";
+    document.getElementById("lastname").value  = "";
+  });
+
+  return false;
+}
+
+
+
+document.getElementById("label_firstname").innerHTML = lang.firstname;
+document.getElementById("label_lastname").innerHTML  = lang.lastname;
+document.getElementById("label_weight").innerHTML  = lang.weight;
+document.getElementById("label_gender").innerHTML  = lang.gender;
+document.getElementById("male").innerHTML  = lang.male;
+document.getElementById("female").innerHTML  = lang.female;
+document.getElementById("headline").innerHTML     = lang.new_judoka;
+document.getElementById("add").innerHTML     = lang.new_judoka;
+
+</script>

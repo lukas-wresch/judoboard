@@ -1,0 +1,214 @@
+<h2 id="headline">New Rule Set</h2>
+
+<form>
+
+<div>
+    <label style="width:200px;float:left; margin-top:4px;" id="label_name">Name</label>
+    <input style="margin-bottom:20px;" type="text" id="name" value="" size="30" maxlength="64"/>
+</div>
+
+<div>
+  <label style="width:200px; float:left; margin-top:4px;" id="label_match_time">Match Time</label>
+  <select style="margin-bottom:20px; width: 2.3cm;" id="match_time">
+    <option value="30">0:30</option>
+    <option value="60">1:00</option>
+    <option value="90">1:30</option>
+    <option value="120">2:00</option>
+    <option value="150">2:30</option>
+    <option selected value="180">3:00</option>
+    <option value="210">3:30</option>
+    <option value="240">4:00</option>
+    <option value="270">4:30</option>
+    <option value="300">5:00</option>
+    <option value="330">5:30</option>
+    <option value="360">6:00</option>
+    <option value="390">6:30</option>
+    <option value="420">7:00</option>
+    <option value="-1">&infin;</option>
+  </select>
+</div>
+
+<div>
+  <label style="width:200px; float:left; margin-top:4px;" id="label_goldenscore_time">Golden Score Time</label>
+  <select style="margin-bottom:20px; width: 2.3cm;" id="goldenscore_time">
+    <option selected value="0" id="disabled">Disabled</option>
+    <option value="30">0:30</option>
+    <option value="60">1:00</option>
+    <option value="90">1:30</option>
+    <option value="120">2:00</option>
+    <option value="150">2:30</option>
+    <option value="180">3:00</option>
+    <option value="210">3:30</option>
+    <option value="240">4:00</option>
+    <option value="270">4:30</option>
+    <option value="300">5:00</option>
+    <option value="330">5:30</option>
+    <option value="360">6:00</option>
+    <option value="390">6:30</option>
+    <option value="420">7:00</option>
+    <option value="-1">&infin;</option>
+  </select>
+</div>
+
+<div>
+  <label style="width:200px;float:left;margin-top:4px;" id="label_osaekomi_ippon">Osaekomi Time (Ippon)</label>
+  <input style="margin-bottom:20px;" type="number" id="osaekomi_ippon" value="20" min="1" max="60" />
+</div>
+
+<div>
+  <label style="width:200px;float:left;margin-top:4px;" id="label_osaekomi_wazaari">Osaekomi Time (Waza-Ari)</label>
+  <input style="margin-bottom:20px;" type="number" id="osaekomi_wazaari" value="10" min="1" max="60" />
+</div>
+
+<div>
+  <label style="width:200px;float:left;margin-top:4px;" id="label_yuko">Yuko</label>
+  <input type="checkbox" id="yuko" class="switch-input">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="yuko">
+    <span class="toggle-on" id="yuko_enabled">Enabled</span><span class="toggle-off" for="yuko" id="yuko_disabled">Disabled</span>
+  </label>
+</div>
+
+<div>
+  <label style="width:200px;float:left;margin-top:4px;" id="label_koka">Koka</label>
+  <input type="checkbox" id="koka" class="switch-input">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="koka">
+    <span class="toggle-on" id="koka_enabled">Enabled</span><span class="toggle-off" id="koka_disabled">Disabled</span>
+  </label>
+</div>
+
+<div>
+  <label style="width:200px;float:left;margin-top:4px;" id="label_draw">Draw</label>
+  <input type="checkbox" id="draw" class="switch-input">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="draw">
+    <span class="toggle-on" id="draw_enabled">Enabled</span><span class="toggle-off" id="draw_disabled">Disabled</span>
+  </label>
+</div>
+
+<div>
+  <label style="width:200px; float:left; margin-top:4px;" id="label_break_time">Break Time</label>
+  <select style="margin-bottom:20px; width: 1.8cm;" id="break_time">
+    <option value="0">0:00</option>
+    <option value="60">1:00</option>
+    <option value="120">2:00</option>
+    <option value="180">3:00</option>
+    <option value="240">4:00</option>
+    <option value="300">5:00</option>
+    <option value="360">6:00</option>
+    <option value="420">7:00</option>
+    <option value="480">8:00</option>
+    <option value="540">9:00</option>
+    <option value="600">10:00</option>
+    <option value="660">11:00</option>
+    <option value="720">12:00</option>
+    <option value="780">13:00</option>
+    <option value="840">14:00</option>
+    <option value="900">15:00</option>
+  </select>
+</div>
+
+<button class="add" style="margin-top: 0.8cm;" onclick="return AddRuleSet()" id="add">New Rule Set</button>
+<button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateRuleSet()" id="update">Update Rule Set</button>
+
+</form>
+
+
+<script>
+
+function AddRuleSet()
+{
+  var params = URLEncode({
+    name:             document.getElementById("name").value,
+    match_time:       document.getElementById("match_time").value,
+    goldenscore_time: document.getElementById("goldenscore_time").value,
+    osaekomi_ippon:   document.getElementById("osaekomi_ippon").value,
+    osaekomi_wazaari: document.getElementById("osaekomi_wazaari").value,
+    yuko:             document.getElementById("yuko").checked,
+    koka:             document.getElementById("koka").checked,
+    draw:             document.getElementById("draw").checked,
+    break_time:       document.getElementById("break_time").value
+  });
+
+  AjaxPost('ajax/rule/add', params, function() {
+    navigate("rule_list.html");
+  });
+
+  return false;
+}
+
+
+function UpdateRuleSet()
+{
+  var params = URLEncode({
+    name:             document.getElementById("name").value,
+    match_time:       document.getElementById("match_time").value,
+    goldenscore_time: document.getElementById("goldenscore_time").value,
+    osaekomi_ippon:   document.getElementById("osaekomi_ippon").value,
+    osaekomi_wazaari: document.getElementById("osaekomi_wazaari").value,
+    yuko:             document.getElementById("yuko").checked,
+    koka:             document.getElementById("koka").checked,
+    draw:             document.getElementById("draw").checked,
+    break_time:       document.getElementById("break_time").value
+  });
+
+  AjaxPost('ajax/rule/update?id='+id, params, function() {
+    navigate("rule_list.html");
+  });
+
+  return false;
+}
+
+
+function GetRuleSet(id)
+{
+  AjaxCallback("ajax/rule/get?id="+id, function(response) {
+    var res = response.split(",");
+    console.log(response);
+
+    document.getElementById("name").value = res[0];
+    document.getElementById("match_time").value  = res[1];
+    document.getElementById("goldenscore_time").value    = res[2];
+    document.getElementById("osaekomi_ippon").value    = res[3];
+    document.getElementById("osaekomi_wazaari").value    = res[4];
+    document.getElementById("yuko").checked = res[5] == 1 ? true : false;
+    document.getElementById("koka").checked = res[6] == 1 ? true : false;
+    document.getElementById("draw").checked = res[7] == 1 ? true : false;
+    document.getElementById("break_time").value = res[8];
+  });
+}
+
+
+
+document.getElementById("add").innerHTML    = lang.new_rule_set;
+document.getElementById("update").innerHTML = lang.update_rule_set;
+document.getElementById("label_name").innerHTML             = lang.name;
+document.getElementById("label_match_time").innerHTML       = lang.match_time;
+document.getElementById("label_goldenscore_time").innerHTML = lang.goldenscore_time;
+document.getElementById("disabled").innerHTML               = lang.disabled;
+document.getElementById("label_osaekomi_ippon").innerHTML   = lang.osaekomi_time_ippon;
+document.getElementById("label_osaekomi_wazaari").innerHTML = lang.osaekomi_time_wazaari;
+
+document.getElementById("yuko_enabled").innerHTML  = lang.enabled;
+document.getElementById("yuko_disabled").innerHTML = lang.disabled;
+document.getElementById("koka_enabled").innerHTML  = lang.enabled;
+document.getElementById("koka_disabled").innerHTML = lang.disabled;
+document.getElementById("draw_enabled").innerHTML  = lang.enabled;
+document.getElementById("draw_disabled").innerHTML = lang.disabled;
+
+document.getElementById("label_draw").innerHTML       = lang.draw;
+document.getElementById("label_break_time").innerHTML = lang.break_time;
+
+var id = URLDecode(URL, "id");
+
+if (id)
+{
+  document.getElementById("headline").innerHTML = lang.update_rule_set;
+  document.getElementById("add").style.display = "none";
+  GetRuleSet(id);
+}
+else
+{
+  document.getElementById("headline").innerHTML = lang.new_rule_set;
+  document.getElementById("update").style.display = "none";
+}
+
+</script>

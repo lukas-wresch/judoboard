@@ -1,0 +1,297 @@
+<h1>Match</h1>
+
+<form>
+
+<div>
+  <label id="label_white" style="width:150px;float:left;margin-top:5px;">Name (white)</label>
+  <p style="padding-top:5px;margin-bottom:20px;" size="50" id="white" value=""></p>
+</div>
+
+<div>
+  <label id="label_blue" style="width:150px;float:left;margin-top:5px;">Name (blue)</label>
+  <p style="padding-top:5px;margin-bottom:20px;" size="50" id="blue" value=""></p>
+</div>
+
+<div>
+  <label id="label_class" style="width:150px;float:left;margin-top:5px;">Class</label>
+  <p style="padding-top:5px;margin-bottom:20px;" size="50" id="class" value=""></p>
+</div>
+
+<div>
+  <label id="label_mat" style="width:150px;float:left;margin-top:5px;">Mat</label>
+  <select style="padding-top:5px;margin-bottom:20px;width: 3.5cm;" id="mat" onchange="return SetMat();">
+  </select>
+</div>
+
+<div>
+  <label id="label_rule" style="width:150px;float:left;margin-top:5px;">Rule Set</label>
+  <select style="padding-top:5px;margin-bottom:20px;width: 5.0cm;" id="rule" onchange="return SetRuleSet();">
+  </select>
+</div>
+
+
+<div style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm;">
+  <div>
+    <label id="label_status" style="width:150px;float:left;margin-top:5px; margin-left: 5px;">Status</label>
+    <p style="padding-top:5px;margin-bottom:20px;" id="status">- - -</p>
+  </div>
+
+<div>
+    <label id="label_winner" style="width:150px;float:left; margin-top:5px; margin-left: 5px;">Winner</label>
+    <p style="padding-top:5px;margin-bottom:20px;" id="winner">- - -</p>
+</div>
+
+<div>
+    <label id="label_score" style="width:150px;float:left;margin-top:5px; margin-left: 5px;">Score</label>
+    <p style="padding-top:5px;margin-bottom:20px;" id="score">0</p>
+</div>
+
+<div>
+    <label id="label_time" style="width:150px;float:left;margin-top:5px; margin-left: 5px;">Time</label>
+    <p style="padding-top:5px;margin-bottom:20px;" id="time">0:00</p>
+</div>
+</div>
+
+<div id="div_delete" style="display: none; margin-top: 5mm;">
+  <button id="delete" class="remove" onclick="return DeleteMatch();">Delete Match</button>
+</div>
+
+
+<div>
+    <p style="width:150px;margin-top:1cm;">Log</p>
+    <table id="log" border="1" rules="all">
+      <tr>
+        <th style="width: 2cm;">Time</th>
+        <th style="width: 2cm;">For</th>
+        <th style="width: 4cm;">Event</th>
+      </tr>
+    </table>
+</div>
+
+</form>
+
+
+
+<script>
+
+function GetMatch()
+{
+  AjaxCallback('ajax/match/get?id='+id, function(response) {
+    console.log(response);
+    var res = response.split(",");
+
+    if (res.length < 4)
+      return;
+
+    var i = 0;
+
+    var id = res[i++];
+    document.getElementById("white").innerHTML = res[i++];
+    document.getElementById("blue" ).innerHTML = res[i++];
+
+    var mat    = res[i++];
+    var status = res[i++];
+    var color  = res[i++];
+
+    if (status == 0)
+    {
+      document.getElementById("status").innerHTML = lang.scheduled;
+      $('#div_delete').show();
+    }
+    else if (status == 1)
+      document.getElementById("status").innerHTML = lang.running;
+    else if (status == 2)
+      document.getElementById("status").innerHTML = lang.concluded;
+
+    var matchtable_id = res[i++];
+    document.getElementById("class").innerHTML = res[i++];
+
+    var winner = res[i++];
+    if (winner == 0)
+      document.getElementById("winner").innerHTML = lang.white;
+    else if (winner == 1)
+      document.getElementById("winner").innerHTML = lang.blue;
+    else if (winner == 2 && status == 2)
+      document.getElementById("winner").innerHTML = lang.draw;
+
+    document.getElementById("score").innerHTML = res[i++];
+    document.getElementById("time").innerHTML  = NiceTimeMS(res[i++]);
+
+    var rules = res[i++];
+
+    GetMats(function (){
+      document.getElementById("mat").value = mat;
+    });
+
+    GetRuleSets(function() {
+      //document.getElementById("rule").value = rules;
+    });
+  });
+}
+
+
+
+function SetMat()
+{
+  var params = URLEncode({
+    mat: document.getElementById("mat").value
+  });
+
+  AjaxPost('ajax/match/set_mat?id='+id, params, function() {
+  });
+
+  return false;
+}
+
+
+
+function SetRuleSet()
+{
+  var params = URLEncode({
+    rule: document.getElementById("rule").value
+  });
+
+  AjaxPost('ajax/match/set_rule?id='+id, params, function() {
+  });
+
+  return false;
+}
+
+
+
+function GetLog()
+{
+  AjaxCallback('ajax/match/get_log?id='+id, function(response) {
+    console.log(response);
+    var res = response.split(",");
+
+    if (res.length < 3)
+      return;
+
+    var table = document.getElementById("log");
+
+    for (var i=0; i < res.length; i+=3)
+    {
+      var row = table.insertRow(-1);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+
+      cell1.innerHTML = NiceTimeMS(res[i+0]);
+
+      if (res[i+1] == 2)
+        cell2.innerHTML = "- - -";
+      else if (res[i+1] == 0)
+        cell2.innerHTML = lang.white;
+      else if (res[i+1] == 1)
+      {
+        cell2.style.color = "blue";
+        cell2.innerHTML = lang.blue;
+      }
+
+
+      if (res[i+1] == 2 && res[i+2] == 0)
+        cell3.innerHTML = "Hajime";
+      else if (res[i+1] == 2 && res[i+2] == 1)
+        cell3.innerHTML = "Mate";
+      else if (res[i+1] == 2 && res[i+2] == 2)
+        cell3.innerHTML = "Tokeda";
+      else if (res[i+1] == 2 && res[i+2] == 3)
+        cell3.innerHTML = "Sonomama";
+      else if (res[i+1] == 2 && res[i+2] == 4)
+        cell3.innerHTML = "Yoshi";
+      else if (res[i+1] == 2 && res[i+2] == 5)
+        cell3.innerHTML = "Osaekomi switched to other fighter";
+      else if (res[i+1] == 2 && res[i+2] == 6)
+        cell3.innerHTML = "Match started";
+      else if (res[i+1] == 2 && res[i+2] == 7)
+        cell3.innerHTML = "End of match";
+      else if (res[i+1] == 2 && res[i+2] == 8)
+        cell3.innerHTML = "Golden Score activated";
+      else if (res[i+1] == 2 && res[i+2] == 9)
+        cell3.innerHTML = "Golden Score revoked!";
+      else if (res[i+1] == 2 && res[i+2] == 10)
+        cell3.innerHTML = "Match is a draw";
+      else if (res[i+1] == 2 && res[i+2] == 11)
+        cell3.innerHTML = "Draw revoked!";
+
+      else if (res[i+2] == 0)
+        cell3.innerHTML = "Ippon";
+      else if (res[i+2] == 1)
+        cell3.innerHTML = "Wazaari";
+      else if (res[i+2] == 2)
+        cell3.innerHTML = "Yuko";
+      else if (res[i+2] == 3)
+        cell3.innerHTML = "Koka";
+      else if (res[i+2] == 4)
+        cell3.innerHTML = "Ippon revoked!";
+      else if (res[i+2] == 5)
+        cell3.innerHTML = "Wazaari revoked!";
+      else if (res[i+2] == 6)
+        cell3.innerHTML = "Yuko revoked!";
+      else if (res[i+2] == 7)
+        cell3.innerHTML = "Koka revoked!";
+      else if (res[i+2] == 8)
+        cell3.innerHTML = "Wazari awasete Ippon";
+      else if (res[i+2] == 9)
+        cell3.innerHTML = "Osaekomi";
+      else if (res[i+2] == 10)
+        cell3.innerHTML = "Shido";
+      else if (res[i+2] == 11)
+        cell3.innerHTML = "Hansoku-Make (indirect)";
+      else if (res[i+2] == 12)
+        cell3.innerHTML = "Hansoku-Make (direct)";
+      else if (res[i+2] == 13)
+        cell3.innerHTML = "Shido revoked!";
+      else if (res[i+2] == 14)
+        cell3.innerHTML = "Hansoku-Make revoked!";
+      else if (res[i+2] == 15)
+        cell3.innerHTML = "Medical Examination";
+      else if (res[i+2] == 16)
+        cell3.innerHTML = "Medical Examination revoked!";
+      else if (res[i+2] == 17)
+        cell3.innerHTML = "Hantei";
+      else if (res[i+2] == 18)
+        cell3.innerHTML = "Disqualification";
+      else if (res[i+2] == 19)
+        cell3.innerHTML = "No Disqualification";
+      else if (res[i+2] == 20)
+        cell3.innerHTML = "Disqualification revoked!";
+      else if (res[i+2] == 21)
+        cell3.innerHTML = "Gachi";
+      else if (res[i+2] == 22)
+        cell3.innerHTML = "Gachi revoked!";
+    }
+  });
+}
+
+
+function DeleteMatch()
+{
+  if (confirm(lang.delete_match_confirm))
+  {
+    Ajax('ajax/match/delete?id='+id);
+    navigate('schedule.html');
+  }
+
+  return false;
+}
+
+
+var id = URLDecode(URL, "id");
+
+GetMatch();
+
+document.getElementById("label_white").innerHTML  = lang.name_white;
+document.getElementById("label_blue").innerHTML   = lang.name_blue;
+document.getElementById("label_mat").innerHTML    = lang.mat;
+document.getElementById("label_rule").innerHTML   = lang.rule_set;
+document.getElementById("label_status").innerHTML = lang.status;
+document.getElementById("label_winner").innerHTML = lang.winner;
+document.getElementById("label_score").innerHTML  = lang.score;
+document.getElementById("label_time").innerHTML   = lang.time;
+document.getElementById("delete").innerHTML       = lang.delete_match;
+
+GetLog();
+
+</script>

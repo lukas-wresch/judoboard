@@ -1,0 +1,85 @@
+<h2>List of Tournaments</h2>
+
+<button class="add" style="margin-bottom: 1cm;" onclick="navigate('tournament_add.html')" id="new_tournament">New Tournament</button> 
+
+<table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
+  <tr>
+    <th style="width: 4cm;" id="name">Name</th>
+    <th style="width: 4cm;" id="description">Description</th>
+    <th style="width: 4cm;" id="status">Status</th>
+    <th style="width: 3cm;" id="options">Options</th>
+  </tr>
+</table>
+
+<script>
+
+function GetTournaments()
+{
+  AjaxCallback("ajax/tournament/list", function(response) {
+    console.log(response);
+    var res = response.split(",");
+
+    if (res.length < 1)
+      return;
+
+    var table = document.getElementById("list");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    for (var i=0; i < res.length; i+=5)
+    {
+      var row = table.insertRow(-1);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+      var cell4 = row.insertCell(3);
+
+      cell1.innerHTML = res[i+0];
+
+      cell2.innerHTML = res[i+1] + " " + lang.participants + "<br/>" + res[i+2] + " " + lang.matches;
+
+      if (res[i+3] == 0)
+        cell3.innerHTML = lang.scheduled;
+      else if (res[i+3] == 1)
+      {
+        cell3.innerHTML = lang.running;
+        cell3.style.color = "red";
+      }
+      else if (res[i+3] == 2)
+      {
+        cell3.innerHTML = lang.concluded;
+        cell3.style.color = "green";
+      }
+
+      if (res[i+4] == 0)
+        cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenTournament(" + i/5 + ");\">Open</button>" + "<button class=\"neutral\" onclick=\"navigate('tournament_add.html?id=" + i/5 + "');\">Edit</button>";
+      else
+        cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseTournament(" + i/5 + ");\">Close</button>";
+    }
+  });
+}
+
+
+function OpenTournament(id)
+{
+  AjaxCallback('ajax/tournament/open?id='+id, function() {
+    GetTournaments();
+  });
+
+  return false;
+}
+
+
+function CloseTournament(id)
+{
+  AjaxCallback('ajax/tournament/close', function() {
+    GetTournaments();
+  });
+
+  return false;
+}
+
+GetTournaments();
+
+</script>
