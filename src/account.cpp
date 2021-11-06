@@ -16,7 +16,7 @@ Account::Nonce::Nonce(uint32_t IP, uint16_t RemotePort) : m_IP(IP)
 
 	if (rd.entropy() < 1.0)
 	{
-		ZED::Log::Error("No entropy source found!");
+		ZED::Log::Warn("No entropy source found!");
 		return;
 	}
 

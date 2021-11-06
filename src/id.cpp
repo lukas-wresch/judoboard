@@ -49,7 +49,7 @@ const UUID ID::GenerateUUID()
 
 	if (rd.entropy() < 1.0)
 	{
-		ZED::Log::Error("No entropy source found!");
+		ZED::Log::Warn("No entropy source found!");
 		return std::string();
 	}
 
