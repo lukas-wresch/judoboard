@@ -1668,6 +1668,9 @@ bool Mat::Render(double dt) const
 	if (!m_Background)
 		return true;
 
+	if (dt > 0.2)//In case the application was stuck for some time
+		dt = 0.2;//Might happen on device with a small amount of RAM during swapping
+
 	UpdateGraphics();
 
 	auto& renderer = m_Window.GetRenderer();
