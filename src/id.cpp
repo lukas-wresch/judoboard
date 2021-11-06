@@ -47,18 +47,13 @@ const UUID ID::GenerateUUID()
 {
 	std::random_device rd;
 
-	if (rd.entropy() < 1.0)
-	{
-		ZED::Log::Warn("No entropy source found!");
-		return std::string();
-	}
-
 	for (int i = 0; true; i++)//Generate ID until we don't have a collision
 	{
 		std::string entropyInput = std::to_string(Timer::GetTimestamp() + i);
 
 		if (rd.entropy() < 1.0)//No entropy source. For example if we are running in the cloud
 		{
+			ZED::Log::Warn("No entropy source found!");
 			srand(Timer::GetTimestamp());
 			for (int bits = 0; bits < 512; bits += 15)
 				entropyInput += std::to_string(rand());
