@@ -188,33 +188,33 @@ Ref<Texture> RendererSDL2::RenderFont(FontSize Size, const std::string& Text, ZE
 	switch (Size)
 	{
 		case FontSize::Small:
-			ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_small, Text.c_str(), color));
-			//if (m_ttf_font_small)
+			if (m_ttf_font_small)
+				ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_small, Text.c_str(), color));
 				//ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_small, Text.c_str(), color));
 			break;
 		case FontSize::Middle:
-			ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_medium, Text.c_str(), color));
-			//if (m_ttf_font_medium)
+			if (m_ttf_font_medium)
+				ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_medium, Text.c_str(), color));
 				//ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_medium, Text.c_str(), color));
 			break;
 		case FontSize::Large:
-			ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_large, Text.c_str(), color));
-			//if (m_ttf_font_large)
+			if (m_ttf_font_large)
+				ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_large, Text.c_str(), color));
 				//ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_large, Text.c_str(), color));
 			break;
 		case FontSize::Huge:
-			ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_huge, Text.c_str(), color));
-			//if (m_ttf_font_huge)
+			if (m_ttf_font_huge)
+				ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_huge, Text.c_str(), color));
 				//ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_huge, Text.c_str(), color));
 			break;
 		case FontSize::Gigantic:
-			ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_gigantic, Text.c_str(), color));
-			//if (m_ttf_font_gigantic)
+			if (m_ttf_font_gigantic)
+				ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_gigantic, Text.c_str(), color));
 				//ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_gigantic, Text.c_str(), color));
 			break;
 		case FontSize::Gigantic2:
-			ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_gigantic2, Text.c_str(), color));
-			//if (m_ttf_font_gigantic2)
+			if (m_ttf_font_gigantic2)
+				ret = new TextureSDL2(TTF_RenderUTF8_Solid(m_ttf_font_gigantic2, Text.c_str(), color));
 				//ret = new TextureSDL2(TTF_RenderUTF8_Blended(m_ttf_font_gigantic2, Text.c_str(), color));
 			break;
 	}
