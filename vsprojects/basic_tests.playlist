@@ -1,0 +1,182 @@
+<Playlist Version="2.0">
+  <Rule Name="Includes" Match="Any">
+    <Rule Match="All">
+      <Property Name="Solution" />
+      <Rule Match="Any">
+        <Rule Match="All">
+          <Property Name="Project" Value="UnitTests" />
+          <Rule Match="Any">
+            <Rule Match="All">
+              <Property Name="Namespace" Value="UnitTests" />
+              <Rule Match="Any">
+                <Rule Match="All">
+                  <Property Name="Class" Value="AppTests" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::AppTests::Mats" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Mats" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::AppTests::ServerConnection" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="ServerConnection" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::AppTests::Tournaments" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Tournaments" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+                <Rule Match="All">
+                  <Property Name="Class" Value="MatTests" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::Yuko2" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Yuko2" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::Scores" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Scores" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::Shido" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Shido" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::HansokuMake" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="HansokuMake" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::OpenAndClose" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="OpenAndClose" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::QuickClose" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="QuickClose" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::StartMatch" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="StartMatch" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::Yuko" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Yuko" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::MedicalExaminiations" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="MedicalExaminiations" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::Koka2" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Koka2" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::WazariAwaseteIppon" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="WazariAwaseteIppon" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::Koka" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Koka" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::MatTests::ForceClose" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="ForceClose" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+                <Rule Match="All">
+                  <Property Name="Class" Value="AccountTests" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::AccountTests::Basics" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Basics" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+                <Rule Match="All">
+                  <Property Name="Class" Value="JudokaTests" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::JudokaTests::Basic" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Basic" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::JudokaTests::ImportExport" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="ImportExport" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+                <Rule Match="All">
+                  <Property Name="Class" Value="DatabaseTests" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::DatabaseTests::AccountTest" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="AccountTest" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::DatabaseTests::JudokaTest" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="JudokaTest" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::DatabaseTests::Login" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="Login" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="UnitTests::DatabaseTests::RuleSets" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="RuleSets" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+              </Rule>
+            </Rule>
+          </Rule>
+        </Rule>
+      </Rule>
+    </Rule>
+  </Rule>
+</Playlist>

@@ -1,0 +1,242 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="HttpServer">
+      <UniqueIdentifier>{acd1fe67-f5e9-4848-bc40-a6345c89c505}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\account.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\app.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\app_ajax.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\club.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\database.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\error.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\id.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\judoka.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\localizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\match.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\matchlog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\matchtable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\remote_mat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rule_set.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\standing_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\tournament.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\weightclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\window_linux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\window_win.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\HttpServer\HttpServer.cpp">
+      <Filter>HttpServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\mongoose\mongoose.cpp">
+      <Filter>HttpServer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\HttpServer\HttpServer.h">
+      <Filter>HttpServer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\judoka.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\weightclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tournament.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\database.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\match.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\matchtable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\matchlog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\3rd-Party-Libraries\mongoose\mongoose.h">
+      <Filter>HttpServer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\app.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\account.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\schedule_entry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\virtual_mat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pause.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rule_set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\remote_mat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\standing_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\localizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\club.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Debug\html\account_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\account_list.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\add_fight.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\add_judoka.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\class_list.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\edit_match.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\index.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\judoka_edit.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\list_judoka.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\login.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\mat.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\mat_configure.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\mat_edit.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\matchtable_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\participant_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\rule_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\rule_list.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\schedule.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\server_config.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\tournament_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\tournament_list.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\weightclass_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Debug\html\weightclass_edit.html">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>
