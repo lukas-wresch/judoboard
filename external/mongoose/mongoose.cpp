@@ -1433,10 +1433,11 @@ int mg_get_var(const char *buf, size_t buf_len, const char *name,
 
       // Point s to the end of the value
       s = (const char *) memchr(p, '&', (size_t)(e - p));
-      if (s == NULL) {
+      if (s == NULL)
         s = e;
-      }
+
       assert(s >= p);
+      assert( (size_t)(s - p) < dst_len );
 
       // Decode variable into destination buffer
       if ((size_t) (s - p) < dst_len) {
@@ -1448,6 +1449,8 @@ int mg_get_var(const char *buf, size_t buf_len, const char *name,
 
   return len;
 }
+
+
 
 int mg_get_cookie(const struct mg_connection *conn, const char *cookie_name, char *dst, size_t dst_size)
 {

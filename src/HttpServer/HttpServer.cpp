@@ -23,7 +23,7 @@ const std::string HttpServer::LoadFile(const std::string& Filename)
 
 std::string HttpServer::DecodeURLEncoded(const std::string& Input, const char* VariableName)
 {
-    char buffer[256] = {};
+    char buffer[4096] = {};
     mg_get_var(Input.c_str(), Input.size(), VariableName, buffer, sizeof(buffer));
     return buffer;
 }

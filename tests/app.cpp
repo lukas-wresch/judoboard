@@ -256,8 +256,9 @@ TEST(App, MatchOnSlave)
 	master.CloseMat(1);
 
 	slave.StartLocalMat(2);
-			
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Judoka j1("White", "LastnameW");
+	Judoka j2("Blue",  "LastnameB");
+	Match match(nullptr, &j1, &j2);
 	match.SetMatID(2);
 
 	auto mat = master.FindMat(2);

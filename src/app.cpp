@@ -1835,28 +1835,28 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	/*m_Server.RegisterResource("/ajax/slave/start_match", [this](auto Request) {
+	m_Server.RegisterResource("/ajax/slave/start_match", [this](auto Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 
 		if (!IsSlave())
 			return "You are not allowed to connect";
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		ZED::CSV match_csv = HttpServer::DecodeURLEncoded(Request.m_Query, "match");
+		int matID      = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		ZED::CSV matchCSV = HttpServer::DecodeURLEncoded(Request.m_Query, "match");
 
 		for (auto mat : m_Mats)
 		{
-			if (mat && mat->GetMatID() == id)
+			if (mat && mat->GetMatID() == matID)
 			{
-				Match match(match_csv);
+				Match match(matchCSV, GetTournament());
 				if (mat->StartMatch(match))
-					return Error();//OK
+					return "ok";//OK
 				return "Could not start match";
 			}
 		}
 
-		return "Could not find mat";
-	});*/
+		return "Mat not found";
+	});
 
 	m_Server.RegisterResource("/ajax/config/shutdown", [this](auto Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);

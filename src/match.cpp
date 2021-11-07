@@ -35,7 +35,7 @@ Match::Match(ZED::CSV& Stream, Tournament* Tournament) : Schedulable(Stream, Tou
 		m_Table = Tournament->FindMatchTable(UUID(std::move(matchtableUUID)));
 
 	m_White.m_Judoka = Tournament->FindParticipant(UUID(std::move(whiteUUID)));
-	m_Blue.m_Judoka = Tournament->FindParticipant(UUID(std::move(blueUUID)));
+	m_Blue.m_Judoka  = Tournament->FindParticipant(UUID(std::move(blueUUID)));
 
 	if (HasConcluded() || IsRunning())
 		m_Log << Stream;
