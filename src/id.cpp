@@ -53,7 +53,7 @@ const UUID ID::GenerateUUID()
 
 		if (rd.entropy() < 1.0)//No entropy source. For example if we are running in the cloud
 		{
-			ZED::Log::Warn("No entropy source found!");
+			ZED::Log::Debug("No entropy source found!");
 			srand(Timer::GetTimestamp());
 			for (int bits = 0; bits < 512; bits += 15)
 				entropyInput += std::to_string(rand());

@@ -20,7 +20,7 @@ TEST(App, ServerConnection)
 	EXPECT_TRUE(app.IsMaster());
 	EXPECT_FALSE(app.IsSlave());
 
-	EXPECT_FALSE(app.GetTournament());
+	EXPECT_TRUE(app.GetTournament());
 	EXPECT_TRUE(app.GetTournamentList().size() == 0);
 }
 
