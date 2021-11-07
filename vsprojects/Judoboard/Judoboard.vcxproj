@@ -74,11 +74,14 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>E:\Workspace\;E:\Workspace\3rd-Party-Libraries;$(IncludePath)</IncludePath>
     <LibraryPath>E:\Workspace\3rd-Party-Libraries;E:\Workspace;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
+    <TargetName>$(ProjectName)_Debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>E:\Workspace\3rd-Party-Libraries;E:\Workspace\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <LibraryPath>E:\Workspace\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
