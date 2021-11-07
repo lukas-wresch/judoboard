@@ -244,5 +244,17 @@
     <None Include="Debug\html\weightclass_edit.html">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\compile.sh">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\dependencies.sh">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\README.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\run_tests.sh">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

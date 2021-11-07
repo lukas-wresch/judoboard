@@ -209,6 +209,10 @@
     <ClInclude Include="src\HttpServer\HttpServer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\compile.sh" />
+    <None Include="..\..\dependencies.sh" />
+    <None Include="..\..\README.md" />
+    <None Include="..\..\run_tests.sh" />
     <None Include="Debug\html\account_add.html" />
     <None Include="Debug\html\account_list.html" />
     <None Include="Debug\html\add_fight.html" />
