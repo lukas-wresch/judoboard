@@ -4,6 +4,7 @@
 //#include "virtual_mat.h"
 #include "remote_mat.h"
 #include "tournament.h"
+#include "remote_tournament.h"
 #include <ZED/include/log.h>
 #include <ZED/include/csv.h>
 #include <ZED/include/http_client.h>
@@ -2247,6 +2248,8 @@ bool Application::ConnectToMaster(const std::string& Hostname, uint16_t Port)
 		ZED::Log::Info("Could not connect to master server: " + Hostname + ":" + std::to_string(Port));
 		return false;
 	}
+
+	SetTournament(new RemoteTournament(Hostname, Port));
 
 	m_Mode = Mode::Slave;
 	m_MasterHostname = Hostname;

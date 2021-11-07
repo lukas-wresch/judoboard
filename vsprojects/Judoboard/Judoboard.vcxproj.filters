@@ -90,81 +90,87 @@
     <ClCompile Include="..\..\external\mongoose\mongoose.cpp">
       <Filter>HttpServer</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\remote_tournament.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\HttpServer\HttpServer.h">
       <Filter>HttpServer</Filter>
     </ClInclude>
-    <ClInclude Include="src\mat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\judoka.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\weightclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\tournament.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\database.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\imat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\match.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\matchtable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\matchlog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\3rd-Party-Libraries\mongoose\mongoose.h">
       <Filter>HttpServer</Filter>
     </ClInclude>
-    <ClInclude Include="src\app.h">
+    <ClInclude Include="..\..\src\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\account.h">
+    <ClInclude Include="..\..\src\weightclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\schedule_entry.h">
+    <ClInclude Include="..\..\src\virtual_mat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\virtual_mat.h">
+    <ClInclude Include="..\..\src\tournament.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\pause.h">
+    <ClInclude Include="..\..\src\timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\rule_set.h">
+    <ClInclude Include="..\..\src\standing_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\remote_mat.h">
+    <ClInclude Include="..\..\src\schedule_entry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\standing_data.h">
+    <ClInclude Include="..\..\src\rule_set.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\id.h">
+    <ClInclude Include="..\..\src\remote_tournament.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\localizer.h">
+    <ClInclude Include="..\..\src\remote_mat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\error.h">
+    <ClInclude Include="..\..\src\pause.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\club.h">
+    <ClInclude Include="..\..\src\matchtable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\matchlog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\match.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\localizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\judoka.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\id.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\database.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\club.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\app.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\account.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

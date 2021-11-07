@@ -168,6 +168,7 @@
     <ClCompile Include="..\..\src\matchlog.cpp" />
     <ClCompile Include="..\..\src\matchtable.cpp" />
     <ClCompile Include="..\..\src\remote_mat.cpp" />
+    <ClCompile Include="..\..\src\remote_tournament.cpp" />
     <ClCompile Include="..\..\src\rule_set.cpp" />
     <ClCompile Include="..\..\src\standing_data.cpp" />
     <ClCompile Include="..\..\src\timer.cpp" />
@@ -180,31 +181,32 @@
     <ClCompile Include="..\..\src\window_win.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\account.h" />
+    <ClInclude Include="..\..\src\app.h" />
+    <ClInclude Include="..\..\src\club.h" />
+    <ClInclude Include="..\..\src\database.h" />
+    <ClInclude Include="..\..\src\error.h" />
+    <ClInclude Include="..\..\src\id.h" />
+    <ClInclude Include="..\..\src\imat.h" />
+    <ClInclude Include="..\..\src\judoka.h" />
+    <ClInclude Include="..\..\src\localizer.h" />
+    <ClInclude Include="..\..\src\mat.h" />
+    <ClInclude Include="..\..\src\match.h" />
+    <ClInclude Include="..\..\src\matchlog.h" />
+    <ClInclude Include="..\..\src\matchtable.h" />
+    <ClInclude Include="..\..\src\pause.h" />
+    <ClInclude Include="..\..\src\remote_mat.h" />
+    <ClInclude Include="..\..\src\remote_tournament.h" />
+    <ClInclude Include="..\..\src\rule_set.h" />
+    <ClInclude Include="..\..\src\schedule_entry.h" />
+    <ClInclude Include="..\..\src\standing_data.h" />
+    <ClInclude Include="..\..\src\timer.h" />
+    <ClInclude Include="..\..\src\tournament.h" />
+    <ClInclude Include="..\..\src\virtual_mat.h" />
+    <ClInclude Include="..\..\src\weightclass.h" />
+    <ClInclude Include="..\..\src\window.h" />
     <ClInclude Include="..\3rd-Party-Libraries\mongoose\mongoose.h" />
-    <ClInclude Include="src\account.h" />
-    <ClInclude Include="src\app.h" />
-    <ClInclude Include="src\club.h" />
-    <ClInclude Include="src\database.h" />
-    <ClInclude Include="src\error.h" />
     <ClInclude Include="src\HttpServer\HttpServer.h" />
-    <ClInclude Include="src\id.h" />
-    <ClInclude Include="src\imat.h" />
-    <ClInclude Include="src\judoka.h" />
-    <ClInclude Include="src\localizer.h" />
-    <ClInclude Include="src\mat.h" />
-    <ClInclude Include="src\match.h" />
-    <ClInclude Include="src\matchlog.h" />
-    <ClInclude Include="src\matchtable.h" />
-    <ClInclude Include="src\pause.h" />
-    <ClInclude Include="src\remote_mat.h" />
-    <ClInclude Include="src\rule_set.h" />
-    <ClInclude Include="src\schedule_entry.h" />
-    <ClInclude Include="src\standing_data.h" />
-    <ClInclude Include="src\timer.h" />
-    <ClInclude Include="src\tournament.h" />
-    <ClInclude Include="src\virtual_mat.h" />
-    <ClInclude Include="src\weightclass.h" />
-    <ClInclude Include="src\window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Debug\html\account_add.html" />

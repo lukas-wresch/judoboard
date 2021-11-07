@@ -39,6 +39,7 @@ namespace Judoboard
 		//Tournaments
 		const Tournament* GetTournament() const { return m_CurrentTournament; }//Returns the tournament that is currently open, return null pointer if no tournament is open
 		Tournament* GetTournament() { return m_CurrentTournament; }//Returns the tournament that is currently open, return null pointer if no tournament is open
+		void SetTournament(Tournament* Tournament) { m_CurrentTournament = Tournament; }
 		const auto& GetTournamentList() const { return m_Tournaments; }
 		auto& SetTournamentList() { return m_Tournaments; }
 		bool OpenTournament(uint32_t Index);
