@@ -11,7 +11,7 @@ using namespace Judoboard;
 
 
 
-Match::Match(const Tournament* Tournament, Judoka* White, Judoka* Blue, uint32_t MatID) : Schedulable(Tournament)
+Match::Match(const ITournament* Tournament, Judoka* White, Judoka* Blue, uint32_t MatID) : Schedulable(Tournament)
 {
 	m_White.m_Judoka = White;
 	m_Blue.m_Judoka  = Blue;
@@ -20,7 +20,7 @@ Match::Match(const Tournament* Tournament, Judoka* White, Judoka* Blue, uint32_t
 
 
 
-Match::Match(ZED::CSV& Stream, Tournament* Tournament) : Schedulable(Stream, Tournament)
+Match::Match(ZED::CSV& Stream, ITournament* Tournament) : Schedulable(Stream, Tournament)
 {
 	std::string whiteUUID, blueUUID;
 

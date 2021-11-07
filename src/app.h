@@ -37,9 +37,9 @@ namespace Judoboard
 		bool LoadDataFromDisk();
 
 		//Tournaments
-		const Tournament* GetTournament() const { return m_CurrentTournament; }//Returns the tournament that is currently open, return null pointer if no tournament is open
-		Tournament* GetTournament() { return m_CurrentTournament; }//Returns the tournament that is currently open, return null pointer if no tournament is open
-		void SetTournament(Tournament* Tournament) { m_CurrentTournament = Tournament; }
+		const ITournament* GetTournament() const { return m_CurrentTournament; }//Returns the tournament that is currently open, return null pointer if no tournament is open
+		ITournament* GetTournament() { return m_CurrentTournament; }//Returns the tournament that is currently open, return null pointer if no tournament is open
+		void SetTournament(ITournament* Tournament) { m_CurrentTournament = Tournament; }
 		const auto& GetTournamentList() const { return m_Tournaments; }
 		auto& SetTournamentList() { return m_Tournaments; }
 		bool OpenTournament(uint32_t Index);
@@ -124,7 +124,7 @@ namespace Judoboard
 
 		Tournament m_TempTournament;
 		std::vector<Tournament*> m_Tournaments;
-		Tournament* m_CurrentTournament = nullptr;//Tournament that is currently open
+		ITournament* m_CurrentTournament = nullptr;//Tournament that is currently open
 
 		std::vector<IMat*> m_Mats;//List of all mats this application is aware of
 

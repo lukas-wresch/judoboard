@@ -10,13 +10,11 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		Weightclass(const Tournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight);
-		Weightclass(const Tournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight, Gender Gender);
-		Weightclass(ZED::CSV& Stream, const Tournament* Tournament);
+		Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight);
+		Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight, Gender Gender);
+		Weightclass(ZED::CSV& Stream, const ITournament* Tournament);
 
 		static std::string GetHTMLForm();
-
-		//WeightClass(WeightClass&& rhs) noexcept : MatchTable(std::move(rhs)) {}
 
 		Type GetType() const override { return Type::Weightclass; }
 

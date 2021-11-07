@@ -12,7 +12,7 @@ using namespace Judoboard;
 
 
 
-Weightclass::Weightclass(const Tournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight) : MatchTable(Tournament)
+Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight) : MatchTable(Tournament)
 {
 	m_MinWeight = MinWeight;
 	m_MaxWeight = MaxWeight;
@@ -22,7 +22,7 @@ Weightclass::Weightclass(const Tournament* Tournament, uint16_t MinWeight, uint1
 
 
 
-Weightclass::Weightclass(const Tournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight, Gender Gender) : Weightclass(Tournament, MinWeight, MaxWeight)
+Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight, Gender Gender) : Weightclass(Tournament, MinWeight, MaxWeight)
 {
 	m_Gender = Gender;
 	m_GenderEnforced = true;
@@ -32,7 +32,7 @@ Weightclass::Weightclass(const Tournament* Tournament, uint16_t MinWeight, uint1
 
 
 
-Weightclass::Weightclass(ZED::CSV& Stream, const Tournament* Tournament) : MatchTable(Stream, Tournament)
+Weightclass::Weightclass(ZED::CSV& Stream, const ITournament* Tournament) : MatchTable(Stream, Tournament)
 {
 	Stream >> m_MinWeight >> m_MaxWeight >> m_Gender >> m_GenderEnforced;
 }

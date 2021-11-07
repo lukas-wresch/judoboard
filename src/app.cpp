@@ -1916,7 +1916,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	//Master
+	//Commands slave -> master
 
 	m_Server.RegisterResource("/ajax/master/connection_test", [this](auto Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
@@ -1965,6 +1965,24 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 		SetMats().emplace_back(new_mat);
 		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/master/find_participant", [this](auto Request) -> std::string {
+		if (!IsMaster())
+			return "You are not allowed to connect";
+
+		auto uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "uuid");
+
+		ZED::Log::Info("Slave requested participant info");
+
+		auto judoka = GetTournament()->FindParticipant(UUID(std::move(uuid)));
+
+		if (!judoka)
+			return "Not found";
+
+		ZED::CSV csv;
+		*judoka >> csv;
+		return csv;
 	});
 }
 

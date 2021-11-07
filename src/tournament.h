@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <unordered_map>
+#include "itournament.h"
 #include "judoka.h"
 #include "matchtable.h"
 #include "mat.h"
@@ -11,7 +12,7 @@
 
 namespace Judoboard
 {
-	class Tournament
+	class Tournament : public ITournament
 	{
 		friend class Application;
 
@@ -31,10 +32,9 @@ namespace Judoboard
 		void Reset();
 		void ConnectToDatabase(Database& db);//Replaces all local references to judoka with reference to the database (as long as the tournament is not finalized)
 
-		const std::string& GetName() const { return m_Name; }//Returns the name of the tournament
+		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
 		const auto& GetSchedule() const { return m_Schedule; }
 		Match* FindMatch(uint32_t ID) const;
-		const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
 
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 
@@ -101,21 +101,19 @@ namespace Judoboard
 		const std::string Participants2String() const;
 		const std::string MasterSchedule2String() const;
 
-	private:
-		bool Load(const std::string& Filename);
-		bool Save(const std::string& Filename) const;
 		bool Save() const {
 			if (!m_AutoSave) return false;
 			return Save("tournaments/" + m_Name);
 		}
 
+	private:
+		bool Load(const std::string& Filename);
+		bool Save(const std::string& Filename) const;
+
 		int32_t  GetMaxScheduleIndex(uint32_t Mat = 0) const;
 		uint32_t GetMaxEntriesAtScheduleIndex(uint32_t MatID, int32_t ScheduleIndex) const;
 
 		std::vector<MatchTable*>& SetMatchTables() { return m_MatchTables; }
-
-		void Lock()   const { m_mutex.lock(); }
-		void Unlock() const { m_mutex.unlock(); }
 
 		std::string m_Name;
 		bool m_AutoSave = true;
@@ -126,9 +124,5 @@ namespace Judoboard
 		std::vector<Schedulable*> m_SchedulePlanner;
 
 		const RuleSet* m_pDefaultRules = nullptr;//Default rule set of the tournament
-
-		StandingData m_StandingData;//Local database for the tournament containing all participants and rule sets
-
-		mutable std::mutex m_mutex;
 	};
 }

@@ -7,6 +7,7 @@
 namespace Judoboard
 {
 	class Match;
+	class ITournament;
 	class Tournament;
 
 
@@ -143,8 +144,8 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		Schedulable(const Tournament* Tournament) : m_Tournament(Tournament) {}
-		Schedulable(ZED::CSV& Stream, const Tournament* Tournament) : m_Tournament(Tournament)
+		Schedulable(const ITournament* Tournament) : m_Tournament(Tournament) {}
+		Schedulable(ZED::CSV& Stream, const ITournament* Tournament) : m_Tournament(Tournament)
 		{
 			Stream >> m_ScheduleIndex >> m_MatID;
 			m_Color << Stream;
@@ -165,7 +166,7 @@ namespace Judoboard
 
 	protected:
 		int32_t GetScheduleIndex() const { return m_ScheduleIndex; }
-		const Tournament* GetTournament() const { return m_Tournament; }
+		const ITournament* GetTournament() const { return m_Tournament; }
 
 		void operator >> (ZED::CSV& Stream) const {
 			Stream << m_ScheduleIndex << m_MatID;
@@ -175,7 +176,7 @@ namespace Judoboard
 	private:
 		void SetScheduleIndex(int32_t ScheduleIndex) { m_ScheduleIndex = ScheduleIndex; }
 
-		const Tournament* m_Tournament = nullptr;
+		const ITournament* m_Tournament = nullptr;
 
 		int32_t m_ScheduleIndex = -1;//Index when this entry should be in the schedule
 		uint32_t m_MatID = 0;

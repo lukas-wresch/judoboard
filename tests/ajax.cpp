@@ -31,7 +31,7 @@ TEST(Ajax, GetMats)
 	EXPECT_TRUE(id == 1);
 	EXPECT_TRUE(type == (int)Mat::Type::LocalMat);
 	EXPECT_TRUE(name == "Mat 1");
-	EXPECT_TRUE(style == (int)IMat::IpponDisplayStyle::SpelledOut);
+	EXPECT_TRUE(style == (int)IMat::IpponDisplayStyle::DoubleDigit);
 }
 
 

@@ -9,6 +9,7 @@
 
 namespace Judoboard
 {
+	class ITournament;
 	class Tournament;
 	class Match;
 	class RuleSet;
@@ -26,8 +27,8 @@ namespace Judoboard
 			Unknown, Weightclass, Pause
 		};
 
-		MatchTable(const Tournament* Tournament) : Schedulable(Tournament) {}
-		MatchTable(ZED::CSV& Stream, const Tournament* Tournament);
+		MatchTable(const ITournament* Tournament) : Schedulable(Tournament) {}
+		MatchTable(ZED::CSV& Stream, const ITournament* Tournament);
 		MatchTable(MatchTable&) = delete;
 		MatchTable(const MatchTable&) = delete;
 

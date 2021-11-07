@@ -173,6 +173,9 @@
     <ClInclude Include="..\..\src\account.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\itournament.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Debug\html\account_add.html">

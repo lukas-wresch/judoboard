@@ -9,6 +9,7 @@
 
 namespace Judoboard
 {
+	class ITournament;
 	class Tournament;
 	class RuleSet;
 
@@ -48,8 +49,8 @@ namespace Judoboard
 		};
 
 
-		Match(const Tournament* Tournament, Judoka* White, Judoka* Blue, uint32_t MatID = 0);
-		Match(ZED::CSV& Stream, Tournament* Tournament);
+		Match(const ITournament* Tournament, Judoka* White, Judoka* Blue, uint32_t MatID = 0);
+		Match(ZED::CSV& Stream, ITournament* Tournament);
 
 		//Virtuals
 		virtual const std::vector<Match*> GetSchedule() override { std::vector<Match*> schedule{ this }; return schedule; }

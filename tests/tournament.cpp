@@ -52,11 +52,11 @@ TEST(Tournament, MatchAgainstOneself)
 
 	d.AddJudoka(&j1);
 
-	Tournament tourney("deleteMe", d.FindRuleSet("Default"));
-	tourney.Reset();
-	tourney.EnableAutoSave(false);
+	Tournament* tourney = new Tournament("deleteMe", d.FindRuleSet("Default"));
+	tourney->Reset();
+	tourney->EnableAutoSave(false);
 
-	EXPECT_FALSE(tourney.AddMatch(Match(&tourney, &j1, &j1)));
+	EXPECT_FALSE(tourney->AddMatch(Match(tourney, &j1, &j1)));
 }
 
 
@@ -348,20 +348,20 @@ TEST(Tournament, SaveAndLoad)
 		d.AddJudoka(&j3);
 		d.AddJudoka(&j4);
 
-		Tournament tourney("deleteMe", d.FindRuleSet("Default"));
-		tourney.Reset();
+		Tournament* tourney = new Tournament("deleteMe", d.FindRuleSet("Default"));
+		tourney->Reset();
 
-		EXPECT_TRUE(tourney.AddParticipant(&j1));
-		EXPECT_TRUE(tourney.AddParticipant(&j2));
-		EXPECT_TRUE(tourney.AddParticipant(&j3));
-		EXPECT_TRUE(tourney.AddParticipant(&j4));
+		EXPECT_TRUE(tourney->AddParticipant(&j1));
+		EXPECT_TRUE(tourney->AddParticipant(&j2));
+		EXPECT_TRUE(tourney->AddParticipant(&j3));
+		EXPECT_TRUE(tourney->AddParticipant(&j4));
 
-		tourney.AddMatchTable(new Weightclass(&tourney, 50, 55));
-		tourney.AddMatchTable(new Weightclass(&tourney, 60, 65));
-		tourney.AddMatch(Match(&tourney, &j1, &j3, 1));
-		tourney.AddMatch(Match(&tourney, &j1, &j4, 2));
+		tourney->AddMatchTable(new Weightclass(tourney, 50, 55));
+		tourney->AddMatchTable(new Weightclass(tourney, 60, 65));
+		tourney->AddMatch(Match(tourney, &j1, &j3, 1));
+		tourney->AddMatch(Match(tourney, &j1, &j4, 2));
 
-		tourney.EnableAutoSave(false);
+		tourney->EnableAutoSave(false);
 
 
 		Tournament t("deleteMe");

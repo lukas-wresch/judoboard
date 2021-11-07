@@ -189,7 +189,7 @@ const std::string MatchTable::ToString() const
 
 
 
-MatchTable::MatchTable(ZED::CSV& Stream, const Tournament* Tournament) : Schedulable(Stream, Tournament)
+MatchTable::MatchTable(ZED::CSV& Stream, const ITournament* Tournament) : Schedulable(Stream, Tournament)
 {
 	Stream >> m_Name;
 
