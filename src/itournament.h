@@ -15,7 +15,7 @@ namespace Judoboard
 		virtual std::string GetName() const { return ""; }//Returns the name of the tournament
 		//const auto& GetSchedule() const { return m_Schedule; }
 		virtual Match* FindMatch(uint32_t ID) const { return nullptr; }
-		virtual Match* FindMatch(UUID UUID) const { return nullptr; }
+		virtual Match* FindMatch(const UUID& UUID) const { return nullptr; }
 		Match* FindMatch(const Match& Match) const { return FindMatch(Match.GetUUID()); }
 		const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
 

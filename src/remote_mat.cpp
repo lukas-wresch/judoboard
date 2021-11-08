@@ -14,6 +14,7 @@ RemoteMat::RemoteMat(uint32_t ID, const std::string& Host, uint16_t Port) : IMat
 {
 	ZED::HttpClient client(m_Hostname, m_Port);
 	std::string response = client.GET("/ajax/slave/set_mat_id?id=" + std::to_string(GetMatID()));
+	assert(response == "ok");
 }
 
 
@@ -160,19 +161,19 @@ std::string RemoteMat::SendRequest(const std::string& URL) const
 RemoteMat::InternalState RemoteMat::GetState(bool& Success) const
 {
 	auto response = SendRequest("/ajax/mat/get_score?id=" + std::to_string(GetMatID()));
+	InternalState internalState;
 
 	if (std::count(response.begin(), response.end(), ',') < 10)
 	{
 		ZED::Log::Warn("Invalid response: " + response);
 		Success = false;
 		assert(false);
+		return internalState;
 	}
 
 	Success = true;
 
 	ZED::CSV state(response);
-
-	InternalState internalState;
 
 	state >> internalState.white_ippon >> internalState.white_wazaari;
 	state >> internalState.blue_ippon  >> internalState.blue_wazaari;

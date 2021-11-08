@@ -35,7 +35,7 @@ namespace Judoboard
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
 		const auto& GetSchedule() const { return m_Schedule; }
 		Match* FindMatch(uint32_t ID) const;
-		Match* FindMatch(UUID UUID) const override;
+		Match* FindMatch(const UUID& UUID) const override;
 
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 
@@ -70,8 +70,8 @@ namespace Judoboard
 		const std::vector<MatchTable*>& GetMatchTables() const { return m_MatchTables; }
 		MatchTable* FindMatchTable(uint32_t ID);
 		const MatchTable* FindMatchTable(uint32_t ID) const;
-		MatchTable* FindMatchTable(UUID ID);
-		const MatchTable* FindMatchTable(UUID ID) const;
+		MatchTable* FindMatchTable(const UUID& ID);
+		const MatchTable* FindMatchTable(const UUID& ID) const;
 		int FindMatchTableIndex(uint32_t ID) const;
 
 		//Judoka

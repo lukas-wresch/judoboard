@@ -93,9 +93,10 @@ namespace Judoboard
 			int white_ippon, white_wazaari, white_shidos, white_medical;
 			int blue_ippon, blue_wazaari, blue_shidos, blue_medical;
 			uint32_t display_time;
-			bool hajime, cannextmatchstart, hasconcluded, isoutoftime_and_draw, isgoldenscore, arefightersonmat;
 			uint32_t white_osaekomi_time, blue_osaekomi_time;
+
 			bool white_osaekomi, blue_osaekomi;
+			bool hajime, cannextmatchstart, hasconcluded, isoutoftime_and_draw, isgoldenscore, arefightersonmat;
 		};
 
 		InternalState GetState(bool& Success) const;

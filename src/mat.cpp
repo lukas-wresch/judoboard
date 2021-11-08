@@ -1343,8 +1343,8 @@ void Mat::UpdateGraphics() const
 			if (!match->HasValidFighters())
 				continue;
 			
-			auto white_name = match->GetFighter(Fighter::White)->GetName();
-			auto blue_name  = match->GetFighter(Fighter::Blue )->GetName();
+			//auto white_name = match->GetFighter(Fighter::White)->GetName();
+			//auto blue_name  = match->GetFighter(Fighter::Blue )->GetName();
 
 			//m_Graphics["next_matches_white_" + std::to_string(i)].UpdateTexture(renderer, white_name, ZED::Color(0, 0, 0), FontSize);
 			//m_Graphics["next_matches_blue_"  + std::to_string(i)].UpdateTexture(renderer, blue_name,  ZED::Color(255, 255, 255), FontSize);

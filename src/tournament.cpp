@@ -406,7 +406,7 @@ Match* Tournament::FindMatch(uint32_t ID) const
 
 
 
-Match* Tournament::FindMatch(UUID UUID) const
+Match* Tournament::FindMatch(const UUID& UUID) const
 {
 	for (auto match : m_Schedule)
 		if (match && match->GetUUID() == UUID)
@@ -612,7 +612,7 @@ const MatchTable* Tournament::FindMatchTable(uint32_t ID) const
 
 
 
-MatchTable* Tournament::FindMatchTable(UUID ID)
+MatchTable* Tournament::FindMatchTable(const UUID& ID)
 {
 	for (auto table : m_MatchTables)
 		if (table && table->GetUUID() == ID)
@@ -622,7 +622,7 @@ MatchTable* Tournament::FindMatchTable(UUID ID)
 
 
 
-const MatchTable* Tournament::FindMatchTable(UUID ID) const
+const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 {
 	for (auto table : m_MatchTables)
 		if (table && table->GetUUID() == ID)
