@@ -19,3 +19,5 @@ jobs:
       run: ./compile.sh
     - name: run tests
       run: ./run_tests.sh
+    - name: debug tests
+      run: cd bin && gdb ./judoboard_GTest_Debug --eval-command=r && cd ..
