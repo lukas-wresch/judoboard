@@ -3,9 +3,6 @@
 #include <signal.h>
 
 
-//#define ZED_NO_LOG
-
-
 #include "../src/account.h"
 #include "../src/app.h"
 #include "../src/database.h"
@@ -43,13 +40,13 @@ inline void my_abort_function(int signo)
 
 inline void initialize() noexcept
 {
-#ifdef _WIN32
 	_set_error_mode(_OUT_TO_STDERR);
 	_set_abort_behavior(0, _WRITE_ABORT_MSG);
 	signal(SIGABRT, my_abort_function);
-	//signal(SIGSEGV, my_abort_function);
-	//signal(SIGINT,  my_abort_function);
-#endif
+	signal(SIGILL,  my_abort_function);
+	signal(SIGSEGV, my_abort_function);
+	signal(SIGINT,  my_abort_function);
+
 	Judoboard::ID::Reset();
 	Application::NoWindow = true;
 }
