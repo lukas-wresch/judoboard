@@ -44,11 +44,11 @@ inline void initialize() noexcept
 #ifdef _WIN32
 	_set_error_mode(_OUT_TO_STDERR);
 	_set_abort_behavior(0, _WRITE_ABORT_MSG);
-#endif
-	//signal(SIGABRT, my_abort_function);
+	signal(SIGABRT, my_abort_function);
 	signal(SIGILL,  my_abort_function);
 	signal(SIGSEGV, my_abort_function);
 	signal(SIGINT,  my_abort_function);
+#endif
 
 	Judoboard::ID::Reset();
 	Application::NoWindow = true;
