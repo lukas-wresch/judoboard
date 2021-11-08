@@ -86,7 +86,7 @@ bool RemoteMat::StartMatch(Match* NewMatch)
 	ZED::CSV csv;
 	*NewMatch >> csv;
 
-	return SendCommand("/ajax/slave/start_match?id=" + std::to_string(GetMatID()) + "&match=" + (std::string)csv);
+	return PostData("/ajax/slave/start_match?id=" + std::to_string(GetMatID()), csv);
 }
 
 
@@ -154,8 +154,18 @@ std::string RemoteMat::SendRequest(const std::string& URL) const
 	ZED::Log::Debug("Sending request: " + URL);
 
 	ZED::HttpClient client(m_Hostname, m_Port);
-	char Token[] = "token=test";
-	return client.POST(URL, Token);
+	return client.GET(URL, "Cookie: token=test");
+}
+
+
+
+bool RemoteMat::PostData(const std::string& URL, const ZED::CSV& Data) const
+{
+	ZED::Log::Debug("Posting data: " + URL);
+
+	ZED::HttpClient client(m_Hostname, m_Port);
+	std::string response = client.POST(URL, Data, "Cookie: token=test");
+	return response == "ok";
 }
 
 

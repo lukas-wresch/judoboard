@@ -253,7 +253,7 @@ TEST(App, MatchOnSlave)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080  + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 

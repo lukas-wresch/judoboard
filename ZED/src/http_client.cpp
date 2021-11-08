@@ -8,17 +8,22 @@ using namespace ZED;
 
 
 
-bool HttpClient::SendGETRequest(const char* Path)
+bool HttpClient::SendGETRequest(const char* Path, const char* AdditionalHeaders)
 {
 	if (!m_Socket.IsConnected())
 		return false;
 	
 
-	char request[512] = {};
+	char request[1024] = {};
 	strcpy_s(request, sizeof(request), "GET ");
 	strcat_s(request, sizeof(request), Path);
 	strcat_s(request, sizeof(request), " HTTP/1.1\r\nHost: ");
 	strcat_s(request, sizeof(request), m_Hostname.c_str());
+	strcat_s(request, sizeof(request), "\r\n");
+
+	if (AdditionalHeaders)
+		strcat_s(request, sizeof(request), AdditionalHeaders);
+
 	strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
 
 	return m_Socket.Send(request, strlen(request));
@@ -26,19 +31,24 @@ bool HttpClient::SendGETRequest(const char* Path)
 
 
 
-bool HttpClient::SendPOSTRequest(const char* Path, const Blob& Data)
+bool HttpClient::SendPOSTRequest(const char* Path, const Blob& Data, const char* AdditionalHeaders)
 {
 	if (!m_Socket.IsConnected())
 		return false;
 
 
-	char request[512] = {};
+	char request[1024] = {};
 	strcpy_s(request, sizeof(request), "GET ");
 	strcat_s(request, sizeof(request), Path);
 	strcat_s(request, sizeof(request), " HTTP/1.1\r\nHost: ");
 	strcat_s(request, sizeof(request), m_Hostname.c_str());
 	strcat_s(request, sizeof(request), "\r\nContent-Length: ");
 	strcat_s(request, sizeof(request), std::to_string(Data.GetSize()).c_str());
+	strcat_s(request, sizeof(request), "\r\n");
+
+	if (AdditionalHeaders)
+		strcat_s(request, sizeof(request), AdditionalHeaders);
+
 	strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
 
 	if (!m_Socket.Send(request, strlen(request)))
@@ -73,7 +83,7 @@ bool HttpClient::SendFile(const char* Path, const char* Filename)
 	auto length = file.tellg();
 	file.seekg(0, std::ios::beg);
 
-	char request[512] = {};
+	char request[1024] = {};
 	strcpy_s(request, sizeof(request), "GET ");
 	strcat_s(request, sizeof(request), Path);
 	strcat_s(request, sizeof(request), " HTTP/1.1\r\nHost: ");

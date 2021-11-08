@@ -1835,8 +1835,8 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		if (!IsSlave())
 			return "You are not allowed to connect";
 
-		int matID      = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		ZED::CSV matchCSV = HttpServer::DecodeURLEncoded(Request.m_Query, "match");
+		int matID         = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		ZED::CSV matchCSV = Request.m_Body;
 
 		for (auto mat : m_Mats)
 		{
@@ -2104,15 +2104,15 @@ bool Application::CloseTournament()
 const Account* Application::IsLoggedIn(const HttpServer::Request& Request) const
 {
 	if (!IsRunning())
-		return nullptr;
-
-	auto token = HttpServer::DecodeURLEncoded(Request.m_Body, "token");
-	if (token == "test")//TODO remove this, i.e. replace this with a secure token
-		return GetDefaultAdminAccount();
+		return nullptr;	
 
 	auto header = Request.m_RequestInfo.FindHeader("Cookie");
 	if (header)
 	{
+		auto token = HttpServer::DecodeURLEncoded(header->Value, "token");
+		if (token == "test")//TODO remove this, i.e. replace this with a secure token (from a specific account maybe)
+			return GetDefaultAdminAccount();
+
 		auto value = HttpServer::DecodeURLEncoded(header->Value, "session");
 		return m_Database.CheckLogin(Request.m_RequestInfo.RemoteIP, value);
 	}

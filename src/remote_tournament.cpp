@@ -101,7 +101,7 @@ bool RemoteTournament::Post2Master(const std::string& URL, const ZED::CSV& Data)
 	ZED::Log::Debug("Posting data to master: " + URL);
 
 	ZED::HttpClient client(m_Hostname, m_Port);
-	auto response = (std::string)client.POST(URL, Data);
+	std::string response = client.POST(URL, Data, "token=test");
 
 	if (response.length() == 0 || response != "ok")
 	{
