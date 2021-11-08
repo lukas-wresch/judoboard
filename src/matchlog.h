@@ -52,7 +52,7 @@ namespace Judoboard
 		return "blue";
 	}
 
-	inline Winner Fighter2Winner (Fighter f)
+	inline Winner Fighter2Winner(Fighter f)
 	{
 		switch (f)
 		{

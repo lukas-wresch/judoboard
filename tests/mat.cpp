@@ -195,9 +195,9 @@ TEST(Mat, CorrectWinner)
 			EXPECT_TRUE(m.EndMatch());
 
 			if (i == 4)
-				EXPECT_TRUE(match.GetMatchResult().m_Winner == Winner::Draw);
+				EXPECT_EQ(match.GetMatchResult().m_Winner, Winner::Draw);
 			else
-				EXPECT_TRUE(match.GetMatchResult().m_Winner == f);
+				EXPECT_EQ(match.GetMatchResult().m_Winner, Fighter2Winner(f));
 		}
 	}
 }
@@ -441,12 +441,12 @@ TEST(Mat, ScoreEndsGoldenScore)
 				m.AddWazaAri(f);
 			else if (i == 2)
 				m.AddYuko(f);
-			else if (i == 3)
+			else
 				m.AddKoka(f);
 
 			EXPECT_FALSE(m.IsHajime());
 			EXPECT_TRUE(m.EndMatch());
-			EXPECT_TRUE(match.GetMatchResult().m_Winner == f);
+			EXPECT_EQ(match.GetMatchResult().m_Winner, Fighter2Winner(f));
 		}
 	}
 }
@@ -2024,7 +2024,7 @@ TEST(Mat, Hantei)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetMatchResult().m_Winner == f);
+		EXPECT_TRUE(match.GetMatchResult().m_Winner == Fighter2Winner(f));
 		EXPECT_TRUE(match.GetMatchResult().m_Score  == Match::Score::Hantei);
 		EXPECT_TRUE(match.GetMatchResult().m_Score  == (Match::Score)1);
 	}

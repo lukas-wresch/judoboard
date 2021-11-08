@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include "judoka.h"
 #include "matchtable.h"
 #include "mat.h"
@@ -16,7 +17,9 @@ namespace Judoboard
 		//const auto& GetSchedule() const { return m_Schedule; }
 		virtual Match* FindMatch(uint32_t ID) const { return nullptr; }
 		virtual Match* FindMatch(const UUID& UUID) const { return nullptr; }
+		[[nodiscard]]
 		Match* FindMatch(const Match& Match) const { return FindMatch(Match.GetUUID()); }
+		[[nodiscard]]
 		const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
 
 		//void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
@@ -50,12 +53,14 @@ namespace Judoboard
 		virtual void UpdateMatchTable(uint32_t ID) {}//Calling this function we recalculate the given match table
 		virtual bool DeleteMatchTable(uint32_t ID) { return false; }
 		virtual const std::vector<MatchTable*>& GetMatchTables() const {
-			std::vector<MatchTable*> ret;
+			assert(false);
+			static std::vector<MatchTable*> ret;
 			return ret;
 		}
 
 		virtual std::vector<MatchTable*>& SetMatchTables() {
-			std::vector<MatchTable*> ret;
+			assert(false);
+			static std::vector<MatchTable*> ret;
 			return ret;
 		}
 

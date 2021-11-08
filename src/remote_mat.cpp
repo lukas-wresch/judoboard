@@ -161,7 +161,7 @@ std::string RemoteMat::SendRequest(const std::string& URL) const
 RemoteMat::InternalState RemoteMat::GetState(bool& Success) const
 {
 	auto response = SendRequest("/ajax/mat/get_score?id=" + std::to_string(GetMatID()));
-	InternalState internalState;
+	InternalState internalState = {};
 
 	if (std::count(response.begin(), response.end(), ',') < 10)
 	{

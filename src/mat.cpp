@@ -1456,8 +1456,7 @@ void Mat::UpdateGraphics() const
 
 				if (new_width > osaekomi_bar.m_width || osaekomi_bar.m_a <= 0.0)
 				{
-					osaekomi_text.StopAllAnimations();
-					osaekomi_text.SetPosition(new_text_x, osaekomi_y + 1, 255);
+					osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
 
 					m_Graphics["osaekomi_bar_border"].SetPosition(0, osaekomi_y, 255);
 					m_Graphics["osaekomi_bar_border"].m_width  = new_width + 5;

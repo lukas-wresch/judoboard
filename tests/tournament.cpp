@@ -267,7 +267,7 @@ TEST(Tournament, HasDefaultRuleSet)
 
 	ZED::Core::RemoveFile("tournaments\\deleteMe");
 	Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
-	tourney.AddParticipant(new Judoka("temp", "temp", 50));
+	EXPECT_TRUE(tourney.AddParticipant(new Judoka("temp", "temp", 50)));
 	tourney.Reset();
 
 	tourney.EnableAutoSave(false);
@@ -418,6 +418,7 @@ TEST(Tournament, AddMatchAfterConclusion)
 		mat->EndMatch();
 
 		EXPECT_FALSE(tourney.AddMatch(&match2));
+		delete mat;
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe");
@@ -464,5 +465,6 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 	mat->AddIppon(Fighter::White);
 	mat->EndMatch();
 
-	EXPECT_TRUE(tourney.AddMatch(&match2));	
+	EXPECT_TRUE(tourney.AddMatch(&match2));
+	delete mat;
 }

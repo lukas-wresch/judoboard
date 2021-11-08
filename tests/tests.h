@@ -18,7 +18,7 @@
 #include "../src/schedule_entry.h"
 #include "../src/timer.h"
 #include "../src/tournament.h"
-#include "../src/virtual_mat.h"
+//#include "../src/virtual_mat.h"
 #include "../src/weightclass.h"
 #include "../src/window.h"
 

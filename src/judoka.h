@@ -55,7 +55,7 @@ namespace Judoboard
 		bool operator ==(const Judoka& cmp) const { return GetID() == cmp.GetID(); }
 
 	private:
-		Judoka() {}//Create empty judoka (for class Mat)
+		Judoka() = default;//Create empty judoka (for class Mat)
 
 		std::string m_Firstname;
 		std::string m_Lastname;

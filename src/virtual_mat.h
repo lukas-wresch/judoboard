@@ -51,17 +51,17 @@ namespace Judoboard
 		virtual void Hantei(Fighter Whom) override {}
 		virtual void SetAsDraw(bool Enable = true) override {}
 
-		virtual void AddShido(Fighter Whom) {}
-		virtual void RemoveShido(Fighter Whom) {}
+		virtual void AddShido(Fighter Whom) override {}
+		virtual void RemoveShido(Fighter Whom) override {}
 
-		virtual void AddHansokuMake(Fighter Whom) {}
-		virtual void RemoveHansokuMake(Fighter Whom) {}
+		virtual void AddHansokuMake(Fighter Whom, bool Direct = true) override {}
+		virtual void RemoveHansokuMake(Fighter Whom) override {}
 
-		virtual void AddMedicalExamination(Fighter Whom) {}
-		virtual void RemoveMedicalExamination(Fighter Whom) {}
+		virtual void AddMedicalExamination(Fighter Whom) override {}
+		virtual void RemoveMedicalExamination(Fighter Whom) override {}
 
-		virtual void Osaekomi(Fighter Whom) {}
-		virtual void Tokeda() {}
+		virtual void Osaekomi(Fighter Whom) override {}
+		virtual void Tokeda() override {}
 
 		//Output
 		virtual Match::Result GetResult() const { Match::Result ret; return ret; };
