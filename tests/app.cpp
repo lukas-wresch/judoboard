@@ -128,12 +128,14 @@ TEST(App, FullTournament)
 	tourney->AddMatchTable(m1);
 	tourney->AddMatchTable(m2);
 
-	auto* mat = app.GetDefaultMat();
+	auto mat = app.GetDefaultMat();
+	ASSERT_TRUE(mat);
 
 	for (int i = 0; i < 6; i++)
 	{
 		ZED::Core::Pause(6000);
-		auto* match = tourney->GetNextMatch(mat->GetMatID());
+		auto match = tourney->GetNextMatch(mat->GetMatID());
+		ASSERT_TRUE(match);
 		EXPECT_TRUE(mat->StartMatch(*match));
 
 		ZED::Core::Pause(8000);

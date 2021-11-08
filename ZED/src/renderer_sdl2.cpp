@@ -221,7 +221,7 @@ Ref<Texture> RendererSDL2::RenderFont(FontSize Size, const std::string& Text, ZE
 
 	if (ret)
 	{
-		Log::Debug("Text rendered to texture, width=" + std::to_string(ret->GetWidth()));
+		//Log::Debug("Text rendered to texture, width=" + std::to_string(ret->GetWidth()));
 		strcpy_s(ret->m_image_filename, sizeof(ret->m_image_filename), Text.c_str());
 	}
 	else

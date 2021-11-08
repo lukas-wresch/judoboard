@@ -2045,7 +2045,7 @@ TEST(Mat, BreakTime)
 
 		Judoka* j1 = new Judoka("Needs", "Break");
 		Judoka* j2 = new Judoka("White", "LastnameW");
-		Judoka* j3 = new Judoka("Blue", "LastnameB");
+		Judoka* j3 = new Judoka("Blue",  "LastnameB");
 
 		Match match(nullptr, j1, j2);
 		match.SetMatID(1);

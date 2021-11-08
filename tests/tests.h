@@ -34,7 +34,6 @@ using namespace Judoboard;
 inline void my_abort_function(int signo)
 {
 	ASSERT_TRUE(false);
-	abort();
 }
 
 
