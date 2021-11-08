@@ -7,8 +7,8 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
-    name: Unit Tests
+  test1:
+    name: Unit Tests on Ubuntu
     runs-on: ubuntu-latest
 
     steps:
@@ -20,4 +20,19 @@ jobs:
     - name: run tests
       run: ./run_tests.sh
     - name: debug tests
-      run: cd bin && gdb ./judoboard_GTest_Debug --eval-command=r && cd ..
+      run: cd bin && echo "r\nbt" > commands; gdb ./judoboard_GTest_Debug --command=commands && cd ..
+      
+  test2:
+    name: Unit Tests on Raspberry Pi 4
+    runs-on: self-hosted
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: chmod u+x *.sh
+    - name: make
+      run: ./compile.sh
+    - name: run tests
+      run: ./run_tests.sh
+    - name: debug tests
+      run: cd bin && echo "r\nbt" > commands; gdb ./judoboard_GTest_Debug --command=commands && cd ..
