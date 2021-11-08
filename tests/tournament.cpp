@@ -135,7 +135,7 @@ TEST(Tournament, DoubleDisqualification2)
 
 		Mat m(1);
 
-		EXPECT_TRUE(m.StartMatch(match1));
+		EXPECT_TRUE(m.StartMatch(&match1));
 		m.Hajime();
 		m.AddIppon(Fighter::White);
 		EXPECT_TRUE(m.EndMatch());
@@ -412,7 +412,7 @@ TEST(Tournament, AddMatchAfterConclusion)
 		EXPECT_TRUE(tourney.AddMatch(&match1));
 
 		auto mat = new Mat(1);
-		mat->StartMatch(match1);
+		mat->StartMatch(&match1);
 
 		mat->AddIppon(Fighter::White);
 		mat->EndMatch();
@@ -459,7 +459,7 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 	EXPECT_TRUE(tourney.AddMatch(&match1));
 
 	auto mat = new Mat(1);
-	mat->StartMatch(match1);
+	mat->StartMatch(&match1);
 
 	mat->AddIppon(Fighter::White);
 	mat->EndMatch();

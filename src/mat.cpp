@@ -137,29 +137,35 @@ bool Mat::Reset()
 
 
 
-bool Mat::StartMatch(Match& NewMatch)
+bool Mat::StartMatch(Match* NewMatch)
 {
-	if (!NewMatch.IsAssociatedWithMat() || NewMatch.GetMatID() != GetMatID())
+	if (!NewMatch)
+	{
+		ZED::Log::Warn("Invalid match");
+		return false;
+	}
+
+	if (!NewMatch->IsAssociatedWithMat() || NewMatch->GetMatID() != GetMatID())
 	{
 		ZED::Log::Warn("Match does not belong to this mat");
 		return false;
 	}
 
-	if (NewMatch.IsRunning() || NewMatch.HasConcluded())
+	if (NewMatch->IsRunning() || NewMatch->HasConcluded())
 	{
 		ZED::Log::Warn("Match is already running or has been concluded");
 		return false;
 	}
 
-	if (!NewMatch.HasValidFighters())
+	if (!NewMatch->HasValidFighters())
 	{
 		ZED::Log::Warn("Can not start a match with invalid fighters");
 		return false;
 	}
 
-	const auto& rules = NewMatch.GetRuleSet();
+	const auto& rules = NewMatch->GetRuleSet();
 
-	if (NewMatch.GetFighter(Fighter::White)->GetLengthOfBreak() < rules.GetBreakTime() || NewMatch.GetFighter(Fighter::Blue)->GetLengthOfBreak() < rules.GetBreakTime())
+	if (NewMatch->GetFighter(Fighter::White)->GetLengthOfBreak() < rules.GetBreakTime() || NewMatch->GetFighter(Fighter::Blue)->GetLengthOfBreak() < rules.GetBreakTime())
 	{
 		ZED::Log::Warn("Can not start a match since at least one fighter has not had his break yet");
 		return false;
@@ -173,12 +179,12 @@ bool Mat::StartMatch(Match& NewMatch)
 		return false;
 	}
 
-	m_White = *NewMatch.GetFighter(Fighter::White);
-	m_Blue  = *NewMatch.GetFighter(Fighter::Blue);
+	m_White = *NewMatch->GetFighter(Fighter::White);
+	m_Blue  = *NewMatch->GetFighter(Fighter::Blue);
 
-	m_pMatch = &NewMatch;
+	m_pMatch = NewMatch;
 
-	NewMatch.StartMatch();
+	NewMatch->StartMatch();
 	AddEvent(MatchLog::NeutralEvent::StartMatch);
 	NextState(State::TransitionToMatch);
 

@@ -108,10 +108,14 @@ bool Database::Save(const std::string& Filename) const
 
 
 
-void Database::AddAccount(const Account& NewAccount)
+const Account* Database::AddAccount(const Account& NewAccount)
 {
-	m_Accounts.push_back(new Account(NewAccount));
+	Account* new_account = new Account(NewAccount);
+	m_Accounts.push_back(new_account);
+
 	Save(m_Filename);
+
+	return new_account;
 }
 
 

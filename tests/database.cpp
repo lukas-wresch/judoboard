@@ -249,7 +249,9 @@ TEST(Database, RuleSets)
 
 		d.AddRuleSet(rules);
 
-		EXPECT_TRUE(d.FindRuleSetByName(name)->GetUUID() == rules->GetUUID());
-		EXPECT_TRUE(d.FindRuleSetByName(name)->GetName() == rules->GetName());
+		ASSERT_TRUE(d.FindRuleSetByName(name));
+
+		EXPECT_EQ(d.FindRuleSetByName(name)->GetUUID(), rules->GetUUID());
+		EXPECT_EQ(d.FindRuleSetByName(name)->GetName(), rules->GetName());
 	}
 }

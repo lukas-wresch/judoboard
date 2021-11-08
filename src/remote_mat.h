@@ -23,9 +23,9 @@ namespace Judoboard
 		virtual bool AreFightersOnMat() const override { return false; }
 
 		virtual bool CanNextFightStart() const override { return false; };
-		virtual bool StartMatch(Match& NewMatch) override;
+		virtual bool StartMatch(Match* NewMatch) override;
 		virtual bool HasConcluded() const override { return false; }
-		virtual bool EndMatch() override { return false; }
+		virtual bool EndMatch() override;
 
 		virtual uint32_t GetTimeElapsed()  const override { return 0; }
 		virtual uint32_t GetTime2Display() const override { return 0; }
@@ -43,7 +43,7 @@ namespace Judoboard
 		virtual void Mate() override {}
 		virtual void Sonomama() override {}
 
-		virtual void AddIppon(Fighter Whom) override {}
+		virtual void AddIppon(Fighter Whom) override;
 		virtual void RemoveIppon(Fighter Whom) override {}
 
 		virtual void AddWazaAri(Fighter Whom) override {}
@@ -85,6 +85,8 @@ namespace Judoboard
 		virtual ZED::CSV Osaekomi2String(Fighter Who) const  override { return ""; }
 
 	private:
+		bool SendRequest(const std::string& URL) const;
+
 		std::vector<OsaekomiEntry> m_OsaekomiList;
 
 		std::string m_Hostname;

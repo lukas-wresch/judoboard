@@ -136,7 +136,7 @@ TEST(App, FullTournament)
 		ZED::Core::Pause(6000);
 		auto match = tourney->GetNextMatch(mat->GetMatID());
 		ASSERT_TRUE(match);
-		EXPECT_TRUE(mat->StartMatch(*match));
+		EXPECT_TRUE(mat->StartMatch(match));
 
 		ZED::Core::Pause(8000);
 				
@@ -195,7 +195,7 @@ TEST(App, VeryLongNameTest)
 
 	ZED::Core::Pause(5000);
 
-	EXPECT_TRUE(m.StartMatch(match));
+	EXPECT_TRUE(m.StartMatch(&match));
 	m.Hajime();
 
 	ZED::Core::Pause(30*1000);
@@ -258,15 +258,19 @@ TEST(App, MatchOnSlave)
 	master.CloseMat(1);
 
 	slave.StartLocalMat(2);
+
+
 	Judoka j1("White", "LastnameW");
 	Judoka j2("Blue",  "LastnameB");
 	Match match(nullptr, &j1, &j2);
 	match.SetMatID(2);
 
+	master.GetTournament()->AddMatch(&match);
+
 	auto mat = master.FindMat(2);
 
 	ASSERT_TRUE(mat != nullptr);
-	ASSERT_TRUE(mat->StartMatch(match));
+	ASSERT_TRUE(mat->StartMatch(&match));
 
 	ZED::Core::Pause(5000);
 

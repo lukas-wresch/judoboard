@@ -3960,19 +3960,20 @@ static void process_new_connection(struct mg_connection *conn) {
                                      conn->buf, conn->buf_size,
                                      &conn->data_len);
     assert(conn->data_len >= conn->request_len);
-    if (conn->request_len == 0 && conn->data_len == conn->buf_size) {
+    if (conn->request_len == 0 && conn->data_len == conn->buf_size)
+    {
       send_http_error(conn, 413, "Request Too Large", "");
       return;
-    } if (conn->request_len <= 0) {
-      return;  // Remote end closed the connection
     }
+    if (conn->request_len <= 0)
+      return;  // Remote end closed the connection
 
-    if (parse_http_request(conn->buf, conn->buf_size, ri) <= 0 ||
-        !is_valid_uri(ri->uri)) {
+    if (parse_http_request(conn->buf, conn->buf_size, ri) <= 0 || !is_valid_uri(ri->uri))
+    {
       // Do not put garbage in the access log, just send it back to the client
-      send_http_error(conn, 400, "Bad Request",
-          "Cannot parse HTTP request: [%.*s]", conn->data_len, conn->buf);
-    } else if (strcmp(ri->http_version, "1.0") &&
+      send_http_error(conn, 400, "Bad Request", "Cannot parse HTTP request: [%.*s]", conn->data_len, conn->buf);
+    }
+    else if (strcmp(ri->http_version, "1.0") &&
                strcmp(ri->http_version, "1.1")) {
       // Request seems valid, but HTTP version is strange
       send_http_error(conn, 505, "HTTP version not supported", "");

@@ -112,7 +112,7 @@ namespace Judoboard
 		const Window& GetWindow() const { return m_Window; }
 
 		//Commands by judge
-		virtual bool StartMatch(Match& NewMatch) override;
+		virtual bool StartMatch(Match* NewMatch) override;
 		virtual bool EndMatch() override;
 
 		virtual void Hajime() override;

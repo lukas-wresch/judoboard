@@ -500,7 +500,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 		auto nextMatch = GetTournament()->GetNextMatch(mat->GetMatID());
 		if (nextMatch)
-			if (!mat->StartMatch(*nextMatch))
+			if (!mat->StartMatch(nextMatch))
 				return "Could not start next match";
 		return Error();//OK
 	});
@@ -1849,7 +1849,9 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		{
 			if (mat && mat->GetMatID() == matID)
 			{
-				Match match(matchCSV, GetTournament());
+				Match* match = new Match(matchCSV, GetTournament());
+				GetTournament()->AddMatch(match);
+
 				if (mat->StartMatch(match))
 					return "ok";//OK
 				return "Could not start match";
@@ -1857,6 +1859,28 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		}
 
 		return "Mat not found";
+	});
+
+	m_Server.RegisterResource("/ajax/slave/end_match", [this](auto Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
+		if (!IsSlave())
+			return "You are not allowed to connect";
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (!mat)
+			return "Could not find mat";
+
+		if (mat->EndMatch())
+			return Error();
+
+		return "Operation failed";
 	});
 
 	m_Server.RegisterResource("/ajax/config/shutdown", [this](auto Request) -> std::string {
@@ -2026,6 +2050,19 @@ bool Application::LoadDataFromDisk()
 
 
 
+const Account* Application::GetDefaultAdminAccount() const
+{
+	for (auto account : GetDatabase().GetAccounts())
+	{
+		if (account && account->GetAccessLevel() == Account::AccessLevel::Admin)
+			return account;
+	}
+
+	//No admin account found, create the default one
+	return m_Database.AddAccount(Account("admin", "1234", Account::AccessLevel::Admin));
+}
+
+
 
 bool Application::OpenTournament(uint32_t Index)
 {
@@ -2057,6 +2094,10 @@ const Account* Application::IsLoggedIn(const HttpServer::Request& Request) const
 {
 	if (!IsRunning())
 		return nullptr;
+
+	auto token = HttpServer::DecodeURLEncoded(Request.m_Body, "token");
+	if (token == "test")//TODO remove this, i.e. replace this with a secure token
+		return GetDefaultAdminAccount();
 
 	auto header = Request.m_RequestInfo.FindHeader("Cookie");
 	if (header)

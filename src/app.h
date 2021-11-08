@@ -32,9 +32,12 @@ namespace Judoboard
 		bool IsMaster()  const { return m_Mode == Mode::Master; }
 		bool IsSlave()   const { return m_Mode == Mode::Slave; }
 
+		const Database& GetDatabase() const { return m_Database; }
 		Database& GetDatabase() { return m_Database; }
 
 		bool LoadDataFromDisk();
+
+		const Account* GetDefaultAdminAccount() const;
 
 		//Tournaments
 		const ITournament* GetTournament() const { return m_CurrentTournament; }//Returns the tournament that is currently open, return null pointer if no tournament is open
@@ -120,7 +123,7 @@ namespace Judoboard
 
 		HttpServer m_Server;
 
-		Database m_Database;
+		mutable Database m_Database;
 
 		Tournament m_TempTournament;
 		std::vector<Tournament*> m_Tournaments;

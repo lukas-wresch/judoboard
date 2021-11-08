@@ -28,7 +28,7 @@ namespace Judoboard
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 
 		//Accounts
-		void AddAccount(const Account& NewAccount);
+		const Account* AddAccount(const Account& NewAccount);
 		size_t GetNumAccounts() const { return m_Accounts.size(); }
 		const Account* GetAccount(size_t Index) const { if (Index >= m_Accounts.size()) return nullptr; return m_Accounts[Index]; }
 		Account* SetAccount(size_t Index) { if (Index >= m_Accounts.size()) return nullptr; return m_Accounts[Index]; }

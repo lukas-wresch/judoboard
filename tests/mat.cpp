@@ -97,7 +97,7 @@ TEST(Mat, ForcedCloseDuringMatch)
 	ZED::Core::Pause(6000);
 	auto match = tourney->GetNextMatch(mat->GetMatID());
 	EXPECT_TRUE(match != nullptr);
-	EXPECT_TRUE(mat->StartMatch(*match));
+	EXPECT_TRUE(mat->StartMatch(match));
 
 	ZED::Core::Pause(8000);
 
@@ -128,7 +128,7 @@ TEST(Mat, StartMatch)
 
 	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 	match.SetMatID(1);
-	EXPECT_TRUE(m.StartMatch(match));
+	EXPECT_TRUE(m.StartMatch(&match));
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
@@ -168,7 +168,7 @@ TEST(Mat, CorrectWinner)
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 5, 0, 30, 20, true, true, true, 0));
 
-			EXPECT_TRUE(m.StartMatch(match));
+			EXPECT_TRUE(m.StartMatch(&match));
 			m.Hajime();
 					
 			if (i == 0)
@@ -214,7 +214,7 @@ TEST(Mat, ForceClose)
 
 	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 	match.SetMatID(1);
-	EXPECT_TRUE(m.StartMatch(match));
+	EXPECT_TRUE(m.StartMatch(&match));
 }
 
 
@@ -230,7 +230,7 @@ TEST(Mat, RemoveIpponShouldRecoverPreviousWazaari)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.AddWazaAri(f);
 		m.AddIppon(f);
@@ -264,7 +264,7 @@ TEST(Mat, RemoveWazariShouldRemoveIppon)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.AddWazaAri(f);
 		m.AddWazaAri(f);
@@ -298,7 +298,7 @@ TEST(Mat, Scores)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 0);
 		m.AddIppon(f);
@@ -332,7 +332,7 @@ TEST(Mat, Shido)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 0);
@@ -388,7 +388,7 @@ TEST(Mat, ShidoDoesntEndGoldenScore)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 5, 60, 30, 20, false, false, true, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 
@@ -427,7 +427,7 @@ TEST(Mat, ScoreEndsGoldenScore)
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 5, 60, 30, 20, true, true, true, 0));
 
-			EXPECT_TRUE(m.StartMatch(match));
+			EXPECT_TRUE(m.StartMatch(&match));
 			m.Hajime();
 
 			ZED::Core::Pause(5500);
@@ -464,7 +464,7 @@ TEST(Mat, ShidosResultInIndirectHansokumake)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		
 		m.AddShido(f);
@@ -496,7 +496,7 @@ TEST(Mat, HansokumakeResultsInDirectHansokumake)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		m.AddHansokuMake(f);
@@ -530,7 +530,7 @@ TEST(Mat, DirectHansokumakeDoesNotConcludeMatch)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		m.AddHansokuMake(f);
@@ -553,7 +553,7 @@ TEST(Mat, DirectHansokumakeAndDisqDoesConcludeMatch)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		m.AddHansokuMake(f);
@@ -577,7 +577,7 @@ TEST(Mat, Gachi)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.AddGachi(f);
 
@@ -599,7 +599,7 @@ TEST(Mat, GachiResultsInMate)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.AddGachi(f);
 
@@ -625,7 +625,7 @@ TEST(Mat, DoubleIppon)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.AddIppon(f);
 		m.AddIppon(!f);
@@ -659,7 +659,7 @@ TEST(Mat, DoubleIpponFightersKeepWazaari)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.AddWazaAri(f);
 		m.AddWazaAri(!f);
@@ -699,7 +699,7 @@ TEST(Mat, DoubleIpponDuringGoldenScore)
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 1, 60, 30, 20, false, false, false, 0));
 
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 		
 		m.Hajime();
 		ZED::Core::Pause(2000);
@@ -737,7 +737,7 @@ TEST(Mat, DoubleIpponDuringGoldenScoreFightersKeepWazaari)
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 1, 60, 30, 20, false, false, false, 0));
 
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 		m.AddWazaAri(f);
@@ -778,7 +778,7 @@ TEST(Mat, IpponResultsInMate)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.AddIppon(f);
 
@@ -802,7 +802,7 @@ TEST(Mat, HansokumakeResultsInMate)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.AddHansokuMake(f);
 
@@ -830,7 +830,7 @@ TEST(Mat, ThirdShidoIsHansokumake)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		m.AddShido(f);
@@ -862,7 +862,7 @@ TEST(Mat, DoubleHansokumake)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		m.AddShido(f);
@@ -904,7 +904,7 @@ TEST(Mat, DoubleGachi)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		m.AddGachi(f);
@@ -930,7 +930,7 @@ TEST(Mat, Hansokumake)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
@@ -967,7 +967,7 @@ TEST(Mat, MedicalExaminiations)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		EXPECT_TRUE(m.GetScoreboard(f).m_MedicalExamination == 0);
@@ -1012,7 +1012,7 @@ TEST(Mat, MatchTime)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", time, 60, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 
@@ -1041,7 +1041,7 @@ TEST(Mat, GoldenScoreTime)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 5, time, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 
@@ -1076,7 +1076,7 @@ TEST(Mat, OsaekomiTime)
 			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 100, 0, time, 20, false, false, false, 0));
-			EXPECT_TRUE(m.StartMatch(match));
+			EXPECT_TRUE(m.StartMatch(&match));
 
 			m.Hajime();
 			m.Osaekomi(f);
@@ -1112,7 +1112,7 @@ TEST(Mat, OsaekomiWithWazaAriTime)
 			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 100, 0, 100, time, false, false, false, 0));
-			EXPECT_TRUE(m.StartMatch(match));
+			EXPECT_TRUE(m.StartMatch(&match));
 
 			m.Hajime();
 			m.AddWazaAri(f);
@@ -1147,7 +1147,7 @@ TEST(Mat, OsaekomiUkeGainsIppon)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 100, 0, 100, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -1179,7 +1179,7 @@ TEST(Mat, OsaekomiToriGivesUp)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 100, 0, 100, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -1213,7 +1213,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 100, 0, time*2, time, false, false, false, 0));
-			EXPECT_TRUE(m.StartMatch(match));
+			EXPECT_TRUE(m.StartMatch(&match));
 
 			m.Hajime();
 			m.AddWazaAri(f);
@@ -1265,7 +1265,7 @@ TEST(Mat, OsaekomiTillEndDuringGoldenScore)
 			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 5, 60, 2*time, time, false, false, false, 0));
-			EXPECT_TRUE(m.StartMatch(match));
+			EXPECT_TRUE(m.StartMatch(&match));
 
 			m.Hajime();
 			ZED::Core::Pause(6000);
@@ -1303,7 +1303,7 @@ TEST(Mat, Sonomama)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 500, 0, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -1359,7 +1359,7 @@ TEST(Mat, Tokeda)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 500, 0, 20, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -1417,7 +1417,7 @@ TEST(Mat, OsaekomiSwitch)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 500, 0, 25, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -1457,7 +1457,7 @@ TEST(Mat, MatchContinuesDuringOsaekomi)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 10, 0, 10, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 		ZED::Core::Pause(8 * 1000);
@@ -1492,7 +1492,7 @@ TEST(Mat, Yuko)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, true, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		EXPECT_TRUE(m.GetScoreboard(f).m_Yuko == 0);
@@ -1524,7 +1524,7 @@ TEST(Mat, Yuko2)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		EXPECT_TRUE(m.GetScoreboard(f).m_Yuko == 0);
@@ -1568,7 +1568,7 @@ TEST(Mat, ShidoForToriDuringOsaekomi)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -1608,7 +1608,7 @@ TEST(Mat, MateDuringSonomama)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 		m.Osaekomi(osaekomi_holder);
@@ -1651,7 +1651,7 @@ TEST(Mat, HansokumakeDuringOsaekomi)
 			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
-			EXPECT_TRUE(m.StartMatch(match));
+			EXPECT_TRUE(m.StartMatch(&match));
 
 			m.Hajime();
 			m.Osaekomi(osaekomi_holder);
@@ -1691,7 +1691,7 @@ TEST(Mat, Koka)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, true, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		EXPECT_TRUE(m.GetScoreboard(f).m_Koka == 0);
@@ -1723,7 +1723,7 @@ TEST(Mat, Koka2)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 
 		EXPECT_TRUE(m.GetScoreboard(f).m_Koka == 0);
@@ -1756,7 +1756,7 @@ TEST(Mat, WazariAwaseteIppon)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 			
 		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 0);
@@ -1799,7 +1799,7 @@ TEST(Mat, GoldenScore)
 	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 10, 10, 30, 20, false, false, true, 0));
-	EXPECT_TRUE(m.StartMatch(match));
+	EXPECT_TRUE(m.StartMatch(&match));
 
 	m.Hajime();
 
@@ -1837,7 +1837,7 @@ TEST(Mat, GoldenScore2)
 	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 10, 0, 30, 20, false, false, true, 0));
-	EXPECT_TRUE(m.StartMatch(match));
+	EXPECT_TRUE(m.StartMatch(&match));
 
 	m.Hajime();
 
@@ -1872,7 +1872,7 @@ TEST(Mat, GoldenScoreResetTime)
 	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 5, 5, 30, 20, false, false, true, 0));
-	EXPECT_TRUE(m.StartMatch(match));
+	EXPECT_TRUE(m.StartMatch(&match));
 
 	m.Hajime();
 
@@ -1902,7 +1902,7 @@ TEST(Mat, GoldenScoreKeepsShidosAndMedicalExaminations)
 	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 5, 5, 30, 20, false, false, true, 0));
-	EXPECT_TRUE(m.StartMatch(match));
+	EXPECT_TRUE(m.StartMatch(&match));
 
 	m.Hajime();
 
@@ -1941,7 +1941,7 @@ TEST(Mat, Draw)
 	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 10, 60, 30, 20, false, false, true, 0));
-	EXPECT_TRUE(m.StartMatch(match));
+	EXPECT_TRUE(m.StartMatch(&match));
 
 	m.Hajime();
 
@@ -1973,7 +1973,7 @@ TEST(Mat, Draw2)
 	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0));
-	EXPECT_TRUE(m.StartMatch(match));
+	EXPECT_TRUE(m.StartMatch(&match));
 
 	m.Hajime();
 
@@ -2010,7 +2010,7 @@ TEST(Mat, Hantei)
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 
@@ -2050,7 +2050,7 @@ TEST(Mat, BreakTime)
 		Match match(nullptr, j1, j2);
 		match.SetMatID(1);
 		match.SetRuleSet(rule_set);
-		EXPECT_TRUE(m.StartMatch(match));
+		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 		m.AddIppon((Fighter)(rand()%2));
@@ -2063,12 +2063,12 @@ TEST(Mat, BreakTime)
 
 		for (int k = 0; k < time-1; k++)
 		{
-			EXPECT_FALSE(m.StartMatch(match2));
+			EXPECT_FALSE(m.StartMatch(&match2));
 			ZED::Core::Pause(1000);
 		}
 
 		ZED::Core::Pause(2000);
 
-		EXPECT_TRUE(m.StartMatch(match2));
+		EXPECT_TRUE(m.StartMatch(&match2));
 	}
 }

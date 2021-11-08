@@ -33,7 +33,10 @@ bool RemoteTournament::IsParticipant(const Judoka& Judoka) const
 
 Judoka* RemoteTournament::FindParticipant(const UUID& UUID)
 {
-	auto response = Request2Master("/ajax/master/find_participant");
+	auto response = Request2Master("/ajax/master/find_participant?uuid=" + (std::string)UUID);
+
+	if (response.length() == 0)
+		return nullptr;
 
 	ZED::CSV csv(response);
 	Judoka* judoka = new Judoka(csv);
@@ -46,7 +49,10 @@ Judoka* RemoteTournament::FindParticipant(const UUID& UUID)
 
 const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 {
-	auto response = Request2Master("/ajax/master/find_participant");
+	auto response = Request2Master("/ajax/master/find_participant?uuid=" + (std::string)UUID);
+
+	if (response.length() == 0)
+		return nullptr;
 
 	ZED::CSV csv(response);
 	Judoka* judoka = new Judoka(csv);
@@ -60,10 +66,18 @@ const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 std::string RemoteTournament::Request2Master(const std::string& URL) const
 {
 	ZED::HttpClient client(m_Hostname, m_Port);
-	auto response = (std::string)client.GET("/ajax/master/find_participant");
+	auto response = (std::string)client.GET(URL);
 
 	if (response.length() == 0)
+	{
 		ZED::Log::Info("Could not connect to master server: " + m_Hostname + ":" + std::to_string(m_Port));
+		return "";
+	}
+	else if (std::count(response.begin(), response.end(), ',') < 3)
+	{
+		ZED::Log::Warn("Invalid response: " + response);
+		return "";
+	}
 
 	return response;
 }

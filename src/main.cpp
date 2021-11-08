@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 		table->SetName(Judoboard::Localizer::Translate("Weightclass") + " -100 kg");
 		match.SetMatchTable(table);
 
-		mat->StartMatch(match);
+		mat->StartMatch(&match);
 		ZED::Core::Pause(500);
 
 		mat->Hajime();
@@ -180,7 +180,7 @@ int main(int argc, char** argv)
 			if (!match)
 				break;
 
-			mat->StartMatch(*match);
+			mat->StartMatch(match);
 
 			ZED::Core::Pause(9000);
 
