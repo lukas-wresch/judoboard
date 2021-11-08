@@ -40,6 +40,8 @@ namespace ZED
 			m_IsShared = !TakeOwnership;
 		}
 
+		Blob(const std::string& Source) : m_Data((uint8_t*)Source.c_str()), m_Size(Source.length()) {}//Copy operation
+
 		DLLEXPORT Blob(File& File);
 
 		void operator =(Blob& Blob)

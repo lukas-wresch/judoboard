@@ -26,6 +26,42 @@ bool HttpClient::SendGETRequest(const char* Path)
 
 
 
+bool HttpClient::SendPOSTRequest(const char* Path, const Blob& Data)
+{
+	if (!m_Socket.IsConnected())
+		return false;
+
+
+	char request[512] = {};
+	strcpy_s(request, sizeof(request), "GET ");
+	strcat_s(request, sizeof(request), Path);
+	strcat_s(request, sizeof(request), " HTTP/1.1\r\nHost: ");
+	strcat_s(request, sizeof(request), m_Hostname.c_str());
+	strcpy_s(request, sizeof(request), "Content-Length: ");
+	strcpy_s(request, sizeof(request), std::to_string(Data.GetSize()).c_str());
+	strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
+
+	if (!m_Socket.Send(request, strlen(request)))
+		return false;
+
+	const int packet_size = 1024;
+	for (size_t bytes_sent = 0; bytes_sent < Data.GetSize();)
+	{
+		int bytes_to_send = packet_size;
+		if (bytes_sent + packet_size > Data.GetSize())
+			bytes_to_send = Data.GetSize() - bytes_sent;
+
+		if (!m_Socket.Send(&Data[bytes_sent], bytes_to_send))
+			return false;
+
+		bytes_sent += bytes_to_send;
+	}
+
+	return true;
+}
+
+
+
 bool HttpClient::SendFile(const char* Path, const char* Filename)
 {
 	std::ifstream file(Filename, std::ios::binary);

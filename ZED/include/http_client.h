@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "socket_tcp.h"
+#include "blob.h"
 
 
 
@@ -29,12 +30,16 @@ namespace ZED
 		const std::string& GetHostname() const { return m_Hostname; }
 
 		DLLEXPORT bool SendGETRequest(const char* Path);
+		DLLEXPORT bool SendPOSTRequest(const char* Path, const Blob& Data);
 		DLLEXPORT bool SendFile(const char* Path, const char* Filename);
 
 		DLLEXPORT Packet RecvResponse();
 
 		Packet GET(const char* Path) { SendGETRequest(Path); return RecvResponse(); }
 		Packet GET(const std::string& Path) { SendGETRequest(Path.c_str()); return RecvResponse(); }
+
+		Packet POST(const std::string& Path, const Blob& Data) { SendPOSTRequest(Path.c_str(), Data); return RecvResponse(); }
+		Packet POST(const std::string& Path, const std::string& Data) { SendPOSTRequest(Path.c_str(), Blob(Data)); return RecvResponse(); }
 
 	private:
 		SocketTCP m_Socket;
