@@ -37,8 +37,8 @@ bool HttpClient::SendPOSTRequest(const char* Path, const Blob& Data)
 	strcat_s(request, sizeof(request), Path);
 	strcat_s(request, sizeof(request), " HTTP/1.1\r\nHost: ");
 	strcat_s(request, sizeof(request), m_Hostname.c_str());
-	strcpy_s(request, sizeof(request), "Content-Length: ");
-	strcpy_s(request, sizeof(request), std::to_string(Data.GetSize()).c_str());
+	strcat_s(request, sizeof(request), "\r\nContent-Length: ");
+	strcat_s(request, sizeof(request), std::to_string(Data.GetSize()).c_str());
 	strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
 
 	if (!m_Socket.Send(request, strlen(request)))
@@ -78,8 +78,8 @@ bool HttpClient::SendFile(const char* Path, const char* Filename)
 	strcat_s(request, sizeof(request), Path);
 	strcat_s(request, sizeof(request), " HTTP/1.1\r\nHost: ");
 	strcat_s(request, sizeof(request), m_Hostname.c_str());
-	strcpy_s(request, sizeof(request), "Content-Length: ");
-	strcpy_s(request, sizeof(request), std::to_string(length).c_str());
+	strcat_s(request, sizeof(request), "\r\nContent-Length: ");
+	strcat_s(request, sizeof(request), std::to_string(length).c_str());
 	strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
 
 	if (!m_Socket.Send(request, strlen(request)))
