@@ -151,6 +151,8 @@ bool RemoteMat::SendCommand(const std::string& URL) const
 
 std::string RemoteMat::SendRequest(const std::string& URL) const
 {
+	ZED::Log::Debug("Sending request: " + URL);
+
 	ZED::HttpClient client(m_Hostname, m_Port);
 	char Token[] = "token=test";
 	return client.POST(URL, Token);

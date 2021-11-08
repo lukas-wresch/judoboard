@@ -75,6 +75,8 @@ void RemoteTournament::OnMatchConcluded(const Match& Match) const
 
 std::string RemoteTournament::Request2Master(const std::string& URL) const
 {
+	ZED::Log::Debug("Requesting data from master: " + URL);
+
 	ZED::HttpClient client(m_Hostname, m_Port);
 	auto response = (std::string)client.GET(URL);
 
@@ -96,6 +98,8 @@ std::string RemoteTournament::Request2Master(const std::string& URL) const
 
 bool RemoteTournament::Post2Master(const std::string& URL, const ZED::CSV& Data) const
 {
+	ZED::Log::Debug("Posting data to master: " + URL);
+
 	ZED::HttpClient client(m_Hostname, m_Port);
 	auto response = (std::string)client.POST(URL, Data);
 
