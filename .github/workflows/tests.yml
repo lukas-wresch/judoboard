@@ -20,7 +20,7 @@ jobs:
     - name: run tests
       run: ./run_tests.sh
     - name: debug tests
-      run: cd bin && echo "r\nbt" > commands; gdb ./judoboard_GTest_Debug --command=commands && cd ..
+      run: cd bin && gdb ./judoboard_GTest_Debug --eval-command=r bt && cd ..
       
   test2:
     name: Unit Tests on Raspberry Pi 4
@@ -35,4 +35,4 @@ jobs:
     - name: run tests
       run: ./run_tests.sh
     - name: debug tests
-      run: cd bin && echo "r\nbt" > commands; gdb ./judoboard_GTest_Debug --command=commands && cd ..
+      run: cd bin && gdb ./judoboard_GTest_Debug --eval-command=r bt && cd ..
