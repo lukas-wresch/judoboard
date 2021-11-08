@@ -16,7 +16,7 @@ namespace Judoboard
 		UUID(const UUID& UUID_) : m_UUID(UUID_) {}
 		UUID(UUID&& org) noexcept : m_UUID(std::move(org.m_UUID)) {}
 
-		operator const std::string& () const { return m_UUID; }
+		explicit operator const std::string& () const { return m_UUID; }
 
 		bool operator == (const UUID& rhs) const noexcept { return m_UUID == rhs.m_UUID; }
 		bool operator != (const UUID& rhs) const noexcept { return m_UUID != rhs.m_UUID; }

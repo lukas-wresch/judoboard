@@ -35,10 +35,10 @@ void Judoka::operator >> (ZED::CSV& Stream) const
 	Stream << m_Firstname;
 	Stream << m_Lastname;
 	Stream << m_Weight << m_Gender << m_Birthyear;
-	Stream << GetUUID();
+	Stream << (std::string)GetUUID();
 
 	if (m_pClub)
-		Stream << m_pClub->GetUUID();
+		Stream << (std::string)m_pClub->GetUUID();
 	else
 		Stream << "?";
 

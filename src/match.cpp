@@ -59,17 +59,17 @@ void Match::operator >>(ZED::CSV& Stream) const
 	if (!GetFighter(Fighter::White) || !GetFighter(Fighter::Blue))
 		ZED::Log::Error("NOT IMPLEMENTED");//DEBUG NOT IMPLEMENTED
 	else
-		Stream << GetFighter(Fighter::White)->GetUUID() << GetFighter(Fighter::Blue)->GetUUID() << m_State;
+		Stream << (std::string)GetFighter(Fighter::White)->GetUUID() << (std::string)GetFighter(Fighter::Blue)->GetUUID() << m_State;
 
 	Stream << m_Result.m_Winner << m_Result.m_Score << m_Result.m_Time;
 
 	if (m_Rules)
-		Stream << m_Rules->GetUUID();
+		Stream << (std::string)m_Rules->GetUUID();
 	else
 		Stream << "-";
 
 	if (m_Table)
-		Stream << m_Table->GetUUID();
+		Stream << (std::string)m_Table->GetUUID();
 	else
 		Stream << "-";
 

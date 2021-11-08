@@ -43,7 +43,7 @@ void RuleSet::operator >>(ZED::CSV& Stream) const
 {
 	Stream << m_Name;
 
-	Stream << GetUUID();
+	Stream << (std::string)GetUUID();
 
 	Stream << m_MatchTime << m_GoldenScoreTime << m_OsaeKomiTime << m_OsaeKomiTime_With_WazaAri << m_BreakTime;
 	Stream << m_Yuko << m_Koka << m_Draw;

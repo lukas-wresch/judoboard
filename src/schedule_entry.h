@@ -172,7 +172,7 @@ namespace Judoboard
 		const ITournament* GetTournament() const { return m_Tournament; }
 
 		void operator >> (ZED::CSV& Stream) const {
-			Stream << GetUUID();
+			Stream << (std::string)GetUUID();
 			Stream << m_ScheduleIndex << m_MatID;
 			m_Color >> Stream;
 		}

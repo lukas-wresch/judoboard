@@ -24,8 +24,8 @@ Club::Club(ZED::CSV& Stream)
 
 void Club::operator >> (ZED::CSV& Stream) const
 {
-	Stream << m_Name;	
-	Stream << GetUUID();
+	Stream << m_Name;
+	Stream << (std::string)GetUUID();
 
 	Stream.AddNewline();//Also needed to flush the stream
 }

@@ -196,7 +196,7 @@ void MatchTable::operator >> (ZED::CSV& Stream) const
 
 	if (m_Rules)
 	{
-		Stream << true << m_Rules->GetUUID();
+		Stream << true << (std::string)m_Rules->GetUUID();
 		Stream.AddNewline();
 	}
 	else
