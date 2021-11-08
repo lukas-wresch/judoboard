@@ -2008,7 +2008,8 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 		ZED::Log::Info("Slave posted match results to us");
 
-		Match posted_match((ZED::CSV)Request.m_Body, GetTournament());
+		ZED::CSV match_data = Request.m_Body;
+		Match posted_match(match_data, GetTournament());
 
 		auto match = GetTournament()->FindMatch(posted_match);
 
