@@ -28,11 +28,18 @@ namespace Judoboard
 		Application(uint16_t Port);
 		~Application();
 
+		[[nodiscard]]
 		bool IsRunning() const { return m_Running; }
+		[[nodiscard]]
 		bool IsMaster()  const { return m_Mode == Mode::Master; }
+		[[nodiscard]]
 		bool IsSlave()   const { return m_Mode == Mode::Slave; }
+		[[nodiscard]]
+		auto GetPort()   const { return m_Server.GetPort(); }
 
+		[[nodiscard]]
 		const Database& GetDatabase() const { return m_Database; }
+		[[nodiscard]]
 		Database& GetDatabase() { return m_Database; }
 
 		bool LoadDataFromDisk();
@@ -40,15 +47,20 @@ namespace Judoboard
 		const Account* GetDefaultAdminAccount() const;
 
 		//Tournaments
+		[[nodiscard]]
 		const ITournament* GetTournament() const { return m_CurrentTournament; }//Returns the tournament that is currently open, return null pointer if no tournament is open
+		[[nodiscard]]
 		ITournament* GetTournament() { return m_CurrentTournament; }//Returns the tournament that is currently open, return null pointer if no tournament is open
 		void SetTournament(ITournament* Tournament) { m_CurrentTournament = Tournament; }
+		[[nodiscard]]
 		const auto& GetTournamentList() const { return m_Tournaments; }
+		[[nodiscard]]
 		auto& SetTournamentList() { return m_Tournaments; }
 		bool OpenTournament(uint32_t Index);
 		bool CloseTournament();
 		bool AddTournament(Tournament* NewTournament);
 		const Tournament* FindTournament(const std::string& Name) const;
+		[[nodiscard]]
 		int FindTournamentIndex(const std::string& Name) const;
 
 		//Mats

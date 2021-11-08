@@ -207,13 +207,13 @@ TEST(App, VeryLongNameTest)
 TEST(App, MasterSlave)
 {
 	initialize();
-	Application master(8080);
-	Application slave(8081);
+	Application master(8080 + rand() % 1000);
+	Application slave(8080 + rand() % 1000);
 
 	EXPECT_TRUE(master.IsMaster());
 	EXPECT_FALSE(master.IsSlave());
 
-	EXPECT_TRUE(slave.ConnectToMaster("127.0.0.1", 8080));
+	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
 	EXPECT_TRUE(master.IsMaster());
 	EXPECT_FALSE(master.IsSlave());
@@ -227,10 +227,10 @@ TEST(App, MasterSlave)
 TEST(App, MasterClosesMatOfSlave)
 {
 	initialize();
-	Application master(8080);
-	Application slave(8081);
+	Application master(8080 + rand() % 1000);
+	Application slave(8080 + rand() % 1000);
 
-	EXPECT_TRUE(slave.ConnectToMaster("127.0.0.1", 8080));
+	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
 	master.StartLocalMat(1);
 	master.CloseMat(1);
@@ -252,10 +252,10 @@ TEST(App, MasterClosesMatOfSlave)
 TEST(App, MatchOnSlave)
 {
 	initialize();
-	Application master(8080);
-	Application slave(8081);
+	Application master(8080 + rand() % 1000);
+	Application slave(8080 + rand() % 1000);
 
-	EXPECT_TRUE(slave.ConnectToMaster("127.0.0.1", 8080));
+	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
 	master.StartLocalMat(1);
 	master.CloseMat(1);
@@ -292,10 +292,10 @@ TEST(App, MatchOnSlave)
 TEST(App, MasterSlaveForceClose)
 {
 	initialize();
-	Application master(8080);
-	Application slave(8081);
+	Application master(8080 + rand() % 1000);
+	Application slave(8080 + rand() % 1000);
 
-	EXPECT_TRUE(slave.ConnectToMaster("127.0.0.1", 8080));
+	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
 	master.StartLocalMat(1);
 
@@ -356,10 +356,10 @@ TEST(App, MasterSlaveFullTournament)
 {
 	initialize();
 
-	Application master(8080);
-	Application slave(8081);
+	Application master(8080 + rand()%1000);
+	Application slave(8080  + rand()%1000);
 
-	EXPECT_TRUE(slave.ConnectToMaster("127.0.0.1", 8080));
+	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
 	master.StartLocalMat(1);
 	slave.StartLocalMat(2);
