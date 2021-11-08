@@ -28,14 +28,23 @@ Match::Match(ZED::CSV& Stream, ITournament* Tournament) : Schedulable(Stream, To
 	Stream >> m_State;
 	Stream >> m_Result.m_Winner >> m_Result.m_Score >> m_Result.m_Time;
 
+	std::string rulesUUID;
+	Stream >> rulesUUID;
+
+	if (rulesUUID.length() > 1 && Tournament)
+		m_Rules = Tournament->FindRuleSet(UUID(std::move(rulesUUID)));
+
 	std::string matchtableUUID;
 	Stream >> matchtableUUID;
 
-	if (matchtableUUID.length() > 1)
+	if (matchtableUUID.length() > 1 && Tournament)
 		m_Table = Tournament->FindMatchTable(UUID(std::move(matchtableUUID)));
 
-	m_White.m_Judoka = Tournament->FindParticipant(UUID(std::move(whiteUUID)));
-	m_Blue.m_Judoka  = Tournament->FindParticipant(UUID(std::move(blueUUID)));
+	if (Tournament)
+	{
+		m_White.m_Judoka = Tournament->FindParticipant(UUID(std::move(whiteUUID)));
+		m_Blue.m_Judoka  = Tournament->FindParticipant(UUID(std::move(blueUUID)));
+	}
 
 	if (HasConcluded() || IsRunning())
 		m_Log << Stream;
@@ -50,15 +59,19 @@ void Match::operator >>(ZED::CSV& Stream) const
 	if (!GetFighter(Fighter::White) || !GetFighter(Fighter::Blue))
 		ZED::Log::Error("NOT IMPLEMENTED");//DEBUG NOT IMPLEMENTED
 	else
-	{
 		Stream << GetFighter(Fighter::White)->GetUUID() << GetFighter(Fighter::Blue)->GetUUID() << m_State;
-		Stream << m_Result.m_Winner << m_Result.m_Score << m_Result.m_Time;
 
-		if (m_Table)
-			Stream << m_Table->GetUUID();
-		else
-			Stream << "-";
-	}
+	Stream << m_Result.m_Winner << m_Result.m_Score << m_Result.m_Time;
+
+	if (m_Rules)
+		Stream << m_Rules->GetUUID();
+	else
+		Stream << "-";
+
+	if (m_Table)
+		Stream << m_Table->GetUUID();
+	else
+		Stream << "-";
 
 	if (HasConcluded() || IsRunning())
 		m_Log >> Stream;
@@ -189,5 +202,5 @@ ZED::CSV Match::ToString() const
 
 ZED::CSV Match::AllToString() const
 {
-	return ToString() << m_Result.m_Winner << m_Result.m_Score << m_Result.m_Time << GetRuleSet().GetID();
+	return ToString() << ','  << m_Result.m_Winner << m_Result.m_Score << m_Result.m_Time << GetRuleSet().GetID();
 }

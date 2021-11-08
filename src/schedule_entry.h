@@ -147,6 +147,9 @@ namespace Judoboard
 		Schedulable(const ITournament* Tournament) : m_Tournament(Tournament) {}
 		Schedulable(ZED::CSV& Stream, const ITournament* Tournament) : m_Tournament(Tournament)
 		{
+			std::string uuid;
+			Stream >> uuid;
+			SetUUID(std::move(uuid));
 			Stream >> m_ScheduleIndex >> m_MatID;
 			m_Color << Stream;
 		}
@@ -169,6 +172,7 @@ namespace Judoboard
 		const ITournament* GetTournament() const { return m_Tournament; }
 
 		void operator >> (ZED::CSV& Stream) const {
+			Stream << GetUUID();
 			Stream << m_ScheduleIndex << m_MatID;
 			m_Color >> Stream;
 		}

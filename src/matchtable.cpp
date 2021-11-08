@@ -162,24 +162,6 @@ int MatchTable::CompareFighterScore(const void* A, const void* B)
 
 
 
-void MatchTable::operator >> (ZED::CSV& Stream) const
-{
-	Stream << GetType();
-
-	Schedulable::operator >>(Stream);
-	Stream << m_Name;
-
-	if (m_Rules)
-	{
-		Stream << true << m_Rules->GetName();
-		Stream.AddNewline();
-	}
-	else
-		Stream << false;//No rule set
-}
-
-
-
 const std::string MatchTable::ToString() const
 {
 	ZED::CSV ret;
@@ -197,8 +179,26 @@ MatchTable::MatchTable(ZED::CSV& Stream, const ITournament* Tournament) : Schedu
 	Stream >> rulesAvailable;
 	if (rulesAvailable && Tournament)
 	{
-		std::string rules;
-		Stream >> rules;
-		m_Rules = Tournament->FindRuleSet(rules);
+		std::string rulesUUID;
+		Stream >> rulesUUID;
+		m_Rules = Tournament->FindRuleSet(UUID(std::move(rulesUUID)));
 	}
+}
+
+
+
+void MatchTable::operator >> (ZED::CSV& Stream) const
+{
+	Stream << GetType();
+
+	Schedulable::operator >>(Stream);
+	Stream << m_Name;
+
+	if (m_Rules)
+	{
+		Stream << true << m_Rules->GetUUID();
+		Stream.AddNewline();
+	}
+	else
+		Stream << false;//No rule set
 }

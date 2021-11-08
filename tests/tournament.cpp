@@ -20,7 +20,7 @@ TEST(Tournament, DontDuplicateParticipants)
 		d.AddJudoka(&j1);
 		d.AddJudoka(&j2);
 
-		Tournament tourney("deleteMe", d.FindRuleSet("Default"));
+		Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 		tourney.Reset();
 		tourney.EnableAutoSave(false);
 
@@ -52,7 +52,7 @@ TEST(Tournament, MatchAgainstOneself)
 
 	d.AddJudoka(&j1);
 
-	Tournament* tourney = new Tournament("deleteMe", d.FindRuleSet("Default"));
+	Tournament* tourney = new Tournament("deleteMe", d.FindRuleSetByName("Default"));
 	tourney->Reset();
 	tourney->EnableAutoSave(false);
 
@@ -203,7 +203,7 @@ TEST(Tournament, ColorsForMatchTables)
 		d.AddJudoka(&j3);
 		d.AddJudoka(&j4);
 
-		Tournament tourney("deleteMe", d.FindRuleSet("Default"));
+		Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 		tourney.Reset();
 		tourney.EnableAutoSave(false);
 
@@ -238,7 +238,7 @@ TEST(Tournament, ParticipantHasSameIDAsInDatabase)
 	d.AddJudoka(&j1);
 
 	ZED::Core::RemoveFile("tournaments\\deleteMe");
-	Tournament tourney("deleteMe", d.FindRuleSet("Default"));
+	Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 	tourney.Reset();
 
 	EXPECT_TRUE(tourney.AddParticipant(&j1));
@@ -266,7 +266,7 @@ TEST(Tournament, HasDefaultRuleSet)
 	d.EnableAutoSave(false);
 
 	ZED::Core::RemoveFile("tournaments\\deleteMe");
-	Tournament tourney("deleteMe", d.FindRuleSet("Default"));
+	Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 	tourney.AddParticipant(new Judoka("temp", "temp", 50));
 	tourney.Reset();
 
@@ -278,9 +278,9 @@ TEST(Tournament, HasDefaultRuleSet)
 	t.EnableAutoSave(false);
 
 	EXPECT_TRUE(t.GetDefaultRuleSet());
-	EXPECT_TRUE(d.FindRuleSet("Default"));
-	EXPECT_TRUE(t.GetDefaultRuleSet()->GetID()   == d.FindRuleSet("Default")->GetID());
-	EXPECT_TRUE(t.GetDefaultRuleSet()->GetUUID() == d.FindRuleSet("Default")->GetUUID());
+	EXPECT_TRUE(d.FindRuleSetByName("Default"));
+	EXPECT_TRUE(t.GetDefaultRuleSet()->GetID()   == d.FindRuleSetByName("Default")->GetID());
+	EXPECT_TRUE(t.GetDefaultRuleSet()->GetUUID() == d.FindRuleSetByName("Default")->GetUUID());
 
 	ZED::Core::RemoveFile("tournaments/deleteMe");
 }
@@ -298,14 +298,14 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 		d.AddRuleSet(new RuleSet("Test", 10, 20, 30, 40));
 
 		ZED::Core::RemoveFile("tournaments/deleteMe");
-		Tournament tourney("deleteMe", d.FindRuleSet("Default"));
+		Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 		tourney.Reset();
 
 		Judoka j1("Firstname", "Lastname", 50, Gender::Male);
 		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
 
 		Match m(&tourney, &j1, &j2);
-		m.SetRuleSet(d.FindRuleSet("Test"));
+		m.SetRuleSet(d.FindRuleSetByName("Test"));
 		tourney.AddMatch(&m);
 
 		tourney.EnableAutoSave(false);
@@ -315,10 +315,10 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 		t.ConnectToDatabase(d);
 		t.EnableAutoSave(false);
 
-		EXPECT_TRUE(t.FindRuleSet("Test"));
-		EXPECT_TRUE(d.FindRuleSet("Test"));
-		EXPECT_TRUE(t.FindRuleSet("Test")->GetID() == d.FindRuleSet("Test")->GetID());
-		EXPECT_TRUE(t.FindRuleSet("Test")->GetUUID() == d.FindRuleSet("Test")->GetUUID());
+		EXPECT_TRUE(t.FindRuleSetByName("Test"));
+		EXPECT_TRUE(d.FindRuleSetByName("Test"));
+		EXPECT_TRUE(t.FindRuleSetByName("Test")->GetID()   == d.FindRuleSetByName("Test")->GetID());
+		EXPECT_TRUE(t.FindRuleSetByName("Test")->GetUUID() == d.FindRuleSetByName("Test")->GetUUID());
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe");
@@ -348,7 +348,7 @@ TEST(Tournament, SaveAndLoad)
 		d.AddJudoka(&j3);
 		d.AddJudoka(&j4);
 
-		Tournament* tourney = new Tournament("deleteMe", d.FindRuleSet("Default"));
+		Tournament* tourney = new Tournament("deleteMe", d.FindRuleSetByName("Default"));
 		tourney->Reset();
 
 		EXPECT_TRUE(tourney->AddParticipant(&j1));
@@ -397,7 +397,7 @@ TEST(Tournament, AddMatchAfterConclusion)
 		d.AddJudoka(&j3);
 		d.AddJudoka(&j4);
 
-		Tournament tourney("deleteMe", d.FindRuleSet("Default"));
+		Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 		tourney.Reset();
 		tourney.EnableAutoSave(false);
 
@@ -444,7 +444,7 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 	d.AddJudoka(&j3);
 	d.AddJudoka(&j4);
 
-	Tournament tourney("", d.FindRuleSet("Default"));//Temporary tournament
+	Tournament tourney("", d.FindRuleSetByName("Default"));//Temporary tournament
 	tourney.Reset();
 	tourney.EnableAutoSave(false);
 

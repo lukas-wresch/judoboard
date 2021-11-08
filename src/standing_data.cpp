@@ -164,7 +164,7 @@ const Club* StandingData::FindClub(const UUID& UUID) const
 
 
 
-RuleSet* StandingData::FindRuleSet(const std::string& RuleSetName)
+RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName)
 {
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetName() == RuleSetName)
@@ -175,7 +175,7 @@ RuleSet* StandingData::FindRuleSet(const std::string& RuleSetName)
 
 
 
-const RuleSet* StandingData::FindRuleSet(const std::string& RuleSetName) const
+const RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName) const
 {
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetName() == RuleSetName)
@@ -232,7 +232,7 @@ const RuleSet* StandingData::FindRuleSet(uint32_t ID) const
 
 bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
 {
-	if (!NewRuleSet || FindRuleSet(NewRuleSet->GetName()))
+	if (!NewRuleSet || FindRuleSet(NewRuleSet->GetUUID()))
 		return false;
 
 	m_RuleSets.emplace_back(NewRuleSet);

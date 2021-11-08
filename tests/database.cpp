@@ -91,7 +91,7 @@ TEST(Database, SaveAndLoad)
 		EXPECT_TRUE(d2.FindJudoka(j2.GetUUID())->GetWeight() == 60);
 		EXPECT_TRUE(d2.FindJudoka(j2.GetUUID())->GetGender() == j2.GetGender());
 
-		auto rule_set = d2.FindRuleSet("Test");
+		auto rule_set = d2.FindRuleSetByName("Test");
 		ASSERT_TRUE(rule_set);
 		EXPECT_TRUE(rule_set->GetMatchTime() == 60);
 		EXPECT_TRUE(rule_set->GetGoldenScoreTime() == 30);
@@ -245,11 +245,11 @@ TEST(Database, RuleSets)
 
 		RuleSet* rules = new RuleSet(name, 60, 30, 30, 20);
 
-		EXPECT_TRUE(d.FindRuleSet(name) == nullptr);
+		EXPECT_TRUE(d.FindRuleSetByName(name) == nullptr);
 
 		d.AddRuleSet(rules);
 
-		EXPECT_TRUE(d.FindRuleSet(name)->GetUUID() == rules->GetUUID());
-		EXPECT_TRUE(d.FindRuleSet(name)->GetName() == rules->GetName());
+		EXPECT_TRUE(d.FindRuleSetByName(name)->GetUUID() == rules->GetUUID());
+		EXPECT_TRUE(d.FindRuleSetByName(name)->GetName() == rules->GetName());
 	}
 }

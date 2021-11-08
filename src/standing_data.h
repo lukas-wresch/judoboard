@@ -44,8 +44,8 @@ namespace Judoboard
 		bool DeleteClub(uint32_t ID);
 
 		//Rule sets
-		RuleSet* FindRuleSet(const std::string& RuleSetName);
-		const RuleSet* FindRuleSet(const std::string& RuleSetName) const;
+		RuleSet* FindRuleSetByName(const std::string& RuleSetName);
+		const RuleSet* FindRuleSetByName(const std::string& RuleSetName) const;
 		RuleSet* FindRuleSet(const UUID& UUID);
 		const RuleSet* FindRuleSet(const UUID& UUID) const;
 		RuleSet* FindRuleSet(uint32_t ID);

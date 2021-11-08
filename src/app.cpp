@@ -311,7 +311,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return std::string("Invalid match id");
 
 		auto* match = GetTournament()->FindMatch(id);
-		auto ruleSet = m_Database.FindRuleSet(rule);
+		auto ruleSet = m_Database.FindRuleSetByName(rule);
 
 		if (!match)
 			return std::string("Could not find match");
@@ -1330,13 +1330,13 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		}
 		
 		int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
-		auto rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
+		auto ruleName = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");//TODO Use ID instead
 
 		new_table->SetMatID(FindDefaultMatID());
 		if (mat >= 0)
 			new_table->SetMatID(mat);
-		if (m_Database.FindRuleSet(rule))
-			new_table->SetRuleSet(m_Database.FindRuleSet(rule));
+		if (m_Database.FindRuleSetByName(ruleName))
+			new_table->SetRuleSet(m_Database.FindRuleSetByName(ruleName));
 
 
 		GetTournament()->Lock();

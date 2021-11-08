@@ -80,10 +80,12 @@ namespace Judoboard
 		const Judoka* FindParticipant(const UUID& UUID) const { return m_StandingData.FindJudoka(UUID); }
 
 		//Rule Sets
-		const RuleSet* GetDefaultRuleSet() const { return m_pDefaultRules; }
-		void SetDefaultRuleSet(const RuleSet* NewDefaultRuleSet) { m_pDefaultRules = NewDefaultRuleSet; }
-		const RuleSet* FindRuleSet(const std::string& Name) const { return m_StandingData.FindRuleSet(Name); }
-		RuleSet* FindRuleSet(const std::string& Name) { return m_StandingData.FindRuleSet(Name); }
+		virtual const RuleSet* GetDefaultRuleSet() const override { return m_pDefaultRules; }
+		virtual void SetDefaultRuleSet(const RuleSet* NewDefaultRuleSet) override { m_pDefaultRules = NewDefaultRuleSet; }
+		virtual const RuleSet* FindRuleSetByName(const std::string& Name) const override { return m_StandingData.FindRuleSetByName(Name); }
+		virtual RuleSet* FindRuleSetByName(const std::string& Name) override { return m_StandingData.FindRuleSetByName(Name); }
+		virtual const RuleSet* FindRuleSet(const UUID& UUID) const override { return m_StandingData.FindRuleSet(UUID); }
+		virtual RuleSet* FindRuleSet(const UUID& UUID) override { return m_StandingData.FindRuleSet(UUID); }
 
 		//Master schedule / schedule entries
 		Schedulable* GetScheduleEntry(uint32_t Index);
