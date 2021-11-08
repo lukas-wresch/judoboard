@@ -63,6 +63,16 @@ const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 
 
 
+void RemoteTournament::OnMatchConcluded(const Match& Match) const
+{
+	ZED::CSV result;
+	Match >> result;
+
+	Post2Master("/ajax/master/post_match_result", result);
+}
+
+
+
 std::string RemoteTournament::Request2Master(const std::string& URL) const
 {
 	ZED::HttpClient client(m_Hostname, m_Port);
@@ -80,4 +90,20 @@ std::string RemoteTournament::Request2Master(const std::string& URL) const
 	}
 
 	return response;
+}
+
+
+
+bool RemoteTournament::Post2Master(const std::string& URL, const ZED::CSV& Data) const
+{
+	ZED::HttpClient client(m_Hostname, m_Port);
+	auto response = (std::string)client.POST(URL, Data);
+
+	if (response.length() == 0 || response != "ok")
+	{
+		ZED::Log::Warn("Invalid response: " + response);
+		return false;
+	}
+
+	return true;
 }

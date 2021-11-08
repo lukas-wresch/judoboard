@@ -111,8 +111,8 @@ TEST(Database, SaveAndLoad)
 
 TEST(Database, OnlyOneDefaultRuleSet)
 {
+	initialize();
 	{
-		initialize();
 		Database d;
 
 		EXPECT_TRUE(d.Save("temp.csv"));
@@ -147,8 +147,8 @@ TEST(Database, EmptyDatabaseShouldHaveDefaultRuleSet)
 
 TEST(Database, AccountTest)
 {
+	initialize();
 	{
-		initialize();
 		Database d;
 
 		EXPECT_TRUE(d.GetNumAccounts() == 0);
@@ -191,6 +191,7 @@ TEST(Database, AccountTest)
 
 TEST(Database, Login)
 {
+	initialize();
 	srand(ZED::Core::CurrentTimestamp());
 
 	Database d;
@@ -232,6 +233,7 @@ TEST(Database, Login)
 
 TEST(Database, RuleSets)
 {
+	initialize();
 	srand(ZED::Core::CurrentTimestamp());
 
 	Database d;

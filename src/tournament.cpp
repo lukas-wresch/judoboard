@@ -406,6 +406,16 @@ Match* Tournament::FindMatch(uint32_t ID) const
 
 
 
+Match* Tournament::FindMatch(UUID UUID) const
+{
+	for (auto match : m_Schedule)
+		if (match && match->GetUUID() == UUID)
+			return match;
+	return nullptr;
+}
+
+
+
 bool Tournament::MoveMatchUp(uint32_t MatchID)
 {
 	size_t Index = 0;

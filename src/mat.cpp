@@ -201,12 +201,14 @@ bool Mat::EndMatch()
 	{
 		m_mutex.lock();
 
-		if (m_pMatch)
+		if (m_pMatch)//Save result in match
 		{
-			m_pMatch->EndMatch();
+			AddEvent(MatchLog::NeutralEvent::EndMatch);
 			m_pMatch->SetResult(GetResult());
+			m_pMatch->EndMatch();
 		}
-		AddEvent(MatchLog::NeutralEvent::EndMatch);
+		
+		//Reset mat
 		NextState(State::TransitionToWaiting);
 
 		Reset();

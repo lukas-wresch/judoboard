@@ -556,7 +556,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 		ZED::CSV ret;
 		ret << mat->Scoreboard2String();
-		ret << mat->GetTime2Display() << mat->IsHajime() << mat->Osaekomi2String(Fighter::White) << mat->Osaekomi2String(Fighter::Blue) << mat->CanNextFightStart() << mat->HasConcluded() << (mat->IsOutOfTime() && mat->GetResult().m_Winner == Winner::Draw) << mat->IsGoldenScore() << mat->AreFightersOnMat();
+		ret << mat->GetTime2Display() << mat->IsHajime() << mat->Osaekomi2String(Fighter::White) << mat->Osaekomi2String(Fighter::Blue) << mat->CanNextMatchStart() << mat->HasConcluded() << (mat->IsOutOfTime() && mat->GetResult().m_Winner == Winner::Draw) << mat->IsGoldenScore() << mat->AreFightersOnMat();
 		return ret;
 	});
 
@@ -606,13 +606,6 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return ret;
 	}, HttpServer::ResourceType::Image_PNG);
 
-
-	//m_Server.RegisterResource("/ajax/mat/get", [this](auto Request) -> std::string {
-		//auto account = IsLoggedIn(Request);
-		//if (!account)
-			//return Error(Error::Type::NotLoggedIn);
-		//return Mats2String();
-	//});
 
 
 	//Commands for fighters
@@ -2007,6 +2000,23 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		ZED::CSV csv;
 		*judoka >> csv;
 		return csv;
+	});
+
+	m_Server.RegisterResource("/ajax/master/post_match_result", [this](auto Request) -> std::string {
+		if (!IsMaster())
+			return "You are not allowed to connect";
+
+		ZED::Log::Info("Slave posted match results to us");
+
+		Match posted_match((ZED::CSV)Request.m_Body, GetTournament());
+
+		auto match = GetTournament()->FindMatch(posted_match);
+
+		if (!match)
+			return "Not found";
+
+		*match = posted_match;
+		return "ok";
 	});
 }
 

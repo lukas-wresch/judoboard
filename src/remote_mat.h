@@ -20,11 +20,11 @@ namespace Judoboard
 
 		virtual const std::vector<OsaekomiEntry>& GetOsaekomiList() const override { return m_OsaekomiList; };
 
-		virtual bool AreFightersOnMat() const override { return false; }
+		virtual bool AreFightersOnMat() const override;
 
-		virtual bool CanNextFightStart() const override { return false; };
+		virtual bool CanNextMatchStart() const override;
 		virtual bool StartMatch(Match* NewMatch) override;
-		virtual bool HasConcluded() const override { return false; }
+		virtual bool HasConcluded() const override;
 		virtual bool EndMatch() override;
 
 		virtual uint32_t GetTimeElapsed()  const override { return 0; }
@@ -44,10 +44,10 @@ namespace Judoboard
 		virtual void Sonomama() override {}
 
 		virtual void AddIppon(Fighter Whom) override;
-		virtual void RemoveIppon(Fighter Whom) override {}
+		virtual void RemoveIppon(Fighter Whom) override;
 
-		virtual void AddWazaAri(Fighter Whom) override {}
-		virtual void RemoveWazaAri(Fighter Whom) override {}
+		virtual void AddWazaAri(Fighter Whom) override;
+		virtual void RemoveWazaAri(Fighter Whom) override;
 
 		virtual void AddYuko(Fighter Whom) override {}
 		virtual void RemoveYuko(Fighter Whom) override {}
@@ -85,7 +85,20 @@ namespace Judoboard
 		virtual ZED::CSV Osaekomi2String(Fighter Who) const  override { return ""; }
 
 	private:
-		bool SendRequest(const std::string& URL) const;
+		bool SendCommand(const std::string& URL) const;
+		std::string SendRequest(const std::string& URL) const;
+
+		struct InternalState
+		{
+			int white_ippon, white_wazaari, white_shidos, white_medical;
+			int blue_ippon, blue_wazaari, blue_shidos, blue_medical;
+			uint32_t display_time;
+			bool hajime, cannextmatchstart, hasconcluded, isoutoftime_and_draw, isgoldenscore, arefightersonmat;
+			uint32_t white_osaekomi_time, blue_osaekomi_time;
+			bool white_osaekomi, blue_osaekomi;
+		};
+
+		InternalState GetState(bool& Success) const;
 
 		std::vector<OsaekomiEntry> m_OsaekomiList;
 

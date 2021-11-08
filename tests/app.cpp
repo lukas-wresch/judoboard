@@ -227,8 +227,8 @@ TEST(App, MasterSlave)
 TEST(App, MasterClosesMatOfSlave)
 {
 	initialize();
-	/*Application master(false, 8080);
-	Application slave(false, 8081);
+	Application master(8080);
+	Application slave(8081);
 
 	EXPECT_TRUE(slave.ConnectToMaster("127.0.0.1", 8080));
 
@@ -236,12 +236,15 @@ TEST(App, MasterClosesMatOfSlave)
 	master.CloseMat(1);
 
 	slave.StartLocalMat(2);
+
+	ZED::Core::Pause(2000);
+	EXPECT_TRUE(slave.GetDefaultMat()->IsOpen());
+
 	master.CloseMat(2);
 
 	ZED::Core::Pause(2000);
 
-	EXPECT_FALSE(slave.GetDefaultMat()->IsOpen());*/
-	EXPECT_TRUE(false);
+	EXPECT_FALSE(slave.GetDefaultMat()->IsOpen());
 }
 
 
@@ -279,6 +282,9 @@ TEST(App, MatchOnSlave)
 	mat->AddIppon(Fighter::White);
 
 	EXPECT_TRUE(mat->EndMatch());
+
+	EXPECT_EQ(match.GetMatchResult().m_Winner, Fighter::White);
+	EXPECT_EQ(match.GetMatchResult().m_Score, Match::Score::Ippon);
 }
 
 
@@ -358,15 +364,6 @@ TEST(App, MasterSlaveFullTournament)
 	master.StartLocalMat(1);
 	slave.StartLocalMat(2);
 
-	ZED::Core::Pause(10 * 1000);
-
-
-	master.CloseTournament();
-	master.SetTournamentList().clear();
-
-	Account acc("admin", "1234", Account::AccessLevel::Admin);
-	master.GetDatabase().AddAccount(acc);
-
 	ZED::Core::Pause(5000);
 
 	Judoka j1(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
@@ -390,7 +387,8 @@ TEST(App, MasterSlaveFullTournament)
 	tourney->EnableAutoSave(false);
 	EXPECT_TRUE(master.AddTournament(tourney));
 
-	master.OpenTournament(master.FindTournamentIndex(tournament_name));
+	ASSERT_TRUE(master.GetTournament());
+	EXPECT_EQ(master.GetTournament()->GetName(), tourney->GetName());
 
 	tourney->AddParticipant(&j1);
 	tourney->AddParticipant(&j2);
@@ -401,20 +399,19 @@ TEST(App, MasterSlaveFullTournament)
 
 	MatchTable* m1 = new Weightclass(tourney, 0, 49);
 	MatchTable* m2 = new Weightclass(tourney, 50, 100);
-	m1->SetMatID(1);
+	m1->SetMatID(2);
 	m2->SetMatID(2);
 	tourney->AddMatchTable(m1);
 	tourney->AddMatchTable(m2);
 
-	EXPECT_TRUE(false);
-
-	/*auto* mat = master.GetDefaultMat();
+	auto mat = master.FindMat(2);
 
 	for (int i = 0; i < 6; i++)
 	{
 		ZED::Core::Pause(6000);
-		auto* match = tourney->GetNextMatch(mat->GetMatID());
-		EXPECT_TRUE(mat->StartMatch(*match));
+		auto match = tourney->GetNextMatch(mat->GetMatID());
+		ASSERT_TRUE(match);
+		EXPECT_TRUE(mat->StartMatch(match));
 
 		ZED::Core::Pause(8000);
 
@@ -453,5 +450,5 @@ TEST(App, MasterSlaveFullTournament)
 
 		EXPECT_TRUE(mat->EndMatch());
 		ZED::Core::Pause(8000);
-	}*/
+	}
 }

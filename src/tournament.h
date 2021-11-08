@@ -35,6 +35,7 @@ namespace Judoboard
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
 		const auto& GetSchedule() const { return m_Schedule; }
 		Match* FindMatch(uint32_t ID) const;
+		Match* FindMatch(UUID UUID) const override;
 
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 
@@ -96,12 +97,15 @@ namespace Judoboard
 		void Disqualify(const Judoka& Judoka);
 		void RevokeDisqualification(const Judoka& Judoka);
 
-		void GenerateSchedule();
+		//Events
+		virtual void OnMatchConcluded(const Match& Match) const override {}
 
 		//Serialization
 		const std::string Schedule2String() const;
 		const std::string Participants2String() const;
 		const std::string MasterSchedule2String() const;
+
+		void GenerateSchedule();
 
 		bool Save() const {
 			if (!m_AutoSave) return false;

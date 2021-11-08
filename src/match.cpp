@@ -204,3 +204,18 @@ ZED::CSV Match::AllToString() const
 {
 	return ToString() << ','  << m_Result.m_Winner << m_Result.m_Score << m_Result.m_Time << GetRuleSet().GetID();
 }
+
+
+
+void Match::EndMatch()
+{
+	m_State = Status::Concluded;
+
+	if (m_White.m_Judoka)
+		m_White.m_Judoka->StartBreak();
+	if (m_Blue.m_Judoka)
+		m_Blue.m_Judoka->StartBreak();
+
+	if (GetTournament())
+		GetTournament()->OnMatchConcluded(*this);
+}

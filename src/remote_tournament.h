@@ -19,8 +19,12 @@ namespace Judoboard
 		virtual Judoka* FindParticipant(const UUID& UUID) override;
 		virtual const Judoka* FindParticipant(const UUID& UUID) const override;
 
+		//Events
+		virtual void OnMatchConcluded(const Match& Match) const override;
+
 	private:
 		std::string Request2Master(const std::string& URL) const;
+		bool Post2Master(const std::string& URL, const ZED::CSV& Data) const;
 
 		std::string m_Hostname;
 		uint16_t m_Port;

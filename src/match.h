@@ -77,15 +77,7 @@ namespace Judoboard
 		const MatchLog& GetLog() const { return m_Log; }
 
 		void StartMatch() { m_State = Status::Running; }
-		void EndMatch()
-		{
-			m_State = Status::Concluded;
-
-			if (m_White.m_Judoka)
-				m_White.m_Judoka->StartBreak();
-			if (m_Blue.m_Judoka)
-				m_Blue.m_Judoka->StartBreak();
-		}
+		void EndMatch();
 
 		const MatchTable* GetMatchTable() const { return m_Table; }
 		void SetMatchTable(MatchTable* MatchTable) { m_Table = MatchTable; }

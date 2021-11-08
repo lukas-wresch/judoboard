@@ -29,21 +29,47 @@ bool RemoteMat::IsOpen() const
 
 bool RemoteMat::Open()
 {
-	return SendRequest("/ajax/slave/open_mat?id=" + std::to_string(GetMatID()));
+	return SendCommand("/ajax/slave/open_mat?id=" + std::to_string(GetMatID()));
 }
 
 
 
 bool RemoteMat::Close()
 {
-	return SendRequest("/ajax/slave/close_mat?id=" + std::to_string(GetMatID()));
+	return SendCommand("/ajax/slave/close_mat?id=" + std::to_string(GetMatID()));
 }
 
 
 
 bool RemoteMat::IsConnected() const
 {
-	return SendRequest("/ajax/slave/get_mat_status?id=" + std::to_string(GetMatID()));
+	return SendCommand("/ajax/slave/get_mat_status?id=" + std::to_string(GetMatID()));
+}
+
+
+
+bool RemoteMat::AreFightersOnMat() const
+{
+	bool success;
+	auto state = GetState(success);
+
+	if (!success)
+		return true;
+
+	return state.arefightersonmat;
+}
+
+
+
+bool RemoteMat::CanNextMatchStart() const
+{
+	bool success;
+	auto state = GetState(success);
+
+	if (!success)
+		return false;
+
+	return state.cannextmatchstart;
 }
 
 
@@ -59,31 +85,107 @@ bool RemoteMat::StartMatch(Match* NewMatch)
 	ZED::CSV csv;
 	*NewMatch >> csv;
 
-	return SendRequest("/ajax/slave/start_match?id=" + std::to_string(GetMatID()) + "&match=" + (std::string)csv);
+	return SendCommand("/ajax/slave/start_match?id=" + std::to_string(GetMatID()) + "&match=" + (std::string)csv);
+}
+
+
+
+bool RemoteMat::HasConcluded() const
+{
+	bool success;
+	auto state = GetState(success);
+
+	if (!success)
+		return false;
+
+	return state.hasconcluded;
 }
 
 
 
 bool RemoteMat::EndMatch()
 {
-	return SendRequest("/ajax/slave/end_match?id=" + std::to_string(GetMatID()));
+	return SendCommand("/ajax/slave/end_match?id=" + std::to_string(GetMatID()));
 }
 
 
 
 void RemoteMat::AddIppon(Fighter Whom)
 {
-	SendRequest("/ajax/mat/" + Fighter2String(Whom) + "/+ippon?id=" + std::to_string(GetMatID()));
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/+ippon?id=" + std::to_string(GetMatID()));
 }
 
 
 
-bool RemoteMat::SendRequest(const std::string& URL) const
+void RemoteMat::RemoveIppon(Fighter Whom)
 {
-	ZED::HttpClient client(m_Hostname, m_Port);
-	char Token[] = "token=test";
-	std::string response = client.POST(URL, Token);
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/-ippon?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::AddWazaAri(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/+wazaari?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::RemoveWazaAri(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/-wazaari?id=" + std::to_string(GetMatID()));
+}
+
+
+
+bool RemoteMat::SendCommand(const std::string& URL) const
+{
+	std::string response = SendRequest(URL);
 
 	assert(response == "ok");
 	return response == "ok";
+}
+
+
+
+std::string RemoteMat::SendRequest(const std::string& URL) const
+{
+	ZED::HttpClient client(m_Hostname, m_Port);
+	char Token[] = "token=test";
+	return client.POST(URL, Token);
+}
+
+
+
+RemoteMat::InternalState RemoteMat::GetState(bool& Success) const
+{
+	auto response = SendRequest("/ajax/mat/get_score?id=" + std::to_string(GetMatID()));
+
+	if (std::count(response.begin(), response.end(), ',') < 10)
+	{
+		ZED::Log::Warn("Invalid response: " + response);
+		Success = false;
+		assert(false);
+	}
+
+	Success = true;
+
+	ZED::CSV state(response);
+
+	InternalState internalState;
+
+	state >> internalState.white_ippon >> internalState.white_wazaari;
+	state >> internalState.blue_ippon  >> internalState.blue_wazaari;
+
+	state >> internalState.white_shidos  >> internalState.blue_shidos;
+	state >> internalState.white_medical >> internalState.blue_medical;
+
+	state >> internalState.display_time >> internalState.hajime;
+
+	state >> internalState.white_osaekomi_time >> internalState.white_osaekomi;
+	state >> internalState.blue_osaekomi_time  >> internalState.blue_osaekomi;
+
+	state >> internalState.cannextmatchstart >> internalState.hasconcluded >> internalState.isoutoftime_and_draw >> internalState.isgoldenscore >> internalState.arefightersonmat;
+
+	return internalState;
 }

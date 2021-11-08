@@ -674,8 +674,8 @@ TEST(Mat, DoubleIpponFightersKeepWazaari)
 
 		EXPECT_FALSE(m.IsHajime());
 
-		EXPECT_TRUE(m.GetScoreboard(Fighter::White).m_WazaAri == 1);
-		EXPECT_TRUE(m.GetScoreboard(Fighter::Blue ).m_WazaAri == 1);
+		EXPECT_EQ(m.GetScoreboard(Fighter::White).m_WazaAri, 1);
+		EXPECT_EQ(m.GetScoreboard(Fighter::Blue ).m_WazaAri, 1);
 
 		m.AddIppon(f);
 
