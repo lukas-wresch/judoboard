@@ -7,13 +7,24 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-    name: Build
+  build1:
+    name: Build on Ubuntu
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
     - name: configure
       run: chmod u+x *.sh && ./dependencies.sh
+    - name: make
+      run: ./compile.sh
+      
+  build2:
+    name: Build on Raspberry Pi 4
+    runs-on: self-hosted
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: chmod u+x *.sh
     - name: make
       run: ./compile.sh
