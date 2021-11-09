@@ -92,7 +92,7 @@ TEST(Mat, ForcedCloseDuringMatch)
 	tourney->AddMatchTable(m1);
 	tourney->AddMatchTable(m2);
 
-	auto* mat = app.GetDefaultMat();
+	auto mat = app.GetDefaultMat();
 
 	ZED::Core::Pause(6000);
 	auto match = tourney->GetNextMatch(mat->GetMatID());

@@ -190,7 +190,7 @@ const Account* Database::CheckLogin(uint32_t IP, const std::string& Response) co
 	if (item == m_ClosedNonces.end())
 		return nullptr;
 
-	auto& nonce = item->second.first;
+	auto& nonce   = item->second.first;
 	auto& account = item->second.second;
 
 	if (nonce.HasExpired())

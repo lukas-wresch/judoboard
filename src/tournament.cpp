@@ -1,5 +1,6 @@
 #include <fstream>
 #include <algorithm>
+#include <cassert>
 #include <ZED/include/log.h>
 #include "tournament.h"
 #include "database.h"
@@ -41,11 +42,11 @@ void Tournament::Reset()
 	m_StandingData.GetAllJudokas().clear();
 	m_StandingData.GetRuleSets().clear();
 
-	for (auto* table : m_MatchTables)
+	for (auto table : m_MatchTables)
 		delete table;
 	m_MatchTables.clear();
 
-	for (auto* match : m_Schedule)
+	for (auto match : m_Schedule)
 		delete match;
 	m_Schedule.clear();
 
@@ -53,6 +54,8 @@ void Tournament::Reset()
 
 	//Don't delete since this could be shared memory
 	//m_pDefaultRules = nullptr;
+
+	assert(m_StandingData.GetNumJudoka() == 0);
 }
 
 

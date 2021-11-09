@@ -40,9 +40,9 @@ TEST(Database, JudokaTest)
 		EXPECT_TRUE(d.Load("temp.csv"));
 
 		ASSERT_TRUE(d.FindJudoka(j1.GetUUID()));
-		EXPECT_TRUE(d.FindJudoka(j1.GetUUID())->GetWeight() == 50);
+		EXPECT_EQ(d.FindJudoka(j1.GetUUID())->GetWeight(), 50);
 		ASSERT_TRUE(d.FindJudoka(j2.GetUUID()));
-		EXPECT_TRUE(d.FindJudoka(j2.GetUUID())->GetWeight() == 60);
+		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), 60);
 	}
 
 	ZED::Core::RemoveFile("temp.csv");
@@ -62,7 +62,7 @@ TEST(Database, SaveAndLoad)
 		EXPECT_TRUE(d.GetNumJudoka() == 0);
 		EXPECT_TRUE(d.GetRuleSets().size() == 1);
 
-		Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
 		Judoka j2("Firstname2", "Lastname2", 60, Gender::Female);
 
 		d.AddJudoka(&j1);
@@ -77,7 +77,7 @@ TEST(Database, SaveAndLoad)
 
 
 		Database d2;
-		d2.Load("temp.csv");
+		EXPECT_TRUE(d2.Load("temp.csv"));
 
 		EXPECT_TRUE(d2.GetNumJudoka() == 2);
 
@@ -87,9 +87,9 @@ TEST(Database, SaveAndLoad)
 		EXPECT_TRUE(d2.FindJudoka(j1.GetUUID())->GetGender() == j1.GetGender());
 
 		ASSERT_TRUE(d2.FindJudoka(j2.GetUUID()));
-		EXPECT_TRUE(d2.FindJudoka(j2.GetUUID())->GetUUID() == j2.GetUUID());
-		EXPECT_TRUE(d2.FindJudoka(j2.GetUUID())->GetWeight() == 60);
-		EXPECT_TRUE(d2.FindJudoka(j2.GetUUID())->GetGender() == j2.GetGender());
+		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetUUID(), j2.GetUUID());
+		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetWeight(), 60);
+		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetGender(), j2.GetGender());
 
 		auto rule_set = d2.FindRuleSetByName("Test");
 		ASSERT_TRUE(rule_set);
@@ -137,10 +137,10 @@ TEST(Database, EmptyDatabaseShouldHaveDefaultRuleSet)
 	initialize();
 	Database d;
 
-	EXPECT_TRUE(d.GetNumAccounts() == 0);
+	EXPECT_EQ(d.GetNumAccounts(), 0);
 
-	EXPECT_TRUE(d.GetRuleSets().size() == 1);
-	EXPECT_TRUE(d.GetRuleSets()[0]->GetName() == "Default");
+	EXPECT_EQ(d.GetRuleSets().size(), 1);
+	EXPECT_EQ(d.GetRuleSets()[0]->GetName(), "Default");
 }
 
 
@@ -195,7 +195,7 @@ TEST(Database, Login)
 	srand(ZED::Core::CurrentTimestamp());
 
 	Database d;
-	EXPECT_TRUE(d.GetNumAccounts() == 0);
+	EXPECT_EQ(d.GetNumAccounts(), 0);
 
 	for (int i = 0; i < 300; i++)
 	{
@@ -205,26 +205,26 @@ TEST(Database, Login)
 		std::string username = "Username" + std::to_string(rand()) + std::to_string(rand());
 		std::string password = "Password" + std::to_string(rand());
 
-		Account j1(username, password);
+		Account acc(username, password);
 
-		d.AddAccount(j1);
+		d.AddAccount(acc);
 
 		auto mynonce = d.CreateNonce(ip, port);
 
 		EXPECT_TRUE(mynonce.GetIP() == ip);
 
-		std::string response = ZED::SHA512(j1.GetUsername() + mynonce.GetChallenge() + password);
+		std::string response = ZED::SHA512(acc.GetUsername() + mynonce.GetChallenge() + password);
 
-		EXPECT_FALSE(d.CheckLogin(ip, response));
-		EXPECT_TRUE(d.DoLogin(j1.GetUsername(), ip, response));
-		EXPECT_TRUE(d.CheckLogin(ip, response));
+		ASSERT_FALSE(d.CheckLogin(ip, response));
+		ASSERT_TRUE(d.DoLogin(acc.GetUsername(), ip, response));
+		ASSERT_TRUE(d.CheckLogin(ip, response));
 
 		for (auto nonce : d.GetNonces())
 		{
 			if (nonce.first.GetChallenge() == mynonce.GetChallenge())
-				EXPECT_TRUE(nonce.second->GetUsername() == j1.GetUsername());
+				EXPECT_EQ(nonce.second->GetUsername(), acc.GetUsername());
 			else
-				EXPECT_FALSE(nonce.second->GetUsername() == j1.GetUsername());
+				EXPECT_NE(nonce.second->GetUsername(), acc.GetUsername());
 		}
 	}
 }
