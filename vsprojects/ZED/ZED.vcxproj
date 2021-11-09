@@ -36,6 +36,21 @@
     <ClCompile Include="..\..\ZED\src\socket_tcp.cpp" />
     <ClCompile Include="..\..\ZED\src\timer.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\ZED\include\blob.h" />
+    <ClInclude Include="..\..\ZED\include\core.h" />
+    <ClInclude Include="..\..\ZED\include\csv.h" />
+    <ClInclude Include="..\..\ZED\include\file.h" />
+    <ClInclude Include="..\..\ZED\include\http_client.h" />
+    <ClInclude Include="..\..\ZED\include\image.h" />
+    <ClInclude Include="..\..\ZED\include\log.h" />
+    <ClInclude Include="..\..\ZED\include\png.h" />
+    <ClInclude Include="..\..\ZED\include\renderer.h" />
+    <ClInclude Include="..\..\ZED\include\renderer_opengl.h" />
+    <ClInclude Include="..\..\ZED\include\renderer_sdl2.h" />
+    <ClInclude Include="..\..\ZED\include\socket.h" />
+    <ClInclude Include="..\..\ZED\include\socket_tcp.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
