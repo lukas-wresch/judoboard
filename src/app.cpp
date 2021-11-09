@@ -1860,6 +1860,8 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		if (!IsSlave())
 			return "You are not allowed to connect";
 
+		//TODO check security token
+
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
@@ -2005,6 +2007,8 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	m_Server.RegisterResource("/ajax/master/post_match_result", [this](auto Request) -> std::string {
 		if (!IsMaster())
 			return "You are not allowed to connect";
+
+		//TODO check security token
 
 		ZED::Log::Info("Slave posted match results to us");
 

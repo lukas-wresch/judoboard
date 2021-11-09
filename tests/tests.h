@@ -46,8 +46,8 @@ inline void initialize() noexcept
 	signal(SIGABRT, my_abort_function);
 	signal(SIGILL,  my_abort_function);
 	signal(SIGINT,  my_abort_function);
-#endif
 	signal(SIGSEGV, my_abort_function);
+#endif
 
 	Judoboard::ID::Reset();
 	Application::NoWindow = true;

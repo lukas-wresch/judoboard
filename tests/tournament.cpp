@@ -315,8 +315,8 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 		t.ConnectToDatabase(d);
 		t.EnableAutoSave(false);
 
-		EXPECT_TRUE(t.FindRuleSetByName("Test"));
-		EXPECT_TRUE(d.FindRuleSetByName("Test"));
+		ASSERT_TRUE(t.FindRuleSetByName("Test"));
+		ASSERT_TRUE(d.FindRuleSetByName("Test"));
 		EXPECT_TRUE(t.FindRuleSetByName("Test")->GetID()   == d.FindRuleSetByName("Test")->GetID());
 		EXPECT_TRUE(t.FindRuleSetByName("Test")->GetUUID() == d.FindRuleSetByName("Test")->GetUUID());
 	}
