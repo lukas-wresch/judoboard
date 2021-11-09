@@ -1,7 +1,7 @@
 #include <fstream>
 #include <sstream>
 #include "HttpServer.h"
-#include <mongoose/mongoose.h>
+#include "../../external/mongoose/mongoose.h"
 
 
 

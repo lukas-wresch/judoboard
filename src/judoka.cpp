@@ -1,4 +1,4 @@
-#include <ZED/include/core.h>
+#include "../ZED/include/core.h"
 #include "judoka.h"
 #include "database.h"
 

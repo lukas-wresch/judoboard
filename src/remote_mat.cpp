@@ -1,5 +1,5 @@
-#include <ZED/include/http_client.h>
-#include <ZED/include/log.h>
+#include "../ZED/include/http_client.h"
+#include "../ZED/include/log.h"
 #include <cassert>
 #include "remote_mat.h"
 #include "app.h"

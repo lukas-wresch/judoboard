@@ -3,9 +3,9 @@
 #include "weightclass.h"
 #include "remote_mat.h"
 #include "tournament.h"
-#include <ZED/include/log.h>
-#include <ZED/include/csv.h>
-#include <ZED/include/http_client.h>
+#include "../ZED/include/log.h"
+#include "../ZED/include/csv.h"
+#include "../ZED/include/http_client.h"
 
 
 

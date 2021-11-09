@@ -1,6 +1,6 @@
 #include <fstream>
 #include <algorithm>
-#include <ZED/include/log.h>
+#include "../ZED/include/log.h"
 #include "tournament.h"
 #include "database.h"
 #include "weightclass.h"

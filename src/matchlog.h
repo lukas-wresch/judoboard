@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <ZED/include//csv.h>
+#include "../ZED/include/csv.h"
 
 
 
@@ -109,7 +109,7 @@ namespace Judoboard
 		void AddEvent(Fighter Whom, BiasedEvent NewEvent, uint32_t Timestamp) { m_Events.emplace_back(Event(Whom, NewEvent, Timestamp)); }
 
 		auto& GetEvents() const { return m_Events; }
-		uint32_t GetNumEvent() const { return m_Events.size(); }
+		size_t GetNumEvent() const { return m_Events.size(); }
 		//const Event* GetEvent(uint32_t Index) const { if (Index < m_Events.size()) return &m_Events[Index]; return nullptr; }
 
 		const std::string ToString() const;

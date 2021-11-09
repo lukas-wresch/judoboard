@@ -1,4 +1,4 @@
-#include <ZED/include/log.h>
+#include "../ZED/include/log.h"
 #include "matchtable.h"
 #include "match.h"
 #include "tournament.h"
