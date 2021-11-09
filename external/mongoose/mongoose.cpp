@@ -3899,7 +3899,7 @@ FILE *mg_fetch(struct mg_context *ctx, const char *url, const char *path, char *
 
     if (req_length <= 0)
         cry(fc(ctx), "%s(%s): invalid HTTP reply", __func__, url);
-    else if (parse_http_response(buf, req_length, ri) <= 0) {
+    else if (parse_http_response(buf, req_length, ri) <= 0)
         cry(fc(ctx), "%s(%s): cannot parse HTTP headers", __func__, url);
     else if ((fp = fopen(path, "w+b")) == NULL)
         cry(fc(ctx), "%s: fopen(%s): %s", __func__, path, strerror(ERRNO));
