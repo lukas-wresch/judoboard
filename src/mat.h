@@ -40,12 +40,12 @@ namespace Judoboard
 
 				m_MedicalExamination = 0;
 				m_Hantei = false;
-				m_Gachi = false;
+				m_Gachi  = false;
 			}
 
 			bool IsUnknownDisqualification() const { return m_HansokuMake && m_Disqualification == DisqualificationState::Unknown; }
-			bool IsDisqualified()    const { return m_HansokuMake && m_Disqualification == DisqualificationState::Disqualified; }
-			bool IsNotDisqualified() const { return m_HansokuMake && m_Disqualification == DisqualificationState::NotDisqualified; }
+			bool IsDisqualified()            const { return m_HansokuMake && m_Disqualification == DisqualificationState::Disqualified; }
+			bool IsNotDisqualified()         const { return m_HansokuMake && m_Disqualification == DisqualificationState::NotDisqualified; }
 
 			uint16_t m_Ippon = 0;
 			uint16_t m_WazaAri = 0;
@@ -71,18 +71,16 @@ namespace Judoboard
 		~Mat() { m_State = State::Waiting; Close(); }
 
 		//Virtuals
-		Type GetType() const override { return IMat::Type::LocalMat; };
-		bool IsOpen()  const override { return m_Window.IsRunning(); }
-		bool Open()  override;
-		bool Close() override;
+		virtual Type GetType() const override { return IMat::Type::LocalMat; };
+		virtual bool IsOpen()  const override { return m_Window.IsRunning(); }
+		virtual bool Open()  override;
+		virtual bool Close() override;
 
-		//void ClearNextMatches() override;
-		//void AddNextMatch(const Match* NextMatch) override;
-		bool HasConcluded() const override;
+		virtual bool HasConcluded() const override;
 
-		const std::vector<OsaekomiEntry>& GetOsaekomiList() const override { return m_OsaekomiList; }
+		virtual const std::vector<OsaekomiEntry>& GetOsaekomiList() const override { return m_OsaekomiList; }
 
-		bool RequestScreenshot() const override;
+		virtual bool RequestScreenshot() const override;
 
 		//Basics
 		const Judoka& GetFighter(Fighter Who) const { if (Who == Fighter::White) return m_White; return m_Blue; }
@@ -102,10 +100,10 @@ namespace Judoboard
 
 		uint32_t EndTimeOfOsaekomi() const;//Returns the number of seconds the osaekomi end the match
 
-		bool IsOutOfTime() const override;
+		virtual bool IsOutOfTime() const override;
 
-		bool IsGoldenScore() const override { return m_GoldenScore; }
-		bool EnableGoldenScore(bool GoldenScore = true) override;
+		virtual bool IsGoldenScore() const override { return m_GoldenScore; }
+		virtual bool EnableGoldenScore(bool GoldenScore = true) override;
 
 		const Scoreboard& GetScoreboard(Fighter Whom) const;
 
@@ -156,6 +154,7 @@ namespace Judoboard
 		//Serialization
 		ZED::CSV Scoreboard2String() const override;
 		ZED::CSV Osaekomi2String(Fighter Who) const override;
+
 
 	private:
 		Scoreboard m_Scoreboards[2];

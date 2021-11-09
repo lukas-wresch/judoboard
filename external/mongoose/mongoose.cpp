@@ -2309,23 +2309,24 @@ static int WINCDECL compare_dir_entries(const void *p1, const void *p2) {
   return query_string[1] == 'd' ? -cmp_result : cmp_result;
 }
 
-static int must_hide_file(struct mg_connection *conn, const char *path) {
+static int must_hide_file(struct mg_connection *conn, const char *path)
+{
   const char *pw_pattern = "**" PASSWORDS_FILE_NAME "$";
   const char *pattern = conn->ctx->config[HIDE_FILES];
-  return match_prefix(pw_pattern, strlen(pw_pattern), path) > 0 ||
-    (pattern != NULL && match_prefix(pattern, strlen(pattern), path) > 0);
+  return match_prefix(pw_pattern, strlen(pw_pattern), path) > 0 || (pattern != NULL && match_prefix(pattern, strlen(pattern), path) > 0);
 }
 
-static int scan_directory(struct mg_connection *conn, const char *dir,
-                          void *data, void (*cb)(struct de *, void *)) {
+static int scan_directory(struct mg_connection *conn, const char *dir, void *data, void (*cb)(struct de *, void *))
+{
   char path[PATH_MAX];
   struct dirent *dp;
   DIR *dirp;
   struct de de;
 
-  if ((dirp = opendir(dir)) == NULL) {
+  if ((dirp = opendir(dir)) == NULL)
     return 0;
-  } else {
+  else
+  {
     de.conn = conn;
 
     while ((dp = readdir(dirp)) != NULL) {
@@ -2361,7 +2362,8 @@ struct dir_scan_data {
   int arr_size;
 };
 
-static void dir_scan_callback(struct de *de, void *data) {
+static void dir_scan_callback(struct de *de, void *data)
+{
   struct dir_scan_data *dsd = (struct dir_scan_data *) data;
 
   if (dsd->entries == NULL || dsd->num_entries >= dsd->arr_size) {
@@ -2420,7 +2422,8 @@ static void handle_directory_request(struct mg_connection *conn,
   // Sort and print directory entries
   qsort(data.entries, (size_t) data.num_entries, sizeof(data.entries[0]),
         compare_dir_entries);
-  for (i = 0; i < data.num_entries; i++) {
+  for (i = 0; i < data.num_entries; i++)
+  {
     print_dir_entry(&data.entries[i]);
     free(data.entries[i].file_name);
   }
@@ -2431,11 +2434,13 @@ static void handle_directory_request(struct mg_connection *conn,
 }
 
 // Send len bytes from the opened file to the client.
-static void send_file_data(struct mg_connection *conn, FILE *fp, int64_t len) {
+static void send_file_data(struct mg_connection *conn, FILE *fp, int64_t len)
+{
   char buf[MG_BUF_LEN];
   int to_read, num_read, num_written;
 
-  while (len > 0) {
+  while (len > 0)
+  {
     // Calculate how much to read from the file in the buffer
     to_read = sizeof(buf);
     if ((int64_t) to_read > len)
@@ -3831,25 +3836,29 @@ struct mg_connection *mg_connect(struct mg_context *ctx,
   struct hostent *he;
   int sock;
 
-  if (ctx->client_ssl_ctx == NULL && use_ssl) {
+  if (ctx->client_ssl_ctx == NULL && use_ssl)
     cry(fc(ctx), "%s: SSL is not initialized", __func__);
-  } else if ((he = gethostbyname(host)) == NULL) {
+  else if ((he = gethostbyname(host)) == NULL)
     cry(fc(ctx), "%s: gethostbyname(%s): %s", __func__, host, strerror(ERRNO));
-  } else if ((sock = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+  else if ((sock = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
     cry(fc(ctx), "%s: socket: %s", __func__, strerror(ERRNO));
-  } else {
+  else
+  {
     sin.sin_family = AF_INET;
     sin.sin_port = htons((uint16_t) port);
     sin.sin_addr = * (struct in_addr *) he->h_addr_list[0];
-    if (connect(sock, (struct sockaddr *) &sin, sizeof(sin)) != 0) {
-      cry(fc(ctx), "%s: connect(%s:%d): %s", __func__, host, port,
-          strerror(ERRNO));
+    if (connect(sock, (struct sockaddr *) &sin, sizeof(sin)) != 0)
+    {
+      cry(fc(ctx), "%s: connect(%s:%d): %s", __func__, host, port, strerror(ERRNO));
       closesocket(sock);
-    } else if ((newconn = (struct mg_connection *)
-                calloc(1, sizeof(*newconn))) == NULL) {
+    }
+    else if ((newconn = (struct mg_connection *)calloc(1, sizeof(*newconn))) == NULL)
+    {
       cry(fc(ctx), "%s: calloc: %s", __func__, strerror(ERRNO));
       closesocket(sock);
-    } else {
+    }
+    else
+    {
       newconn->ctx = ctx;
       newconn->client.sock = sock;
       newconn->client.rsa.sin = sin;
@@ -3863,8 +3872,10 @@ struct mg_connection *mg_connect(struct mg_context *ctx,
   return newconn;
 }
 
-FILE *mg_fetch(struct mg_context *ctx, const char *url, const char *path,
-               char *buf, size_t buf_len, struct mg_request_info *ri) {
+
+
+FILE *mg_fetch(struct mg_context *ctx, const char *url, const char *path, char *buf, size_t buf_len, struct mg_request_info *ri)
+{
   struct mg_connection *newconn;
   int n, req_length, data_length, port;
   char host[1025], proto[10], buf2[MG_BUF_LEN];
@@ -3878,21 +3889,22 @@ FILE *mg_fetch(struct mg_context *ctx, const char *url, const char *path,
     return NULL;
   }
 
-  if ((newconn = mg_connect(ctx, host, port,
-                            !strcmp(proto, "https"))) == NULL) {
+  if ((newconn = mg_connect(ctx, host, port, !strcmp(proto, "https"))) == NULL)
     cry(fc(ctx), "%s: mg_connect(%s): %s", __func__, url, strerror(ERRNO));
-  } else {
+  else
+  {
     mg_printf(newconn, "GET /%s HTTP/1.0\r\nHost: %s\r\n\r\n", url + n, host);
     data_length = 0;
-    req_length = read_request(NULL, newconn->client.sock,
-                              newconn->ssl, buf, buf_len, &data_length);
-    if (req_length <= 0) {
-      cry(fc(ctx), "%s(%s): invalid HTTP reply", __func__, url);
-    } else if (parse_http_response(buf, req_length, ri) <= 0) {
-      cry(fc(ctx), "%s(%s): cannot parse HTTP headers", __func__, url);
-    } else if ((fp = fopen(path, "w+b")) == NULL) {
-      cry(fc(ctx), "%s: fopen(%s): %s", __func__, path, strerror(ERRNO));
-    } else {
+    req_length = read_request(NULL, newconn->client.sock, newconn->ssl, buf, buf_len, &data_length);
+
+    if (req_length <= 0)
+        cry(fc(ctx), "%s(%s): invalid HTTP reply", __func__, url);
+    else if (parse_http_response(buf, req_length, ri) <= 0)
+        cry(fc(ctx), "%s(%s): cannot parse HTTP headers", __func__, url);
+    else if ((fp = fopen(path, "w+b")) == NULL)
+        cry(fc(ctx), "%s: fopen(%s): %s", __func__, path, strerror(ERRNO));
+    else
+    {
       // Write chunk of data that may be in the user's buffer
       data_length -= req_length;
       if (data_length > 0 &&

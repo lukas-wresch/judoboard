@@ -1,7 +1,7 @@
 #include <sstream>
 #include <fstream>
-#include <ZED/include/csv.h>
-#include <ZED/include/log.h>
+#include "../ZED/include/csv.h"
+#include "../ZED/include/log.h"
 #include "match.h"
 #include "tournament.h"
 

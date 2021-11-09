@@ -1,7 +1,7 @@
 #include <fstream>
 #include <random>
-#include <ZED/include/log.h>
-#include <ZED/include/sha512.h>
+#include "../ZED/include/log.h"
+#include "../ZED/include/sha512.h"
 #include "database.h"
 
 
@@ -82,7 +82,10 @@ bool Database::Save(const std::string& Filename) const
 	std::ofstream File(Filename, std::ios::binary);
 
 	if (!File)
+	{
+		ZED::Log::Error("Could not save file " + Filename);
 		return false;
+	}
 
 	ZED::CSV csv;
 
@@ -90,7 +93,7 @@ bool Database::Save(const std::string& Filename) const
 	
 	StandingData::operator>>(csv);
 
-	csv << (uint32_t)m_Accounts.size();
+	csv << m_Accounts.size();
 
 	for (auto account : m_Accounts)
 	{
@@ -122,7 +125,7 @@ const Account* Database::AddAccount(const Account& NewAccount)
 
 const Account* Database::FindAccount(const std::string& Username) const
 {
-	for (auto& account : m_Accounts)
+	for (auto account : m_Accounts)
 		if (account && account->GetUsername() == Username)
 			return account;
 

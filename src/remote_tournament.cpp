@@ -1,6 +1,6 @@
 #include "remote_tournament.h"
-#include <ZED/include/log.h>
-#include <ZED/include/http_client.h>
+#include "../ZED/include/log.h"
+#include "../ZED/include/http_client.h"
 
 
 

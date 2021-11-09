@@ -6,7 +6,7 @@
 #include <thread>
 #include <algorithm>
 #include <cmath>
-#include <ZED/include/log.h>
+#include "../ZED/include/log.h"
 
 
 
@@ -1329,7 +1329,7 @@ void Mat::UpdateGraphics() const
 		//ZED::FontSize FontSize = ZED::FontSize::Huge;
 		ZED::FontSize FontSize = ZED::FontSize::Gigantic;
 
-		for (int i = m_NextMatches.size(); i < 4; i++)
+		for (size_t i = m_NextMatches.size(); i < 4; i++)
 		{
 			m_Graphics["next_matches_white_" + std::to_string(i)].Clear();
 			m_Graphics["next_matches_blue_"  + std::to_string(i)].Clear();

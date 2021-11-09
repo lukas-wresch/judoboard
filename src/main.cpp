@@ -2,7 +2,7 @@
 #include "database.h"
 #include "tournament.h"
 #include "weightclass.h"
-#include <ZED/include/log.h>
+#include "../ZED/include/log.h"
 
 
 

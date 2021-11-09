@@ -1,6 +1,6 @@
 #include <random>
-#include <ZED/include/log.h>
-#include <ZED/include/sha512.h>
+#include "../ZED/include/log.h"
+#include "../ZED/include/sha512.h"
 #include "account.h"
 #include "timer.h"
 

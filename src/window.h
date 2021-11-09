@@ -1,8 +1,8 @@
 #pragma once
 #include <functional>
-#include <ZED/include/renderer_opengl.h>
-#include <ZED/include/renderer_opengles1_1.h>
-#include <ZED/include/renderer_sdl2.h>
+#include "../ZED/include/renderer_opengl.h"
+//#include "../ZED/include/renderer_opengles1_1.h"
+#include "../ZED/include/renderer_sdl2.h"
 #ifdef LINUX
 #include <gtk/gtk.h>
 #endif
@@ -11,6 +11,11 @@
 
 namespace Judoboard
 {
+#ifdef _WIN32
+	LRESULT CALLBACK WindowProc(HWND Hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
+#endif
+
+
 	class Window
 	{
 	public:
