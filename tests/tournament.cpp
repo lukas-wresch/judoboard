@@ -146,7 +146,7 @@ TEST(Tournament, DoubleDisqualification2)
 		EXPECT_TRUE(match1.HasConcluded());
 		EXPECT_TRUE(match1.GetMatchResult().m_Winner == Winner::White);
 		EXPECT_TRUE(match1.GetMatchResult().m_Score == Match::Score::Ippon);
-		EXPECT_TRUE(match1.GetMatchResult().m_Time == 0);
+		EXPECT_EQ(match1.GetMatchResult().m_Time, 0);
 		EXPECT_TRUE(match1.GetLog().GetEvents().size() >= 3);
 
 		EXPECT_TRUE(match2.HasConcluded());

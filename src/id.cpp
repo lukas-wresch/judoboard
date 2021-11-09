@@ -69,7 +69,10 @@ const UUID ID::GenerateUUID()
 		const UUID uuid(hash);
 
 		if (s_UsedUUIDs.find(uuid) == s_UsedUUIDs.end())//Check if there is a collision
+		{
+			s_UsedUUIDs.insert(uuid);
 			return uuid;//No collision, uuid can be used
+		}
 	}
 
 	return std::string();

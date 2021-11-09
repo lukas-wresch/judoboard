@@ -2,7 +2,7 @@
 
 
 
-TEST(Timer, Accuary)
+TEST(Timer, Accuracy)
 {
 	initialize();
 	for (int i = 0; i < 2; i++)
