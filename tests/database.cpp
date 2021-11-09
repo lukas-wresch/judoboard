@@ -68,6 +68,9 @@ TEST(Database, SaveAndLoad)
 		d.AddJudoka(&j1);
 		d.AddJudoka(&j2);
 
+		EXPECT_NE(j1.GetID(),   j2.GetID());
+		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
+
 		d.AddRuleSet(new RuleSet("Test", 60, 30, 20, 10, true, true, true, 1));
 
 		EXPECT_TRUE(d.FindJudoka(j1.GetID())->GetWeight() == 50);

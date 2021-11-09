@@ -22,9 +22,9 @@
 #include "../src/weightclass.h"
 #include "../src/window.h"
 
-#include <ZED/include/http_client.h>
-#include <ZED/include/sha512.h>
-#include <ZED/include/log.h>
+#include "../ZED/include/http_client.h"
+#include "../ZED/include/sha512.h"
+#include "../ZED/include/log.h"
 
 
 using namespace Judoboard;
