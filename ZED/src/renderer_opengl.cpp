@@ -182,6 +182,8 @@ void ZED::RendererOpenGL::Release()
 Ref<Texture> ZED::RendererOpenGL::RenderFont(FontSize Size, const std::string& Text, ZED::Color Textcolor) const
 {
 	auto temp = RendererSDL2::RenderFont(Size, Text, Textcolor);
+	if (!temp)
+		return nullptr;
 	TextureOpenGL* ret = new TextureOpenGL(*(TextureSDL2*)temp.data);
 	return ret;
 }

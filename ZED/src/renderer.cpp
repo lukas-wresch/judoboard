@@ -13,17 +13,21 @@
 
 
 #ifdef _DEBUG
-#pragma comment(lib, "../external/SDL2-2.0.14/VisualC/Win32/Debug/SDL2.lib")
-#pragma comment(lib, "../external/SDL2_image-2.0.5/VisualC/Win32/Debug/SDL2_image.lib")
-#pragma comment(lib, "../external/SDL2_ttf-2.0.15/VisualC/Win32/Debug/SDL2_ttf.lib")
+//#pragma comment(lib, "../external/SDL2-2.0.14/VisualC/Win32/Debug/SDL2.lib")
+#pragma comment(lib, "SDL2.lib")
+//#pragma comment(lib, "../external/SDL2_image-2.0.5/VisualC/Win32/Debug/SDL2_image.lib")
+//#pragma comment(lib, "../external/SDL2_ttf-2.0.15/VisualC/Win32/Debug/SDL2_ttf.lib")
+#pragma comment(lib, "SDL2_ttf.lib")
 //#pragma comment(lib, "../external/SDL2_ttf-2.0.15/VisualC/external/lib/x86/libfreetype-6.lib")
-#pragma comment(lib, "../external/freetype-2.10.4/objs/Win32/Debug Static/freetype.lib")
+//#pragma comment(lib, "../external/freetype-2.10.4/objs/Win32/Debug Static/freetype.lib")
 #else
-#pragma comment(lib, "../external/SDL2-2.0.14/VisualC/Win32/Release/SDL2.lib")
-#pragma comment(lib, "../external/SDL2_image-2.0.5/VisualC/Win32/Release/SDL2_image.lib")
-#pragma comment(lib, "../external/SDL2_ttf-2.0.15/VisualC/Win32/Release/SDL2_ttf.lib")
+//#pragma comment(lib, "../external/SDL2-2.0.14/VisualC/Win32/Release/SDL2.lib")
+// #pragma comment(lib, "SDL2.lib")
+//#pragma comment(lib, "../external/SDL2_image-2.0.5/VisualC/Win32/Release/SDL2_image.lib")
+//#pragma comment(lib, "../external/SDL2_ttf-2.0.15/VisualC/Win32/Release/SDL2_ttf.lib")
+//#pragma comment(lib, "SDL2_ttf.lib")
 //#pragma comment(lib, "../external/SDL2_ttf-2.0.15/VisualC/external/lib/x86/libfreetype-6.lib")
-#pragma comment(lib, "../external/freetype-2.10.4/objs/Win32/Release Static/freetype.lib")
+//#pragma comment(lib, "../external/freetype-2.10.4/objs/Win32/Release Static/freetype.lib")
 #endif
 
 
@@ -39,8 +43,10 @@ Ref<Texture> Renderer::CreateTexture() const
 	else if (GetType() == Type::OpenGL)
 		return new TextureOpenGL;
 #endif
+#ifndef NO_OPENGLES
 	else if (GetType() == Type::OpenGLES1_1)
 		return new TextureOpenGLES1_1;
+#endif
 	return nullptr;
 }
 
@@ -54,8 +60,10 @@ Ref<Texture>Renderer::CreateTexture(int w, int h) const
 	else if (GetType() == Type::OpenGL)
 		return new TextureOpenGL(w, h);
 #endif
+#ifndef NO_OPENGLES
 	else if (GetType() == Type::OpenGLES1_1)
 		return new TextureOpenGLES1_1(w, h);
+#endif
 	return nullptr;
 }
 
@@ -69,8 +77,10 @@ Ref<Texture> Renderer::CreateTexture(const char* Filename) const
 	else if (GetType() == Type::OpenGL)
 		return new TextureOpenGL(Filename);
 #endif
-	//else if (GetType() == Type::OpenGLES1_1)
-		//return new TextureOpenGLES1_1(Filename);
+#ifndef NO_OPENGLES
+	else if (GetType() == Type::OpenGLES1_1)
+		return new TextureOpenGLES1_1(Filename);
+#endif
 	return nullptr;
 }
 
@@ -84,8 +94,10 @@ Ref<Texture> Renderer::CreateTexture(const Image& Image) const
 	else if (GetType() == Type::OpenGL)
 		return new TextureOpenGL(Image);
 #endif
+#ifndef NO_OPENGLES
 	else if (GetType() == Type::OpenGLES1_1)
 		return new TextureOpenGLES1_1(Image);
+#endif
 	return nullptr;
 }
 

@@ -15,9 +15,9 @@
 
 
 #ifdef _DEBUG
-#pragma comment(lib, "../external/SDL2_ttf-2.0.15/VisualC/Win32/Debug/SDL2_ttf.lib")
+//#pragma comment(lib, "../external/SDL2_ttf-2.0.15/VisualC/Win32/Debug/SDL2_ttf.lib")
 #else
-#pragma comment(lib, "../external/SDL2_ttf-2.0.15/VisualC/Win32/Release/SDL2_ttf.lib")
+//#pragma comment(lib, "../external/SDL2_ttf-2.0.15/VisualC/Win32/Release/SDL2_ttf.lib")
 #endif
 
 

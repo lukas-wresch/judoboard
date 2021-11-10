@@ -13,9 +13,10 @@
 #else
 #define DLLEXPORT
 #ifdef _DEBUG
-#pragma comment(lib, "ZED/bin/ZEDd.lib")
+//#pragma comment(lib, "ZED/bin/ZEDd.lib")
+#pragma comment(lib, "bin/ZEDd.lib")
 #else
-#pragma comment(lib, "ZED/bin/ZED.lib")
+#pragma comment(lib, "bin/ZED.lib")
 #endif
 #endif
 #endif

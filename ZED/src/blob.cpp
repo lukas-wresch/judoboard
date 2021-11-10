@@ -53,7 +53,7 @@ void Blob::Append(const void* Data, size_t BytesToWrite)
 
 	else
 	{
-		const uint32_t bytesAvailable = m_Size - m_WriteCursor;
+		const size_t bytesAvailable = m_Size - m_WriteCursor;
 		if (BytesToWrite > bytesAvailable)//Need to resize buffer
 		{
 			uint8_t* tmp = (uint8_t*)realloc(m_Data, m_Size + (BytesToWrite - bytesAvailable));

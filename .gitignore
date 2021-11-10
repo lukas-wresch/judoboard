@@ -370,3 +370,4 @@ FodyWeavers.xsd
 /ZED/external/libpng-1.6.37/projects/vstudio/zlib/Release Library/zlib.tlog
 /ZED/external/libpng-1.6.37/projects/vstudio/zlib/Release Library/zlib.vcxproj.FileListAbsolute.txt
 /ZED/external/libpng-1.6.37/projects/vstudio/zlib/Debug Library/zlib.vcxproj.FileListAbsolute.txt
+*.lib
