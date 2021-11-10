@@ -4,7 +4,7 @@
 
 TEST(Account, NonceExpiration)
 {
-	srand(ZED::Core::CurrentTimestamp());
+	initialize();
 	int ip  = rand();
 	int port = rand();
 
@@ -33,6 +33,7 @@ TEST(Account, NonceExpiration)
 
 TEST(Account, Basics)
 {
+	initialize();
 	Account acc("Username", "Password");
 
 	EXPECT_EQ(acc.GetUsername(), std::string("Username"));
@@ -50,6 +51,7 @@ TEST(Account, Basics)
 
 TEST(Account, Login)
 {
+	initialize();
 	srand(ZED::Core::CurrentTimestamp());
 
 	for (int i = 0; i < 1000 * 50; i++)
@@ -73,6 +75,7 @@ TEST(Account, Login)
 
 TEST(Account, LoginBruteforce)
 {
+	initialize();
 	srand(ZED::Core::CurrentTimestamp());
 
 	for (int i = 0; i < 1000 * 100; i++)
