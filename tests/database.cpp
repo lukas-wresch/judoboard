@@ -260,14 +260,11 @@ TEST(Database, RuleSets)
 
 	for (int i = 0; i < 1000; i++)
 	{
-		int ip = rand();
-		int port = rand();
-
-		std::string name = "Rules" + std::to_string(rand()) + std::to_string(rand());
+		std::string name = "Rules" + std::to_string(rand()) + std::to_string(rand()) + std::to_string(rand());
 
 		RuleSet* rules = new RuleSet(name, 60, 30, 30, 20);
 
-		EXPECT_TRUE(d.FindRuleSetByName(name) == nullptr);
+		ASSERT_TRUE(d.FindRuleSetByName(name) == nullptr);
 
 		d.AddRuleSet(rules);
 
