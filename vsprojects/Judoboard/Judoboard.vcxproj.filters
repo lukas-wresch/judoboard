@@ -178,75 +178,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Debug\html\account_add.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\account_list.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\add_fight.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\add_judoka.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\class_list.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\edit_match.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\index.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\judoka_edit.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\list_judoka.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\login.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\mat.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\mat_configure.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\mat_edit.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\matchtable_add.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\participant_add.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\rule_add.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\rule_list.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\schedule.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\server_config.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\tournament_add.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\tournament_list.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\weightclass_add.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Debug\html\weightclass_edit.html">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="..\..\compile.sh">
       <Filter>Resource Files</Filter>
     </None>
@@ -257,6 +188,84 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\run_tests.sh">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\common.js">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\account_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\account_list.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\add_fight.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\add_judoka.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\class_list.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\club_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\club_list.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\edit_match.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\index.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\judoka_edit.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\list_judoka.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\login.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\mat.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\mat_configure.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\mat_edit.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\matchtable_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\participant_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\rule_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\rule_list.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\schedule.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\server_config.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\tournament_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\tournament_list.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\weightclass_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\weightclass_edit.html">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

@@ -60,7 +60,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	m_Server.RegisterResource("/club_list.html", [](auto& Request) { return HttpServer::LoadFile("html/club_list.html"); });
 	m_Server.RegisterResource("/club_add.html",  [](auto& Request) { return HttpServer::LoadFile("html/club_add.html"); });
 
-	m_Server.RegisterResource("/add_fight.html",   [](auto& Request) { return HttpServer::LoadFile("html/add_fight.html"); });
+	m_Server.RegisterResource("/add_match.html",   [](auto& Request) { return HttpServer::LoadFile("html/add_match.html"); });
 	m_Server.RegisterResource("/edit_match.html",  [](auto& Request) { return HttpServer::LoadFile("html/edit_match.html"); });
 
 	m_Server.RegisterResource("/account_add.html",  [](auto& Request) { return HttpServer::LoadFile("html/account_add.html"); });

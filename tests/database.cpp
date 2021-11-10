@@ -51,7 +51,6 @@ TEST(Database, JudokaTest)
 
 
 
-
 TEST(Database, SaveAndLoad)
 {
 	initialize();
@@ -85,9 +84,9 @@ TEST(Database, SaveAndLoad)
 		EXPECT_TRUE(d2.GetNumJudoka() == 2);
 
 		ASSERT_TRUE(d2.FindJudoka(j1.GetUUID()));
-		EXPECT_TRUE(d2.FindJudoka(j1.GetUUID())->GetUUID() == j1.GetUUID());
-		EXPECT_TRUE(d2.FindJudoka(j1.GetUUID())->GetWeight() == 50);
-		EXPECT_TRUE(d2.FindJudoka(j1.GetUUID())->GetGender() == j1.GetGender());
+		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetUUID(), j1.GetUUID());
+		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetWeight(), 50);
+		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetGender(), j1.GetGender());
 
 		ASSERT_TRUE(d2.FindJudoka(j2.GetUUID()));
 		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetUUID(), j2.GetUUID());
