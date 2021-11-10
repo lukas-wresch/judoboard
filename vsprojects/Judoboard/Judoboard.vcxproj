@@ -72,8 +72,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>E:\Workspace\;E:\Workspace\3rd-Party-Libraries;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\Workspace\3rd-Party-Libraries;E:\Workspace;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\bin\</OutDir>
     <TargetName>$(ProjectName)_Debug</TargetName>
   </PropertyGroup>
@@ -250,11 +250,6 @@
     <None Include="..\..\dependencies.sh" />
     <None Include="..\..\README.md" />
     <None Include="..\..\run_tests.sh" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ZED\ZED.vcxproj">
-      <Project>{aa9c2691-1e7a-4861-9e26-b61695a63543}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
