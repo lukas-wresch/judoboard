@@ -1759,10 +1759,10 @@ bool Mat::Render(double dt) const
 
 		auto text_date = renderer.RenderFont(ZED::FontSize::Middle, day.str(), ZED::Color(0, 0, 0));
 		if (text_date)
-			renderer.RenderTransformed(text_date, width - 230, height - 120);
+			renderer.RenderTransformed(text_date, width - 250, height - 120);
 		auto text_time = renderer.RenderFont(ZED::FontSize::Middle, time.str(), ZED::Color(0, 0, 0));
 		if (text_time)
-			renderer.RenderTransformed(text_time, width - 230, height - 70);
+			renderer.RenderTransformed(text_time, width - 250, height - 70);
 
 		//Render startup screen
 		if (m_Application && m_Application->GetTournament() && m_Application->GetTournament()->GetNextMatch(GetMatID()))
