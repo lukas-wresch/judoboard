@@ -192,6 +192,24 @@ TEST(Database, AccountTest)
 
 
 
+TEST(Database, Nonces)
+{
+	const int size = 1000;
+	Account::Nonce* nonces[size] = {};
+
+	int ip   = rand();
+	int port = rand();
+
+	for (int i = 0; i < size; i++)
+		nonces[i] = new Account::Nonce(ip, port);
+
+	for (int i = 0; i < size; i++)
+		for (int j = i + 1; j < size; j++)
+			ASSERT_NE(nonces[i]->GetChallenge(), nonces[j]->GetChallenge());
+}
+
+
+
 TEST(Database, Login)
 {
 	initialize();
@@ -202,7 +220,7 @@ TEST(Database, Login)
 
 	for (int i = 0; i < 300; i++)
 	{
-		int ip = rand();
+		int ip   = rand();
 		int port = rand();
 
 		std::string username = "Username" + std::to_string(rand()) + std::to_string(rand());
@@ -214,13 +232,13 @@ TEST(Database, Login)
 
 		auto mynonce = d.CreateNonce(ip, port);
 
-		EXPECT_TRUE(mynonce.GetIP() == ip);
+		EXPECT_EQ(mynonce.GetIP(), ip);
 
 		std::string response = ZED::SHA512(acc.GetUsername() + mynonce.GetChallenge() + password);
 
-		ASSERT_FALSE(d.CheckLogin(ip, response));
+		ASSERT_FALSE(d.IsLoggedIn(ip, response));
 		ASSERT_TRUE(d.DoLogin(acc.GetUsername(), ip, response));
-		ASSERT_TRUE(d.CheckLogin(ip, response));
+		ASSERT_TRUE(d.IsLoggedIn(ip, response));
 
 		for (auto nonce : d.GetNonces())
 		{

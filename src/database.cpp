@@ -14,7 +14,7 @@ void Database::Reset()
 {
 	StandingData::Reset();
 
-	for (auto* account : m_Accounts)
+	for (auto account : m_Accounts)
 		delete account;
 
 	m_Accounts.clear();
@@ -165,20 +165,20 @@ bool Database::DoLogin(const std::string& Username, uint32_t IP, const std::stri
 	if (!account)
 		return false;
 
-	for (auto nonce = m_OpenNonces.cbegin(); nonce != m_OpenNonces.cend();)
+	for (auto nonce_it = m_OpenNonces.cbegin(); nonce_it != m_OpenNonces.cend();)
 	{
-		if (nonce->HasExpired())
-			nonce = m_OpenNonces.erase(nonce);
+		if (nonce_it->HasExpired())
+			nonce_it = m_OpenNonces.erase(nonce_it);
 
-		else if (account->Verify(*nonce, Response))
+		else if (account->Verify(*nonce_it, Response))
 		{
-			m_ClosedNonces.insert({ Response, {*nonce, account} });
-			m_OpenNonces.erase(nonce);
+			m_ClosedNonces.insert({ Response, {*nonce_it, account} });
+			m_OpenNonces.erase(nonce_it);
 
 			return true;
 		}
 		else
-			++nonce;
+			++nonce_it;
 	}
 
 	return false;
@@ -186,7 +186,7 @@ bool Database::DoLogin(const std::string& Username, uint32_t IP, const std::stri
 
 
 
-const Account* Database::CheckLogin(uint32_t IP, const std::string& Response) const
+const Account* Database::IsLoggedIn(uint32_t IP, const std::string& Response) const
 {
 	auto item = m_ClosedNonces.find(Response);
 

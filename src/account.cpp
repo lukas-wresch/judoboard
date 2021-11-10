@@ -20,7 +20,7 @@ Account::Nonce::Nonce(uint32_t IP, uint16_t RemotePort) : m_IP(IP)
 	{
 		//ZED::Log::Debug("No entropy source found!");
 
-		srand(Timer::GetTimestamp());
+		//srand(Timer::GetTimestamp());
 		for (int bits = 0; bits < 512; bits += 15)
 			entropyInput += std::to_string(rand());
 	}

@@ -11,6 +11,10 @@ using namespace Judoboard;
 
 
 
+RuleSet s_default_rules;
+
+
+
 Match::Match(const ITournament* Tournament, Judoka* White, Judoka* Blue, uint32_t MatID) : Schedulable(Tournament)
 {
 	m_White.m_Judoka = White;
@@ -169,10 +173,9 @@ const RuleSet& Match::GetRuleSet() const
 	if (GetTournament() && GetTournament()->GetDefaultRuleSet())
 		return *GetTournament()->GetDefaultRuleSet();
 
-	ZED::Log::Error("Could not find rule set");
+	ZED::Log::Debug("Could not find rule set, using the default set");
 
-	static RuleSet* default_rules = new RuleSet;
-	return *default_rules;
+	return s_default_rules;
 }
 
 

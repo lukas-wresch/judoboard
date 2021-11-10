@@ -39,7 +39,7 @@ namespace Judoboard
 		//Logins
 		const Account::Nonce& CreateNonce(uint32_t IP, uint16_t RemotePort);
 		bool DoLogin(const std::string& Username, uint32_t IP, const std::string& Response);
-		const Account* CheckLogin(uint32_t IP, const std::string& Response) const;
+		const Account* IsLoggedIn(uint32_t IP, const std::string& Response) const;
 		const std::vector<std::pair<Account::Nonce, const Account*>> GetNonces();
 
 	private:

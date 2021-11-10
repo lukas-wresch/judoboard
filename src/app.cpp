@@ -2118,7 +2118,7 @@ const Account* Application::IsLoggedIn(const HttpServer::Request& Request) const
 			return GetDefaultAdminAccount();
 
 		auto value = HttpServer::DecodeURLEncoded(header->Value, "session");
-		return m_Database.CheckLogin(Request.m_RequestInfo.RemoteIP, value);
+		return m_Database.IsLoggedIn(Request.m_RequestInfo.RemoteIP, value);
 	}
 
 	return nullptr;
@@ -2138,7 +2138,7 @@ Error Application::CheckPermission(const HttpServer::Request& Request, Account::
 	auto value = HttpServer::DecodeURLEncoded(header->Value, "session");
 
 	LockTillScopeEnd();
-	auto* account = m_Database.CheckLogin(Request.m_RequestInfo.RemoteIP, value);
+	auto* account = m_Database.IsLoggedIn(Request.m_RequestInfo.RemoteIP, value);
 
 	if (!account || account->GetAccessLevel() < AccessLevel)
 		return Error::Type::NotEnoughPermissions;
