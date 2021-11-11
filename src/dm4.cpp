@@ -21,7 +21,7 @@ DM4::DM4(const std::string& Filename)
 
 
 
-bool DM4::Parse(ZED::Blob& Data)
+bool DM4::Parse(ZED::Blob&& Data)
 {
 	m_IsValid = false;
 

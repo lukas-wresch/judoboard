@@ -38,7 +38,7 @@ namespace Judoboard
 
 
 		DM4(const std::string& Filename);
-		DM4(ZED::Blob& Data) { Parse(Data); }
+		DM4(ZED::Blob& Data) { Parse(std::move(Data)); }
 		~DM4();
 
 		const Club* FindClubByID(int ClubID) const;
@@ -58,7 +58,7 @@ namespace Judoboard
 		operator bool() const { return m_IsValid; }
 
 	private:
-		bool Parse(ZED::Blob& Data);
+		bool Parse(ZED::Blob&& Data);
 
 		bool ParseLine(const std::string& Line);//Parse a single line of the dm4 file
 		bool ParseStartOfChunk(const std::string& Line);//Parses the start of a new chunk, i.e. [Identifikation] or [Absender]. Returns false if Line is not the start of a new chunk
