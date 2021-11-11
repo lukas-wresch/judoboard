@@ -277,7 +277,7 @@
     <None Include="..\..\.gitignore">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\bin\html\dm4.html">
+    <None Include="..\..\.gitattributes">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
