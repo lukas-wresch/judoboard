@@ -9,9 +9,10 @@ TEST(RemoteMat, OpenAndClose)
 	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
-	ASSERT_TRUE(slave.StartLocalMat(2));
+	ASSERT_TRUE(slave.StartLocalMat(1));
 
 	IMat* m = master.FindMat(1);
+	ASSERT_TRUE(m);
 
 	EXPECT_TRUE(m->GetType() == IMat::Type::RemoteMat);
 	EXPECT_TRUE(m->IsOpen());
@@ -37,28 +38,39 @@ TEST(RemoteMat, OpenAndClose)
 
 
 
-/*TEST(Mat, QuickClose)
+TEST(RemoteMat, QuickClose)
 {
 	initialize();
 	DWORD time = ZED::Core::CurrentTimestamp();
 	{
-		Application app;
-		Mat m(1);
+		Application master(8080 + rand() % 10000);
+		Application slave(8080 + rand() % 10000);
+
+		ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
+		ASSERT_TRUE(slave.StartLocalMat(1));
+
+		IMat* m = master.FindMat(1);
+		ASSERT_TRUE(m);
 	}
-	EXPECT_TRUE(ZED::Core::CurrentTimestamp() - time < 1500);
+	EXPECT_LE(ZED::Core::CurrentTimestamp() - time, 1500u);
 }
 
 
 
-TEST(Mat, ForcedCloseDuringMatch)
+/*TEST(RemoteMat, ForcedCloseDuringMatch)
 {
 	initialize();
-	Application app;
+	Application master(8080 + rand() % 10000);
+	Application slave(8080 + rand() % 10000);
 
-	app.CloseTournament();
-	app.SetTournamentList().clear();
+	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
+	ASSERT_TRUE(slave.StartLocalMat(1));
 
-	app.StartLocalMat(1);
+	master.CloseTournament();
+	master.SetTournamentList().clear();
+
+	master.StartLocalMat(1);
+	slave.StartLocalMat(2);
 
 	Judoka j1(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
 	Judoka j2(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
@@ -68,20 +80,20 @@ TEST(Mat, ForcedCloseDuringMatch)
 	Judoka j5(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
 	Judoka j6(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
 
-	app.GetDatabase().AddJudoka(std::move(j1));
-	app.GetDatabase().AddJudoka(std::move(j2));
-	app.GetDatabase().AddJudoka(std::move(j3));
+	master.GetDatabase().AddJudoka(std::move(j1));
+	master.GetDatabase().AddJudoka(std::move(j2));
+	master.GetDatabase().AddJudoka(std::move(j3));
 
-	app.GetDatabase().AddJudoka(std::move(j4));
-	app.GetDatabase().AddJudoka(std::move(j5));
-	app.GetDatabase().AddJudoka(std::move(j6));
+	master.GetDatabase().AddJudoka(std::move(j4));
+	master.GetDatabase().AddJudoka(std::move(j5));
+	master.GetDatabase().AddJudoka(std::move(j6));
 
 	auto tournament_name = GetRandomName();
 	auto tourney = new Tournament(tournament_name, new RuleSet("Test", 60, 0, 20, 10));
 	tourney->EnableAutoSave(false);
-	EXPECT_TRUE(app.AddTournament(tourney));
+	EXPECT_TRUE(master.AddTournament(tourney));
 
-	app.OpenTournament(app.FindTournamentIndex(tournament_name));
+	master.OpenTournament(master.FindTournamentIndex(tournament_name));
 
 	tourney->AddParticipant(&j1);
 	tourney->AddParticipant(&j2);
@@ -93,39 +105,44 @@ TEST(Mat, ForcedCloseDuringMatch)
 	MatchTable* m1 = new Weightclass(tourney, 0, 49);
 	MatchTable* m2 = new Weightclass(tourney, 50, 100);
 	m1->SetMatID(1);
-	m2->SetMatID(1);
+	m2->SetMatID(2);
 	tourney->AddMatchTable(m1);
 	tourney->AddMatchTable(m2);
 
-	auto mat = app.GetDefaultMat();
+	IMat* mat[2];
+	mat[0] = master.FindMat(1);
+	mat[1] = master.FindMat(2);
 
 	ZED::Core::Pause(6000);
-	auto match = tourney->GetNextMatch(mat->GetMatID());
-	EXPECT_TRUE(match != nullptr);
-	EXPECT_TRUE(mat->StartMatch(match));
 
-	ZED::Core::Pause(8000);
+	for (int i = 0;i < 2;i++)
+	{
+		auto match = tourney->GetNextMatch(mat[i]->GetMatID());
+		EXPECT_TRUE(match);
+		EXPECT_TRUE(mat[i]->StartMatch(match));
 
-	mat->Hajime();
+		ZED::Core::Pause(8000);
 
-	ZED::Core::Pause(1000);
+		mat[i]->Hajime();
 
-	Fighter f = Fighter::White;
-	if (rand() % 2 == 0)
-		f = Fighter::Blue;
+		ZED::Core::Pause(1000);
+
+		Fighter f = Fighter::White;
+		if (rand() % 2 == 0)
+			f = Fighter::Blue;
+
+		mat[i]->AddIppon(f);
+
+		ZED::Core::Pause(3000);
+
+		EXPECT_TRUE(mat[i]->EndMatch());
+		ZED::Core::Pause(4000);
+	}
+}*/
 
 
-	mat->AddIppon(f);
 
-	ZED::Core::Pause(3000);
-
-	EXPECT_TRUE(mat->EndMatch());
-	ZED::Core::Pause(8000);
-}
-
-
-
-TEST(Mat, StartMatch)
+/*TEST(RemoteMat, StartMatch)
 {
 	initialize();
 	Application app;
