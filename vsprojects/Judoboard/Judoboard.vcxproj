@@ -201,6 +201,7 @@
     <ClInclude Include="..\..\src\id.h" />
     <ClInclude Include="..\..\src\imat.h" />
     <ClInclude Include="..\..\src\itournament.h" />
+    <ClInclude Include="..\..\src\judoboard.h" />
     <ClInclude Include="..\..\src\judoka.h" />
     <ClInclude Include="..\..\src\localizer.h" />
     <ClInclude Include="..\..\src\mat.h" />

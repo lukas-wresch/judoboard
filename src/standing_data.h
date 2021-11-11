@@ -4,6 +4,7 @@
 #include "judoka.h"
 #include "club.h"
 #include "rule_set.h"
+#include "dm4.h"
 
 
 
@@ -30,6 +31,9 @@ namespace Judoboard
 		Judoka* FindJudoka(const UUID& UUID);
 		const Judoka* FindJudoka(const UUID& UUID) const;
 
+		Judoka* FindJudoka_DM4_ExactMatch(const DM4::Participant& NewJudoka);
+		Judoka* FindJudoka_DM4_SameName(const DM4::Participant& NewJudoka);
+
 		bool DeleteJudoka(uint32_t ID);
 
 		//Clubs
@@ -40,6 +44,8 @@ namespace Judoboard
 		const Club* FindClub(uint32_t ID) const;
 		Club* FindClub(const UUID& UUID);
 		const Club* FindClub(const UUID& UUID) const;
+		Club* FindClubByName(const std::string& Name);
+		const Club* FindClubByName(const std::string& Name) const;
 
 		bool DeleteClub(uint32_t ID);
 
