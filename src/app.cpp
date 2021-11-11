@@ -81,6 +81,8 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 	m_Server.RegisterResource("/server_config.html", [](auto& Request) { return HttpServer::LoadFile("html/server_config.html"); });
 
+	m_Server.RegisterResource("/dm4.html", [](auto& Request) { return HttpServer::LoadFile("html/dm4.html"); });
+
 
 	//Ajax requests
 

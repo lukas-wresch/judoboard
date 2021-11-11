@@ -233,6 +233,7 @@
     <None Include="..\..\bin\html\club_add.html" />
     <None Include="..\..\bin\html\club_list.html" />
     <None Include="..\..\bin\html\common.js" />
+    <None Include="..\..\bin\html\dm4.html" />
     <None Include="..\..\bin\html\edit_match.html" />
     <None Include="..\..\bin\html\index.html" />
     <None Include="..\..\bin\html\judoka_edit.html" />

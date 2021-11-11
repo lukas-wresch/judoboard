@@ -277,5 +277,8 @@
     <None Include="..\..\.gitignore">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\bin\html\dm4.html">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
