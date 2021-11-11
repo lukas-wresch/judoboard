@@ -44,13 +44,13 @@
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>..\Judoboard\x64\Debug;..\..;$(LibraryPath)</LibraryPath>
-    <ReferencePath>..\Judoboard\x64\Debug;$(ReferencePath)</ReferencePath>
-    <OutDir>$(SolutionDir)..\bin\</OutDir>
+    <LibraryPath>..\Judoboard\x64\Debug;..\..\bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\bin\</OutDir>
-    <LibraryPath>..\Judoboard\x64\Release;..\..;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\Judoboard\x64\Release;..\..\bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemGroup>
     <None Include="packages.config" />
