@@ -199,7 +199,7 @@
     <None Include="..\..\bin\html\account_list.html">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\bin\html\add_fight.html">
+    <None Include="..\..\bin\html\add_match.html">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\bin\html\add_judoka.html">
