@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include "judoka.h"
+#include "judoboard.h"
+#include "../ZED/include/blob.h"
 
 
 
@@ -29,12 +30,15 @@ namespace Judoboard
 			std::string Firstname;
 			std::string Lastname;
 
+			Gender Gender;
+
 			int Weight = -1;//< 0 if no weight is known
 			int Birthyear = -1;//< 0 if no value is known
 		};
 
 
 		DM4(const std::string& Filename);
+		DM4(ZED::Blob& Data) { Parse(Data); }
 		~DM4();
 
 		const Club* FindClubByID(int ClubID) const;
@@ -54,6 +58,8 @@ namespace Judoboard
 		operator bool() const { return m_IsValid; }
 
 	private:
+		bool Parse(ZED::Blob& Data);
+
 		bool ParseLine(const std::string& Line);//Parse a single line of the dm4 file
 		bool ParseStartOfChunk(const std::string& Line);//Parses the start of a new chunk, i.e. [Identifikation] or [Absender]. Returns false if Line is not the start of a new chunk
 		bool GetValue(const std::string& Line, const std::string& Key, std::string& Result) const;

@@ -1,10 +1,13 @@
 <h1 id="headline">Upload DM4 File</h1>
 
-<form method="post" enctype="multipart/form-data">
+<form action="upload/dm4" method="post" enctype="multipart/form-data">
 
- <label id="label_dm4_upload">Choose the dm4 file you would like to submit
-    <input name="file" type="file" size="1024" accept="text/*"> 
- </label>  
+<div>
+     <label id="label_dm4_upload">Choose the dm4 file you would like to submit</label>
+     <input name="file" type="file" size="1024" accept="text/*.*">
+</div>
+
+<br/>
 
 <button class="add" id="add">Upload File</button> 
 

@@ -1,6 +1,6 @@
 #include "../ZED/include/file.h"
-#include "../ZED/include/blob.h"
 #include "../ZED/include/log.h"
+#include "../ZED/include/csv.h"
 #include "dm4.h"
 
 
@@ -13,37 +13,42 @@ DM4::DM4(const std::string& Filename)
 {
 	ZED::File file(Filename);
 
-	if (!file)
-	{
+	if (file)
+		Parse(ZED::Blob(file));
+	else
 		ZED::Log::Warn("Could not open file " + Filename);
-		return;
-	}
+}
 
-	ZED::Blob data(file);
+
+
+bool DM4::Parse(ZED::Blob& Data)
+{
+	m_IsValid = false;
 
 	//Read line by line
 	std::string line;
-	for (size_t i = 0; i < data.GetSize(); i++)
+	for (size_t i = 0; i < Data.GetSize(); i++)
 	{
-		if (data[i] == '\n')
+		if (Data[i] == '\n')
 			continue;
 
-		else if (data[i] == '\r')
+		else if (Data[i] == '\r')
 		{
 			if (!ParseLine(line))
 			{
 				ZED::Log::Warn("Parsing error on line: " + line);
-				return;
+				return false;
 			}
 
 			line = "";
 			continue;
 		}
 
-		line += data[i];
+		line += Data[i];
 	}
 
 	m_IsValid = true;
+	return m_IsValid;
 }
 
 
@@ -157,6 +162,7 @@ bool DM4::ParseLine(const std::string& Line)
 
 				//Find Club
 				new_participant.Club = FindClubByID(new_participant.ClubID);
+				new_participant.Gender = m_Gender;//Set gender
 
 				m_Participants.emplace_back(new_participant);
 			}
@@ -191,7 +197,7 @@ bool DM4::ParseStartOfChunk(const std::string& Line)
 
 bool DM4::GetValue(const std::string& Line, const std::string& Key, std::string& Result) const
 {
-	auto pos = Line.rfind(Key, 0);
+	auto pos = Line.find(Key);
 	if (pos != std::string::npos)
 	{
 		Result = Line.substr(pos + Key.length());

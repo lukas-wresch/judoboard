@@ -30,8 +30,6 @@ namespace Judoboard
 		Tournament(const std::string& Name, const RuleSet* RuleSet);
 		~Tournament();
 
-		bool AddDM4File(const DM4& File);
-
 		void Reset();
 		void ConnectToDatabase(Database& db);//Replaces all local references to judoka with reference to the database (as long as the tournament is not finalized)
 

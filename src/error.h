@@ -16,7 +16,8 @@ namespace Judoboard
 			InternalError,
 			ItemNotFound,
 			TournamentNotOpen,
-			OperationFailed
+			OperationFailed,
+			InvalidFormat
 		};
 		
 		Error() = default;

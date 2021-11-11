@@ -30,6 +30,23 @@ Judoka::Judoka(ZED::CSV& Stream, const StandingData* pStandingData)
 
 
 
+Judoka::Judoka(const DM4::Participant& Participant, const StandingData* pStandingData)
+{
+	m_Firstname = Participant.Firstname;
+	m_Lastname  = Participant.Lastname;
+	m_Gender    = Participant.Gender;
+
+	if (Participant.Birthyear > 0)
+		m_Birthyear = Participant.Birthyear;
+	if (Participant.Weight > 0)
+		m_Weight = Participant.Weight;
+
+	if (pStandingData && Participant.Club)
+		m_pClub = pStandingData->FindClubByName(Participant.Club->Name);
+}
+
+
+
 void Judoka::operator >> (ZED::CSV& Stream) const
 {
 	Stream << m_Firstname;

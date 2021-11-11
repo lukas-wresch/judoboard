@@ -164,6 +164,28 @@ const Club* StandingData::FindClub(const UUID& UUID) const
 
 
 
+Club* StandingData::FindClubByName(const std::string& Name)
+{
+	for (auto club : m_Clubs)
+		if (club && club->GetName() == Name)
+			return club;
+
+	return nullptr;
+}
+
+
+
+const Club* StandingData::FindClubByName(const std::string& Name) const
+{
+	for (auto club : m_Clubs)
+		if (club && club->GetName() == Name)
+			return club;
+
+	return nullptr;
+}
+
+
+
 RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName)
 {
 	for (auto rule : m_RuleSets)
@@ -285,4 +307,49 @@ const Judoka* StandingData::FindJudoka(const UUID& UUID) const
 	}
 
 	return nullptr;
+}
+
+
+
+Judoka* StandingData::FindJudoka_DM4_ExactMatch(const DM4::Participant& NewJudoka)
+{
+	Judoka* ret = nullptr;
+
+	for (auto [id, judoka] : m_Judokas)
+	{
+		if (judoka && judoka->GetFirstname()  == NewJudoka.Firstname
+			       && judoka->GetLastname()   == NewJudoka.Lastname
+				   && judoka->GetGender()     == NewJudoka.Gender
+				   //&& (judoka->GetWeight()    == NewJudoka.Weight || judoka->GetWeight() == 0 || NewJudoka.Weight < 0)
+			       && (judoka->GetBirthyear() == NewJudoka.Birthyear || judoka->GetBirthyear() == 0 || NewJudoka.Birthyear < 0)
+				   && (!judoka->GetClub() || !NewJudoka.Club || judoka->GetClub()->GetName() == NewJudoka.Club->Name) )
+		{
+			if (ret)//Have we found one?
+				return nullptr;//Then this is not an exact match
+
+			ret = judoka;
+		}
+	}
+
+	return ret;
+}
+
+
+
+Judoka* StandingData::FindJudoka_DM4_SameName(const DM4::Participant& NewJudoka)
+{
+	Judoka* ret = nullptr;
+
+	for (auto [id, judoka] : m_Judokas)
+	{
+		if (judoka && judoka->GetFirstname() == NewJudoka.Firstname && judoka->GetLastname() == NewJudoka.Lastname && judoka->GetGender() == NewJudoka.Gender)
+		{
+			if (ret)//Have we found one?
+				return nullptr;//Then this is not an exact match
+
+			ret = judoka;
+		}
+	}
+
+	return ret;
 }
