@@ -135,25 +135,25 @@ bool DM4::ParseLine(const std::string& Line)
 			if (!GetValue(Line, "Anzahl=", count))
 			{
 				ZED::CSV data(Line);
-				std::string id,   lastname,   firstname,   unknown1,   weight,   unknown2,   birthyear,   unknown3,   unknown4,   unknown5, unknown6, unknown7;
+				std::string id,   lastname,   firstname,   unknown1,   weight,   unknown2,   birthyear,   unknown3,   unknown4,   unknown5,   unknown6,   unknown7;
 				data     >> id >> lastname >> firstname >> unknown1 >> weight >> unknown2 >> birthyear >> unknown3 >> unknown4 >> unknown5 >> unknown6 >> unknown7;
 
 				Participant new_participant;
 
 				RemoveCharFromString(id, '\"');
 				if (sscanf_s(id.c_str(), "%d=%d", &new_participant.ID, &new_participant.ClubID) != 2)
-					ZED::Log::Warn("Could not parse id of line:" + Line);
+					ZED::Log::Warn("Could not parse id of line: " + Line);
 
 				new_participant.Firstname = RemoveCharFromString(firstname, '\"');
-				new_participant.Lastname  = RemoveCharFromString(lastname, '\"');
+				new_participant.Lastname  = RemoveCharFromString(lastname,  '\"');
 
 				RemoveCharFromString(weight, '\"');
 				if (sscanf_s(weight.c_str(), "%d", &new_participant.Weight) != 1)
-					ZED::Log::Debug("Could not parse id of line:" + Line);
+					ZED::Log::Debug("Could not parse weight of line:" + Line);
 
 				RemoveCharFromString(birthyear, '\"');
 				if (sscanf_s(birthyear.c_str(), "%d", &new_participant.Birthyear) != 1)
-					ZED::Log::Debug("Could not parse id of line:" + Line);
+					ZED::Log::Debug("Could not parse birthyear of line:" + Line);
 
 				//Find Club
 				new_participant.Club = FindClubByID(new_participant.ClubID);
