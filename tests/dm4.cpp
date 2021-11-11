@@ -8,6 +8,9 @@ TEST(DM4, Read_Verein1_U13)
 
 	DM4 file("test-data/Verein1_U13 (m).dm4");
 
+	EXPECT_EQ(file.GetSenderClubName(), "Verein1");
+	EXPECT_EQ(file.GetSenderName(),     "Vereinsleiter Nachname");
+
 	EXPECT_EQ(file.GetTournamentName(), "Turniername");
 	EXPECT_EQ(file.GetTournamentDate(), "01.02.2020");
 	EXPECT_EQ(file.GetTournamentPlace(), "Ort des Turniers");
@@ -38,6 +41,9 @@ TEST(DM4, Read_Verein1_U15)
 	initialize();
 
 	DM4 file("test-data/Verein1_U15 (m).dm4");
+
+	EXPECT_EQ(file.GetSenderClubName(), "Verein1");
+	EXPECT_EQ(file.GetSenderName(),     "Vereinsleiter Nachname");
 
 	EXPECT_EQ(file.GetTournamentName(), "13. Judoturnier");
 	EXPECT_EQ(file.GetTournamentDate(), "31.07.2019");
