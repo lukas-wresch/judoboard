@@ -64,6 +64,7 @@
     <ClCompile Include="..\..\tests\app.cpp" />
     <ClCompile Include="..\..\tests\club.cpp" />
     <ClCompile Include="..\..\tests\database.cpp" />
+    <ClCompile Include="..\..\tests\dm4.cpp" />
     <ClCompile Include="..\..\tests\id.cpp" />
     <ClCompile Include="..\..\tests\judoka.cpp" />
     <ClCompile Include="..\..\tests\mat.cpp" />
@@ -118,7 +119,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;error.obj;HttpServer.obj;id.obj;judoka.obj;localizer.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;remote_tournament.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;id.obj;judoka.obj;localizer.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;remote_tournament.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -157,7 +158,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;error.obj;HttpServer.obj;id.obj;judoka.obj;localizer.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;remote_tournament.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;id.obj;judoka.obj;localizer.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;remote_tournament.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
