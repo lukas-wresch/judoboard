@@ -48,6 +48,14 @@ DM4::DM4(const std::string& Filename)
 
 
 
+DM4::~DM4()
+{
+	for (auto club : m_Clubs)
+		delete club;
+}
+
+
+
 bool DM4::ParseLine(const std::string& Line)
 {
 	const bool isStartOfChunk = ParseStartOfChunk(Line);
@@ -76,16 +84,82 @@ bool DM4::ParseLine(const std::string& Line)
 			GetValue(Line, "Turnier=", m_TournamentName);
 			GetValue(Line, "Datum=",   m_TournamentDate);
 			GetValue(Line, "Ort=",     m_TournamentPlace);
+			GetValue(Line, "Altersgruppe=", m_AgeGroup);
+
+			std::string gender;
+			if (GetValue(Line, "Geschlecht=", gender))
+			{
+				if (gender == "m")
+					m_Gender = Gender::Male;
+				else if (gender == "w")
+					m_Gender = Gender::Female;
+				else
+					ZED::Log::Warn("Could not parse gender at line: " + Line);
+			}
 			break;
 		}
 
 		case Chunk::Clubs:
 		{
+			if (isStartOfChunk)
+				return true;
+
+			std::string count;
+			if (!GetValue(Line, "Anzahl=", count))
+			{
+				ZED::CSV data(Line);
+				std::string id,   club,   unknown1,   club_no,   lastname,   firstname,   street,   zipcode,   place,   unknown3, unknown4, mobil, email, county, state_city, state, unknown5, country;
+				data     >> id >> club >> unknown1 >> club_no >> lastname >> firstname >> street >> zipcode >> place >> unknown3 >> unknown4 >> mobil >> email >> county >> state_city >> state >> unknown5 >> country;
+
+				Club new_club;
+
+				RemoveCharFromString(id, '\"');
+				if (sscanf_s(id.c_str(), "%d=", &new_club.ID) != 1)
+					ZED::Log::Warn("Could not parse id of line:" + Line);
+
+				new_club.Name                     = RemoveCharFromString(club, '\"');
+				new_club.Representative_Firstname = RemoveCharFromString(firstname, '\"');
+				new_club.Representative_Lastname  = RemoveCharFromString(lastname,  '\"');
+
+				m_Clubs.emplace_back(new Club(new_club));
+			}
 			break;
 		}
 
 		case Chunk::Participants:
 		{
+			if (isStartOfChunk)
+				return true;
+
+			std::string count;
+			if (!GetValue(Line, "Anzahl=", count))
+			{
+				ZED::CSV data(Line);
+				std::string id,   lastname,   firstname,   unknown1,   weight,   unknown2,   birthyear,   unknown3,   unknown4,   unknown5, unknown6, unknown7;
+				data     >> id >> lastname >> firstname >> unknown1 >> weight >> unknown2 >> birthyear >> unknown3 >> unknown4 >> unknown5 >> unknown6 >> unknown7;
+
+				Participant new_participant;
+
+				RemoveCharFromString(id, '\"');
+				if (sscanf_s(id.c_str(), "%d=%d", &new_participant.ID, &new_participant.ClubID) != 2)
+					ZED::Log::Warn("Could not parse id of line:" + Line);
+
+				new_participant.Firstname = RemoveCharFromString(firstname, '\"');
+				new_participant.Lastname  = RemoveCharFromString(lastname, '\"');
+
+				RemoveCharFromString(weight, '\"');
+				if (sscanf_s(weight.c_str(), "%d", &new_participant.Weight) != 1)
+					ZED::Log::Debug("Could not parse id of line:" + Line);
+
+				RemoveCharFromString(birthyear, '\"');
+				if (sscanf_s(birthyear.c_str(), "%d", &new_participant.Birthyear) != 1)
+					ZED::Log::Debug("Could not parse id of line:" + Line);
+
+				//Find Club
+				new_participant.Club = FindClubByID(new_participant.ClubID);
+
+				m_Participants.emplace_back(new_participant);
+			}
 			break;
 		}
 	}
@@ -124,4 +198,22 @@ bool DM4::GetValue(const std::string& Line, const std::string& Key, std::string&
 		return true;
 	}
 	return false;
+}
+
+
+
+std::string DM4::RemoveCharFromString(std::string& Str, char CharacterToRemove) const
+{
+	Str.erase(remove(Str.begin(), Str.end(), CharacterToRemove), Str.end());
+	return Str;
+}
+
+
+
+const DM4::Club* DM4::FindClubByID(int ClubID) const
+{
+	for (auto club : m_Clubs)
+		if (club && club->ID == ClubID)
+			return club;
+	return nullptr;
 }

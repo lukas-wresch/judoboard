@@ -24,7 +24,7 @@ namespace Judoboard
 			int ID = -1;
 
 			int ClubID = -1;//< 0 if no value is known
-			Club* Club = nullptr;
+			const Club* Club = nullptr;
 
 			std::string Firstname;
 			std::string Lastname;
@@ -35,8 +35,11 @@ namespace Judoboard
 
 
 		DM4(const std::string& Filename);
+		~DM4();
 
-		const std::vector<Club>& GetClubs() const { return m_Clubs; }
+		const Club* FindClubByID(int ClubID) const;
+
+		const std::vector<Club*>& GetClubs() const { return m_Clubs; }
 		const std::vector<Participant>& GetParticipants() const { return m_Participants; }
 
 		std::string GetSenderClubName()  const { return m_Sender_ClubName; }
@@ -48,10 +51,13 @@ namespace Judoboard
 		std::string GetAgeGroup()        const { return m_AgeGroup; }
 		Gender      GetGender()          const { return m_Gender; }
 
+		operator bool() const { return m_IsValid; }
+
 	private:
 		bool ParseLine(const std::string& Line);//Parse a single line of the dm4 file
 		bool ParseStartOfChunk(const std::string& Line);//Parses the start of a new chunk, i.e. [Identifikation] or [Absender]. Returns false if Line is not the start of a new chunk
 		bool GetValue(const std::string& Line, const std::string& Key, std::string& Result) const;
+		std::string RemoveCharFromString(std::string& Str, char CharacterToRemove) const;
 
 		//Flags used during parsing
 		enum class Chunk
@@ -65,8 +71,8 @@ namespace Judoboard
 		} m_CurrentChunk = Chunk::Unknow;
 
 
-		const std::vector<Club> m_Clubs;
-		const std::vector<Participant> m_Participants;
+		std::vector<Club*> m_Clubs;
+		std::vector<Participant> m_Participants;
 
 		std::string m_Sender_ClubName;
 		std::string m_Sender_Name;

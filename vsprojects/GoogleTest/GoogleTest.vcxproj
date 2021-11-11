@@ -104,7 +104,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>E:\Workspace\Judoboard\vsprojects\Judoboard\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;error.obj;HttpServer.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -141,7 +141,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>E:\Workspace\Judoboard\vsprojects\Judoboard\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;error.obj;HttpServer.obj;imat.obj;id.obj;judoka.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;imat.obj;id.obj;judoka.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
