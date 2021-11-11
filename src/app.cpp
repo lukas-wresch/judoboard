@@ -583,7 +583,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return (std::string)ret;
 	});
 
-	m_Server.RegisterResource("/ajax/mat/screenshot", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/screenshot", [this](auto Request) -> ZED::Blob {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -593,17 +593,18 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		if (id <= 0)
 			return std::string();
 
-		auto* mat = FindMat(id);
+		auto mat = FindMat(id);
 
 		if (!mat)
 			return std::string();
 
-		if (!mat->RequestScreenshot())
-			return std::string("Could not create screenshot");
+		//if (!mat->RequestScreenshot())
+			//return std::string("Could not create screenshot");
 
-		const auto ret = HttpServer::LoadFile("screenshot.png");
-
-		return ret;
+		//const auto ret = HttpServer::LoadFile("screenshot.png");
+		//return ret;
+		ZED::Blob data = mat->RequestScreenshot();
+		return data;
 	}, HttpServer::ResourceType::Image_PNG);
 
 

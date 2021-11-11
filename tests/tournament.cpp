@@ -265,7 +265,7 @@ TEST(Tournament, HasDefaultRuleSet)
 	Database d;
 	d.EnableAutoSave(false);
 
-	ZED::Core::RemoveFile("tournaments\\deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe");
 	Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 	EXPECT_TRUE(tourney.AddParticipant(new Judoka("temp", "temp", 50)));
 	tourney.Reset();
@@ -277,10 +277,10 @@ TEST(Tournament, HasDefaultRuleSet)
 	t.ConnectToDatabase(d);
 	t.EnableAutoSave(false);
 
-	EXPECT_TRUE(t.GetDefaultRuleSet());
-	EXPECT_TRUE(d.FindRuleSetByName("Default"));
-	EXPECT_TRUE(t.GetDefaultRuleSet()->GetID()   == d.FindRuleSetByName("Default")->GetID());
-	EXPECT_TRUE(t.GetDefaultRuleSet()->GetUUID() == d.FindRuleSetByName("Default")->GetUUID());
+	ASSERT_TRUE(t.GetDefaultRuleSet());
+	ASSERT_TRUE(d.FindRuleSetByName("Default"));
+	EXPECT_EQ(t.GetDefaultRuleSet()->GetID(),   d.FindRuleSetByName("Default")->GetID());
+	EXPECT_EQ(t.GetDefaultRuleSet()->GetUUID(), d.FindRuleSetByName("Default")->GetUUID());
 
 	ZED::Core::RemoveFile("tournaments/deleteMe");
 }

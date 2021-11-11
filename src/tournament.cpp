@@ -1050,5 +1050,5 @@ void Tournament::GenerateSchedule()
 		}
 	}
 
-	Save();
+	assert(Save());
 }

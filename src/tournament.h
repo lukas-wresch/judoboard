@@ -109,7 +109,7 @@ namespace Judoboard
 		void GenerateSchedule();
 
 		bool Save() const {
-			if (!m_AutoSave) return false;
+			if (!m_AutoSave) return true;
 			return Save("tournaments/" + m_Name);
 		}
 

@@ -62,8 +62,11 @@ PNG::PNG(const char* Filename)
 
 
 
-PNG::PNG(ZED::Blob& Blob)
+PNG::PNG(const ZED::Blob& Blob)
 {
+    if (Blob.GetSize() < 256)
+        return;
+
     png_struct* png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
     if (!png_ptr)
@@ -87,7 +90,7 @@ PNG::PNG(ZED::Blob& Blob)
         return;
     }
 
-    png_set_read_fn(png_ptr, Blob, [](png_struct* ps, png_byte* Data, png_size_t Length) {
+    png_set_read_fn(png_ptr, const_cast<void*>((const void*)Blob), [](png_struct* ps, png_byte* Data, png_size_t Length) {
         ZED::Blob* b = (ZED::Blob*)png_get_io_ptr(ps);
         png_size_t bytes_read = b->OutputTo(Data, Length);
 
@@ -95,7 +98,7 @@ PNG::PNG(ZED::Blob& Blob)
             png_error(ps, "Read Error!");
     });
 
-    png_init_io(png_ptr, (FILE*)(void*)Blob);
+    png_init_io(png_ptr, (FILE*)(const void*)Blob);
     png_set_sig_bytes(png_ptr, 8);
     
     Decompress(png_ptr, info_ptr);
@@ -161,6 +164,60 @@ void PNG::Decompress(png_struct* png_ptr, png_info* info_ptr)
     png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
 
     Log::Debug("Decompressed " + std::to_string(m_Width)  + "x" + std::to_string(m_Height)  + " pixels");
+}
+
+
+
+Blob PNG::Compress(const Image& Image)
+{
+    Blob ret;
+    png_struct* writeStruct = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+
+    if (!writeStruct)
+    {
+        Log::Error("png_create_write_struct() failed");
+        return ret;
+    }
+
+    png_info* infoStruct = png_create_info_struct(writeStruct);
+    if (!infoStruct)
+    {
+        Log::Error("png_create_info_struct() failed");
+        return ret;
+    }
+
+    if (setjmp(png_jmpbuf(writeStruct)))
+    {
+        Log::Error("Error in libpng occured");
+        png_free_data(writeStruct, infoStruct, PNG_FREE_ALL, -1);
+        png_destroy_write_struct(&writeStruct, &infoStruct);
+        return ret;
+    }
+
+    //png_init_io(writeStruct, (FILE*)(const void*)ret);
+    png_set_write_fn(writeStruct, &ret, [](png_structp ps, png_bytep data, png_size_t length) {
+        ZED::Blob* b = (ZED::Blob*)png_get_io_ptr(ps);
+        b->Append(data, length);
+        }, [](png_structp png_ptr) {});
+
+    //Write header (8 bit color depth)
+    png_set_IHDR(writeStruct, infoStruct, Image.GetWidth(), Image.GetHeight(), 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+
+    png_write_info(writeStruct, infoStruct);
+
+    //RGB 3-byte stride.
+    const uint32_t rowStride = Image.GetWidth() * 3;
+    for (uint32_t row = 0; row < Image.GetHeight(); row++)
+    {
+        uint32_t rowOffset = row * rowStride;
+        png_write_row(writeStruct, &Image[rowOffset]);
+    }
+
+    png_write_end(writeStruct, infoStruct);
+
+    png_free_data(writeStruct, infoStruct, PNG_FREE_ALL, -1);
+    png_destroy_write_struct(&writeStruct, &infoStruct);
+    return ret;
 }
 
 

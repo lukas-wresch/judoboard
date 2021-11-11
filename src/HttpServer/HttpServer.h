@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <functional>
+#include "../../ZED/include/blob.h"
 
 
 
@@ -84,19 +85,20 @@ public:
 	bool IsRunning() const { return m_Context; }
 		
 	//void RegisterResource(const std::string& URI, std::string (*Callback)(const std::string Query), ResourceType Type = ResourceType::HTML);
-	void RegisterResource(const std::string& URI, std::function<std::string(Request&)> Callback, ResourceType Type = ResourceType::HTML);
+	//void RegisterResource(const std::string& URI, std::function<std::string(Request&)> Callback, ResourceType Type = ResourceType::HTML);
+	void RegisterResource(const std::string& URI, std::function<ZED::Blob(Request&)> Callback, ResourceType Type = ResourceType::HTML);
 
 private:
 
 	struct Resource
 	{
-		Resource(ResourceType Type, std::function<std::string(Request&)> Callback) : m_Callback(Callback)
+		Resource(ResourceType Type, std::function<ZED::Blob(Request&)> Callback) : m_Callback(Callback)
 		{
 			m_Type = Type;
 		}
 
 		ResourceType m_Type;
-		std::function<std::string(Request&)> m_Callback;
+		std::function<ZED::Blob(Request&)> m_Callback;
 	};
 
 	void* Callback(mg_event Event, mg_connection* Connection);

@@ -49,7 +49,7 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
             query = request_info->query_string;
         std::string request_body;
 
-        std::string content = "No data registered with request '" + request_uri + "'";
+        ZED::Blob content = "No data registered with request '" + request_uri + "'";
         ResourceType Type = ResourceType::Plain;
 
 
@@ -73,7 +73,7 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
         Request request(query, request_body, info);
 
         auto item = m_Resources.find(request_uri);
-
+        
         if (item != m_Resources.end())
         {
             Type = item->second.m_Type;
@@ -105,7 +105,7 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
                 "Content-Length: %d\r\n"//Always set Content-Length
                 "%s\r\n"
                 "\r\n",
-                MIMEType.c_str(), content.length(), request.m_ResponseHeader.c_str());
+                MIMEType.c_str(), content.GetSize(), request.m_ResponseHeader.c_str());
         }
         else
         {
@@ -116,10 +116,10 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
                 "Content-Type: %s;\r\n"
                 "Content-Length: %d\r\n"//Always set Content-Length
                 "\r\n",
-                MIMEType.c_str(), content.length());
+                MIMEType.c_str(), content.GetSize());
         }
 
-        mg_write(Connection, content.c_str(), content.length());
+        mg_write(Connection, content, content.GetSize());
     }
 
     return nullptr;
@@ -152,7 +152,14 @@ HttpServer::~HttpServer()
 
 
 
-void HttpServer::RegisterResource(const std::string& URI, std::function<std::string(Request&)> Callback, ResourceType Type)
+//void HttpServer::RegisterResource(const std::string& URI, std::function<std::string(Request&)> Callback, ResourceType Type)
+//{
+    //m_Resources.insert({ URI, Resource(Type, Callback) });
+//}
+
+
+
+void HttpServer::RegisterResource(const std::string& URI, std::function<ZED::Blob(Request&)> Callback, ResourceType Type)
 {
     m_Resources.insert({ URI, Resource(Type, Callback) });
 }

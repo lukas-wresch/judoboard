@@ -80,7 +80,7 @@ namespace Judoboard
 
 		virtual const std::vector<OsaekomiEntry>& GetOsaekomiList() const override { return m_OsaekomiList; }
 
-		virtual bool RequestScreenshot() const override;
+		virtual ZED::Blob RequestScreenshot() const override;
 
 		//Basics
 		const Judoka& GetFighter(Fighter Who) const { if (Who == Fighter::White) return m_White; return m_Blue; }
@@ -394,6 +394,7 @@ namespace Judoboard
 		const Application* m_Application;
 
 		mutable volatile bool m_RequestScreenshot = false;//True if a screenshot has been requested. Will be false after the screenshot has been saved
+		mutable ZED::Blob m_Screenshot;
 		uint32_t m_LastFrameTime = 40;
 
 		std::thread m_Thread;//Thread for running the main loop

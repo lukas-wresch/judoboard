@@ -41,7 +41,8 @@ namespace ZED
 		operator const void* () const { return m_ImageData; }
 
 		uint8_t& operator [] (uint32_t Index) { return m_ImageData[Index]; }
-		uint8_t  operator [] (uint32_t Index) const { return m_ImageData[Index]; }
+		const uint8_t& operator [] (uint32_t Index) const { return m_ImageData[Index]; }
+		//uint8_t  operator [] (uint32_t Index) const { return m_ImageData[Index]; }
 
 	protected:
 		uint32_t m_Width  = 0;

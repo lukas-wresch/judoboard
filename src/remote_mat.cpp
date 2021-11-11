@@ -139,6 +139,15 @@ void RemoteMat::RemoveWazaAri(Fighter Whom)
 
 
 
+ZED::Blob RemoteMat::RequestScreenshot() const
+{
+	ZED::Blob data(SendRequest("/ajax/mat/screenshot?id=" + std::to_string(GetMatID())).body);
+	//return ZED::PNG(std::move(data));
+	return data;
+}
+
+
+
 bool RemoteMat::SendCommand(const std::string& URL) const
 {
 	std::string response = SendRequest(URL);
@@ -149,7 +158,7 @@ bool RemoteMat::SendCommand(const std::string& URL) const
 
 
 
-std::string RemoteMat::SendRequest(const std::string& URL) const
+ZED::HttpClient::Packet RemoteMat::SendRequest(const std::string& URL) const
 {
 	ZED::Log::Debug("Sending request: " + URL);
 
@@ -172,7 +181,7 @@ bool RemoteMat::PostData(const std::string& URL, const ZED::CSV& Data) const
 
 RemoteMat::InternalState RemoteMat::GetState(bool& Success) const
 {
-	auto response = SendRequest("/ajax/mat/get_score?id=" + std::to_string(GetMatID()));
+	std::string response = SendRequest("/ajax/mat/get_score?id=" + std::to_string(GetMatID()));
 	InternalState internalState = {};
 
 	if (std::count(response.begin(), response.end(), ',') < 10)

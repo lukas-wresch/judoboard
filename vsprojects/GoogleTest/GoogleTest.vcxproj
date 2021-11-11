@@ -34,7 +34,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\bin\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
     <TargetName>$(ProjectName)_Debug</TargetName>
   </PropertyGroup>
@@ -68,6 +68,7 @@
     <ClCompile Include="..\..\tests\judoka.cpp" />
     <ClCompile Include="..\..\tests\mat.cpp" />
     <ClCompile Include="..\..\tests\match.cpp" />
+    <ClCompile Include="..\..\tests\remote_mat.cpp" />
     <ClCompile Include="..\..\tests\timer.cpp" />
     <ClCompile Include="..\..\tests\tournament.cpp" />
   </ItemGroup>
@@ -92,6 +93,9 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RemoveUnreferencedCodeData>false</RemoveUnreferencedCodeData>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

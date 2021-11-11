@@ -27,7 +27,7 @@ TEST(Mat, OpenAndClose)
 
 	EXPECT_FALSE(m.HasConcluded());
 	EXPECT_TRUE(m.GetOsaekomiList().size() == 0);
-	EXPECT_TRUE(m.RequestScreenshot());
+	EXPECT_TRUE(m.RequestScreenshot().GetSize() > 1024);
 }
 
 

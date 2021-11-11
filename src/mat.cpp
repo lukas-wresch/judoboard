@@ -258,7 +258,7 @@ bool Mat::HasConcluded() const
 
 
 
-bool Mat::RequestScreenshot() const
+ZED::Blob Mat::RequestScreenshot() const
 {
 	m_mutex.lock();
 
@@ -273,7 +273,7 @@ bool Mat::RequestScreenshot() const
 
 	ZED::Log::Info("Screenshot done");
 
-	return !m_RequestScreenshot;
+	return m_Screenshot;
 }
 
 
@@ -2010,7 +2010,7 @@ bool Mat::Render(double dt) const
 		ZED::Log::Debug("Taking screenshot");
 		//renderer.TakeScreenshotPNG("screenshot.png");
 
-		ZED::PNG img = ZED::PNG(renderer.TakeScreenshot());
+		/*ZED::PNG img = ZED::PNG(renderer.TakeScreenshot());
 		if (img)
 		{
 			auto lambda = [&](ZED::PNG&& Img) {
@@ -2021,6 +2021,20 @@ bool Mat::Render(double dt) const
 			};
 
 			std::thread(lambda, std::move(img)).detach();
+		}*/
+
+		ZED::PNG image = renderer.TakeScreenshot();
+		
+		if (image)
+		{
+			auto lambda = [&](ZED::PNG&& Img) {
+				Img.ConvertTo(ZED::ColorType::R8G8B8);
+				Img.Flip();
+				m_Screenshot = ZED::PNG::Compress(Img);//Compress image
+				//Img.Save("screenshot.png");
+			};
+
+			std::thread(lambda, std::move(image)).detach();
 		}
 
 		m_RequestScreenshot = false;

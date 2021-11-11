@@ -1,5 +1,6 @@
 #pragma once
 #include "imat.h"
+#include "../ZED/include/http_client.h"
 
 
 
@@ -79,6 +80,7 @@ namespace Judoboard
 
 		//Output
 		virtual Match::Result GetResult() const { Match::Result ret; return ret; };
+		virtual ZED::Blob RequestScreenshot() const;
 
 		//Serialization
 		virtual ZED::CSV Scoreboard2String() const override { return ""; }
@@ -86,7 +88,7 @@ namespace Judoboard
 
 	private:
 		bool SendCommand(const std::string& URL) const;
-		std::string SendRequest(const std::string& URL) const;
+		ZED::HttpClient::Packet SendRequest(const std::string& URL) const;
 		bool PostData(const std::string& URL, const ZED::CSV& Data) const;
 
 		struct InternalState

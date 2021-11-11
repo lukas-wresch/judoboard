@@ -2,6 +2,7 @@
 #include "match.h"
 #include "localizer.h"
 #include "../ZED/include/csv.h"
+#include "../ZED/include/image.h"
 
 
 
@@ -115,7 +116,7 @@ namespace Judoboard
 
 		//Output
 		virtual Match::Result GetResult() const = 0;
-		virtual bool RequestScreenshot() const { return false; }
+		virtual ZED::Blob RequestScreenshot() const = 0;
 
 		//Serialization
 		virtual ZED::CSV Scoreboard2String() const = 0;
