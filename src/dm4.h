@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "judoka.h"
 
 
 
@@ -42,6 +43,7 @@ namespace Judoboard
 		std::string GetTournamentPlace() const { return m_TournamentPlace; }
 		std::string GetTournamentDate()  const { return m_TournamentDate; }		
 		std::string GetAgeGroup()        const { return m_AgeGroup; }
+		Gender      GetGender()          const { return m_Gender; }
 
 	private:
 		const std::vector<Club> m_Clubs;
@@ -51,5 +53,6 @@ namespace Judoboard
 		std::string m_TournamentPlace;
 		std::string m_TournamentDate;
 		std::string m_AgeGroup;
+		Gender      m_Gender;
 	};
 }

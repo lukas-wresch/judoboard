@@ -1,0 +1,29 @@
+[Identifikation]
+File=Diskmelder
+Type=V
+Version=4
+[Absender]
+Verband=Verein1
+Ebene=
+Name=Vereinsleiter Nachname
+Strasse=östr.12
+PLZ=12345
+Ort=Vereinsort
+Telefonp=
+Telefond=
+Telefax=
+Mobil=012345678901
+Email=email@verein.com
+[Meldung]
+Turnier=13. Judoturnier
+Datum=31.03.2021
+Ort=Turnierort
+Altersgruppe=U15 (w)
+Geschlecht=w
+[Vereine]
+Anzahl=1
+1=""1","Verein1","","3000006","Nachname","Vereinsleiter","östr.12","12345","Vereinsort","","","012345678901","email@verein.com","","B-Gü","Detmold","nrw","x","GER""
+[Teilnehmer]
+1=""1","F","Joyce","4","","","2005","","","","","""
+2=""1","H","Clara","5","63","","2006","","","","","""
+Anzahl=2
