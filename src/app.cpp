@@ -586,17 +586,17 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	m_Server.RegisterResource("/ajax/mat/screenshot", [this](auto Request) -> ZED::Blob {
 		auto account = IsLoggedIn(Request);
 		if (!account)
-			return Error(Error::Type::NotLoggedIn);
+			return (std::string)Error(Error::Type::NotLoggedIn);
 
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
-			return std::string();
+			return (std::string)Error(Error::Type::InvalidID);
 
 		auto mat = FindMat(id);
 
 		if (!mat)
-			return std::string();
+			return (std::string)Error(Error::Type::MatNotFound);
 
 		//if (!mat->RequestScreenshot())
 			//return std::string("Could not create screenshot");
