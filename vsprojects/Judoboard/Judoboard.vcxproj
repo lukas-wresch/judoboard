@@ -222,6 +222,8 @@
     <ClInclude Include="src\HttpServer\HttpServer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\.gitattributes" />
+    <None Include="..\..\.gitignore" />
     <None Include="..\..\bin\html\account_add.html" />
     <None Include="..\..\bin\html\account_list.html" />
     <None Include="..\..\bin\html\add_match.html" />

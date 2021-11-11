@@ -268,5 +268,11 @@
     <None Include="..\..\bin\html\weightclass_edit.html">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\.gitignore">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\.gitattributes">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
