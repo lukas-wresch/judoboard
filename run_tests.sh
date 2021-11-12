@@ -1,4 +1,4 @@
-cd bin/release
+cd bin
 ./judoboard_test --gtest_output=xml
 if [ $? -eq 0 ]
 then

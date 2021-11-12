@@ -6,7 +6,7 @@ TEST(DM4, Read_Verein1_U13_m)
 {
 	initialize();
 
-	DM4 file("../test-data/Verein1_U13 (m).dm4");
+	DM4 file("test-data/Verein1_U13 (m).dm4");
 
 	ASSERT_TRUE(file);
 
@@ -44,7 +44,7 @@ TEST(DM4, Read_Verein1_U15_m)
 {
 	initialize();
 
-	DM4 file("../test-data/Verein1_U15 (m).dm4");
+	DM4 file("test-data/Verein1_U15 (m).dm4");
 
 	ASSERT_TRUE(file);
 
@@ -92,7 +92,7 @@ TEST(DM4, Read_Verein1_U15_w)
 {
 	initialize();
 
-	DM4 file("../test-data/Verein1_U15 (w).dm4");
+	DM4 file("test-data/Verein1_U15 (w).dm4");
 
 	ASSERT_TRUE(file);
 
@@ -140,7 +140,7 @@ TEST(DM4, Read_Verein1_U18_w)
 {
 	initialize();
 
-	DM4 file("../test-data/Verein1_U18 (w).dm4");
+	DM4 file("test-data/Verein1_U18 (w).dm4");
 
 	ASSERT_TRUE(file);
 
@@ -208,7 +208,7 @@ TEST(DM4, Read_Verein1_U21_n)
 {
 	initialize();
 
-	DM4 file("../test-data/Verein1_U21 (m).dm4");
+	DM4 file("test-data/Verein1_U21 (m).dm4");
 
 	ASSERT_TRUE(file);
 
