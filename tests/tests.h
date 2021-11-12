@@ -21,6 +21,7 @@
 //#include "../src/virtual_mat.h"
 #include "../src/weightclass.h"
 #include "../src/window.h"
+#include "../src/md5.h"
 
 #include "../ZED/include/http_client.h"
 #include "../ZED/include/sha512.h"

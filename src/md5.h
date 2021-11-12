@@ -131,7 +131,7 @@ namespace Judoboard
 
 		MD5(const std::string& Filename);
 		MD5(ZED::Blob& Data) { Parse(std::move(Data)); }
-		~MD5();
+		//~MD5();
 
 		const std::vector<Club>& GetClubs() const { return m_Clubs; }
 		const std::vector<Participant>& GetParticipants() const { return m_Participants; }
@@ -142,11 +142,17 @@ namespace Judoboard
 
 	private:
 		bool Parse(ZED::Blob&& Data);
-		std::string ReadLine(ZED::Blob& Data, bool* pStartOfHeading = nullptr);
+		std::string ReadLine(ZED::Blob& Data, bool* pStartOfHeading = nullptr, bool* pNewLine = nullptr, bool* pDoubleZero = nullptr);
+		std::string RemoveControlCharacters(std::string& Str);
 
 		bool ReadTournamentData(ZED::Blob& Data);
+		bool ReadRankScore(ZED::Blob& Data);
 		bool ReadAgeGroups(ZED::Blob& Data);
 		bool ReadWeightclasses(ZED::Blob& Data);
+		bool ReadRelationClubAssociation(ZED::Blob& Data);
+		bool ReadLotteryScheme(ZED::Blob& Data);
+		bool ReadLotterySchemaLine(ZED::Blob& Data);
+		bool ReadParticipants(ZED::Blob& Data);
 		bool ReadAssociation(ZED::Blob& Data);
 		bool ReadClubs(ZED::Blob& Data);
 
