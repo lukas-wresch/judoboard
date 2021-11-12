@@ -43,6 +43,18 @@ size_t Blob::OutputTo(void* Data, size_t BytesToRead)
 
 
 
+uint8_t Blob::ReadByte()
+{
+	if (m_ReadCursor >= m_Size)
+		return 0x00;
+
+	uint8_t ret = m_Data[m_ReadCursor];
+	m_ReadCursor++;
+	return ret;
+}
+
+
+
 void Blob::Append(const void* Data, size_t BytesToWrite)
 {
 	if (!m_Data)

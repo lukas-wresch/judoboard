@@ -142,12 +142,23 @@ namespace Judoboard
 
 	private:
 		bool Parse(ZED::Blob&& Data);
+		std::string ReadLine(ZED::Blob& Data, bool* pStartOfHeading = nullptr);
+
+		bool ReadTournamentData(ZED::Blob& Data);
+		bool ReadAgeGroups(ZED::Blob& Data);
+		bool ReadWeightclasses(ZED::Blob& Data);
+		bool ReadAssociation(ZED::Blob& Data);
+		bool ReadClubs(ZED::Blob& Data);
 
 
 		std::vector<Club> m_Clubs;
 		std::vector<Participant> m_Participants;
 
+		//Meta data can be found at the start of a MD5 file
 		std::string m_FileDate;
+		std::string m_Description;
+		int m_SchemaID = -1;
+		std::string m_Place;
 
 		bool m_IsValid = false;
 	};

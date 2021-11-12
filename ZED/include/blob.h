@@ -74,7 +74,10 @@ namespace ZED
 
 		void MakeShared() { m_IsShared = true; }
 
+		bool EndReached() const { return GetReadCursor() >= m_Size; }
+
 		DLLEXPORT size_t OutputTo(void* Data, size_t BytesToRead);//Reads BytesToRead many bytes and puts them in Data. Returns the number of bytes actually read
+		DLLEXPORT uint8_t ReadByte();
 		DLLEXPORT void Append(const void* Data, size_t BytesToWrite);
 		DLLEXPORT bool InsertAt(size_t Index, const void* Data, size_t BytesToWrite);
 		template <typename T>
