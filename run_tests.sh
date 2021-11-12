@@ -1,5 +1,5 @@
-cd bin
-./release/judoboard_test --gtest_output=xml
+cd bin/release
+./judoboard_test --gtest_output=xml
 if [ $? -eq 0 ]
 then
   echo "All test ran successfull"
