@@ -150,11 +150,15 @@ namespace Judoboard
 		bool ReadAgeGroups(ZED::Blob& Data);
 		bool ReadWeightclasses(ZED::Blob& Data);
 		bool ReadRelationClubAssociation(ZED::Blob& Data);
+		bool ReadLottery(ZED::Blob& Data);
 		bool ReadLotteryScheme(ZED::Blob& Data);
 		bool ReadLotterySchemaLine(ZED::Blob& Data);
 		bool ReadParticipants(ZED::Blob& Data);
 		bool ReadAssociation(ZED::Blob& Data);
 		bool ReadClubs(ZED::Blob& Data);
+		bool ReadRelation(ZED::Blob& Data);
+		bool ReadMatchData(ZED::Blob& Data);
+		bool ReadResult(ZED::Blob& Data);
 
 
 		std::vector<Club> m_Clubs;

@@ -45,6 +45,7 @@ bool MD5::Parse(ZED::Blob&& Data)
 	m_FileDate = ReadLine(Data);
 
 	bool is_ok = true;
+	bool found_end = false;
 
 	while (!Data.EndReached() && is_ok)
 	{
@@ -70,9 +71,22 @@ bool MD5::Parse(ZED::Blob&& Data)
 			is_ok &= ReadLotterySchemaLine(Data);
 		else if (line == "Teilnehmer")
 			is_ok &= ReadParticipants(Data);
+		else if (line == "Lose")
+			is_ok &= ReadLottery(Data);
+		else if (line == "SystemZuordnung")
+			is_ok &= ReadRelation(Data);
+		else if (line == "Fortfuehrung")
+			is_ok &= ReadMatchData(Data);
+		else if (line == "Ergebnis")
+			is_ok &= ReadResult(Data);
 
 		else if (line == "\r\n")
 			continue;
+		else if (line == "\\\\end")
+		{
+			found_end = true;
+			break;
+		}
 		else
 		{
 			ZED::Log::Warn("Unknown chunk: " + line);
@@ -81,6 +95,9 @@ bool MD5::Parse(ZED::Blob&& Data)
 			break;
 		}
 	}
+
+	if (!found_end)//Did we find the \\end tag at the end of the file?
+		is_ok = false;
 
 	m_IsValid = is_ok;
 
@@ -413,6 +430,56 @@ bool MD5::ReadRelationClubAssociation(ZED::Blob& Data)
 
 
 
+bool MD5::ReadLottery(ZED::Blob& Data)
+{
+	std::vector<std::string> header;
+	std::vector<std::string> data;
+	bool are_in_data_part = false;
+
+	while (!Data.EndReached())
+	{
+		bool start_of_heading, newline;
+		auto Line = ReadLine(Data, &start_of_heading, &newline);
+
+		if (Line == "\r\n")
+			return true;
+
+		//if (start_of_heading)
+			//are_in_data_part = true;
+
+		if (!are_in_data_part)//We are reading the header
+		{
+			header.emplace_back(Line);
+			if (newline)
+				are_in_data_part = true;
+		}
+		else
+		{
+			data.emplace_back(Line);
+
+			if (data.size() >= header.size())//Have we read the entire data block?
+			{
+				for (size_t i = 0; i < header.size(); i++)
+				{
+					if (header[i] == "VerbandPK")
+						;
+					else if (header[i] == "LosNR")
+						;
+				}
+
+				data.clear();
+
+				if (newline)
+					return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+
 bool MD5::ReadLotteryScheme(ZED::Blob& Data)
 {
 	std::vector<std::string> header;
@@ -507,10 +574,69 @@ bool MD5::ReadLotterySchemaLine(ZED::Blob& Data)
 
 
 
-bool MD5::ReadParticipants(ZED::Blob& Data)
+bool MD5::ReadRelation(ZED::Blob& Data)
 {
 	std::vector<std::string> header;
 	std::vector<std::string> data;
+	bool are_in_header_part = true;
+	bool are_in_data_part   = false;
+
+	while (!Data.EndReached())
+	{
+		bool start_of_heading, newline;
+		auto Line = ReadLine(Data, &start_of_heading, &newline);
+
+		if (Line == "\r\n")
+			return true;
+
+		//if (start_of_heading)
+			//are_in_data_part = true;
+
+		if (are_in_header_part)//We are reading the header
+		{
+			header.emplace_back(Line);
+			if (newline)
+				are_in_header_part = false;
+		}
+		else if (start_of_heading)
+			are_in_data_part = true;
+
+		if (are_in_data_part)
+		{
+			data.emplace_back(Line);
+
+			if (data.size() >= header.size())//Have we read the entire data block?
+			{
+				for (size_t i = 0; i < header.size(); i++)
+				{
+					if (header[i] == "AltersgruppePK")
+						;
+					else if (header[i] == "GewichtsklassePK")
+						;
+					else if (header[i] == "StartNR")
+						;
+					else if (header[i] == "TeilnehmerPK")
+						;
+				}
+
+				data.clear();
+
+				if (newline)
+					return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+
+bool MD5::ReadMatchData(ZED::Blob& Data)
+{
+	std::vector<std::string> header;
+	std::vector<std::string> data;
+	bool are_in_header_part = true;
 	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
@@ -518,14 +644,202 @@ bool MD5::ReadParticipants(ZED::Blob& Data)
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
-		if (start_of_heading)
+		if (Line == "\r\n")
+			return true;
+
+		if (are_in_header_part)//We are reading the header
+		{
+			header.emplace_back(Line);
+			if (newline)
+				are_in_header_part = false;
+		}
+		else if (start_of_heading)
 			are_in_data_part = true;
 
-		if (!are_in_data_part)//We are reading the header
-			header.emplace_back(Line);
-		else
+		if (are_in_data_part)
 		{
 			data.emplace_back(Line);
+
+			if (data.size() >= header.size())//Have we read the entire data block?
+			{
+				for (size_t i = 0; i < header.size(); i++)
+				{
+					if (header[i] == "AltersgruppePK")
+						;
+					else if (header[i] == "GewichtsklassePK")
+						;
+					else if (header[i] == "KampfNR")
+						;
+					else if (header[i] == "StartNRRot")
+						;
+					else if (header[i] == "RotPK")
+						;
+					else if (header[i] == "RotAusKampfNR")
+						;
+					else if (header[i] == "RotTyp")
+						;
+					else if (header[i] == "StartNRWeiss")
+						;
+					else if (header[i] == "WeissPK")
+						;
+					else if (header[i] == "WeissAusKampfNR")
+						;
+					else if (header[i] == "WeissTyp")
+						;
+					else if (header[i] == "SiegerPK")
+						;
+					else if (header[i] == "SiegerKampfNR")
+						;
+					else if (header[i] == "SiegerFarbe")
+						;
+					else if (header[i] == "VerliererPK")
+						;
+					else if (header[i] == "VerliererKampfNR")
+						;
+					else if (header[i] == "VerliererFarbe")
+						;
+					else if (header[i] == "WarteAufSiegerAusKampf")
+						;
+					else if (header[i] == "Zeit")
+						;
+					else if (header[i] == "Bewertung")
+						;
+					else if (header[i] == "UnterbewertungSieger")
+						;
+					else if (header[i] == "UnterbewertungVerlierer")
+						;
+					else if (header[i] == "Status")
+						;
+					else if (header[i] == "RotAusgeschiedenKampfNR")
+						;
+					else if (header[i] == "WeissAusgeschiedenKampfNR")
+						;
+					else if (header[i] == "Pool")
+						;
+					else if (header[i] == "DritterKampfNR")
+						;
+					else if (header[i] == "DritterFarbe")
+						;
+					else if (header[i] == "BereichPK")
+						;
+				}
+
+				data.clear();
+
+				if (newline)
+					return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+
+bool MD5::ReadResult(ZED::Blob& Data)
+{
+	std::vector<std::string> header;
+	std::vector<std::string> data;
+	bool are_in_header_part = true;
+	bool are_in_data_part = false;
+
+	while (!Data.EndReached())
+	{
+		bool start_of_heading, newline;
+		auto Line = ReadLine(Data, &start_of_heading, &newline);
+
+		if (Line == "\r\n")
+			return true;
+
+		if (are_in_header_part)//We are reading the header
+		{
+			header.emplace_back(Line);
+			if (newline)
+				are_in_header_part = false;
+		}
+		else if (start_of_heading)
+			are_in_data_part = true;
+
+		if (are_in_data_part)
+		{
+			data.emplace_back(Line);
+
+			if (data.size() >= header.size())//Have we read the entire data block?
+			{
+				for (size_t i = 0; i < header.size(); i++)
+				{
+					if (header[i] == "AltersgruppePK")
+						;
+					else if (header[i] == "GewichtsklassePK")
+						;
+					else if (header[i] == "PlatzPK")
+						;
+					else if (header[i] == "Pool")
+						;
+					else if (header[i] == "PlatzNR")
+						;
+					else if (header[i] == "KampfNR")
+						;
+					else if (header[i] == "Platztyp")
+						;
+					else if (header[i] == "TeilnehmerPK")
+						;
+					else if (header[i] == "PunktePl")
+						;
+					else if (header[i] == "PunkteMi")
+						;
+					else if (header[i] == "UnterbewertungPl")
+						;
+					else if (header[i] == "UnterbewertungMi")
+						;
+					else if (header[i] == "Weitermelden")
+						;
+					else if (header[i] == "AusPool")
+						;
+				}
+
+				data.clear();
+
+				if (newline)
+					return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+
+bool MD5::ReadParticipants(ZED::Blob& Data)
+{
+	std::vector<std::string> header;
+	std::vector<std::string> data;
+	bool are_in_header_part = true;
+	bool are_in_data_part   = false;
+
+	while (!Data.EndReached())
+	{
+		bool start_of_heading, newline;
+		auto Line = ReadLine(Data, &start_of_heading, &newline);
+
+		if (are_in_header_part)//We are reading the header
+		{
+			header.emplace_back(RemoveControlCharacters(Line));
+
+			if (newline)
+				are_in_header_part = false;
+		}
+		else
+		{
+			if (start_of_heading)
+				are_in_data_part = true;
+		}
+
+		if (are_in_data_part)
+		{
+			data.emplace_back(RemoveControlCharacters(Line));
 
 			if (data.size() >= header.size())//Have we read the entire data block?
 			{
@@ -743,6 +1057,8 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pStartOfHeading, bool* pNewLine
 		}
 		else if (c == 0x02)//Start of text
 			continue;
+		else if (c == 0x04)//End of Transmission
+			continue;
 		else if (c == 0x05)//Enquiry
 			continue;
 		else if (c == 0x06)//Acknowledgement
@@ -753,15 +1069,23 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pStartOfHeading, bool* pNewLine
 			continue;
 		else if (c == 0x09)//Horizontal tab
 			continue;
+		else if (c == 0x0C)//Form Feed
+			continue;
+		else if (c == 0x0E)//Shift Out
+			continue;
+		else if (c == 0x0F)//Shift in
+			continue;
 		else if (c == 0x11)//Device Control 1
 			continue;
 		else if (c == 0x12)//Device Control 2
 			continue;
+		else if (c == 0x13)//Device Control 3
+			continue;
 		else if (c == 0x14)//Device Control 4
 			continue;
-		else if (c == 0x0F)//Shift in
-			continue;
 		else if (c == 0x15)//Negative Acknowledgement
+			continue;
+		else if (c == 0x1D)//Group Separator
 			continue;
 		else if (c == '\r')
 		{
@@ -797,7 +1121,7 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pStartOfHeading, bool* pNewLine
 std::string MD5::RemoveControlCharacters(std::string& Str)
 {
 	std::string ret = Str;
-	char charactersToRemove[] = { 0x01, 0x05, 0x06, 0x07, 0x08, 0x09, 0x11, 0x12, 0x14, 0x0F, 0x15, '\r', '\n'};
+	char charactersToRemove[] = { 0x01, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0C, 0x11, 0x12, 0x13, 0x14, 0x0E, 0x0F, 0x15, 0x1D, '\r', '\n'};
 
 	for (auto c : charactersToRemove)
 		ret.erase(remove(ret.begin(), ret.end(), c), ret.end());
