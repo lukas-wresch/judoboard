@@ -10,5 +10,7 @@ TEST(MD5, ReadTestData)
 
 	ASSERT_TRUE(file);
 
+	file.Dump();
+
 	ASSERT_TRUE(false);//TODO
 }

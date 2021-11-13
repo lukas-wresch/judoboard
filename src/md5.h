@@ -11,6 +11,9 @@ namespace Judoboard
 	class MD5
 	{
 	public:
+		struct Weightclass;
+
+
 		struct Club
 		{
 			int ID = -1;
@@ -28,8 +31,9 @@ namespace Judoboard
 			std::string Representative_TelMobil;
 			std::string Representative_Email;
 			std::string Representative_Fax;
-			std::string Representative_ClubNo;//Official no. of the club
-			int StatusChanged = -1;//Could also be a boolean
+
+			int OfficialClubNo = -1;//Official no. of the club
+			int StatusChanged  = -1;//Could also be a boolean
 		};
 
 		struct RelationClubAssociation//Relational table to connect clubs to associations
@@ -37,6 +41,13 @@ namespace Judoboard
 			int ClubID = -1;
 			int TierID = -1;
 			int AssociationID = -1;
+		};
+
+		struct AgeGroup
+		{
+			int ID = -1;
+
+			std::string Name;
 		};
 
 		struct Participant
@@ -47,9 +58,13 @@ namespace Judoboard
 			int ClubID = -1;
 			const Club* Club = nullptr;
 
+			std::string Firstname;
+			std::string Lastname;
+
 			int Graduation = -1;
 
-			int WeightclassID = -1;
+			int  WeightclassID = -1;
+			const Weightclass* Weightclass = nullptr;
 			bool HasBeenWeighted = false;
 
 			int Birthyear = -1;//< 0 if no value is known
@@ -59,15 +74,47 @@ namespace Judoboard
 
 			bool StatusChanged = false;
 
-			std::string ClubFull;
-			std::string ClubShort;
+			std::string ClubFullname;
+			std::string ClubShortname;
 
 			int AllCategoriesParticipantID = -1;
 			int KataParticipantID = -1;
 			int GKParticipantID = -1;//GK = ???
 
 			bool MoneyIncreased = false;
-			int WeightInGramm = -1;
+			int  WeightInGramm = -1;
+		};
+
+		struct Weightclass
+		{
+			int ID = -1;
+			int AgeGroupID = -1;
+			const AgeGroup* AgeGroup = nullptr;
+
+			int WeightLargerThan  = -1;
+			int WeightSmallerThan = -1;
+
+			int WeightInGrammsLargerThan  = -1;
+			int WeightInGrammsSmallerThan = -1;
+
+			int MaxPooled = -1;
+
+			std::string Description;
+			int Status = -1;
+
+			int FightSystemID = -1;
+			int FightSystemTypeID = -1;
+
+			bool MatchForThirdPlace = false;
+			bool MatchForFifthPlace = false;
+
+			std::string Date;
+
+			int Relay = -1;
+			int MaxJGJ = -1;
+
+			std::string Identifier;
+			std::string ForReference;
 		};
 
 		struct Lottery
@@ -110,11 +157,11 @@ namespace Judoboard
 
 			int WaitingForWinnerFromMatch = -1;
 
-			int Time = -1;
+			int Time   = -1;
 			int Result = -1;
 
 			int ScoreWinner = -1;
-			int ScoreLoser = -1;
+			int ScoreLoser  = -1;
 
 			int Status = -1;
 
@@ -124,17 +171,54 @@ namespace Judoboard
 			int Pool = -1;
 
 			int ThirdMatchNo = -1;
-			int ThirdColor = -1;
+			int ThirdColor   = -1;
 			int AreaID = -1;
+		};
+
+		struct Result
+		{
+			int AgeGroupID = -1;
+			const AgeGroup* AgeGroup = nullptr;
+			int WeightclassID = -1;
+			const Weightclass* Weightclass = nullptr;
+
+			int RankID = -1;
+			int Pool = -1;
+
+			int RankNo = -1;
+			int MatchNo = -1;
+
+			int RankType = -1;
+			int ParticipantID = -1;
+			Participant* Participant = nullptr;
+
+			int PointsPlus  = -1;
+			int PointsMinus = -1;
+
+			int ScorePlus  = -1;
+			int ScoreMinus = -1;
+
+			bool Relay = false;
+			bool FromPool = false;
 		};
 
 
 		MD5(const std::string& Filename);
 		MD5(ZED::Blob& Data) { Parse(std::move(Data)); }
-		//~MD5();
+		~MD5();
 
-		const std::vector<Club>& GetClubs() const { return m_Clubs; }
-		const std::vector<Participant>& GetParticipants() const { return m_Participants; }
+		Club*        FindClub(int ClubID);
+		Participant* FindParticipant(int ParticipantID);
+		AgeGroup*    FindAgeGroup(int AgeGroupID);
+		Weightclass* FindWeightclass(int WeightclassID);
+		const Result* FindResult(int AgeGroupID, int WeightclassID, int Rank) const;
+		std::vector<const Result*> FindResults(int AgeGroupID, int WeightclassID) const;
+
+		void Dump() const;
+
+		const std::vector<Club*>&        GetClubs() const { return m_Clubs; }
+		const std::vector<Participant*>& GetParticipants() const { return m_Participants; }
+		const std::vector<Result>&       GetResults() const { return m_Results; }
 
 		std::string GetFileDate()  const { return m_FileDate; }
 
@@ -156,13 +240,18 @@ namespace Judoboard
 		bool ReadParticipants(ZED::Blob& Data);
 		bool ReadAssociation(ZED::Blob& Data);
 		bool ReadClubs(ZED::Blob& Data);
-		bool ReadRelation(ZED::Blob& Data);
+		bool ReadRelationParticipantMatchTable(ZED::Blob& Data);
 		bool ReadMatchData(ZED::Blob& Data);
 		bool ReadResult(ZED::Blob& Data);
 
 
-		std::vector<Club> m_Clubs;
-		std::vector<Participant> m_Participants;
+		std::vector<Club*> m_Clubs;
+		std::vector<Participant*> m_Participants;
+		std::vector<AgeGroup*>    m_AgeGroups;
+		std::vector<Weightclass*> m_Weightclasses;
+		std::vector<RelationParticipantMatchTable> m_Relations;
+		std::vector<Match>  m_Matches;
+		std::vector<Result> m_Results;
 
 		//Meta data can be found at the start of a MD5 file
 		std::string m_FileDate;
