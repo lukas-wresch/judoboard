@@ -126,7 +126,7 @@ void MD5::Dump() const
 			if (weightclass->ID == -1)
 				continue;
 
-			auto& results = FindResults(weightclass->AgeGroupID, weightclass->ID);
+			auto results = FindResults(weightclass->AgeGroupID, weightclass->ID);
 
 			if (results.empty())
 				continue;
