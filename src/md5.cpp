@@ -133,7 +133,6 @@ void MD5::Dump() const
 
 			ZED::Log::Info(weightclass->Description);
 
-			//for (int rank = 1; auto result = FindResult(weightclass->AgeGroupID, weightclass->ID, rank); rank++)
 			for (auto result : results)
 			{
 				std::string line = std::to_string(result->RankNo) + ". Place\t";
@@ -284,7 +283,7 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 			header.emplace_back(Line);
 		else
 		{
-			data.emplace_back(Line);\
+			data.emplace_back(Line);
 
 			if (data.size() >= header.size())//Have we read the entire data block?
 			{
@@ -300,11 +299,11 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 					else if (header[i] == "Ort")
 						m_Place = data[i];
 					else if (header[i] == "DatumVon")
-						m_Place = data[i];
+						m_DateStart = data[i];
 					else if (header[i] == "DatumBis")
-						m_Place = data[i];
+						m_DateEnd = data[i];
 					else if (header[i] == "LosEbenePK")
-						;
+						;//TODO
 					else if (header[i] == "VerbandPK")
 						;
 					else if (header[i] == "VerbandEbenePK")
@@ -334,7 +333,7 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 					else if (header[i] == "Meldegelderhoeht")
 						;
 					else if (header[i] == "JGJIgnoreNegativeUnterbew")
-						;
+						;//TODO
 				}
 
 				return true;
@@ -375,9 +374,9 @@ bool MD5::ReadRankScore(ZED::Blob& Data)
 				for (size_t i = 0; i < header.size(); i++)
 				{
 					if (header[i] == "PlatzPK")
-						;
+						;//TODO
 					else if (header[i] == "Punkte")
-						;
+						;//TODO
 				}
 
 				data.clear();//Clear block
@@ -424,7 +423,7 @@ bool MD5::ReadAgeGroups(ZED::Blob& Data)
 					else if (header[i] == "Bezeichnung")
 						age_group.Name = data[i];
 					else if (header[i] == "MinJahrgang")
-						;
+						;//TODO
 					else if (header[i] == "MaxJahrgang")
 						;
 					else if (header[i] == "Geschlecht")
@@ -458,7 +457,7 @@ bool MD5::ReadAgeGroups(ZED::Blob& Data)
 					else if (header[i] == "AlleTNinErgebnisliste")
 						;
 					else if (header[i] == "Mannschaft")
-						;
+						;//TODO
 				}
 
 				m_AgeGroups.emplace_back(new AgeGroup(age_group));
@@ -663,14 +662,23 @@ bool MD5::ReadLottery(ZED::Blob& Data)
 
 			if (data.size() >= header.size())//Have we read the entire data block?
 			{
+				Lottery new_lottery;
+
 				for (size_t i = 0; i < header.size(); i++)
 				{
 					if (header[i] == "VerbandPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_lottery.AssociationID) != 1)
+							ZED::Log::Warn("Could not read AssociationID of lottery table");
+					}
 					else if (header[i] == "LosNR")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_lottery.StartNo) != 1)
+							ZED::Log::Warn("Could not read StartNo of lottery table");
+					}
 				}
 
+				m_Lottery.emplace_back(new_lottery);
 				data.clear();
 
 				if (newline)
@@ -712,13 +720,13 @@ bool MD5::ReadLotteryScheme(ZED::Blob& Data)
 				for (size_t i = 0; i < header.size(); i++)
 				{
 					if (header[i] == "LosSchemaPK")
-						;
+						;//TODO
 					else if (header[i] == "Bezeichnung")
 						;
 					else if (header[i] == "VerbandPK")
 						;
 					else if (header[i] == "EbenePK")
-						;
+						;//TODO
 				}
 
 				data.clear();
@@ -1308,7 +1316,7 @@ bool MD5::ReadAssociation(ZED::Blob& Data)
 				for (size_t i = 0; i < header.size(); i++)
 				{
 					if (header[i] == "VerbandPK")
-						;
+						;//TODO
 					else if (header[i] == "EbenePK")
 						;
 					else if (header[i] == "Bezeichnung")
@@ -1320,7 +1328,7 @@ bool MD5::ReadAssociation(ZED::Blob& Data)
 					else if (header[i] == "NaechsteEbenePK")
 						;
 					else if (header[i] == "Aktiv")
-						;
+						;//TODO
 				}
 
 				data.clear();

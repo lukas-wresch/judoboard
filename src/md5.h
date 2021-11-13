@@ -48,6 +48,8 @@ namespace Judoboard
 			int ID = -1;
 
 			std::string Name;
+
+			//TODO add missing fields
 		};
 
 		struct Participant
@@ -249,15 +251,20 @@ namespace Judoboard
 		std::vector<Participant*> m_Participants;
 		std::vector<AgeGroup*>    m_AgeGroups;
 		std::vector<Weightclass*> m_Weightclasses;
+
 		std::vector<RelationParticipantMatchTable> m_Relations;
+		std::vector<Lottery> m_Lottery;
+
 		std::vector<Match>  m_Matches;
 		std::vector<Result> m_Results;
 
 		//Meta data can be found at the start of a MD5 file
-		std::string m_FileDate;
+		std::string m_FileDate;//Date the file was saved
 		std::string m_Description;
 		int m_SchemaID = -1;
 		std::string m_Place;
+		std::string m_DateStart;
+		std::string m_DateEnd;
 
 		bool m_IsValid = false;
 	};
