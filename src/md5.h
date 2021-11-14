@@ -70,7 +70,27 @@ namespace Judoboard
 
 			Gender Gender;
 
-			//TODO add missing fields
+			int LotterySchemaID = -1;
+
+			bool MoveUp = false;
+			bool ChangeWeightAtScale = false;
+
+			bool AllCategories = false;
+			bool Kata = false;
+
+			bool PoolSystem = false;
+			bool AllParticipantsInResultTable = false;
+
+			int Money = -1;
+			int MoneyKata = -1;
+			int MoneyAllCategories = -1;
+			int MoneyIncreased = -1;
+			int MoneyKataIncreased = -1;
+			int MoneyAllCategoriesIncreased = -1;
+
+			int Tolerance = -1;
+
+			std::string Team;//Format is unclear
 		};
 
 		struct Participant

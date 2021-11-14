@@ -501,35 +501,59 @@ bool MD5::ReadAgeGroups(ZED::Blob& Data)
 					else if (header[i] == "Geschlecht")
 						age_group.Gender = data[i] == "m" ? Gender::Male : Gender::Female;
 					else if (header[i] == "Aufruecken")
-						;
+						age_group.MoveUp = data[i] == "1";
 					else if (header[i] == "Toleranz")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &age_group.Tolerance) != 1)
+							ZED::Log::Warn("Could not read Tolerance of age group");
+					}
 					else if (header[i] == "GewichtAnWaageAendern")
-						;
+						age_group.ChangeWeightAtScale = data[i] == "1";
 					else if (header[i] == "LosverfahrenPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &age_group.LotterySchemaID) != 1)
+							ZED::Log::Warn("Could not read LotterySchemaID of age group");
+					}
 					else if (header[i] == "Allkategorie")
-						;
+						age_group.AllCategories = data[i] != "F";
 					else if (header[i] == "Kata")
-						;
+						age_group.Kata = data[i] != "F";
 					else if (header[i] == "Meldegeld")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &age_group.Money) != 1)
+							ZED::Log::Warn("Could not read Money of age group");
+					}
 					else if (header[i] == "MeldegeldKata")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyKata) != 1)
+							ZED::Log::Warn("Could not read MoneyKata of age group");
+					}
 					else if (header[i] == "MeldegeldAllkategorie")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyAllCategories) != 1)
+							ZED::Log::Warn("Could not read MoneyAllCategories of age group");
+					}
 					else if (header[i] == "Meldegelderhoeht")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyIncreased) != 1)
+							ZED::Log::Warn("Could not read MoneyIncreased of age group");
+					}
 					else if (header[i] == "MeldegeldKataerhoeht")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyKataIncreased) != 1)
+							ZED::Log::Warn("Could not read MoneyKataIncreased of age group");
+					}
 					else if (header[i] == "MeldegeldAllkategorieerho")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyAllCategoriesIncreased) != 1)
+							ZED::Log::Warn("Could not read MoneyKataIncreased of age group");
+					}
 					else if (header[i] == "Poolsystem")
-						;
+						age_group.PoolSystem = data[i] == "T";
 					else if (header[i] == "AlleTNinErgebnisliste")
-						;
+						age_group.AllParticipantsInResultTable = data[i] == "T";
 					else if (header[i] == "Mannschaft")
-						;//TODO
+						age_group.Team = data[i];
 				}
 
 				m_AgeGroups.emplace_back(new AgeGroup(age_group));
