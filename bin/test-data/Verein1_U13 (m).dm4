@@ -1,0 +1,28 @@
+[Identifikation]
+File=Diskmelder
+Type=V
+Version=4
+[Absender]
+Verband=Verein1
+Ebene=
+Name=Vereinsleiter Nachname
+Strasse=Strasseö.123
+PLZ=12345
+Ort=Vereinsort
+Telefonp=
+Telefond=
+Telefax=
+Mobil=012345678901
+Email=email@verein.com
+[Meldung]
+Turnier=Turniername
+Datum=01.02.2020
+Ort=Ort des Turniers
+Altersgruppe=U13 (m)
+Geschlecht=m
+[Vereine]
+Anzahl=1
+1=""1","Verein1","","3000006","Nachname","Vereinsleiter","Strasseö.123","12345","Vereinsort","","","012345678901","email@verein.com","","Name-vomKreisü","Detmold","nrw","x","GER""
+[Teilnehmer]
+1=""1","NachnameTN","VornameTN","4","50","","2007","","","","","""
+Anzahl=1

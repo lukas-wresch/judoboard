@@ -167,6 +167,7 @@
     <ClCompile Include="..\..\src\app_ajax.cpp" />
     <ClCompile Include="..\..\src\club.cpp" />
     <ClCompile Include="..\..\src\database.cpp" />
+    <ClCompile Include="..\..\src\dm4.cpp" />
     <ClCompile Include="..\..\src\error.cpp" />
     <ClCompile Include="..\..\src\HttpServer\HttpServer.cpp" />
     <ClCompile Include="..\..\src\id.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="..\..\src\app.h" />
     <ClInclude Include="..\..\src\club.h" />
     <ClInclude Include="..\..\src\database.h" />
+    <ClInclude Include="..\..\src\dm4.h" />
     <ClInclude Include="..\..\src\error.h" />
     <ClInclude Include="..\..\src\id.h" />
     <ClInclude Include="..\..\src\imat.h" />
@@ -233,6 +235,7 @@
     <None Include="..\..\bin\html\club_add.html" />
     <None Include="..\..\bin\html\club_list.html" />
     <None Include="..\..\bin\html\common.js" />
+    <None Include="..\..\bin\html\dm4.html" />
     <None Include="..\..\bin\html\edit_match.html" />
     <None Include="..\..\bin\html\index.html" />
     <None Include="..\..\bin\html\judoka_edit.html" />

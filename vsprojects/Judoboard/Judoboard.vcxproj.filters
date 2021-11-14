@@ -93,6 +93,9 @@
     <ClCompile Include="..\..\src\remote_tournament.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\dm4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\HttpServer\HttpServer.h">

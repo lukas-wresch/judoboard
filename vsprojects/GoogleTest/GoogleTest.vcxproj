@@ -47,10 +47,12 @@
     <LibraryPath>..\Judoboard\x64\Debug;..\..\bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)..\bin\</OutDir>
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
     <LibraryPath>..\Judoboard\x64\Release;..\..\bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -64,6 +66,7 @@
     <ClCompile Include="..\..\tests\app.cpp" />
     <ClCompile Include="..\..\tests\club.cpp" />
     <ClCompile Include="..\..\tests\database.cpp" />
+    <ClCompile Include="..\..\tests\dm4.cpp" />
     <ClCompile Include="..\..\tests\id.cpp" />
     <ClCompile Include="..\..\tests\judoka.cpp" />
     <ClCompile Include="..\..\tests\mat.cpp" />
@@ -101,7 +104,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>E:\Workspace\Judoboard\vsprojects\Judoboard\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;error.obj;HttpServer.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,7 +121,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;error.obj;HttpServer.obj;id.obj;judoka.obj;localizer.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;remote_tournament.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;id.obj;judoka.obj;localizer.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;remote_tournament.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -138,7 +141,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>E:\Workspace\Judoboard\vsprojects\Judoboard\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;error.obj;HttpServer.obj;imat.obj;id.obj;judoka.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;imat.obj;id.obj;judoka.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
@@ -157,7 +160,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;error.obj;HttpServer.obj;id.obj;judoka.obj;localizer.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;remote_tournament.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;id.obj;judoka.obj;localizer.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;remote_tournament.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -1,0 +1,26 @@
+<h1 id="headline">Upload DM4 File</h1>
+
+<form action="upload/dm4" method="post" enctype="multipart/form-data">
+
+<div>
+     <label id="label_dm4_upload">Choose the dm4 file you would like to submit</label>
+     <input name="file" type="file" size="1024" accept="text/*.*">
+</div>
+
+<br/>
+
+<button class="add" id="add">Upload File</button> 
+
+</form>
+
+
+<script>
+
+
+
+
+document.getElementById("headline").innerHTML         = lang.upload_dm4_file;
+document.getElementById("label_dm4_upload").innerHTML = lang.label_dm4_upload;
+
+
+</script>
