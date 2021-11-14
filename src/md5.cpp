@@ -427,13 +427,23 @@ bool MD5::ReadRankScore(ZED::Blob& Data)
 
 			if (data.size() >= header.size())//Have we read the entire data block?
 			{
+				RankToPoints new_ranktopoints;
+
 				for (size_t i = 0; i < header.size(); i++)
 				{
 					if (header[i] == "PlatzPK")
-						;//TODO
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_ranktopoints.Rank) != 1)
+							ZED::Log::Warn("Could not read rank of relation table rank -> points");
+					}
 					else if (header[i] == "Punkte")
-						;//TODO
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_ranktopoints.Points) != 1)
+							ZED::Log::Warn("Could not read points of relation table rank -> points");
+					}
 				}
+
+				m_RankToPoints.emplace_back(new_ranktopoints);
 
 				data.clear();//Clear block
 			}
@@ -479,11 +489,17 @@ bool MD5::ReadAgeGroups(ZED::Blob& Data)
 					else if (header[i] == "Bezeichnung")
 						age_group.Name = data[i];
 					else if (header[i] == "MinJahrgang")
-						;//TODO
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &age_group.MinBirthyear) != 1)
+							ZED::Log::Warn("Could not read MinBirthyear of age group");
+					}
 					else if (header[i] == "MaxJahrgang")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &age_group.MaxBirthyear) != 1)
+							ZED::Log::Warn("Could not read MinBirthyear of age group");
+					}
 					else if (header[i] == "Geschlecht")
-						;
+						age_group.ID = data[i] == "m" ? Gender::Male : Gender::Female;
 					else if (header[i] == "Aufruecken")
 						;
 					else if (header[i] == "Toleranz")

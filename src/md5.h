@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "judoboard.h"
 #include "../ZED/include/blob.h"
 
 
@@ -63,6 +64,11 @@ namespace Judoboard
 			int ID = -1;
 
 			std::string Name;
+
+			int MinBirthyear = -1;
+			int MaxBirthyear = -1;
+
+			Gender Gender;
 
 			//TODO add missing fields
 		};
@@ -219,6 +225,12 @@ namespace Judoboard
 			bool FromPool = false;
 		};
 
+		struct RankToPoints
+		{
+			int Rank = -1;
+			int Points = -1;
+		};
+
 
 		MD5(const std::string& Filename);
 		MD5(ZED::Blob& Data) { Parse(std::move(Data)); }
@@ -279,6 +291,7 @@ namespace Judoboard
 
 		std::vector<Match>  m_Matches;
 		std::vector<Result> m_Results;
+		std::vector<RankToPoints> m_RankToPoints;
 
 		//Meta data can be found at the start of a MD5 file
 		std::string m_FileDate;//Date the file was saved
