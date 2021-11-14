@@ -692,11 +692,11 @@ bool MD5::ReadRelationClubAssociation(ZED::Blob& Data)
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading;
-		auto Line = ReadLine(Data, &start_of_heading);
+		bool start_of_heading, newline;
+		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
-		if (Line == "\r\n")
-			return true;
+		//if (Line == "\r\n")
+			//return true;
 
 		if (start_of_heading)
 			are_in_data_part = true;
@@ -709,17 +709,33 @@ bool MD5::ReadRelationClubAssociation(ZED::Blob& Data)
 
 			if (data.size() >= header.size())//Have we read the entire data block?
 			{
+				RelationClubAssociation new_relation;
+
 				for (size_t i = 0; i < header.size(); i++)
 				{
 					if (header[i] == "VereinPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_relation.ClubID) != 1)
+							ZED::Log::Warn("Could not read club id of club relations table");
+					}
 					else if (header[i] == "EbenePK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_relation.TierID) != 1)
+							ZED::Log::Warn("Could not read club id of club relations table");
+					}
 					else if (header[i] == "VerbandPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_relation.AssociationID) != 1)
+							ZED::Log::Warn("Could not read club id of club relations table");
+					}
 				}
 
+				m_ClubRelations.emplace_back(new_relation);
+
 				data.clear();
+
+				if (newline)
+					return true;
 			}
 		}
 	}
@@ -813,17 +829,30 @@ bool MD5::ReadLotteryScheme(ZED::Blob& Data)
 
 			if (data.size() >= header.size())//Have we read the entire data block?
 			{
+				LotterySchema new_lotteryschema;
+
 				for (size_t i = 0; i < header.size(); i++)
 				{
 					if (header[i] == "LosSchemaPK")
-						;//TODO
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschema.ID) != 1)
+							ZED::Log::Warn("Could not read id of lottery schema");
+					}
 					else if (header[i] == "Bezeichnung")
-						;
+						new_lotteryschema.Description = data[i];
 					else if (header[i] == "VerbandPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschema.AssociationID) != 1)
+							ZED::Log::Warn("Could not read association of lottery schema");
+					}
 					else if (header[i] == "EbenePK")
-						;//TODO
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschema.TierID) != 1)
+							ZED::Log::Warn("Could not read tier id of lottery schema");
+					}
 				}
+
+				m_LotterySchemas.emplace_back(new_lotteryschema);
 
 				data.clear();
 			}
@@ -860,17 +889,33 @@ bool MD5::ReadLotterySchemaLine(ZED::Blob& Data)
 
 			if (data.size() >= header.size())//Have we read the entire data block?
 			{
+				LotterySchemaLine new_lotteryschemaline;
+
 				for (size_t i = 0; i < header.size(); i++)
 				{
 					if (header[i] == "LosschemaPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschemaline.LotterySchemaID) != 1)
+							ZED::Log::Warn("Could not read lottery schema id of lottery schema line");
+					}
 					else if (header[i] == "PosPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschemaline.PositionID) != 1)
+							ZED::Log::Warn("Could not read position of lottery schema line");
+					}
 					else if (header[i] == "VerbandPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschemaline.AssociationID) != 1)
+							ZED::Log::Warn("Could not read association id of lottery schema line");
+					}
 					else if (header[i] == "PlatzPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschemaline.RankID) != 1)
+							ZED::Log::Warn("Could not read rank of lottery schema line");
+					}
 				}
+
+				m_LotterySchemaLines.emplace_back(new_lotteryschemaline);
 
 				data.clear();
 			}

@@ -166,6 +166,24 @@ namespace Judoboard
 			int StartNo = -1;
 		};
 
+		struct LotterySchema
+		{
+			int ID = -1;
+			std::string Description;
+
+			int AssociationID = -1;
+			int TierID = -1;
+		};
+
+		struct LotterySchemaLine
+		{
+			int LotterySchemaID = -1;
+			int PositionID = -1;
+
+			int AssociationID = -1;
+			int RankID = -1;
+		};
+
 		struct RelationParticipantMatchTable
 		{
 			int AgeGroupID = -1;
@@ -307,7 +325,11 @@ namespace Judoboard
 		std::vector<Weightclass*> m_Weightclasses;
 
 		std::vector<RelationParticipantMatchTable> m_Relations;
+		std::vector<RelationClubAssociation> m_ClubRelations;
+
 		std::vector<Lottery> m_Lottery;
+		std::vector<LotterySchema> m_LotterySchemas;
+		std::vector<LotterySchemaLine> m_LotterySchemaLines;
 
 		std::vector<Match>  m_Matches;
 		std::vector<Result> m_Results;
