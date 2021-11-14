@@ -499,7 +499,7 @@ bool MD5::ReadAgeGroups(ZED::Blob& Data)
 							ZED::Log::Warn("Could not read MinBirthyear of age group");
 					}
 					else if (header[i] == "Geschlecht")
-						age_group.ID = data[i] == "m" ? Gender::Male : Gender::Female;
+						age_group.Gender = data[i] == "m" ? Gender::Male : Gender::Female;
 					else if (header[i] == "Aufruecken")
 						;
 					else if (header[i] == "Toleranz")
