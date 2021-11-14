@@ -22,7 +22,7 @@
 #include "../src/weightclass.h"
 #include "../src/window.h"
 #include "../src/dm4.h"
-
+#include "../src/md5.h"
 #include "../ZED/include/http_client.h"
 #include "../ZED/include/sha512.h"
 #include "../ZED/include/log.h"

@@ -178,6 +178,7 @@
     <ClCompile Include="..\..\src\match.cpp" />
     <ClCompile Include="..\..\src\matchlog.cpp" />
     <ClCompile Include="..\..\src\matchtable.cpp" />
+    <ClCompile Include="..\..\src\md5.cpp" />
     <ClCompile Include="..\..\src\remote_mat.cpp" />
     <ClCompile Include="..\..\src\remote_tournament.cpp" />
     <ClCompile Include="..\..\src\rule_set.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="..\..\src\match.h" />
     <ClInclude Include="..\..\src\matchlog.h" />
     <ClInclude Include="..\..\src\matchtable.h" />
+    <ClInclude Include="..\..\src\md5.h" />
     <ClInclude Include="..\..\src\pause.h" />
     <ClInclude Include="..\..\src\remote_mat.h" />
     <ClInclude Include="..\..\src\remote_tournament.h" />

@@ -71,6 +71,7 @@
     <ClCompile Include="..\..\tests\judoka.cpp" />
     <ClCompile Include="..\..\tests\mat.cpp" />
     <ClCompile Include="..\..\tests\match.cpp" />
+    <ClCompile Include="..\..\tests\md5.cpp" />
     <ClCompile Include="..\..\tests\remote_mat.cpp" />
     <ClCompile Include="..\..\tests\timer.cpp" />
     <ClCompile Include="..\..\tests\tournament.cpp" />
