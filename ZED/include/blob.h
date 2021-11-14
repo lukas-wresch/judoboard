@@ -74,6 +74,8 @@ namespace ZED
 
 		void MakeShared() { m_IsShared = true; }
 
+		DLLEXPORT void Trim(size_t NewSize);
+
 		DLLEXPORT size_t OutputTo(void* Data, size_t BytesToRead);//Reads BytesToRead many bytes and puts them in Data. Returns the number of bytes actually read
 		DLLEXPORT void Append(const void* Data, size_t BytesToWrite);
 		DLLEXPORT bool InsertAt(size_t Index, const void* Data, size_t BytesToWrite);

@@ -286,5 +286,8 @@
     <None Include="..\..\bin\html\dm4.html">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\bin\html\style.css">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

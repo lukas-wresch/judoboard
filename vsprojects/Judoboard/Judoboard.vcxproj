@@ -250,6 +250,7 @@
     <None Include="..\..\bin\html\rule_list.html" />
     <None Include="..\..\bin\html\schedule.html" />
     <None Include="..\..\bin\html\server_config.html" />
+    <None Include="..\..\bin\html\style.css" />
     <None Include="..\..\bin\html\tournament_add.html" />
     <None Include="..\..\bin\html\tournament_list.html" />
     <None Include="..\..\bin\html\weightclass_add.html" />

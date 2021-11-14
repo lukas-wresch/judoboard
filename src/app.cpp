@@ -92,11 +92,35 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return error;
 
 		ZED::Log::Debug(Request.m_Body);
+
+
+		//auto header = Request.m_RequestInfo.FindHeader("Content-Length");
+		//int content_length = -1;
+		//if (header)
+			//content_length = ZED::Core::ToInt(*header);
+
 		auto pos = Request.m_Body.find("\r\n\r\n");
 		if (pos != std::string::npos)
 		{
-			std::string upload_content = Request.m_Body.substr(pos + 4);
+			//std::string body_after_boundary = Request.m_Body.substr(pos + 4)
+			auto boundary_end = Request.m_Body.rfind("\r\n------WebKitFormBoundary");
+
+			auto upload_content = ZED::Blob(Request.m_Body.substr(pos + 4, boundary_end - pos - 4));
+
+			ZED::Log::Debug(Request.m_Body.substr(pos + 4, boundary_end - pos - 4));
+
+			//upload_content.Trim(content_length);
 			DM4 dm4_file(upload_content);
+
+			if (!dm4_file)
+				return Error(Error::Type::InvalidFormat);
+
+			bool success;
+			auto output = AddDM4File(dm4_file, true, &success);
+
+			if (!success)
+				return "Parsing FAILED<br/><br/>" + output;
+			return "Parsing OK<br/><br/>" + output;
 
 			//TODO apply DM4 file
 		}
@@ -2165,7 +2189,7 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 
 		if (!GetDatabase().FindClubByName(club->Name))
 		{
-			ret += "Adding new club: " + club->Name;
+			ret += "Adding new club: " + club->Name + "<br/>";
 
 			if (!ParseOnly)
 				GetDatabase().AddClub(new Club(club->Name));
@@ -2185,7 +2209,7 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 
 			if (old_judoka)//Found someone with the right name but incorrect club/birthyear
 			{
-				ret += "Updating information of judoka: " + old_judoka->GetName();
+				ret += "Updating information of judoka: " + old_judoka->GetName() + "<br/>";
 
 				if (!ParseOnly)
 				{
@@ -2201,7 +2225,7 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 			else//We don't have a judoka with this name
 			{
 				//Add to database
-				ret += "Adding judoka: " + new_judoka.Firstname + " " + new_judoka.Lastname;
+				ret += "Adding judoka: " + new_judoka.Firstname + " " + new_judoka.Lastname + "<br/>";
 
 				if (!ParseOnly)
 				{

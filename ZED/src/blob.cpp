@@ -81,6 +81,14 @@ void Blob::Append(const void* Data, size_t BytesToWrite)
 
 
 
+void Blob::Trim(size_t NewSize)
+{
+	m_Data = (uint8_t*)realloc(m_Data, NewSize);
+	m_Size = NewSize;
+}
+
+
+
 bool Blob::InsertAt(size_t Index, const void* Data, size_t BytesToWrite)
 {
 	if (Index + BytesToWrite >= m_Size)

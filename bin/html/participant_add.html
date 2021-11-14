@@ -1,7 +1,5 @@
 <h1 id="headline">New Participant</h1>
 
-<form>
-
 <div>
     <label id="label_white" style="width:150px;float:left;margin-top:5px;">Name</label>
     <input style="margin-bottom:20px;" size="50" id="white" value="">
@@ -16,13 +14,9 @@
 <br/>
 <br/>
 
-<button class="add" id="add" onclick="navigate('dm4.html')">Upload DM4 File</button>
-
-<br/>
-<br/>
-
-<button class="add" id="add" onclick="navigate('dm4.html')">Upload DM4 File</button>
-
+<form action="/upload/dm4" method="post" id="upload_form" enctype="multipart/form-data">
+    <input id="file" name="file" type="file" accept="text/*.*" onchange="document.getElementById('upload_form').submit();" hidden/>
+    <button class="add" id="add" onclick="document.getElementById('file').click(); return false;">Upload DM4 File</button>
 </form>
 
 

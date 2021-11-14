@@ -29,6 +29,7 @@ public:
 	struct RequestHeader
 	{
 		RequestHeader(const std::string& Name_, const std::string& Value_) : Name(Name_), Value(Value_) {}
+		operator const std::string& () const { return Value; }
 
 		std::string Name;
 		std::string Value;
