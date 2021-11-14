@@ -1332,7 +1332,8 @@ bool MD5::ReadResult(ZED::Blob& Data)
 						new_result.FromPool = data[i] != "0";
 				}
 
-				m_Results.emplace_back(new_result);
+				if (new_result.ParticipantID > 0)//Filter invalid result data
+					m_Results.emplace_back(new_result);
 				data.clear();
 
 				if (newline)
