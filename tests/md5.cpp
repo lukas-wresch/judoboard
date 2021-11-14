@@ -19,5 +19,8 @@ TEST(MD5, ReadTestData)
 	EXPECT_EQ(file.GetClubs().size(), 21);
 	EXPECT_EQ(file.GetParticipants().size(), 142);
 
+	ASSERT_TRUE(file.FindResult("Jugend u10 w", "-20,7 kg", 1));
+	EXPECT_EQ(  file.FindResult("Jugend u10 w", "-20,7 kg", 1)->Participant->Firstname, "Laura");
+
 	ASSERT_TRUE(false);//TODO
 }

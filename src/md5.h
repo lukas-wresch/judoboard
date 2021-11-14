@@ -106,7 +106,7 @@ namespace Judoboard
 
 			int Graduation = -1;
 
-			int  WeightclassID = -1;
+			int  WeightclassID = -1;//Remeber these IDs are NOT unique!
 			const Weightclass* Weightclass = nullptr;
 			bool HasBeenWeighted = false;
 
@@ -130,9 +130,9 @@ namespace Judoboard
 
 		struct Weightclass
 		{
-			int ID = -1;
+			int ID = -1;//These are IDs are NOT unique!! Weightclasses for differen age groups have the SAME ID!!
 			int AgeGroupID = -1;
-			const AgeGroup* AgeGroup = nullptr;
+			const AgeGroup* AgeGroup = nullptr;//Don't link like this, because this is messed up in md5 files!
 
 			int WeightLargerThan  = -1;
 			int WeightSmallerThan = -1;
@@ -278,8 +278,9 @@ namespace Judoboard
 		Club*        FindClub(int ClubID);
 		Participant* FindParticipant(int ParticipantID);
 		AgeGroup*    FindAgeGroup(int AgeGroupID);
-		Weightclass* FindWeightclass(int WeightclassID);
+		Weightclass* FindWeightclass(int AgeGroupID, int WeightclassID);
 		const Result* FindResult(int AgeGroupID, int WeightclassID, int Rank) const;
+		const Result* FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const;
 		std::vector<const Result*> FindResults(int AgeGroupID, int WeightclassID) const;
 
 		void Dump() const;

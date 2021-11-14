@@ -90,13 +90,26 @@ MD5::AgeGroup* MD5::FindAgeGroup(int AgeGroupID)
 
 
 
-MD5::Weightclass* MD5::FindWeightclass(int WeightclassID)
+MD5::Weightclass* MD5::FindWeightclass(int AgeGroupID, int WeightclassID)
 {
 	if (WeightclassID <= -1)
 		return nullptr;
 
+#ifdef _DEBUG
+	bool found = false;
 	for (auto weightclass : m_Weightclasses)
-		if (weightclass && weightclass->ID == WeightclassID)
+	{
+		if (weightclass && weightclass->AgeGroupID == AgeGroupID && weightclass->ID == WeightclassID)
+		{
+			if (found)
+				assert(!found);//Crash when the ID exists twice
+			found = true;
+		}
+	}
+#endif
+
+	for (auto weightclass : m_Weightclasses)
+		if (weightclass && weightclass->AgeGroupID == AgeGroupID && weightclass->ID == WeightclassID)
 			return weightclass;
 	return nullptr;
 }
@@ -107,6 +120,16 @@ const MD5::Result* MD5::FindResult(int AgeGroupID, int WeightclassID, int Rank) 
 {
 	for (auto& result : m_Results)
 		if (result.AgeGroupID == AgeGroupID && result.WeightclassID == WeightclassID && result.RankNo == Rank)
+			return &result;
+	return nullptr;
+}
+
+
+
+const MD5::Result* MD5::FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const
+{
+	for (auto& result : m_Results)
+		if (result.AgeGroup && result.AgeGroup->Name == AgeGroup && result.Weightclass && result.Weightclass->Description == Weightclass && result.RankNo == Rank)
 			return &result;
 	return nullptr;
 }
@@ -260,20 +283,28 @@ bool MD5::Parse(ZED::Blob&& Data)
 			association->NextAsscociation = FindAssociation(association->NextAsscociationID);
 		}
 
+		for (auto& age_group : m_AgeGroups)
+		{
+			//weightclass->AgeGroup = FindAgeGroup(weightclass->AgeGroupID);
+		}
+
 		for (auto& weightclass : m_Weightclasses)
 		{
+			//Doing it like this is actually wrong, since weightclasses for different age groups are actually NOT saved separateley!!
 			weightclass->AgeGroup = FindAgeGroup(weightclass->AgeGroupID);
 		}
 
 		for (auto& judoka : m_Participants)
 		{
-			judoka->Weightclass = FindWeightclass(judoka->WeightclassID);
+			judoka->Weightclass = FindWeightclass(judoka->AgeGroupID, judoka->WeightclassID);
 			judoka->Club        = FindClub(judoka->ClubID);
 		}
 
 		for (auto& result : m_Results)
 		{
 			result.Participant = FindParticipant(result.ParticipantID);
+			result.AgeGroup    = FindAgeGroup(result.AgeGroupID);
+			result.Weightclass = FindWeightclass(result.AgeGroupID, result.WeightclassID);
 		}
 	}
 
