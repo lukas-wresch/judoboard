@@ -43,8 +43,10 @@ namespace Judoboard
 		Database& GetDatabase() { return m_Database; }
 
 		bool LoadDataFromDisk();
-
 		const Account* GetDefaultAdminAccount() const;
+
+		//DM4
+		std::string AddDM4File(const DM4& File, bool ParseOnly = false, bool* pSuccess = nullptr);
 
 		//Tournaments
 		[[nodiscard]]

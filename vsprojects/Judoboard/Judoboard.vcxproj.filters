@@ -179,7 +179,13 @@
     <ClInclude Include="..\..\src\itournament.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\dm4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\md5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\judoboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -278,6 +284,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\.gitattributes">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\dm4.html">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

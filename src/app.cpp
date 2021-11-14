@@ -82,6 +82,26 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	m_Server.RegisterResource("/server_config.html", [](auto& Request) { return HttpServer::LoadFile("html/server_config.html"); });
 
 
+	//File uploads
+
+	m_Server.RegisterResource("/upload/dm4", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		ZED::Log::Debug(Request.m_Body);
+		auto pos = Request.m_Body.find("\r\n\r\n");
+		if (pos != std::string::npos)
+		{
+			std::string upload_content = Request.m_Body.substr(pos + 4);
+			//DM4 dm4_file(upload_content);
+
+			//TODO apply DM4 file
+		}
+		
+		return Error(Error::Type::InvalidFormat);
+	});
+
 	//Ajax requests
 
 	m_Server.RegisterResource("/ajax/get_nonce", [this](auto& Request) {
@@ -2076,6 +2096,89 @@ const Account* Application::GetDefaultAdminAccount() const
 
 	//No admin account found, create the default one
 	return m_Database.AddAccount(Account("admin", "1234", Account::AccessLevel::Admin));
+}
+
+
+
+std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSuccess)
+{
+	std::string ret;
+
+	if (!File)
+	{
+		ZED::Log::Warn("Invalid DM4 file");
+		if (pSuccess)
+			*pSuccess = false;
+		return ret;
+	}
+
+	ret += "Tournament name: " + File.GetTournamentName() + "<br/>";
+	ret += "Tournament date: " + File.GetTournamentDate() + "<br/>";
+
+
+	for (auto club : File.GetClubs())
+	{
+		if (!club)
+			continue;
+
+		if (!GetDatabase().FindClubByName(club->Name))
+		{
+			ret += "Adding new club: " + club->Name;
+
+			if (!ParseOnly)
+				GetDatabase().AddClub(new Club(club->Name));
+		}
+	}
+
+
+	Gender gender_of_participants = File.GetGender();
+
+	for (auto new_judoka : File.GetParticipants())
+	{
+		auto old_judoka = GetDatabase().FindJudoka_DM4_ExactMatch(new_judoka);
+
+		if (!old_judoka)//No exact match
+		{
+			old_judoka = GetDatabase().FindJudoka_DM4_SameName(new_judoka);
+
+			if (old_judoka)//Found someone with the right name but incorrect club/birthyear
+			{
+				ret += "Updating information of judoka: " + old_judoka->GetName();
+
+				if (!ParseOnly)
+				{
+					if (new_judoka.Club)
+						old_judoka->SetClub(GetDatabase().FindClubByName(new_judoka.Club->Name));
+					if (new_judoka.Birthyear > 0)
+						old_judoka->SetBirthyear(new_judoka.Birthyear);
+					if (new_judoka.Weight > 0)
+						old_judoka->SetWeight(new_judoka.Weight);
+				}
+			}
+
+			else//We don't have a judoka with this name
+			{
+				//Add to database
+				ret += "Adding judoka: " + new_judoka.Firstname + " " + new_judoka.Lastname;
+
+				if (!ParseOnly)
+				{
+					old_judoka = new Judoka(new_judoka);
+					GetDatabase().AddJudoka(old_judoka);
+				}
+			}
+		}
+
+
+		//Judoka is now added/updated
+
+		if (!ParseOnly)
+		{//Add to the current tournament
+			GetTournament()->AddParticipant(old_judoka);
+		}
+	}
+
+	return ret;
 }
 
 
