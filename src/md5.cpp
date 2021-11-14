@@ -574,19 +574,27 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 {
 	std::vector<std::string> header;
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
+	bool are_in_header_part = true;
+	bool are_in_data_part   = false;
 
 	while (!Data.EndReached())
 	{
 		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);
+		auto Line = ReadLine(Data, &start_of_heading, &newline);		
+			
 
-		if (start_of_heading)
+		if (are_in_header_part)//We are reading the header
+		{
+			header.emplace_back(RemoveControlCharacters(Line));
+
+			if (newline)
+				are_in_header_part = false;
+		}
+		else if (start_of_heading)
 			are_in_data_part = true;
 
-		if (!are_in_data_part)//We are reading the header
-			header.emplace_back(RemoveControlCharacters(Line));
-		else
+
+		if (are_in_data_part)
 		{
 			data.emplace_back(RemoveControlCharacters(Line));
 
@@ -1438,19 +1446,26 @@ bool MD5::ReadAssociation(ZED::Blob& Data)
 {
 	std::vector<std::string> header;
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
+	bool are_in_header_part = true;
+	bool are_in_data_part   = false;
 
 	while (!Data.EndReached())
 	{
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
-		if (start_of_heading)
+
+		if (are_in_header_part)//We are reading the header
+		{
+			header.emplace_back(RemoveControlCharacters(Line));
+			if (newline)
+				are_in_header_part = false;
+		}
+		else if (start_of_heading)
 			are_in_data_part = true;
 
-		if (!are_in_data_part)//We are reading the header
-			header.emplace_back(RemoveControlCharacters(Line));
-		else
+
+		if (are_in_data_part)
 		{
 			data.emplace_back(RemoveControlCharacters(Line));
 
@@ -1690,10 +1705,6 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pStartOfHeading, bool* pNewLine
 			if (Line.length() == 1)
 				Line += c;
 		}
-		else if (c == '@')
-			continue;
-		else if (c == -109)
-			continue;
 		else//Printable character
 		{
 			if (Line.length() == 1 && Line[0] == '\r')
