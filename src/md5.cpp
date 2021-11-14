@@ -24,14 +24,29 @@ MD5::MD5(const std::string& Filename)
 
 MD5::~MD5()
 {
+	for (auto association : m_Associations)
+		delete association;
+	for (auto club : m_Clubs)
+		delete club;
 	for (auto age_group : m_AgeGroups)
 		delete age_group;
 	for (auto weightclass : m_Weightclasses)
 		delete weightclass;
-	for (auto club : m_Clubs)
-		delete club;
 	for (auto participant : m_Participants)
 		delete participant;
+}
+
+
+
+MD5::Association* MD5::FindAssociation(int AssociationID)
+{
+	if (AssociationID <= -1)
+		return nullptr;
+
+	for (auto association : m_Associations)
+		if (association && association->ID == AssociationID)
+			return association;
+	return nullptr;
 }
 
 
@@ -240,6 +255,11 @@ bool MD5::Parse(ZED::Blob&& Data)
 	if (is_ok)
 	{
 		//Resolve dependencies
+		for (auto& association : m_Associations)
+		{
+			association->NextAsscociation = FindAssociation(association->NextAsscociationID);
+		}
+
 		for (auto& weightclass : m_Weightclasses)
 		{
 			weightclass->AgeGroup = FindAgeGroup(weightclass->AgeGroupID);
@@ -280,10 +300,10 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 			are_in_data_part = true;
 
 		if (!are_in_data_part)//We are reading the header
-			header.emplace_back(Line);
+			header.emplace_back(RemoveControlCharacters(Line));
 		else
 		{
-			data.emplace_back(Line);
+			data.emplace_back(RemoveControlCharacters(Line));
 
 			if (data.size() >= header.size())//Have we read the entire data block?
 			{
@@ -294,7 +314,7 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 					else if (header[i] == "VorzugsschemaPK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &m_SchemaID) != 1)
-						ZED::Log::Warn("Could not parse schema id");
+							ZED::Log::Warn("Could not parse schema id");
 					}
 					else if (header[i] == "Ort")
 						m_Place = data[i];
@@ -303,37 +323,73 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 					else if (header[i] == "DatumBis")
 						m_DateEnd = data[i];
 					else if (header[i] == "LosEbenePK")
-						;//TODO
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &m_LotteryLevelID) != 1)
+							ZED::Log::Warn("Could not parse schema LotteryLevelID");
+					}
 					else if (header[i] == "VerbandPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &m_AssociationID) != 1)
+							ZED::Log::Warn("Could not parse schema AssociationID");
+					}
 					else if (header[i] == "VerbandEbenePK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &m_AssociationLevelID) != 1)
+							ZED::Log::Warn("Could not parse schema AssociationLevelID");
+					}
 					else if (header[i] == "KuerzelEbenePK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &m_LevelShortID) != 1)
+							ZED::Log::Warn("Could not parse schema LevelShortID");
+					}
 					else if (header[i] == "MAXJGJ")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &m_MAXJGJ) != 1)
+							ZED::Log::Warn("Could not parse schema MAXJGJ");
+					}
 					else if (header[i] == "KampfumPlatz3")
-						;
+						m_ThirdPlaceMatch = data[i] != "-1";
 					else if (header[i] == "KampfUmPlatz5")
-						;
+						m_FifthPlaceMatch = data[i] != "-1";
 					else if (header[i] == "SportlicheLeitung")
-						;
+						m_SportAdministrator = data[i];
 					else if (header[i] == "AnzWeitermelden")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &m_NumOfRelays) != 1)
+							ZED::Log::Warn("Could not parse schema NumOfRelays");
+					}
 					else if (header[i] == "LOSVERFAHREN")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &m_LotteryProcess) != 1)
+							ZED::Log::Warn("Could not parse schema LotteryProcess");
+					}
 					else if (header[i] == "AktVereinPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &m_NumClubs) != 1)
+							ZED::Log::Warn("Could not parse schema m_NumClubs");
+					}
 					else if (header[i] == "AktTNPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &m_NumParticipants) != 1)
+							ZED::Log::Warn("Could not parse schema m_NumParticipants");
+					}
 					else if (header[i] == "AktVerbandPK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &m_NumAssociations) != 1)
+							ZED::Log::Warn("Could not parse schema m_NumAssociations");
+					}
 					else if (header[i] == "Meldegeld")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &m_Money) != 1)
+							ZED::Log::Warn("Could not parse schema Money");
+					}
 					else if (header[i] == "Meldegelderhoeht")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &m_MoneyIncreased) != 1)
+							ZED::Log::Warn("Could not parse schema Money");
+					}
 					else if (header[i] == "JGJIgnoreNegativeUnterbew")
-						;//TODO
+						m_IgnoreNegativeScores = data[i] != "0";
 				}
 
 				return true;
@@ -1277,7 +1333,9 @@ bool MD5::ReadParticipants(ZED::Blob& Data)
 					}
 				}
 
-				m_Participants.emplace_back(new Participant(new_participant));
+				if (new_participant.ID != 0)//To filter dummy participants
+					m_Participants.emplace_back(new Participant(new_participant));
+
 				data.clear();
 
 				if (newline)
@@ -1313,24 +1371,39 @@ bool MD5::ReadAssociation(ZED::Blob& Data)
 
 			if (data.size() >= header.size())//Have we read the entire data block?
 			{
+				Association new_association;
+
 				for (size_t i = 0; i < header.size(); i++)
 				{
 					if (header[i] == "VerbandPK")
-						;//TODO
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_association.ID) != 1)
+							ZED::Log::Warn("Could not read id of association");
+					}
 					else if (header[i] == "EbenePK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_association.TierID) != 1)
+							ZED::Log::Warn("Could not read tier id of association");
+					}
 					else if (header[i] == "Bezeichnung")
-						;
+						new_association.Description = data[i];
 					else if (header[i] == "Kuerzel")
-						;
+						new_association.ShortName = data[i];
 					else if (header[i] == "Nummer")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_association.Number) != 1)
+							ZED::Log::Warn("Could not read number of association");
+					}
 					else if (header[i] == "NaechsteEbenePK")
-						;
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_association.NextAsscociationID) != 1)
+							ZED::Log::Warn("Could not read NextTierID of association");
+					}
 					else if (header[i] == "Aktiv")
-						;//TODO
+						new_association.Active = data[i] == "1";
 				}
 
+				m_Associations.emplace_back(new Association(new_association));
 				data.clear();
 
 				if (newline)

@@ -36,6 +36,21 @@ namespace Judoboard
 			int StatusChanged  = -1;//Could also be a boolean
 		};
 
+		struct Association
+		{
+			int ID = -1;
+			int TierID = -1;
+
+			std::string Description;
+			std::string ShortName;
+
+			int Number = -1;
+			int NextAsscociationID = -1;
+			const Association* NextAsscociation = nullptr;
+
+			bool Active = false;
+		};
+
 		struct RelationClubAssociation//Relational table to connect clubs to associations
 		{
 			int ClubID = -1;
@@ -209,6 +224,7 @@ namespace Judoboard
 		MD5(ZED::Blob& Data) { Parse(std::move(Data)); }
 		~MD5();
 
+		Association* FindAssociation(int AssociationID);
 		Club*        FindClub(int ClubID);
 		Participant* FindParticipant(int ParticipantID);
 		AgeGroup*    FindAgeGroup(int AgeGroupID);
@@ -218,9 +234,14 @@ namespace Judoboard
 
 		void Dump() const;
 
-		const std::vector<Club*>&        GetClubs() const { return m_Clubs; }
+		const std::vector<Association*>& GetAssociations() const { return m_Associations; }
+		const std::vector<Club*>&        GetClubs()		   const { return m_Clubs; }
 		const std::vector<Participant*>& GetParticipants() const { return m_Participants; }
-		const std::vector<Result>&       GetResults() const { return m_Results; }
+		const std::vector<Result>&       GetResults()	   const { return m_Results; }
+
+		int GetNumAssociations()  const { return m_NumAssociations; }//Returns the number of associations that should be in the file according to the header, not the actual number of associations read
+		int GetNumClubs()		  const { return m_NumClubs; }//Returns the number of clubs that should be in the file according to the header, not the actual number of clubs read
+		int GetNumParticipants()  const { return m_NumParticipants; }//Returns the number of participants that should be in the file according to the header, not the actual number of participants read
 
 		std::string GetFileDate()  const { return m_FileDate; }
 
@@ -247,6 +268,7 @@ namespace Judoboard
 		bool ReadResult(ZED::Blob& Data);
 
 
+		std::vector<Association*> m_Associations;
 		std::vector<Club*> m_Clubs;
 		std::vector<Participant*> m_Participants;
 		std::vector<AgeGroup*>    m_AgeGroups;
@@ -261,10 +283,32 @@ namespace Judoboard
 		//Meta data can be found at the start of a MD5 file
 		std::string m_FileDate;//Date the file was saved
 		std::string m_Description;
+
 		int m_SchemaID = -1;
+		int m_LotteryLevelID = -1;
+		int m_AssociationID  = -1;
+		int m_AssociationLevelID = -1;
+		int m_LevelShortID = -1;
+		int m_MAXJGJ = -1;
+		int m_LotteryProcess = -1;
+
+		int m_NumOfRelays = -1;
+
 		std::string m_Place;
 		std::string m_DateStart;
 		std::string m_DateEnd;
+		std::string m_SportAdministrator;
+
+		bool m_ThirdPlaceMatch = false;
+		bool m_FifthPlaceMatch = false;
+		bool m_IgnoreNegativeScores = false;
+
+		int m_NumClubs = -1;//Number of clubs in the md5 file
+		int m_NumParticipants = -1;//Number of participants in the md5 file
+		int m_NumAssociations = -1;//Number of associations in the md5 file
+
+		int m_Money = -1;
+		int m_MoneyIncreased = -1;
 
 		bool m_IsValid = false;
 	};
