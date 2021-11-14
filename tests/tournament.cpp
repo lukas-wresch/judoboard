@@ -146,14 +146,14 @@ TEST(Tournament, DoubleDisqualification2)
 		EXPECT_TRUE(match1.HasConcluded());
 		EXPECT_EQ(match1.GetMatchResult().m_Winner, Winner::White);
 		EXPECT_EQ(match1.GetMatchResult().m_Score, Match::Score::Ippon);
-		EXPECT_LE(match1.GetMatchResult().m_Time, 20);
-		EXPECT_GE(match1.GetLog().GetEvents().size(), 3);
+		EXPECT_LE(match1.GetMatchResult().m_Time, 20u);
+		EXPECT_GE(match1.GetLog().GetEvents().size(), 3u);
 
 		EXPECT_TRUE(match2.HasConcluded());
 		EXPECT_EQ(match2.GetMatchResult().m_Winner, Winner::Draw);
 		EXPECT_EQ(match2.GetMatchResult().m_Score, Match::Score::Draw);
-		EXPECT_LE(match2.GetMatchResult().m_Time, 20);
-		EXPECT_EQ(match2.GetLog().GetEvents().size(), 0);
+		EXPECT_LE(match2.GetMatchResult().m_Time, 20u);
+		EXPECT_EQ(match2.GetLog().GetEvents().size(), 0u);
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe");

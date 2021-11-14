@@ -90,6 +90,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return error;
 
 		ZED::Log::Debug(Request.m_Body);
+
 		auto pos = Request.m_Body.find("\r\n\r\n");
 		if (pos != std::string::npos)
 		{
@@ -99,6 +100,25 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			//TODO apply DM4 file
 		}
 		
+		return Error(Error::Type::InvalidFormat);
+	});
+
+	m_Server.RegisterResource("/upload/md5", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		ZED::Log::Debug(Request.m_Body);
+
+		auto pos = Request.m_Body.find("\r\n\r\n");
+		if (pos != std::string::npos)
+		{
+			std::string upload_content = Request.m_Body.substr(pos + 4);
+			//MD5 md5_file(upload_content);
+
+			//TODO apply MD5 file
+		}
+
 		return Error(Error::Type::InvalidFormat);
 	});
 
