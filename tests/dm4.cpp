@@ -6,7 +6,11 @@ TEST(DM4, Read_Verein1_U13_m)
 {
 	initialize();
 
+#ifdef _WIN32
+	DM4 file("../test-data/Verein1_U13 (m).dm4");
+#else
 	DM4 file("test-data/Verein1_U13 (m).dm4");
+#endif
 
 	ASSERT_TRUE(file);
 
@@ -44,7 +48,11 @@ TEST(DM4, Read_Verein1_U15_m)
 {
 	initialize();
 
-	DM4 file("test-data/Verein1_U15 (m).dm4");
+#ifdef _WIN32
+	DM4 file("../test-data/Verein1_U15 (m).dm4");
+#else
+	DM4 file("test-data/Verein1_U15 (m).dm4"); 
+#endif
 
 	ASSERT_TRUE(file);
 
@@ -92,7 +100,11 @@ TEST(DM4, Read_Verein1_U15_w)
 {
 	initialize();
 
+#ifdef _WIN32
+	DM4 file("../test-data/Verein1_U15 (w).dm4");
+#else
 	DM4 file("test-data/Verein1_U15 (w).dm4");
+#endif
 
 	ASSERT_TRUE(file);
 
@@ -140,7 +152,11 @@ TEST(DM4, Read_Verein1_U18_w)
 {
 	initialize();
 
+#ifdef _WIN32
+	DM4 file("../test-data/Verein1_U18 (w).dm4");
+#else
 	DM4 file("test-data/Verein1_U18 (w).dm4");
+#endif
 
 	ASSERT_TRUE(file);
 
@@ -208,7 +224,11 @@ TEST(DM4, Read_Verein1_U21_n)
 {
 	initialize();
 
+#ifdef _WIN32
+	DM4 file("../test-data/Verein1_U21 (m).dm4");
+#else
 	DM4 file("test-data/Verein1_U21 (m).dm4");
+#endif
 
 	ASSERT_TRUE(file);
 
