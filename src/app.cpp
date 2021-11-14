@@ -94,7 +94,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		if (pos != std::string::npos)
 		{
 			std::string upload_content = Request.m_Body.substr(pos + 4);
-			DM4 dm4_file(upload_content);
+			//DM4 dm4_file(upload_content);
 
 			//TODO apply DM4 file
 		}
