@@ -78,7 +78,8 @@ TEST(DM4, Read_Verein1_U15_m)
 	ASSERT_TRUE(file.GetParticipants()[0].Club);
 	EXPECT_EQ(file.GetParticipants()[0].Club->Name, "Verein1");
 	EXPECT_EQ(file.GetParticipants()[0].Firstname,  "Robin");
-	EXPECT_EQ(file.GetParticipants()[0].Lastname,   "Kд");
+	//EXPECT_EQ(file.GetParticipants()[0].Lastname,   "Kд");
+	EXPECT_EQ(file.GetParticipants()[0].Lastname, u8"K\u00e4");
 	EXPECT_EQ(file.GetParticipants()[0].Gender, Gender::Male);
 	EXPECT_EQ(file.GetParticipants()[0].Weight, -1);
 	EXPECT_EQ(file.GetParticipants()[0].Birthyear, 2006);
@@ -192,7 +193,8 @@ TEST(DM4, Read_Verein1_U18_w)
 	ASSERT_TRUE(file.GetParticipants()[1].Club);
 	EXPECT_EQ(file.GetParticipants()[1].Club->Name, "Verein1");
 	EXPECT_EQ(file.GetParticipants()[1].Firstname, "Hanna");
-	EXPECT_EQ(file.GetParticipants()[1].Lastname, "ья");
+	//EXPECT_EQ(file.GetParticipants()[1].Lastname, "ья");
+	EXPECT_EQ(file.GetParticipants()[1].Lastname, u8"\u00fc\u00df");
 	EXPECT_EQ(file.GetParticipants()[1].Gender, Gender::Female);
 	EXPECT_EQ(file.GetParticipants()[1].Weight, -1);
 	EXPECT_EQ(file.GetParticipants()[1].Birthyear, 2003);

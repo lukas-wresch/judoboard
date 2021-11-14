@@ -23,8 +23,16 @@ void Localizer::Initialize(Language NewLanguage)
 			if (!s_de.empty())
 				break;
 
+			//a umlaut \u00e4
+			//A umlaut \u00c4
+			//u umlaut \u00fc
+			//U umlaut \u00dc
+			//o umlaut \u00f6
+			//O umlaut \u00d6
+			//ss       \u00df
+
 			//German
-			s_de["Mat"] = "Matte";
+			s_de["Mat"] = u8"Matte";
 			s_de["Weightclass"] = "Gewichtsklasse";
 			s_de["Next Match"]  = u8"N\u00e4chster Kampf";
 			s_de["Following Matches"] = u8"Nachfolgende K\u00e4mpfe";

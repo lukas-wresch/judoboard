@@ -120,6 +120,9 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 			if (!success)
 				return "Parsing FAILED<br/><br/>" + output;
+
+			AddDM4File(dm4_file);
+
 			return "Parsing OK<br/><br/>" + output;
 
 			//TODO apply DM4 file

@@ -8,13 +8,13 @@ TEST(App, ServerConnection)
 	Application app(8080 + rand() % 10000);
 
 	ZED::HttpClient client("127.0.0.1", app.GetPort());
-	EXPECT_TRUE(client.IsConnected());
+	ASSERT_TRUE(client.IsConnected());
 
-	EXPECT_TRUE(client.SendGETRequest("/"));
+	EXPECT_TRUE(client.SendGETRequest("/test"));
 
 	auto packet = client.RecvResponse();
-	EXPECT_TRUE(packet.header.length() > 10);
-	EXPECT_TRUE(packet.body.length() > 10);
+	EXPECT_GE(packet.header.length(), 10u);
+	EXPECT_GE(packet.body.length(), 10u);
 
 	EXPECT_TRUE(app.IsRunning());
 	EXPECT_TRUE(app.IsMaster());

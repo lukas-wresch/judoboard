@@ -149,8 +149,8 @@ bool DM4::ParseLine(const std::string& Line)
 				if (sscanf_s(id.c_str(), "%d=%d", &new_participant.ID, &new_participant.ClubID) != 2)
 					ZED::Log::Warn("Could not parse id of line: " + Line);
 
-				new_participant.Firstname = RemoveCharFromString(firstname, '\"');
-				new_participant.Lastname  = RemoveCharFromString(lastname,  '\"');
+				new_participant.Firstname = Latin1ToUTF8(RemoveCharFromString(firstname, '\"'));
+				new_participant.Lastname  = Latin1ToUTF8(RemoveCharFromString(lastname,  '\"'));
 
 				RemoveCharFromString(weight, '\"');
 				if (sscanf_s(weight.c_str(), "%d", &new_participant.Weight) != 1)
