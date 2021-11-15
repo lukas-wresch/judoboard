@@ -28,7 +28,7 @@ namespace Judoboard
 		Tournament() = default;
 		Tournament(const std::string& Name);
 		Tournament(const std::string& Name, const RuleSet* RuleSet);
-		Tournament(const MD5& File);
+		Tournament(const MD5& File, Database* pDatabase = nullptr);
 		~Tournament();
 
 		void Reset();

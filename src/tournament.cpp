@@ -29,12 +29,35 @@ Tournament::Tournament(const std::string& Name, const RuleSet* RuleSet) : m_pDef
 
 
 
-Tournament::Tournament(const MD5& File)
+Tournament::Tournament(const MD5& File, Database* pDatabase)
 {
 	m_Name = File.GetDescription();
 
+	//Add clubs
+	for (auto club : File.GetClubs())
+	{
+		if (pDatabase)
+		{
+			Club* new_club = pDatabase->AddClub(*club);
+			m_StandingData.AddClub(new_club);
+		}
+
+		else
+			m_StandingData.AddClub(new Club(*club));
+	}
+
+	//Add judoka
 	for (auto judoka : File.GetParticipants())
-		AddParticipant(new Judoka(*judoka));
+	{
+		if (pDatabase)
+		{
+			Judoka* new_judoka = pDatabase->AddJudoka(*judoka);
+			AddParticipant(new_judoka);
+		}
+
+		else
+			AddParticipant(new Judoka(*judoka));
+	}
 }
 
 

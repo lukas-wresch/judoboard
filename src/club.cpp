@@ -22,6 +22,13 @@ Club::Club(ZED::CSV& Stream)
 
 
 
+Club::Club(const MD5::Club& Club)
+{
+	m_Name = Club.Name;
+}
+
+
+
 void Club::operator >> (ZED::CSV& Stream) const
 {
 	Stream << m_Name;

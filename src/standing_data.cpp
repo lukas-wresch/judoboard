@@ -65,6 +65,17 @@ void StandingData::operator >> (ZED::CSV& Stream) const
 
 
 
+void StandingData::AddMD5File(const MD5& File)
+{
+	for (auto club : File.GetClubs())
+		AddClub(new Club(*club));
+
+	for (auto judoka : File.GetParticipants())
+		AddJudoka(new Judoka(*judoka));
+}
+
+
+
 bool StandingData::AddJudoka(Judoka* NewJudoka)
 {
 	if (!NewJudoka)
@@ -72,6 +83,14 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 
 	m_Judokas.insert({ NewJudoka->GetID(), NewJudoka });
 	return true;
+}
+
+
+
+Judoka* StandingData::AddJudoka(const MD5::Participant& NewJudoka)
+{
+	ZED::Log::Error("NOT IMPLEMENTED");
+	return nullptr;
 }
 
 
@@ -105,6 +124,14 @@ const std::string StandingData::JudokaToJSON() const
 
 	ret += "]";
 	return ret;
+}
+
+
+
+Club* StandingData::AddClub(const MD5::Club& NewClub)
+{
+	ZED::Log::Error("NOT IMPLEMENTED");
+	return nullptr;
 }
 
 

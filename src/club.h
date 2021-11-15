@@ -1,5 +1,6 @@
 #pragma once
 #include "id.h"
+#include "md5.h"
 #include "../ZED/include/csv.h"
 
 
@@ -13,6 +14,7 @@ namespace Judoboard
 	public:
 		Club(const std::string& Name);
 		Club(ZED::CSV& Stream);//Load club from file
+		Club(const MD5::Club& Club);
 
 		std::string GetName() const { return m_Name; }
 

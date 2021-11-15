@@ -19,9 +19,12 @@ namespace Judoboard
 		void operator << (ZED::CSV& Stream);
 		void operator >> (ZED::CSV& Stream) const;
 
+		void AddMD5File(const MD5& File);
+
 		//Judokas
 		uint32_t AddJudoka(Judoka&& NewJudoka) { return AddJudoka(new Judoka(NewJudoka)); }//Adds a judoka to the database
 		bool AddJudoka(Judoka* NewJudoka);//Adds a judoka to the database by reference
+		Judoka* AddJudoka(const MD5::Participant& NewJudoka);
 		const std::unordered_map<uint32_t, Judoka*>& GetAllJudokas() const { return m_Judokas; }
 		std::unordered_map<uint32_t, Judoka*>& GetAllJudokas() { return m_Judokas; }
 		size_t GetNumJudoka() const { return m_Judokas.size(); }
@@ -39,7 +42,8 @@ namespace Judoboard
 
 		//Clubs
 		auto& GetAllClubs() const { return m_Clubs; }
-		bool AddClub(Club* NewClub);
+		Club* AddClub(const MD5::Club& NewClub);
+		bool  AddClub(Club* NewClub);
 
 		Club* FindClub(uint32_t ID);
 		const Club* FindClub(uint32_t ID) const;
