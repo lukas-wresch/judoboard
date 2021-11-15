@@ -111,6 +111,66 @@ bool Database::Save(const std::string& Filename) const
 
 
 
+Judoka* Database::UpdateOrAdd(const MD5::Participant& NewJudoka)
+{
+	DM4::Participant dm4_judoka(NewJudoka);
+
+	std::string output;
+	auto ret = UpdateOrAdd(dm4_judoka, false, output);
+	ZED::Log::Debug(output);
+
+	return ret;
+}
+
+
+
+Judoka* Database::UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly, std::string& Output)
+{
+	auto old_judoka = FindJudoka_DM4_ExactMatch(NewJudoka);
+
+	if (old_judoka)//Exact match
+		return old_judoka;
+
+	else//No exact match
+	{
+		old_judoka = FindJudoka_DM4_SameName(NewJudoka);
+
+		if (old_judoka)//Found someone with the right name but incorrect club/birthyear
+		{
+			Output += "Updating information of judoka: " + old_judoka->GetName() + "<br/>";
+
+			if (!ParseOnly)
+			{
+				if (NewJudoka.Club)
+					old_judoka->SetClub(FindClubByName(NewJudoka.Club->Name));
+				if (NewJudoka.Birthyear > 0)
+					old_judoka->SetBirthyear(NewJudoka.Birthyear);
+				if (NewJudoka.Weight > 0)
+					old_judoka->SetWeight(NewJudoka.Weight);
+			}
+
+			return old_judoka;
+		}
+
+		else//We don't have a judoka with this name
+		{
+			//Add to database
+			Output += "Adding judoka: " + NewJudoka.Firstname + " " + NewJudoka.Lastname + "<br/>";
+
+			if (!ParseOnly)
+			{
+				auto new_judoka = new Judoka(NewJudoka);
+				AddJudoka(new_judoka);
+				return new_judoka;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+
+
 const Account* Database::AddAccount(const Account& NewAccount)
 {
 	Account* new_account = new Account(NewAccount);

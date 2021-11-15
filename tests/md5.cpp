@@ -309,3 +309,24 @@ TEST(MD5, CreateTournamentFromTestData)
 	EXPECT_EQ(tour.GetDatabase().GetNumJudoka(), 142);
 	EXPECT_EQ(tour.GetDatabase().GetNumClubs(),   21);
 }
+
+
+
+TEST(MD5, CreateTournamentFromTestData2)
+{
+	initialize();
+
+#ifdef _WIN32
+	MD5 file("../test-data/Test.md5");
+#else
+	MD5 file("test-data/Test.md5");
+#endif
+
+	ASSERT_TRUE(file);
+
+	Database db;
+	Tournament tour(file, &db);
+
+	EXPECT_EQ(db.GetNumJudoka(), 142);
+	EXPECT_EQ(db.GetNumClubs(),   21);
+}

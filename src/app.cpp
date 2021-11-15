@@ -149,7 +149,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 				return Error(Error::Type::InvalidFormat);
 
 			//TODO apply MD5 file
-			AddTournament(new Tournament(md5_file));
+			AddTournament(new Tournament(md5_file, &GetDatabase()));
 		}
 
 		return Error(Error::Type::InvalidFormat);
@@ -2186,9 +2186,10 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 
 	Gender gender_of_participants = File.GetGender();
 
-	for (auto new_judoka : File.GetParticipants())
+	for (auto dm4_judoka : File.GetParticipants())
 	{
-		auto old_judoka = GetDatabase().FindJudoka_DM4_ExactMatch(new_judoka);
+		auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);
+		/*auto old_judoka = GetDatabase().FindJudoka_DM4_ExactMatch(new_judoka);
 
 		if (!old_judoka)//No exact match
 		{
@@ -2220,14 +2221,14 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 					GetDatabase().AddJudoka(old_judoka);
 				}
 			}
-		}
+		}*/
 
 
 		//Judoka is now added/updated
 
-		if (!ParseOnly)
+		if (!ParseOnly && new_judoka)
 		{//Add to the current tournament
-			GetTournament()->AddParticipant(old_judoka);
+			GetTournament()->AddParticipant(new_judoka);
 		}
 	}
 

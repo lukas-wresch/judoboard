@@ -87,14 +87,6 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 
 
 
-Judoka* StandingData::AddJudoka(const MD5::Participant& NewJudoka)
-{
-	ZED::Log::Error("NOT IMPLEMENTED");
-	return nullptr;
-}
-
-
-
 bool StandingData::DeleteJudoka(uint32_t ID)
 {
 	for (auto it = m_Judokas.begin(); it != m_Judokas.end(); ++it)
@@ -130,7 +122,22 @@ const std::string StandingData::JudokaToJSON() const
 
 Club* StandingData::AddClub(const MD5::Club& NewClub)
 {
-	ZED::Log::Error("NOT IMPLEMENTED");
+	auto club_to_update = FindClubByName(NewClub.Name);
+	if (club_to_update)
+	{
+		//TODO update addtional club information
+		return club_to_update;
+	}
+
+	//Add the club to the database
+	auto new_club = new Club(NewClub);
+	if (!AddClub(new_club))
+	{
+		ZED::Log::Error("Could not add MD5 club to database");
+		delete new_club;
+		new_club = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -139,6 +146,9 @@ Club* StandingData::AddClub(const MD5::Club& NewClub)
 bool StandingData::AddClub(Club* NewClub)
 {
 	if (!NewClub)
+		return false;
+
+	if (FindClub(NewClub->GetUUID()))
 		return false;
 
 	m_Clubs.emplace_back(NewClub);

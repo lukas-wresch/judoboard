@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "judoboard.h"
+#include "md5.h"
 #include "../ZED/include/blob.h"
 
 
@@ -22,6 +23,19 @@ namespace Judoboard
 
 		struct Participant
 		{
+			Participant() = default;
+			Participant(const MD5::Participant& Judoka)
+			{
+				Firstname = Judoka.Firstname;
+				Lastname  = Judoka.Lastname;
+
+				if (Judoka.AgeGroup)
+					Gender = Judoka.AgeGroup->Gender;
+
+				if (Judoka.WeightInGramm > 0)
+					Weight = Judoka.WeightInGramm / 1000;
+			}
+
 			int ID = -1;
 
 			int ClubID = -1;//< 0 if no value is known

@@ -27,6 +27,10 @@ namespace Judoboard
 
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 
+		//Judoka
+		Judoka* UpdateOrAdd(const MD5::Participant& NewJudoka);
+		Judoka* UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly, std::string& Output);
+
 		//Accounts
 		const Account* AddAccount(const Account& NewAccount);
 		size_t GetNumAccounts() const { return m_Accounts.size(); }
