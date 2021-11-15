@@ -9,6 +9,14 @@ using namespace Judoboard;
 
 
 
+MatchTable::~MatchTable()
+{
+	for (auto match : m_Schedule)
+		delete match;
+}
+
+
+
 void MatchTable::SetMatID(int32_t MatID)
 {
 	Schedulable::SetMatID(MatID);

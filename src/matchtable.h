@@ -32,6 +32,8 @@ namespace Judoboard
 		MatchTable(MatchTable&) = delete;
 		MatchTable(const MatchTable&) = delete;
 
+		~MatchTable();
+
 		bool IsIncluded(const Judoka& Fighter) const;
 		size_t GetNumberOfMatches() const { return m_Schedule.size(); }
 

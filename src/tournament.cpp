@@ -1093,6 +1093,8 @@ void Tournament::GenerateSchedule()
 	if (GetStatus() != Status::Scheduled)
 		return;
 
+	for (auto match : m_Schedule)
+		delete match;
 	m_Schedule.clear();
 
 	for (auto table : m_MatchTables)
