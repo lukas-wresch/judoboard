@@ -1,8 +1,8 @@
 <h2>List of Tournaments</h2>
 
-<button class="add" style="margin-bottom: 1cm;" onclick="navigate('tournament_add.html')" id="new_tournament">New Tournament</button> 
+<button class="add" style="margin-bottom: 1cm;" onclick="navigate('tournament_add.html')" id="new_tournament">New Tournament</button>
 
-<form action="/upload/md5" method="post" id="upload_form" enctype="multipart/form-data">
+<form style="display: inline;" action="/upload/md5" method="post" id="upload_form" enctype="multipart/form-data">
     <input id="file" name="file" type="file" accept="text/*.*" onchange="document.getElementById('upload_form').submit();" hidden/>
     <button class="add" id="add" onclick="document.getElementById('file').click(); return false;">Upload MD5 File</button>
 </form>
@@ -24,7 +24,7 @@ function GetTournaments()
     console.log(response);
     var res = response.split(",");
 
-    if (res.length < 1)
+    if (res.length < 4)
       return;
 
     var table = document.getElementById("list");

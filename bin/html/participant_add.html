@@ -11,10 +11,7 @@
 
 <button class="add" id="add" onclick="return AddParticipant()">Add Participant</button>
 
-<br/>
-<br/>
-
-<form action="/upload/dm4" method="post" id="upload_form" enctype="multipart/form-data">
+<form style="display: inline;" action="/upload/dm4" method="post" id="upload_form" enctype="multipart/form-data">
     <input id="file" name="file" type="file" accept="text/*.*" onchange="document.getElementById('upload_form').submit();" hidden/>
     <button class="add" id="add" onclick="document.getElementById('file').click(); return false;">Upload DM4 File</button>
 </form>

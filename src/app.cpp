@@ -1779,14 +1779,14 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		ZED::CSV ret;
 		for (auto tournament : m_Tournaments)
 		{
-			if (tournament && tournament->GetName().length() > 0)//Filter out temporary tournament
+			if (tournament)//Filter out temporary tournament
 			{
 				ret << tournament->GetName() << tournament->GetParticipants().size() << tournament->GetSchedule().size() << tournament->GetStatus();
 				ret << (m_CurrentTournament && tournament->GetName() == m_CurrentTournament->GetName());
 			}
 		}
 
-		return (std::string)ret;
+		return ret;
 	});
 
 
