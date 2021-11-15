@@ -1247,16 +1247,20 @@ void Mat::NextState(State NextState) const
 
 				shift *= m_ScalingFactor;
 
+				if (m_Graphics["next_matches_blue_" + std::to_string(i)])//TODO improve this
 				m_Graphics["next_matches_blue_" + std::to_string(i)].StopAllAnimations()
 																	 .SetPosition(40 - 1320, (int)shift, 0)
 																	 .AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
+				if (m_Graphics["next_matches_white_" + std::to_string(i)])//TODO improve this
 				m_Graphics["next_matches_white_"  + std::to_string(i)].StopAllAnimations().Right()
 																	 .SetPosition(width - 40 + 1320, (int)shift, 0)
 																	 .AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
 
+				if (m_Graphics["next_matches_blue2_" + std::to_string(i)])//TODO improve this
 				m_Graphics["next_matches_blue2_" + std::to_string(i)].StopAllAnimations()
 																	 .SetPosition(40 - 1320, (int)shift + (int)(165.0*m_ScalingFactor), 0)
 																	 .AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
+				if (m_Graphics["next_matches_white2_" + std::to_string(i)])//TODO improve this
 				m_Graphics["next_matches_white2_"  + std::to_string(i)].StopAllAnimations().Right()
 																	 .SetPosition(width - 40 + 1320, (int)shift + (int)(165.0*m_ScalingFactor), 0)
 																	 .AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
@@ -1864,7 +1868,7 @@ bool Mat::Render(double dt) const
 		m_Graphics["osaekomi_text"].Render(renderer, dt);
 
 		//Render golden score
-		if (m_GoldenScore)
+		if (m_GoldenScore && m_Graphics["timer"])
 		{
 			//const int gs_pox_x = (int)(55.0 * m_ScalingFactor);
 			//const int gs_pox_y = (int)(78.0 * m_ScalingFactor);
