@@ -342,14 +342,14 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 				for (size_t i = 0; i < header.size(); i++)
 				{
 					if (header[i] == "Bezeichnung")
-						m_Description = data[i];
+						m_Description = Latin1ToUTF8(data[i]);
 					else if (header[i] == "VorzugsschemaPK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &m_SchemaID) != 1)
 							ZED::Log::Warn("Could not parse schema id");
 					}
 					else if (header[i] == "Ort")
-						m_Place = data[i];
+						m_Place = Latin1ToUTF8(data[i]);
 					else if (header[i] == "DatumVon")
 						m_DateStart = data[i];
 					else if (header[i] == "DatumBis")
@@ -384,7 +384,7 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 					else if (header[i] == "KampfUmPlatz5")
 						m_FifthPlaceMatch = data[i] != "-1";
 					else if (header[i] == "SportlicheLeitung")
-						m_SportAdministrator = data[i];
+						m_SportAdministrator = Latin1ToUTF8(data[i]);
 					else if (header[i] == "AnzWeitermelden")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &m_NumOfRelays) != 1)
@@ -519,7 +519,7 @@ bool MD5::ReadAgeGroups(ZED::Blob& Data)
 							ZED::Log::Warn("Could not read id of age group");
 					}
 					else if (header[i] == "Bezeichnung")
-						age_group.Name = data[i];
+						age_group.Name = Latin1ToUTF8(data[i]);
 					else if (header[i] == "MinJahrgang")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &age_group.MinBirthyear) != 1)
@@ -657,7 +657,7 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 							ZED::Log::Warn("Could not read WeightSmallerThan of weightclass");
 					}
 					else if (header[i] == "Bezeichnung")
-						new_weightclass.Description = data[i];
+						new_weightclass.Description = Latin1ToUTF8(data[i]);
 					else if (header[i] == "Status")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.Status) != 1)
@@ -879,7 +879,7 @@ bool MD5::ReadLotteryScheme(ZED::Blob& Data)
 							ZED::Log::Warn("Could not read id of lottery schema");
 					}
 					else if (header[i] == "Bezeichnung")
-						new_lotteryschema.Description = data[i];
+						new_lotteryschema.Description = Latin1ToUTF8(data[i]);
 					else if (header[i] == "VerbandPK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschema.AssociationID) != 1)
@@ -1399,9 +1399,9 @@ bool MD5::ReadParticipants(ZED::Blob& Data)
 							ZED::Log::Warn("Could not read club id of participant");
 					}
 					else if (header[i] == "Nachname")
-						new_participant.Lastname = data[i];
+						new_participant.Lastname = Latin1ToUTF8(data[i]);
 					else if (header[i] == "Vorname")
-						new_participant.Firstname = data[i];
+						new_participant.Firstname = Latin1ToUTF8(data[i]);
 					else if (header[i] == "GradPK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_participant.Graduation) != 1)
@@ -1519,9 +1519,9 @@ bool MD5::ReadAssociation(ZED::Blob& Data)
 							ZED::Log::Warn("Could not read tier id of association");
 					}
 					else if (header[i] == "Bezeichnung")
-						new_association.Description = data[i];
+						new_association.Description = Latin1ToUTF8(data[i]);
 					else if (header[i] == "Kuerzel")
-						new_association.ShortName = data[i];
+						new_association.ShortName   = Latin1ToUTF8(data[i]);
 					else if (header[i] == "Nummer")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_association.Number) != 1)
@@ -1582,17 +1582,17 @@ bool MD5::ReadClubs(ZED::Blob& Data)
 							ZED::Log::Warn("Could not read club id");
 					}
 					else if (header[i] == "Sortierbezeichnung")
-						new_club.Name_ForSorting = data[i];
+						new_club.Name_ForSorting = Latin1ToUTF8(data[i]);
 					else if (header[i] == "Bezeichnung")
-						new_club.Name = data[i];
+						new_club.Name = Latin1ToUTF8(data[i]);
 					else if (header[i] == "Nachname")
-						new_club.Representative_Lastname = data[i];
+						new_club.Representative_Lastname  = Latin1ToUTF8(data[i]);
 					else if (header[i] == "Vorname")
-						new_club.Representative_Firstname = data[i];
+						new_club.Representative_Firstname = Latin1ToUTF8(data[i]);
 					else if (header[i] == "Strasse")
-						new_club.Representative_Street = data[i];
+						new_club.Representative_Street = Latin1ToUTF8(data[i]);
 					else if (header[i] == "Ort")
-						new_club.Representative_Place = data[i];
+						new_club.Representative_Place = Latin1ToUTF8(data[i]);
 					else if (header[i] == "PLZ")
 						new_club.Representative_ZipCode = data[i];
 					else if (header[i] == "Telp")

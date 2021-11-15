@@ -160,26 +160,26 @@ TEST(MD5, ReadTestData)
 	EXPECT_EQ(   file.FindResult("Frauen u18", "-57,7 kg", 3)->Participant->Firstname, "Fia");
 	ASSERT_FALSE(file.FindResult("Frauen u18", "-57,7 kg", 4));
 
-	ASSERT_TRUE( file.FindResult("Männer u18", "-54 kg", 1));
-	EXPECT_EQ(   file.FindResult("Männer u18", "-54 kg", 1)->Participant->Firstname, "Simon");
-	EXPECT_EQ(   file.FindResult("Männer u18", "-54 kg", 2)->Participant->Firstname, "Justin");
-	EXPECT_EQ(   file.FindResult("Männer u18", "-54 kg", 3)->Participant->Firstname, "Vakhtang");
-	EXPECT_EQ(   file.FindResult("Männer u18", "-54 kg", 4)->Participant->Firstname, "Vincenzo");
-	ASSERT_FALSE(file.FindResult("Männer u18", "-54 kg", 5));
+	ASSERT_TRUE( file.FindResult(u8"M\u00e4nner u18", "-54 kg", 1));
+	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-54 kg", 1)->Participant->Firstname, "Simon");
+	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-54 kg", 2)->Participant->Firstname, "Justin");
+	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-54 kg", 3)->Participant->Firstname, "Vakhtang");
+	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-54 kg", 4)->Participant->Firstname, "Vincenzo");
+	ASSERT_FALSE(file.FindResult(u8"\u00e4änner u18", "-54 kg", 5));
 
-	ASSERT_TRUE( file.FindResult("Männer u18", "-65,5 kg", 1));
-	EXPECT_EQ(   file.FindResult("Männer u18", "-65,5 kg", 1)->Participant->Firstname, "Jason");
-	EXPECT_EQ(   file.FindResult("Männer u18", "-65,5 kg", 2)->Participant->Firstname, "Ben-N");
-	EXPECT_EQ(   file.FindResult("Männer u18", "-65,5 kg", 3)->Participant->Firstname, "Maximilian");
-	EXPECT_EQ(   file.FindResult("Männer u18", "-65,5 kg", 4)->Participant->Firstname, "Quentin");
-	ASSERT_FALSE(file.FindResult("Männer u18", "-65,5 kg", 5));
+	ASSERT_TRUE( file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 1));
+	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 1)->Participant->Firstname, "Jason");
+	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 2)->Participant->Firstname, "Ben-N");
+	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 3)->Participant->Firstname, "Maximilian");
+	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 4)->Participant->Firstname, "Quentin");
+	ASSERT_FALSE(file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 5));
 
-	ASSERT_TRUE( file.FindResult("Männer u18", "-72,6 kg", 1));
-	EXPECT_EQ(   file.FindResult("Männer u18", "-72,6 kg", 1)->Participant->Firstname, "Tobias");
-	EXPECT_EQ(   file.FindResult("Männer u18", "-72,6 kg", 2)->Participant->Firstname, "Nikita");
-	EXPECT_EQ(   file.FindResult("Männer u18", "-72,6 kg", 3)->Participant->Firstname, "Ewan F");
-	EXPECT_EQ(   file.FindResult("Männer u18", "-72,6 kg", 4)->Participant->Firstname, "Jan");
-	ASSERT_FALSE(file.FindResult("Männer u18", "-72,6 kg", 5));
+	ASSERT_TRUE( file.FindResult(u8"M\u00e4nner u18", "-72,6 kg", 1));
+	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-72,6 kg", 1)->Participant->Firstname, "Tobias");
+	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-72,6 kg", 2)->Participant->Firstname, "Nikita");
+	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-72,6 kg", 3)->Participant->Firstname, "Ewan F");
+	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-72,6 kg", 4)->Participant->Firstname, "Jan");
+	ASSERT_FALSE(file.FindResult(u8"M\u00e4nner u18", "-72,6 kg", 5));
 
 	ASSERT_TRUE( file.FindResult("Jugend u13w", "-28,1 kg", 1));
 	EXPECT_EQ(   file.FindResult("Jugend u13w", "-28,1 kg", 1)->Participant->Firstname, "Klara");
