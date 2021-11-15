@@ -1,5 +1,6 @@
 #pragma once
 #include "matchtable.h"
+#include "md5.h"
 
 
 
@@ -13,6 +14,7 @@ namespace Judoboard
 		Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight);
 		Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight, Gender Gender);
 		Weightclass(ZED::CSV& Stream, const ITournament* Tournament);
+		Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament);
 
 		static std::string GetHTMLForm();
 

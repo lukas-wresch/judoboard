@@ -287,10 +287,11 @@ namespace Judoboard
 
 		void Dump() const;
 
-		const std::vector<Association*>& GetAssociations() const { return m_Associations; }
-		const std::vector<Club*>&        GetClubs()		   const { return m_Clubs; }
-		const std::vector<Participant*>& GetParticipants() const { return m_Participants; }
-		const std::vector<Result>&       GetResults()	   const { return m_Results; }
+		const std::vector<Association*>& GetAssociations()  const { return m_Associations; }
+		const std::vector<Club*>&        GetClubs()		    const { return m_Clubs; }
+		const std::vector<Weightclass*>& GetWeightclasses() const { return m_Weightclasses; }
+		const std::vector<Participant*>& GetParticipants()  const { return m_Participants; }
+		const std::vector<Result>&       GetResults()	    const { return m_Results; }
 
 		int GetNumAssociations()  const { return m_NumAssociations; }//Returns the number of associations that should be in the file according to the header, not the actual number of associations read
 		int GetNumClubs()		  const { return m_NumClubs; }//Returns the number of clubs that should be in the file according to the header, not the actual number of clubs read

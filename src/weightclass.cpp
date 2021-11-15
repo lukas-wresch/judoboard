@@ -39,6 +39,29 @@ Weightclass::Weightclass(ZED::CSV& Stream, const ITournament* Tournament) : Matc
 
 
 
+Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament) : MatchTable(Tournament)
+{
+	SetName(Weightclass.Description);
+
+	if (Weightclass.WeightLargerThan > 0)
+		m_MinWeight = Weightclass.WeightLargerThan;
+	if (Weightclass.WeightSmallerThan > 0)
+		m_MaxWeight = Weightclass.WeightSmallerThan;
+
+	if (Weightclass.AgeGroup)
+	{
+		m_Gender = Weightclass.AgeGroup->Gender;
+		m_GenderEnforced = true;
+
+		//TODO convert birthyear to actual age limit
+		//m_MinAge = Weightclass.AgeGroup->MinBirthyear;
+		//m_MaxAge = Weightclass.AgeGroup->MaxBirthyear;
+		//m_AgeEnforced = true;
+	}
+}
+
+
+
 void Weightclass::operator >> (ZED::CSV& Stream) const
 {
 	MatchTable::operator >>(Stream);

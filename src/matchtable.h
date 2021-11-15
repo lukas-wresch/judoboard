@@ -49,7 +49,7 @@ namespace Judoboard
 
 		const Match* GetMatch(size_t Index) const { if (Index >= m_Schedule.size()) return nullptr; return m_Schedule[Index]; }
 
-		bool AddParticipant(Judoka* NewParticipant);
+		bool AddParticipant(Judoka* NewParticipant, bool Force = false);
 		const std::vector<const Match*> FindMatches(const Judoka& Fighter1, const Judoka& Fighter2) const;//Returns all matches where Fighter1 and Fighter2 fight against each other
 
 		bool Contains(const Judoka* Judoka) const;

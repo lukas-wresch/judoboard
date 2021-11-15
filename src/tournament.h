@@ -75,6 +75,7 @@ namespace Judoboard
 		const MatchTable* FindMatchTable(uint32_t ID) const;
 		MatchTable* FindMatchTable(const UUID& ID);
 		const MatchTable* FindMatchTable(const UUID& ID) const;
+		MatchTable* FindMatchTableByName(const std::string& Name);
 		int FindMatchTableIndex(uint32_t ID) const;
 
 		//Judoka

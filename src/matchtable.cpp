@@ -30,10 +30,14 @@ bool MatchTable::IsIncluded(const Judoka& Fighter) const
 
 
 
-bool MatchTable::AddParticipant(Judoka* NewParticipant)
+bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 {
-	if (!NewParticipant || !IsElgiable(*NewParticipant))
+	if (!NewParticipant)
 		return false;
+
+	if (!Force)//Don't check if we are adding we are forcing the judoka in this match table
+		if (!IsElgiable(*NewParticipant))//Is the judoka allowed in this match table?
+			return false;
 
 	m_Participants.push_back(NewParticipant);
 	return true;

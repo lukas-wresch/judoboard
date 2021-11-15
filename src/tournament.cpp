@@ -46,17 +46,38 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			m_StandingData.AddClub(new Club(*club));
 	}
 
+	//Add weightclasses
+	for (auto weightclass : File.GetWeightclasses())
+	{
+		m_MatchTables.emplace_back(new Weightclass(*weightclass, this));
+	}
+
 	//Add judoka
 	for (auto judoka : File.GetParticipants())
 	{
+		Judoka* new_judoka = nullptr;
+
 		if (pDatabase)
 		{
 			Judoka* new_judoka = pDatabase->UpdateOrAdd(*judoka);
-			AddParticipant(new_judoka);
+			//AddParticipant(new_judoka);
+			if (new_judoka)
+				m_StandingData.AddJudoka(new_judoka);//Add participant
 		}
 
 		else
-			AddParticipant(new Judoka(*judoka));
+			Judoka* new_judoka = new Judoka(*judoka);
+
+		if (new_judoka)
+		{
+			AddParticipant(new_judoka);
+
+			if (judoka->Weightclass)
+			{
+				auto match_table = FindMatchTableByName(judoka->Weightclass->Description);
+				match_table->AddParticipant(new_judoka, true);//Add with force
+			}
+		}
 	}
 }
 
@@ -663,6 +684,16 @@ const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 {
 	for (auto table : m_MatchTables)
 		if (table && table->GetUUID() == ID)
+			return table;
+	return nullptr;
+}
+
+
+
+MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
+{
+	for (auto table : m_MatchTables)
+		if (table && table->GetName() == Name)
 			return table;
 	return nullptr;
 }
