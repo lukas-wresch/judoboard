@@ -154,6 +154,8 @@ bool Weightclass::IsElgiable(const Judoka& Fighter) const
 
 void Weightclass::GenerateSchedule()
 {
+	for (auto match : m_Schedule)
+		delete match;
 	m_Schedule.clear();
 
 	if (GetParticipants().size() <= 3)
