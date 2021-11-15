@@ -25,6 +25,7 @@ namespace Judoboard
 		const std::unordered_map<uint32_t, Judoka*>& GetAllJudokas() const { return m_Judokas; }
 		std::unordered_map<uint32_t, Judoka*>& GetAllJudokas() { return m_Judokas; }
 		size_t GetNumJudoka() const { return m_Judokas.size(); }
+		size_t GetNumClubs()  const { return m_Clubs.size(); }
 
 		Judoka* FindJudoka(uint32_t ID);
 		const Judoka* FindJudoka(uint32_t ID) const;

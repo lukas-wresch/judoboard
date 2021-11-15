@@ -118,6 +118,7 @@ TEST(MD5, ReadTestData)
 	ASSERT_TRUE( file.FindResult("Jugend u15 m", "-37 kg", 1));
 	EXPECT_EQ(   file.FindResult("Jugend u15 m", "-37 kg", 1)->Participant->Firstname, "Luca");
 	EXPECT_EQ(   file.FindResult("Jugend u15 m", "-37 kg", 2)->Participant->Firstname, "Vincent");
+	EXPECT_EQ(   file.FindResult("Jugend u15 m", "-37 kg", 2)->Participant->Lastname,  u8"B\u00f6");
 	ASSERT_FALSE(file.FindResult("Jugend u15 m", "-37 kg", 3));
 
 	ASSERT_TRUE( file.FindResult("Jugend u15 m", "-40 kg", 1));
@@ -287,4 +288,24 @@ TEST(MD5, ReadTestData)
 	EXPECT_EQ(   file.FindResult("Jugend u13m", "-47,7 kg", 3)->Participant->Firstname, "Luca");
 	EXPECT_EQ(   file.FindResult("Jugend u13m", "-47,7 kg", 4)->Participant->Firstname, "Titus");
 	ASSERT_FALSE(file.FindResult("Jugend u13m", "-47,7 kg", 5));
+}
+
+
+
+TEST(MD5, CreateTournamentFromTestData)
+{
+	initialize();
+
+#ifdef _WIN32
+	MD5 file("../test-data/Test.md5");
+#else
+	MD5 file("test-data/Test.md5");
+#endif
+
+	ASSERT_TRUE(file);
+
+	Tournament tour(file);
+
+	EXPECT_EQ(tour.GetDatabase().GetNumJudoka(), 142);
+	EXPECT_EQ(tour.GetDatabase().GetNumClubs(),   21);
 }
