@@ -39,8 +39,8 @@ namespace Judoboard
 			Result(Fighter Winner, Score Score, uint32_t Time = 0)
 			{
 				m_Winner = Fighter2Winner(Winner);
-				m_Score = Score;
-				m_Time = Time;
+				m_Score  = Score;
+				m_Time   = Time;
 			}
 
 			Winner m_Winner = Winner::Draw;
@@ -111,7 +111,7 @@ namespace Judoboard
 
 	private:
 		void SetState(Status NewState) { m_State = NewState; }
-		void SetResult(const Result& Result) { m_Result = Result; }
+		void SetResult(const Result& Result) { m_Result = Result; SetState(Status::Concluded); }
 
 		struct {
 			Judoka* m_Judoka = nullptr;

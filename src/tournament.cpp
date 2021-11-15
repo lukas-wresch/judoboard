@@ -97,6 +97,11 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		Match* new_match = new Match(this, (Judoka*)match.White->pUserData, (Judoka*)match.Red->pUserData);
 
+		if (match.WinnerID == match.WhiteID)
+			new_match->SetResult(Match::Result(Fighter::White, (Match::Score)match.ScoreWinner, match.Time));
+		else
+			new_match->SetResult(Match::Result(Fighter::Blue,  (Match::Score)match.ScoreWinner, match.Time));
+
 		if (match.Weightclass && match.Weightclass->pUserData)
 		{
 			auto match_table = (Weightclass*)match.Weightclass->pUserData;
@@ -105,6 +110,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		m_Schedule.emplace_back(new_match);
 	}
+
+	Save();
 }
 
 
