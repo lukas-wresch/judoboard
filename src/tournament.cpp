@@ -253,8 +253,8 @@ void Tournament::ConnectToDatabase(Database& db)
 
 	for (auto it = m_StandingData.GetAllJudokas().begin(); it != m_StandingData.GetAllJudokas().end();)
 	{
-		auto* db_ref = db.FindJudoka(it->second->GetUUID());
-		if (db_ref)
+		auto db_ref = db.FindJudoka(it->second->GetUUID());
+		if (db_ref && it->second != db_ref)//Pointing to different objects
 		{
 			delete it->second;
 			it = m_StandingData.GetAllJudokas().erase(it);
@@ -264,7 +264,7 @@ void Tournament::ConnectToDatabase(Database& db)
 			++it;
 	}
 
-	for (auto* judoka : judoka_to_add)
+	for (auto judoka : judoka_to_add)
 		m_StandingData.AddJudoka(judoka);
 
 

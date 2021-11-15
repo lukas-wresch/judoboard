@@ -107,7 +107,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			//ZED::Log::Debug(Request.m_Body.substr(pos + 4, boundary_end - pos - 4));
 
 			//upload_content.Trim(content_length);
-			DM4 dm4_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4));
+			DM4 dm4_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
 
 			if (!dm4_file)
 				return Error(Error::Type::InvalidFormat);
@@ -118,11 +118,9 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			if (!success)
 				return "Parsing FAILED<br/><br/>" + output;
 
-			AddDM4File(dm4_file);
+			AddDM4File(dm4_file);//apply DM4 file
 
 			return "Parsing OK<br/><br/>" + output;
-
-			//TODO apply DM4 file
 		}
 		
 		return Error(Error::Type::InvalidFormat);
@@ -143,13 +141,14 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
 
-			MD5 md5_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4));
+			MD5 md5_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
 
 			if (!md5_file)
 				return Error(Error::Type::InvalidFormat);
 
-			//TODO apply MD5 file
-			AddTournament(new Tournament(md5_file, &GetDatabase()));
+			AddTournament(new Tournament(md5_file, &GetDatabase()));//apply MD5 file
+
+			return "Parsing OK";
 		}
 
 		return Error(Error::Type::InvalidFormat);
@@ -1780,7 +1779,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		ZED::CSV ret;
 		for (auto tournament : m_Tournaments)
 		{
-			if (tournament)
+			if (tournament && tournament->GetName().length() > 0)//Filter out temporary tournament
 			{
 				ret << tournament->GetName() << tournament->GetParticipants().size() << tournament->GetSchedule().size() << tournament->GetStatus();
 				ret << (m_CurrentTournament && tournament->GetName() == m_CurrentTournament->GetName());
