@@ -1372,9 +1372,9 @@ void Mat::UpdateGraphics() const
 		m_Graphics["white_name"].UpdateTexture(renderer, GetFighter(Fighter::White).GetName(), ZED::Color(0, 0, 0));
 		m_Graphics["blue_name" ].UpdateTexture(renderer, GetFighter(Fighter::Blue ).GetName(), ZED::Color(255, 255, 255));
 
-		while (m_Graphics["white_name"]->GetWidth() > std::max((width - 25.0*m_ScalingFactor)/2, 100.0))
+		while (m_Graphics["white_name"] && m_Graphics["white_name"]->GetWidth() > std::max((width - 25.0*m_ScalingFactor)/2, 100.0))
 			m_Graphics["white_name"].Shorten(renderer);
-		while (m_Graphics["blue_name" ]->GetWidth() > std::max((width - 25.0*m_ScalingFactor)/2, 100.0))
+		while (m_Graphics["blue_name" ] && m_Graphics["blue_name" ]->GetWidth() > std::max((width - 25.0*m_ScalingFactor)/2, 100.0))
 			m_Graphics["blue_name"].Shorten(renderer);
 
 	//fall through
@@ -1452,10 +1452,9 @@ void Mat::UpdateGraphics() const
 
 				const int new_width = m_OsaekomiTimer[(int)fighter].GetElapsedTime() * osaekomi_max_width / (EndTimeOfOsaekomi() * 1000);
 
-				int new_text_x = new_width - osaekomi_text->GetWidth() - 2;
-
-				if (new_width > osaekomi_bar.m_width || osaekomi_bar.m_a <= 0.0)
+				if (osaekomi_text && new_width > osaekomi_bar.m_width || osaekomi_bar.m_a <= 0.0)
 				{
+					const int new_text_x = new_width - osaekomi_text->GetWidth() - 2;
 					osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
 
 					m_Graphics["osaekomi_bar_border"].SetPosition(0, osaekomi_y, 255);
@@ -1463,7 +1462,7 @@ void Mat::UpdateGraphics() const
 					m_Graphics["osaekomi_bar_border"].m_height = (int)(100.0 * m_ScalingFactor) + 10;
 					m_Graphics["osaekomi_bar_border"].m_color  = ZED::Color(0, 0, 0);
 
-					
+
 					osaekomi_bar.SetPosition(0, osaekomi_y + 5, 255);
 
 					//osaekomi_bar.m_color = ZED::Color(30, 150, 30);
