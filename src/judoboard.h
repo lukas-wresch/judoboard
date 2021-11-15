@@ -30,4 +30,17 @@ namespace Judoboard
 
 		return ret;
 	}
+
+
+
+	inline void ReplaceAll(std::string& Haystack, const std::string& Needle, const std::string& ReplaceBy)
+	{
+		size_t start_pos = 0;
+
+		while ((start_pos = Haystack.find(Needle, start_pos)) != std::string::npos)
+		{
+			Haystack.replace(start_pos, Needle.length(), ReplaceBy);
+			start_pos += ReplaceBy.length();
+		}
+	}
 }

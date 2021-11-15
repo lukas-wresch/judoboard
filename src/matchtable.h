@@ -38,6 +38,8 @@ namespace Judoboard
 		virtual Type GetType() const { return Type::Unknown; }
 		virtual bool IsEditable() const override { return true; }
 
+		virtual bool AddMatch(Match* NewMatch);//Add a match manually to the match table. Use only for manual cases
+
 		virtual const std::vector<Match*> GetSchedule() override { return m_Schedule; }
 		virtual uint32_t GetRecommendedNumMatchesBeforeBreak() const override { return m_RecommendedNumMatches_Before_Break; }
 
@@ -58,7 +60,11 @@ namespace Judoboard
 		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
 
 		const std::string GetName() const override { return m_Name; }
-		void SetName(const std::string& Name) { m_Name = Name; }
+		void SetName(const std::string& Name)
+		{
+			m_Name = Name;
+			ReplaceAll(m_Name, ",", "&#44;");//Escape all ','
+		}
 
 		//Serialization
 		virtual const std::string ToString() const;

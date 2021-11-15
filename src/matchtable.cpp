@@ -30,6 +30,18 @@ bool MatchTable::IsIncluded(const Judoka& Fighter) const
 
 
 
+bool MatchTable::AddMatch(Match* NewMatch)
+{
+	if (!NewMatch)
+		return false;
+
+	NewMatch->SetMatchTable(this);
+	m_Schedule.emplace_back(NewMatch);
+	return true;
+}
+
+
+
 bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 {
 	if (!NewParticipant)

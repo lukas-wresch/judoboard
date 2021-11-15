@@ -301,6 +301,15 @@ bool MD5::Parse(ZED::Blob&& Data)
 			judoka->Club        = FindClub(judoka->ClubID);
 		}
 
+		for (auto& match : m_Matches)
+		{
+			match.AgeGroup    = FindAgeGroup(match.AgeGroupID);
+			match.Weightclass = FindWeightclass(match.AgeGroupID, match.WeightclassID);
+
+			match.White = FindParticipant(match.WhiteID);
+			match.Red   = FindParticipant(match.RedID);
+		}
+
 		for (auto& result : m_Results)
 		{
 			result.Participant = FindParticipant(result.ParticipantID);

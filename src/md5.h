@@ -128,6 +128,8 @@ namespace Judoboard
 
 			bool MoneyIncreased = false;
 			int  WeightInGramm = -1;
+
+			mutable void* pUserData = nullptr;
 		};
 
 		struct Weightclass
@@ -160,6 +162,8 @@ namespace Judoboard
 
 			std::string Identifier;
 			std::string ForReference;
+
+			mutable void* pUserData = nullptr;
 		};
 
 		struct Lottery
@@ -197,18 +201,24 @@ namespace Judoboard
 		struct Match
 		{
 			int AgeGroupID = -1;
+			const AgeGroup* AgeGroup = nullptr;
+
 			int WeightclassID = -1;
+			const Weightclass* Weightclass = nullptr;
+
 			int MatchNo = -1;
 
 			int StartNoRed = -1;
 			int RedID = -1;
 			int RedFromMatch = -1;
 			int RedTyp = -1;
+			const Participant* Red = nullptr;
 
 			int StartNoWhite = -1;
 			int WhiteID = -1;
 			int WhiteFromMatch = -1;
 			int WhiteTyp = -1;
+			const Participant* White = nullptr;
 
 			int WinnerID = -1;
 			int WinnerMatchNo = -1;
@@ -291,6 +301,7 @@ namespace Judoboard
 		const std::vector<Club*>&        GetClubs()		    const { return m_Clubs; }
 		const std::vector<Weightclass*>& GetWeightclasses() const { return m_Weightclasses; }
 		const std::vector<Participant*>& GetParticipants()  const { return m_Participants; }
+		const std::vector<Match>&		 GetMatches()	    const { return m_Matches; }
 		const std::vector<Result>&       GetResults()	    const { return m_Results; }
 
 		int GetNumAssociations()  const { return m_NumAssociations; }//Returns the number of associations that should be in the file according to the header, not the actual number of associations read

@@ -49,7 +49,9 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add weightclasses
 	for (auto weightclass : File.GetWeightclasses())
 	{
-		m_MatchTables.emplace_back(new Weightclass(*weightclass, this));
+		auto new_weightclass = new Weightclass(*weightclass, this);
+		weightclass->pUserData = new_weightclass;
+		m_MatchTables.emplace_back(new_weightclass);
 	}
 
 	//Add judoka
@@ -59,8 +61,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		if (pDatabase)
 		{
-			Judoka* new_judoka = pDatabase->UpdateOrAdd(*judoka);
-			//AddParticipant(new_judoka);
+			new_judoka = pDatabase->UpdateOrAdd(*judoka);
+			
 			if (new_judoka)
 				m_StandingData.AddJudoka(new_judoka);//Add participant
 		}
@@ -70,14 +72,38 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		if (new_judoka)
 		{
+			judoka->pUserData = new_judoka;
 			AddParticipant(new_judoka);
 
 			if (judoka->Weightclass)
 			{
-				auto match_table = FindMatchTableByName(judoka->Weightclass->Description);
-				match_table->AddParticipant(new_judoka, true);//Add with force
+				auto match_table = (Weightclass*)judoka->Weightclass->pUserData;
+				if (match_table)
+					match_table->AddParticipant(new_judoka, true);//Add with force
 			}
 		}
+	}
+
+	//Add matches
+	for (auto& match : File.GetMatches())
+	{
+		if (match.WhiteID == match.RedID)//Filter dummy matches
+			continue;
+
+		if (!match.White || !match.Red)
+			continue;
+		if (!match.White->pUserData || !match.Red->pUserData)
+			continue;
+
+		Match* new_match = new Match(this, (Judoka*)match.White->pUserData, (Judoka*)match.Red->pUserData);
+
+		if (match.Weightclass && match.Weightclass->pUserData)
+		{
+			auto match_table = (Weightclass*)match.Weightclass->pUserData;
+			match_table->AddMatch(new_match);//Add match to weightclass
+		}
+
+		m_Schedule.emplace_back(new_match);
 	}
 }
 
