@@ -1458,8 +1458,11 @@ void Mat::UpdateGraphics() const
 
 				if (osaekomi_text && new_width > osaekomi_bar.m_width || osaekomi_bar.m_a <= 0.0)
 				{
-					const int new_text_x = new_width - osaekomi_text->GetWidth() - 2;
-					osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
+					if (osaekomi_text)
+					{
+						const int new_text_x = new_width - osaekomi_text->GetWidth() - 2;
+						osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
+					}
 
 					m_Graphics["osaekomi_bar_border"].SetPosition(0, osaekomi_y, 255);
 					m_Graphics["osaekomi_bar_border"].m_width  = new_width + 5;
