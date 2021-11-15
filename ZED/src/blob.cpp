@@ -101,6 +101,53 @@ void Blob::Trim(size_t NewSize)
 
 
 
+size_t Blob::Find(char* SearchString)
+{
+	const int len = strlen(SearchString);
+	int j = 0;
+
+	for (size_t i = 0; i < m_Size; i++)
+	{
+		if (m_Data[i] != SearchString[j])
+			j = 0;
+		else
+		{
+			j++;
+			if (j == len)
+				return i - len;
+		}
+	}
+
+	return 0;
+}
+
+
+
+size_t Blob::FindLast(char* SearchString)
+{
+	//TODO this could be made faster by doing a reverse search
+
+	const int len = strlen(SearchString);
+	int j = 0;
+	size_t ret = 0;
+
+	for (size_t i = 0; i < m_Size; i++)
+	{
+		if (m_Data[i] != SearchString[j])
+			j = 0;
+		else
+		{
+			j++;
+			if (j == len)
+				ret = i - len;
+		}
+	}
+
+	return ret;
+}
+
+
+
 bool Blob::InsertAt(size_t Index, const void* Data, size_t BytesToWrite)
 {
 	if (Index + BytesToWrite >= m_Size)

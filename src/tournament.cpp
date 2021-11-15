@@ -5,6 +5,7 @@
 #include "tournament.h"
 #include "database.h"
 #include "weightclass.h"
+#include "md5.h"
 
 
 
@@ -24,6 +25,16 @@ Tournament::Tournament(const std::string& Name) : m_Name(Name)
 Tournament::Tournament(const std::string& Name, const RuleSet* RuleSet) : m_pDefaultRules(RuleSet), m_Name(Name)
 {
 	Load("tournaments/" + Name);
+}
+
+
+
+Tournament::Tournament(const MD5& File)
+{
+	m_Name = File.GetDescription();
+
+	for (auto judoka : File.GetParticipants())
+		AddParticipant(new Judoka(*judoka));
 }
 
 

@@ -91,26 +91,23 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		if (!error)
 			return error;
 
-		ZED::Log::Debug(Request.m_Body);
+		//ZED::Log::Debug(Request.m_Body);
 
-
-		//auto header = Request.m_RequestInfo.FindHeader("Content-Length");
-		//int content_length = -1;
-		//if (header)
-			//content_length = ZED::Core::ToInt(*header);
-
-		auto pos = Request.m_Body.find("\r\n\r\n");
-		if (pos != std::string::npos)
+		auto pos = Request.m_Body.Find("\r\n\r\n");
+		if (pos != 0)
 		{
 			//std::string body_after_boundary = Request.m_Body.substr(pos + 4)
-			auto boundary_end = Request.m_Body.rfind("\r\n------WebKitFormBoundary");
+			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
 
-			auto upload_content = ZED::Blob(Request.m_Body.substr(pos + 4, boundary_end - pos - 4));
+			if (boundary_end == 0)
+				return Error(Error::Type::InvalidFormat);
 
-			ZED::Log::Debug(Request.m_Body.substr(pos + 4, boundary_end - pos - 4));
+			//auto upload_content = ZED::Blob(Request.m_Body.substr(pos + 4, boundary_end - pos - 4));
+
+			//ZED::Log::Debug(Request.m_Body.substr(pos + 4, boundary_end - pos - 4));
 
 			//upload_content.Trim(content_length);
-			DM4 dm4_file(upload_content);
+			DM4 dm4_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4));
 
 			if (!dm4_file)
 				return Error(Error::Type::InvalidFormat);
@@ -131,41 +128,28 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error(Error::Type::InvalidFormat);
 	});
 
-	//File uploads
-
-	m_Server.RegisterResource("/upload/dm4", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-
-		ZED::Log::Debug(Request.m_Body);
-
-		auto pos = Request.m_Body.find("\r\n\r\n");
-		if (pos != std::string::npos)
-		{
-			std::string upload_content = Request.m_Body.substr(pos + 4);
-			//DM4 dm4_file(upload_content);
-
-			//TODO apply DM4 file
-		}
-		
-		return Error(Error::Type::InvalidFormat);
-	});
-
 	m_Server.RegisterResource("/upload/md5", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
 
-		ZED::Log::Debug(Request.m_Body);
+		//ZED::Log::Debug(Request.m_Body);
 
-		auto pos = Request.m_Body.find("\r\n\r\n");
-		if (pos != std::string::npos)
+		auto pos = Request.m_Body.Find("\r\n\r\n");
+		if (pos != 0)
 		{
-			std::string upload_content = Request.m_Body.substr(pos + 4);
-			//MD5 md5_file(upload_content);
+			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
+
+			if (boundary_end == 0)
+				return Error(Error::Type::InvalidFormat);
+
+			MD5 md5_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4));
+
+			if (!md5_file)
+				return Error(Error::Type::InvalidFormat);
 
 			//TODO apply MD5 file
+			AddTournament(new Tournament(md5_file));
 		}
 
 		return Error(Error::Type::InvalidFormat);
@@ -257,7 +241,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/tournament/is_open", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/tournament/is_open", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -268,14 +252,14 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/get_schedule", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/get_schedule", [this](auto& Request) -> std::string {
 		if (!GetTournament())
 			return std::string("No tournament is open");
 		return GetTournament()->Schedule2String();
 	});
 
 
-	m_Server.RegisterResource("/ajax/participants/get", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/participants/get", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -286,7 +270,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/get_masterschedule", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/get_masterschedule", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -297,7 +281,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/masterschedule/move_up", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/masterschedule/move_up", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -314,7 +298,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/masterschedule/move_down", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/masterschedule/move_down", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -331,7 +315,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/match/get", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/match/get", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -353,7 +337,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/masterschedule/set_mat", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/masterschedule/set_mat", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -385,7 +369,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/match/set_rule", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/match/set_rule", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -412,7 +396,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/match/move_up", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/match/move_up", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -429,7 +413,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return std::string();
 	});
 
-	m_Server.RegisterResource("/ajax/match/move_down", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/match/move_down", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -446,7 +430,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return std::string();
 	});
 
-	m_Server.RegisterResource("/ajax/match/delete", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/match/delete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -463,7 +447,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return std::string();
 	});
 
-	m_Server.RegisterResource("/ajax/match/get_log", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/match/get_log", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -484,7 +468,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/mat/hajime", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/hajime", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -505,7 +489,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 	//Generic pause. Will call Mate() or Sonomama() if it's more appropriate
-	m_Server.RegisterResource("/ajax/mat/pause", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/pause", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -529,7 +513,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();
 	});
 
-	m_Server.RegisterResource("/ajax/mat/mate", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/mate", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -549,7 +533,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/mat/sonomama", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/sonomama", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -569,7 +553,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/mat/start_match", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/start_match", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -594,7 +578,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/mat/end_match", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/end_match", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -618,7 +602,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 	//Serialization
-	m_Server.RegisterResource("/ajax/mat/current_time", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/current_time", [this](auto& Request) -> std::string {
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
@@ -632,7 +616,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return std::to_string(mat->GetTimeElapsed()) + "," + (mat->IsHajime() ? "1" : "0");
 	});
 
-	m_Server.RegisterResource("/ajax/mat/get_score", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/get_score", [this](auto& Request) -> std::string {
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
@@ -649,7 +633,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return ret;
 	});
 
-	m_Server.RegisterResource("/ajax/mat/get_osaekomilist", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/get_osaekomilist", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -672,7 +656,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return (std::string)ret;
 	});
 
-	m_Server.RegisterResource("/ajax/mat/screenshot", [this](auto Request) -> ZED::Blob {
+	m_Server.RegisterResource("/ajax/mat/screenshot", [this](auto& Request) -> ZED::Blob {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return (std::string)Error(Error::Type::NotLoggedIn);
@@ -703,7 +687,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	{
 		Fighter fighter = (Fighter)i;
 
-		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+ippon", [this, fighter](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+ippon", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -720,7 +704,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-ippon", [this, fighter](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-ippon", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -737,7 +721,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+wazaari", [this, fighter](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+wazaari", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -754,7 +738,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-wazaari", [this, fighter](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-wazaari", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -771,7 +755,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/osaekomi", [this, fighter](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/osaekomi", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -788,7 +772,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+shido", [this, fighter](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+shido", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -805,7 +789,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-shido", [this, fighter](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-shido", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -822,7 +806,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+hansokumake", [this, fighter](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+hansokumake", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -842,7 +826,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-hansokumake", [this, fighter](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-hansokumake", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -859,7 +843,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+medic", [this, fighter](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+medic", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -876,7 +860,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-medic", [this, fighter](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-medic", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -893,7 +877,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/hantei", [this, fighter](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/hantei", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -914,7 +898,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/+draw", [this](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/+draw", [this](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -935,7 +919,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
-		m_Server.RegisterResource("/ajax/mat/+golden_score", [this](auto Request) -> std::string {
+		m_Server.RegisterResource("/ajax/mat/+golden_score", [this](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -954,7 +938,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	}
 
 
-	m_Server.RegisterResource("/ajax/mat/tokeda", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/tokeda", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -972,7 +956,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/mat/names_on_mat", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/names_on_mat", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1007,7 +991,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 
 
-	m_Server.RegisterResource("/ajax/judoka/autocomplete", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/judoka/autocomplete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1021,7 +1005,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/judoka/add", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/judoka/add", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1043,7 +1027,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/judoka/get", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/judoka/get", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1061,7 +1045,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/judoka/list", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/judoka/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1076,7 +1060,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/judoka/update", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/judoka/update", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1109,7 +1093,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/judoka/delete", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/judoka/delete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
 			return error;
@@ -1130,7 +1114,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/club/list", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/club/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1139,7 +1123,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/participant/add", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/participant/add", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1170,7 +1154,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/participant/remove", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/participant/remove", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1187,7 +1171,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/account/add", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/account/add", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1214,7 +1198,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/account/update", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/account/update", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1252,7 +1236,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/account/delete", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/account/delete", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1275,7 +1259,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/account/list", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/account/list", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1293,7 +1277,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/account/get", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/account/get", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1314,7 +1298,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/nonces/list", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/nonces/list", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1335,7 +1319,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/matchtable/list", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/matchtable/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1357,7 +1341,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/matchtable/get_form", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/matchtable/get_form", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1379,7 +1363,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/matchtable/add", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/matchtable/add", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1431,7 +1415,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 
 
-	m_Server.RegisterResource("/ajax/matchtable/update", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/matchtable/update", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1506,7 +1490,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/matchtable/delete", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/matchtable/delete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1531,7 +1515,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/matchtable/get", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/matchtable/get", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1552,7 +1536,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 
 
-	m_Server.RegisterResource("/ajax/match/add", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/match/add", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1604,7 +1588,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 	//Rule Sets
 
-	m_Server.RegisterResource("/ajax/rule/add", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/rule/add", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1626,7 +1610,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/rule/update", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/rule/update", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1653,7 +1637,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/rule/get", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/rule/get", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1671,7 +1655,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return (std::string)ret;
 	});
 
-	m_Server.RegisterResource("/ajax/rule/list", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/rule/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1698,7 +1682,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 	//Tournaments
 
-	m_Server.RegisterResource("/ajax/tournament/add", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/tournament/add", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1727,7 +1711,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/tournament/get", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/tournament/get", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1744,7 +1728,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return ret;
 	});
 
-	m_Server.RegisterResource("/ajax/tournament/open", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/tournament/open", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1760,7 +1744,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/tournament/close", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/tournament/close", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1774,7 +1758,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/tournament/empty", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/tournament/empty", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
 			return error;
@@ -1788,7 +1772,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/tournament/list", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/tournament/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1809,7 +1793,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 	//Slave
 
-	m_Server.RegisterResource("/ajax/slave/connection_test", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/slave/connection_test", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 
 		if (!IsSlave())
@@ -1820,7 +1804,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 	//Slave mat commands
 
-	m_Server.RegisterResource("/ajax/slave/set_mat_id", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/slave/set_mat_id", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 
 		if (!IsSlave())
@@ -1837,7 +1821,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/slave/is_mat_open", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/slave/is_mat_open", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 
 		if (!IsSlave())
@@ -1859,7 +1843,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/slave/open_mat", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/slave/open_mat", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 
 		if (!IsSlave())
@@ -1881,7 +1865,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/slave/close_mat", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/slave/close_mat", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 
 		if (!IsSlave())
@@ -1903,7 +1887,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/slave/get_mat_status", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/slave/get_mat_status", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 
 		if (!IsSlave())
@@ -1919,14 +1903,14 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/slave/start_match", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/slave/start_match", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 
 		if (!IsSlave())
 			return "You are not allowed to connect";
 
 		int matID         = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		ZED::CSV matchCSV = Request.m_Body;
+		ZED::CSV matchCSV(Request.m_Body);
 
 		for (auto mat : m_Mats)
 		{
@@ -1944,7 +1928,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return "Mat not found";
 	});
 
-	m_Server.RegisterResource("/ajax/slave/end_match", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/slave/end_match", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 
 		if (!IsSlave())
@@ -1968,7 +1952,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return "Operation failed";
 	});
 
-	m_Server.RegisterResource("/ajax/config/shutdown", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/config/shutdown", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
 			return error;
@@ -1992,7 +1976,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	});
 
 
-	m_Server.RegisterResource("/ajax/config/testscreen", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/config/testscreen", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
 			return error;
@@ -2009,7 +1993,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		});
 
 
-	m_Server.RegisterResource("/ajax/config/demo", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/config/demo", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
 			return error;
@@ -2027,7 +2011,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 	//Commands slave -> master
 
-	m_Server.RegisterResource("/ajax/master/connection_test", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/master/connection_test", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 
 		if (!IsMaster())
@@ -2036,7 +2020,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/config/connect_to_master", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/config/connect_to_master", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
 			return error;
@@ -2054,7 +2038,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/master/mat_available", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/master/mat_available", [this](auto& Request) -> std::string {
 		if (!IsMaster())
 			return "You are not allowed to connect";
 
@@ -2076,7 +2060,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/master/find_participant", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/master/find_participant", [this](auto& Request) -> std::string {
 		if (!IsMaster())
 			return "You are not allowed to connect";
 
@@ -2094,7 +2078,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return csv;
 	});
 
-	m_Server.RegisterResource("/ajax/master/post_match_result", [this](auto Request) -> std::string {
+	m_Server.RegisterResource("/ajax/master/post_match_result", [this](auto& Request) -> std::string {
 		if (!IsMaster())
 			return "You are not allowed to connect";
 

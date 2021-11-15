@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include "core.h"
+#include "blob.h"
 
 
 
@@ -78,12 +79,10 @@ namespace ZED
 			if (Input.is_open())
 				m_stream << Input.rdbuf();
 		}
-
-		/*~CSV()
+		CSV(const ZED::Blob& Data)
 		{
-			//m_stream.~basic_stringstream();
-			//m_line.~basic_string();
-		}*/
+			m_stream.write((const char*)Data, Data.GetSize());
+		}
 
 		template<typename T>
 		CSV& operator << (const T& Value)

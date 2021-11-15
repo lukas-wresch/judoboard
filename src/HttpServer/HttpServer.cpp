@@ -21,10 +21,19 @@ const std::string HttpServer::LoadFile(const std::string& Filename)
 
 
 
+std::string HttpServer::DecodeURLEncoded(const ZED::Blob& Input, const char* VariableName)
+{
+    char buffer[4096] = {};
+    mg_get_var((const char*)Input, Input.GetSize(), VariableName, buffer, sizeof(buffer));
+    return buffer;
+}
+
+
+
 std::string HttpServer::DecodeURLEncoded(const std::string& Input, const char* VariableName)
 {
     char buffer[4096] = {};
-    mg_get_var(Input.c_str(), Input.size(), VariableName, buffer, sizeof(buffer));
+    mg_get_var(Input.c_str(), Input.length(), VariableName, buffer, sizeof(buffer));
     return buffer;
 }
 
@@ -47,7 +56,7 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
         std::string query = "";
         if (request_info->query_string)
             query = request_info->query_string;
-        std::string request_body;
+        ZED::Blob request_body;
 
         ZED::Blob content = "No data registered with request '" + request_uri + "'";
         ResourceType Type = ResourceType::Plain;
@@ -55,11 +64,12 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
 
         if (Connection->content_len > 0)
         {
-            char* body = new char[(size_t)Connection->content_len + 1];
+            ZED::Blob body((size_t)Connection->content_len);
+            //char* body = new char[(size_t)Connection->content_len + 1];
             mg_read(Connection, body, (size_t)Connection->content_len);
-            body[Connection->content_len] = '\0';
-            request_body = body;
-            delete[] body;
+            //body[Connection->content_len] = '\0';
+            request_body = std::move(body);
+            //delete[] body;
         }
 
 
@@ -70,7 +80,7 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
         for (int i = 0; i < request_info->num_headers; i++)
             info.m_Headers.emplace_back(request_info->http_headers[i].name, request_info->http_headers[i].value);
 
-        Request request(query, request_body, info);
+        Request request(query, std::move(request_body), info);
 
         auto item = m_Resources.find(request_uri);
         

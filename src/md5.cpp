@@ -296,6 +296,7 @@ bool MD5::Parse(ZED::Blob&& Data)
 
 		for (auto& judoka : m_Participants)
 		{
+			judoka->AgeGroup    = FindAgeGroup(judoka->AgeGroupID);
 			judoka->Weightclass = FindWeightclass(judoka->AgeGroupID, judoka->WeightclassID);
 			judoka->Club        = FindClub(judoka->ClubID);
 		}

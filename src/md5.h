@@ -98,6 +98,8 @@ namespace Judoboard
 			int ID = -1;
 
 			int AgeGroupID = -1;
+			const AgeGroup* AgeGroup = nullptr;
+
 			int ClubID = -1;
 			const Club* Club = nullptr;
 
@@ -294,7 +296,8 @@ namespace Judoboard
 		int GetNumClubs()		  const { return m_NumClubs; }//Returns the number of clubs that should be in the file according to the header, not the actual number of clubs read
 		int GetNumParticipants()  const { return m_NumParticipants; }//Returns the number of participants that should be in the file according to the header, not the actual number of participants read
 
-		std::string GetFileDate()  const { return m_FileDate; }
+		std::string GetFileDate()    const { return m_FileDate; }
+		std::string GetDescription() const { return m_Description; }
 
 		operator bool() const { return m_IsValid; }
 

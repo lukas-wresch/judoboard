@@ -47,20 +47,21 @@ Judoka::Judoka(const DM4::Participant& Participant, const StandingData* pStandin
 
 
 
-/*Judoka::Judoka(const MD5::Participant& Participant, const StandingData* pStandingData)
+Judoka::Judoka(const MD5::Participant& Participant, const StandingData* pStandingData)
 {
 	m_Firstname = Participant.Firstname;
 	m_Lastname  = Participant.Lastname;
-	m_Gender    = Participant.Gender;
+	if (Participant.AgeGroup)//Try to determine the gender
+		m_Gender = Participant.AgeGroup->Gender;
 
 	if (Participant.Birthyear > 0)
 		m_Birthyear = Participant.Birthyear;
-	if (Participant.Weight > 0)
-		m_Weight = Participant.Weight;
+	if (Participant.WeightInGramm > 0)
+		m_Weight = Participant.WeightInGramm/1000;//TODO Loss of information!!
 
 	if (pStandingData && Participant.Club)
 		m_pClub = pStandingData->FindClubByName(Participant.Club->Name);
-}*/
+}
 
 
 

@@ -54,11 +54,14 @@ public:
 	struct Request
 	{
 		Request(const std::string& Query) : m_Query(Query) {}
-		Request(const std::string& Query, const std::string& Body) : m_Query(Query), m_Body(Body) {}
-		Request(const std::string& Query, const std::string& Body, const RequestInfo& RequestInfo) : m_Query(Query), m_Body(Body), m_RequestInfo(RequestInfo) {}
+		Request(const std::string& Query, ZED::Blob&& Body) : m_Query(Query), m_Body(std::move(Body)) {}
+		Request(const std::string& Query, const std::string& Body) : Request(Query, ZED::Blob(Body)) {}
+		Request(const std::string& Query, ZED::Blob&& Body,  const RequestInfo& RequestInfo) : m_Query(Query), m_Body(std::move(Body)), m_RequestInfo(RequestInfo) {}
+		Request(const std::string& Query, std::string& Body, const RequestInfo& RequestInfo) : Request(Query, ZED::Blob(Body), RequestInfo) {}
 
 		std::string m_Query;
-		std::string m_Body;
+		//std::string m_Body;
+		ZED::Blob m_Body;
 		const RequestInfo m_RequestInfo;
 
 		mutable std::string m_ResponseHeader;
@@ -75,6 +78,9 @@ public:
 
 	[[nodiscard]]
 	static const std::string LoadFile(const std::string& Filename);
+
+	[[nodiscard]]
+	static std::string DecodeURLEncoded(const ZED::Blob& Input, const char* VariableName);
 
 	[[nodiscard]]
 	static std::string DecodeURLEncoded(const std::string& Input, const char* VariableName);
