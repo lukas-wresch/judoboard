@@ -60,15 +60,12 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		Judoka* new_judoka = nullptr;
 
 		if (pDatabase)
-		{
 			new_judoka = pDatabase->UpdateOrAdd(*judoka);
-			
-			if (new_judoka)
-				m_StandingData.AddJudoka(new_judoka);//Add participant
-		}
-
 		else
+		{
 			Judoka* new_judoka = new Judoka(*judoka);
+			m_StandingData.AddJudoka(new_judoka);//Add participant
+		}
 
 		if (new_judoka)
 		{
