@@ -36,7 +36,7 @@ bool MatchTable::AddMatch(Match* NewMatch)
 		return false;
 
 	NewMatch->SetMatchTable(this);
-	m_Schedule.emplace_back(NewMatch);
+	m_ManualMatches.emplace_back(NewMatch);
 	return true;
 }
 

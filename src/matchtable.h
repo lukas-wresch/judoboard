@@ -116,6 +116,7 @@ namespace Judoboard
 		static int CompareFighterScore(const void* a, const void* b);
 
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
+		std::vector<Match*> m_ManualMatches;//Manually added matches
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
 
 	private:

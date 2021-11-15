@@ -156,7 +156,11 @@ void Weightclass::GenerateSchedule()
 {
 	for (auto match : m_Schedule)
 		delete match;
+
 	m_Schedule.clear();
+
+	for (auto manual_match : m_ManualMatches)
+		m_Schedule.emplace_back(manual_match);
 
 	if (GetParticipants().size() <= 3)
 		m_RecommendedNumMatches_Before_Break = 1;
