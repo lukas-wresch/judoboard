@@ -101,7 +101,7 @@ void Blob::Trim(size_t NewSize)
 
 
 
-size_t Blob::Find(char* SearchString)
+size_t Blob::Find(const char* SearchString)
 {
 	const int len = strlen(SearchString);
 	int j = 0;
@@ -123,7 +123,7 @@ size_t Blob::Find(char* SearchString)
 
 
 
-size_t Blob::FindLast(char* SearchString)
+size_t Blob::FindLast(const char* SearchString)
 {
 	//TODO this could be made faster by doing a reverse search
 

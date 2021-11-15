@@ -77,8 +77,8 @@ namespace ZED
 		bool EndReached() const { return GetReadCursor() >= m_Size; }
 		DLLEXPORT void Trim(size_t NewSize);
 		Blob Trim(size_t Start, size_t NewSize) { return Blob(&m_Data[Start], NewSize, false); }
-		DLLEXPORT size_t Find(char* SearchString);//Returns the first occurrence of tjhe seached string, returns 0 if not found
-		DLLEXPORT size_t FindLast(char* SearchString);//Returns the first occurrence of tjhe seached string, returns 0 if not found
+		DLLEXPORT size_t Find(const char* SearchString);//Returns the first occurrence of tjhe seached string, returns 0 if not found
+		DLLEXPORT size_t FindLast(const char* SearchString);//Returns the first occurrence of tjhe seached string, returns 0 if not found
 
 		DLLEXPORT size_t OutputTo(void* Data, size_t BytesToRead);//Reads BytesToRead many bytes and puts them in Data. Returns the number of bytes actually read
 		DLLEXPORT uint8_t ReadByte();

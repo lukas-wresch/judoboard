@@ -38,7 +38,7 @@ namespace Judoboard
 
 
 		DM4(const std::string& Filename);
-		DM4(ZED::Blob& Data) { Parse(std::move(Data)); }
+		DM4(ZED::Blob&& Data) { Parse(std::move(Data)); }
 		~DM4();
 
 		const Club* FindClubByID(int ClubID) const;
