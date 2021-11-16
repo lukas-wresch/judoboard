@@ -179,7 +179,7 @@ void MD5::Dump() const
 					std::string name = result->Participant->Firstname + " " + result->Participant->Lastname;
 					line += name;
 
-					int tab_count = 3;
+					size_t tab_count = 3;
 					tab_count -= name.length() / 8;
 
 					for (int i = 0; i < tab_count; i++)

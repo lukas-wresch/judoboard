@@ -18,10 +18,12 @@ namespace Judoboard
 
 		static std::string GetHTMLForm();
 
-		Type GetType() const override { return Type::Weightclass; }
+		virtual Type GetType() const override { return Type::Weightclass; }
 
 		const std::string GetDescription() const;
 		virtual Status GetStatus() const override;
+
+		virtual std::vector<Result> CalculateResults() const override;
 
 		void SetMinWeight(uint16_t MinWeight) { m_MinWeight = MinWeight; }
 		void SetMaxWeight(uint16_t MaxWeight) { m_MaxWeight = MaxWeight; }

@@ -45,6 +45,7 @@ bool MatchTable::AddMatch(Match* NewMatch)
 
 	NewMatch->SetMatchTable(this);
 	m_ManualMatches.emplace_back(NewMatch);
+	m_Schedule.emplace_back(NewMatch);
 	return true;
 }
 
@@ -115,8 +116,8 @@ const RuleSet& MatchTable::GetRuleSet() const
 
 int MatchTable::CompareFighterScore(const void* A, const void* B)
 {
-	const FighterScore* a = (FighterScore*)A;
-	const FighterScore* b = (FighterScore*)B;
+	const Result* a = (Result*)A;
+	const Result* b = (Result*)B;
 
 	if (a->Wins < b->Wins)
 		return 1;
@@ -186,6 +187,76 @@ int MatchTable::CompareFighterScore(const void* A, const void* B)
 
 
 
+bool MatchTable::Result::operator < (const Result& rhs) const
+{
+	if (Wins < rhs.Wins)
+		return false;
+	if (Wins > rhs.Wins)
+		return true;
+
+	if (Score < rhs.Score)
+		return false;
+	if (Score > rhs.Score)
+		return true;
+
+	//Direct comparision
+	auto matches = MatchTable->FindMatches(*Judoka, *rhs.Judoka);
+
+	int a_wins  = 0, b_wins  = 0;
+	int a_score = 0, b_score = 0;
+
+	for (auto match : matches)
+	{
+		if (!match->HasConcluded())
+			continue;
+
+		auto result = match->GetMatchResult();
+
+		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetID() == Judoka->GetID())
+		{
+			a_wins++;
+			a_score += (int)match->GetMatchResult().m_Score;
+		}
+
+		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetID() == rhs.Judoka->GetID())
+		{
+			b_wins++;
+			b_score += (int)match->GetMatchResult().m_Score;
+		}
+	}
+
+	if (a_wins < b_wins)
+		return false;
+	if (a_wins > b_wins)
+		return true;
+
+	if (a_score < b_score)
+		return false;
+	if (a_score > b_score)
+		return true;
+
+	if (Time < rhs.Time)
+		return true;
+	if (Time > rhs.Time)
+		return false;
+
+	//This ensures that everything is well-ordered, however if this is necessary a flag is raised!
+	if (Judoka->GetID() < rhs.Judoka->GetID())
+	{
+		NotSortable = rhs.NotSortable = true;
+		return true;
+	}
+	if (Judoka->GetID() > rhs.Judoka->GetID())
+	{
+		NotSortable = rhs.NotSortable = true;
+		return false;
+	}
+
+	return false;
+}
+
+
+
 const std::string MatchTable::ToString() const
 {
 	ZED::CSV ret;
@@ -207,6 +278,8 @@ MatchTable::MatchTable(ZED::CSV& Stream, const ITournament* Tournament) : Schedu
 		Stream >> rulesUUID;
 		m_Rules = Tournament->FindRuleSet(UUID(std::move(rulesUUID)));
 	}
+
+	//TODO import manual matches
 }
 
 
@@ -225,4 +298,6 @@ void MatchTable::operator >> (ZED::CSV& Stream) const
 	}
 	else
 		Stream << false;//No rule set
+
+	//TODO export manual matches
 }

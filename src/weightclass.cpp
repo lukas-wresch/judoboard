@@ -41,7 +41,10 @@ Weightclass::Weightclass(ZED::CSV& Stream, const ITournament* Tournament) : Matc
 
 Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament) : MatchTable(Tournament)
 {
-	SetName(Weightclass.Description);
+	if (Weightclass.AgeGroup)
+		SetName(Weightclass.AgeGroup->Name + " " + Weightclass.Description);
+	else
+		SetName(Weightclass.Description);
 
 	if (Weightclass.WeightLargerThan > 0)
 		m_MinWeight = Weightclass.WeightLargerThan;
@@ -156,9 +159,6 @@ void Weightclass::GenerateSchedule()
 {
 	m_Schedule.clear();
 
-	for (auto manual_match : m_ManualMatches)
-		m_Schedule.emplace_back(manual_match);
-
 	if (GetParticipants().size() <= 3)
 		m_RecommendedNumMatches_Before_Break = 1;
 	else
@@ -206,8 +206,62 @@ void Weightclass::GenerateSchedule()
 		std::shuffle(std::begin(m_Schedule), std::end(m_Schedule), rng);
 	}
 
+	//Add back manual matches
+	for (auto manual_match : m_ManualMatches)
+		m_Schedule.emplace_back(manual_match);
+
 	for (auto match : m_Schedule)
 		match->SetMatchTable(this);
+}
+
+
+
+std::vector<MatchTable::Result> Weightclass::CalculateResults() const
+{
+	std::vector<Result> ret(GetParticipants().size());
+
+	for (size_t i = 0; i < GetParticipants().size(); i++)
+	{
+		auto fighter = GetParticipant(i);
+
+		if (!fighter)
+			continue;
+
+		ret[i].Set(fighter, this);
+
+		for (size_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
+		{
+			auto enemy = GetParticipant(j);
+			if (!enemy)
+				continue;
+
+			if (fighter->GetID() == enemy->GetID())
+				continue;
+
+			auto matches = FindMatches(*fighter, *enemy);//Find all matches of these two
+
+			if (!matches.empty())
+			{
+				if (!matches[0]->HasConcluded())
+					continue;
+
+				const auto& result = matches[0]->GetMatchResult();
+
+				if (matches[0]->GetWinningJudoka()->GetID() == fighter->GetID())
+				{
+					ret[i].Wins++;
+					ret[i].Score += (uint32_t)result.m_Score;
+				}
+
+				ret[i].Time += result.m_Time;
+			}
+		}
+	}
+
+	//std::qsort(ret, GetParticipants().size(), sizeof(Result), MatchTable::CompareFighterScore);
+	std::sort(ret.begin(), ret.end());
+
+	return ret;
 }
 
 
@@ -228,7 +282,8 @@ const std::string Weightclass::ToHTML() const
 	ret += "<th style=\"text-align: center; width: 2.0cm;\">Total</th>";
 	ret += "</tr>";
 
-	FighterScore* pScores = new FighterScore[GetParticipants().size()];
+	//Result* pScores = new Result[GetParticipants().size()];
+	auto results = CalculateResults();
 
 	for (size_t i = 0; i < GetParticipants().size();i++)
 	{
@@ -241,7 +296,7 @@ const std::string Weightclass::ToHTML() const
 		ret += "<td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
 		ret += "<td>" + fighter->GetName() + "<br/>(" + std::to_string(fighter->GetWeight()) + " kg)</td>";
 
-		pScores[i].Set(fighter, this);
+		//pScores[i].Set(fighter, this);
 
 		for (size_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
 		{
@@ -261,22 +316,22 @@ const std::string Weightclass::ToHTML() const
 					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">- - -</a></td>";
 				else if (matches[0]->GetWinningJudoka()->GetID() == fighter->GetID())
 				{
-					pScores[i].Wins++;
+					//pScores[i].Wins++;
 					const auto& result = matches[0]->GetMatchResult();
-					pScores[i].Score += (unsigned int)result.m_Score;
-					pScores[i].Time  += result.m_Time;
+					//pScores[i].Score += (unsigned int)result.m_Score;
+					//pScores[i].Time  += result.m_Time;
 					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
 				}
 				else
 				{
 					const auto& result = matches[0]->GetMatchResult();
-					pScores[i].Time += result.m_Time;
+					//pScores[i].Time += result.m_Time;
 					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">0 (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
 				}
 			}
 		}
 
-		ret += "<td style=\"text-align: center;\">" + std::to_string(pScores[i].Wins) + " : " + std::to_string(pScores[i].Score) + "<br/>(" + Timer::TimestampToString(pScores[i].Time) + ")</td>";
+		ret += "<td style=\"text-align: center;\">" + std::to_string(results[i].Wins) + " : " + std::to_string(results[i].Score) + "<br/>(" + Timer::TimestampToString(results[i].Time) + ")</td>";
 
 		ret += "</tr>";
 	}
@@ -286,11 +341,11 @@ const std::string Weightclass::ToHTML() const
 	ret += "</table><br/><br/><table border=\"1\" rules=\"all\">";
 	ret += "<tr><th style=\"width: 0.5cm; text-align: center;\">#</th><th style=\"width: 5.0cm;\">Name</th><th style=\"width: 1.0cm;\">Wins</th><th style=\"width: 1.0cm;\">Score</th><th style=\"width: 1.3cm;\">Time</th></tr>";
 
-	std::qsort(pScores, GetParticipants().size(), sizeof(FighterScore), MatchTable::CompareFighterScore);
+	//std::qsort(pScores, GetParticipants().size(), sizeof(Result), MatchTable::CompareFighterScore);
 
 	for (size_t i = 0; i < GetParticipants().size(); i++)
 	{
-		const auto& score = pScores[i];
+		const auto& score = results[i];
 
 		ret += "<tr><td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
 		ret += "<td>" + score.Judoka->GetName() + "</td>";
@@ -300,7 +355,7 @@ const std::string Weightclass::ToHTML() const
 		ret += "<td>" + Timer::TimestampToString(score.Time);
 
 		if (score.NotSortable && score.Time > 0)
-			ret += " Not sortable!";//DEBUG
+			ret += " Not sortable!";//TODO make proper message
 
 		ret += "</td>";
 
@@ -308,7 +363,7 @@ const std::string Weightclass::ToHTML() const
 	}
 
 	ret += "</table>";
-	delete[] pScores;
+	//delete[] pScores;
 
 	return ret;
 }

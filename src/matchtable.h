@@ -27,6 +27,45 @@ namespace Judoboard
 			Unknown, Weightclass, Pause
 		};
 
+		struct Result
+		{
+			Result() = default;
+			//Result(Result&) = delete;
+			//Result(const Result&) = delete;
+
+			void Set(const Judoka* Judoka_, const MatchTable* MatchTable_)
+			{
+				Judoka = Judoka_;
+				MatchTable = MatchTable_;
+				Wins  = 0;
+				Score = 0;
+				Time  = 0;
+				NotSortable = false;
+			}
+
+			void Set(const Judoka* Judoka_, const MatchTable* MatchTable_, int Wins_, int Score_, uint32_t Time_)
+			{
+				Judoka = Judoka_;
+				MatchTable = MatchTable_;
+				Wins  = Wins_;
+				Score = Score_;
+				Time  = Time_;
+				NotSortable = false;
+			}
+
+			bool operator < (const Result& rhs) const;
+
+			const Judoka* Judoka = nullptr;
+			const MatchTable* MatchTable = nullptr;
+
+			unsigned int Wins = 0;
+			unsigned int Score = 0;
+			uint32_t Time = 0;
+
+			mutable bool NotSortable = false;//Flag to indicate if the element could not be sorted
+		};
+
+
 		MatchTable(const ITournament* Tournament) : Schedulable(Tournament) {}
 		MatchTable(ZED::CSV& Stream, const ITournament* Tournament);
 		MatchTable(MatchTable&) = delete;
@@ -58,6 +97,8 @@ namespace Judoboard
 
 		bool Contains(const Judoka* Judoka) const;
 
+		virtual std::vector<Result> CalculateResults() const = 0;
+
 		const RuleSet& GetRuleSet() const;
 		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
 
@@ -74,43 +115,6 @@ namespace Judoboard
 		virtual void operator >> (ZED::CSV& Stream) const;
 
 	protected:
-		struct FighterScore
-		{
-			FighterScore() = default;
-			FighterScore(FighterScore&) = delete;
-			FighterScore(const FighterScore&) = delete;
-
-			void Set(const Judoka* Judoka_, const MatchTable* MatchTable_)
-			{
-				Judoka = Judoka_;
-				MatchTable = MatchTable_;
-				Wins = 0;
-				Score = 0;
-				Time = 0;
-				NotSortable = false;
-			}
-
-			void Set(const Judoka* Judoka_, const MatchTable* MatchTable_, int Wins_, int Score_, uint32_t Time_)
-			{
-				Judoka = Judoka_;
-				MatchTable = MatchTable_;
-				Wins = Wins_;
-				Score = Score_;
-				Time = Time_;
-				NotSortable = false;
-			}
-
-			const Judoka* Judoka = nullptr;
-			const MatchTable* MatchTable = nullptr;
-
-			unsigned int Wins = 0;
-			unsigned int Score = 0;
-			uint32_t Time = 0;
-
-			mutable bool NotSortable = false;//Flag to indicate if the element could not be sorted
-		};
-
-
 		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
 		Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
