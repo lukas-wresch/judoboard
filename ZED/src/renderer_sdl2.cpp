@@ -238,6 +238,7 @@ Image RendererSDL2::TakeScreenshot() const
 
 	PNG Image(std::move(data), m_screen_w, m_screen_h, ColorType::B8G8R8);
 	Image.ConvertTo(ColorType::R8G8B8);
+	return Image;
 }
 
 
