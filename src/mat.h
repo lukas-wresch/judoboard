@@ -23,48 +23,6 @@ namespace Judoboard
 		friend class Application;
 
 	public:
-		struct Scoreboard
-		{
-			enum class DisqualificationState
-			{
-				Unknown, Disqualified, NotDisqualified
-			};
-
-			void Reset()
-			{
-				m_Ippon = m_WazaAri = m_Yuko = m_Koka = 0;
-				m_Shido = 0;
-
-				m_HansokuMake = false;
-				m_Disqualification = DisqualificationState::Unknown;
-
-				m_MedicalExamination = 0;
-				m_Hantei = false;
-				m_Gachi  = false;
-			}
-
-			bool IsUnknownDisqualification() const { return m_HansokuMake && m_Disqualification == DisqualificationState::Unknown; }
-			bool IsDisqualified()            const { return m_HansokuMake && m_Disqualification == DisqualificationState::Disqualified; }
-			bool IsNotDisqualified()         const { return m_HansokuMake && m_Disqualification == DisqualificationState::NotDisqualified; }
-
-			uint16_t m_Ippon = 0;
-			uint16_t m_WazaAri = 0;
-			uint16_t m_Yuko = 0;
-			uint16_t m_Koka = 0;
-
-			uint16_t m_Shido = 0;
-			uint16_t m_MedicalExamination = 0;
-
-			DisqualificationState m_Disqualification = DisqualificationState::Unknown;//Did the judoka get disqualified
-
-			bool m_HansokuMake = false;
-
-			bool m_Hantei = false;
-
-			bool m_Gachi = false;//Fusen or kiken gachi
-		};
-
-
 		Mat(uint32_t ID, const Application* App = nullptr);
 		Mat(Mat&) = delete;
 		Mat(const Mat&) = delete;
@@ -104,8 +62,6 @@ namespace Judoboard
 
 		virtual bool IsGoldenScore() const override { return m_GoldenScore; }
 		virtual bool EnableGoldenScore(bool GoldenScore = true) override;
-
-		const Scoreboard& GetScoreboard(Fighter Whom) const;
 
 		const Window& GetWindow() const { return m_Window; }
 
@@ -155,10 +111,23 @@ namespace Judoboard
 		ZED::CSV Scoreboard2String() const override;
 		ZED::CSV Osaekomi2String(Fighter Who) const override;
 
+		virtual const Scoreboard& GetScoreboard(Fighter Whom) const override
+		{
+			if (Whom == Fighter::White)
+				return m_Scoreboards[0];
+			return m_Scoreboards[1];
+		}
+
 
 	private:
-		Scoreboard m_Scoreboards[2];
+		Scoreboard& SetScoreboard(Fighter Whom)
+		{
+			if (Whom == Fighter::White)
+				return m_Scoreboards[0];
+			return m_Scoreboards[1];
+		}
 
+		Scoreboard m_Scoreboards[2];
 
 		enum class State
 		{
@@ -367,7 +336,6 @@ namespace Judoboard
 		void RenderBackgroundEffect(const float alpha) const;
 
 		bool Reset();
-		Scoreboard& SetScoreboard(Fighter Whom);
 		void AddEvent(MatchLog::NeutralEvent NewEvent);
 		void AddEvent(Fighter Whom, MatchLog::BiasedEvent NewEvent);
 		Match::Result GetResult() const;

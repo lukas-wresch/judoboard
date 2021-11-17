@@ -196,11 +196,11 @@ RemoteMat::InternalState RemoteMat::GetState(bool& Success) const
 
 	ZED::CSV state(response);
 
-	state >> internalState.white_ippon >> internalState.white_wazaari;
-	state >> internalState.blue_ippon  >> internalState.blue_wazaari;
+	state >> SetScoreboard(Fighter::White).m_Ippon >> SetScoreboard(Fighter::White).m_WazaAri;
+	state >> SetScoreboard(Fighter::Blue).m_Ippon  >> SetScoreboard(Fighter::Blue).m_WazaAri;
 
-	state >> internalState.white_shidos  >> internalState.blue_shidos;
-	state >> internalState.white_medical >> internalState.blue_medical;
+	state >> SetScoreboard(Fighter::White).m_Shido >> SetScoreboard(Fighter::Blue).m_Shido;
+	state >> SetScoreboard(Fighter::White).m_MedicalExamination >> SetScoreboard(Fighter::Blue).m_MedicalExamination;
 
 	state >> internalState.display_time >> internalState.hajime;
 

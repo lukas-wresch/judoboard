@@ -93,8 +93,8 @@ namespace Judoboard
 
 		struct InternalState
 		{
-			int white_ippon, white_wazaari, white_shidos, white_medical;
-			int blue_ippon, blue_wazaari, blue_shidos, blue_medical;
+			//int white_ippon, white_wazaari, white_shidos, white_medical;
+			//int blue_ippon, blue_wazaari, blue_shidos, blue_medical;
 			uint32_t display_time;
 			uint32_t white_osaekomi_time, blue_osaekomi_time;
 
@@ -102,7 +102,22 @@ namespace Judoboard
 			bool hajime, cannextmatchstart, hasconcluded, isoutoftime_and_draw, isgoldenscore, arefightersonmat;
 		};
 
+		virtual const Scoreboard& GetScoreboard(Fighter Whom) const override
+		{
+			if (Whom == Fighter::White)
+				return m_Scoreboards[0];
+			return m_Scoreboards[1];
+		}
+		Scoreboard& SetScoreboard(Fighter Whom) const
+		{
+			if (Whom == Fighter::White)
+				return m_Scoreboards[0];
+			return m_Scoreboards[1];
+		}
+
 		InternalState GetState(bool& Success) const;
+
+		mutable Scoreboard m_Scoreboards[2];
 
 		std::vector<OsaekomiEntry> m_OsaekomiList;
 

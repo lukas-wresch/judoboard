@@ -27,6 +27,48 @@ namespace Judoboard
 		};
 
 
+		struct Scoreboard
+		{
+			enum class DisqualificationState
+			{
+				Unknown, Disqualified, NotDisqualified
+			};
+
+			void Reset()
+			{
+				m_Ippon = m_WazaAri = m_Yuko = m_Koka = 0;
+				m_Shido = 0;
+
+				m_HansokuMake = false;
+				m_Disqualification = DisqualificationState::Unknown;
+
+				m_MedicalExamination = 0;
+				m_Hantei = false;
+				m_Gachi  = false;
+			}
+
+			bool IsUnknownDisqualification() const { return m_HansokuMake && m_Disqualification == DisqualificationState::Unknown; }
+			bool IsDisqualified()            const { return m_HansokuMake && m_Disqualification == DisqualificationState::Disqualified; }
+			bool IsNotDisqualified()         const { return m_HansokuMake && m_Disqualification == DisqualificationState::NotDisqualified; }
+
+			uint16_t m_Ippon = 0;
+			uint16_t m_WazaAri = 0;
+			uint16_t m_Yuko = 0;
+			uint16_t m_Koka = 0;
+
+			uint16_t m_Shido = 0;
+			uint16_t m_MedicalExamination = 0;
+
+			DisqualificationState m_Disqualification = DisqualificationState::Unknown;//Did the judoka get disqualified
+
+			bool m_HansokuMake = false;
+
+			bool m_Hantei = false;
+
+			bool m_Gachi = false;//Fusen or kiken gachi
+		};
+
+
 		struct OsaekomiEntry
 		{
 			OsaekomiEntry(Fighter Who, uint32_t Time) : m_Who(Who), m_Time(Time) {}
@@ -38,6 +80,9 @@ namespace Judoboard
 
 		IMat(uint32_t ID) { m_ID = ID; IMat::SetName(Localizer::Translate("Mat") + " " + std::to_string(ID)); }
 		virtual ~IMat() {}
+
+		IMat(IMat&) = delete;
+		IMat(const IMat&) = delete;
 
 		uint32_t GetMatID() const { return m_ID; }
 		void SetMatID(uint32_t NewID) { m_ID = NewID; }
@@ -115,6 +160,7 @@ namespace Judoboard
 		virtual void Tokeda() = 0;//Stops an osaekomi
 
 		//Output
+		virtual const Scoreboard& GetScoreboard(Fighter Whom) const = 0;
 		virtual Match::Result GetResult() const = 0;
 		virtual ZED::Blob RequestScreenshot() const = 0;
 

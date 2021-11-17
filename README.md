@@ -13,4 +13,13 @@ Currently working on the following features:
 
 ## Demonstration
 
+Click on the image to watch the demonstration video
+
 [![Watch the video](https://img.youtube.com/vi/_PlGZOPMyZ8/maxresdefault.jpg)](https://youtu.be/_PlGZOPMyZ8)
+
+## Features
+
+Management for tournaments, weightclasses and matches on multiple mats.
+Import of *.dm4 and *.md5 files.
+Scoreboard display with name of participants, scores, osaekomi, shidos and hansokumake.
+Support for advance IJF rules: Double ippon, double hansokumake.

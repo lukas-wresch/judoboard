@@ -57,11 +57,11 @@ TEST(RemoteMat, QuickClose)
 
 
 
-/*TEST(RemoteMat, ForcedCloseDuringMatch)
+TEST(RemoteMat, ForcedCloseDuringMatch)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -138,45 +138,50 @@ TEST(RemoteMat, QuickClose)
 		EXPECT_TRUE(mat[i]->EndMatch());
 		ZED::Core::Pause(4000);
 	}
-}*/
-
-
-
-/*TEST(RemoteMat, StartMatch)
-{
-	initialize();
-	Application app;
-	Mat m(1);
-
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-	match.SetMatID(1);
-	EXPECT_TRUE(m.StartMatch(&match));
-
-	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
-	{
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 0);
-		EXPECT_TRUE(m.GetScoreboard(f).m_WazaAri == 0);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Yuko == 0);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Koka == 0);
-
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 0);
-		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
-		EXPECT_TRUE(m.GetScoreboard(f).m_MedicalExamination == 0);
-
-		EXPECT_FALSE(m.GetScoreboard(f).m_Hantei);
-	}
-
-	EXPECT_FALSE(m.HasConcluded());
-	EXPECT_FALSE(m.EndMatch());
-	m.AddIppon(Fighter::White);
-	EXPECT_TRUE(m.HasConcluded());
-	EXPECT_TRUE(m.EndMatch());
-	EXPECT_FALSE(m.HasConcluded());
 }
 
 
 
-TEST(Mat, CorrectWinner)
+TEST(RemoteMat, StartMatch)
+{
+	initialize();
+	Application master(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
+
+	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
+	ASSERT_TRUE(slave.StartLocalMat(1));
+
+	IMat* m = master.FindMat(1);
+
+	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	match.SetMatID(1);
+	EXPECT_TRUE(m->StartMatch(&match));
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon == 0);
+		EXPECT_TRUE(m->GetScoreboard(f).m_WazaAri == 0);
+		EXPECT_TRUE(m->GetScoreboard(f).m_Yuko == 0);
+		EXPECT_TRUE(m->GetScoreboard(f).m_Koka == 0);
+
+		EXPECT_TRUE(m->GetScoreboard(f).m_Shido == 0);
+		EXPECT_FALSE(m->GetScoreboard(f).m_HansokuMake);
+		EXPECT_TRUE(m->GetScoreboard(f).m_MedicalExamination == 0);
+
+		EXPECT_FALSE(m->GetScoreboard(f).m_Hantei);
+	}
+
+	EXPECT_FALSE(m->HasConcluded());
+	EXPECT_FALSE(m->EndMatch());
+	m->AddIppon(Fighter::White);
+	EXPECT_TRUE(m->HasConcluded());
+	EXPECT_TRUE(m->EndMatch());
+	EXPECT_FALSE(m->HasConcluded());
+}
+
+
+
+/*TEST(RemoteMat, CorrectWinner)
 {
 	initialize();
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)

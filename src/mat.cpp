@@ -2092,24 +2092,6 @@ bool Mat::Mainloop()
 
 
 
-const Mat::Scoreboard& Mat::GetScoreboard(Fighter Whom) const
-{
-	if (Whom == Fighter::White)
-		return m_Scoreboards[0];
-	return m_Scoreboards[1];
-}
-
-
-
-Mat::Scoreboard& Mat::SetScoreboard(Fighter Whom)
-{
-	if (Whom == Fighter::White)
-		return m_Scoreboards[0];
-	return m_Scoreboards[1];
-}
-
-
-
 void Mat::AddEvent(MatchLog::NeutralEvent NewEvent)
 {
 	if (m_pMatch)
