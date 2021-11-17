@@ -102,7 +102,7 @@ MD5::Weightclass* MD5::FindWeightclass(int AgeGroupID, int WeightclassID)
 		if (weightclass && weightclass->AgeGroupID == AgeGroupID && weightclass->ID == WeightclassID)
 		{
 			if (found)
-				assert(!found);//Crash when the ID exists twice
+				assert(false);//Crash when the ID exists twice
 			found = true;
 		}
 	}

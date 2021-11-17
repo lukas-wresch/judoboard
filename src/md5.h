@@ -68,7 +68,7 @@ namespace Judoboard
 			int MinBirthyear = -1;
 			int MaxBirthyear = -1;
 
-			Gender Gender;
+			Gender Gender = Gender::Male;
 
 			int LotterySchemaID = -1;
 

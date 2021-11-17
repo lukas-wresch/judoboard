@@ -40,7 +40,7 @@ bool DM4::Parse(ZED::Blob&& Data)
 				return false;
 			}
 
-			line = "";
+			line.clear();
 			continue;
 		}
 
