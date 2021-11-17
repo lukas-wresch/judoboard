@@ -1909,7 +1909,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		if (!IsSlave())
 			return "You are not allowed to connect";
 
-		int matID         = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 		ZED::CSV matchCSV(Request.m_Body);
 
 		for (auto mat : m_Mats)

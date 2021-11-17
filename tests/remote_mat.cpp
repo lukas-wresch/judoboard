@@ -57,6 +57,31 @@ TEST(RemoteMat, QuickClose)
 
 
 
+/*TEST(RemoteMat, SlavesOpensMatTwice)
+{
+	initialize();
+	Application master(8080 + rand() % 10000);
+	Application slave(8080 + rand() % 10000);
+
+	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
+	ASSERT_TRUE(slave.StartLocalMat(2));
+
+	master.CloseTournament();
+	master.SetTournamentList().clear();
+
+	master.StartLocalMat(1);
+	slave.StartLocalMat(2);
+
+	IMat* mat[2];
+	mat[0] = master.FindMat(1);
+	mat[1] = master.FindMat(2);
+
+	EXPECT_TRUE(mat[0]);
+	EXPECT_TRUE(mat[1]);
+}*/
+
+
+
 TEST(RemoteMat, ForcedCloseDuringMatch)
 {
 	initialize();
@@ -143,7 +168,7 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 
 
 
-TEST(RemoteMat, StartMatch)
+/*TEST(RemoteMat, StartMatch)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
@@ -178,7 +203,7 @@ TEST(RemoteMat, StartMatch)
 	EXPECT_TRUE(m->HasConcluded());
 	EXPECT_TRUE(m->EndMatch());
 	EXPECT_FALSE(m->HasConcluded());
-}
+}*/
 
 
 
