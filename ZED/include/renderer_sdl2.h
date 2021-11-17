@@ -36,7 +36,7 @@ namespace ZED
 		DLLEXPORT bool InitFonts(const char* FontFile, int Small = 7, int Middle = 10, int Large = 20, int Huge = 32, int Gigantic = -1, int Gigantic2 = -1) const override;
 		DLLEXPORT virtual Ref<Texture> RenderFont(FontSize Size, const std::string& Text, ZED::Color Textcolor) const;
 
-		DLLEXPORT Image TakeScreenshot() const override { return Image(); }
+		DLLEXPORT Image TakeScreenshot() const override;
 		DLLEXPORT void TakeScreenshotPNG(const char* Filename) const override;
 
 		//Shader

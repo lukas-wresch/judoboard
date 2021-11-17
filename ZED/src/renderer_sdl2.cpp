@@ -232,6 +232,16 @@ Ref<Texture> RendererSDL2::RenderFont(FontSize Size, const std::string& Text, ZE
 
 
 
+Image RendererSDL2::TakeScreenshot() const
+{
+	Blob data(m_SDL_screen->pixels, m_screen_w * m_screen_h * 3);
+
+	PNG Image(std::move(data), m_screen_w, m_screen_h, ColorType::B8G8R8);
+	Image.ConvertTo(ColorType::R8G8B8);
+}
+
+
+
 void RendererSDL2::TakeScreenshotPNG(const char* Filename) const
 {
 	Blob data(m_SDL_screen->pixels, m_screen_w * m_screen_h * 3);

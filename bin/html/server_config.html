@@ -25,6 +25,8 @@
 
 <button style="margin-top: 8mm;" class="remove" onclick="return RunTestscreen()">Run Testscreen</button>
 
+<button style="margin-top: 8mm;" class="remove" onclick="return RunUpdate()">Update</button>
+
 <script>
 
 
@@ -95,6 +97,11 @@ function RunTestscreen()
   Ajax("ajax/config/testscreen");
 }
 
+
+function Update()
+{
+  Ajax("ajax/config/update");
+}
 
 
 

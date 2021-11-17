@@ -2009,6 +2009,24 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
+	m_Server.RegisterResource("/ajax/config/update", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		LockTillScopeEnd();
+
+#ifdef _WIN32
+		//system("Judoboard.exe --demo");
+		//TODO: not supported
+#else
+		system("git pull; cd ..; ./compile.sh; cd bin; ./Judoboard --demo");
+		Shutdown();
+#endif
+		
+		return Error();//OK
+	});
+
 	//Commands slave -> master
 
 	m_Server.RegisterResource("/ajax/master/connection_test", [this](auto& Request) -> std::string {
