@@ -106,7 +106,7 @@ bool RemoteMat::HasConcluded() const
 
 bool RemoteMat::EndMatch()
 {
-	return SendCommand("/ajax/slave/end_match?id=" + std::to_string(GetMatID()));
+	return SendCommand("/ajax/mat/end_match?id=" + std::to_string(GetMatID()));
 }
 
 
@@ -151,8 +151,6 @@ ZED::Blob RemoteMat::RequestScreenshot() const
 bool RemoteMat::SendCommand(const std::string& URL) const
 {
 	std::string response = SendRequest(URL);
-
-	assert(response == "ok");
 	return response == "ok";
 }
 

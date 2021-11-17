@@ -587,12 +587,13 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
-		auto* mat = FindMat(id);
+		auto mat = FindMat(id);
 
 		if (!mat)
-			return "Could not find mat";
+			return Error(Error::Type::MatNotFound);
 
-		mat->EndMatch();
+		if (!mat->EndMatch())
+			return Error(Error::Type::OperationFailed);
 
 		if (GetTournament())
 			GetTournament()->Save();
@@ -2055,7 +2056,9 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		RemoteMat* new_mat = new RemoteMat(id, ip, port);
 		new_mat->Open();
 
+		LockTillScopeEnd();
 		SetMats().emplace_back(new_mat);
+		
 		return Error();//OK
 	});
 

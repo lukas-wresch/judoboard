@@ -64,13 +64,12 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
-	ASSERT_TRUE(slave.StartLocalMat(1));
 
 	master.CloseTournament();
 	master.SetTournamentList().clear();
 
 	master.StartLocalMat(1);
-	slave.StartLocalMat(2);
+	ASSERT_TRUE(slave.StartLocalMat(2));
 
 	Judoka j1(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
 	Judoka j2(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
@@ -113,15 +112,17 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 	mat[0] = master.FindMat(1);
 	mat[1] = master.FindMat(2);
 
-	ZED::Core::Pause(6000);
+	ZED::Core::Pause(2000);
 
 	for (int i = 0;i < 2;i++)
 	{
+		ASSERT_TRUE(mat[i]);
+
 		auto match = tourney->GetNextMatch(mat[i]->GetMatID());
 		EXPECT_TRUE(match);
 		EXPECT_TRUE(mat[i]->StartMatch(match));
 
-		ZED::Core::Pause(8000);
+		ZED::Core::Pause(5000);
 
 		mat[i]->Hajime();
 
@@ -136,7 +137,7 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 		ZED::Core::Pause(3000);
 
 		EXPECT_TRUE(mat[i]->EndMatch());
-		ZED::Core::Pause(4000);
+		ZED::Core::Pause(3000);
 	}
 }
 
@@ -231,7 +232,7 @@ TEST(RemoteMat, StartMatch)
 
 
 
-TEST(Mat, ForceClose)
+TEST(RemoteMat, ForceClose)
 {
 	initialize();
 	Application app;

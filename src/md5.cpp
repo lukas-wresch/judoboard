@@ -182,7 +182,7 @@ void MD5::Dump() const
 					size_t tab_count = 3;
 					tab_count -= name.length() / 8;
 
-					for (int i = 0; i < tab_count; i++)
+					for (size_t i = 0; i < tab_count; i++)
 						line += "\t";
 
 					line += std::to_string(result->Participant->Birthyear);
