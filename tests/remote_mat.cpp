@@ -57,7 +57,7 @@ TEST(RemoteMat, QuickClose)
 
 
 
-TEST(RemoteMat, SlavesOpensMatTwice)
+TEST(RemoteMat, SlaveOpensMatTwice)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
@@ -179,7 +179,12 @@ TEST(RemoteMat, StartMatch)
 
 	IMat* m = master.FindMat(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	auto j1 = new Judoka(GetRandomName(), GetRandomName());
+	auto j2 = new Judoka(GetRandomName(), GetRandomName());
+	master.GetDatabase().AddJudoka(j1);
+	master.GetDatabase().AddJudoka(j2);
+
+	Match match(nullptr, j1, j2);
 	match.SetMatID(1);
 	EXPECT_TRUE(m->StartMatch(&match));
 
@@ -2274,7 +2279,7 @@ TEST(RemoteMat, Draw2)
 
 	EXPECT_FALSE(m->HasConcluded());
 
-	m.SetAsDraw(true);
+	m->SetAsDraw(true);
 
 	EXPECT_FALSE(m->HasConcluded());
 	EXPECT_FALSE(m->EndMatch());
