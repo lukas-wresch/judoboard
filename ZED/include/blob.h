@@ -16,7 +16,7 @@ namespace ZED
 		{
 			m_IsShared = true;
 		}
-		Blob(const Blob& Original) = delete;
+		Blob(const Blob& Original) : m_Data(Original.m_Data), m_Size(Original.m_Size), m_ReadCursor(Original.m_WriteCursor), m_WriteCursor(Original.m_WriteCursor), m_IsShared(Original.m_IsShared) {}
 		/*Blob(const Blob& Original) : m_Data(Original.m_Data), m_Size(Original.m_Size)
 		{
 			m_IsShared = true;
