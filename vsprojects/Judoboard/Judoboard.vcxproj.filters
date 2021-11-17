@@ -16,6 +16,9 @@
     <Filter Include="HttpServer">
       <UniqueIdentifier>{acd1fe67-f5e9-4848-bc40-a6345c89c505}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\workflows">
+      <UniqueIdentifier>{a00860c9-7920-416c-af76-d09fec57835c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\account.cpp">
@@ -294,6 +297,21 @@
     </None>
     <None Include="..\..\bin\html\style.css">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\.github\workflows\build.yml">
+      <Filter>Resource Files\workflows</Filter>
+    </None>
+    <None Include="..\..\.github\workflows\dm4.yml">
+      <Filter>Resource Files\workflows</Filter>
+    </None>
+    <None Include="..\..\.github\workflows\md5.yml">
+      <Filter>Resource Files\workflows</Filter>
+    </None>
+    <None Include="..\..\.github\workflows\tests.yml">
+      <Filter>Resource Files\workflows</Filter>
+    </None>
+    <None Include="..\..\.github\workflows\remote-mat.yml">
+      <Filter>Resource Files\workflows</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -119,6 +119,7 @@ namespace Judoboard
 
 		virtual bool IsOsaekomiRunning() const = 0;//Returns true if one of the osaekomi clocks are running
 		virtual bool IsOsaekomi() const = 0;//Returns true during an osaekomi situation
+		virtual Fighter GetOsaekomiHolder() const = 0;
 
 		//Commands by judge
 		virtual void Hajime() = 0;//Starts/continues the match. If an osaekomi is running this commands acts as an yoshi

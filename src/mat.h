@@ -49,7 +49,7 @@ namespace Judoboard
 		bool IsHajime() const override { return m_HajimeTimer.IsRunning(); }
 		bool IsOsaekomiRunning() const override { return m_OsaekomiTimer[0].IsRunning() || m_OsaekomiTimer[1].IsRunning(); }//Returns true during an osaekomi situation
 		bool IsOsaekomi() const override { return IsOsaekomiRunning() || m_OsaekomiTimer[0].GetElapsedTime() > 0 || m_OsaekomiTimer[1].GetElapsedTime() > 0; }//Returns true during an osaekomi situation (even during yoshi!)
-		Fighter GetOsaekomiHolder() const { if (m_OsaekomiTimer[(int)Fighter::White].GetElapsedTime() > 0) return Fighter::White; return Fighter::Blue; }
+		virtual Fighter GetOsaekomiHolder() const override { if (m_OsaekomiTimer[(int)Fighter::White].GetElapsedTime() > 0) return Fighter::White; return Fighter::Blue; }
 		bool CanNextMatchStart() const override { return m_State == State::Waiting; }
 		bool IsDoingAnimation() const { return m_State == State::TransitionToMatch || m_State == State::TransitionToWaiting; }
 		bool AreFightersOnMat() const override { return m_State == State::TransitionToMatch || m_State == State::Running; }

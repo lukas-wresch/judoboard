@@ -38,6 +38,7 @@ namespace Judoboard
 
 		virtual bool IsOsaekomiRunning() const override { return false; };//Returns true if one of the osaekomi clocks are running
 		virtual bool IsOsaekomi() const override { return false; };//Returns true during an osaekomi situation
+		virtual Fighter GetOsaekomiHolder() const override { return Fighter::White; }
 
 		//Commands by judge
 		virtual void Hajime() override {}
