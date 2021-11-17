@@ -2382,20 +2382,29 @@ bool Application::CloseMat(uint32_t ID)
 bool Application::StartLocalMat(uint32_t ID)
 {
 	ZED::Log::Debug("Starting local mat");
-
-	for (auto mat : m_Mats)
+	for (; true; ID++)
 	{
-		if (mat && mat->GetType() == IMat::Type::LocalMat && mat->IsOpen())
+		bool is_ok = true;
+
+		for (auto mat : m_Mats)
 		{
-			ZED::Log::Warn("A local mat is already open, can not open another mat");
-			return false;
+			if (mat && mat->GetType() == IMat::Type::LocalMat && mat->IsOpen())
+			{
+				ZED::Log::Warn("A local mat is already open, can not open another mat");
+				return false;
+			}
+
+			if (mat && mat->GetMatID() == ID)
+			{
+				ZED::Log::Warn("There is already a mat open with the requested id");
+				is_ok = false;
+				break;
+				//return false;
+			}
 		}
 
-		if (mat && mat->GetMatID() == ID)
-		{
-			ZED::Log::Warn("There is already a mat open with the requested id");
-			return false;
-		}
+		if (is_ok)
+			break;
 	}
 
 	LockTillScopeEnd();
