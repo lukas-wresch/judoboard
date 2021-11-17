@@ -52,7 +52,6 @@ bool Mat::Open()
 
 		double tiny = 20.0, middle = 50.0, large = 70.0, huge = 100.0, gigantic = 170.0, gigantic2 = 250.0;
 		m_ScalingFactor = display_width / 1920.0;
-		//m_ScalingFactor = 1.0;
 
 		tiny *= m_ScalingFactor;
 		middle *= m_ScalingFactor;
@@ -1683,9 +1682,9 @@ bool Mat::Render(double dt) const
 
 	if (dt > 0.2)//In case the application was stuck for some time
 		dt = 0.2;//Might happen on device with a small amount of RAM during swapping
-
+	
 	UpdateGraphics();
-
+	
 	auto& renderer = m_Window.GetRenderer();
 	renderer.Lock();
 	renderer.ClearDisplay();
@@ -1698,14 +1697,14 @@ bool Mat::Render(double dt) const
 	renderer.FillRect(ZED::Rect(0, 0, width/2 - 50, height), 0, 0, 255);
 	renderer.FillRect(ZED::Rect(width/2 + 50, 0, width, height), 255, 255, 255);
 
-	if (m_Background->GetType() == ZED::Type::OpenGL)
+	if (m_Background && m_Background->GetType() == ZED::Type::OpenGL)
 	{
 		m_Background->SetSizeX(1.0f);
 		m_Background->SetSizeY(20.0f);
 		m_Background->SetAngle(0.0f);
 		renderer.RenderTransformedRotated(*m_Background, width / 2 - 50, 0);
 	}
-	else
+	else if (m_Background)
 	{
 		m_Background->SetAngle(0.0f);
 		for (int y = 0; y < height + 100; y += 100)

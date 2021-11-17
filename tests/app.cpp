@@ -26,6 +26,18 @@ TEST(App, ServerConnection)
 
 
 
+TEST(App, MemoryLeak)
+{
+	initialize();
+	for (int i = 0; i < 1000; i++)
+	{
+		Application app;
+		app.StartLocalMat();
+	}
+}
+
+
+
 TEST(App, Tournaments)
 {
 	initialize();
