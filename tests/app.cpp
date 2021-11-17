@@ -26,7 +26,7 @@ TEST(App, ServerConnection)
 
 
 
-TEST(App, MemoryLeak)
+/*TEST(App, MemoryLeak)
 {
 	initialize();
 	for (int i = 0; i < 1000; i++)
@@ -34,7 +34,7 @@ TEST(App, MemoryLeak)
 		Application app;
 		app.StartLocalMat();
 	}
-}
+}*/
 
 
 
