@@ -10,7 +10,9 @@ namespace ZED
 	{
 	public:
 		Image() = default;
+		Image(const Image& rhs) = default;
 		Image(Image&& rhs) = default;
+
 		DLLEXPORT Image(uint32_t Width, uint32_t Height, ColorType ColorType);
 		DLLEXPORT Image(Blob&& Data, uint32_t Width, uint32_t Height, ColorType ColorType);
 

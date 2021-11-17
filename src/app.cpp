@@ -2020,7 +2020,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		//system("Judoboard.exe --demo");
 		//TODO: not supported
 #else
-		system("git pull; cd ..; ./compile.sh; cd bin; ./Judoboard --demo");
+		system("git pull; cd ..; ./compile.sh; cd bin; ./Judoboard");
 		Shutdown();
 #endif
 		
