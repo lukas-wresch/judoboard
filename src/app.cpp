@@ -46,42 +46,21 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	m_Server.RegisterResource("/slideout.min.js", [](auto& Request) { return HttpServer::LoadFile("html/slideout.min.js"); }, HttpServer::ResourceType::JavaScript);
 	m_Server.RegisterResource("/menu.png",        [](auto& Request) { return HttpServer::LoadFile("html/menu.png"); }, HttpServer::ResourceType::Image_PNG);
 
-	m_Server.RegisterResource("/schedule.html",      [](auto& Request) { return HttpServer::LoadFile("html/schedule.html"); });
-	m_Server.RegisterResource("/mat.html",           [](auto& Request) { return HttpServer::LoadFile("html/mat.html"); });
-	m_Server.RegisterResource("/mat_configure.html", [](auto& Request) { return HttpServer::LoadFile("html/mat_configure.html"); });
-	m_Server.RegisterResource("/mat_edit.html",      [](auto& Request) { return HttpServer::LoadFile("html/mat_edit.html"); });
 
-	m_Server.RegisterResource("/participant_add.html", [](auto& Request) { return HttpServer::LoadFile("html/participant_add.html"); });
+	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "add_judoka", "list_judoka", "judoka_edit", 
+		"club_list", "club_add", "add_match", "edit_match", "account_add", "account_edit", "account_list",
+		"class_list", "weightclass_add", "weightclass_edit", "matchtable_add", "rule_add", "rule_list", "tournament_list", "tournament_add",
+		"server_config"
+	};
 
-	m_Server.RegisterResource("/add_judoka.html",  [](auto& Request) { return HttpServer::LoadFile("html/add_judoka.html"); });
-	m_Server.RegisterResource("/list_judoka.html", [](auto& Request) { return HttpServer::LoadFile("html/list_judoka.html"); });
-	m_Server.RegisterResource("/judoka_edit.html", [](auto& Request) { return HttpServer::LoadFile("html/judoka_edit.html"); });
-
-	m_Server.RegisterResource("/club_list.html", [](auto& Request) { return HttpServer::LoadFile("html/club_list.html"); });
-	m_Server.RegisterResource("/club_add.html",  [](auto& Request) { return HttpServer::LoadFile("html/club_add.html"); });
-
-	m_Server.RegisterResource("/add_match.html",   [](auto& Request) { return HttpServer::LoadFile("html/add_match.html"); });
-	m_Server.RegisterResource("/edit_match.html",  [](auto& Request) { return HttpServer::LoadFile("html/edit_match.html"); });
-
-	m_Server.RegisterResource("/account_add.html",  [](auto& Request) { return HttpServer::LoadFile("html/account_add.html"); });
-	m_Server.RegisterResource("/account_edit.html", [](auto& Request) { return HttpServer::LoadFile("html/account_edit.html"); });
-	m_Server.RegisterResource("/account_list.html", [](auto& Request) { return HttpServer::LoadFile("html/account_list.html"); });
-
-	m_Server.RegisterResource("/class_list.html", [](auto& Request) { return HttpServer::LoadFile("html/class_list.html"); });
-	m_Server.RegisterResource("/weightclass_add.html",  [](auto& Request) { return HttpServer::LoadFile("html/weightclass_add.html"); });
-	m_Server.RegisterResource("/weightclass_edit.html", [](auto& Request) { return HttpServer::LoadFile("html/weightclass_edit.html"); });
-
-	m_Server.RegisterResource("/matchtable_add.html", [](auto& Request) { return HttpServer::LoadFile("html/matchtable_add.html"); });
-
-	m_Server.RegisterResource("/rule_add.html",  [](auto& Request) { return HttpServer::LoadFile("html/rule_add.html"); });
-	m_Server.RegisterResource("/rule_list.html", [](auto& Request) { return HttpServer::LoadFile("html/rule_list.html"); });
-
-	m_Server.RegisterResource("/tournament_list.html", [](auto& Request) { return HttpServer::LoadFile("html/tournament_list.html"); });
-	m_Server.RegisterResource("/tournament_add.html",  [](auto& Request) { return HttpServer::LoadFile("html/tournament_add.html"); });
-
-	m_Server.RegisterResource("/server_config.html", [](auto& Request) { return HttpServer::LoadFile("html/server_config.html"); });
-
-	m_Server.RegisterResource("/dm4.html", [](auto& Request) { return HttpServer::LoadFile("html/dm4.html"); });
+	for (auto& filename : urls)
+	{
+		m_Server.RegisterResource("/" + filename + ".html", [this, filename](auto& Request) {
+			if (!IsLoggedIn(Request))
+				return HttpServer::LoadFile("html/login.html");
+			return HttpServer::LoadFile("html/" + filename + ".html");
+		});
+	}
 
 
 	//File uploads
@@ -1990,7 +1969,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 #endif
 
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/config/demo", [this](auto& Request) -> std::string {
@@ -2020,7 +1999,10 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		//system("Judoboard.exe --demo");
 		//TODO: not supported
 #else
-		system("git pull; cd ..; ./compile.sh; cd bin; ./Judoboard");
+		if (Application::NoWindow)
+			system("git pull; cd ..; ./compile.sh; cd bin; ./judoboard --nowindow");
+		else
+			system("git pull; cd ..; ./compile.sh; cd bin; ./judoboard");
 		Shutdown();
 #endif
 		
