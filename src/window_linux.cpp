@@ -164,7 +164,6 @@ void Judoboard::Window::CloseWindow()
 
 	m_IsRunning = false;
 
-	m_Renderer->Release();
 	m_Renderer->Unlock();
 }
 
