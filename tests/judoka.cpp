@@ -21,7 +21,6 @@ TEST(Judoka, Basic)
 	j.SetFirstname("New");
 	j.SetLastname("Name");
 	EXPECT_EQ(j.GetName(), std::string("New Name"));
-	//EXPECT_EQ(j.GetShortName(), std::string("New Name"));
 }
 
 
@@ -41,7 +40,6 @@ TEST(Judoka, ImportExport)
 		EXPECT_TRUE(j.GetWeight() == j2.GetWeight());
 		EXPECT_TRUE(j.GetAge() == j2.GetAge());
 		EXPECT_TRUE(j.GetUUID() == j2.GetUUID());
-		//EXPECT_TRUE(j.GetShortName() == j2.GetShortName());
 		EXPECT_TRUE(j.GetLengthOfBreak() == j2.GetLengthOfBreak());
 	}
 }

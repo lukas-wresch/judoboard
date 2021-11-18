@@ -2190,41 +2190,7 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 
 	for (auto dm4_judoka : File.GetParticipants())
 	{
-		auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);
-		/*auto old_judoka = GetDatabase().FindJudoka_DM4_ExactMatch(new_judoka);
-
-		if (!old_judoka)//No exact match
-		{
-			old_judoka = GetDatabase().FindJudoka_DM4_SameName(new_judoka);
-
-			if (old_judoka)//Found someone with the right name but incorrect club/birthyear
-			{
-				ret += "Updating information of judoka: " + old_judoka->GetName() + "<br/>";
-
-				if (!ParseOnly)
-				{
-					if (new_judoka.Club)
-						old_judoka->SetClub(GetDatabase().FindClubByName(new_judoka.Club->Name));
-					if (new_judoka.Birthyear > 0)
-						old_judoka->SetBirthyear(new_judoka.Birthyear);
-					if (new_judoka.Weight > 0)
-						old_judoka->SetWeight(new_judoka.Weight);
-				}
-			}
-
-			else//We don't have a judoka with this name
-			{
-				//Add to database
-				ret += "Adding judoka: " + new_judoka.Firstname + " " + new_judoka.Lastname + "<br/>";
-
-				if (!ParseOnly)
-				{
-					old_judoka = new Judoka(new_judoka);
-					GetDatabase().AddJudoka(old_judoka);
-				}
-			}
-		}*/
-
+		auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);		
 
 		//Judoka is now added/updated
 

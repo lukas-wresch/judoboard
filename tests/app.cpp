@@ -56,7 +56,7 @@ TEST(App, Tournaments)
 	EXPECT_TRUE(app.GetTournament()->GetName() == t->GetName());
 	EXPECT_TRUE(app.CloseTournament());
 
-	EXPECT_TRUE(app.FindTournament("Tournament Name")->GetName() == t->GetName());
+	EXPECT_EQ(app.FindTournament("Tournament Name")->GetName(), t->GetName());
 }
 
 

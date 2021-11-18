@@ -52,7 +52,7 @@ TEST(RemoteMat, QuickClose)
 		IMat* m = master.FindMat(1);
 		ASSERT_TRUE(m);
 	}
-	EXPECT_LE(ZED::Core::CurrentTimestamp() - time, 2000u);
+	EXPECT_LE(ZED::Core::CurrentTimestamp() - time, 2500u);
 }
 
 
