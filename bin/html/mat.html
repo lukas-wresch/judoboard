@@ -59,6 +59,26 @@
     </td>
   </tr>
 
+  <tr id="row_hansokumake_decision_white" style="display: none;">
+    <td colspan="2">
+      <div id="div_hansokumake_decision_white" style="display: none; height: 0px; text-align: center;">
+        <h2>Hansokumake: <label id="label_hansokumake_desc_white">White</label></h2>
+        <button class="remove" style="width: 4.5cm;"                   onclick="SetScore('white', '+disqualification'); ShowHansokumakeDecision(false, 'white');">Disqualification</button>
+        <button class="add"    style="margin-left: 2cm; width: 4.5cm;" onclick="SetScore('white', '-disqualification'); ShowHansokumakeDecision(false, 'white');">No Disqualification</button>
+      </div>
+    </td>
+  </tr>
+
+  <tr id="row_hansokumake_decision_blue" style="display: none;">
+    <td colspan="2">
+      <div id="div_hansokumake_decision_blue" style="display: none; height: 0px; text-align: center;">
+        <h2>Hansokumake: <label id="label_hansokumake_desc_blue">Blue</label></h2>
+        <button class="remove" style="width: 4.5cm;"                   onclick="SetScore('blue', '+disqualification'); ShowHansokumakeDecision(false, 'blue');">Disqualification</button>
+        <button class="add"    style="margin-left: 2cm; width: 4.5cm;" onclick="SetScore('blue', '-disqualification'); ShowHansokumakeDecision(false, 'blue');">No Disqualification</button>
+      </div>
+    </td>
+  </tr>
+
   <tr id="row_additional1" style="display: none;">
 
     <td style="text-align: center;">
@@ -297,6 +317,34 @@ function ShowHantei(show)
 }
 
 
+function ShowHansokumakeDecision(show, whom)
+{
+    if (whom == 'white')
+    {
+        if (show == showHansokumakeDecisionWhite)
+            return;
+        showHansokumakeDecisionWhite = show;
+    }
+    else
+    {
+        if (show == showHansokumakeDecisionBlue)
+            return;
+        showHansokumakeDecisionBlue = show;
+    }
+
+  if (show)
+  {
+    $("#row_hansokumake_decision_" + whom).show();
+    $("#div_hansokumake_decision_" + whom).show().animate({height: '100px', opacity: 100}, 1000);
+  }
+  else
+  {
+    $("#div_hansokumake_decision" + whom).animate({height: '0px', opacity: 0}, 1000);
+    $("#row_hansokumake_decision" + whom).hide(1000);
+  }
+}
+
+
 function GetScore()
 {
   AjaxCallback("ajax/mat/get_score?id="+id, function(response) {
@@ -327,6 +375,8 @@ function GetScore()
     isOutOfTime       = parseInt(res[16]);
     isGoldenScore     = parseInt(res[17]);
     areFightersOnMat  = parseInt(res[18]);
+    whiteNeedHanDesc  = parseInt(res[19]);
+    blueNeedHanDesc   = parseInt(res[20]);
 
     if (isHajime == 1)
     {
@@ -397,6 +447,9 @@ function GetScore()
       document.getElementById("golden_score").disabled = true;
     else
       document.getElementById("golden_score").disabled = false;
+
+    if (whiteNeedHanDesc)
+        ShowHansokumakeDecision(true, 'white');
 
     DisplayTimer();
   });
@@ -539,6 +592,8 @@ TimerID = window.setInterval(UpdateTimer, 100);
 
 var more = false;
 var showHantei = false;
+var showHansokumakeDecisionWhite = false;
+var showHansokumakeDecisionBlue  = false;
 
 document.getElementById("time").innerHTML = lang.time;
 document.getElementById("mat").innerHTML  = lang.mat + ' ' + id;

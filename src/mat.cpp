@@ -785,6 +785,19 @@ void Mat::AddDisqualification(Fighter Whom)
 
 void Mat::AddNotDisqualification(Fighter Whom)
 {
+	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && GetScoreboard(Whom).IsDisqualified())
+	{
+		//Can we simply remove the previous disqualification?
+		if (m_pMatch && !m_pMatch->HasConcluded())
+		{
+			m_mutex.lock();
+			SetScoreboard(Whom).m_Disqualification = Scoreboard::DisqualificationState::Unknown;
+			AddEvent(Whom, MatchLog::BiasedEvent::RemoveDisqualification);
+			m_mutex.unlock();
+		}
+	}
+
+
 	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && !GetScoreboard(Whom).IsDisqualified())
 	{
 		m_mutex.lock();

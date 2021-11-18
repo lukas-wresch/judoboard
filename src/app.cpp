@@ -608,7 +608,11 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 		ZED::CSV ret;
 		ret << mat->Scoreboard2String();
-		ret << mat->GetTime2Display() << mat->IsHajime() << mat->Osaekomi2String(Fighter::White) << mat->Osaekomi2String(Fighter::Blue) << mat->CanNextMatchStart() << mat->HasConcluded() << (mat->IsOutOfTime() && mat->GetResult().m_Winner == Winner::Draw) << mat->IsGoldenScore() << mat->AreFightersOnMat();
+		ret << mat->GetTime2Display() << mat->IsHajime() << mat->Osaekomi2String(Fighter::White) << mat->Osaekomi2String(Fighter::Blue);
+		ret << mat->CanNextMatchStart() << mat->HasConcluded() << (mat->IsOutOfTime() && mat->GetResult().m_Winner == Winner::Draw) << mat->IsGoldenScore() << mat->AreFightersOnMat();
+		//Hansokumake with decision needed?
+		ret << mat->GetScoreboard(Fighter::White).IsUnknownDisqualification();
+		ret << mat->GetScoreboard(Fighter::Blue ).IsUnknownDisqualification();
 		return ret;
 	});
 
@@ -798,10 +802,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			auto mat = FindMat(id);
 
 			if (mat)
-			{
 				mat->AddHansokuMake(fighter);
-				mat->AddNotDisqualification(fighter);//TODO REMOVE THIS!!
-			}
 			return Error();//OK
 		});
 
@@ -821,6 +822,23 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 				mat->RemoveHansokuMake(fighter);
 			return Error();//OK
 		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+disqualification", [this, fighter](auto& Request) -> std::string {
+			auto account = IsLoggedIn(Request);
+			if (!account)
+				return Error(Error::Type::NotLoggedIn);
+
+			return Ajax_AddDisqualification(fighter, Request);
+		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-disqualification", [this, fighter](auto& Request) -> std::string {
+			auto account = IsLoggedIn(Request);
+			if (!account)
+				return Error(Error::Type::NotLoggedIn);
+
+			return Ajax_NoDisqualification(fighter, Request);
+		});
+			
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+medic", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);

@@ -158,3 +158,35 @@ ZED::CSV Application::Ajax_Uptime()
 	ret.AddNewline();
 	return ret;
 }
+
+
+
+Error Application::Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request)
+{
+	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	if (id <= 0)
+		return Error::Type::InvalidID;
+
+	auto mat = FindMat(id);
+
+	if (mat)
+		mat->AddDisqualification(Whom);
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_NoDisqualification(Fighter Whom, const HttpServer::Request& Request)
+{
+	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	if (id <= 0)
+		return Error::Type::InvalidID;
+
+	auto mat = FindMat(id);
+
+	if (mat)
+		mat->AddNotDisqualification(Whom);
+	return Error();//OK
+}

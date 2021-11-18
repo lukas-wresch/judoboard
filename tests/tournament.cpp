@@ -86,7 +86,6 @@ TEST(Tournament, Disqualification)
 
 
 
-
 TEST(Tournament, DoubleDisqualification)
 {
 	initialize();

@@ -566,6 +566,42 @@ TEST(Mat, DirectHansokumakeAndDisqDoesConcludeMatch)
 
 
 
+TEST(Mat, DisqualificationCanBeRemoved)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		match.SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(&match));
+
+
+		m.AddHansokuMake(f);
+		EXPECT_FALSE(m.GetScoreboard(f).IsDisqualified());
+		EXPECT_FALSE(m.GetScoreboard(f).IsNotDisqualified());
+		EXPECT_TRUE(m.GetScoreboard(f).IsUnknownDisqualification());
+
+		m.AddDisqualification(f);
+		EXPECT_TRUE(m.GetScoreboard(f).IsDisqualified());
+		EXPECT_FALSE(m.GetScoreboard(f).IsNotDisqualified());
+		EXPECT_FALSE(m.GetScoreboard(f).IsUnknownDisqualification());
+
+		m.AddNotDisqualification(f);
+		EXPECT_FALSE(m.GetScoreboard(f).IsDisqualified());
+		EXPECT_TRUE(m.GetScoreboard(f).IsNotDisqualified());
+		EXPECT_FALSE(m.GetScoreboard(f).IsUnknownDisqualification());
+
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
 TEST(Mat, Gachi)
 {
 	initialize();

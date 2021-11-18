@@ -96,6 +96,9 @@ namespace Judoboard
 
 		ZED::CSV Ajax_Uptime();
 
+		Error Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request);
+		Error Ajax_NoDisqualification( Fighter Whom, const HttpServer::Request& Request);
+
 		//Serialization
 		[[deprecated]]
 		ZED::CSV Mats2String() const;
