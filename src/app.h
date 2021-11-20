@@ -109,6 +109,8 @@ namespace Judoboard
 		static bool NoWindow;
 
 	private:
+		void SetupHttpServer();
+
 		bool IsTournamentOpen() const { return m_CurrentTournament; }
 		const Account* IsLoggedIn(const HttpServer::Request& Request) const;
 
