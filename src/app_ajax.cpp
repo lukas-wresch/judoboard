@@ -117,20 +117,20 @@ void Application::SetupHttpServer()
 		}
 
 		return Error(Error::Type::InvalidFormat);
-		});
+	});
 
 	//Ajax requests
 
 	m_Server.RegisterResource("/ajax/get_nonce", [this](auto& Request) {
 		auto& nonce = m_Database.CreateNonce(Request.m_RequestInfo.RemoteIP, Request.m_RequestInfo.RemotePort);
 		return nonce.GetChallenge();
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/login", [this](auto& Request) -> std::string {
 		auto username  = HttpServer::DecodeURLEncoded(Request.m_Body, "username");
 		auto challenge = HttpServer::DecodeURLEncoded(Request.m_Body, "challenge");
-		auto respons e = HttpServer::DecodeURLEncoded(Request.m_Body, "response");
+		auto response  = HttpServer::DecodeURLEncoded(Request.m_Body, "response");
 
 		if (!m_Database.DoLogin(username, Request.m_RequestInfo.RemoteIP, response))
 			return Error(Error::Type::OperationFailed);
@@ -138,7 +138,7 @@ void Application::SetupHttpServer()
 		Request.m_ResponseHeader = HttpServer::CookieHeader("session", response);
 
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/config/get_mats", [this](auto& Request) -> std::string {
@@ -147,7 +147,7 @@ void Application::SetupHttpServer()
 			return error;
 
 		return Ajax_GetMats();
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/config/open_mat", [this](auto& Request) -> std::string {
@@ -156,7 +156,7 @@ void Application::SetupHttpServer()
 			return error;
 
 		return Ajax_OpenMat(Request);
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/config/close_mat", [this](auto& Request) -> std::string {
@@ -165,7 +165,7 @@ void Application::SetupHttpServer()
 			return error;
 
 		return Ajax_CloseMat(Request);
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/config/set_mat", [this](auto& Request) -> std::string {
@@ -174,21 +174,19 @@ void Application::SetupHttpServer()
 			return error;
 
 		return Ajax_UpdateMat(Request);
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/config/uptime", [this](auto& Request) -> std::string {
-		auto account = IsLoggedIn(Request);
-		if (!account)
+		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
 		return Ajax_Uptime();
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/colors/get", [this](auto& Request) -> std::string {
-		auto account = IsLoggedIn(Request);
-		if (!account)
+		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
 		ZED::CSV ret;
@@ -202,12 +200,11 @@ void Application::SetupHttpServer()
 		} while (i != base_color);
 
 		return ret;
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/tournament/is_open", [this](auto& Request) -> std::string {
-		auto account = IsLoggedIn(Request);
-		if (!account)
+		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
 		if (GetTournament() != &m_TempTournament)
@@ -311,7 +308,7 @@ void Application::SetupHttpServer()
 		int mat   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
 
 		if (index < 0)
-			return std::string("Invalid match id");
+			return Error(Error::Type::InvalidID);
 		if (mat <= 0)
 			return std::string("Invalid mat id");
 
@@ -321,7 +318,7 @@ void Application::SetupHttpServer()
 		auto entry = GetTournament()->GetScheduleEntry(index);
 
 		if (!entry)
-			return std::string("Could not find entry");
+			return Error(Error::Type::ItemNotFound);
 
 		entry->SetMatID(mat);
 		return Error();//OK
@@ -340,7 +337,7 @@ void Application::SetupHttpServer()
 		auto rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 
 		if (id < 0)
-			return std::string("Invalid match id");
+			return Error(Error::Type::InvalidID);
 
 		auto* match = GetTournament()->FindMatch(id);
 		auto ruleSet = m_Database.FindRuleSetByName(rule);
@@ -370,7 +367,7 @@ void Application::SetupHttpServer()
 		GetTournament()->MoveMatchUp(id);
 
 		return std::string();
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/match/move_down", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -387,7 +384,7 @@ void Application::SetupHttpServer()
 		GetTournament()->MoveMatchDown(id);
 
 		return std::string();
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/match/delete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -435,7 +432,7 @@ void Application::SetupHttpServer()
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
-			return "Invalid id";
+			return Error(Error::Type::InvalidID);
 
 		LockTillScopeEnd();
 		auto mat = FindMat(id);
@@ -523,7 +520,7 @@ void Application::SetupHttpServer()
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
-			return "Invalid mat";
+			return Error(Error::Type::InvalidID);
 
 		auto mat = FindMat(id);
 
@@ -605,7 +602,7 @@ void Application::SetupHttpServer()
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
-			return std::string();
+			return Error(Error::Type::InvalidID);
 
 		auto mat = FindMat(id);
 
@@ -634,11 +631,6 @@ void Application::SetupHttpServer()
 		if (!mat)
 			return (std::string)Error(Error::Type::MatNotFound);
 
-		//if (!mat->RequestScreenshot())
-			//return std::string("Could not create screenshot");
-
-		//const auto ret = HttpServer::LoadFile("screenshot.png");
-		//return ret;
 		ZED::Blob data = mat->RequestScreenshot();
 		return data;
 	}, HttpServer::ResourceType::Image_PNG);
@@ -715,6 +707,70 @@ void Application::SetupHttpServer()
 
 			if (mat)
 				mat->RemoveWazaAri(fighter);
+			return Error();//OK
+		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+yuko", [this, fighter](auto& Request) -> std::string {
+			if (!IsLoggedIn(Request))
+				return Error(Error::Type::NotLoggedIn);
+
+			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+			if (id <= 0)
+				return Error(Error::Type::InvalidID);
+
+			auto mat = FindMat(id);
+
+			if (mat)
+				mat->AddYuko(fighter);
+			return Error();//OK
+		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-yuko", [this, fighter](auto& Request) -> std::string {
+			if (!IsLoggedIn(Request))
+				return Error(Error::Type::NotLoggedIn);
+
+			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+			if (id <= 0)
+				return Error(Error::Type::InvalidID);
+
+			auto mat = FindMat(id);
+
+			if (mat)
+				mat->RemoveYuko(fighter);
+			return Error();//OK
+		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+koka", [this, fighter](auto& Request) -> std::string {
+			if (!IsLoggedIn(Request))
+				return Error(Error::Type::NotLoggedIn);
+
+			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+			if (id <= 0)
+				return Error(Error::Type::InvalidID);
+
+			auto mat = FindMat(id);
+
+			if (mat)
+				mat->AddKoka(fighter);
+			return Error();//OK
+		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-koka", [this, fighter](auto& Request) -> std::string {
+			if (!IsLoggedIn(Request))
+				return Error(Error::Type::NotLoggedIn);
+
+			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+			if (id <= 0)
+				return Error(Error::Type::InvalidID);
+
+			auto mat = FindMat(id);
+
+			if (mat)
+				mat->RemoveKoka(fighter);
 			return Error();//OK
 		});
 
@@ -801,19 +857,19 @@ void Application::SetupHttpServer()
 			if (mat)
 				mat->RemoveHansokuMake(fighter);
 			return Error();//OK
-			});
+		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+disqualification", [this, fighter](auto& Request) -> std::string {
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 			return Ajax_AddDisqualification(fighter, Request);
-			});
+		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-disqualification", [this, fighter](auto& Request) -> std::string {
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 			return Ajax_NoDisqualification(fighter, Request);
-			});
+		});
 
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+medic", [this, fighter](auto& Request) -> std::string {
@@ -848,7 +904,7 @@ void Application::SetupHttpServer()
 			if (mat)
 				mat->RemoveMedicalExamination(fighter);
 			return Error();//OK
-			});
+		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/hantei", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
@@ -869,7 +925,7 @@ void Application::SetupHttpServer()
 			}
 
 			return Error();//OK
-			});
+		});
 
 		m_Server.RegisterResource("/ajax/mat/+draw", [this](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
@@ -890,7 +946,7 @@ void Application::SetupHttpServer()
 			}
 
 			return Error();//OK
-			});
+		});
 
 		m_Server.RegisterResource("/ajax/mat/+golden_score", [this](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
@@ -907,7 +963,7 @@ void Application::SetupHttpServer()
 			if (mat)
 				mat->EnableGoldenScore();
 			return Error();//OK
-			});
+		});
 	}
 
 
@@ -919,14 +975,14 @@ void Application::SetupHttpServer()
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
-			return "Invalid id";
+			return Error(Error::Type::InvalidID);
 
 		auto mat = FindMat(id);
 
 		if (mat)
 			mat->Tokeda();
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/mat/names_on_mat", [this](auto& Request) -> std::string {
@@ -937,7 +993,7 @@ void Application::SetupHttpServer()
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
-			return std::string();
+			return Error(Error::Type::InvalidID);
 
 		auto mat = FindMat(id);
 
@@ -960,7 +1016,7 @@ void Application::SetupHttpServer()
 		}
 
 		return ret;
-		});
+	});
 
 
 
@@ -997,7 +1053,7 @@ void Application::SetupHttpServer()
 		m_Database.AddJudoka(Judoka(firstname, lastname, weight, gender));
 		m_Database.Save();
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/judoka/get", [this](auto& Request) -> std::string {
@@ -1015,7 +1071,7 @@ void Application::SetupHttpServer()
 			return judoka->ToString();
 
 		return std::string();
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/judoka/list", [this](auto& Request) -> std::string {
@@ -1029,8 +1085,8 @@ void Application::SetupHttpServer()
 			if (judoka)
 				ret << judoka->ToString();
 		}
-		return (std::string)ret;
-		});
+		return ret;
+	});
 
 
 	m_Server.RegisterResource("/ajax/judoka/update", [this](auto& Request) -> std::string {
@@ -1063,7 +1119,7 @@ void Application::SetupHttpServer()
 		judoka->SetWeight(weight);
 		judoka->SetGender(gender);
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/judoka/delete", [this](auto& Request) -> std::string {
@@ -1084,7 +1140,7 @@ void Application::SetupHttpServer()
 			return std::string("Failed to delete");
 
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/club/list", [this](auto& Request) -> std::string {
@@ -1093,7 +1149,7 @@ void Application::SetupHttpServer()
 			return error;
 
 		return Ajax_ListClubs();
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/participant/add", [this](auto& Request) -> std::string {
@@ -1123,8 +1179,8 @@ void Application::SetupHttpServer()
 			}
 		}
 
-		return std::string("failed");
-		});
+		return Error(Error::Type::OperationFailed);
+	});
 
 
 	m_Server.RegisterResource("/ajax/participant/remove", [this](auto& Request) -> std::string {
@@ -1140,8 +1196,8 @@ void Application::SetupHttpServer()
 		if (GetTournament() && GetTournament()->RemoveParticipant(id))
 			return Error();//OK
 
-		return std::string("failed");
-		});
+		return Error(Error::Type::OperationFailed);
+	});
 
 
 	m_Server.RegisterResource("/ajax/account/add", [this](auto& Request) -> std::string {
@@ -1168,7 +1224,7 @@ void Application::SetupHttpServer()
 
 		m_Database.Save();
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/account/update", [this](auto& Request) -> std::string {
@@ -1206,7 +1262,7 @@ void Application::SetupHttpServer()
 
 		m_Database.Save();
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/account/delete", [this](auto& Request) -> std::string {
@@ -1246,8 +1302,8 @@ void Application::SetupHttpServer()
 			if (acc)
 				ret << acc->ToString(account->GetAccessLevel());
 		}
-		return (std::string)ret;
-		});
+		return ret;
+	});
 
 
 	m_Server.RegisterResource("/ajax/account/get", [this](auto& Request) -> std::string {
@@ -1288,8 +1344,8 @@ void Application::SetupHttpServer()
 				ret << nonce.GetChallenge() << nonce.GetIP2String() << account->GetUsername() << (nonce.GetExpirationTimestamp() - Timer::GetTimestamp());
 		}
 
-		return (std::string)ret;
-		});
+		return ret;
+	});
 
 
 	m_Server.RegisterResource("/ajax/matchtable/list", [this](auto& Request) -> std::string {
@@ -1333,7 +1389,7 @@ void Application::SetupHttpServer()
 		default:
 			return std::string("Unknown form");
 		}
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/matchtable/add", [this](auto& Request) -> std::string {
@@ -1384,7 +1440,7 @@ void Application::SetupHttpServer()
 		GetTournament()->GenerateSchedule();
 		GetTournament()->Unlock();
 		return Error();//OK
-		});
+	});
 
 
 
@@ -1460,7 +1516,7 @@ void Application::SetupHttpServer()
 
 		GetTournament()->UpdateMatchTable(id);
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/matchtable/delete", [this](auto& Request) -> std::string {
@@ -1505,7 +1561,7 @@ void Application::SetupHttpServer()
 			return std::string("Could not find class");
 
 		return GetTournament()->FindMatchTable(id)->ToString();
-		});
+	});
 
 
 
@@ -1581,7 +1637,7 @@ void Application::SetupHttpServer()
 			return std::string("Could not add rule set to database");
 		m_Database.Save();
 		return Error();//OK
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/rule/update", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -1625,8 +1681,8 @@ void Application::SetupHttpServer()
 		ret << rule->GetName() << rule->GetMatchTime() << rule->GetGoldenScoreTime();
 		ret << rule->GetOsaeKomiTime(false) << rule->GetOsaeKomiTime(true);
 		ret << rule->IsYukoEnabled() << rule->IsKokaEnabled() << rule->IsDrawAllowed() << rule->GetBreakTime();
-		return (std::string)ret;
-		});
+		return ret;
+	});
 
 	m_Server.RegisterResource("/ajax/rule/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -1699,7 +1755,7 @@ void Application::SetupHttpServer()
 		ret << m_Tournaments[index]->GetSchedule().size() << m_Tournaments[index]->GetStatus();
 		ret << m_Tournaments[index]->GetDefaultRuleSet()->GetID();
 		return ret;
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/tournament/open", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -1715,7 +1771,7 @@ void Application::SetupHttpServer()
 			return std::string("Could not open tournament");
 
 		return Error();//OK
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/tournament/close", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -1743,7 +1799,7 @@ void Application::SetupHttpServer()
 
 		m_Tournaments[index]->DeleteAllMatchResults();
 		return Error();//OK
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/tournament/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -1791,7 +1847,7 @@ void Application::SetupHttpServer()
 
 		GetDefaultMat()->SetMatID(new_id);
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/slave/is_mat_open", [this](auto& Request) -> std::string {
@@ -1830,12 +1886,12 @@ void Application::SetupHttpServer()
 			{
 				if (mat->Open())
 					return Error();//OK
-				return "Could not open";
+				return Error(Error::Type::OperationFailed);
 			}
 		}
 
-		return "Could not find mat";
-		});
+		return Error(Error::Type::MatNotFound);
+	});
 
 
 	m_Server.RegisterResource("/ajax/slave/close_mat", [this](auto& Request) -> std::string {
@@ -1852,7 +1908,7 @@ void Application::SetupHttpServer()
 			{
 				if (mat->Close())
 					return Error();//OK
-				return "Could not close mat";
+				return Error(Error::Type::OperationFailed);
 			}
 		}
 
