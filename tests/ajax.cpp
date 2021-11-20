@@ -162,6 +162,45 @@ TEST(Ajax, UpdateMat)
 
 
 
+TEST(Ajax, SetFullscreen)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		Mat* mat = (Mat*)app.GetDefaultMat();
+
+		app.Ajax_SetFullscreen(true, HttpServer::Request("id=1"));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsFullscreen());
+		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+
+
+		app.Ajax_SetFullscreen(false, HttpServer::Request("id=1"));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_FALSE(app.GetDefaultMat()->IsFullscreen());
+		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+
+
+		app.Ajax_SetFullscreen(true, HttpServer::Request("id=1"));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetDefaultMat()->IsFullscreen());
+		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+	}
+}
+
+
+
 TEST(Ajax, ListClubs)
 {
 	initialize();

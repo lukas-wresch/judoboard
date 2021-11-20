@@ -15,7 +15,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Unknown, LocalMat, VirtualMat, RemoteMat
+			Unknown = 0, LocalMat, VirtualMat, RemoteMat
 		};
 
 
@@ -178,11 +178,14 @@ namespace Judoboard
 		//Config
 		IpponStyle GetIpponStyle() const { return m_IpponStyle; }
 		TimerStyle GetTimerStyle() const { return m_TimerStyle; }
+		bool IsFullscreen() const { return m_IsFullscreen; }
+		virtual void SetFullscreen(bool Enabled = true) = 0;
 
 	protected:
 		virtual void SetName(const std::string& NewName) { m_Name = NewName; }
 		virtual void SetIpponStyle(IpponStyle NewStyle) { m_IpponStyle = NewStyle; }
 		virtual void SetTimerStyle(TimerStyle NewStyle) { m_TimerStyle = NewStyle; }
+		virtual void SetIsFullscreen(bool Enabled) { m_IsFullscreen = Enabled; }
 
 		std::vector<const Match*> m_NextMatches;
 
@@ -195,5 +198,6 @@ namespace Judoboard
 		TimerStyle m_TimerStyle = TimerStyle::HundredsMS;
 		IpponStyle m_IpponStyle = IpponStyle::DoubleDigit;
 		//IpponStyle m_IpponStyle = IpponStyle::SpelledOut;
+		bool m_IsFullscreen = true;
 	};
 }

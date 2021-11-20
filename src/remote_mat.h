@@ -86,6 +86,13 @@ namespace Judoboard
 		virtual ZED::CSV Scoreboard2String() const override { return ""; }
 		virtual ZED::CSV Osaekomi2String(Fighter Who) const  override { return ""; }
 
+		//Config
+		virtual void SetFullscreen(bool Enabled = true) override
+		{
+			//TODO
+			IMat::SetIsFullscreen(Enabled);
+		}
+
 	private:
 		bool SendCommand(const std::string& URL) const;
 		ZED::HttpClient::Packet SendRequest(const std::string& URL) const;

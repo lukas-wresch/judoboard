@@ -83,7 +83,7 @@ int main(int argc, char** argv)
 
 		Judoboard::Mat* mat = (Judoboard::Mat*)app.GetDefaultMat();
 
-		mat->GetWindow().Fullscreen();
+		mat->SetFullscreen();
 		ZED::Core::Pause(5000);
 
 		srand(ZED::Core::CurrentTimestamp());

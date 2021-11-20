@@ -118,6 +118,13 @@ namespace Judoboard
 			return m_Scoreboards[1];
 		}
 
+		//Config
+		virtual void SetFullscreen(bool Enabled = true) override
+		{
+			m_Window.Fullscreen(Enabled);
+			IMat::SetIsFullscreen(Enabled);
+		}
+
 
 	private:
 		Scoreboard& SetScoreboard(Fighter Whom)

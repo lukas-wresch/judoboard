@@ -177,6 +177,22 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/config/fullscreen", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+		return Ajax_SetFullscreen(true, Request);
+	});
+
+
+	m_Server.RegisterResource("/ajax/config/windowed", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+		return Ajax_SetFullscreen(false, Request);
+	});
+
+
 	m_Server.RegisterResource("/ajax/config/uptime", [this](auto& Request) -> std::string {
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
@@ -2169,10 +2185,10 @@ ZED::CSV Application::Ajax_GetMats() const
 			if (!mat)
 			{
 				std::string mat_name = Localizer::Translate("Mat") + " " + std::to_string(id);
-				ret << id << IMat::Type::Unknown << false << mat_name << false;
+				ret << id << IMat::Type::Unknown << false << mat_name << 0 << 0 << false;
 			}
 			else
-				ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponStyle() << mat->GetTimerStyle();
+				ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponStyle() << mat->GetTimerStyle() << mat->IsFullscreen();
 		}
 	}
 
@@ -2314,8 +2330,10 @@ Error Application::Ajax_AddDisqualification(Fighter Whom, const HttpServer::Requ
 
 	auto mat = FindMat(id);
 
-	if (mat)
-		mat->AddDisqualification(Whom);
+	if (!mat)
+		return Error::Type::MatNotFound;
+
+	mat->AddDisqualification(Whom);
 	return Error();//OK
 }
 
@@ -2330,7 +2348,27 @@ Error Application::Ajax_NoDisqualification(Fighter Whom, const HttpServer::Reque
 
 	auto mat = FindMat(id);
 
-	if (mat)
-		mat->AddNotDisqualification(Whom);
+	if (!mat)
+		return Error::Type::MatNotFound;
+
+	mat->AddNotDisqualification(Whom);
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request)
+{
+	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	if (id <= 0)
+		return Error::Type::InvalidID;
+
+	auto mat = FindMat(id);
+
+	if (!mat)
+		return Error::Type::MatNotFound;
+
+	mat->SetFullscreen(Fullscreen);
 	return Error();//OK
 }

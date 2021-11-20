@@ -35,6 +35,16 @@ function CloseMat(id)
 
 
 
+function Command(cmd, id)
+{
+  AjaxCallback('/ajax/config/' + cmd + '?id=' + id, function() {
+    Update();
+  });
+  return false;
+}
+
+
+
 function Update()
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
@@ -56,6 +66,8 @@ function Update()
       var is_open = res[i++];
       var name    = res[i++];
       var showIpponAsTwoWazaari = res[i++];
+      var timerStyle = res[i++];
+      var fullscreen = res[i++];
 
 
       var row = table.insertRow(-1);
@@ -75,9 +87,16 @@ function Update()
       {
         cell3.innerHTML = "Local mat";
         if (is_open == 1)
-          cell4.innerHTML = "<button class=\"neutral\" onclick=\"navigate('mat_edit.html?id=" + matID + "');\">Edit</button>" + "<button class=\"remove\" onclick=\"return CloseMat(" + matID + ");\">Close</button>";
+          cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseMat(" + matID + ");\">Close</button>";
         else
-          cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenMat(" + matID + ");\">Start</button>" + "<button class=\"neutral\" onclick=\"navigate('mat_edit.html?id=" + matID + "');\">Edit</button>";
+          cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenMat(" + matID + ");\">Start</button>";
+
+        if (fullscreen == 0)
+          cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('fullscreen'," + matID + ");\">Fullscreen</button>";
+        else
+          cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('windowed'," + matID + ");\">Window Mode</button>";
+
+        cell4.innerHTML += "<button class=\"neutral\" onclick=\"navigate('mat_edit.html?id=" + matID + "');\">Edit</button>";
       }
       else if (type == 2)
       {

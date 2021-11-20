@@ -33,6 +33,8 @@ bool Mat::Open()
 
 	m_Thread = std::thread([this]()
 	{
+		//m_Window = Window(Application::Name);//Recreate
+
 		if (!m_Window.OpenWindow())
 			ZED::Log::Warn("Could not open window");
 
