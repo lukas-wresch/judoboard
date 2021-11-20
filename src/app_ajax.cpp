@@ -1769,7 +1769,10 @@ void Application::SetupHttpServer()
 		ZED::CSV ret;
 		ret << m_Tournaments[index]->GetName() << m_Tournaments[index]->GetParticipants().size();
 		ret << m_Tournaments[index]->GetSchedule().size() << m_Tournaments[index]->GetStatus();
-		ret << m_Tournaments[index]->GetDefaultRuleSet()->GetID();
+		if (m_Tournaments[index]->GetDefaultRuleSet())
+			ret << m_Tournaments[index]->GetDefaultRuleSet()->GetID();
+		else
+			ret << -1;
 		return ret;
 	});
 
