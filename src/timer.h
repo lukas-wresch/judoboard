@@ -20,6 +20,7 @@ public:
 	bool IsRunning() const { return m_Running; }
 
 	std::string ToString() const;
+	std::string ToStringWithHundreds() const;
 	std::string ToStringInSeconds() const;
 
 	uint32_t GetElapsedTime() const;//Returns elapsed time in milliseconds

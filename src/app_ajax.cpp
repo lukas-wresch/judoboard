@@ -2172,7 +2172,7 @@ ZED::CSV Application::Ajax_GetMats() const
 				ret << id << IMat::Type::Unknown << false << mat_name << false;
 			}
 			else
-				ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponDisplayStyle();
+				ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponStyle() << mat->GetTimerStyle();
 		}
 	}
 
@@ -2239,10 +2239,13 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 	int new_id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body,  "id"));
 	auto name  = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
+	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
 
 	if (id <= 0 || new_id <= 0)
 		return Error::Type::InvalidID;
 	if (ipponStyle <= -1)
+		return Error::Type::InvalidID;
+	if (timerStyle <= -1)
 		return Error::Type::InvalidID;
 
 	if (id != new_id)//Check if new_id is an unused id
@@ -2264,7 +2267,8 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 				mat->SetMatID(new_id);
 
 			mat->SetName(name);
-			mat->SetIpponDisplayStyle((Mat::IpponDisplayStyle)ipponStyle);
+			mat->SetIpponStyle((Mat::IpponStyle)ipponStyle);
+			mat->SetTimerStyle((Mat::TimerStyle)timerStyle);
 
 			return Error();//OK
 		}

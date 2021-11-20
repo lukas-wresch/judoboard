@@ -1398,14 +1398,14 @@ void Mat::UpdateGraphics() const
 	case State::Running:
 	{
 		//Update scoreboard
-		switch (GetIpponDisplayStyle())
+		switch (GetIpponStyle())
 		{
-		case IpponDisplayStyle::SingleDigit:
+		case IpponStyle::SingleDigit:
 			m_Graphics["white_wazari"].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::White).m_Ippon ? 2 : GetScoreboard(Fighter::White).m_WazaAri), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic);
 			m_Graphics["blue_wazari" ].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::Blue ).m_Ippon ? 2 : GetScoreboard(Fighter::Blue ).m_WazaAri), ZED::Color(255, 255, 255), ZED::FontSize::Gigantic);
 			break;
 
-		case IpponDisplayStyle::DoubleDigit:
+		case IpponStyle::DoubleDigit:
 			m_Graphics["white_ippon" ].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::White).m_Ippon), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic);
 			m_Graphics["white_wazari"].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::White).m_Ippon ? 0 : GetScoreboard(Fighter::White).m_WazaAri), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic);
 
@@ -1413,7 +1413,7 @@ void Mat::UpdateGraphics() const
 			m_Graphics["blue_wazari"].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::Blue).m_Ippon ? 0 : GetScoreboard(Fighter::Blue).m_WazaAri), ZED::Color(255, 255, 255), ZED::FontSize::Gigantic);
 			break;
 
-		case IpponDisplayStyle::SpelledOut:
+		case IpponStyle::SpelledOut:
 		{
 			std::string spelled_out_white, spelled_out_blue;
 
@@ -1451,7 +1451,12 @@ void Mat::UpdateGraphics() const
 
 			//Update timer
 			Timer time(GetTime2Display());
-			m_Graphics["timer"].UpdateTexture(renderer, time.ToString(), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic2);
+			if (GetTimerStyle() == TimerStyle::HundredsMS)
+				m_Graphics["timer"].UpdateTexture(renderer, time.ToStringWithHundreds(), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic2);
+			else if (GetTimerStyle() == TimerStyle::OnlySeconds)
+				m_Graphics["timer"].UpdateTexture(renderer, time.ToStringInSeconds(),    ZED::Color(0, 0, 0), ZED::FontSize::Gigantic2);
+			else if (GetTimerStyle() == TimerStyle::Full)
+				m_Graphics["timer"].UpdateTexture(renderer, time.ToString(), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic2);
 			
 			
 			//Update osaekomi
@@ -1551,7 +1556,7 @@ void Mat::RenderScore(double dt) const
 {
 	auto& renderer = m_Window.GetRenderer();
 
-	if (GetIpponDisplayStyle() == IpponDisplayStyle::DoubleDigit)
+	if (GetIpponStyle() == IpponStyle::DoubleDigit)
 	{
 		m_Graphics["white_ippon"].Render(renderer, dt);
 		m_Graphics["blue_ippon" ].Render(renderer, dt);

@@ -19,7 +19,14 @@ namespace Judoboard
 		};
 
 
-		enum class IpponDisplayStyle
+		enum class TimerStyle
+		{
+			HundredsMS,//Show time like:  1:23.5
+			OnlySeconds,//Show time like: 1:23
+			Full,//Show time like:        1:23.456
+		};
+
+		enum class IpponStyle
 		{
 			DoubleDigit,//Show score like: 0 0, 0 1, 1 0
 			SingleDigit,//Show score like: 0, 1, 2
@@ -169,11 +176,13 @@ namespace Judoboard
 		virtual ZED::CSV Osaekomi2String(Fighter Who) const = 0;
 
 		//Config
-		IpponDisplayStyle GetIpponDisplayStyle() const { return m_DisplayStyle; }
+		IpponStyle GetIpponStyle() const { return m_IpponStyle; }
+		TimerStyle GetTimerStyle() const { return m_TimerStyle; }
 
 	protected:
 		virtual void SetName(const std::string& NewName) { m_Name = NewName; }
-		virtual void SetIpponDisplayStyle(IpponDisplayStyle NewStyle) { m_DisplayStyle = NewStyle; }
+		virtual void SetIpponStyle(IpponStyle NewStyle) { m_IpponStyle = NewStyle; }
+		virtual void SetTimerStyle(TimerStyle NewStyle) { m_TimerStyle = NewStyle; }
 
 		std::vector<const Match*> m_NextMatches;
 
@@ -183,8 +192,8 @@ namespace Judoboard
 		uint32_t m_ID = 1;
 
 		//Configuration
-		IpponDisplayStyle m_DisplayStyle = IpponDisplayStyle::DoubleDigit;
-		//IpponDisplayStyle m_DisplayStyle = IpponDisplayStyle::SpelledOut;
-		//bool m_ShowIpponAsTwoWazaari = true;//If true an ippon will be displayed as 2 wazari instead of 1 ippon & 0 wazarri
+		TimerStyle m_TimerStyle = TimerStyle::HundredsMS;
+		IpponStyle m_IpponStyle = IpponStyle::DoubleDigit;
+		//IpponStyle m_IpponStyle = IpponStyle::SpelledOut;
 	};
 }

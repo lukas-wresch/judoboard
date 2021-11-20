@@ -31,7 +31,7 @@ TEST(Ajax, GetMats)
 	EXPECT_TRUE(id == 1);
 	EXPECT_TRUE(type == (int)Mat::Type::LocalMat);
 	EXPECT_TRUE(name == "Mat 1");
-	EXPECT_TRUE(style == (int)IMat::IpponDisplayStyle::DoubleDigit);
+	EXPECT_TRUE(style == (int)IMat::IpponStyle::DoubleDigit);
 }
 
 
@@ -129,32 +129,34 @@ TEST(Ajax, UpdateMat)
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 
-		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0"));
+		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&timerStyle=1"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 5);
 		EXPECT_TRUE(app.GetDefaultMat()->GetName()  == "Test");
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponDisplayStyle() == 0);
+		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 0);
+		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 1);
 
 
-
-		app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1"));
-
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
-		EXPECT_TRUE(app.GetDefaultMat()->GetName() == "Test2");
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponDisplayStyle() == 1);
-
-
-		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test2&ipponStyle=2"));
+		app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&timerStyle=2"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
 		EXPECT_TRUE(app.GetDefaultMat()->GetName() == "Test2");
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponDisplayStyle() == 2);
+		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 1);
+		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 2);
+
+
+		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test2&ipponStyle=2&timerStyle=0"));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+		EXPECT_TRUE(app.GetDefaultMat()->GetName() == "Test2");
+		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 2);
+		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 0);
 	}
 }
 

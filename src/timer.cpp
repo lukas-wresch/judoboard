@@ -79,6 +79,17 @@ std::string Timer::ToString() const
 	auto time = GetElapsedTime();
 
 	std::stringstream stream;
+	stream << std::setfill('0') << std::setw(1) << (time/1000)/60 << ":" << std::setw(2) << (time/1000)%60 << "." << std::setw(3) << time%1000;
+	return stream.str();
+}
+
+
+
+std::string Timer::ToStringWithHundreds() const
+{
+	auto time = GetElapsedTime();
+
+	std::stringstream stream;
 	//stream << std::setfill('0') << std::setw(1) << (time/1000)/60 << ":" << std::setw(2) << (time/1000)%60 << "." << std::setw(3) << time%1000;
 	stream << std::setfill('0') << std::setw(1) << (time / 1000) / 60 << ":" << std::setw(2) << (time / 1000) % 60 << "." << std::setw(1) << (time % 1000)/100;
 	return stream.str();
@@ -88,7 +99,12 @@ std::string Timer::ToString() const
 
 std::string Timer::ToStringInSeconds() const
 {
-	return std::to_string(GetElapsedTime() / 1000);
+	auto time = GetElapsedTime();
+
+	std::stringstream stream;
+	stream << std::setfill('0') << std::setw(1) << (time / 1000) / 60 << ":" << std::setw(2) << (time / 1000) % 60;
+	return stream.str();
+	//return std::to_string(GetElapsedTime() / 1000);
 }
 
 
