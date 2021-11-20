@@ -10,7 +10,7 @@
 
 namespace Judoboard
 {
-	class ITournament
+	class ITournament : public ID
 	{
 	public:
 		virtual std::string GetName() const { return ""; }//Returns the name of the tournament

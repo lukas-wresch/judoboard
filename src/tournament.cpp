@@ -198,7 +198,7 @@ bool Tournament::Load(const std::string& Filename)
 
 		if (new_table)
 		{
-			AddMatchTable(new_table);
+			AddMatchTable(new_table, false);//TODO: Do this in a separate method
 			new_table->SetSchedule().clear();
 		}
 	}
@@ -749,13 +749,13 @@ uint32_t Tournament::GetFreeMatchTableID() const
 
 
 
-void Tournament::AddMatchTable(MatchTable* NewMatchTable)
+void Tournament::AddMatchTable(MatchTable* NewMatchTable, bool DoSave)
 {
 	if (!NewMatchTable)
 		return;
 
 	//Add all eligable participants to the match table
-	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
+	for (auto [id, judoka] : m_StandingData.GetAllJudokas())//TODO This is bad if NewMatchTable is already stored on disk
 	{
 		if (judoka && NewMatchTable->IsElgiable(*judoka))
 			NewMatchTable->AddParticipant(judoka);
@@ -777,8 +777,11 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	m_MatchTables.push_back(NewMatchTable);
 	m_SchedulePlanner.push_back(NewMatchTable);
 
-	GenerateSchedule();
-	Save();
+	if (DoSave)
+	{
+		GenerateSchedule();
+		Save();
+	}
 }
 
 

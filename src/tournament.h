@@ -67,7 +67,7 @@ namespace Judoboard
 
 		//Match tables
 		uint32_t GetFreeMatchTableID() const;//Returns an unused/free ID that should be used for the next match table
-		void AddMatchTable(MatchTable* NewMatchTable);
+		void AddMatchTable(MatchTable* NewMatchTable, bool DoSave = true);
 		void UpdateMatchTable(uint32_t ID);//Calling this function we recalculate the given match table
 		bool DeleteMatchTable(uint32_t ID);
 		const std::vector<MatchTable*>& GetMatchTables() const { return m_MatchTables; }

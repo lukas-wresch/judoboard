@@ -1814,9 +1814,30 @@ void Application::SetupHttpServer()
 		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (index < 0 || (uint32_t)index >= m_Tournaments.size())
-			return std::string("Invalid tournament id");
+			return Error(Error::Type::InvalidID);
 
 		m_Tournaments[index]->DeleteAllMatchResults();
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/tournament/delete", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (index < 0 || (uint32_t)index >= m_Tournaments.size())
+			return Error(Error::Type::InvalidID);
+
+		if (GetTournament()->GetID() == m_Tournaments[index]->GetID())
+			return Error(Error::Type::OperationFailed);
+
+		ZED::Core::RemoveFile("tournaments/" + m_Tournaments[index]->GetName());
+
+		delete m_Tournaments[index];
+		m_Tournaments.erase(m_Tournaments.begin() + index);
+
 		return Error();//OK
 	});
 
@@ -1836,7 +1857,7 @@ void Application::SetupHttpServer()
 		}
 
 		return ret;
-		});
+	});
 
 
 	//Slave
@@ -1848,7 +1869,7 @@ void Application::SetupHttpServer()
 			return "You are not allowed to connect";
 
 		return Error();//OK
-		});
+	});
 
 	//Slave mat commands
 
@@ -1888,7 +1909,7 @@ void Application::SetupHttpServer()
 		}
 
 		return "Could not find mat";
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/slave/open_mat", [this](auto& Request) -> std::string {
@@ -2076,7 +2097,7 @@ void Application::SetupHttpServer()
 #endif
 
 		return Error();//OK
-		});
+	});
 
 	//Commands slave -> master
 
