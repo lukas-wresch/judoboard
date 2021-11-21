@@ -1,8 +1,8 @@
 #include "../include/png.h"
 #include "../include/file.h"
 #include "../include/log.h"
-//#include "../external/libpng-1.6.37/png.h"
-#include <png.h>
+#include "../external/libpng-1.6.37/png.h"
+//#include <png.h>
 
 
 using namespace ZED;
