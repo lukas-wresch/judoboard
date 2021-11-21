@@ -71,8 +71,8 @@ namespace Judoboard
 
 		virtual MatchTable* FindMatchTable(uint32_t ID) { return nullptr; }
 		virtual const MatchTable* FindMatchTable(uint32_t ID) const { return nullptr; }
-		virtual MatchTable* FindMatchTable(UUID ID) { return nullptr; }
-		virtual const MatchTable* FindMatchTable(UUID ID) const { return nullptr; }
+		virtual MatchTable* FindMatchTable(const UUID& ID) { return nullptr; }
+		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
 		virtual int FindMatchTableIndex(uint32_t ID) const { return -1; }
 
 		//Rule Sets

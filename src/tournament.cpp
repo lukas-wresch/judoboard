@@ -99,10 +99,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (match.Weightclass && match.Weightclass->pUserData)
 		{
 			auto match_table = (Weightclass*)match.Weightclass->pUserData;
-			//match_table->AddMatch(new_match);//Add match to weightclass
-
-			m_MatchTables.push_back(match_table);
-			m_SchedulePlanner.push_back(match_table);
+			match_table->AddMatch(new_match);//Add match to weightclass
 		}
 
 		m_Schedule.emplace_back(new_match);

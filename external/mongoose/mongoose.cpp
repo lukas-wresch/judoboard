@@ -4040,11 +4040,11 @@ static int consume_socket(struct mg_context *ctx, struct socket *sp) {
 
 static void worker_thread(struct mg_context *ctx)
 {
-  struct mg_connection *conn;
   int buf_size = atoi(ctx->config[MAX_REQUEST_SIZE]);
 
-  conn = (struct mg_connection *) calloc(1, sizeof(*conn) + buf_size);
-  if (conn == NULL) {
+  struct mg_connection* conn = (struct mg_connection *) calloc(1, sizeof(*conn) + buf_size);
+  if (!conn)
+  {
     cry(fc(ctx), "%s", "Cannot create new connection struct, OOM");
     return;
   }
@@ -4053,7 +4053,8 @@ static void worker_thread(struct mg_context *ctx)
 
   // Call consume_socket() even when ctx->stop_flag > 0, to let it signal
   // sq_empty condvar to wake up the master waiting in produce_socket()
-  while (consume_socket(ctx, &conn->client)) {
+  while (consume_socket(ctx, &conn->client))
+  {
     conn->birth_time = time(NULL);
     conn->ctx = ctx;
 
@@ -4075,34 +4076,34 @@ static void worker_thread(struct mg_context *ctx)
   free(conn);
 
   // Signal master that we're done with connection and exiting
-  (void) pthread_mutex_lock(&ctx->mutex);
+  pthread_mutex_lock(&ctx->mutex);
   ctx->num_threads--;
-  (void) pthread_cond_signal(&ctx->cond);
-  assert(ctx->num_threads >= 0);
-  (void) pthread_mutex_unlock(&ctx->mutex);
+  pthread_cond_signal(&ctx->cond);
+  //assert(ctx->num_threads >= 0);
+  pthread_mutex_unlock(&ctx->mutex);
 
   DEBUG_TRACE(("exiting"));
 }
 
 // Master thread adds accepted socket to a queue
-static void produce_socket(struct mg_context *ctx, const struct socket *sp) {
+static void produce_socket(struct mg_context *ctx, const struct socket *sp)
+{
   (void) pthread_mutex_lock(&ctx->mutex);
 
   // If the queue is full, wait
-  while (ctx->stop_flag == 0 &&
-         ctx->sq_head - ctx->sq_tail >= (int) ARRAY_SIZE(ctx->queue)) {
-    (void) pthread_cond_wait(&ctx->sq_empty, &ctx->mutex);
-  }
+  while (ctx->stop_flag == 0 && ctx->sq_head - ctx->sq_tail >= (int) ARRAY_SIZE(ctx->queue))
+    pthread_cond_wait(&ctx->sq_empty, &ctx->mutex);
 
-  if (ctx->sq_head - ctx->sq_tail < (int) ARRAY_SIZE(ctx->queue)) {
+  if (ctx->sq_head - ctx->sq_tail < (int) ARRAY_SIZE(ctx->queue))
+  {
     // Copy socket to the queue and increment head
     ctx->queue[ctx->sq_head % ARRAY_SIZE(ctx->queue)] = *sp;
     ctx->sq_head++;
     DEBUG_TRACE(("queued socket %d", sp->sock));
   }
 
-  (void) pthread_cond_signal(&ctx->sq_full);
-  (void) pthread_mutex_unlock(&ctx->mutex);
+  pthread_cond_signal(&ctx->sq_full);
+  pthread_mutex_unlock(&ctx->mutex);
 }
 
 static void accept_new_connection(const struct socket *listener,

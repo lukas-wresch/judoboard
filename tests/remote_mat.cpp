@@ -32,7 +32,7 @@ TEST(RemoteMat, OpenAndClose)
 	EXPECT_TRUE(m->IsOpen());
 
 	EXPECT_FALSE(m->HasConcluded());
-	EXPECT_TRUE(m->GetOsaekomiList().size() == 0);
+	EXPECT_EQ(m->GetOsaekomiList().size(), 0);
 	//EXPECT_GE(m->RequestScreenshot().GetSize(), 1024u);//Would only work in software renderer
 }
 

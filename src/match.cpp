@@ -42,7 +42,11 @@ Match::Match(ZED::CSV& Stream, ITournament* Tournament) : Schedulable(Stream, To
 	Stream >> matchtableUUID;
 
 	if (matchtableUUID.length() > 1 && Tournament)
+	{
 		m_Table = Tournament->FindMatchTable(UUID(std::move(matchtableUUID)));
+		if (!m_Table)
+			ZED::Log::Error("Could not find match table!");
+	}
 
 	if (Tournament)
 	{

@@ -80,8 +80,8 @@ namespace Judoboard
 		const std::vector<MatchTable*>& GetMatchTables() const { return m_MatchTables; }
 		MatchTable* FindMatchTable(uint32_t ID);
 		const MatchTable* FindMatchTable(uint32_t ID) const;
-		MatchTable* FindMatchTable(const UUID& ID);
-		const MatchTable* FindMatchTable(const UUID& ID) const;
+		virtual MatchTable* FindMatchTable(const UUID& ID) override;
+		virtual const MatchTable* FindMatchTable(const UUID& ID) const override;
 		MatchTable* FindMatchTableByName(const std::string& Name);
 		int FindMatchTableIndex(uint32_t ID) const;
 
