@@ -271,7 +271,13 @@ int main(int argc, char** argv)
 	//if (app.GetTournamentList().size() == 0)
 		//app.AddTournament(new Judoboard::Tournament("Test Tournament", app.GetDatabase().FindRuleSet("Default")));
 
-	ZED::Core::Pause(1000);
+	ZED::Core::Pause(3000);
+
+#ifdef WIN32
+#ifndef _DEBUG
+	ShellExecute(NULL, L"open", L"http://localhost:8080", NULL, NULL, 0);
+#endif
+#endif
 
 #ifdef _DEBUG
 	if (app.GetDatabase().GetNumJudoka() < 5)

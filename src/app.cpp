@@ -57,8 +57,8 @@ bool Application::LoadDataFromDisk()
 {
 	if (!m_Database.Load("database.csv"))
 	{
-		ZED::Log::Error("Could not load database!");
-		return false;
+		ZED::Log::Warn("Could not load database!");
+		//return false;
 	}
 
 	ZED::Core::Indexer([this](auto Filename) {

@@ -31,7 +31,7 @@ bool Database::Load(const std::string& Filename)
 
 	if (!File)
 	{
-		ZED::Log::Error("Could not open file " + Filename);
+		ZED::Log::Warn("Could not open file " + Filename);
 		return false;
 	}
 

@@ -83,7 +83,7 @@ namespace Judoboard
 		bool ConnectToMaster(const std::string& Hostname, uint16_t Port = 8080);
 
 		void Run();
-		void Shutdown() { m_Running = false; }
+		void Shutdown() const { m_Running = false; }
 
 		//AJAX requests
 		ZED::CSV Ajax_GetMats() const;
@@ -154,7 +154,7 @@ namespace Judoboard
 
 		mutable std::mutex m_mutex;
 
-		bool m_Running = true;
+		mutable bool m_Running = true;
 		const uint32_t m_StartupTimestamp;
 	};
 }
