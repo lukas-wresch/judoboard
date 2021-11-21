@@ -27,4 +27,14 @@ jobs:
     - name: configure
       run: chmod u+x *.sh
     - name: make
-      run: ./compile.sh
+    
+  build3:
+    name: Build on Windows
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup MSBuild.exe
+      uses: warrenbuckley/Setup-MSBuild@v1
+    - name: msbuild
+      run: compile.bat
