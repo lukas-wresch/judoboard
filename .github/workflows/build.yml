@@ -42,8 +42,8 @@ jobs:
     - name: change directory
       run: dir; cd vsprojects; dir
     - name: nuget1
-      run: nuget install ZED\packages.config        -OutputDirectory packages
+      run: dir; cd vsprojects; dir; nuget install ZED\packages.config        -OutputDirectory packages
     - name: nuget2
-      run: nuget install GoogleTest\packages.config -OutputDirectory packages
+      run: dir; cd vsprojects; dir; nuget install GoogleTest\packages.config -OutputDirectory packages
     - name: msbuild
       run: dir; cd vsprojects; dir; msbuild Judoboard.sln
