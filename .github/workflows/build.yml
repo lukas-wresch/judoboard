@@ -27,6 +27,7 @@ jobs:
     - name: configure
       run: chmod u+x *.sh
     - name: make
+      run: ./compile.sh
     
   build3:
     name: Build on Windows
