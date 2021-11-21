@@ -39,5 +39,13 @@ jobs:
       uses: warrenbuckley/Setup-MSBuild@v1
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+    - name: change directory
+      run: cd vsprojects
+    - name: nuget1
+      run: nuget install ZED\packages.config        -OutputDirectory packages
+    - name: nuget2
+      run: nuget install GoogleTest\packages.config -OutputDirectory packages
+    - name: copy libpng
+      run: copy packages\libpng.1.6.28.1\build\native\lib\x64\v140\dynamic\Release\libpng16.lib ZED\libpng16.lib
     - name: msbuild
-      run: cd judoboard; compile.bat
+      run: msbuild
