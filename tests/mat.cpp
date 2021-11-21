@@ -2103,7 +2103,7 @@ TEST(Mat, BreakTime)
 			ZED::Core::Pause(1000);
 		}
 
-		ZED::Core::Pause(2000);
+		ZED::Core::Pause(2500);
 
 		EXPECT_TRUE(m.StartMatch(&match2));
 	}
