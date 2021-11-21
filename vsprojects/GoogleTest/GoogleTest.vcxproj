@@ -39,8 +39,8 @@
     <TargetName>$(ProjectName)_Debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>E:\Workspace;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\Workspace;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\bin\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -136,6 +136,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -143,7 +144,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>E:\Workspace\Judoboard\vsprojects\Judoboard\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;md5.obj;imat.obj;id.obj;judoka.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>

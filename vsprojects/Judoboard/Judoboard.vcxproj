@@ -92,7 +92,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>..\..;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\bin\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -257,6 +257,7 @@
     <None Include="..\..\bin\html\tournament_list.html" />
     <None Include="..\..\bin\html\weightclass_add.html" />
     <None Include="..\..\bin\html\weightclass_edit.html" />
+    <None Include="..\..\compile.bat" />
     <None Include="..\..\compile.sh" />
     <None Include="..\..\dependencies.sh" />
     <None Include="..\..\README.md" />
