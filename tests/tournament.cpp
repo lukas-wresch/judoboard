@@ -335,9 +335,9 @@ TEST(Tournament, SaveAndLoad)
 		Database d;
 		d.EnableAutoSave(false);
 
-		EXPECT_TRUE(d.GetNumJudoka() == 0);
+		EXPECT_EQ(d.GetNumJudoka(), 0);
 
-		Judoka j1("Firstname",  "Lastname", 50, Gender::Male);
+		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
 		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
 		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
 		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);

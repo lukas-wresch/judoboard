@@ -30,14 +30,14 @@ namespace Judoboard
 		void SetGender(Gender Gender) { m_Gender = Gender; m_GenderEnforced = true; }
 		void EnforceGender(bool Enabled = true) { m_GenderEnforced = Enabled; }
 
-		bool IsElgiable(const Judoka& Fighter) const override;
+		virtual bool IsElgiable(const Judoka& Fighter) const override;
 		void GenerateSchedule() override;
 
 		//Serialization
-		const std::string ToHTML() const override;
-		const std::string ToString() const override;
+		virtual const std::string ToHTML() const override;
+		virtual const std::string ToString() const override;
 
-		void operator >> (ZED::CSV& Stream) const override;
+		virtual void operator >> (ZED::CSV& Stream) const override;
 
 
 	private:

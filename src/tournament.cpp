@@ -99,7 +99,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (match.Weightclass && match.Weightclass->pUserData)
 		{
 			auto match_table = (Weightclass*)match.Weightclass->pUserData;
-			match_table->AddMatch(new_match);//Add match to weightclass
+			//match_table->AddMatch(new_match);//Add match to weightclass
+
+			m_MatchTables.push_back(match_table);
+			m_SchedulePlanner.push_back(match_table);
 		}
 
 		m_Schedule.emplace_back(new_match);
@@ -198,8 +201,9 @@ bool Tournament::Load(const std::string& Filename)
 
 		if (new_table)
 		{
-			AddMatchTable(new_table, false);//TODO: Do this in a separate method
-			new_table->SetSchedule().clear();
+			//AddMatchTable(new_table, false);//TODO: Do this in a separate method
+			m_MatchTables.push_back(new_table);
+			m_SchedulePlanner.push_back(new_table);
 		}
 	}
 
@@ -645,7 +649,6 @@ bool Tournament::RemoveParticipant(uint32_t ID)
 		}
 	}
 
-	Save();
 	GenerateSchedule();//Recalculate schedule
 
 	return true;
@@ -749,7 +752,7 @@ uint32_t Tournament::GetFreeMatchTableID() const
 
 
 
-void Tournament::AddMatchTable(MatchTable* NewMatchTable, bool DoSave)
+void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 {
 	if (!NewMatchTable)
 		return;
@@ -777,11 +780,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable, bool DoSave)
 	m_MatchTables.push_back(NewMatchTable);
 	m_SchedulePlanner.push_back(NewMatchTable);
 
-	if (DoSave)
-	{
-		GenerateSchedule();
-		Save();
-	}
+	GenerateSchedule();
 }
 
 

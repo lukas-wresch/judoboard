@@ -216,8 +216,8 @@ TEST(Ajax, ListClubs)
 		std::string name1, name2;
 		csv >> id1 >> name1;
 
-		EXPECT_TRUE(id1 == 2);
-		EXPECT_TRUE(name1 == "Club 1");
+		EXPECT_EQ(id1, 3);
+		EXPECT_EQ(name1, "Club 1");
 
 
 		app.GetDatabase().AddClub(new Club("Club 2"));
@@ -226,10 +226,10 @@ TEST(Ajax, ListClubs)
 
 		csv2 >> id1 >> name1 >> id2 >> name2;
 
-		EXPECT_TRUE(id1 == 2);
-		EXPECT_TRUE(name1 == "Club 1");
-		EXPECT_TRUE(id2 == 3);
-		EXPECT_TRUE(name2 == "Club 2");
+		EXPECT_EQ(id1, 3);
+		EXPECT_EQ(name1, "Club 1");
+		EXPECT_EQ(id2, 4);
+		EXPECT_EQ(name2, "Club 2");
 	}
 }
 
