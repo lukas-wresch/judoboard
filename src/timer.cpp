@@ -109,6 +109,13 @@ std::string Timer::ToStringInSeconds() const
 
 
 
+std::string Timer::ToStringOnlySeconds() const
+{
+	return std::to_string(GetElapsedTime() / 1000);
+}
+
+
+
 uint32_t Timer::GetElapsedTime() const
 {
 	if (!m_Running)

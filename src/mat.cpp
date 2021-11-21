@@ -1471,7 +1471,7 @@ void Mat::UpdateGraphics() const
 				auto& osaekomi_text = m_Graphics["osaekomi_text"];
 				auto& osaekomi_bar  = m_Graphics["osaekomi_bar"];
 
-				osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringInSeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
+				osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
 
 				const int new_width = m_OsaekomiTimer[(int)fighter].GetElapsedTime() * osaekomi_max_width / (EndTimeOfOsaekomi() * 1000);
 

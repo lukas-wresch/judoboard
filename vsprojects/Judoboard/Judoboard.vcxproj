@@ -262,6 +262,7 @@
     <None Include="..\..\compile.bat" />
     <None Include="..\..\compile.sh" />
     <None Include="..\..\dependencies.sh" />
+    <None Include="..\..\package.bat" />
     <None Include="..\..\README.md" />
     <None Include="..\..\run_tests.sh" />
   </ItemGroup>
