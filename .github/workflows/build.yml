@@ -46,4 +46,4 @@ jobs:
     - name: nuget2
       run: nuget install GoogleTest\packages.config -OutputDirectory packages
     - name: msbuild
-      run: dir; msbuild Judoboard.sln
+      run: di; cd vsprojects; dir; msbuild Judoboard.sln
