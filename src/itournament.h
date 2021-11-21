@@ -39,10 +39,15 @@ namespace Judoboard
 		virtual bool MoveMatchUp(uint32_t MatchID) { return false; }
 		virtual bool MoveMatchDown(uint32_t MatchID) { return false; }
 
+		//Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;
 		//const std::unordered_map<uint32_t, Judoka*>& GetParticipants() const { return m_StandingData.GetAllJudokas(); }
 		virtual bool AddParticipant(Judoka* Judoka) { return false; }
 		virtual bool RemoveParticipant(uint32_t ID) { return false; }
+		virtual Judoka* FindParticipant(uint32_t ID) { return nullptr; }
+		virtual const Judoka* FindParticipant(uint32_t ID) const { return nullptr; }
+		virtual Judoka* FindParticipant(const UUID& UUID) = 0;
+		virtual const Judoka* FindParticipant(const UUID& UUID) const = 0;
 
 		virtual uint32_t GetHighestMatIDUsed() const { return 0; }//Returns the highest ID of all mats that are used in the tournament. Returns zero if no mats are used
 		virtual bool IsMatUsed(uint32_t ID) const { return false; }
@@ -69,12 +74,6 @@ namespace Judoboard
 		virtual MatchTable* FindMatchTable(UUID ID) { return nullptr; }
 		virtual const MatchTable* FindMatchTable(UUID ID) const { return nullptr; }
 		virtual int FindMatchTableIndex(uint32_t ID) const { return -1; }
-
-		//Judoka
-		//Judoka* FindParticipant(uint32_t ID) { return m_StandingData.FindJudoka(ID); }
-		//const Judoka* FindParticipant(uint32_t ID) const { return m_StandingData.FindJudoka(ID); }
-		virtual Judoka* FindParticipant(const UUID& UUID) = 0;
-		virtual const Judoka* FindParticipant(const UUID& UUID) const = 0;
 
 		//Rule Sets
 		virtual const RuleSet* GetDefaultRuleSet() const { return nullptr; }

@@ -19,7 +19,7 @@ void Application::SetupHttpServer()
 		if (!IsLoggedIn(Request))
 			return HttpServer::LoadFile("html/login.html");
 		return HttpServer::LoadFile("html/index.html");
-		});
+	});
 
 	m_Server.RegisterResource("/style.css", [](auto& Request) { return HttpServer::LoadFile("html/style.css"); }, HttpServer::ResourceType::CSS);
 	m_Server.RegisterResource("/common.js", [](auto& Request) { return HttpServer::LoadFile("html/common.js"); }, HttpServer::ResourceType::JavaScript);
@@ -45,7 +45,7 @@ void Application::SetupHttpServer()
 			if (!IsLoggedIn(Request))
 				return HttpServer::LoadFile("html/login.html");
 			return HttpServer::LoadFile("html/" + filename + ".html");
-			});
+		});
 	}
 
 

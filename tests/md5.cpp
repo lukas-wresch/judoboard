@@ -367,3 +367,51 @@ TEST(MD5, ImportIntoTournament)
 
 	//TODO
 }
+
+
+
+TEST(MD5, ImportIntoTournament_LoadAfterSave)
+{
+	initialize();
+
+#ifdef _WIN32
+	MD5 file("../test-data/Test.md5");
+#else
+	MD5 file("test-data/Test.md5");
+#endif
+
+	ASSERT_TRUE(file);
+
+	{
+		Database db;
+		{
+			Tournament tour(file, &db);
+			tour.SetName("deleteMe");
+			tour.Save();
+		}
+
+		Tournament tour2("deleteMe");
+
+		auto table = tour2.FindMatchTableByName("Jugend u10 w -20&#44;7 kg");
+		ASSERT_TRUE(table);
+		auto results = table->CalculateResults();
+
+		ASSERT_EQ(results.size(), 1);
+		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Laura");
+
+
+		table = tour2.FindMatchTableByName("Jugend u10 w -26&#44;7 kg");
+		ASSERT_TRUE(table);
+		results = table->CalculateResults();
+
+		ASSERT_EQ(results.size(), 3);
+		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Mila");
+		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Amalia");
+		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Julia");
+
+		//TODO
+	}
+
+
+	ZED::Core::RemoveFile("deleteMe");
+}

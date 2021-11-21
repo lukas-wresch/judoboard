@@ -266,7 +266,7 @@ const std::string MatchTable::ToString() const
 
 
 
-MatchTable::MatchTable(ZED::CSV& Stream, const ITournament* Tournament) : Schedulable(Stream, Tournament)
+MatchTable::MatchTable(ZED::CSV& Stream, ITournament* Tournament) : Schedulable(Stream, Tournament)
 {
 	Stream >> m_Name;
 
@@ -279,7 +279,35 @@ MatchTable::MatchTable(ZED::CSV& Stream, const ITournament* Tournament) : Schedu
 		m_Rules = Tournament->FindRuleSet(UUID(std::move(rulesUUID)));
 	}
 
-	//TODO import manual matches
+	size_t participants;
+	Stream >> participants;
+	for (size_t i = 0; i < participants; i++)
+	{
+		uint32_t id;
+		Stream >> id;
+
+		if (Tournament)
+		{
+			assert(Tournament->FindParticipant(id));
+			m_Participants.emplace_back(Tournament->FindParticipant(id));
+		}
+	}
+
+	size_t manual_matches;
+	Stream >> manual_matches;
+	for (size_t i = 0; i < manual_matches; i++)
+	{
+		uint32_t id;
+		Stream >> id;
+
+		if (Tournament)
+		{
+			assert(Tournament->FindMatch(id));
+			m_ManualMatches.emplace_back(Tournament->FindMatch(id));
+		}
+	}
+
+	//TODO import matches
 }
 
 
@@ -299,5 +327,13 @@ void MatchTable::operator >> (ZED::CSV& Stream) const
 	else
 		Stream << false;//No rule set
 
-	//TODO export manual matches
+	Stream << m_Participants.size();
+	for (auto judoka : m_Participants)
+		Stream << judoka->GetID();
+
+	Stream << m_ManualMatches.size();
+	for (auto match : m_ManualMatches)
+		Stream << match->GetID();
+
+	//TODO export matches
 }

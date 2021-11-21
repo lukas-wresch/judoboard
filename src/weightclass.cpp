@@ -32,7 +32,7 @@ Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint
 
 
 
-Weightclass::Weightclass(ZED::CSV& Stream, const ITournament* Tournament) : MatchTable(Stream, Tournament)
+Weightclass::Weightclass(ZED::CSV& Stream, ITournament* Tournament) : MatchTable(Stream, Tournament)
 {
 	Stream >> m_MinWeight >> m_MaxWeight >> m_Gender >> m_GenderEnforced;
 }

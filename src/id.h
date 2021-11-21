@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <unordered_set>
+#include "../ZED/include/blob.h"
 
 
 
@@ -40,6 +41,7 @@ namespace Judoboard
 	{
 	public:
 		ID();
+		ID(ZED::Blob& Stream);
 		~ID();
 
 		static const UUID GenerateUUID();

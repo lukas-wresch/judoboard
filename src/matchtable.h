@@ -67,7 +67,7 @@ namespace Judoboard
 
 
 		MatchTable(const ITournament* Tournament) : Schedulable(Tournament) {}
-		MatchTable(ZED::CSV& Stream, const ITournament* Tournament);
+		MatchTable(ZED::CSV& Stream, ITournament* Tournament);
 		MatchTable(MatchTable&) = delete;
 		MatchTable(const MatchTable&) = delete;
 

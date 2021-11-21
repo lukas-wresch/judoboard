@@ -40,6 +40,7 @@ namespace Judoboard
 		Match* FindMatch(uint32_t ID) const;
 		Match* FindMatch(const UUID& UUID) const override;
 
+		void SetName(const std::string& NewName) { m_Name = NewName; }
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 
 		Status GetStatus() const;
@@ -57,10 +58,16 @@ namespace Judoboard
 
 		std::vector<const Match*> GetNextMatches(uint32_t MatID) const;
 
-		bool IsParticipant(const Judoka& Judoka) const { return m_StandingData.FindJudoka(Judoka.GetUUID()); }
+		//Participant / Judoka
+		virtual bool IsParticipant(const Judoka& Judoka) const override { return m_StandingData.FindJudoka(Judoka.GetUUID()); }
 		const std::unordered_map<uint32_t, Judoka*>& GetParticipants() const { return m_StandingData.GetAllJudokas(); }
-		bool AddParticipant(Judoka* Judoka);
-		bool RemoveParticipant(uint32_t ID);
+		virtual bool AddParticipant(Judoka* Judoka) override;
+		virtual bool RemoveParticipant(uint32_t ID) override;
+
+		virtual       Judoka* FindParticipant(uint32_t ID)            override { return m_StandingData.FindJudoka(ID); }
+		virtual const Judoka* FindParticipant(uint32_t ID) const      override { return m_StandingData.FindJudoka(ID); }
+		virtual       Judoka* FindParticipant(const UUID& UUID)       override { return m_StandingData.FindJudoka(UUID); }
+		virtual const Judoka* FindParticipant(const UUID& UUID) const override { return m_StandingData.FindJudoka(UUID); }
 
 		uint32_t GetHighestMatIDUsed() const;//Returns the highest ID of all mats that are used in the tournament. Returns zero if no mats are used
 		bool IsMatUsed(uint32_t ID) const;
@@ -77,12 +84,6 @@ namespace Judoboard
 		const MatchTable* FindMatchTable(const UUID& ID) const;
 		MatchTable* FindMatchTableByName(const std::string& Name);
 		int FindMatchTableIndex(uint32_t ID) const;
-
-		//Judoka
-		Judoka* FindParticipant(uint32_t ID) { return m_StandingData.FindJudoka(ID); }
-		const Judoka* FindParticipant(uint32_t ID) const { return m_StandingData.FindJudoka(ID); }
-		Judoka* FindParticipant(const UUID& UUID) { return m_StandingData.FindJudoka(UUID); }
-		const Judoka* FindParticipant(const UUID& UUID) const { return m_StandingData.FindJudoka(UUID); }
 
 		//Rule Sets
 		virtual const RuleSet* GetDefaultRuleSet() const override { return m_pDefaultRules; }
