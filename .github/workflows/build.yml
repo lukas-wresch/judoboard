@@ -40,10 +40,10 @@ jobs:
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
     - name: change directory
-      run: cd vsprojects
+      run: dir; cd vsprojects; dir
     - name: nuget1
       run: nuget install ZED\packages.config        -OutputDirectory packages
     - name: nuget2
       run: nuget install GoogleTest\packages.config -OutputDirectory packages
-    - name: msbuild
+    - name: dir; msbuild
       run: msbuild
