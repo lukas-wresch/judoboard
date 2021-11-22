@@ -32,7 +32,12 @@ void Localizer::Initialize(Language NewLanguage)
 			//ss       \u00df
 
 			//German
-			s_de["Mat"] = u8"Matte";
+			s_de["No."]   = u8"Nr.";
+			s_de["Mat"]   = u8"Matte";
+			s_de["Wins"]  = u8"Siege";
+			s_de["Score"] = u8"Unterwertung";
+			s_de["Time"]  = u8"Zeit";
+
 			s_de["Weightclass"] = "Gewichtsklasse";
 			s_de["Next Match"]  = u8"N\u00e4chster Kampf";
 			s_de["Following Matches"] = u8"Nachfolgende K\u00e4mpfe";

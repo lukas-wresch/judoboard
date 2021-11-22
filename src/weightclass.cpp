@@ -274,9 +274,10 @@ const std::string Weightclass::ToHTML() const
 
 	ret += "<a href=\"#matchtable_add.html?id=" + std::to_string(GetID()) + "\">" + GetName() + "</a><br/>";
 
-	ret += GetDescription() + " / " + "Mat " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
+	ret += GetDescription() + " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 
-	ret += R"(<table width="50%" border="1" rules="all"><tr><th style="text-align: center;">No.</th><th style="width: 5.0cm;">Name</th>)";
+	ret += R"(<table width="50%" border="1" rules="all"><tr><th style="text-align: center;">)" + Localizer::Translate("No.")
+		+ "</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name") + "</th>)";
 
 	for (uint32_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
 		ret += "<th>vs " + GetParticipants()[j]->GetName() + "</th>";
@@ -284,26 +285,23 @@ const std::string Weightclass::ToHTML() const
 	ret += "<th style=\"text-align: center; width: 2.0cm;\">Total</th>";
 	ret += "</tr>";
 
-	//Result* pScores = new Result[GetParticipants().size()];
 	auto results = CalculateResults();
 
 	for (size_t i = 0; i < GetParticipants().size();i++)
 	{
-		auto fighter = GetParticipant(i);
+		auto enemy = GetParticipant(i);
 
-		if (!fighter)
+		if (!enemy)
 			continue;
 
 		ret += "<tr>";
 		ret += "<td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
-		ret += "<td>" + fighter->GetName() + "<br/>(" + std::to_string(fighter->GetWeight()) + " kg)</td>";
-
-		//pScores[i].Set(fighter, this);
+		ret += "<td>" + enemy->GetName() + "<br/>(" + std::to_string(enemy->GetWeight()) + " kg)</td>";
 
 		for (size_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
 		{
-			auto enemy = GetParticipant(j);
-			if (!enemy)
+			auto fighter = GetParticipant(j);
+			if (!fighter)
 				continue;
 
 			auto matches = FindMatches(*fighter, *enemy);
@@ -318,16 +316,12 @@ const std::string Weightclass::ToHTML() const
 					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">- - -</a></td>";
 				else if (matches[0]->GetWinningJudoka()->GetID() == fighter->GetID())
 				{
-					//pScores[i].Wins++;
 					const auto& result = matches[0]->GetMatchResult();
-					//pScores[i].Score += (unsigned int)result.m_Score;
-					//pScores[i].Time  += result.m_Time;
 					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
 				}
 				else
 				{
 					const auto& result = matches[0]->GetMatchResult();
-					//pScores[i].Time += result.m_Time;
 					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">0 (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
 				}
 			}
@@ -341,9 +335,9 @@ const std::string Weightclass::ToHTML() const
 
 
 	ret += "</table><br/><br/><table border=\"1\" rules=\"all\">";
-	ret += "<tr><th style=\"width: 0.5cm; text-align: center;\">#</th><th style=\"width: 5.0cm;\">Name</th><th style=\"width: 1.0cm;\">Wins</th><th style=\"width: 1.0cm;\">Score</th><th style=\"width: 1.3cm;\">Time</th></tr>";
-
-	//std::qsort(pScores, GetParticipants().size(), sizeof(Result), MatchTable::CompareFighterScore);
+	ret += "<tr><th style=\"width: 0.5cm; text-align: center;\">#</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name")
+		+ "</th><th style=\"width: 1.0cm;\">" + Localizer::Translate("Wins") + "</th><th style=\"width: 1.0cm;\">"
+		+ Localizer::Translate("Score") + "</th><th style=\"width: 1.3cm;\">" + Localizer::Translate("Time") + "</th></tr>";
 
 	for (size_t i = 0; i < GetParticipants().size(); i++)
 	{
@@ -365,7 +359,6 @@ const std::string Weightclass::ToHTML() const
 	}
 
 	ret += "</table>";
-	//delete[] pScores;
 
 	return ret;
 }
