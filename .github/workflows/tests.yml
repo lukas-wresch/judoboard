@@ -39,7 +39,7 @@ jobs:
       
   test3:
     name: Unit Tests on Windows
-    runs-on: self-hosted
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
     - name: Setup MSBuild.exe
@@ -57,6 +57,6 @@ jobs:
     - name: msbuild
       run: dir; cd vsprojects; dir; msbuild Judoboard.sln
     - name: compile
-      run: dir; compile.bat
+      run: dir; .\compile.bat
     - name: Run Tests
-      run: dir; cd bin\Release; dir; GoogleTest.exe
+      run: dir; cd bin\; dir; .\Release\GoogleTest.exe
