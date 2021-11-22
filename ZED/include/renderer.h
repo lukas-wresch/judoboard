@@ -118,8 +118,7 @@ namespace ZED
 		{
 			if (this != &New)
 			{
-				if (data)
-					delete data;
+				delete data;
 				data = New.data;
 				New.data = nullptr;
 			}

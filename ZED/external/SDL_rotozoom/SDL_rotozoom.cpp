@@ -1035,9 +1035,6 @@ SDL_Surface *rotozoomSurfaceXY(SDL_Surface * src, double angle, double zoomx, do
 	int is32bit;
 	int i, src_converted;
 	int flipx,flipy;
-	Uint8 r = 0;
-	Uint8 g = 0;
-	Uint8 b = 0;
 	Uint32 colorkey = 0;
 	int colorKeyAvailable = 0;
 
