@@ -22,9 +22,9 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       - name: build
-        run: dir; compile.bat
+        run: dir; .\compile.bat
       - name: package
-        run: dir; package.bat
+        run: dir; .\package.bat
       - name: version
         run: echo "::set-output name=version::$(./bin/Release/Judoboard.exe --version)"
         id: version
