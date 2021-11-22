@@ -1413,6 +1413,22 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/matchtable/get_participants", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+		return Ajax_GetParticipantsFromMatchTable(Request);
+	});
+
+
+	m_Server.RegisterResource("/ajax/matchtable/get_matches", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+		return Ajax_GetMatchesFromMatchTable(Request);
+	});
+
+
 	m_Server.RegisterResource("/ajax/matchtable/add", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -1570,7 +1586,7 @@ void Application::SetupHttpServer()
 			return std::string("Failed to delete match table");
 
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/matchtable/get", [this](auto& Request) -> std::string {
@@ -2340,6 +2356,66 @@ ZED::CSV Application::Ajax_ListClubs()
 		if (club)
 			ret << club->GetID() << club->GetName();
 	}
+	ret.AddNewline();
+	return ret;
+}
+
+
+
+std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request)
+{
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	if (id < 0)
+		return Error(Error::Type::InvalidID);
+
+	auto table = GetTournament()->FindMatchTable(id);
+
+	if (!table)
+		return Error(Error::Type::ItemNotFound);
+
+
+	GetTournament()->Lock();
+
+	ZED::CSV ret;
+	for (auto judoka : table->GetParticipants())
+		ret << judoka->GetID() << judoka->GetName();
+
+	GetTournament()->Unlock();
+	
+	ret.AddNewline();
+	return ret;
+}
+
+
+
+std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request& Request)
+{
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	if (id < 0)
+		return Error(Error::Type::InvalidID);
+
+	auto table = GetTournament()->FindMatchTable(id);
+
+	if (!table)
+		return Error(Error::Type::ItemNotFound);
+
+
+	GetTournament()->Lock();
+
+	ZED::CSV ret;
+	for (auto match : table->GetSchedule())
+		ret << match->ToString();
+
+	GetTournament()->Unlock();
+
 	ret.AddNewline();
 	return ret;
 }

@@ -328,3 +328,74 @@ TEST(Ajax, NoDisqualification)
 		EXPECT_FALSE(mat->GetScoreboard(f).IsUnknownDisqualification());
 	}
 }
+
+
+
+TEST(Ajax, GetParticipantsFromMatchTable)
+{
+	initialize();
+
+	Application app;
+
+	auto j1 = new Judoka(GetRandomName(), GetRandomName(), 50);
+	auto j2 = new Judoka(GetRandomName(), GetRandomName(), 50);
+	auto j3 = new Judoka(GetRandomName(), GetRandomName(), 50);
+
+	app.GetTournament()->AddParticipant(j1);
+	app.GetTournament()->AddParticipant(j2);
+	app.GetTournament()->AddParticipant(j3);
+
+	auto table = new Weightclass(app.GetTournament(), 10, 100);
+	app.GetTournament()->AddMatchTable(table);
+
+	ZED::CSV result = app.Ajax_GetParticipantsFromMatchTable(HttpServer::Request("id=" + std::to_string(table->GetID())));
+
+	int id;
+	std::string name;
+
+	result >> id >> name;
+	EXPECT_EQ(j1->GetID(), id);
+	EXPECT_EQ(j1->GetName(), name);
+
+	result >> id >> name;
+	EXPECT_EQ(j2->GetID(), id);
+	EXPECT_EQ(j2->GetName(), name);
+
+	result >> id >> name;
+	EXPECT_EQ(j3->GetID(), id);
+	EXPECT_EQ(j3->GetName(), name);
+}
+
+
+
+TEST(Ajax, GetMatchesFromMatchTable)
+{
+	initialize();
+
+	Application app;
+
+	auto j1 = new Judoka(GetRandomName(), GetRandomName(), 50);
+	auto j2 = new Judoka(GetRandomName(), GetRandomName(), 50);
+	auto j3 = new Judoka(GetRandomName(), GetRandomName(), 50);
+
+	app.GetTournament()->AddParticipant(j1);
+	app.GetTournament()->AddParticipant(j2);
+	app.GetTournament()->AddParticipant(j3);
+
+	auto table = new Weightclass(app.GetTournament(), 10, 100);
+	app.GetTournament()->AddMatchTable(table);
+
+	ZED::CSV result = app.Ajax_GetMatchesFromMatchTable(HttpServer::Request("id=" + std::to_string(table->GetID())));
+
+	int id, matID, state, tableID;
+	std::string name1, name2, tableName, color;
+
+	for (int i = 0; i < 3; i++)
+	{
+		result >> id >> name1 >> name2 >> matID >> state >> color >> tableID >> tableName;
+		EXPECT_EQ(table->GetSchedule()[i]->GetID(), id);
+		EXPECT_EQ(table->GetSchedule()[i]->GetFighter(Fighter::White)->GetName(), name1);
+		EXPECT_EQ(table->GetSchedule()[i]->GetFighter(Fighter::Blue )->GetName(), name2);
+		EXPECT_EQ(table->GetSchedule()[i]->GetMatID(), matID);
+	}
+}

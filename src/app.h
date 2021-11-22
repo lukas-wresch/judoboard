@@ -86,20 +86,27 @@ namespace Judoboard
 		void Shutdown() const { m_Running = false; }
 
 		//AJAX requests
-		ZED::CSV Ajax_GetMats() const;
 
+		//Mat
+		ZED::CSV Ajax_GetMats() const;
 		Error Ajax_OpenMat(  const HttpServer::Request& Request);
 		Error Ajax_CloseMat( const HttpServer::Request& Request);
 		Error Ajax_UpdateMat(const HttpServer::Request& Request);
 
-		ZED::CSV Ajax_ListClubs();
-
-		ZED::CSV Ajax_Uptime();
+		Error Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request);
 
 		Error Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request);
-		Error Ajax_NoDisqualification( Fighter Whom, const HttpServer::Request& Request);
+		Error Ajax_NoDisqualification(Fighter Whom, const HttpServer::Request& Request);
 
-		Error Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request);
+		//Clubs
+		ZED::CSV Ajax_ListClubs();
+
+		//Match tables
+		ZED::CSV Ajax_ListMatchTables(const HttpServer::Request& Request);
+		std::string Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request);
+		std::string Ajax_GetMatchesFromMatchTable(const HttpServer::Request& Request);
+
+		ZED::CSV Ajax_Uptime();
 
 		//Serialization
 		[[deprecated]]

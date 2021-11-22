@@ -295,22 +295,6 @@ MatchTable::MatchTable(ZED::CSV& Stream, ITournament* Tournament) : Schedulable(
 				ZED::Log::Error("Participant could not be found");
 		}
 	}
-
-	/*size_t manual_matches;
-	Stream >> manual_matches;
-	for (size_t i = 0; i < manual_matches; i++)
-	{
-		uint32_t id;
-		Stream >> id;
-
-		if (Tournament)
-		{
-			assert(Tournament->FindMatch(id));
-			m_ManualMatches.emplace_back(Tournament->FindMatch(id));
-		}
-	}*/
-
-	//TODO import matches
 }
 
 
@@ -333,12 +317,6 @@ void MatchTable::operator >> (ZED::CSV& Stream) const
 	Stream << m_Participants.size();
 	for (auto judoka : m_Participants)
 		Stream << (std::string)judoka->GetUUID();
-
-	/*Stream << m_ManualMatches.size();
-	for (auto match : m_ManualMatches)
-		Stream << match->GetID();*/
-
-	//TODO export matches
 }
 
 

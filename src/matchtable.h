@@ -114,14 +114,13 @@ namespace Judoboard
 
 		virtual void operator >> (ZED::CSV& Stream) const;
 
+		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
+
 	protected:
 		Match* AddAutoMatch(size_t WhiteIndex, size_t BlueIndex);
 
-		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
 		Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
-
-		static int CompareFighterScore(const void* a, const void* b);
 
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
