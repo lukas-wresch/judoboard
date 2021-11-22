@@ -25,3 +25,25 @@ jobs:
         run: dir; compile.bat
       - name: package
         run: dir; package.bat
+      - name: version
+        run: echo "::set-output name=version::$(./bin/Release/Judoboard.exe --version)"
+        id: version
+      - name: Create Release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: true
+          prerelease: true
+          release_name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Upload Windows Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./bin/Release/package.zip
+          asset_name: Judoboard.zip
+          asset_content_type: application/zip
