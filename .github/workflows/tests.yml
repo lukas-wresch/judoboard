@@ -59,4 +59,4 @@ jobs:
     - name: compile
       run: dir; .\compile.bat
     - name: Run Tests
-      run: dir; cd bin\Release; dir; .\GoogleTest.exe
+      run: dir; cd bin\; dir; .\Release\GoogleTest.exe
