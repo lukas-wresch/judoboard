@@ -2054,7 +2054,8 @@ bool Mat::Render(double dt) const
 		{
 			auto lambda = [&](ZED::PNG&& Img) {
 				Img.ConvertTo(ZED::ColorType::R8G8B8);
-				Img.Flip();
+				if (renderer.GetType() == ZED::Type::OpenGL)
+					Img.Flip();
 				m_Screenshot = ZED::PNG::Compress(Img);//Compress image
 				//Img.Save("screenshot.png");
 			};
