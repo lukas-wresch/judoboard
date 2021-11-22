@@ -343,7 +343,7 @@ void MatchTable::operator >> (ZED::CSV& Stream) const
 
 
 
-Match* MatchTable::AddAutoMatch(uint32_t WhiteIndex, uint32_t BlueIndex)
+Match* MatchTable::AddAutoMatch(size_t WhiteIndex, size_t BlueIndex)
 {
 	if (!GetParticipant(WhiteIndex) || !GetParticipant(BlueIndex))
 	{

@@ -115,7 +115,7 @@ namespace Judoboard
 		virtual void operator >> (ZED::CSV& Stream) const;
 
 	protected:
-		Match* AddAutoMatch(uint32_t WhiteIndex, uint32_t BlueIndex);
+		Match* AddAutoMatch(size_t WhiteIndex, size_t BlueIndex);
 
 		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
 		Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
