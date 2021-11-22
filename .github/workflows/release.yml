@@ -17,4 +17,11 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
-      - run: echo "The workflow works!!"
+      - name: Setup MSBuild.exe
+        uses: warrenbuckley/Setup-MSBuild@v1
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+      - name: build
+        run: dir; compile.bat
+      - name: package
+        run: dir; package.bat
