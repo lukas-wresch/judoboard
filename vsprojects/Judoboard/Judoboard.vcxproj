@@ -238,7 +238,7 @@
     <None Include="..\..\bin\html\account_list.html" />
     <None Include="..\..\bin\html\add_match.html" />
     <None Include="..\..\bin\html\add_judoka.html" />
-    <None Include="..\..\bin\html\class_list.html" />
+    <None Include="..\..\bin\html\matchtable_list.html" />
     <None Include="..\..\bin\html\club_add.html" />
     <None Include="..\..\bin\html\club_list.html" />
     <None Include="..\..\bin\html\common.js" />
@@ -260,8 +260,6 @@
     <None Include="..\..\bin\html\style.css" />
     <None Include="..\..\bin\html\tournament_add.html" />
     <None Include="..\..\bin\html\tournament_list.html" />
-    <None Include="..\..\bin\html\weightclass_add.html" />
-    <None Include="..\..\bin\html\weightclass_edit.html" />
     <None Include="..\..\compile.bat" />
     <None Include="..\..\compile.sh" />
     <None Include="..\..\dependencies.sh" />

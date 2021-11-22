@@ -49,10 +49,32 @@
   <button id="delete" class="remove" onclick="return DeleteMatchtable();">Delete Match Table</button>
 </div>
 
-<div id="div_participants">
+<div id="div_participants" style="margin-top: 1cm;">
+  <h2>Participants</h2>
+  <table id="participants" border="1" rules="all" style="margin-bottom: 1cm;">
+    <tr>
+      <th style="width: 0.5cm;" id="no">No.</th>
+      <th style="width: 4cm;" id="name">Name</th>
+      <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
+      <th style="width: 2cm; text-align: center;" id="matches">#Matches</th>
+      <th style="width: 3.0cm; text-align: center;">Options</th>
+    </tr>
+  </table>
 </div>
 
+
 <div id="div_matches">
+  <h2>Matches</h2>
+  <table id="schedule" border="1" rules="all" style="margin-bottom: 1cm;">
+    <tr>
+      <th style="width: 0.5cm;" id="no">No.</th>
+      <th style="width: 5cm;" id="white">White</th>
+      <th style="width: 5cm;" id="blue">Blue</th>
+      <th style="width: 1cm;" id="mat">Mat</th>
+      <th style="width: 2.5cm; text-align: center;" id="mat">Status</th>
+      <th style="width: 2.5cm; text-align: center;">Options</th>
+    </tr>
+  </table>
 </div>
 
 <script>
@@ -182,6 +204,150 @@ function GetMatchTable(id)
       document.getElementById("color").value = color;
       document.getElementById("color").onchange();
     });
+
+
+    AjaxCallback("ajax/matchtable/get_participants?id="+id, function(response) {
+      console.log(response);
+      var res = response.split(",");
+
+      if (res.length < 2)
+        return;
+
+      var table = document.getElementById("participants");
+
+      while (table.rows.length > 1)
+        table.deleteRow(table.rows.length-1);
+
+      var i = 0;
+      var no = 0;
+      for (var i=0; i < res.length;)
+      {
+      no++;
+      var id   = res[i++];
+      var name = res[i++];
+
+      var row = table.insertRow(-1);
+      var cell0 = row.insertCell(0);
+      var cell1 = row.insertCell(1);
+      var cell2 = row.insertCell(2);
+      var cell3 = row.insertCell(3);
+      var cell4 = row.insertCell(4);
+
+      if (no%2 == 0)
+        row.style.backgroundColor = "#eee";
+
+      cell0.innerHTML = no;
+      cell0.style.textAlign = "center";
+      cell0.style.fontSize  = "14pt";
+
+      cell1.innerHTML = "<a href=\"#judoka_edit.html?id=" + id + "\">" + name + "</a>";
+      //cell2.innerHTML = weight + " kg";
+      cell2.style.textAlign = "center";
+      cell2.style.fontSize  = "16pt";
+
+      //cell3.innerHTML = matches;
+      cell3.style.textAlign = "center";
+      cell3.style.fontSize  = "16pt";
+
+      cell4.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+id+")\">" + lang.remove + "</button>";
+      cell4.style.textAlign = "center";
+      }
+    });
+  });
+
+
+  AjaxCallback("ajax/matchtable/get_matches?id="+id, function(response) {
+    var res = response.split(",");
+
+    if (res.length < 4)
+      return;
+
+    var table = document.getElementById("schedule");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    console.log(response);
+
+    var no = 0;
+    for (var i=0; i < res.length;)
+    {
+      var row = table.insertRow(-1);
+      var cell0 = row.insertCell(0);
+      var cell1 = row.insertCell(1);
+      var cell2 = row.insertCell(2);
+      //var cell3 = row.insertCell(3);
+      var cell4 = row.insertCell(3);
+      var cell5 = row.insertCell(4);
+      var cell6 = row.insertCell(5);
+
+      no++;
+      var id    = res[i++];
+      var white = res[i++];
+      var blue  = res[i++];
+      var matID = res[i++];
+      var state = res[i++];
+      var color = res[i++];
+      var matchtableID   = res[i++];
+      var matchtableName = res[i++];
+
+      if (no%2 == 0)
+        row.style.backgroundColor = "#eee";
+
+      cell0.innerHTML = no;
+      cell0.style.textAlign = "center";
+      cell0.style.fontSize  = "14pt";
+      cell0.style.height    = "1.5cm";
+
+      cell1.innerHTML = white;
+      cell2.innerHTML = blue;
+
+      /*if (matchtableID > 0)
+        cell3.innerHTML = "<a href=\"#matchtable_add.html?id="+matchtableID+"\">" + matchtableName + "</a>";
+      else
+        cell3.innerHTML = matchtableName;
+
+      cell3.style.backgroundColor = color;
+      cell3.style.textAlign = "center";*/
+
+      if (matID <= 0)
+      {
+        cell4.style.fontWeight = "bold";
+        cell4.innerHTML = "None";
+      }
+      else
+        cell4.innerHTML = matID;
+
+      cell4.style.backgroundColor = Color(matID);
+      cell4.style.textAlign = "center";
+      cell4.style.fontSize  = "16pt";
+
+      if (state == 0)
+        cell5.innerHTML = lang.scheduled;
+      else if (state == 1)
+      {
+        cell5.style.color = "red";
+        cell5.innerHTML = lang.running;
+      }
+      else if (state == 2)
+      {
+        cell5.style.color = "green";
+        cell5.innerHTML = lang.concluded;
+      }
+      else
+        cell5.innerHTML = "Unknown";
+
+      cell5.style.textAlign = "center";
+
+      var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
+
+
+      var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 2.2cm; margin-right: 0mm;\" onclick=navigate(\"edit_match.html?id="+id+"\");>" + lang.details + "</button></td>";
+
+      options += "<td></td></tr><tr><td></td></tr></table>";
+
+      cell6.innerHTML = options;
+    }
   });
 }
 
@@ -206,14 +372,11 @@ else
   document.getElementById("update").style.display = "none";
   document.getElementById("delete").style.display = "none";
   document.getElementById("div_name").style.display = "none";
+  document.getElementById("div_color").style.display = "none";
 
   GetForm();
   GetRuleSets();
   GetMats();
-  GetColors(function() {
-      document.getElementById("color").value = 1;
-      document.getElementById("color").onchange();
-    });
 }
 
 document.getElementById("add").innerHTML = lang.add_matchtable;

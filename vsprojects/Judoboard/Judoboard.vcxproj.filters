@@ -226,7 +226,7 @@
     <None Include="..\..\bin\html\add_judoka.html">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\bin\html\class_list.html">
+    <None Include="..\..\bin\html\matchtable_list.html">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\bin\html\club_add.html">
@@ -281,12 +281,6 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\bin\html\tournament_list.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\bin\html\weightclass_add.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\bin\html\weightclass_edit.html">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\.gitignore">

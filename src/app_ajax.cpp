@@ -37,7 +37,7 @@ void Application::SetupHttpServer()
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "add_judoka", "list_judoka", "judoka_edit",
 		"club_list", "club_add", "add_match", "edit_match", "account_add", "account_edit", "account_list",
-		"class_list", "weightclass_add", "weightclass_edit", "matchtable_add", "rule_add", "rule_list", "tournament_list", "tournament_add",
+		"matchtable_list", "matchtable_add", "rule_add", "rule_list", "tournament_list", "tournament_add",
 		"server_config"
 	};
 

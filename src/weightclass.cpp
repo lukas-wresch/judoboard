@@ -170,7 +170,14 @@ void Weightclass::GenerateSchedule()
 	else
 		m_RecommendedNumMatches_Before_Break = 2;
 
-	if (GetParticipants().size() == 4)
+	if (GetParticipants().size() == 3)
+	{
+		AddAutoMatch(0, 1);
+		AddAutoMatch(0, 2);
+		AddAutoMatch(1, 2);
+	}
+
+	else if (GetParticipants().size() == 4)
 	{
 		AddAutoMatch(0, 1);
 		AddAutoMatch(2, 3);
@@ -276,7 +283,7 @@ const std::string Weightclass::ToHTML() const
 	ret += GetDescription() + " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 
 	ret += R"(<table width="50%" border="1" rules="all"><tr><th style="text-align: center;">)" + Localizer::Translate("No.")
-		+ "</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name") + "</th>)";
+		+ "</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name") + "</th>";
 
 	for (uint32_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
 		ret += "<th>vs " + GetParticipants()[j]->GetName() + "</th>";
