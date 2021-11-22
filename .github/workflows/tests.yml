@@ -36,3 +36,27 @@ jobs:
       run: ./run_tests.sh
     - name: debug tests
       run: cd bin && gdb ./judoboard_test_debug --eval-command=r bt && cd ..
+      
+  test3:
+    name: Unit Tests on Windows
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup MSBuild.exe
+      uses: warrenbuckley/Setup-MSBuild@v1
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+    - name: change directory
+      run: dir; cd vsprojects; dir
+    - name: nuget1
+      run: dir; cd vsprojects; dir; nuget install ZED\packages.config        -OutputDirectory packages
+    - name: nuget2
+      run: dir; cd vsprojects; dir; nuget install GoogleTest\packages.config -OutputDirectory packages
+    - name: copy libpng
+      run: dir; cd vsprojects; dir; copy packages\libpng.1.6.28.1\build\native\lib\x64\v140\dynamic\Release\libpng16.lib ZED\libpng16.lib
+    - name: msbuild
+      run: dir; cd vsprojects; dir; msbuild Judoboard.sln
+    - name: compile
+      run: dir; compile.bat
+    - name: Run Tests
+      run: dir; cd bin\Release; dir; GoogleTest.exe
