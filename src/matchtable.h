@@ -24,7 +24,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Unknown, Weightclass, Pause
+			Unknown, Weightclass, Pause, Custom
 		};
 
 		struct Result
@@ -81,7 +81,7 @@ namespace Judoboard
 
 		virtual bool AddMatch(Match* NewMatch);//Add a match manually to the match table. Use only for manual cases
 
-		virtual const std::vector<Match*> GetSchedule() override { return m_Schedule; }
+		virtual const std::vector<Match*> GetSchedule() const override { return m_Schedule; }
 		virtual uint32_t GetRecommendedNumMatchesBeforeBreak() const override { return m_RecommendedNumMatches_Before_Break; }
 
 		virtual bool IsElgiable(const Judoka& Fighter) const = 0;

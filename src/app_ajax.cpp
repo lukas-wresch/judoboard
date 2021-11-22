@@ -1,6 +1,8 @@
 #include "app.h"
 #include "database.h"
 #include "weightclass.h"
+#include "pause.h"
+#include "customtable.h"
 #include "remote_mat.h"
 #include "tournament.h"
 #include "../ZED/include/log.h"
@@ -1383,7 +1385,7 @@ void Application::SetupHttpServer()
 		}
 
 		return ret;
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/matchtable/get_form", [this](auto& Request) -> std::string {
@@ -1398,12 +1400,15 @@ void Application::SetupHttpServer()
 
 		switch ((MatchTable::Type)type)
 		{
-		case MatchTable::Type::Weightclass:
-			return Weightclass::GetHTMLForm();
-			break;
+			case MatchTable::Type::Weightclass:
+				return Weightclass::GetHTMLForm();
+			case MatchTable::Type::Pause:
+				return Pause::GetHTMLForm();
+			case MatchTable::Type::Custom:
+				return CustomTable::GetHTMLForm();
 
-		default:
-			return std::string("Unknown form");
+			default:
+				return std::string("Unknown form");
 		}
 	});
 
@@ -1436,6 +1441,14 @@ void Application::SetupHttpServer()
 				new_table = new Weightclass(GetTournament(), minWeight, maxWeight, (Gender)gender);
 			break;
 		}
+
+		case MatchTable::Type::Pause:
+			return std::string("NOT IMPLEMENTED");
+			break;
+
+		case MatchTable::Type::Custom:
+			new_table = new CustomTable(GetTournament());
+			break;
 
 		default:
 			return std::string("Unknown type");

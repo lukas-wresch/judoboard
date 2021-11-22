@@ -53,7 +53,7 @@ namespace Judoboard
 		Match(ZED::CSV& Stream, ITournament* Tournament);
 
 		//Virtuals
-		virtual const std::vector<Match*> GetSchedule() override { std::vector<Match*> schedule{ this }; return schedule; }
+		virtual const std::vector<Match*> GetSchedule() const override { std::vector<Match*> schedule{ (Match*)this }; return schedule; }
 		virtual const std::string GetName() const override {
 			if (!HasValidFighters())
 				return "T.b.d. vs. T.b.d.";

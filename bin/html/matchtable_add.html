@@ -5,6 +5,8 @@
   <label style="width:100px;float:left;margin-top:4px;" id="label_type">Type</label>
   <select style="margin-bottom:20px; width: 5.5cm;" id="type" onchange="GetForm();">
     <option selected value="1" id="label_weightclass">Weightclass</option>
+    <option value="2" id="label_pause">Pause</option>
+    <option value="3" id="label_custom">Custom</option>
   </select>
 </div>
 
@@ -58,9 +60,9 @@ function GetForm(callback)
     document.getElementById("label_min_weight").innerHTML = lang.min_weight;
     document.getElementById("label_max_weight").innerHTML = lang.max_weight;
     document.getElementById("label_gender").innerHTML     = lang.gender;
-    document.getElementById("all").innerHTML     = lang.all;
-    document.getElementById("male").innerHTML    = lang.male;
-    document.getElementById("female").innerHTML  = lang.female;
+    document.getElementById("all").innerHTML    = lang.all;
+    document.getElementById("male").innerHTML   = lang.male;
+    document.getElementById("female").innerHTML = lang.female;
 
     if (typeof callback !== 'undefined')
       callback();
@@ -144,7 +146,8 @@ function GetMatchTable(id)
     var elements = document.getElementById("form").elements;
 
     var i = 0;
-    var id = res[i++];
+    var id   = res[i++];
+    var type = res[i++];
     var schedule_index = res[i++];
     var matID  = res[i++];
     var color  = res[i++];
@@ -152,7 +155,8 @@ function GetMatchTable(id)
     var name   = res[i++];
 
     document.getElementById("name").value = name;
-    console.log(elements);
+    document.getElementById("type").value = type;
+    document.getElementById("type").onchange();
 
     for (var j=i;j < res.length;j++)
     {
@@ -174,7 +178,6 @@ function GetMatchTable(id)
     });
   });
 }
-
 
 
 
@@ -201,13 +204,17 @@ else
   GetForm();
   GetRuleSets();
   GetMats();
+  GetColors(function() {
+      document.getElementById("color").value = 1;
+      document.getElementById("color").onchange();
+    });
 }
 
 document.getElementById("add").innerHTML = lang.add_matchtable;
 document.getElementById("update").innerHTML = lang.update_matchtable;
 document.getElementById("delete").innerHTML = lang.delete_matchtable;
 document.getElementById("label_type").innerHTML = lang.type;
-document.getElementById("label_mat").innerHTML = lang.mat;
+document.getElementById("label_mat").innerHTML  = lang.mat;
 document.getElementById("label_rule_set").innerHTML = lang.rule_set;
 document.getElementById("label_weightclass").innerHTML = lang.weightclass;
 

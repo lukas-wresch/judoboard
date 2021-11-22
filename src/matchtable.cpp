@@ -113,7 +113,7 @@ const RuleSet& MatchTable::GetRuleSet() const
 
 
 
-int MatchTable::CompareFighterScore(const void* A, const void* B)
+/*int MatchTable::CompareFighterScore(const void* A, const void* B)
 {
 	const Result* a = (Result*)A;
 	const Result* b = (Result*)B;
@@ -182,7 +182,7 @@ int MatchTable::CompareFighterScore(const void* A, const void* B)
 	}
 
 	return 0;
-}
+}*/
 
 
 
@@ -259,7 +259,7 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 const std::string MatchTable::ToString() const
 {
 	ZED::CSV ret;
-	ret << GetID() << GetScheduleIndex() << GetMatID() << GetColor() << GetRuleSet().GetID() << m_Name;
+	ret << GetID() << GetType() << GetScheduleIndex() << GetMatID() << GetColor() << GetRuleSet().GetID() << m_Name;
 	return ret;
 }
 

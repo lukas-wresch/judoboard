@@ -260,7 +260,6 @@ std::vector<MatchTable::Result> Weightclass::CalculateResults() const
 		}
 	}
 
-	//std::qsort(ret, GetParticipants().size(), sizeof(Result), MatchTable::CompareFighterScore);
 	std::sort(ret.begin(), ret.end());
 
 	return ret;

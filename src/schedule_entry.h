@@ -159,7 +159,7 @@ namespace Judoboard
 			//m_Color << Stream;
 		}
 
-		virtual const std::vector<Match*> GetSchedule() = 0;
+		virtual const std::vector<Match*> GetSchedule() const = 0;
 		virtual uint32_t GetRecommendedNumMatchesBeforeBreak() const { return 1; }
 		virtual const std::string GetName() const = 0;
 

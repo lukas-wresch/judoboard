@@ -114,6 +114,13 @@ Tournament::~Tournament()
 {
 	if (m_Schedule.size() > 0 || GetParticipants().size() > 0 || m_MatchTables.size() > 0 || m_SchedulePlanner.size() > 0)
 		Save();
+
+	for (auto table : m_MatchTables)
+		delete table;
+
+	//for (auto match : m_Schedule)
+		//if (!match->GetMatchTable())
+			//delete match;//Match might now be stored on the heap, then this will crash
 }
 
 
@@ -129,7 +136,8 @@ void Tournament::Reset()
 	m_MatchTables.clear();
 
 	for (auto match : m_Schedule)
-		delete match;
+		if (!match->GetMatchTable())
+			delete match;
 	m_Schedule.clear();
 
 	m_SchedulePlanner.clear();

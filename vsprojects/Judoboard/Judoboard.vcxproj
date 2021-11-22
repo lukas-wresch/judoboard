@@ -168,6 +168,7 @@
     <ClCompile Include="..\..\src\app.cpp" />
     <ClCompile Include="..\..\src\app_ajax.cpp" />
     <ClCompile Include="..\..\src\club.cpp" />
+    <ClCompile Include="..\..\src\customtable.cpp" />
     <ClCompile Include="..\..\src\database.cpp" />
     <ClCompile Include="..\..\src\dm4.cpp" />
     <ClCompile Include="..\..\src\error.cpp" />
@@ -200,6 +201,7 @@
     <ClInclude Include="..\..\src\account.h" />
     <ClInclude Include="..\..\src\app.h" />
     <ClInclude Include="..\..\src\club.h" />
+    <ClInclude Include="..\..\src\customtable.h" />
     <ClInclude Include="..\..\src\database.h" />
     <ClInclude Include="..\..\src\dm4.h" />
     <ClInclude Include="..\..\src\error.h" />
