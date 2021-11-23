@@ -115,8 +115,8 @@ Tournament::~Tournament()
 	if (m_Schedule.size() > 0 || GetParticipants().size() > 0 || m_MatchTables.size() > 0 || m_SchedulePlanner.size() > 0)
 		Save();
 
-	for (auto table : m_MatchTables)
-		delete table;
+	//for (auto table : m_MatchTables)
+		//delete table;
 
 	//for (auto match : m_Schedule)
 		//if (!match->GetMatchTable())
