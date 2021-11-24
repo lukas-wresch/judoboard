@@ -48,11 +48,13 @@
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
     <TargetName>$(ProjectName)</TargetName>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
     <LibraryPath>..\Judoboard\$(Configuration)\;..\..\bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemGroup>
     <None Include="packages.config" />

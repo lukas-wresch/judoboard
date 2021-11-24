@@ -11,8 +11,8 @@ using namespace Judoboard;
 
 MatchTable::~MatchTable()
 {
-	//for (auto match : m_Schedule)
-		//delete match;
+	for (auto match : m_Schedule)
+		delete match;
 }
 
 
