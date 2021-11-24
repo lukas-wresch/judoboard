@@ -61,4 +61,4 @@ jobs:
     - name: package
       run: dir; .\package.bat
     - name: Run Tests
-      run: dir; cd bin\; dir; .\Release\GoogleTest.exe
+      run: dir; cd bin\; dir; ./Release/GoogleTest.exe
