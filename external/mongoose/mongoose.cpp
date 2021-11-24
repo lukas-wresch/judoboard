@@ -4205,11 +4205,15 @@ static void master_thread(struct mg_context *ctx) {
   DEBUG_TRACE(("exiting"));
 }
 
-static void free_context(struct mg_context *ctx) {
+
+
+static void free_context(struct mg_context *ctx)
+{
   int i;
 
   // Deallocate config parameters
-  for (i = 0; i < NUM_OPTIONS; i++) {
+  for (i = 0; i < NUM_OPTIONS; i++)
+  {
     if (ctx->config[i] != NULL)
       free(ctx->config[i]);
   }
@@ -4231,18 +4235,21 @@ static void free_context(struct mg_context *ctx) {
   free(ctx);
 }
 
+
+
 void mg_stop(struct mg_context *ctx)
 {
   ctx->stop_flag = 1;
 
   // Wait until mg_fini() stops
-  while (ctx->stop_flag != 2) {
+  while (ctx->stop_flag != 2)
+  {
     mg_sleep(10);
   }
   free_context(ctx);
 
 #if defined(_WIN32) && !defined(__SYMBIAN32__)
-  (void) WSACleanup();
+  WSACleanup();
 #endif // _WIN32
 }
 

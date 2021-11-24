@@ -2092,7 +2092,7 @@ bool Mat::Mainloop()
 
 	Process();
 
-	//Render((double)m_LastFrameTime * 0.001f);
+	Render((double)m_LastFrameTime * 0.001f);
 
 	if (IsDoingAnimation())
 		frameTime = 15;
