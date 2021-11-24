@@ -149,7 +149,7 @@ HttpServer::HttpServer(uint16_t Port) : m_Port(Port)
     const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", nullptr };
     //const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", "num_threads", "1", nullptr};
 
-    //m_Context = mg_start([](mg_event Event, mg_connection* Connection) { ((HttpServer*)Connection->ctx->user_data)->Callback(Event, Connection); }, this, options);
+    m_Context = mg_start([](mg_event Event, mg_connection* Connection) { ((HttpServer*)Connection->ctx->user_data)->Callback(Event, Connection); }, this, options);
 }
 
 

@@ -46,7 +46,8 @@ struct mg_connection;  // Handle for the individual connection
 
 
 // This structure contains information about the HTTP request.
-struct mg_request_info {
+struct mg_request_info
+{
   void *user_data;       // User-defined pointer passed to mg_start()
   char *request_method;  // "GET", "POST", etc
   char *uri;             // URL-decoded URI
@@ -85,7 +86,8 @@ typedef struct ssl_ctx_st SSL_CTX;
 
 
 // NOTE(lsm): this enum shoulds be in sync with the config_options below.
-enum {
+enum
+{
     CGI_EXTENSIONS, CGI_ENVIRONMENT, PUT_DELETE_PASSWORDS_FILE, CGI_INTERPRETER,
     PROTECT_URI, AUTHENTICATION_DOMAIN, SSI_EXTENSIONS, ACCESS_LOG_FILE,
     SSL_CHAIN_FILE, ENABLE_DIRECTORY_LISTING, ERROR_LOG_FILE,
@@ -117,7 +119,8 @@ typedef void (*mg_callback_t)(enum mg_event event, struct mg_connection* conn);
 
 // Unified socket address. For IPv6 support, add IPv6 address structure
 // in the union u.
-union usa {
+union usa
+{
     struct sockaddr sa;
     struct sockaddr_in sin;
 #if defined(USE_IPV6)
@@ -126,7 +129,8 @@ union usa {
 };
 
 // Describes a string (chunk of memory).
-struct vec {
+struct vec
+{
     const char* ptr;
     size_t len;
 };

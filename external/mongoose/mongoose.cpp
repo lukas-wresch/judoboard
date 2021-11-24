@@ -641,24 +641,24 @@ static char *skip_quoted(char **buf, const char *delimiters,
 
 // Simplified version of skip_quoted without quote char
 // and whitespace == delimiters
-static char *skip(char **buf, const char *delimiters) {
+static char *skip(char **buf, const char *delimiters)
+{
   return skip_quoted(buf, delimiters, delimiters, 0);
 }
 
 
 // Return HTTP header value, or NULL if not found.
-static const char *get_header(const struct mg_request_info *ri,
-                              const char *name) {
-  int i;
-
-  for (i = 0; i < ri->num_headers; i++)
+static const char* get_header(const struct mg_request_info *ri, const char *name)
+{
+  for (int i = 0; i < ri->num_headers; i++)
     if (!mg_strcasecmp(name, ri->http_headers[i].name))
       return ri->http_headers[i].value;
 
   return NULL;
 }
 
-const char *mg_get_header(const struct mg_connection *conn, const char *name) {
+const char* mg_get_header(const struct mg_connection *conn, const char *name)
+{
   return get_header(&conn->request_info, name);
 }
 
@@ -679,13 +679,16 @@ static const char *next_option(const char *list, struct vec *val,
       // Comma found. Store length and shift the list ptr
       val->len = list - val->ptr;
       list++;
-    } else {
+    }
+    else
+    {
       // This value is the last one
       list = val->ptr + strlen(val->ptr);
       val->len = list - val->ptr;
     }
 
-    if (eq_val != NULL) {
+    if (eq_val)
+    {
       // Value has form "x=y", adjust pointers and lengths
       // so that val points to "x", and eq_val points to "y".
       eq_val->len = 0;
@@ -1036,15 +1039,21 @@ static DIR * opendir(const char *name) {
   return dir;
 }
 
-static int closedir(DIR *dir) {
+
+
+static int closedir(DIR *dir)
+{
   int result = 0;
 
-  if (dir != NULL) {
+  if (dir)
+  {
     if (dir->handle != INVALID_HANDLE_VALUE)
       result = FindClose(dir->handle) ? 0 : -1;
 
     free(dir);
-  } else {
+  }
+  else
+  {
     result = -1;
     SetLastError(ERROR_BAD_ARGUMENTS);
   }
@@ -1052,27 +1061,30 @@ static int closedir(DIR *dir) {
   return result;
 }
 
-static struct dirent *readdir(DIR *dir) {
+
+
+static struct dirent *readdir(DIR *dir)
+{
   struct dirent *result = 0;
 
-  if (dir) {
-    if (dir->handle != INVALID_HANDLE_VALUE) {
+  if (dir)
+  {
+    if (dir->handle != INVALID_HANDLE_VALUE)
+    {
       result = &dir->result;
-      (void) WideCharToMultiByte(CP_UTF8, 0,
-          dir->info.cFileName, -1, result->d_name,
-          sizeof(result->d_name), NULL, NULL);
+      WideCharToMultiByte(CP_UTF8, 0, dir->info.cFileName, -1, result->d_name, sizeof(result->d_name), NULL, NULL);
 
-      if (!FindNextFileW(dir->handle, &dir->info)) {
-        (void) FindClose(dir->handle);
+      if (!FindNextFileW(dir->handle, &dir->info))
+      {
+        FindClose(dir->handle);
         dir->handle = INVALID_HANDLE_VALUE;
       }
-
-    } else {
-      SetLastError(ERROR_FILE_NOT_FOUND);
     }
-  } else {
-    SetLastError(ERROR_BAD_ARGUMENTS);
+    else
+      SetLastError(ERROR_FILE_NOT_FOUND);
   }
+  else
+    SetLastError(ERROR_BAD_ARGUMENTS);
 
   return result;
 }
@@ -1093,8 +1105,8 @@ static HANDLE dlopen(const char *dll_name, int flags) {
 #if !defined(NO_CGI)
 #define SIGKILL 0
 static int kill(pid_t pid, int sig_num) {
-  (void) TerminateProcess(pid, sig_num);
-  (void) CloseHandle(pid);
+  TerminateProcess(pid, sig_num);
+  CloseHandle(pid);
   return 0;
 }
 
@@ -1140,8 +1152,7 @@ static pid_t spawn_process(struct mg_connection *conn, const char *prog,
     interp = buf + 2;
   }
 
-  (void) mg_snprintf(conn, cmdline, sizeof(cmdline), "%s%s%s%c%s",
-                     interp, interp[0] == '\0' ? "" : " ", dir, DIRSEP, prog);
+  mg_snprintf(conn, cmdline, sizeof(cmdline), "%s%s%s%c%s", interp, interp[0] == '\0' ? "" : " ", dir, DIRSEP, prog);
 
   DEBUG_TRACE(("Running [%s]", cmdline));
   if (CreateProcessA(NULL, cmdline, NULL, NULL, TRUE,
@@ -1149,23 +1160,30 @@ static pid_t spawn_process(struct mg_connection *conn, const char *prog,
     cry(conn, "%s: CreateProcess(%s): %d",
         __func__, cmdline, ERRNO);
     pi.hProcess = (pid_t) -1;
-  } else {
-    (void) close(fd_stdin);
-    (void) close(fd_stdout);
+  }
+  else
+  {
+    close(fd_stdin);
+    close(fd_stdout);
   }
 
-  (void) CloseHandle(si.hStdOutput);
-  (void) CloseHandle(si.hStdInput);
-  (void) CloseHandle(pi.hThread);
+  CloseHandle(si.hStdOutput);
+  CloseHandle(si.hStdInput);
+  CloseHandle(pi.hThread);
 
   return (pid_t) pi.hProcess;
 }
 #endif // !NO_CGI
 
-static int set_non_blocking_mode(SOCKET sock) {
+
+
+static int set_non_blocking_mode(SOCKET sock)
+{
   unsigned long on = 1;
   return ioctlsocket(sock, FIONBIO, &on);
 }
+
+
 
 #else
 static int mg_stat(const char *path, struct mgstat *stp) {
@@ -1236,17 +1254,20 @@ static pid_t spawn_process(struct mg_connection *conn, const char *prog,
       }
     }
     exit(EXIT_FAILURE);
-  } else {
-    // Parent. Close stdio descriptors
-    (void) close(fd_stdin);
-    (void) close(fd_stdout);
   }
+    else
+    {
+        // Parent. Close stdio descriptors
+        close(fd_stdin);
+        close(fd_stdout);
+    }
 
-  return pid;
+    return pid;
 }
 #endif // !NO_CGI
 
-static int set_non_blocking_mode(SOCKET sock) {
+static int set_non_blocking_mode(SOCKET sock)
+{
   int flags;
 
   flags = fcntl(sock, F_GETFL, 0);
@@ -1258,26 +1279,26 @@ static int set_non_blocking_mode(SOCKET sock) {
 
 // Write data to the IO channel - opened file descriptor, socket or SSL
 // descriptor. Return number of bytes written.
-static int64_t push(FILE *fp, SOCKET sock, SSL *ssl, const char *buf,
-                    int64_t len) {
+static int64_t push(FILE *fp, SOCKET sock, SSL *ssl, const char *buf, int64_t len) {
   int64_t sent;
   int n, k;
 
   sent = 0;
-  while (sent < len) {
-
+  while (sent < len)
+  {
     // How many bytes we send in this iteration
     k = len - sent > INT_MAX ? INT_MAX : (int) (len - sent);
 
-    if (ssl != NULL) {
+    if (ssl)
       n = SSL_write(ssl, buf + sent, k);
-    } else if (fp != NULL) {
+    else if (fp)
+    {
       n = fwrite(buf + sent, 1, (size_t) k, fp);
       if (ferror(fp))
         n = -1;
-    } else {
-      n = send(sock, buf + sent, (size_t) k, MSG_NOSIGNAL);
     }
+    else
+      n = send(sock, buf + sent, (size_t) k, MSG_NOSIGNAL);
 
     if (n < 0)
       break;
@@ -1290,21 +1311,23 @@ static int64_t push(FILE *fp, SOCKET sock, SSL *ssl, const char *buf,
 
 // Read from IO channel - opened file descriptor, socket, or SSL descriptor.
 // Return number of bytes read.
-static int pull(FILE *fp, SOCKET sock, SSL *ssl, char *buf, int len) {
+static int pull(FILE *fp, SOCKET sock, SSL *ssl, char *buf, int len)
+{
   int nread;
 
-  if (ssl != NULL) {
+  if (ssl)
     nread = SSL_read(ssl, buf, len);
-  } else if (fp != NULL) {
+  else if (fp)
+  {
     // Use read() instead of fread(), because if we're reading from the CGI
     // pipe, fread() may block until IO buffer is filled up. We cannot afford
     // to block and must pass all read bytes immediately to the client.
     nread = read(fileno(fp), buf, (size_t) len);
     if (ferror(fp))
       nread = -1;
-  } else {
-    nread = recv(sock, buf, (size_t) len, 0);
   }
+  else
+    nread = recv(sock, buf, (size_t) len, 0);
 
   return nread;
 }
@@ -1539,10 +1562,9 @@ static int convert_uri_to_file_name(struct mg_connection *conn, char *buf,
   return stat_result;
 }
 
-static int sslize(struct mg_connection *conn, SSL_CTX *s, int (*func)(SSL *)) {
-  return (conn->ssl = SSL_new(s)) != NULL &&
-    SSL_set_fd(conn->ssl, conn->client.sock) == 1 &&
-    func(conn->ssl) == 1;
+static int sslize(struct mg_connection *conn, SSL_CTX *s, int (*func)(SSL *))
+{
+  return (conn->ssl = SSL_new(s)) != NULL && SSL_set_fd(conn->ssl, conn->client.sock) == 1 && func(conn->ssl) == 1;
 }
 
 // Check whether full request is buffered. Return:
@@ -4209,22 +4231,23 @@ static void master_thread(struct mg_context *ctx) {
 
 static void free_context(struct mg_context *ctx)
 {
-  int i;
+    if (!ctx)
+        return;
 
-  // Deallocate config parameters
-  for (i = 0; i < NUM_OPTIONS; i++)
-  {
-    if (ctx->config[i] != NULL)
-      free(ctx->config[i]);
-  }
+    // Deallocate config parameters
+    for (int i = 0; i < NUM_OPTIONS; i++)
+    {
+        if (ctx->config[i])
+            free(ctx->config[i]);
+    }
 
   // Deallocate SSL context
-  if (ctx->ssl_ctx != NULL) {
-    SSL_CTX_free(ctx->ssl_ctx);
-  }
-  if (ctx->client_ssl_ctx != NULL) {
-    SSL_CTX_free(ctx->client_ssl_ctx);
-  }
+    if (ctx->ssl_ctx)
+        SSL_CTX_free(ctx->ssl_ctx);
+  
+  if (ctx->client_ssl_ctx)
+        SSL_CTX_free(ctx->client_ssl_ctx);
+  
 #ifndef NO_SSL
   if (ssl_mutexes != NULL) {
     free(ssl_mutexes);
@@ -4295,7 +4318,8 @@ struct mg_context* mg_start(void (*user_callback)(enum mg_event event, struct mg
   }
 
   // Set default value if needed
-  for (i = 0; config_options[i * ENTRIES_PER_CONFIG_OPTION] != NULL; i++) {
+  for (i = 0; config_options[i * ENTRIES_PER_CONFIG_OPTION] != NULL; i++)
+  {
     default_value = config_options[i * ENTRIES_PER_CONFIG_OPTION + 2];
     if (ctx->config[i] == NULL && default_value != NULL) {
       ctx->config[i] = mg_strdup(default_value);
@@ -4329,16 +4353,17 @@ struct mg_context* mg_start(void (*user_callback)(enum mg_event event, struct mg
   (void) signal(SIGCHLD, SIG_IGN);
 #endif // !_WIN32
 
-  (void) pthread_mutex_init(&ctx->mutex, NULL);
-  (void) pthread_cond_init(&ctx->cond, NULL);
-  (void) pthread_cond_init(&ctx->sq_empty, NULL);
-  (void) pthread_cond_init(&ctx->sq_full, NULL);
+  pthread_mutex_init(&ctx->mutex, NULL);
+  pthread_cond_init(&ctx->cond, NULL);
+  pthread_cond_init(&ctx->sq_empty, NULL);
+  pthread_cond_init(&ctx->sq_full, NULL);
 
   // Start master (listening) thread
   mg_start_thread((mg_thread_func_t) master_thread, ctx);
 
   // Start worker threads
-  for (i = 0; i < atoi(ctx->config[NUM_THREADS]); i++) {
+  for (i = 0; i < atoi(ctx->config[NUM_THREADS]); i++)
+  {
     if (mg_start_thread((mg_thread_func_t) worker_thread, ctx) != 0) {
       cry(fc(ctx), "Cannot start worker thread: %d", ERRNO);
     } else {
