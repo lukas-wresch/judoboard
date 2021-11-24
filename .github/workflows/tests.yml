@@ -56,7 +56,7 @@ jobs:
       run: dir; cd vsprojects; dir; msbuild Judoboard.sln
     - name: compile
       run: dir; .\compile.bat
-    - name: package
-      run: dir; .\package.bat
+    - name: create folder
+      run: dir; cd bin\Release; mkdir tournaments
     - name: Run Tests
       run: dir; cd bin\Release; dir; .\GoogleTest.exe
