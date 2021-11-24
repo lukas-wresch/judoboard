@@ -261,13 +261,13 @@ bool Window::IsRunning() const
 
 void Window::CloseWindow()
 {
-	if (!m_Renderer)
-		return;
+	//if (!m_Renderer)
+		//return;
 
-	m_Renderer->Lock();
+	//m_Renderer->Lock();
 	SendMessage(m_Hwnd, WM_CLOSE, 0, 0);
 	m_IsRunning = false;
-	m_Renderer->Unlock();
+	//m_Renderer->Unlock();
 }
 
 

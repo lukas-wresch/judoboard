@@ -1472,10 +1472,10 @@ TEST(Mat, OsaekomiSwitch)
 
 		EXPECT_FALSE(m.IsOsaekomiRunning());
 
-		EXPECT_TRUE(m.GetOsaekomiList().size() == 1);
-		EXPECT_TRUE(m.GetOsaekomiList()[0].m_Who == f);
+		EXPECT_EQ(m.GetOsaekomiList().size(), 1);
+		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, f);
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 1);
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 	}

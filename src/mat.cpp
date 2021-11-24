@@ -78,12 +78,12 @@ bool Mat::Open()
 
 		ZED::Log::Info("Logo loaded");
 
-		//while (m_Window.IsRunning())
-			//Mainloop();
+		while (m_Window.IsRunning())
+			Mainloop();
 	});
 
-	//while (!m_Window.IsRunning() || !m_Background || !m_Background->IsLoaded())
-		//ZED::Core::Pause(100);
+	while (!m_Window.IsRunning() || !m_Background || !m_Background->IsLoaded())
+		ZED::Core::Pause(100);
 
 	return m_Window.IsRunning();
 }

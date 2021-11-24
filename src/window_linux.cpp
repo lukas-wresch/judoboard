@@ -148,7 +148,7 @@ void Judoboard::Window::CloseWindow()
 {
 	if (!m_Renderer) return;
 
-	m_Renderer->Lock();
+	//m_Renderer->Lock();
 
 	if (m_Hwnd)
 	{
@@ -164,7 +164,7 @@ void Judoboard::Window::CloseWindow()
 
 	m_IsRunning = false;
 
-	m_Renderer->Unlock();
+	//m_Renderer->Unlock();
 }
 
 
