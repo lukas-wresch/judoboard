@@ -82,8 +82,8 @@ bool Mat::Open()
 			//Mainloop();
 	});
 
-	while (!m_Window.IsRunning() || !m_Background || !m_Background->IsLoaded())
-		ZED::Core::Pause(100);
+	//while (!m_Window.IsRunning() || !m_Background || !m_Background->IsLoaded())
+		//ZED::Core::Pause(100);
 
 	return m_Window.IsRunning();
 }
@@ -101,10 +101,10 @@ bool Mat::Close()
 	if (!m_Window.IsRunning())//Check if the window is running
 		ZED::Core::Pause(1000);
 
-	//m_Window.CloseWindow();
+	m_Window.CloseWindow();
 	
-	//if (m_Thread.joinable())
-		//m_Thread.join();
+	if (m_Thread.joinable())
+		m_Thread.join();
 
 	return true;
 }

@@ -175,6 +175,8 @@ void ZED::RendererOpenGL::Release()
 {
 	m_screen_w = 0;
 	m_screen_h = 0;
+
+	SDL_GL_DeleteContext(m_glcontext);
 }
 
 

@@ -39,8 +39,8 @@ Application::~Application()
 	if (!m_Database.Save("database.csv"))
 		ZED::Log::Error("Could not save database!");
 
-	for (auto mat : m_Mats)
-		delete mat;
+	//for (auto mat : m_Mats)
+		//delete mat;
 
 	m_Mats.clear();
 
