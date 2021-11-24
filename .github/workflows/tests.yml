@@ -52,8 +52,6 @@ jobs:
       run: dir; cd vsprojects; dir; nuget install ZED\packages.config        -OutputDirectory packages
     - name: nuget2
       run: dir; cd vsprojects; dir; nuget install GoogleTest\packages.config -OutputDirectory packages
-    - name: msbuild
-      run: dir; cd vsprojects; dir; msbuild Judoboard.sln
     - name: compile
       run: dir; .\compile.bat
     - name: create folder
