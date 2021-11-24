@@ -118,9 +118,9 @@ Tournament::~Tournament()
 	for (auto table : m_MatchTables)
 		delete table;
 
-	for (auto match : m_Schedule)
-		if (!match->GetMatchTable())
-			delete match;//Match might now be stored on the heap, then this will crash
+	//for (auto match : m_Schedule)
+		//if (!match->GetMatchTable())
+			//delete match;//Match might now be stored on the heap, then this will crash
 }
 
 
