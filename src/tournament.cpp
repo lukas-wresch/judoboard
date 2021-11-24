@@ -330,7 +330,7 @@ void Tournament::ConnectToDatabase(Database& db)
 
 	for (auto it = m_StandingData.GetRuleSets().begin(); it != m_StandingData.GetRuleSets().end();)
 	{
-		auto* db_ref = db.FindRuleSet((*it)->GetUUID());
+		auto db_ref = db.FindRuleSet((*it)->GetUUID());
 		if (db_ref)
 		{
 			delete *it;
@@ -341,12 +341,12 @@ void Tournament::ConnectToDatabase(Database& db)
 			++it;
 	}
 
-	for (auto* rule : rule_sets_to_add)
+	for (auto rule : rule_sets_to_add)
 		m_StandingData.AddRuleSet(rule);
 
 	if (m_pDefaultRules)
 	{
-		auto* db_ref = db.FindRuleSet(m_pDefaultRules->GetUUID());
+		auto db_ref = db.FindRuleSet(m_pDefaultRules->GetUUID());
 		if (db_ref)
 			m_pDefaultRules = db_ref;
 	}
