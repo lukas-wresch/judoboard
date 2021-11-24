@@ -265,6 +265,7 @@
     <None Include="..\..\bin\html\tournament_list.html" />
     <None Include="..\..\compile.bat" />
     <None Include="..\..\compile.sh" />
+    <None Include="..\..\compile64.bat" />
     <None Include="..\..\dependencies.sh" />
     <None Include="..\..\package.bat" />
     <None Include="..\..\README.md" />

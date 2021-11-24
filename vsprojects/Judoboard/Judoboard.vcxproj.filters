@@ -301,5 +301,8 @@
     <None Include="..\..\package.bat">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\compile64.bat">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
