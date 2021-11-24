@@ -57,6 +57,6 @@ jobs:
     - name: compile
       run: dir; .\compile.bat
     - name: create folder
-      run: dir; cd bin\Release; xcopy ..\assets assets /S /Y; xcopy ..\html   html   /S /Y; mkdir tournaments
+      run: dir; cd bin\Release; xcopy ..\assets\ assets\ /S /Y; xcopy ..\html\   html\   /S /Y; mkdir tournaments
     - name: Run Tests
       run: dir; cd bin\Release; dir; .\GoogleTest.exe
