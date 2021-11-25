@@ -301,7 +301,7 @@ TEST(App, MatchOnSlave)
 
 
 
-TEST(App, MasterSlaveForceClose)
+/*TEST(App, MasterSlaveForceClose)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
@@ -463,4 +463,4 @@ TEST(App, MasterSlaveFullTournament)
 		EXPECT_TRUE(mat->EndMatch());
 		ZED::Core::Pause(8000);
 	}
-}
+}*/

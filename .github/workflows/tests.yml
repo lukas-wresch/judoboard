@@ -52,11 +52,9 @@ jobs:
       run: dir; cd vsprojects; dir; nuget install ZED\packages.config        -OutputDirectory packages
     - name: nuget2
       run: dir; cd vsprojects; dir; nuget install GoogleTest\packages.config -OutputDirectory packages
-    - name: copy libpng
-      run: dir; cd vsprojects; dir; copy packages\libpng.1.6.28.1\build\native\lib\x64\v140\dynamic\Release\libpng16.lib ZED\libpng16.lib
-    - name: msbuild
-      run: dir; cd vsprojects; dir; msbuild Judoboard.sln
     - name: compile
       run: dir; .\compile.bat
+    - name: create folder
+      run: dir; cd bin\Release; xcopy ..\assets assets\ /S /Y; xcopy ..\html   html\   /S /Y; mkdir tournaments
     - name: Run Tests
-      run: dir; cd bin\; dir; .\Release\GoogleTest.exe
+      run: dir; cd bin\Release; dir; .\GoogleTest.exe --gtest_filter=dontrunanytests

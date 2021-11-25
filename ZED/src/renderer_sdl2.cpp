@@ -139,11 +139,18 @@ void RendererSDL2::UpdateDisplay() const
 
 void RendererSDL2::Release()
 {
-	SDL_FreeSurface(m_SDL_screen);
+	if (m_SDL_screen)
+	{
+		SDL_FreeSurface(m_SDL_screen);
+		m_SDL_screen = nullptr;
+	}
 
-	SDL_DestroyWindow(m_SDL_window);
-
-	SDL_Quit();
+	if (m_SDL_window)
+	{
+		SDL_DestroyWindow(m_SDL_window);
+		m_SDL_window = nullptr;
+		SDL_Quit();
+	}
 }
 
 
