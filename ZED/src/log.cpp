@@ -31,29 +31,29 @@ void Log::Add(const std::string& LogMessage, Type Type)
 {
 	Open();
 
-	if (!g_LogFile)
-		return;//No access to log file
+	if (g_LogFile)
+	{
+		g_lock.lock();
 
-	g_lock.lock();
+		std::string type_string = "[???] ";
+		if (Type == Type::Error)
+			type_string = "[ERROR] ";
+		else if (Type == Type::Warning)
+			type_string = "[WARNING] ";
+		else if (Type == Type::Info)
+			type_string = "[INFO] ";
+		else if (Type == Type::Debug)
+			type_string = "[DEBUG] ";
 
-	std::string type_string = "[???] ";
-	if (Type == Type::Error)
-		type_string = "[ERROR] ";
-	else if (Type == Type::Warning)
-		type_string = "[WARNING] ";
-	else if (Type == Type::Info)
-		type_string = "[INFO] ";
-	else if (Type == Type::Debug)
-		type_string = "[DEBUG] ";
+		const std::string time = std::to_string(Core::CurrentTime());
 
-	const std::string time = std::to_string(Core::CurrentTime());
+		fprintf(g_LogFile, "%s", ("[" + time + "]: " + type_string + LogMessage + "\n").c_str());
 
-	fprintf(g_LogFile, "%s", ("[" + time + "]: " + type_string + LogMessage + "\n").c_str());
+		if (Type == Type::Error || Type == Type::Warning)
+			fflush(g_LogFile);
 
-	if (Type == Type::Error || Type == Type::Warning)
-		fflush(g_LogFile);
-
-	g_lock.unlock();
+		g_lock.unlock();
+	}
 
 #ifdef _DEBUG
 #ifdef _WIN32
