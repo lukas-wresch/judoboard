@@ -20,8 +20,9 @@
 
 
 
-#if defined(_WIN32)
 #define _CRT_SECURE_NO_WARNINGS // Disable deprecation warning in VS2005
+#include "../../ZED/include/log.h"
+#if defined(_WIN32)
 #pragma comment(lib, "Ws2_32.lib")
 #define NO_SSL
 #else
@@ -233,7 +234,7 @@ static pthread_t pthread_self(void) {
 }
 #endif // _WIN32
 
-#if defined(DEBUG)
+/*#if defined(DEBUG)
 #define DEBUG_TRACE(x) do { \
   flockfile(stdout); \
   printf("*** %lu.%p.%s.%d: ", \
@@ -246,7 +247,7 @@ static pthread_t pthread_self(void) {
 } while (0)
 #else
 #define DEBUG_TRACE(x)
-#endif // DEBUG
+#endif // DEBUG*/
 
 // Darwin prior to 7.0 and Win32 do not have socklen_t
 #ifdef NO_SOCKLEN_T
@@ -449,7 +450,8 @@ static void sockaddr_to_string(char *buf, size_t len,
 }
 
 // Print error message to the opened error log stream.
-static void cry(struct mg_connection *conn, const char *fmt, ...) {
+static void cry(struct mg_connection *conn, const char *fmt, ...)
+{
   char buf[MG_BUF_LEN], src_addr[20];
   va_list ap;
   FILE *fp;
@@ -793,7 +795,7 @@ static void send_http_error(struct mg_connection *conn, int status,
       len += mg_vsnprintf(conn, buf + len, sizeof(buf) - len, fmt, ap);
       va_end(ap);
     }
-    DEBUG_TRACE(("[%s]", buf));
+    ZED::Log::Debug(std::string(buf));
 
     mg_printf(conn, "HTTP/1.1 %d %s\r\n"
               "Content-Type: text/plain\r\n"
@@ -1165,11 +1167,11 @@ static pid_t spawn_process(struct mg_connection *conn, const char *prog,
 
   mg_snprintf(conn, cmdline, sizeof(cmdline), "%s%s%s%c%s", interp, interp[0] == '\0' ? "" : " ", dir, DIRSEP, prog);
 
-  DEBUG_TRACE(("Running [%s]", cmdline));
+  ZED::Log::Debug("Running "  + std::string(cmdline));
   if (CreateProcessA(NULL, cmdline, NULL, NULL, TRUE,
         CREATE_NEW_PROCESS_GROUP, envblk, dir, &si, &pi) == 0) {
-    cry(conn, "%s: CreateProcess(%s): %d",
-        __func__, cmdline, ERRNO);
+    //cry(conn, "%s: CreateProcess(%s): %d", __func__, cmdline, ERRNO);
+      cry(conn, "CreateProcess()");
     pi.hProcess = (pid_t) -1;
   }
   else
@@ -1349,8 +1351,7 @@ int mg_read(struct mg_connection *conn, void *buf, size_t len) {
 
   assert((conn->content_len == -1 && conn->consumed_content == 0) ||
          conn->consumed_content <= conn->content_len);
-  DEBUG_TRACE(("%p %zu %lld %lld", buf, len,
-               conn->content_len, conn->consumed_content));
+  //DEBUG_TRACE(("%p %zu %lld %lld", buf, len, conn->content_len, conn->consumed_content));
   nread = 0;
   if (conn->consumed_content < conn->content_len) {
 
@@ -1586,7 +1587,7 @@ static int get_request_len(const char *buf, int buflen) {
   const char *s, *e;
   int len = 0;
 
-  DEBUG_TRACE(("buf: %p, len: %d", buf, buflen));
+  //DEBUG_TRACE(("buf: %p, len: %d", buf, buflen));
   for (s = buf, e = s + buflen - 1; len <= 0 && s < e; s++)
     // Control characters are not allowed but >=128 is.
     if (!isprint(* (const unsigned char *) s) && *s != '\r' &&
@@ -3087,7 +3088,7 @@ static int put_dir(const char *path)
     buf[len] = '\0';
 
     // Try to create intermediate directory
-    DEBUG_TRACE(("mkdir(%s)", buf));
+    //DEBUG_TRACE(("mkdir(%s)", buf));
     if (mg_stat(buf, &st) == -1 && mg_mkdir(buf, 0755) != 0) {
       res = -1;
       break;
@@ -3355,7 +3356,7 @@ static void handle_propfind(struct mg_connection *conn, const char* path,
 // This function is called when the request is read, parsed and validated,
 // and Mongoose must decide what action to take: serve a file, or
 // a directory, or call embedded function, etcetera.
-static void handle_request(struct mg_connection *conn)
+static void handle_request(struct mg_connection* conn)
 {
   struct mg_request_info *ri = &conn->request_info;
   char path[PATH_MAX];
@@ -3370,8 +3371,9 @@ static void handle_request(struct mg_connection *conn)
   remove_double_dots_and_double_slashes(ri->uri);
   stat_result = convert_uri_to_file_name(conn, path, sizeof(path), &st);
 
-  DEBUG_TRACE(("%s", ri->uri));
-  if (!check_authorization(conn, path)) {
+  ZED::Log::Debug(std::string(ri->uri));
+  if (!check_authorization(conn, path))
+  {
       send_authorization_request(conn);
       //} else if (call_user(conn, MG_NEW_REQUEST) != NULL) {
   }
@@ -3435,11 +3437,13 @@ static void handle_request(struct mg_connection *conn)
   }*/
 }
 
-static void close_all_listening_sockets(struct mg_context *ctx) {
+static void close_all_listening_sockets(struct mg_context *ctx)
+{
   struct socket *sp, *tmp;
-  for (sp = ctx->listening_sockets; sp != NULL; sp = tmp) {
+  for (sp = ctx->listening_sockets; sp != NULL; sp = tmp)
+  {
     tmp = sp->next;
-    (void) closesocket(sp->sock);
+    closesocket(sp->sock);
     free(sp);
   }
 }
@@ -3447,7 +3451,8 @@ static void close_all_listening_sockets(struct mg_context *ctx) {
 // Valid listening port specification is: [ip_address:]port[s]
 // Examples: 80, 443s, 127.0.0.1:3128,1.2.3.4:8080s
 // TODO(lsm): add parsing of the IPv6 address
-static int parse_port_string(const struct vec *vec, struct socket *so) {
+static int parse_port_string(const struct vec *vec, struct socket *so)
+{
   int a, b, c, d, port, len;
 
   // MacOS needs that. If we do not zero it, subsequent bind() will fail.
@@ -3853,7 +3858,7 @@ static void close_socket_gracefully(SOCKET sock) {
   } while (n > 0);
 
   // Now we know that our FIN is ACK-ed, safe to close
-  (void) closesocket(sock);
+  closesocket(sock);
 }
 
 static void close_connection(struct mg_connection *conn)
@@ -4058,7 +4063,7 @@ static void process_new_connection(struct mg_connection *conn)
 static int consume_socket(struct mg_context *ctx, struct socket *sp)
 {
   pthread_mutex_lock(&ctx->mutex);
-  DEBUG_TRACE(("going idle"));
+  ZED::Log::Debug(("going idle"));
 
   // If the queue is empty, wait. We're idle at this point.
   while (ctx->sq_head == ctx->sq_tail && ctx->stop_flag == 0)
@@ -4070,7 +4075,7 @@ static int consume_socket(struct mg_context *ctx, struct socket *sp)
     // Copy socket from the queue and increment tail
     *sp = ctx->queue[ctx->sq_tail % ARRAY_SIZE(ctx->queue)];
     ctx->sq_tail++;
-    DEBUG_TRACE(("grabbed socket %d, going busy", sp->sock));
+    ZED::Log::Debug("grabbed socket, going busy " +  std::to_string(sp->sock));
 
     // Wrap pointers if needed
     while (ctx->sq_tail > (int) ARRAY_SIZE(ctx->queue)) {
@@ -4110,8 +4115,7 @@ static void worker_thread(struct mg_context *ctx)
     // Thanks to Johannes Winkelmann for the patch.
     // TODO(lsm): Fix IPv6 case
     conn->request_info.remote_port = ntohs(conn->client.rsa.sin.sin_port);
-    memcpy(&conn->request_info.remote_ip,
-           &conn->client.rsa.sin.sin_addr.s_addr, 4);
+    memcpy(&conn->request_info.remote_ip, &conn->client.rsa.sin.sin_addr.s_addr, 4);
     conn->request_info.remote_ip = ntohl(conn->request_info.remote_ip);
     conn->request_info.is_ssl = conn->client.is_ssl;
 
@@ -4129,7 +4133,7 @@ static void worker_thread(struct mg_context *ctx)
   //assert(ctx->num_threads >= 0);
   pthread_mutex_unlock(&ctx->mutex);
 
-  DEBUG_TRACE(("exiting"));
+  ZED::Log::Debug("worker exiting");
 }
 
 // Master thread adds accepted socket to a queue
@@ -4146,7 +4150,7 @@ static void produce_socket(struct mg_context *ctx, const struct socket *sp)
     // Copy socket to the queue and increment head
     ctx->queue[ctx->sq_head % ARRAY_SIZE(ctx->queue)] = *sp;
     ctx->sq_head++;
-    DEBUG_TRACE(("queued socket %d", sp->sock));
+    ZED::Log::Debug("queued socket " + std::to_string(sp->sock));
   }
 
   pthread_cond_signal(&ctx->sq_full);
@@ -4167,7 +4171,7 @@ static void accept_new_connection(const struct socket *listener,
     allowed = check_acl(ctx, &accepted.rsa);
     if (allowed) {
       // Put accepted socket structure into the queue
-      DEBUG_TRACE(("accepted socket %d", accepted.sock));
+        ZED::Log::Debug("accepted socket " + std::to_string(accepted.sock));
       accepted.is_ssl = listener->is_ssl;
       produce_socket(ctx, &accepted);
     } else {
@@ -4178,7 +4182,8 @@ static void accept_new_connection(const struct socket *listener,
   }
 }
 
-static void master_thread(struct mg_context *ctx) {
+static void master_thread(struct mg_context *ctx)
+{
   fd_set read_set;
   struct timeval tv;
   struct socket *sp;
@@ -4195,34 +4200,37 @@ static void master_thread(struct mg_context *ctx) {
   pthread_setschedparam(pthread_self(), SCHED_RR, &sched_param);
 #endif
 
-  while (ctx->stop_flag == 0) {
+  while (ctx->stop_flag == 0)
+  {
     FD_ZERO(&read_set);
     max_fd = -1;
 
     // Add listening sockets to the read set
-    for (sp = ctx->listening_sockets; sp != NULL; sp = sp->next) {
+    for (sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
       add_to_set(sp->sock, &read_set, &max_fd);
-    }
 
     tv.tv_sec = 0;
     tv.tv_usec = 200 * 1000;
 
-    if (select(max_fd + 1, &read_set, NULL, NULL, &tv) < 0) {
+    if (select(max_fd + 1, &read_set, NULL, NULL, &tv) < 0)
+    {
 #ifdef _WIN32
       // On windows, if read_set and write_set are empty,
       // select() returns "Invalid parameter" error
       // (at least on my Windows XP Pro). So in this case, we sleep here.
       mg_sleep(1000);
 #endif // _WIN32
-    } else {
-      for (sp = ctx->listening_sockets; sp != NULL; sp = sp->next) {
-        if (ctx->stop_flag == 0 && FD_ISSET(sp->sock, &read_set)) {
+    }
+    else
+    {
+      for (sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
+      {
+        if (ctx->stop_flag == 0 && FD_ISSET(sp->sock, &read_set))
           accept_new_connection(sp, ctx);
-        }
       }
     }
   }
-  DEBUG_TRACE(("stopping workers"));
+  ZED::Log::Debug("stopping workers");
 
   // Stop signal received: somebody called mg_stop. Quit.
   close_all_listening_sockets(ctx);
@@ -4231,16 +4239,18 @@ static void master_thread(struct mg_context *ctx) {
   pthread_cond_broadcast(&ctx->sq_full);
 
   // Wait until all threads finish
-  //(void) pthread_mutex_lock(&ctx->mutex);
-  //while (ctx->num_threads > 0)
-    //(void) pthread_cond_wait(&ctx->cond, &ctx->mutex);
-  //(void) pthread_mutex_unlock(&ctx->mutex);
+  pthread_mutex_lock(&ctx->mutex);
+  while (ctx->num_threads > 0)
+    pthread_cond_wait(&ctx->cond, &ctx->mutex);
+  pthread_mutex_unlock(&ctx->mutex);
+
+  ZED::Log::Debug("all workers stopped");
 
   // All threads exited, no sync is needed. Destroy mutex and condvars
-  (void) pthread_mutex_destroy(&ctx->mutex);
-  (void) pthread_cond_destroy(&ctx->cond);
-  (void) pthread_cond_destroy(&ctx->sq_empty);
-  (void) pthread_cond_destroy(&ctx->sq_full);
+  pthread_mutex_destroy(&ctx->mutex);
+  pthread_cond_destroy(&ctx->cond);
+  pthread_cond_destroy(&ctx->sq_empty);
+  pthread_cond_destroy(&ctx->sq_full);
 
 #if !defined(NO_SSL)
   uninitialize_ssl(ctx);
@@ -4249,7 +4259,7 @@ static void master_thread(struct mg_context *ctx) {
   // Signal mg_stop() that we're done
   ctx->stop_flag = 2;
 
-  DEBUG_TRACE(("exiting"));
+  ZED::Log::Debug("exiting");
 }
 
 
@@ -4274,9 +4284,8 @@ static void free_context(struct mg_context *ctx)
         SSL_CTX_free(ctx->client_ssl_ctx);
   
 #ifndef NO_SSL
-  if (ssl_mutexes != NULL) {
+  if (ssl_mutexes)
     free(ssl_mutexes);
-  }
 #endif // !NO_SSL
 
   // Deallocate context itself
@@ -4292,8 +4301,10 @@ void mg_stop(struct mg_context *ctx)
   // Wait until mg_fini() stops
   while (ctx->stop_flag != 2)
   {
-    mg_sleep(10);
+    mg_sleep(100);
   }
+
+  mg_sleep(100);
   free_context(ctx);
 
 #if defined(_WIN32) && !defined(__SYMBIAN32__)
@@ -4339,7 +4350,7 @@ struct mg_context* mg_start(void (*user_callback)(enum mg_event event, struct mg
       cry(fc(ctx), "warning: %s: duplicate option", name);
 
     ctx->config[i] = mg_strdup(value);
-    DEBUG_TRACE(("[%s] -> [%s]", name, value));
+    ZED::Log::Debug(std::string(name) + " -> " + std::string(value));
   }
 
   // Set default value if needed
@@ -4348,7 +4359,7 @@ struct mg_context* mg_start(void (*user_callback)(enum mg_event event, struct mg
     default_value = config_options[i * ENTRIES_PER_CONFIG_OPTION + 2];
     if (ctx->config[i] == NULL && default_value != NULL) {
       ctx->config[i] = mg_strdup(default_value);
-      DEBUG_TRACE(("Setting default: [%s] -> [%s]",
+      ZED::Log::Debug(("Setting default: [%s] -> [%s]",
                    config_options[i * ENTRIES_PER_CONFIG_OPTION + 1],
                    default_value));
     }
