@@ -705,37 +705,43 @@ static int match_prefix(const char *pattern, int pattern_len, const char *str) {
   const char *or_str;
   int i, j, len, res;
 
-  if ((or_str = (const char *) memchr(pattern, '|', pattern_len)) != NULL) {
+  if ((or_str = (const char *) memchr(pattern, '|', pattern_len)) != NULL)
+  {
     res = match_prefix(pattern, or_str - pattern, str);
-    return res > 0 ? res :
-        match_prefix(or_str + 1, (pattern + pattern_len) - (or_str + 1), str);
+    return res > 0 ? res : match_prefix(or_str + 1, (pattern + pattern_len) - (or_str + 1), str);
   }
 
   i = j = 0;
   res = -1;
-  for (; i < pattern_len; i++, j++) {
-    if (pattern[i] == '?' && str[j] != '\0') {
+  for (; i < pattern_len; i++, j++)
+  {
+    if (pattern[i] == '?' && str[j] != '\0')
       continue;
-    } else if (pattern[i] == '$') {
+    else if (pattern[i] == '$')
       return str[j] == '\0' ? j : -1;
-    } else if (pattern[i] == '*') {
+    else if (pattern[i] == '*')
+    {
       i++;
-      if (pattern[i] == '*') {
+      if (pattern[i] == '*')
+      {
         i++;
         len = strlen(str + j);
-      } else {
+      }
+      else
         len = strcspn(str + j, "/");
-      }
-      if (i == pattern_len) {
+
+      if (i == pattern_len)
         return j + len;
-      }
-      do {
+      
+      do
+      {
         res = match_prefix(pattern + i, pattern_len - i, str + j + len);
       } while (res == -1 && len-- > 0);
+
       return res == -1 ? -1 : j + res + len;
-    } else if (pattern[i] != str[j]) {
-      return -1;
     }
+    else if (pattern[i] != str[j])
+      return -1;
   }
   return j;
 }
@@ -743,20 +749,21 @@ static int match_prefix(const char *pattern, int pattern_len, const char *str) {
 // HTTP 1.1 assumes keep alive if "Connection:" header is not set
 // This function must tolerate situations when connection info is not
 // set up, for example if request parsing failed.
-static int should_keep_alive(const struct mg_connection *conn) {
+static int should_keep_alive(const struct mg_connection *conn)
+{
   const char *http_version = conn->request_info.http_version;
   const char *header = mg_get_header(conn, "Connection");
-  if (conn->must_close ||
-      conn->request_info.status_code == 401 ||
+  if (conn->must_close || conn->request_info.status_code == 401 ||
       mg_strcasecmp(conn->ctx->config[ENABLE_KEEP_ALIVE], "yes") != 0 ||
       (header != NULL && mg_strcasecmp(header, "keep-alive") != 0) ||
-      (header == NULL && http_version && strcmp(http_version, "1.1"))) {
+      (header == NULL && http_version && strcmp(http_version, "1.1")))
     return 0;
-  }
+  
   return 1;
 }
 
-static const char *suggest_connection_header(const struct mg_connection *conn) {
+static const char* suggest_connection_header(const struct mg_connection *conn)
+{
   return should_keep_alive(conn) ? "keep-alive" : "close";
 }
 
@@ -795,21 +802,25 @@ static void send_http_error(struct mg_connection *conn, int status,
 }
 
 #if defined(_WIN32) && !defined(__SYMBIAN32__)
-static int pthread_mutex_init(pthread_mutex_t *mutex, void *unused) {
+static int pthread_mutex_init(pthread_mutex_t *mutex, void *unused)
+{
   unused = NULL;
   *mutex = CreateMutex(NULL, FALSE, NULL);
   return *mutex == NULL ? -1 : 0;
 }
 
-static int pthread_mutex_destroy(pthread_mutex_t *mutex) {
+static int pthread_mutex_destroy(pthread_mutex_t *mutex)
+{
   return CloseHandle(*mutex) == 0 ? -1 : 0;
 }
 
-static int pthread_mutex_lock(pthread_mutex_t *mutex) {
+static int pthread_mutex_lock(pthread_mutex_t *mutex)
+{
   return WaitForSingleObject(*mutex, INFINITE) == WAIT_OBJECT_0? 0 : -1;
 }
 
-static int pthread_mutex_unlock(pthread_mutex_t *mutex) {
+static int pthread_mutex_unlock(pthread_mutex_t *mutex)
+{
   return ReleaseMutex(*mutex) == 0 ? -1 : 0;
 }
 
@@ -2991,7 +3002,7 @@ static void handle_cgi_request(struct mg_connection *conn, const char *prog) {
       !mg_strcasecmp(get_header(&ri, "Connection"), "keep-alive")) {
     conn->must_close = 1;
   }
-  (void) mg_printf(conn, "HTTP/1.1 %d %s\r\n", conn->request_info.status_code,
+  mg_printf(conn, "HTTP/1.1 %d %s\r\n", conn->request_info.status_code,
                    status_text);
 
   // Send headers
@@ -2999,7 +3010,7 @@ static void handle_cgi_request(struct mg_connection *conn, const char *prog) {
     mg_printf(conn, "%s: %s\r\n",
               ri.http_headers[i].name, ri.http_headers[i].value);
   }
-  (void) mg_write(conn, "\r\n", 2);
+  mg_write(conn, "\r\n", 2);
 
   // Send chunk of data that may be read after the headers
   conn->num_bytes_sent += mg_write(conn, buf + headers_len,
@@ -3020,9 +3031,9 @@ done:
   }
 
   if (in != NULL) {
-    (void) fclose(in);
+    fclose(in);
   } else if (fd_stdin[1] != -1) {
-    (void) close(fd_stdin[1]);
+    close(fd_stdin[1]);
   }
 
   if (out != NULL) {
@@ -3036,13 +3047,15 @@ done:
 // For a given PUT path, create all intermediate subdirectories
 // for given path. Return 0 if the path itself is a directory,
 // or -1 on error, 1 if OK.
-static int put_dir(const char *path) {
+static int put_dir(const char *path)
+{
   char buf[PATH_MAX];
   const char *s, *p;
   struct mgstat st;
   int len, res = 1;
 
-  for (s = p = path + 2; (p = strchr(s, DIRSEP)) != NULL; s = ++p) {
+  for (s = p = path + 2; (p = strchr(s, DIRSEP)) != NULL; s = ++p)
+  {
     len = p - path;
     if (len >= (int) sizeof(buf)) {
       res = -1;
@@ -3059,15 +3072,15 @@ static int put_dir(const char *path) {
     }
 
     // Is path itself a directory?
-    if (p[1] == '\0') {
+    if (p[1] == '\0')
       res = 0;
-    }
   }
 
   return res;
 }
 
-static void put_file(struct mg_connection *conn, const char *path) {
+static void put_file(struct mg_connection *conn, const char *path)
+{
   struct mgstat st;
   const char *range;
   int64_t r1, r2;
@@ -3076,15 +3089,20 @@ static void put_file(struct mg_connection *conn, const char *path) {
 
   conn->request_info.status_code = mg_stat(path, &st) == 0 ? 200 : 201;
 
-  if ((rc = put_dir(path)) == 0) {
+  if ((rc = put_dir(path)) == 0)
     mg_printf(conn, "HTTP/1.1 %d OK\r\n\r\n", conn->request_info.status_code);
-  } else if (rc == -1) {
+  else if (rc == -1)
+  {
     send_http_error(conn, 500, http_500_error,
         "put_dir(%s): %s", path, strerror(ERRNO));
-  } else if ((fp = mg_fopen(path, "wb+")) == NULL) {
+  }
+  else if ((fp = mg_fopen(path, "wb+")) == NULL)
+  {
     send_http_error(conn, 500, http_500_error,
         "fopen(%s): %s", path, strerror(ERRNO));
-  } else {
+  }
+  else
+  {
     set_close_on_exec(fileno(fp));
     range = mg_get_header(conn, "Content-Range");
     r1 = r2 = 0;
@@ -3315,15 +3333,16 @@ static void handle_propfind(struct mg_connection *conn, const char* path,
 // This function is called when the request is read, parsed and validated,
 // and Mongoose must decide what action to take: serve a file, or
 // a directory, or call embedded function, etcetera.
-static void handle_request(struct mg_connection *conn) {
+static void handle_request(struct mg_connection *conn)
+{
   struct mg_request_info *ri = &conn->request_info;
   char path[PATH_MAX];
   int stat_result, uri_len;
   struct mgstat st;
 
-  if ((conn->request_info.query_string = strchr(ri->uri, '?')) != NULL) {
-    * conn->request_info.query_string++ = '\0';
-  }
+  if ((conn->request_info.query_string = strchr(ri->uri, '?')) != NULL)
+    *conn->request_info.query_string++ = '\0';
+
   uri_len = strlen(ri->uri);
   url_decode(ri->uri, (size_t)uri_len, ri->uri, (size_t)(uri_len + 1), 0);
   remove_double_dots_and_double_slashes(ri->uri);
@@ -3777,7 +3796,8 @@ static int set_acl_option(struct mg_context *ctx) {
   return check_acl(ctx, &fake) != -1;
 }
 
-static void reset_per_request_attributes(struct mg_connection *conn) {
+static void reset_per_request_attributes(struct mg_connection *conn)
+{
   conn->path_info = NULL;
   conn->num_bytes_sent = conn->consumed_content = 0;
   conn->content_len = -1;
@@ -3805,7 +3825,8 @@ static void close_socket_gracefully(SOCKET sock) {
   // behaviour is seen on Windows, when client keeps sending data
   // when server decide to close the connection; then when client
   // does recv() it gets no data back.
-  do {
+  do
+  {
     n = pull(NULL, sock, NULL, buf, sizeof(buf));
   } while (n > 0);
 
@@ -3813,24 +3834,26 @@ static void close_socket_gracefully(SOCKET sock) {
   (void) closesocket(sock);
 }
 
-static void close_connection(struct mg_connection *conn) {
-  if (conn->ssl) {
+static void close_connection(struct mg_connection *conn)
+{
+  if (conn->ssl)
+  {
     SSL_free(conn->ssl);
     conn->ssl = NULL;
   }
 
-  if (conn->client.sock != INVALID_SOCKET) {
+  if (conn->client.sock != INVALID_SOCKET)
     close_socket_gracefully(conn->client.sock);
-  }
 }
 
-void mg_close_connection(struct mg_connection *conn) {
+void mg_close_connection(struct mg_connection *conn)
+{
   close_connection(conn);
   free(conn);
 }
 
-struct mg_connection *mg_connect(struct mg_context *ctx,
-                                 const char *host, int port, int use_ssl) {
+struct mg_connection* mg_connect(struct mg_context *ctx, const char *host, int port, int use_ssl)
+{
   struct mg_connection *newconn = NULL;
   struct sockaddr_in sin;
   struct hostent *he;
@@ -3874,7 +3897,7 @@ struct mg_connection *mg_connect(struct mg_context *ctx,
 
 
 
-FILE *mg_fetch(struct mg_context *ctx, const char *url, const char *path, char *buf, size_t buf_len, struct mg_request_info *ri)
+FILE* mg_fetch(struct mg_context *ctx, const char *url, const char *path, char *buf, size_t buf_len, struct mg_request_info *ri)
 {
   struct mg_connection *newconn;
   int n, req_length, data_length, port;
@@ -3931,7 +3954,8 @@ FILE *mg_fetch(struct mg_context *ctx, const char *url, const char *path, char *
   return fp;
 }
 
-static void discard_current_request_from_buffer(struct mg_connection *conn) {
+static void discard_current_request_from_buffer(struct mg_connection *conn)
+{
   char *buffered;
   int buffered_len, body_len;
 
@@ -3953,13 +3977,15 @@ static void discard_current_request_from_buffer(struct mg_connection *conn) {
           (size_t) conn->data_len);
 }
 
-static int is_valid_uri(const char *uri) {
+static int is_valid_uri(const char *uri)
+{
   // Conform to http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1.2
   // URI can be an asterisk (*) or should start with slash.
   return uri[0] == '/' || (uri[0] == '*' && uri[1] == '\0');
 }
 
-static void process_new_connection(struct mg_connection *conn) {
+static void process_new_connection(struct mg_connection *conn)
+{
   struct mg_request_info *ri = &conn->request_info;
   int keep_alive_enabled;
   const char *cl;
@@ -4003,23 +4029,22 @@ static void process_new_connection(struct mg_connection *conn) {
     if (ri->remote_user != NULL) {
       free((void *) ri->remote_user);
     }
-  } while (conn->ctx->stop_flag == 0 &&
-           keep_alive_enabled &&
-           should_keep_alive(conn));
+  } while (conn->ctx->stop_flag == 0 && keep_alive_enabled && should_keep_alive(conn));
 }
 
 // Worker threads take accepted socket from the queue
-static int consume_socket(struct mg_context *ctx, struct socket *sp) {
-  (void) pthread_mutex_lock(&ctx->mutex);
+static int consume_socket(struct mg_context *ctx, struct socket *sp)
+{
+  pthread_mutex_lock(&ctx->mutex);
   DEBUG_TRACE(("going idle"));
 
   // If the queue is empty, wait. We're idle at this point.
-  while (ctx->sq_head == ctx->sq_tail && ctx->stop_flag == 0) {
+  while (ctx->sq_head == ctx->sq_tail && ctx->stop_flag == 0)
     pthread_cond_wait(&ctx->sq_full, &ctx->mutex);
-  }
 
   // If we're stopping, sq_head may be equal to sq_tail.
-  if (ctx->sq_head > ctx->sq_tail) {
+  if (ctx->sq_head > ctx->sq_tail)
+  {
     // Copy socket from the queue and increment tail
     *sp = ctx->queue[ctx->sq_tail % ARRAY_SIZE(ctx->queue)];
     ctx->sq_tail++;
