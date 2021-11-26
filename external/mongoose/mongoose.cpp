@@ -401,37 +401,37 @@ static const char *config_options[] = {
 };
 #define ENTRIES_PER_CONFIG_OPTION 3
 
-const char **mg_get_valid_option_names(void) {
+const char **mg_get_valid_option_names(void)
+{
   return config_options;
 }
 
-static void call_user(struct mg_connection *conn, enum mg_event event) {
+static void call_user(struct mg_connection *conn, enum mg_event event)
+{
   conn->request_info.user_data = conn->ctx->user_data;
   if (conn->ctx->user_callback)
       conn->ctx->user_callback(event, conn);
 }
 
-static int get_option_index(const char *name) {
-  int i;
-
-  for (i = 0; config_options[i] != NULL; i += ENTRIES_PER_CONFIG_OPTION) {
-    if (strcmp(config_options[i], name) == 0 ||
-        strcmp(config_options[i + 1], name) == 0) {
+static int get_option_index(const char *name)
+{
+  for (int i = 0; config_options[i] != NULL; i += ENTRIES_PER_CONFIG_OPTION)
+  {
+    if (strcmp(config_options[i], name) == 0 || strcmp(config_options[i + 1], name) == 0)
       return i / ENTRIES_PER_CONFIG_OPTION;
-    }
   }
   return -1;
 }
 
-const char *mg_get_option(const struct mg_context *ctx, const char *name) {
+const char* mg_get_option(const struct mg_context *ctx, const char *name)
+{
   int i;
-  if ((i = get_option_index(name)) == -1) {
+  if ((i = get_option_index(name)) == -1)
     return NULL;
-  } else if (ctx->config[i] == NULL) {
+  else if (ctx->config[i] == NULL)
     return "";
-  } else {
+  else
     return ctx->config[i];
-  }
 }
 
 static void sockaddr_to_string(char *buf, size_t len,
@@ -458,7 +458,7 @@ static void cry(struct mg_connection *conn, const char *fmt, ...)
   time_t timestamp;
 
   va_start(ap, fmt);
-  (void) vsnprintf(buf, sizeof(buf), fmt, ap);
+  vsnprintf(buf, sizeof(buf), fmt, ap);
   va_end(ap);
 
   // Do not lock when getting the callback value, here and below.
@@ -471,25 +471,22 @@ static void cry(struct mg_connection *conn, const char *fmt, ...)
     fp = conn->ctx->config[ERROR_LOG_FILE] == NULL ? NULL :
       mg_fopen(conn->ctx->config[ERROR_LOG_FILE], "a+");
 
-    if (fp != NULL) {
+    if (fp)
+    {
       flockfile(fp);
       timestamp = time(NULL);
 
       sockaddr_to_string(src_addr, sizeof(src_addr), &conn->client.rsa);
-      fprintf(fp, "[%010lu] [error] [client %s] ", (unsigned long) timestamp,
-              src_addr);
+      fprintf(fp, "[%010lu] [error] [client %s] ", (unsigned long) timestamp, src_addr);
 
-      if (conn->request_info.request_method != NULL) {
-        fprintf(fp, "%s %s: ", conn->request_info.request_method,
-                conn->request_info.uri);
-      }
+      if (conn->request_info.request_method != NULL)
+        fprintf(fp, "%s %s: ", conn->request_info.request_method, conn->request_info.uri);
 
-      (void) fprintf(fp, "%s", buf);
+      fprintf(fp, "%s", buf);
       fputc('\n', fp);
       funlockfile(fp);
-      if (fp != stderr) {
+      if (fp != stderr)
         fclose(fp);
-      }
     }
   }
   conn->request_info.log_message = NULL;
@@ -4400,11 +4397,10 @@ struct mg_context* mg_start(void (*user_callback)(enum mg_event event, struct mg
   // Start worker threads
   for (i = 0; i < atoi(ctx->config[NUM_THREADS]); i++)
   {
-    if (mg_start_thread((mg_thread_func_t) worker_thread, ctx) != 0) {
+    if (mg_start_thread((mg_thread_func_t) worker_thread, ctx) != 0)
       cry(fc(ctx), "Cannot start worker thread: %d", ERRNO);
-    } else {
+    else
       ctx->num_threads++;
-    }
   }
 
   return ctx;
