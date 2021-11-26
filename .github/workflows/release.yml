@@ -36,7 +36,7 @@ jobs:
         with:
           draft: true
           prerelease: true
-          release_name: ${{ steps.version.outputs.version }}
+          release_name: Judoboard
           tag_name: ${{ github.ref }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
