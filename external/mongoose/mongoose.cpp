@@ -494,13 +494,15 @@ static void cry(struct mg_connection *conn, const char *fmt, ...)
 
 // Return fake connection structure. Used for logging, if connection
 // is not applicable at the moment of logging.
-static struct mg_connection *fc(struct mg_context *ctx) {
+static struct mg_connection *fc(struct mg_context *ctx)
+{
   static struct mg_connection fake_connection;
   fake_connection.ctx = ctx;
   return &fake_connection;
 }
 
-const char *mg_version(void) {
+const char *mg_version(void)
+{
   return MONGOOSE_VERSION;
 }
 
@@ -508,18 +510,21 @@ const struct mg_request_info *mg_get_request_info(struct mg_connection *conn) {
   return &conn->request_info;
 }
 
-static void mg_strlcpy(char *dst, const char *src, size_t n) {
+static void mg_strlcpy(char *dst, const char *src, size_t n)
+{
   for (; *src != '\0' && n > 1; n--) {
     *dst++ = *src++;
   }
   *dst = '\0';
 }
 
-static int lowercase(const char *s) {
+static int lowercase(const char *s)
+{
   return tolower(* (const unsigned char *) s);
 }
 
-static int mg_strncasecmp(const char *s1, const char *s2, size_t len) {
+static int mg_strncasecmp(const char *s1, const char *s2, size_t len)
+{
   int diff = 0;
 
   if (len > 0)
@@ -530,7 +535,8 @@ static int mg_strncasecmp(const char *s1, const char *s2, size_t len) {
   return diff;
 }
 
-static int mg_strcasecmp(const char *s1, const char *s2) {
+static int mg_strcasecmp(const char *s1, const char *s2)
+{
   int diff;
 
   do {
@@ -4089,48 +4095,50 @@ static int consume_socket(struct mg_context *ctx, struct socket *sp)
 
 static void worker_thread(struct mg_context *ctx)
 {
-  int buf_size = atoi(ctx->config[MAX_REQUEST_SIZE]);
+    int buf_size = atoi(ctx->config[MAX_REQUEST_SIZE]);
 
-  struct mg_connection* conn = (struct mg_connection *) calloc(1, sizeof(*conn) + buf_size);
-  if (!conn)
-  {
-    cry(fc(ctx), "%s", "Cannot create new connection struct, OOM");
-    return;
-  }
-  conn->buf_size = buf_size;
-  conn->buf = (char *) (conn + 1);
+    struct mg_connection* conn = (struct mg_connection *) calloc(1, sizeof(*conn) + buf_size);
+    if (!conn)
+    {
+        cry(fc(ctx), "%s", "Cannot create new connection struct, OOM");
+        return;
+    }
 
-  // Call consume_socket() even when ctx->stop_flag > 0, to let it signal
-  // sq_empty condvar to wake up the master waiting in produce_socket()
-  while (consume_socket(ctx, &conn->client))
-  {
-    conn->birth_time = time(NULL);
-    conn->ctx = ctx;
+    conn->buf_size = buf_size;
+    conn->buf = (char *) (conn + 1);
 
-    // Fill in IP, port info early so even if SSL setup below fails,
-    // error handler would have the corresponding info.
-    // Thanks to Johannes Winkelmann for the patch.
-    // TODO(lsm): Fix IPv6 case
-    conn->request_info.remote_port = ntohs(conn->client.rsa.sin.sin_port);
-    memcpy(&conn->request_info.remote_ip, &conn->client.rsa.sin.sin_addr.s_addr, 4);
-    conn->request_info.remote_ip = ntohl(conn->request_info.remote_ip);
-    conn->request_info.is_ssl = conn->client.is_ssl;
+    // Call consume_socket() even when ctx->stop_flag > 0, to let it signal
+    // sq_empty condvar to wake up the master waiting in produce_socket()
+    while (consume_socket(ctx, &conn->client))
+    {
+        conn->birth_time = time(NULL);
+        conn->ctx = ctx;
 
-    if (!conn->client.is_ssl || (conn->client.is_ssl && sslize(conn, conn->ctx->ssl_ctx, SSL_accept)))
-      process_new_connection(conn);
+        // Fill in IP, port info early so even if SSL setup below fails,
+        // error handler would have the corresponding info.
+        // Thanks to Johannes Winkelmann for the patch.
+        // TODO(lsm): Fix IPv6 case
+        conn->request_info.remote_port = ntohs(conn->client.rsa.sin.sin_port);
+        memcpy(&conn->request_info.remote_ip, &conn->client.rsa.sin.sin_addr.s_addr, 4);
+        conn->request_info.remote_ip = ntohl(conn->request_info.remote_ip);
+        conn->request_info.is_ssl = conn->client.is_ssl;
 
-    close_connection(conn);
-  }
-  free(conn);
+        if (!conn->client.is_ssl || (conn->client.is_ssl && sslize(conn, conn->ctx->ssl_ctx, SSL_accept)))
+            process_new_connection(conn);
 
-  // Signal master that we're done with connection and exiting
-  pthread_mutex_lock(&ctx->mutex);
-  ctx->num_threads--;
-  pthread_cond_signal(&ctx->cond);
-  //assert(ctx->num_threads >= 0);
-  pthread_mutex_unlock(&ctx->mutex);
+        close_connection(conn);
+    }
 
-  ZED::Log::Debug("worker exiting");
+    free(conn);
+
+    // Signal master that we're done with connection and exiting
+    pthread_mutex_lock(&ctx->mutex);
+    ctx->num_threads--;
+    pthread_cond_signal(&ctx->cond);
+    assert(ctx->num_threads >= 0);
+    pthread_mutex_unlock(&ctx->mutex);
+
+    ZED::Log::Debug("worker exiting");
 }
 
 // Master thread adds accepted socket to a queue
@@ -4293,19 +4301,23 @@ static void free_context(struct mg_context *ctx)
 
 void mg_stop(struct mg_context *ctx)
 {
-  ctx->stop_flag = 1;
+    ctx->stop_flag = 1;
 
-  // Wait until mg_fini() stops
-  while (ctx->stop_flag != 2)
-  {
+    // Wait until mg_fini() stops
+    int i = 0;
+    while (ctx->stop_flag != 2)
+    {
+        if (i >= 10)//After 10 seconds
+            break;
+        mg_sleep(1000);
+        i++;
+    }
+
     mg_sleep(100);
-  }
-
-  mg_sleep(100);
-  free_context(ctx);
+    free_context(ctx);
 
 #if defined(_WIN32) && !defined(__SYMBIAN32__)
-  WSACleanup();
+    WSACleanup();
 #endif // _WIN32
 }
 
