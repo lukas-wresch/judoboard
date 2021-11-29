@@ -34,7 +34,7 @@ jobs:
         uses: actions/create-release@latest
         id: create_release
         with:
-          draft: true
+          draft: false
           prerelease: true
           release_name: Judoboard
           tag_name: ${{ github.ref }}
