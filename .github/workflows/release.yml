@@ -37,7 +37,6 @@ jobs:
           draft: false
           prerelease: true
           release_name: Judoboard
-          tag_name: ${{ github.ref }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Upload Windows Artifact
