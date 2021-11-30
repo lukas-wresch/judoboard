@@ -31,17 +31,16 @@ jobs:
         run: echo "::set-output name=version::$(./bin/Release/Judoboard.exe --version)"
         id: version
       - name: Create Release
-        uses: actions/create-release@v1
+        uses: actions/create-release@latest
         id: create_release
         with:
-          draft: true
+          draft: false
           prerelease: true
-          release_name: ${{ steps.version.outputs.version }}
-          tag_name: ${{ github.ref }}
+          release_name: Judoboard
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Upload Windows Artifact
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@latest
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:

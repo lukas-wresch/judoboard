@@ -109,7 +109,6 @@ TEST(Mat, ForcedCloseDuringMatch)
 	if (rand() % 2 == 0)
 		f = Fighter::Blue;
 
-
 	mat->AddIppon(f);
 
 	ZED::Core::Pause(3000);

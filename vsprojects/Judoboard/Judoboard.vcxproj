@@ -231,7 +231,6 @@
     <ClInclude Include="..\..\src\virtual_mat.h" />
     <ClInclude Include="..\..\src\weightclass.h" />
     <ClInclude Include="..\..\src\window.h" />
-    <ClInclude Include="..\3rd-Party-Libraries\mongoose\mongoose.h" />
     <ClInclude Include="src\HttpServer\HttpServer.h" />
   </ItemGroup>
   <ItemGroup>
