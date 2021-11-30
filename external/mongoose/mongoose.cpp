@@ -704,9 +704,10 @@ static const char *next_option(const char *list, struct vec *val,
   return list;
 }
 
-static int match_prefix(const char *pattern, int pattern_len, const char *str) {
+static size_t match_prefix(const char *pattern, size_t pattern_len, const char *str)
+{
   const char *or_str;
-  int i, j, len, res;
+  size_t i, j, len, res;
 
   if ((or_str = (const char *) memchr(pattern, '|', pattern_len)) != NULL)
   {
@@ -1292,7 +1293,7 @@ static int set_non_blocking_mode(SOCKET sock)
 // descriptor. Return number of bytes written.
 static int64_t push(FILE *fp, SOCKET sock, SSL *ssl, const char *buf, int64_t len) {
   int64_t sent;
-  int n, k;
+  size_t n, k;
 
   sent = 0;
   while (sent < len)
@@ -1343,7 +1344,8 @@ static int pull(FILE *fp, SOCKET sock, SSL *ssl, char *buf, int len)
   return nread;
 }
 
-int mg_read(struct mg_connection *conn, void *buf, size_t len) {
+int mg_read(struct mg_connection *conn, void *buf, size_t len)
+{
   int n, buffered_len, nread;
   const char *buffered;
 
