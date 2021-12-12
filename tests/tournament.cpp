@@ -218,6 +218,33 @@ TEST(Tournament, RevokeDisqualification)
 	tourney.RevokeDisqualification(j1);
 
 	EXPECT_FALSE(match.HasConcluded());
+	EXPECT_FALSE(tourney.IsDisqualified(j1));
+}
+
+
+
+TEST(Tournament, RevokeDoubleDisqualification)
+{
+	initialize();
+
+	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+	Judoka j2("Firstname2", "Lastname2", 50, Gender::Male);
+
+	Tournament tourney("deleteMe");
+	tourney.Reset();
+	tourney.EnableAutoSave(false);
+
+	Match match(&tourney, &j1, &j2);
+	tourney.AddMatch(&match);
+
+	tourney.Disqualify(j1);
+	tourney.Disqualify(j2);
+	tourney.RevokeDisqualification(j1);
+
+	EXPECT_TRUE(match.HasConcluded());
+	EXPECT_EQ(match.GetMatchResult().m_Winner, Winner::White);
+	EXPECT_FALSE(tourney.IsDisqualified(j1));
+	EXPECT_TRUE(tourney.IsDisqualified(j2));
 }
 
 

@@ -1014,13 +1014,28 @@ void Tournament::Disqualify(const Judoka& Judoka)
 
 void Tournament::RevokeDisqualification(const Judoka& Judoka)
 {
+	if (!IsDisqualified(Judoka))
+		return;
+
 	Lock();
+
+	m_DisqualifiedJudoka.erase(Judoka.GetUUID());
 
 	for (auto match : m_Schedule)
 	{
 		if (match->HasConcluded() && match->GetLog().GetNumEvent() == 0 && match->Contains(Judoka))
 		{
-			match->SetState(Status::Scheduled);//Reset match result
+			auto enemy = match->GetEnemyOf(Judoka);
+
+			if (enemy && IsDisqualified(*enemy))//Is the enemy disqualified?
+			{
+				//Store result
+				Match::Result result(match->GetColorOfFighter(Judoka), Match::Score::Ippon);
+				match->SetResult(result);
+				match->EndMatch();//Mark match as concluded
+			}
+			else
+				match->SetState(Status::Scheduled);//Reset match result
 		}
 	}
 

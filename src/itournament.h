@@ -110,6 +110,6 @@ namespace Judoboard
 	protected:
 		StandingData m_StandingData;//Local database for the tournament containing all participants and rule sets
 
-		mutable std::mutex m_mutex;
+		mutable std::recursive_mutex m_mutex;
 	};
 }

@@ -128,6 +128,28 @@ bool Match::Contains(const Judoka& Judoka) const
 
 
 
+Fighter Match::GetColorOfFighter(const Judoka& Judoka) const
+{
+	if (m_White.m_Judoka && m_White.m_Judoka->GetID() == Judoka.GetID())
+		return Fighter::White;
+	return Fighter::Blue;
+}
+
+
+
+const Judoka* Match::GetEnemyOf(const Judoka& Judoka) const
+{
+	if (m_White.m_Judoka && m_White.m_Judoka->GetID() == Judoka.GetID())
+		return m_Blue.m_Judoka;
+
+	if (m_Blue.m_Judoka  && m_Blue.m_Judoka->GetID()  == Judoka.GetID())
+		return m_White.m_Judoka;
+
+	return nullptr;
+}
+
+
+
 const Judoka* Match::GetWinningJudoka() const
 {
 	if (!HasConcluded())

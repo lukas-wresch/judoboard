@@ -93,6 +93,8 @@ namespace Judoboard
 		Result GetMatchResult() const { return m_Result; }//Returns the result of the match (if it has concluded)
 
 		bool Contains(const Judoka& Judoka) const;//Returns true if and only if Judoka is one of the two fighters
+		Fighter GetColorOfFighter(const Judoka& Judoka) const;//Returns the color (white or blue) of the judoka. 'Judoka' must be on of the two fighters of the match
+		const Judoka* GetEnemyOf(const Judoka& Judoka) const;//Returns the enemy of the given fighter. Judoka must be on of the two fighters of this match
 
 		const Judoka* GetWinningJudoka() const;
 		bool HasDependentMatches() const { return m_White.m_PreviousMatch || m_Blue.m_PreviousMatch; }//Returns true if and only if this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
