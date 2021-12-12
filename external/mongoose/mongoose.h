@@ -283,7 +283,7 @@ const struct mg_request_info *mg_get_request_info(struct mg_connection *);
 
 
 // Send data to the client.
-int mg_write(struct mg_connection *, const void *buf, size_t len);
+int64_t mg_write(struct mg_connection *, const void *buf, size_t len);
 
 
 // Send data to the browser using printf() semantics.
@@ -292,7 +292,7 @@ int mg_write(struct mg_connection *, const void *buf, size_t len);
 // Note that mg_printf() uses internal buffer of size IO_BUF_SIZE
 // (8 Kb by default) as temporary message storage for formatting. Do not
 // print data that is bigger than that, otherwise it will be truncated.
-int mg_printf(struct mg_connection *, const char *fmt, ...)
+int64_t mg_printf(struct mg_connection *, const char *fmt, ...)
 #ifdef __GNUC__
 __attribute__((format(printf, 2, 3)))
 #endif
