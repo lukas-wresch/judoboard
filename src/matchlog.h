@@ -27,6 +27,13 @@ namespace Judoboard
 	}
 
 
+	inline void operator++ (Fighter& f)
+	{
+		f = (Fighter)(((int)f) + 1);
+	}
+
+
+
 	inline void operator++ (Fighter& f, int)
 	{
 		f = (Fighter)(((int)f) + 1);

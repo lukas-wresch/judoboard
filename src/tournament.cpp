@@ -975,8 +975,10 @@ const std::string Tournament::Schedule2String() const
 	ZED::CSV ret;
 	Lock();
 	for (auto match : m_Schedule)
+	{
 		if (match)
 			ret << match->ToString();
+	}
 	Unlock();
 	return ret;
 }

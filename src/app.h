@@ -92,11 +92,14 @@ namespace Judoboard
 		Error Ajax_OpenMat(  const HttpServer::Request& Request);
 		Error Ajax_CloseMat( const HttpServer::Request& Request);
 		Error Ajax_UpdateMat(const HttpServer::Request& Request);
-
 		Error Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request);
 
+		//Commands
 		Error Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request);
 		Error Ajax_NoDisqualification(Fighter Whom, const HttpServer::Request& Request);
+
+		//Schedule
+		std::string Ajax_GetHansokumake() const;//Returns matches that are in progress and have a hansokumake
 
 		//Clubs
 		ZED::CSV Ajax_ListClubs();

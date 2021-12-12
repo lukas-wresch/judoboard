@@ -8,6 +8,21 @@
 </table>
 
 
+<div id="div-hansokumake">
+    <h2 id="hansokumake-headline">Hansokumake</h2>
+    <table id="hansokumake" border="1" rules="all" style="margin-bottom: 1cm;">
+        <tr>
+            <th style="width: 0.5cm;" id="no">No.</th>
+            <th style="width: 4cm;" id="white">White</th>
+            <th style="width: 4cm;" id="blue">Blue</th>
+            <th style="width: 2cm; text-align: center;" id="class">Class</th>
+            <th style="width: 1cm;" id="mat">Mat</th>
+            <th style="width: 2.5cm; text-align: center;" id="mat">Status</th>
+            <th style="width: 4.5cm; text-align: center;">Options</th>
+        </tr>
+    </table>
+</div>
+
 <h2 id="headline">Schedule</h2>
 <table id="schedule" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
@@ -32,6 +47,8 @@
     <th style="width: 3.0cm; text-align: center;">Options</th>
   </tr>
 </table>
+
+
 
 <script>
 
@@ -322,6 +339,87 @@ function Update()
 
       cell4.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+res[i]+")\">" + lang.remove + "</button>";
       cell4.style.textAlign = "center";
+    }
+  });
+
+
+
+  AjaxCallback("ajax/hansokumake/get", function(response) {
+    console.log(response);
+    var res = response.split(",");
+
+    if (res.length < 4)
+      return;
+
+    var table = document.getElementById("hansokumake");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    var no = 0;
+    for (var i=0; i < res.length;)
+    {
+      no++;
+      var id = res[i++];
+      var white_name = res[i++];
+      var blue_name  = res[i++];
+      var mat_id  = res[i++];
+      var state  = res[i++];
+      var color  = res[i++];
+      var matchtable_id   = res[i++];
+      var matchtable_name = res[i++];
+      var hansokumake_fighter = res[i++];
+      var hansokumake_state   = res[i++];
+
+      var row = table.insertRow(-1);
+      var cell0 = row.insertCell(0);
+      var cell1 = row.insertCell(1);
+      var cell2 = row.insertCell(2);
+      var cell3 = row.insertCell(3);
+      var cell4 = row.insertCell(4);
+      var cell5 = row.insertCell(5);
+      var cell6 = row.insertCell(6);
+
+      if (no%2 == 0)
+        row.style.backgroundColor = "#eee";
+
+      cell0.innerHTML = no;
+      cell0.style.textAlign = "center";
+      cell0.style.fontSize  = "14pt";
+
+      cell1.innerHTML = white_name;
+      cell2.innerHTML = blue_name;
+
+      cell3.innerHTML = matchtable_name;
+      cell4.innerHTML = mat_id;
+
+      if (hansokumake_state == 0)
+        cell5.innerHTML = "Hansokumake " + lang.for + " ";
+      else
+        cell5.innerHTML = "Hansokumake " + lang.for + " ";
+
+      if (hansokumake_fighter == 0)
+        cell5.innerHTML += lang.white;
+      else
+        cell5.innerHTML += lang.blue;
+
+      cell5.style.fontSize  = "16pt";
+
+      if (hansokumake_state == 0)
+      {
+        cell6.innerHTML  = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return TODO("+id+")\">" + "Disqualify" + "</button>";
+        cell6.innerHTML += "<button class=\"neutral\" style=\"width: 4.5cm; height: 0.9cm;\" onclick=\"return TODO("+id+")\">" + "No Disqualification" + "</button>";
+      }
+      else if (hansokumake_state == 1)
+      {
+        cell6.innerHTML = "<button class=\"neutral\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return TODO("+id+")\">" + "Revoke Disqualification" + "</button>";
+      }
+      else if (hansokumake_state == 2)
+      {
+        cell6.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return TODO("+id+")\">" + "Disqualify" + "</button>";
+      }
+
+      cell6.style.textAlign = "center";
     }
   });
 }

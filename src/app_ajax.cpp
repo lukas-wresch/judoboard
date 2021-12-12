@@ -248,6 +248,13 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/hansokumake/get", [this](auto& Request) -> std::string {
+		if (!IsLoggedIn(Request))
+			return Error(Error::Type::NotLoggedIn);
+		return Ajax_GetHansokumake();
+	});
+
+
 	m_Server.RegisterResource("/ajax/get_masterschedule", [this](auto& Request) -> std::string {
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
@@ -2466,6 +2473,35 @@ Error Application::Ajax_NoDisqualification(Fighter Whom, const HttpServer::Reque
 
 	mat->AddNotDisqualification(Whom);
 	return Error();//OK
+}
+
+
+
+std::string Application::Ajax_GetHansokumake() const
+{
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	ZED::CSV ret;
+
+	LockTillScopeEnd();
+	for (auto mat : GetMats())
+	{
+		if (!mat) continue;
+		if (!mat->GetMatch()) continue;
+
+		for (Fighter f = Fighter::White; f <= Fighter::Blue; ++f)
+		{
+			if (mat->GetScoreboard(f).m_HansokuMake)
+			{
+				ret << mat->GetMatch()->ToString();
+				ret << f;
+				ret << mat->GetScoreboard(f).m_Disqualification;//Disqualification state
+			}
+		}
+	}
+
+	return ret;
 }
 
 

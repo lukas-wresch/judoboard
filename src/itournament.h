@@ -96,7 +96,7 @@ namespace Judoboard
 		virtual void OnMatchConcluded(const Match& Match) const = 0;
 
 		//Serialization
-		virtual const std::string Schedule2String() const { return ""; }
+		virtual const std::string Schedule2String(bool OnlyHansokumake = false) const { return ""; }
 		virtual const std::string Participants2String() const { return ""; }
 		virtual const std::string MasterSchedule2String() const { return ""; }
 
