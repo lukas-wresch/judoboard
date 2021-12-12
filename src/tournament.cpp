@@ -983,12 +983,10 @@ void Tournament::Disqualify(const Judoka& Judoka)
 	for (auto match : m_Schedule)
 	{
 		//Scheduled match where we are participating?
-		if (!match->HasConcluded() && match->HasValidFighters() && match->Contains(Judoka))
+		if (!match->HasConcluded() && match->Contains(Judoka))
 		{
 			//Determine winner of this match
-			Fighter winner = Fighter::White;
-			if (*match->GetFighter(Fighter::White) == Judoka)
-				winner = Fighter::Blue;
+			const Fighter winner = !match->GetColorOfFighter(Judoka);
 			
 			//Store result
 			Match::Result result(winner, Match::Score::Ippon);
