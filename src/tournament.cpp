@@ -183,6 +183,17 @@ bool Tournament::Load(const std::string& Filename)
 	m_StandingData << csv;
 	ZED::Log::Info("Number of participants: " + std::to_string(m_StandingData.GetNumJudoka()));
 
+	int disqualified_judoka;
+	csv >> disqualified_judoka;
+	ZED::Log::Info("Number of disqualified participants: " + std::to_string(disqualified_judoka));
+	
+	for (int i = 0; i < disqualified_judoka; i++)
+	{
+		std::string uuid;
+		csv >> uuid;
+		m_DisqualifiedJudoka.insert(UUID(std::move(uuid)));
+	}
+
 	m_pDefaultRules = new RuleSet(csv);
 
 
@@ -249,6 +260,10 @@ bool Tournament::Save(const std::string& Filename) const
 	stream << 1;//Version
 
 	m_StandingData >> stream;
+
+	stream << m_DisqualifiedJudoka.size();
+	for (const auto& judoka_uuid : m_DisqualifiedJudoka)
+		stream << (std::string)judoka_uuid;
 
 	if (m_pDefaultRules)
 		*m_pDefaultRules >> stream;
@@ -414,7 +429,37 @@ bool Tournament::AddMatch(Match* NewMatch)
 	if (NewMatch->GetFighter(Fighter::Blue) && !IsParticipant(*NewMatch->GetFighter(Fighter::Blue)))
 		m_StandingData.AddJudoka(NewMatch->GetFighter(Fighter::Blue));
 
+	Unlock();
+
+	if (NewMatch->GetFighter(Fighter::White) && IsDisqualified(*NewMatch->GetFighter(Fighter::White)))
+	{
+		//Store result
+		Match::Result result(Fighter::Blue, Match::Score::Ippon);
+		NewMatch->SetResult(result);
+		NewMatch->EndMatch();//Mark match as concluded
+	}
+	if (NewMatch->GetFighter(Fighter::Blue) && IsDisqualified(*NewMatch->GetFighter(Fighter::Blue)))
+	{
+		if (NewMatch->HasConcluded())//Double disqualification?
+		{
+			//Store result
+			Match::Result result(Winner::Draw, Match::Score::Draw);
+			NewMatch->SetResult(result);
+			NewMatch->EndMatch();//Mark match as concluded
+		}
+
+		else
+		{
+			//Store result
+			Match::Result result(Fighter::White, Match::Score::Ippon);
+			NewMatch->SetResult(result);
+			NewMatch->EndMatch();//Mark match as concluded
+		}
+	}
+
 	NewMatch->SetScheduleIndex(GetMaxScheduleIndex() + 1);
+
+	Lock();
 
 	m_Schedule.emplace_back(NewMatch);
 	m_SchedulePlanner.emplace_back(NewMatch);
@@ -916,9 +961,24 @@ bool Tournament::MoveScheduleEntryDown(uint32_t Index)
 
 
 
+bool Tournament::IsDisqualified(const Judoka& Judoka) const
+{
+	Lock();
+
+	bool ret = m_DisqualifiedJudoka.find(Judoka.GetUUID()) != m_DisqualifiedJudoka.cend();
+
+	Unlock();
+
+	return ret;
+}
+
+
+
 void Tournament::Disqualify(const Judoka& Judoka)
 {
 	Lock();
+
+	m_DisqualifiedJudoka.insert(Judoka.GetUUID());
 
 	for (auto match : m_Schedule)
 	{

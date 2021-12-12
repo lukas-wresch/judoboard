@@ -82,6 +82,46 @@ TEST(Tournament, Disqualification)
 	EXPECT_TRUE(match.GetMatchResult().m_Score == Match::Score::Ippon);
 	EXPECT_TRUE(match.GetMatchResult().m_Time == 0);
 	EXPECT_TRUE(match.GetLog().GetEvents().size() == 0);
+
+	EXPECT_TRUE(tourney.IsDisqualified(j1));
+	EXPECT_FALSE(tourney.IsDisqualified(j2));
+}
+
+
+
+TEST(Tournament, AddMatchAfterDisqualification)
+{
+	initialize();
+
+	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+	Judoka j2("Firstname2", "Lastname2", 50, Gender::Male);
+	Judoka j3("Firstname3", "Lastname3", 50, Gender::Male);
+
+	Tournament tourney("deleteMe");
+	tourney.Reset();
+	tourney.EnableAutoSave(false);
+
+	Match match1(&tourney, &j1, &j2);
+	tourney.AddMatch(&match1);
+	Match matchdummy(&tourney, &j2, &j3);
+	tourney.AddMatch(&matchdummy);
+
+	tourney.Disqualify(j1);
+
+	Match match2(&tourney, &j1, &j2);
+	tourney.AddMatch(&match2);
+
+	EXPECT_TRUE(match1.HasConcluded());
+	EXPECT_EQ(match1.GetMatchResult().m_Winner, Winner::Blue);
+	EXPECT_EQ(match1.GetMatchResult().m_Score, Match::Score::Ippon);
+	EXPECT_EQ(match1.GetMatchResult().m_Time, 0);
+	EXPECT_EQ(match1.GetLog().GetEvents().size(), 0);
+
+	EXPECT_TRUE(match2.HasConcluded());
+	EXPECT_EQ(match2.GetMatchResult().m_Winner, Winner::Blue);
+	EXPECT_EQ(match2.GetMatchResult().m_Score, Match::Score::Ippon);
+	EXPECT_EQ(match2.GetMatchResult().m_Time, 0);
+	EXPECT_EQ(match2.GetLog().GetEvents().size(), 0);
 }
 
 
@@ -363,14 +403,22 @@ TEST(Tournament, SaveAndLoad)
 		tourney->AddMatch(Match(tourney, &j1, &j3, 1));
 		tourney->AddMatch(Match(tourney, &j1, &j4, 2));
 
+		tourney->Disqualify(j1);
+
 		tourney->EnableAutoSave(false);
 
 
 		Tournament t("deleteMe");
 		t.EnableAutoSave(false);
+
 		EXPECT_EQ(t.GetParticipants().size(), 4);
 		EXPECT_EQ(t.GetMatchTables().size(), 2);
 		EXPECT_EQ(t.GetSchedule().size(), 4);
+
+		EXPECT_TRUE(t.IsDisqualified(j1));
+		EXPECT_FALSE(t.IsDisqualified(j2));
+		EXPECT_FALSE(t.IsDisqualified(j3));
+		EXPECT_FALSE(t.IsDisqualified(j4));
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe");

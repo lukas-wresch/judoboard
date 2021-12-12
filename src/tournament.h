@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include "itournament.h"
 #include "judoka.h"
 #include "matchtable.h"
@@ -99,6 +100,7 @@ namespace Judoboard
 		bool MoveScheduleEntryDown(uint32_t ID);
 
 		//Disqualifications
+		bool IsDisqualified(const Judoka& Judoka) const;
 		void Disqualify(const Judoka& Judoka);
 		void RevokeDisqualification(const Judoka& Judoka);
 
@@ -135,5 +137,7 @@ namespace Judoboard
 		std::vector<Schedulable*> m_SchedulePlanner;
 
 		const RuleSet* m_pDefaultRules = nullptr;//Default rule set of the tournament
+
+		std::unordered_set<UUID> m_DisqualifiedJudoka;
 	};
 }

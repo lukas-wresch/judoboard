@@ -2490,13 +2490,13 @@ std::string Application::Ajax_GetHansokumake() const
 		if (!mat) continue;
 		if (!mat->GetMatch()) continue;
 
-		for (Fighter f = Fighter::White; f <= Fighter::Blue; ++f)
+		for (Fighter fighter = Fighter::White; fighter <= Fighter::Blue; ++fighter)
 		{
-			if (mat->GetScoreboard(f).m_HansokuMake && mat->GetScoreboard(f).m_HansokuMake_Direct)
+			if (mat->GetScoreboard(fighter).m_HansokuMake && mat->GetScoreboard(fighter).m_HansokuMake_Direct)
 			{
 				ret << mat->GetMatch()->ToString();
-				ret << f;
-				ret << mat->GetScoreboard(f).m_Disqualification;//Disqualification state
+				ret << fighter;
+				ret << mat->GetScoreboard(fighter).m_Disqualification;//Disqualification state
 			}
 		}
 	}
