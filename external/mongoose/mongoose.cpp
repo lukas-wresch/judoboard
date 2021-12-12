@@ -708,8 +708,6 @@ static const char *next_option(const char *list, struct vec *val, struct vec *eq
 
 static size_t match_prefix(const char *pattern, size_t pattern_len, const char *str)
 {
-static int match_prefix(const char *pattern, int pattern_len, const char *str)
-{
   const char *or_str;
   size_t i, j, len, res;
 
