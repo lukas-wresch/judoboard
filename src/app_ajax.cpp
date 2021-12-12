@@ -2492,7 +2492,7 @@ std::string Application::Ajax_GetHansokumake() const
 
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; ++f)
 		{
-			if (mat->GetScoreboard(f).m_HansokuMake)
+			if (mat->GetScoreboard(f).m_HansokuMake && mat->GetScoreboard(f).m_HansokuMake_Direct)
 			{
 				ret << mat->GetMatch()->ToString();
 				ret << f;

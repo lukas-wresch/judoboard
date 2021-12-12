@@ -735,6 +735,7 @@ void Mat::AddHansokuMake(Fighter Whom, bool Direct)
 	{
 		m_mutex.lock();
 		SetScoreboard(Whom).m_HansokuMake = true;
+		SetScoreboard(Whom).m_HansokuMake_Direct = Direct;
 
 		if (Direct)
 			AddEvent(Whom, MatchLog::BiasedEvent::AddHansokuMake_Direct);
@@ -760,6 +761,7 @@ void Mat::RemoveHansokuMake(Fighter Whom)
 	{
 		m_mutex.lock();
 		SetScoreboard(Whom).m_HansokuMake = false;
+		SetScoreboard(Whom).m_HansokuMake_Direct = false;
 
 		AddEvent(Whom, MatchLog::BiasedEvent::RemoveHansokuMake);
 		m_Graphics["effect_hansokumake_" + Fighter2String(Whom)].StopAllAnimations().SetAlpha(0);
@@ -772,7 +774,7 @@ void Mat::RemoveHansokuMake(Fighter Whom)
 
 void Mat::AddDisqualification(Fighter Whom)
 {
-	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && !GetScoreboard(Whom).IsDisqualified())
+	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && GetScoreboard(Whom).m_HansokuMake_Direct && !GetScoreboard(Whom).IsDisqualified())
 	{
 		m_mutex.lock();
 		SetScoreboard(Whom).m_Disqualification = Scoreboard::DisqualificationState::Disqualified;
@@ -787,7 +789,7 @@ void Mat::AddDisqualification(Fighter Whom)
 
 void Mat::AddNotDisqualification(Fighter Whom)
 {
-	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && GetScoreboard(Whom).IsDisqualified())
+	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && GetScoreboard(Whom).m_HansokuMake_Direct && GetScoreboard(Whom).IsDisqualified())
 	{
 		//Can we simply remove the previous disqualification?
 		if (m_pMatch && !m_pMatch->HasConcluded())
@@ -800,7 +802,7 @@ void Mat::AddNotDisqualification(Fighter Whom)
 	}
 
 
-	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && !GetScoreboard(Whom).IsDisqualified())
+	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && GetScoreboard(Whom).m_HansokuMake_Direct && !GetScoreboard(Whom).IsDisqualified())
 	{
 		m_mutex.lock();
 		SetScoreboard(Whom).m_Disqualification = Scoreboard::DisqualificationState::NotDisqualified;

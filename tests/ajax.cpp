@@ -299,6 +299,34 @@ TEST(Ajax, Ajax_GetHansokumake)
 
 
 
+TEST(Ajax, Ajax_GetHansokumake2)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+		IMat* mat = app.FindMat(1);
+
+		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+
+		auto ret = app.Ajax_GetHansokumake();
+		EXPECT_EQ(ret.length(), 0);
+
+		mat->StartMatch(&match);
+		for (int i = 0;i < 5; i++)
+			mat->AddShido(f);
+
+		auto ret2 = app.Ajax_GetHansokumake();
+
+		EXPECT_EQ(ret2.length(), 0);
+	}
+}
+
+
+
 TEST(Ajax, ListClubs)
 {
 	initialize();

@@ -99,7 +99,7 @@ namespace Judoboard
 		Error Ajax_NoDisqualification(Fighter Whom, const HttpServer::Request& Request);
 
 		//Schedule
-		std::string Ajax_GetHansokumake() const;//Returns matches that are in progress and have a hansokumake
+		std::string Ajax_GetHansokumake() const;//Returns matches that are in progress and have a direct hansokumake
 
 		//Clubs
 		ZED::CSV Ajax_ListClubs();

@@ -47,6 +47,7 @@ namespace Judoboard
 				m_Shido = 0;
 
 				m_HansokuMake = false;
+				m_HansokuMake_Direct = false;
 				m_Disqualification = DisqualificationState::Unknown;
 
 				m_MedicalExamination = 0;
@@ -69,6 +70,7 @@ namespace Judoboard
 			DisqualificationState m_Disqualification = DisqualificationState::Unknown;//Did the judoka get disqualified
 
 			bool m_HansokuMake = false;
+			bool m_HansokuMake_Direct = false;
 
 			bool m_Hantei = false;
 
