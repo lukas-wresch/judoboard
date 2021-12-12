@@ -215,7 +215,7 @@ ZED::CSV Match::ToString() const
 
 ZED::CSV Match::AllToString() const
 {
-	return ToString() << ','  << m_Result.m_Winner << m_Result.m_Score << m_Result.m_Time << GetRuleSet().GetID();
+	return ToString() << m_Result.m_Winner << m_Result.m_Score << m_Result.m_Time << GetRuleSet().GetID();
 }
 
 

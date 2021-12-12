@@ -1261,20 +1261,20 @@ void Mat::NextState(State NextState) const
 
 				shift *= m_ScalingFactor;
 
-				if (m_Graphics["next_matches_blue_" + std::to_string(i)])//TODO improve this
+				
 				m_Graphics["next_matches_blue_" + std::to_string(i)].StopAllAnimations()
 																	 .SetPosition(40 - 1320, (int)shift, 0)
 																	 .AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
-				if (m_Graphics["next_matches_white_" + std::to_string(i)])//TODO improve this
+				
 				m_Graphics["next_matches_white_"  + std::to_string(i)].StopAllAnimations().Right()
 																	 .SetPosition(width - 40 + 1320, (int)shift, 0)
 																	 .AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
 
-				if (m_Graphics["next_matches_blue2_" + std::to_string(i)])//TODO improve this
+				
 				m_Graphics["next_matches_blue2_" + std::to_string(i)].StopAllAnimations()
 																	 .SetPosition(40 - 1320, (int)shift + (int)(165.0*m_ScalingFactor), 0)
 																	 .AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
-				if (m_Graphics["next_matches_white2_" + std::to_string(i)])//TODO improve this
+				
 				m_Graphics["next_matches_white2_"  + std::to_string(i)].StopAllAnimations().Right()
 																	 .SetPosition(width - 40 + 1320, (int)shift + (int)(165.0*m_ScalingFactor), 0)
 																	 .AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
@@ -1347,7 +1347,7 @@ void Mat::UpdateGraphics() const
 		//ZED::FontSize FontSize = ZED::FontSize::Huge;
 		ZED::FontSize FontSize = ZED::FontSize::Gigantic;
 
-		for (size_t i = m_NextMatches.size(); i < 4; i++)
+		for (size_t i = m_NextMatches.size(); i < 2; i++)
 		{
 			m_Graphics["next_matches_white_" + std::to_string(i)].Clear();
 			m_Graphics["next_matches_blue_"  + std::to_string(i)].Clear();

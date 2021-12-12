@@ -106,9 +106,9 @@ namespace Judoboard
 		virtual void OnMatchConcluded(const Match& Match) const override {}
 
 		//Serialization
-		const std::string Schedule2String() const;
-		const std::string Participants2String() const;
-		const std::string MasterSchedule2String() const;
+		const std::string Schedule2String() const override;
+		const std::string Participants2String() const override;
+		const std::string MasterSchedule2String() const override;
 
 		void GenerateSchedule();
 
