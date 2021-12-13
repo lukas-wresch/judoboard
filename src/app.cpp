@@ -195,7 +195,7 @@ Error Application::CheckPermission(const HttpServer::Request& Request, Account::
 	auto value = HttpServer::DecodeURLEncoded(header->Value, "session");
 
 	LockTillScopeEnd();
-	auto* account = m_Database.IsLoggedIn(Request.m_RequestInfo.RemoteIP, value);
+	auto account = m_Database.IsLoggedIn(Request.m_RequestInfo.RemoteIP, value);
 
 	if (!account || account->GetAccessLevel() < AccessLevel)
 		return Error::Type::NotEnoughPermissions;

@@ -364,7 +364,7 @@ void Application::SetupHttpServer()
 		if (id < 0)
 			return Error(Error::Type::InvalidID);
 
-		auto* match = GetTournament()->FindMatch(id);
+		auto match = GetTournament()->FindMatch(id);
 		auto ruleSet = m_Database.FindRuleSetByName(rule);
 
 		if (!match)
@@ -1187,7 +1187,7 @@ void Application::SetupHttpServer()
 		if (id < 0)
 			return std::string("Invalid input");
 
-		auto* judoka = m_Database.FindJudoka(id);
+		auto judoka = m_Database.FindJudoka(id);
 
 		if (!judoka)
 			return std::string("Could not find judoka in database");
@@ -1259,7 +1259,7 @@ void Application::SetupHttpServer()
 
 		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		auto* account_to_change = m_Database.SetAccount(index);
+		auto account_to_change = m_Database.SetAccount(index);
 		if (!account_to_change)
 			return std::string("Account not found");
 
@@ -1297,7 +1297,7 @@ void Application::SetupHttpServer()
 
 		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		auto* account_to_change = m_Database.SetAccount(index);
+		auto account_to_change = m_Database.SetAccount(index);
 		if (!account_to_change)
 			return std::string("Account not found");
 
@@ -1341,7 +1341,7 @@ void Application::SetupHttpServer()
 
 		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		auto* account_to_change = m_Database.GetAccount(index);
+		auto account_to_change = m_Database.GetAccount(index);
 		if (!account_to_change)
 			return std::string("Account not found");
 
@@ -1708,7 +1708,7 @@ void Application::SetupHttpServer()
 		bool draw = HttpServer::DecodeURLEncoded(Request.m_Body, "draw") == "true";
 		int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
 
-		auto* rule = m_Database.FindRuleSet(id);
+		auto rule = m_Database.FindRuleSet(id);
 
 		if (!rule)
 			return std::string("Could not find rule set in database");
@@ -1725,7 +1725,7 @@ void Application::SetupHttpServer()
 
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		auto* rule = m_Database.FindRuleSet(id);
+		auto rule = m_Database.FindRuleSet(id);
 		if (!rule)
 			return std::string("Could not find rule set in database");
 

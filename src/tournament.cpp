@@ -637,7 +637,7 @@ std::vector<const Match*> Tournament::GetNextMatches(uint32_t MatID) const
 	uint32_t id = 0;
 	for (int i = 0; i < 5; i++)
 	{
-		auto* nextMatch = GetNextMatch(MatID, id);
+		auto nextMatch = GetNextMatch(MatID, id);
 
 		if (nextMatch)
 			ret.push_back(nextMatch);
@@ -721,7 +721,7 @@ uint32_t Tournament::GetHighestMatIDUsed() const
 
 bool Tournament::IsMatUsed(uint32_t ID) const
 {
-	for (const auto* match : m_Schedule)
+	for (const auto match : m_Schedule)
 		if (match && match->GetMatID() == ID)
 			return true;
 
@@ -820,7 +820,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 	//Find a new color for this match table
 	Color match_table_color = Color::Name::Blue;
-	for (auto* table : m_MatchTables)
+	for (auto table : m_MatchTables)
 	{
 		if (table->GetColor() >= match_table_color)
 			match_table_color = table->GetColor() + 1;
@@ -837,7 +837,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 void Tournament::UpdateMatchTable(uint32_t ID)
 {
-	auto* matchTable = FindMatchTable(ID);
+	auto matchTable = FindMatchTable(ID);
 
 	if (!matchTable)
 		return;
@@ -861,7 +861,7 @@ void Tournament::UpdateMatchTable(uint32_t ID)
 
 bool Tournament::DeleteMatchTable(uint32_t ID)
 {
-	auto* matchTable = FindMatchTable(ID);
+	auto matchTable = FindMatchTable(ID);
 
 	if (!matchTable)
 		return false;
@@ -1116,7 +1116,7 @@ const std::string Tournament::MasterSchedule2String() const
 			std::vector<std::pair<uint32_t, Schedulable*>> entries;
 			for (uint32_t it = 0; it < m_SchedulePlanner.size(); ++it)//For all schedule entries
 			{
-				auto* entry = m_SchedulePlanner[it];
+				auto entry = m_SchedulePlanner[it];
 
 				if (!entry || entry->GetScheduleIndex() != index || entry->GetMatID() != matID)
 					continue;
@@ -1212,7 +1212,7 @@ void Tournament::GenerateSchedule()
 				{
 					if (schedule.size() > 0)
 					{
-						auto* match = schedule.front();
+						auto match = schedule.front();
 						m_Schedule.push_back(match);
 
 						schedule.erase(schedule.begin());

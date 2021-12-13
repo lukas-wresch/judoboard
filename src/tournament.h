@@ -79,8 +79,8 @@ namespace Judoboard
 		void UpdateMatchTable(uint32_t ID);//Calling this function we recalculate the given match table
 		bool DeleteMatchTable(uint32_t ID);
 		const std::vector<MatchTable*>& GetMatchTables() const { return m_MatchTables; }
-		MatchTable* FindMatchTable(uint32_t ID);
-		const MatchTable* FindMatchTable(uint32_t ID) const;
+		virtual MatchTable* FindMatchTable(uint32_t ID) override;
+		virtual const MatchTable* FindMatchTable(uint32_t ID) const override;
 		virtual MatchTable* FindMatchTable(const UUID& ID) override;
 		virtual const MatchTable* FindMatchTable(const UUID& ID) const override;
 		MatchTable* FindMatchTableByName(const std::string& Name);
@@ -95,14 +95,14 @@ namespace Judoboard
 		virtual RuleSet* FindRuleSet(const UUID& UUID) override { return m_StandingData.FindRuleSet(UUID); }
 
 		//Master schedule / schedule entries
-		Schedulable* GetScheduleEntry(uint32_t Index);
-		bool MoveScheduleEntryUp(uint32_t ID);
-		bool MoveScheduleEntryDown(uint32_t ID);
+		Schedulable* GetScheduleEntry(uint32_t Index) override;
+		bool MoveScheduleEntryUp(uint32_t ID) override;
+		bool MoveScheduleEntryDown(uint32_t ID) override;
 
 		//Disqualifications
 		bool IsDisqualified(const Judoka& Judoka) const;
-		void Disqualify(const Judoka& Judoka);
-		void RevokeDisqualification(const Judoka& Judoka);
+		void Disqualify(const Judoka& Judoka) override;
+		void RevokeDisqualification(const Judoka& Judoka) override;
 
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const override {}
