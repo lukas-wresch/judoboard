@@ -1,8 +1,19 @@
-## Welcome to GitHub Pages
+## Judoboard
 
-You can use the [editor on GitHub](https://github.com/lukas-wresch/judoboard/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+Judoboard is a easy to use digital scoreboard and tournament management system for the sport of Judo.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Demonstration
+
+Click on the image to watch the demonstration video
+
+[![Watch the video](https://img.youtube.com/vi/_PlGZOPMyZ8/maxresdefault.jpg)](https://youtu.be/_PlGZOPMyZ8)
+
+## Features
+
+Management for tournaments, weightclasses and matches on multiple mats.
+Import of *.dm4 and *.md5 files.
+Scoreboard display with name of participants, scores, osaekomi, shidos and hansokumake.
+Support for advance IJF rules: Double ippon, double hansokumake.
 
 ### Markdown
 
