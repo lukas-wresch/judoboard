@@ -32,6 +32,7 @@
     <ClCompile Include="..\..\ZED\src\renderer.cpp" />
     <ClCompile Include="..\..\ZED\src\renderer_opengl.cpp" />
     <ClCompile Include="..\..\ZED\src\renderer_sdl2.cpp" />
+    <ClCompile Include="..\..\ZED\src\sha256.cpp" />
     <ClCompile Include="..\..\ZED\src\sha512.cpp" />
     <ClCompile Include="..\..\ZED\src\socket.cpp" />
     <ClCompile Include="..\..\ZED\src\socket_tcp.cpp" />
@@ -49,6 +50,8 @@
     <ClInclude Include="..\..\ZED\include\renderer.h" />
     <ClInclude Include="..\..\ZED\include\renderer_opengl.h" />
     <ClInclude Include="..\..\ZED\include\renderer_sdl2.h" />
+    <ClInclude Include="..\..\ZED\include\sha256.h" />
+    <ClInclude Include="..\..\ZED\include\sha512.h" />
     <ClInclude Include="..\..\ZED\include\socket.h" />
     <ClInclude Include="..\..\ZED\include\socket_tcp.h" />
   </ItemGroup>
