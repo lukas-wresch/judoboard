@@ -2080,7 +2080,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/master/find_participant", [this](auto& Request) -> std::string {
+	m_Server.RegisterResource("/ajax/master/find_judoka", [this](auto& Request) -> std::string {
 		if (!IsMaster())
 			return "You are not allowed to connect";
 
@@ -2088,7 +2088,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 		ZED::Log::Info("Slave requested participant info");
 
-		auto judoka = GetTournament()->FindParticipant(UUID(std::move(uuid)));
+		auto judoka = GetDatabase().FindJudoka(UUID(std::move(uuid)));
 
 		if (!judoka)
 			return "Not found";

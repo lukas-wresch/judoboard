@@ -28,7 +28,7 @@ namespace Judoboard
 		virtual bool CanCloseTournament() const { return false; }
 		//void DeleteAllMatchResults();
 
-		virtual bool AddMatch(Match* NewMatch) { return false; }
+		virtual bool AddMatch(Match* NewMatch) = 0;
 		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
 		virtual Match* GetNextMatch(int32_t MatID = -1) const { return nullptr; }//Returns the next match for a given mat if available, otherwise null pointer is returned
 		//const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned

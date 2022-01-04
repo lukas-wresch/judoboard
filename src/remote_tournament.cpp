@@ -23,6 +23,21 @@ std::vector<const Match*> RemoteTournament::GetNextMatches(uint32_t MatID) const
 
 
 
+bool RemoteTournament::AddMatch(Match* NewMatch)
+{
+	if (!NewMatch)
+	{
+		ZED::Log::Error("Invalid match");
+		return false;
+	}
+
+	//TODO: Add match data to cache
+
+	return true;
+}
+
+
+
 bool RemoteTournament::IsParticipant(const Judoka& Judoka) const
 {
 	ZED::Log::Error("NOT IMPLEMENTED");
@@ -33,14 +48,17 @@ bool RemoteTournament::IsParticipant(const Judoka& Judoka) const
 
 Judoka* RemoteTournament::FindParticipant(const UUID& UUID)
 {
-	auto response = Request2Master("/ajax/master/find_participant?uuid=" + (std::string)UUID);
+	auto response = Request2Master("/ajax/master/find_judoka?uuid=" + (std::string)UUID);
 
 	if (response.length() == 0)
+	{
+		ZED::Log::Error("Could not obtain judoka data from master server");
 		return nullptr;
+	}
 
 	ZED::CSV csv(response);
 	Judoka* judoka = new Judoka(csv);
-	m_StandingData.AddJudoka(judoka);
+	m_StandingData.AddJudoka(judoka);//Add to cache
 
 	return judoka;
 }
@@ -49,10 +67,13 @@ Judoka* RemoteTournament::FindParticipant(const UUID& UUID)
 
 const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 {
-	auto response = Request2Master("/ajax/master/find_participant?uuid=" + (std::string)UUID);
+	auto response = Request2Master("/ajax/master/find_judoka?uuid=" + (std::string)UUID);
 
 	if (response.length() == 0)
+	{
+		ZED::Log::Error("Could not obtain judoka data from master server");
 		return nullptr;
+	}
 
 	ZED::CSV csv(response);
 	Judoka* judoka = new Judoka(csv);

@@ -14,8 +14,9 @@ namespace Judoboard
 
 		virtual std::vector<const Match*> GetNextMatches(uint32_t MatID) const override;
 
-		virtual bool IsParticipant(const Judoka& Judoka) const override;
+		virtual bool AddMatch(Match* NewMatch) override;
 
+		virtual bool IsParticipant(const Judoka& Judoka) const override;
 		virtual Judoka* FindParticipant(const UUID& UUID) override;
 		virtual const Judoka* FindParticipant(const UUID& UUID) const override;
 

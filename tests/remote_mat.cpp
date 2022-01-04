@@ -216,7 +216,7 @@ TEST(RemoteMat, CorrectWinner)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave(8080  + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -271,16 +271,21 @@ TEST(RemoteMat, ForceClose)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
 
 	IMat* m = master.FindMat(1);
 
+	Judoka j1("White", "LastnameW");
+	Judoka j2("Blue",  "LastnameB");
+	master.GetDatabase().AddJudoka(&j1);
+	master.GetDatabase().AddJudoka(&j2);
+
 	ZED::Core::Pause(500);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(nullptr, &j1, &j2);
 	match.SetMatID(1);
 	EXPECT_TRUE(m->StartMatch(&match));
 }
