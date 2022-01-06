@@ -212,26 +212,67 @@ TEST(RemoteMat, StartMatch)
 
 
 
-TEST(RemoteMat, CorrectWinner)
+TEST(RemoteMat, RuleSetIsSent)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080  + rand() % 10000);
+	Application slave(8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
 
 	IMat* m = master.FindMat(1);
 
+	auto j1 = new Judoka(GetRandomName(), GetRandomName());
+	auto j2 = new Judoka(GetRandomName(), GetRandomName());
+	auto rules = new RuleSet("Test", 5, 0, 30, 20, true, true, true, 0);
+
+	master.GetDatabase().AddJudoka(j1);
+	master.GetDatabase().AddJudoka(j2);
+	master.GetDatabase().AddRuleSet(rules);
+
+	Match match(nullptr, j1, j2);
+	match.SetMatID(1);
+	match.SetRuleSet(rules);
+
+	ASSERT_TRUE(m);
+	ASSERT_TRUE(m->StartMatch(&match));		
+
+	auto remote_rules = slave.GetMats()[0]->GetMatch()->GetRuleSet();
+	EXPECT_EQ(remote_rules.GetName(), "Test");
+	EXPECT_EQ(remote_rules.GetMatchTime(), 5);
+}
+
+
+
+TEST(RemoteMat, CorrectWinner)
+{
+	initialize();
+	Application master(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
+
+	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
+	ASSERT_TRUE(slave.StartLocalMat(1));
+
+	IMat* m = master.FindMat(1);
+	auto rules = new RuleSet("Test", 5, 0, 30, 20, true, true, true, 0);
+	master.GetDatabase().AddRuleSet(rules);
+
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		for (int i = 0; i <= 5; i++)
 		{
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			auto j1 = new Judoka(GetRandomName(), GetRandomName());
+			auto j2 = new Judoka(GetRandomName(), GetRandomName());
+			master.GetDatabase().AddJudoka(j1);
+			master.GetDatabase().AddJudoka(j2);
+
+			Match match(nullptr, j1, j2);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 5, 0, 30, 20, true, true, true, 0));
 
-			EXPECT_TRUE(m->StartMatch(&match));
+			ASSERT_TRUE(m);
+			ASSERT_TRUE(m->StartMatch(&match));
 			m->Hajime();
 					
 			if (i == 0)

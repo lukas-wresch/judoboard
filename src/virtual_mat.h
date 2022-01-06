@@ -23,7 +23,7 @@ namespace Judoboard
 		virtual bool CanNextMatchStart() const override { return false; };
 		virtual bool StartMatch(Match& NewMatch) { return false; }
 		virtual bool HasConcluded() const override { return false; }
-		virtual bool EndMatch() { return false; }
+		virtual bool EndMatch() = 0;
 
 		virtual uint32_t GetTimeElapsed() const { return 0; }
 

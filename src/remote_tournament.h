@@ -20,6 +20,10 @@ namespace Judoboard
 		virtual Judoka* FindParticipant(const UUID& UUID) override;
 		virtual const Judoka* FindParticipant(const UUID& UUID) const override;
 
+		//Rule Sets
+		virtual const RuleSet* FindRuleSet(const UUID& UUID) const override;
+		virtual RuleSet* FindRuleSet(const UUID& UUID) override;
+
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const override;
 

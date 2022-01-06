@@ -61,7 +61,7 @@ void Match::operator >>(ZED::CSV& Stream) const
 	Schedulable::operator >>(Stream);
 
 	if (!GetFighter(Fighter::White) || !GetFighter(Fighter::Blue))
-		ZED::Log::Error("NOT IMPLEMENTED");//DEBUG NOT IMPLEMENTED
+		ZED::Log::Error("Match::operator >> NOT IMPLEMENTED");//DEBUG NOT IMPLEMENTED
 	else
 		Stream << (std::string)GetFighter(Fighter::White)->GetUUID() << (std::string)GetFighter(Fighter::Blue)->GetUUID() << m_State;
 
@@ -173,7 +173,7 @@ const RuleSet& Match::GetRuleSet() const
 	if (GetTournament() && GetTournament()->GetDefaultRuleSet())
 		return *GetTournament()->GetDefaultRuleSet();
 
-	ZED::Log::Debug("Could not find rule set, using the default set");
+	//ZED::Log::Debug("Could not find rule set, using the default set");
 
 	return s_default_rules;
 }

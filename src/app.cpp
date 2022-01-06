@@ -23,6 +23,7 @@ bool Application::NoWindow = false;
 Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Timer::GetTimestamp())
 {
 	m_TempTournament.EnableAutoSave(false);
+	m_TempTournament.SetDefaultRuleSet(new RuleSet);//Take default rule set as rule set for temporary tournaments
 	m_CurrentTournament = &m_TempTournament;
 
 	if (!m_Server.IsRunning())
@@ -2095,6 +2096,24 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 		ZED::CSV csv;
 		*judoka >> csv;
+		return csv;
+	});
+
+	m_Server.RegisterResource("/ajax/master/find_ruleset", [this](auto& Request) -> std::string {
+		if (!IsMaster())
+			return "You are not allowed to connect";
+
+		auto uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "uuid");
+
+		ZED::Log::Info("Slave requested rule set info");
+
+		auto rule_set = GetDatabase().FindRuleSet(UUID(std::move(uuid)));
+
+		if (!rule_set)
+			return "Not found";
+
+		ZED::CSV csv;
+		*rule_set >> csv;
 		return csv;
 	});
 

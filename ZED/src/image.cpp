@@ -205,7 +205,7 @@ void Image::Flip()
 
 	if (bpp != 3)
 	{
-		Log::Error("Not implemented");
+		Log::Error("Image::Flip() Not implemented");
 		return;
 	}
 

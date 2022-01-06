@@ -81,8 +81,8 @@ namespace Judoboard
 		virtual void SetDefaultRuleSet(const RuleSet* NewDefaultRuleSet) {}
 		virtual const RuleSet* FindRuleSetByName(const std::string& Name) const { return nullptr; }
 		virtual RuleSet* FindRuleSetByName(const std::string& Name) { return nullptr; }
-		virtual const RuleSet* FindRuleSet(const UUID& UUID) const { return nullptr; }
-		virtual RuleSet* FindRuleSet(const UUID& UUID) { return nullptr; }
+		virtual const RuleSet* FindRuleSet(const UUID& UUID) const = 0;
+		virtual RuleSet* FindRuleSet(const UUID& UUID) = 0;
 
 		//Master schedule / schedule entries
 		virtual Schedulable* GetScheduleEntry(uint32_t Index) { return nullptr; }

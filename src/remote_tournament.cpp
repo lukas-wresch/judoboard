@@ -16,7 +16,7 @@ RemoteTournament::RemoteTournament(const std::string& Host, uint16_t Port) : m_H
 
 std::vector<const Match*> RemoteTournament::GetNextMatches(uint32_t MatID) const
 {
-	ZED::Log::Error("NOT IMPLEMENTED");
+	ZED::Log::Error("RemoteTournament::GetNextMatches() NOT IMPLEMENTED");
 	std::vector<const Match*> ret;
 	return ret;
 }
@@ -40,7 +40,7 @@ bool RemoteTournament::AddMatch(Match* NewMatch)
 
 bool RemoteTournament::IsParticipant(const Judoka& Judoka) const
 {
-	ZED::Log::Error("NOT IMPLEMENTED");
+	ZED::Log::Error("RemoteTournament::IsParticipant() NOT IMPLEMENTED");
 	return false;
 }
 
@@ -80,6 +80,44 @@ const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 	m_StandingData.AddJudoka(judoka);
 
 	return judoka;
+}
+
+
+
+const RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID) const
+{
+	auto response = Request2Master("/ajax/master/find_ruleset?uuid=" + (std::string)UUID);
+
+	if (response.length() == 0)
+	{
+		ZED::Log::Error("Could not obtain rule set data from master server");
+		return nullptr;
+	}
+
+	ZED::CSV csv(response);
+	RuleSet* rule_set = new RuleSet(csv);
+	m_StandingData.AddRuleSet(rule_set);//Add to cache
+
+	return rule_set;
+}
+
+
+
+RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID)
+{
+	auto response = Request2Master("/ajax/master/find_ruleset?uuid=" + (std::string)UUID);
+
+	if (response.length() == 0)
+	{
+		ZED::Log::Error("Could not obtain rule set data from master server");
+		return nullptr;
+	}
+
+	ZED::CSV csv(response);
+	RuleSet* rule_set = new RuleSet(csv);
+	m_StandingData.AddRuleSet(rule_set);//Add to cache
+
+	return rule_set;
 }
 
 
