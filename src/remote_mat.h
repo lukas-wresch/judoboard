@@ -41,9 +41,9 @@ namespace Judoboard
 		virtual Fighter GetOsaekomiHolder() const override { return Fighter::White; }
 
 		//Commands by judge
-		virtual void Hajime() override {}
-		virtual void Mate() override {}
-		virtual void Sonomama() override {}
+		virtual void Hajime() override;
+		virtual void Mate() override;
+		virtual void Sonomama() override;
 
 		virtual void AddIppon(Fighter Whom) override;
 		virtual void RemoveIppon(Fighter Whom) override;

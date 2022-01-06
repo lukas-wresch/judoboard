@@ -212,7 +212,7 @@ TEST(RemoteMat, StartMatch)
 
 
 
-TEST(RemoteMat, RuleSetIsSent)
+TEST(RemoteMat, SendRuleSet)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
@@ -245,6 +245,39 @@ TEST(RemoteMat, RuleSetIsSent)
 
 
 
+TEST(RemoteMat, SendHajime)
+{
+	initialize();
+	Application master(8080 + rand() % 10000);
+	Application slave(8080 + rand() % 10000);
+
+	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
+	ASSERT_TRUE(slave.StartLocalMat(1));
+
+	IMat* m = master.FindMat(1);
+
+	auto j1 = new Judoka(GetRandomName(), GetRandomName());
+	auto j2 = new Judoka(GetRandomName(), GetRandomName());
+	auto rules = new RuleSet("Test", 5, 0, 30, 20, true, true, true, 0);
+
+	master.GetDatabase().AddJudoka(j1);
+	master.GetDatabase().AddJudoka(j2);
+	master.GetDatabase().AddRuleSet(rules);
+
+	Match match(nullptr, j1, j2);
+	match.SetMatID(1);
+	match.SetRuleSet(rules);
+
+	ASSERT_TRUE(m);
+	ASSERT_TRUE(m->StartMatch(&match));
+	m->Hajime();
+
+	auto remote_mat = slave.GetMats()[0];	
+	EXPECT_TRUE(remote_mat->IsHajime());
+}
+
+
+
 TEST(RemoteMat, CorrectWinner)
 {
 	initialize();
@@ -269,7 +302,7 @@ TEST(RemoteMat, CorrectWinner)
 
 			Match match(nullptr, j1, j2);
 			match.SetMatID(1);
-			match.SetRuleSet(new RuleSet("Test", 5, 0, 30, 20, true, true, true, 0));
+			match.SetRuleSet(rules);
 
 			ASSERT_TRUE(m);
 			ASSERT_TRUE(m->StartMatch(&match));

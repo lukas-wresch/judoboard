@@ -111,6 +111,27 @@ bool RemoteMat::EndMatch()
 
 
 
+void RemoteMat::Hajime()
+{
+	SendCommand("/ajax/mat/hajime?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::Mate()
+{
+	SendCommand("/ajax/mat/mate?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::Sonomama()
+{
+	SendCommand("/ajax/mat/sonomama?id=" + std::to_string(GetMatID()));
+}
+
+
+
 void RemoteMat::AddIppon(Fighter Whom)
 {
 	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/+ippon?id=" + std::to_string(GetMatID()));
