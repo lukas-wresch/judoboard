@@ -351,32 +351,38 @@ function GetScore()
     console.log(response);
     var res = response.split(",");
 
-    document.getElementById("white_ippon").innerHTML   = res[0];
-    document.getElementById("white_wazaari").innerHTML = res[1];
-    document.getElementById("blue_ippon").innerHTML    = res[2];
-    document.getElementById("blue_wazaari").innerHTML  = res[3];
+    var i=0;
+    document.getElementById("white_ippon").innerHTML   = res[i++];
+    document.getElementById("white_wazaari").innerHTML = res[i++];
+    document.getElementById("blue_ippon").innerHTML    = res[i++];
+    document.getElementById("blue_wazaari").innerHTML  = res[i++];
 
-    document.getElementById("white_shidos").innerHTML = res[4];
-    document.getElementById("blue_shidos").innerHTML  = res[5];
+    var white_yuko = res[i++];
+    var blue_yuko  = res[i++];
+    var white_koka = res[i++];
+    var blue_koka  = res[i++];
 
-    document.getElementById("white_medics").innerHTML = res[6];
-    document.getElementById("blue_medics").innerHTML  = res[7];
+    document.getElementById("white_shidos").innerHTML = res[i++];
+    document.getElementById("blue_shidos").innerHTML  = res[i++];
 
-    HajimeTimer = parseInt(res[8]);
-    isHajime    = parseInt(res[9]);
+    document.getElementById("white_medics").innerHTML = res[i++];
+    document.getElementById("blue_medics").innerHTML  = res[i++];
 
-    OsaekomiWhiteTimer = parseInt(res[10]);
-    OsaekomiWhiteTimer_Running = parseInt(res[11]);
-    OsaekomiBlueTimer  = parseInt(res[12]);
-    OsaekomiBlueTimer_Running = parseInt(res[13]);
+    HajimeTimer = parseInt(res[i++]);
+    isHajime    = parseInt(res[i++]);
 
-    canNextMatchStart = parseInt(res[14]);
-    hasConcluded      = parseInt(res[15]);
-    isOutOfTime       = parseInt(res[16]);
-    isGoldenScore     = parseInt(res[17]);
-    areFightersOnMat  = parseInt(res[18]);
-    whiteNeedHanDesc  = parseInt(res[19]);
-    blueNeedHanDesc   = parseInt(res[20]);
+    OsaekomiWhiteTimer = parseInt(res[i++]);
+    OsaekomiWhiteTimer_Running = parseInt(res[i++]);
+    OsaekomiBlueTimer  = parseInt(res[i++]);
+    OsaekomiBlueTimer_Running = parseInt(res[i++]);
+
+    canNextMatchStart = parseInt(res[i++]);
+    hasConcluded      = parseInt(res[i++]);
+    isOutOfTime       = parseInt(res[i++]);
+    isGoldenScore     = parseInt(res[i++]);
+    areFightersOnMat  = parseInt(res[i++]);
+    whiteNeedHanDesc  = parseInt(res[i++]);
+    blueNeedHanDesc   = parseInt(res[i++]);
 
     if (isHajime == 1)
     {

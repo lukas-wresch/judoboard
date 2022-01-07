@@ -337,6 +337,16 @@ ZED::CSV Mat::Scoreboard2String() const
 	ret << GetScoreboard(Fighter::White).m_Ippon << (GetScoreboard(Fighter::White).m_Ippon ? 0 : GetScoreboard(Fighter::White).m_WazaAri);
 	ret << GetScoreboard(Fighter::Blue).m_Ippon  << (GetScoreboard(Fighter::Blue ).m_Ippon ? 0 : GetScoreboard(Fighter::Blue ).m_WazaAri);
 
+	if (m_pMatch && m_pMatch->GetRuleSet().IsYukoEnabled())
+		ret << GetScoreboard(Fighter::White).m_Yuko << GetScoreboard(Fighter::Blue).m_Yuko;
+	else
+		ret << -1 << -1;
+
+	if (m_pMatch && m_pMatch->GetRuleSet().IsKokaEnabled())
+		ret << GetScoreboard(Fighter::White).m_Koka << GetScoreboard(Fighter::Blue).m_Koka;
+	else
+		ret << -1 << -1;
+
 	ret << (GetScoreboard(Fighter::White).m_HansokuMake ? 3 : GetScoreboard(Fighter::White).m_Shido);
 	ret << (GetScoreboard(Fighter::Blue ).m_HansokuMake ? 3 : GetScoreboard(Fighter::Blue ).m_Shido);
 
