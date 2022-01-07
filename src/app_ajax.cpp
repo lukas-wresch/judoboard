@@ -612,7 +612,7 @@ void Application::SetupHttpServer()
 		ZED::CSV ret;
 		ret << mat->Scoreboard2String();
 		ret << mat->GetTime2Display() << mat->IsHajime() << mat->Osaekomi2String(Fighter::White) << mat->Osaekomi2String(Fighter::Blue);
-		ret << mat->CanNextMatchStart() << mat->HasConcluded() << (mat->IsOutOfTime() && mat->GetResult().m_Winner == Winner::Draw) << mat->IsGoldenScore() << mat->AreFightersOnMat();
+		ret << mat->CanNextMatchStart() << mat->HasConcluded() << mat->IsOutOfTime() << (mat->GetResult().m_Winner == Winner::Draw) << mat->IsGoldenScore() << mat->AreFightersOnMat();
 		//Hansokumake with decision needed?
 		ret << mat->GetScoreboard(Fighter::White).IsUnknownDisqualification();
 		ret << mat->GetScoreboard(Fighter::Blue).IsUnknownDisqualification();

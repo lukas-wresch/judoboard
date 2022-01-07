@@ -211,7 +211,7 @@ RemoteMat::InternalState RemoteMat::GetState(bool& Success) const
 	state >> internalState.white_osaekomi_time >> internalState.white_osaekomi;
 	state >> internalState.blue_osaekomi_time  >> internalState.blue_osaekomi;
 
-	state >> internalState.cannextmatchstart >> internalState.hasconcluded >> internalState.isoutoftime_and_draw >> internalState.isgoldenscore >> internalState.arefightersonmat;
+	state >> internalState.cannextmatchstart >> internalState.hasconcluded >> internalState.isoutoftime >> internalState.NoWinnerYet  >> internalState.isgoldenscore >> internalState.arefightersonmat;
 
 	return internalState;
 }

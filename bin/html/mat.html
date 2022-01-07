@@ -379,6 +379,7 @@ function GetScore()
     canNextMatchStart = parseInt(res[i++]);
     hasConcluded      = parseInt(res[i++]);
     isOutOfTime       = parseInt(res[i++]);
+    noWinnerYet       = parseInt(res[i++]);
     isGoldenScore     = parseInt(res[i++]);
     areFightersOnMat  = parseInt(res[i++]);
     whiteNeedHanDesc  = parseInt(res[i++]);
@@ -446,7 +447,7 @@ function GetScore()
     else
       document.getElementById("end_match").disabled = true;
 
-    if (hasConcluded == 0 && isOutOfTime == 1)
+    if (hasConcluded == 0 && isOutOfTime == 1 && noWinnerYet == 1)
       ShowHantei(true);
 
     if (isGoldenScore == 1)

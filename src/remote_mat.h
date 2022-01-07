@@ -106,7 +106,7 @@ namespace Judoboard
 			uint32_t white_osaekomi_time, blue_osaekomi_time;
 
 			bool white_osaekomi, blue_osaekomi;
-			bool hajime, cannextmatchstart, hasconcluded, isoutoftime_and_draw, isgoldenscore, arefightersonmat;
+			bool hajime, cannextmatchstart, hasconcluded, isoutoftime, NoWinnerYet, isgoldenscore, arefightersonmat;
 		};
 
 		virtual const Scoreboard& GetScoreboard(Fighter Whom) const override
