@@ -59,7 +59,7 @@ bool RemoteMat::IsConnected() const
 bool RemoteMat::AreFightersOnMat() const
 {
 	bool success;
-	auto state = GetState(success);
+	auto state = GetState(&success);
 
 	if (!success)
 		return true;
@@ -72,7 +72,7 @@ bool RemoteMat::AreFightersOnMat() const
 bool RemoteMat::CanNextMatchStart() const
 {
 	bool success;
-	auto state = GetState(success);
+	auto state = GetState(&success);
 
 	if (!success)
 		return false;
@@ -101,7 +101,7 @@ bool RemoteMat::StartMatch(Match* NewMatch)
 bool RemoteMat::HasConcluded() const
 {
 	bool success;
-	auto state = GetState(success);
+	auto state = GetState(&success);
 
 	if (!success)
 		return false;
