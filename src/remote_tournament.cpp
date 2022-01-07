@@ -16,8 +16,24 @@ RemoteTournament::RemoteTournament(const std::string& Host, uint16_t Port) : m_H
 
 std::vector<const Match*> RemoteTournament::GetNextMatches(uint32_t MatID) const
 {
-	ZED::Log::Error("RemoteTournament::GetNextMatches() NOT IMPLEMENTED");
+	auto response = Request2Master("/ajax/master/get_next_matches?id=" + std::to_string(MatID));
 	std::vector<const Match*> ret;
+
+	if (response.length() == 0)
+	{
+		ZED::Log::Warn("Could not obtain next match data from master server");
+		return ret;
+	}
+
+	ZED::CSV csv(response);
+	int count;
+	csv >> count;
+	for (int i = 0; i < count; i++)
+	{
+		Match* next_match = new Match(csv, (RemoteTournament*)this);
+		ret.emplace_back(next_match);
+	}
+	
 	return ret;
 }
 

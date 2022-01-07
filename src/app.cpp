@@ -2199,10 +2199,32 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 		auto match = GetTournament()->FindMatch(posted_match);
 
 		if (!match)
+		{
+			ZED::Log::Error("Could not store match result that was sent by slave");
 			return "Not found";
+		}
 
 		*match = posted_match;
 		return "ok";
+	});
+
+	m_Server.RegisterResource("/ajax/master/get_next_matches", [this](auto& Request) -> std::string {
+		if (!IsMaster())
+			return "You are not allowed to connect";
+
+		//TODO check security token
+
+		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		auto next_matches = GetNextMatches(matID);
+
+		ZED::CSV match_data;
+		match_data << next_matches.size();//TODO add number of matches to send
+
+		for (auto match : next_matches)
+			*match >> match_data;
+		
+		return match_data;
 	});
 }
 

@@ -300,12 +300,13 @@ TEST(RemoteMat, CorrectWinner)
 			master.GetDatabase().AddJudoka(j1);
 			master.GetDatabase().AddJudoka(j2);
 
-			Match match(nullptr, j1, j2);
-			match.SetMatID(1);
-			match.SetRuleSet(rules);
+			Match* match = new Match(nullptr, j1, j2);
+			match->SetMatID(1);
+			match->SetRuleSet(rules);
+			master.GetTournament()->AddMatch(match);
 
 			ASSERT_TRUE(m);
-			ASSERT_TRUE(m->StartMatch(&match));
+			ASSERT_TRUE(m->StartMatch(match));
 			m->Hajime();
 					
 			if (i == 0)
@@ -331,10 +332,12 @@ TEST(RemoteMat, CorrectWinner)
 
 			EXPECT_TRUE(m->EndMatch());
 
+			ZED::Core::Pause(500);
+
 			if (i == 4)
-				EXPECT_EQ(match.GetMatchResult().m_Winner, Winner::Draw);
+				EXPECT_EQ(match->GetMatchResult().m_Winner, Winner::Draw);
 			else
-				EXPECT_EQ(match.GetMatchResult().m_Winner, Fighter2Winner(f));
+				EXPECT_EQ(match->GetMatchResult().m_Winner, Fighter2Winner(f));
 		}
 	}
 }

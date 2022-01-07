@@ -97,7 +97,7 @@ namespace Judoboard
 		const Judoka* GetWinningJudoka() const;
 		bool HasDependentMatches() const { return m_White.m_PreviousMatch || m_Blue.m_PreviousMatch; }//Returns true if and only if this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
 		bool HasValidFighters() const { return m_White.m_Judoka && m_Blue.m_Judoka; }//Returns true if and only if GetFighter() returns not a null pointer
-		const std::vector<Match*> GetDependentMatches();//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
+		const std::vector<Match*>       GetDependentMatches();//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
 		const std::vector<const Match*> GetDependentMatches() const;//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
 
 		const RuleSet& GetRuleSet() const;
