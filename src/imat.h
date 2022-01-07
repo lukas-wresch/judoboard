@@ -61,8 +61,8 @@ namespace Judoboard
 
 			uint16_t m_Ippon = 0;
 			uint16_t m_WazaAri = 0;
-			uint16_t m_Yuko = 0;
-			uint16_t m_Koka = 0;
+			int16_t m_Yuko = 0;//-1 if yuko is not possible (disabled by rule set)
+			int16_t m_Koka = 0;//-1 if koka is not possible (disabled by rule set)
 
 			uint16_t m_Shido = 0;
 			uint16_t m_MedicalExamination = 0;

@@ -298,6 +298,9 @@ RemoteMat::InternalState RemoteMat::GetState(bool& Success) const
 	state >> SetScoreboard(Fighter::White).m_Ippon >> SetScoreboard(Fighter::White).m_WazaAri;
 	state >> SetScoreboard(Fighter::Blue).m_Ippon  >> SetScoreboard(Fighter::Blue).m_WazaAri;
 
+	state >> SetScoreboard(Fighter::White).m_Yuko >> SetScoreboard(Fighter::Blue).m_Yuko;
+	state >> SetScoreboard(Fighter::White).m_Koka >> SetScoreboard(Fighter::Blue).m_Koka;
+
 	state >> SetScoreboard(Fighter::White).m_Shido >> SetScoreboard(Fighter::Blue).m_Shido;
 	state >> SetScoreboard(Fighter::White).m_MedicalExamination >> SetScoreboard(Fighter::Blue).m_MedicalExamination;
 
