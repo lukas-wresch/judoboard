@@ -1,6 +1,5 @@
 #include "../ZED/include/http_client.h"
 #include "../ZED/include/log.h"
-#include <cassert>
 #include "remote_mat.h"
 #include "app.h"
 
@@ -14,7 +13,8 @@ RemoteMat::RemoteMat(uint32_t ID, const std::string& Host, uint16_t Port) : IMat
 {
 	ZED::HttpClient client(m_Hostname, m_Port);
 	std::string response = client.GET("/ajax/slave/set_mat_id?id=" + std::to_string(GetMatID()));
-	assert(response == "ok");
+	if (response != "ok")
+		ZED::Log::Error("Could not connect to remote mat");
 }
 
 
@@ -23,7 +23,14 @@ bool RemoteMat::IsOpen() const
 {
 	ZED::HttpClient client(m_Hostname, m_Port);
 	std::string response = client.GET("/ajax/slave/is_mat_open?id=" + std::to_string(GetMatID()));
-	return response == "ok";
+
+	if (response != "ok")
+	{
+		ZED::Log::Error("Could not open remote mat");
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -281,7 +288,6 @@ RemoteMat::InternalState RemoteMat::GetState(bool& Success) const
 	{
 		ZED::Log::Warn("Invalid response: " + response);
 		Success = false;
-		assert(false);
 		return internalState;
 	}
 

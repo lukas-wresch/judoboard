@@ -66,6 +66,9 @@
     <ClCompile Include="..\..\ZED\external\SDL_rotozoom\SDL_rotozoom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\ZED\src\sha256.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ZED\include\blob.h">
@@ -105,6 +108,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ZED\include\socket_tcp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ZED\include\sha256.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ZED\include\sha512.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -98,7 +98,6 @@ StyleCopReport.xml
 *.scc
 
 #Binary and log files
-*.exe
 *.dll
 *.exp
 *.txt
@@ -381,7 +380,11 @@ FodyWeavers.xsd
 
 *.bak
 *.csv
-*.exe
 *.dll
 *.txt
 *.testdurations
+
+
+/bin/GoogleTest_Debug.exe
+/bin/Judoboard.exe
+/bin/Judoboard_Debug.exe

@@ -82,8 +82,47 @@ TEST(Tournament, Disqualification)
 	EXPECT_TRUE(match.GetMatchResult().m_Score == Match::Score::Ippon);
 	EXPECT_TRUE(match.GetMatchResult().m_Time == 0);
 	EXPECT_TRUE(match.GetLog().GetEvents().size() == 0);
+
+	EXPECT_TRUE(tourney.IsDisqualified(j1));
+	EXPECT_FALSE(tourney.IsDisqualified(j2));
 }
 
+
+
+TEST(Tournament, AddMatchAfterDisqualification)
+{
+	initialize();
+
+	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+	Judoka j2("Firstname2", "Lastname2", 50, Gender::Male);
+	Judoka j3("Firstname3", "Lastname3", 50, Gender::Male);
+
+	Tournament tourney("deleteMe");
+	tourney.Reset();
+	tourney.EnableAutoSave(false);
+
+	Match match1(&tourney, &j1, &j2);
+	tourney.AddMatch(&match1);
+	Match matchdummy(&tourney, &j2, &j3);
+	tourney.AddMatch(&matchdummy);
+
+	tourney.Disqualify(j1);
+
+	Match match2(&tourney, &j1, &j2);
+	tourney.AddMatch(&match2);
+
+	EXPECT_TRUE(match1.HasConcluded());
+	EXPECT_EQ(match1.GetMatchResult().m_Winner, Winner::Blue);
+	EXPECT_EQ(match1.GetMatchResult().m_Score, Match::Score::Ippon);
+	EXPECT_EQ(match1.GetMatchResult().m_Time, 0);
+	EXPECT_EQ(match1.GetLog().GetEvents().size(), 0);
+
+	EXPECT_TRUE(match2.HasConcluded());
+	EXPECT_EQ(match2.GetMatchResult().m_Winner, Winner::Blue);
+	EXPECT_EQ(match2.GetMatchResult().m_Score, Match::Score::Ippon);
+	EXPECT_EQ(match2.GetMatchResult().m_Time, 0);
+	EXPECT_EQ(match2.GetLog().GetEvents().size(), 0);
+}
 
 
 
@@ -146,13 +185,13 @@ TEST(Tournament, DoubleDisqualification2)
 		EXPECT_TRUE(match1.HasConcluded());
 		EXPECT_EQ(match1.GetMatchResult().m_Winner, Winner::White);
 		EXPECT_EQ(match1.GetMatchResult().m_Score, Match::Score::Ippon);
-		EXPECT_LE(match1.GetMatchResult().m_Time, 20u);
+		EXPECT_LE(match1.GetMatchResult().m_Time, 50u);
 		EXPECT_GE(match1.GetLog().GetEvents().size(), 3u);
 
 		EXPECT_TRUE(match2.HasConcluded());
 		EXPECT_EQ(match2.GetMatchResult().m_Winner, Winner::Draw);
 		EXPECT_EQ(match2.GetMatchResult().m_Score, Match::Score::Draw);
-		EXPECT_LE(match2.GetMatchResult().m_Time, 20u);
+		EXPECT_LE(match2.GetMatchResult().m_Time, 50u);
 		EXPECT_EQ(match2.GetLog().GetEvents().size(), 0u);
 	}
 
@@ -179,6 +218,33 @@ TEST(Tournament, RevokeDisqualification)
 	tourney.RevokeDisqualification(j1);
 
 	EXPECT_FALSE(match.HasConcluded());
+	EXPECT_FALSE(tourney.IsDisqualified(j1));
+}
+
+
+
+TEST(Tournament, RevokeDoubleDisqualification)
+{
+	initialize();
+
+	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+	Judoka j2("Firstname2", "Lastname2", 50, Gender::Male);
+
+	Tournament tourney("deleteMe");
+	tourney.Reset();
+	tourney.EnableAutoSave(false);
+
+	Match match(&tourney, &j1, &j2);
+	tourney.AddMatch(&match);
+
+	tourney.Disqualify(j1);
+	tourney.Disqualify(j2);
+	tourney.RevokeDisqualification(j1);
+
+	EXPECT_TRUE(match.HasConcluded());
+	EXPECT_EQ(match.GetMatchResult().m_Winner, Winner::White);
+	EXPECT_FALSE(tourney.IsDisqualified(j1));
+	EXPECT_TRUE(tourney.IsDisqualified(j2));
 }
 
 
@@ -336,9 +402,9 @@ TEST(Tournament, SaveAndLoad)
 		Database d;
 		d.EnableAutoSave(false);
 
-		EXPECT_TRUE(d.GetNumJudoka() == 0);
+		EXPECT_EQ(d.GetNumJudoka(), 0);
 
-		Judoka j1("Firstname",  "Lastname", 50, Gender::Male);
+		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
 		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
 		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
 		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
@@ -364,18 +430,91 @@ TEST(Tournament, SaveAndLoad)
 		tourney->AddMatch(Match(tourney, &j1, &j3, 1));
 		tourney->AddMatch(Match(tourney, &j1, &j4, 2));
 
+		tourney->Disqualify(j1);
+
 		tourney->EnableAutoSave(false);
 
 
 		Tournament t("deleteMe");
 		t.EnableAutoSave(false);
-		EXPECT_TRUE(t.GetParticipants().size() == 4);
-		EXPECT_TRUE(t.GetMatchTables().size() == 2);
-		EXPECT_TRUE(t.GetSchedule().size() == 4);
+
+		EXPECT_EQ(t.GetParticipants().size(), 4);
+		EXPECT_EQ(t.GetMatchTables().size(), 2);
+		EXPECT_EQ(t.GetSchedule().size(), 4);
+
+		EXPECT_TRUE(t.IsDisqualified(j1));
+		EXPECT_FALSE(t.IsDisqualified(j2));
+		EXPECT_FALSE(t.IsDisqualified(j3));
+		EXPECT_FALSE(t.IsDisqualified(j4));
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe");
 }
+
+
+
+TEST(Tournament, SaveAndLoad_AutoMatches)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe");
+
+	{
+		Database d;
+		d.EnableAutoSave(false);
+
+		EXPECT_EQ(d.GetNumJudoka(), 0);
+
+		Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+
+		EXPECT_NE(j1.GetID(), j2.GetID());
+		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
+
+		d.AddJudoka(&j1);
+		d.AddJudoka(&j2);
+		d.AddJudoka(&j3);
+		d.AddJudoka(&j4);
+
+		Tournament* tourney = new Tournament("deleteMe", d.FindRuleSetByName("Default"));
+		tourney->Reset();
+
+		EXPECT_TRUE(tourney->AddParticipant(&j1));
+		EXPECT_TRUE(tourney->AddParticipant(&j2));
+		EXPECT_TRUE(tourney->AddParticipant(&j3));
+		EXPECT_TRUE(tourney->AddParticipant(&j4));
+
+		tourney->AddMatchTable(new Weightclass(tourney, 50, 55));
+		tourney->AddMatchTable(new Weightclass(tourney, 60, 65));
+		tourney->AddMatch(Match(tourney, &j1, &j3, 2));
+		tourney->AddMatch(Match(tourney, &j1, &j4, 2));
+
+		tourney->EnableAutoSave(false);
+
+
+		Tournament t("deleteMe");
+		t.EnableAutoSave(false);
+		EXPECT_EQ(t.GetParticipants().size(), 4);
+		ASSERT_EQ(t.GetMatchTables().size(), 2);
+		EXPECT_EQ(t.GetSchedule().size(), 4);
+
+		EXPECT_TRUE(t.GetMatchTables()[0]->GetSchedule()[0]->IsAutoGenerated());
+		EXPECT_TRUE(t.GetMatchTables()[1]->GetSchedule()[0]->IsAutoGenerated());
+
+		for (auto match : t.GetSchedule())
+		{
+			if (match->GetMatID() == 2)
+				EXPECT_FALSE(match->IsAutoGenerated());
+			else
+				EXPECT_TRUE(match->IsAutoGenerated());
+		}
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe");
+}
+
 
 
 

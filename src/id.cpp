@@ -28,6 +28,16 @@ ID::ID()
 
 
 
+ID::ID(ZED::Blob& Stream)
+{
+	Stream >> m_ID;
+	ZED::SHA512 hash;
+	Stream >> hash;
+	m_UUID = hash;
+}
+
+
+
 ID::~ID()
 {
 	s_UsedUUIDs.erase(m_UUID);

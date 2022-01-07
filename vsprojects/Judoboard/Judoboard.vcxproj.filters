@@ -102,12 +102,12 @@
     <ClCompile Include="..\..\src\md5.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\customtable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\HttpServer\HttpServer.h">
-      <Filter>HttpServer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\3rd-Party-Libraries\mongoose\mongoose.h">
       <Filter>HttpServer</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\window.h">
@@ -194,6 +194,9 @@
     <ClInclude Include="..\..\src\judoboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\customtable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\compile.sh">
@@ -223,7 +226,7 @@
     <None Include="..\..\bin\html\add_judoka.html">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\bin\html\class_list.html">
+    <None Include="..\..\bin\html\matchtable_list.html">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\bin\html\club_add.html">
@@ -280,12 +283,6 @@
     <None Include="..\..\bin\html\tournament_list.html">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\bin\html\weightclass_add.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\bin\html\weightclass_edit.html">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="..\..\.gitignore">
       <Filter>Resource Files</Filter>
     </None>
@@ -296,6 +293,15 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\bin\html\style.css">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\compile.bat">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\package.bat">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\compile64.bat">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\.github\workflows\build.yml">

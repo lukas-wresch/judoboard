@@ -348,7 +348,7 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 
 			if (data.size() >= header.size())//Have we read the entire data block?
 			{
-				for (size_t i = 0; i < header.size(); i++)
+				for (size_t i = 0; i < header.size(); i++) //-V1008
 				{
 					if (header[i] == "Bezeichnung")
 						m_Description = Latin1ToUTF8(data[i]);

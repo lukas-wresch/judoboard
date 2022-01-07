@@ -26,6 +26,18 @@ TEST(App, ServerConnection)
 
 
 
+/*TEST(App, MemoryLeak)
+{
+	initialize();
+	for (int i = 0; i < 1000; i++)
+	{
+		Application app;
+		app.StartLocalMat();
+	}
+}*/
+
+
+
 TEST(App, Tournaments)
 {
 	initialize();
@@ -44,7 +56,7 @@ TEST(App, Tournaments)
 	EXPECT_TRUE(app.GetTournament()->GetName() == t->GetName());
 	EXPECT_TRUE(app.CloseTournament());
 
-	EXPECT_TRUE(app.FindTournament("Tournament Name")->GetName() == t->GetName());
+	EXPECT_EQ(app.FindTournament("Tournament Name")->GetName(), t->GetName());
 }
 
 
@@ -289,7 +301,7 @@ TEST(App, MatchOnSlave)
 
 
 
-TEST(App, MasterSlaveForceClose)
+/*TEST(App, MasterSlaveForceClose)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
@@ -451,4 +463,4 @@ TEST(App, MasterSlaveFullTournament)
 		EXPECT_TRUE(mat->EndMatch());
 		ZED::Core::Pause(8000);
 	}
-}
+}*/

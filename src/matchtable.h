@@ -24,7 +24,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Unknown, Weightclass, Pause
+			Unknown, Weightclass, Pause, Custom
 		};
 
 		struct Result
@@ -67,7 +67,7 @@ namespace Judoboard
 
 
 		MatchTable(const ITournament* Tournament) : Schedulable(Tournament) {}
-		MatchTable(ZED::CSV& Stream, const ITournament* Tournament);
+		MatchTable(ZED::CSV& Stream, ITournament* Tournament);
 		MatchTable(MatchTable&) = delete;
 		MatchTable(const MatchTable&) = delete;
 
@@ -81,7 +81,7 @@ namespace Judoboard
 
 		virtual bool AddMatch(Match* NewMatch);//Add a match manually to the match table. Use only for manual cases
 
-		virtual const std::vector<Match*> GetSchedule() override { return m_Schedule; }
+		virtual const std::vector<Match*> GetSchedule() const override { return m_Schedule; }
 		virtual uint32_t GetRecommendedNumMatchesBeforeBreak() const override { return m_RecommendedNumMatches_Before_Break; }
 
 		virtual bool IsElgiable(const Judoka& Fighter) const = 0;
@@ -114,15 +114,15 @@ namespace Judoboard
 
 		virtual void operator >> (ZED::CSV& Stream) const;
 
-	protected:
 		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
+
+	protected:
+		Match* AddAutoMatch(size_t WhiteIndex, size_t BlueIndex);
+
 		Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 
-		static int CompareFighterScore(const void* a, const void* b);
-
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
-		std::vector<Match*> m_ManualMatches;//Manually added matches
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
 
 	private:

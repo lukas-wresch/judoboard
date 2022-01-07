@@ -498,6 +498,8 @@ function GetMats(callback)
       var is_open = res[i++];
       var name    = res[i++];
       var showIpponAsTwoWazaari = res[i++];
+      var timerStyle = res[i++];
+      var fullscreen = res[i++];
 
       var option = document.createElement("option");
       option.text  = name;

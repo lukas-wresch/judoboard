@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include "itournament.h"
 #include "judoka.h"
 #include "matchtable.h"
@@ -40,6 +41,7 @@ namespace Judoboard
 		Match* FindMatch(uint32_t ID) const;
 		Match* FindMatch(const UUID& UUID) const override;
 
+		void SetName(const std::string& NewName) { m_Name = NewName; }
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 
 		Status GetStatus() const;
@@ -57,10 +59,16 @@ namespace Judoboard
 
 		std::vector<const Match*> GetNextMatches(uint32_t MatID) const;
 
-		bool IsParticipant(const Judoka& Judoka) const { return m_StandingData.FindJudoka(Judoka.GetUUID()); }
+		//Participant / Judoka
+		virtual bool IsParticipant(const Judoka& Judoka) const override { return m_StandingData.FindJudoka(Judoka.GetUUID()); }
 		const std::unordered_map<uint32_t, Judoka*>& GetParticipants() const { return m_StandingData.GetAllJudokas(); }
-		bool AddParticipant(Judoka* Judoka);
-		bool RemoveParticipant(uint32_t ID);
+		virtual bool AddParticipant(Judoka* Judoka) override;
+		virtual bool RemoveParticipant(uint32_t ID) override;
+
+		virtual       Judoka* FindParticipant(uint32_t ID)            override { return m_StandingData.FindJudoka(ID); }
+		virtual const Judoka* FindParticipant(uint32_t ID) const      override { return m_StandingData.FindJudoka(ID); }
+		virtual       Judoka* FindParticipant(const UUID& UUID)       override { return m_StandingData.FindJudoka(UUID); }
+		virtual const Judoka* FindParticipant(const UUID& UUID) const override { return m_StandingData.FindJudoka(UUID); }
 
 		uint32_t GetHighestMatIDUsed() const;//Returns the highest ID of all mats that are used in the tournament. Returns zero if no mats are used
 		bool IsMatUsed(uint32_t ID) const;
@@ -71,18 +79,12 @@ namespace Judoboard
 		void UpdateMatchTable(uint32_t ID);//Calling this function we recalculate the given match table
 		bool DeleteMatchTable(uint32_t ID);
 		const std::vector<MatchTable*>& GetMatchTables() const { return m_MatchTables; }
-		MatchTable* FindMatchTable(uint32_t ID);
-		const MatchTable* FindMatchTable(uint32_t ID) const;
-		MatchTable* FindMatchTable(const UUID& ID);
-		const MatchTable* FindMatchTable(const UUID& ID) const;
+		virtual MatchTable* FindMatchTable(uint32_t ID) override;
+		virtual const MatchTable* FindMatchTable(uint32_t ID) const override;
+		virtual MatchTable* FindMatchTable(const UUID& ID) override;
+		virtual const MatchTable* FindMatchTable(const UUID& ID) const override;
 		MatchTable* FindMatchTableByName(const std::string& Name);
 		int FindMatchTableIndex(uint32_t ID) const;
-
-		//Judoka
-		Judoka* FindParticipant(uint32_t ID) { return m_StandingData.FindJudoka(ID); }
-		const Judoka* FindParticipant(uint32_t ID) const { return m_StandingData.FindJudoka(ID); }
-		Judoka* FindParticipant(const UUID& UUID) { return m_StandingData.FindJudoka(UUID); }
-		const Judoka* FindParticipant(const UUID& UUID) const { return m_StandingData.FindJudoka(UUID); }
 
 		//Rule Sets
 		virtual const RuleSet* GetDefaultRuleSet() const override { return m_pDefaultRules; }
@@ -93,21 +95,22 @@ namespace Judoboard
 		virtual RuleSet* FindRuleSet(const UUID& UUID) override { return m_StandingData.FindRuleSet(UUID); }
 
 		//Master schedule / schedule entries
-		Schedulable* GetScheduleEntry(uint32_t Index);
-		bool MoveScheduleEntryUp(uint32_t ID);
-		bool MoveScheduleEntryDown(uint32_t ID);
+		Schedulable* GetScheduleEntry(uint32_t Index) override;
+		bool MoveScheduleEntryUp(uint32_t ID) override;
+		bool MoveScheduleEntryDown(uint32_t ID) override;
 
 		//Disqualifications
-		void Disqualify(const Judoka& Judoka);
-		void RevokeDisqualification(const Judoka& Judoka);
+		bool IsDisqualified(const Judoka& Judoka) const;
+		void Disqualify(const Judoka& Judoka) override;
+		void RevokeDisqualification(const Judoka& Judoka) override;
 
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const override {}
 
 		//Serialization
-		const std::string Schedule2String() const;
-		const std::string Participants2String() const;
-		const std::string MasterSchedule2String() const;
+		const std::string Schedule2String() const override;
+		const std::string Participants2String() const override;
+		const std::string MasterSchedule2String() const override;
 
 		void GenerateSchedule();
 
@@ -134,5 +137,7 @@ namespace Judoboard
 		std::vector<Schedulable*> m_SchedulePlanner;
 
 		const RuleSet* m_pDefaultRules = nullptr;//Default rule set of the tournament
+
+		std::unordered_set<UUID> m_DisqualifiedJudoka;
 	};
 }

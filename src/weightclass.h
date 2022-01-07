@@ -13,7 +13,7 @@ namespace Judoboard
 	public:
 		Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight);
 		Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight, Gender Gender);
-		Weightclass(ZED::CSV& Stream, const ITournament* Tournament);
+		Weightclass(ZED::CSV& Stream, ITournament* Tournament);
 		Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament);
 
 		static std::string GetHTMLForm();
@@ -30,14 +30,14 @@ namespace Judoboard
 		void SetGender(Gender Gender) { m_Gender = Gender; m_GenderEnforced = true; }
 		void EnforceGender(bool Enabled = true) { m_GenderEnforced = Enabled; }
 
-		bool IsElgiable(const Judoka& Fighter) const override;
+		virtual bool IsElgiable(const Judoka& Fighter) const override;
 		void GenerateSchedule() override;
 
 		//Serialization
-		const std::string ToHTML() const override;
-		const std::string ToString() const override;
+		virtual const std::string ToHTML() const override;
+		virtual const std::string ToString() const override;
 
-		void operator >> (ZED::CSV& Stream) const override;
+		virtual void operator >> (ZED::CSV& Stream) const override;
 
 
 	private:

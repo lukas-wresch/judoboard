@@ -83,16 +83,31 @@ namespace Judoboard
 		bool ConnectToMaster(const std::string& Hostname, uint16_t Port = 8080);
 
 		void Run();
-		void Shutdown() { m_Running = false; }
+		void Shutdown() const { m_Running = false; }
 
 		//AJAX requests
-		ZED::CSV Ajax_GetMats() const;
 
+		//Mat
+		ZED::CSV Ajax_GetMats() const;
 		Error Ajax_OpenMat(  const HttpServer::Request& Request);
 		Error Ajax_CloseMat( const HttpServer::Request& Request);
 		Error Ajax_UpdateMat(const HttpServer::Request& Request);
+		Error Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request);
 
+		//Commands
+		Error Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request);
+		Error Ajax_NoDisqualification(Fighter Whom, const HttpServer::Request& Request);
+
+		//Schedule
+		std::string Ajax_GetHansokumake() const;//Returns matches that are in progress and have a direct hansokumake
+
+		//Clubs
 		ZED::CSV Ajax_ListClubs();
+
+		//Match tables
+		ZED::CSV Ajax_ListMatchTables(const HttpServer::Request& Request);
+		std::string Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request);
+		std::string Ajax_GetMatchesFromMatchTable(const HttpServer::Request& Request);
 
 		ZED::CSV Ajax_Uptime();
 
@@ -106,6 +121,8 @@ namespace Judoboard
 		static bool NoWindow;
 
 	private:
+		void SetupHttpServer();
+
 		bool IsTournamentOpen() const { return m_CurrentTournament; }
 		const Account* IsLoggedIn(const HttpServer::Request& Request) const;
 
@@ -147,7 +164,7 @@ namespace Judoboard
 
 		mutable std::mutex m_mutex;
 
-		bool m_Running = true;
+		mutable bool m_Running = true;
 		const uint32_t m_StartupTimestamp;
 	};
 }

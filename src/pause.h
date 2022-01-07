@@ -1,25 +1,31 @@
 #pragma once
-#include "schedule_entry.h"
+#include "matchtable.h"
 
 
 
-class Pause : public ScheduleEntry
+namespace Judoboard
 {
-	friend class Tournament;
+	class Pause : public MatchTable
+	{
+		friend class Tournament;
 
-public:
-	Pause(uint32_t ID) : ScheduleEntry(ID) {}
+	public:
+		Pause(const ITournament* Tournament) : MatchTable(Tournament) {}
+		Pause(ZED::CSV& Stream, ITournament* Tournament) : MatchTable(Stream, Tournament) {}
 
-	const std::string GetName() const override { return "Pause"; }
+		static std::string GetHTMLForm() { return ""; }
 
-	bool IsElgiable(const Judoka& Fighter) const override { return false; }
-	void GenerateSchedule() override {}
+		virtual Type GetType() const { return Type::Pause; }
+		virtual const std::string GetName() const override { return "Pause"; }
 
-	//Serialization
-	const std::string ToHTML() const override { return ""; }//DEBUG
-	const std::string ToString() const override { return ""; }//DEBUG
-	const std::string ToSaveFile() const override { return ""; }//DEBUG
+		virtual bool IsElgiable(const Judoka& Fighter) const override { return false; }
+		virtual void GenerateSchedule() override {}
 
-private:
-	Pause(uint32_t ID, std::stringstream Stream);
-};
+		//Serialization
+		const std::string ToHTML() const override { return ""; }//DEBUG
+		const std::string ToString() const override { return ""; }//DEBUG
+
+	private:
+		Pause(uint32_t ID, std::stringstream Stream);
+	};
+}

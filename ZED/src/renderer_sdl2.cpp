@@ -97,7 +97,7 @@ bool RendererSDL2::Init(GtkWindow* DrawingArea)
 	Uint32 amask = 0x00000000;
 	m_SDL_screen = SDL_CreateRGBSurface(0, m_screen_w, m_screen_h, 24, rmask, gmask, bmask, amask);
 
-	m_SDL_renderer = SDL_CreateRenderer(m_SDL_window, -1, SDL_RENDERER_ACCELERATED);
+	//m_SDL_renderer = SDL_CreateRenderer(m_SDL_window, -1, SDL_RENDERER_ACCELERATED);
 
 	ZED::Log::Debug("SDL2 renderer initialized with size " + std::to_string(m_screen_w) + "x" + std::to_string(m_screen_h));
 	return true;
@@ -139,7 +139,18 @@ void RendererSDL2::UpdateDisplay() const
 
 void RendererSDL2::Release()
 {
-	SDL_Quit();
+	if (m_SDL_screen)
+	{
+		SDL_FreeSurface(m_SDL_screen);
+		m_SDL_screen = nullptr;
+	}
+
+	if (m_SDL_window)
+	{
+		SDL_DestroyWindow(m_SDL_window);
+		m_SDL_window = nullptr;
+		SDL_Quit();
+	}
 }
 
 
@@ -235,10 +246,14 @@ Ref<Texture> RendererSDL2::RenderFont(FontSize Size, const std::string& Text, ZE
 Image RendererSDL2::TakeScreenshot() const
 {
 	Blob data(m_SDL_screen->pixels, m_screen_w * m_screen_h * 3);
-
-	PNG Image(std::move(data), m_screen_w, m_screen_h, ColorType::B8G8R8);
-	Image.ConvertTo(ColorType::R8G8B8);
-	return Image;
+	Image img(std::move(data), m_screen_w, m_screen_h, ColorType::B8G8R8);
+	return img;
+	//img.ConvertTo(ColorType::R8G8B8);
+	//return Image(PNG::Compress(img), m_screen_w, m_screen_h, ColorType::R8G8B8);
+	//PNG Image(std::move(img));
+	//PNG Image(std::move(data), m_screen_w, m_screen_h, ColorType::B8G8R8);
+	//Image.ConvertTo(ColorType::R8G8B8);
+	//return Image;
 }
 
 

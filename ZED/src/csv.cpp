@@ -32,7 +32,7 @@ void CSV::Flush() const
 
 void CSV::AppendImpl(const char* Value)
 {
-	if (m_line.length() > 0)
+	if (!m_stream.str().empty() || m_line.length() > 0)
 		m_line += ",";
 	m_line += Value;
 }

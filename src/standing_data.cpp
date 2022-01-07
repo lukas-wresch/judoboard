@@ -16,7 +16,7 @@ void StandingData::Reset()
 		delete judoka;
 	m_Judokas.clear();
 
-	for (auto* rule : m_RuleSets)
+	for (auto rule : m_RuleSets)
 		delete rule;
 	m_RuleSets.clear();
 }

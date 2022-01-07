@@ -89,10 +89,13 @@
     <LibraryPath>..\..\bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
     <TargetName>$(ProjectName)_Debug</TargetName>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>..\..;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\bin\$(Configuration);$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -103,10 +106,13 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RemoveUnreferencedCodeData>false</RemoveUnreferencedCodeData>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>false</OptimizeReferences>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -166,6 +172,7 @@
     <ClCompile Include="..\..\src\app.cpp" />
     <ClCompile Include="..\..\src\app_ajax.cpp" />
     <ClCompile Include="..\..\src\club.cpp" />
+    <ClCompile Include="..\..\src\customtable.cpp" />
     <ClCompile Include="..\..\src\database.cpp" />
     <ClCompile Include="..\..\src\dm4.cpp" />
     <ClCompile Include="..\..\src\error.cpp" />
@@ -198,6 +205,7 @@
     <ClInclude Include="..\..\src\account.h" />
     <ClInclude Include="..\..\src\app.h" />
     <ClInclude Include="..\..\src\club.h" />
+    <ClInclude Include="..\..\src\customtable.h" />
     <ClInclude Include="..\..\src\database.h" />
     <ClInclude Include="..\..\src\dm4.h" />
     <ClInclude Include="..\..\src\error.h" />
@@ -223,7 +231,6 @@
     <ClInclude Include="..\..\src\virtual_mat.h" />
     <ClInclude Include="..\..\src\weightclass.h" />
     <ClInclude Include="..\..\src\window.h" />
-    <ClInclude Include="..\3rd-Party-Libraries\mongoose\mongoose.h" />
     <ClInclude Include="src\HttpServer\HttpServer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -238,7 +245,7 @@
     <None Include="..\..\bin\html\account_list.html" />
     <None Include="..\..\bin\html\add_match.html" />
     <None Include="..\..\bin\html\add_judoka.html" />
-    <None Include="..\..\bin\html\class_list.html" />
+    <None Include="..\..\bin\html\matchtable_list.html" />
     <None Include="..\..\bin\html\club_add.html" />
     <None Include="..\..\bin\html\club_list.html" />
     <None Include="..\..\bin\html\common.js" />
@@ -260,10 +267,11 @@
     <None Include="..\..\bin\html\style.css" />
     <None Include="..\..\bin\html\tournament_add.html" />
     <None Include="..\..\bin\html\tournament_list.html" />
-    <None Include="..\..\bin\html\weightclass_add.html" />
-    <None Include="..\..\bin\html\weightclass_edit.html" />
+    <None Include="..\..\compile.bat" />
     <None Include="..\..\compile.sh" />
+    <None Include="..\..\compile64.bat" />
     <None Include="..\..\dependencies.sh" />
+    <None Include="..\..\package.bat" />
     <None Include="..\..\README.md" />
     <None Include="..\..\run_tests.sh" />
   </ItemGroup>

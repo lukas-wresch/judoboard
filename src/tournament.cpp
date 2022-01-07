@@ -114,6 +114,13 @@ Tournament::~Tournament()
 {
 	if (m_Schedule.size() > 0 || GetParticipants().size() > 0 || m_MatchTables.size() > 0 || m_SchedulePlanner.size() > 0)
 		Save();
+
+	for (auto table : m_MatchTables)
+		delete table;
+
+	//for (auto match : m_Schedule)
+		//if (!match->GetMatchTable())
+			//delete match;//Match might now be stored on the heap, then this will crash
 }
 
 
@@ -129,7 +136,8 @@ void Tournament::Reset()
 	m_MatchTables.clear();
 
 	for (auto match : m_Schedule)
-		delete match;
+		if (!match->GetMatchTable())
+			delete match;
 	m_Schedule.clear();
 
 	m_SchedulePlanner.clear();
@@ -175,6 +183,17 @@ bool Tournament::Load(const std::string& Filename)
 	m_StandingData << csv;
 	ZED::Log::Info("Number of participants: " + std::to_string(m_StandingData.GetNumJudoka()));
 
+	int disqualified_judoka;
+	csv >> disqualified_judoka;
+	ZED::Log::Info("Number of disqualified participants: " + std::to_string(disqualified_judoka));
+	
+	for (int i = 0; i < disqualified_judoka; i++)
+	{
+		std::string uuid;
+		csv >> uuid;
+		m_DisqualifiedJudoka.insert(UUID(std::move(uuid)));
+	}
+
 	m_pDefaultRules = new RuleSet(csv);
 
 
@@ -198,8 +217,9 @@ bool Tournament::Load(const std::string& Filename)
 
 		if (new_table)
 		{
-			AddMatchTable(new_table);
-			new_table->SetSchedule().clear();
+			//AddMatchTable(new_table, false);//TODO: Do this in a separate method
+			m_MatchTables.push_back(new_table);
+			m_SchedulePlanner.push_back(new_table);
 		}
 	}
 
@@ -240,6 +260,10 @@ bool Tournament::Save(const std::string& Filename) const
 	stream << 1;//Version
 
 	m_StandingData >> stream;
+
+	stream << m_DisqualifiedJudoka.size();
+	for (const auto& judoka_uuid : m_DisqualifiedJudoka)
+		stream << (std::string)judoka_uuid;
 
 	if (m_pDefaultRules)
 		*m_pDefaultRules >> stream;
@@ -321,7 +345,7 @@ void Tournament::ConnectToDatabase(Database& db)
 
 	for (auto it = m_StandingData.GetRuleSets().begin(); it != m_StandingData.GetRuleSets().end();)
 	{
-		auto* db_ref = db.FindRuleSet((*it)->GetUUID());
+		auto db_ref = db.FindRuleSet((*it)->GetUUID());
 		if (db_ref)
 		{
 			delete *it;
@@ -332,12 +356,12 @@ void Tournament::ConnectToDatabase(Database& db)
 			++it;
 	}
 
-	for (auto* rule : rule_sets_to_add)
+	for (auto rule : rule_sets_to_add)
 		m_StandingData.AddRuleSet(rule);
 
 	if (m_pDefaultRules)
 	{
-		auto* db_ref = db.FindRuleSet(m_pDefaultRules->GetUUID());
+		auto db_ref = db.FindRuleSet(m_pDefaultRules->GetUUID());
 		if (db_ref)
 			m_pDefaultRules = db_ref;
 	}
@@ -405,7 +429,37 @@ bool Tournament::AddMatch(Match* NewMatch)
 	if (NewMatch->GetFighter(Fighter::Blue) && !IsParticipant(*NewMatch->GetFighter(Fighter::Blue)))
 		m_StandingData.AddJudoka(NewMatch->GetFighter(Fighter::Blue));
 
+	Unlock();
+
+	if (NewMatch->GetFighter(Fighter::White) && IsDisqualified(*NewMatch->GetFighter(Fighter::White)))
+	{
+		//Store result
+		Match::Result result(Fighter::Blue, Match::Score::Ippon);
+		NewMatch->SetResult(result);
+		NewMatch->EndMatch();//Mark match as concluded
+	}
+	if (NewMatch->GetFighter(Fighter::Blue) && IsDisqualified(*NewMatch->GetFighter(Fighter::Blue)))
+	{
+		if (NewMatch->HasConcluded())//Double disqualification?
+		{
+			//Store result
+			Match::Result result(Winner::Draw, Match::Score::Draw);
+			NewMatch->SetResult(result);
+			NewMatch->EndMatch();//Mark match as concluded
+		}
+
+		else
+		{
+			//Store result
+			Match::Result result(Fighter::White, Match::Score::Ippon);
+			NewMatch->SetResult(result);
+			NewMatch->EndMatch();//Mark match as concluded
+		}
+	}
+
 	NewMatch->SetScheduleIndex(GetMaxScheduleIndex() + 1);
+
+	Lock();
 
 	m_Schedule.emplace_back(NewMatch);
 	m_SchedulePlanner.emplace_back(NewMatch);
@@ -583,7 +637,7 @@ std::vector<const Match*> Tournament::GetNextMatches(uint32_t MatID) const
 	uint32_t id = 0;
 	for (int i = 0; i < 5; i++)
 	{
-		auto* nextMatch = GetNextMatch(MatID, id);
+		auto nextMatch = GetNextMatch(MatID, id);
 
 		if (nextMatch)
 			ret.push_back(nextMatch);
@@ -645,7 +699,6 @@ bool Tournament::RemoveParticipant(uint32_t ID)
 		}
 	}
 
-	Save();
 	GenerateSchedule();//Recalculate schedule
 
 	return true;
@@ -668,7 +721,7 @@ uint32_t Tournament::GetHighestMatIDUsed() const
 
 bool Tournament::IsMatUsed(uint32_t ID) const
 {
-	for (const auto* match : m_Schedule)
+	for (const auto match : m_Schedule)
 		if (match && match->GetMatID() == ID)
 			return true;
 
@@ -755,7 +808,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 		return;
 
 	//Add all eligable participants to the match table
-	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
+	for (auto [id, judoka] : m_StandingData.GetAllJudokas())//TODO This is bad if NewMatchTable is already stored on disk
 	{
 		if (judoka && NewMatchTable->IsElgiable(*judoka))
 			NewMatchTable->AddParticipant(judoka);
@@ -767,7 +820,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 	//Find a new color for this match table
 	Color match_table_color = Color::Name::Blue;
-	for (auto* table : m_MatchTables)
+	for (auto table : m_MatchTables)
 	{
 		if (table->GetColor() >= match_table_color)
 			match_table_color = table->GetColor() + 1;
@@ -778,14 +831,13 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	m_SchedulePlanner.push_back(NewMatchTable);
 
 	GenerateSchedule();
-	Save();
 }
 
 
 
 void Tournament::UpdateMatchTable(uint32_t ID)
 {
-	auto* matchTable = FindMatchTable(ID);
+	auto matchTable = FindMatchTable(ID);
 
 	if (!matchTable)
 		return;
@@ -809,7 +861,7 @@ void Tournament::UpdateMatchTable(uint32_t ID)
 
 bool Tournament::DeleteMatchTable(uint32_t ID)
 {
-	auto* matchTable = FindMatchTable(ID);
+	auto matchTable = FindMatchTable(ID);
 
 	if (!matchTable)
 		return false;
@@ -909,19 +961,32 @@ bool Tournament::MoveScheduleEntryDown(uint32_t Index)
 
 
 
+bool Tournament::IsDisqualified(const Judoka& Judoka) const
+{
+	Lock();
+
+	bool ret = m_DisqualifiedJudoka.find(Judoka.GetUUID()) != m_DisqualifiedJudoka.cend();
+
+	Unlock();
+
+	return ret;
+}
+
+
+
 void Tournament::Disqualify(const Judoka& Judoka)
 {
 	Lock();
 
+	m_DisqualifiedJudoka.insert(Judoka.GetUUID());
+
 	for (auto match : m_Schedule)
 	{
 		//Scheduled match where we are participating?
-		if (!match->HasConcluded() && match->HasValidFighters() && match->Contains(Judoka))
+		if (!match->HasConcluded() && match->Contains(Judoka))
 		{
 			//Determine winner of this match
-			Fighter winner = Fighter::White;
-			if (*match->GetFighter(Fighter::White) == Judoka)
-				winner = Fighter::Blue;
+			const Fighter winner = !match->GetColorOfFighter(Judoka);
 			
 			//Store result
 			Match::Result result(winner, Match::Score::Ippon);
@@ -947,13 +1012,28 @@ void Tournament::Disqualify(const Judoka& Judoka)
 
 void Tournament::RevokeDisqualification(const Judoka& Judoka)
 {
+	if (!IsDisqualified(Judoka))
+		return;
+
 	Lock();
+
+	m_DisqualifiedJudoka.erase(Judoka.GetUUID());
 
 	for (auto match : m_Schedule)
 	{
 		if (match->HasConcluded() && match->GetLog().GetNumEvent() == 0 && match->Contains(Judoka))
 		{
-			match->SetState(Status::Scheduled);//Reset match result
+			auto enemy = match->GetEnemyOf(Judoka);
+
+			if (enemy && IsDisqualified(*enemy))//Is the enemy disqualified?
+			{
+				//Store result
+				Match::Result result(match->GetColorOfFighter(Judoka), Match::Score::Ippon);
+				match->SetResult(result);
+				match->EndMatch();//Mark match as concluded
+			}
+			else
+				match->SetState(Status::Scheduled);//Reset match result
 		}
 	}
 
@@ -968,8 +1048,10 @@ const std::string Tournament::Schedule2String() const
 	ZED::CSV ret;
 	Lock();
 	for (auto match : m_Schedule)
+	{
 		if (match)
 			ret << match->ToString();
+	}
 	Unlock();
 	return ret;
 }
@@ -1034,7 +1116,7 @@ const std::string Tournament::MasterSchedule2String() const
 			std::vector<std::pair<uint32_t, Schedulable*>> entries;
 			for (uint32_t it = 0; it < m_SchedulePlanner.size(); ++it)//For all schedule entries
 			{
-				auto* entry = m_SchedulePlanner[it];
+				auto entry = m_SchedulePlanner[it];
 
 				if (!entry || entry->GetScheduleIndex() != index || entry->GetMatID() != matID)
 					continue;
@@ -1130,7 +1212,7 @@ void Tournament::GenerateSchedule()
 				{
 					if (schedule.size() > 0)
 					{
-						auto* match = schedule.front();
+						auto match = schedule.front();
 						m_Schedule.push_back(match);
 
 						schedule.erase(schedule.begin());

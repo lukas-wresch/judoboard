@@ -2,6 +2,7 @@
 #include <thread>
 #include "window.h"
 #include "app.h"
+#include "../ZED/include/log.h"
 
 
 
@@ -215,7 +216,10 @@ bool Window::OpenWindow()
 	m_Renderer->Lock();
 
 	if (!m_Renderer->Init(m_Hwnd))
+	{
+		ZED::Log::Error("Failed to create renderer");
 		return false;
+	}
 
 	SetWindowLongPtr(m_Hwnd, GWLP_USERDATA, (LONG_PTR)this);
 
@@ -257,10 +261,13 @@ bool Window::IsRunning() const
 
 void Window::CloseWindow()
 {
-	m_Renderer->Lock();
+	//if (!m_Renderer)
+		//return;
+
+	//m_Renderer->Lock();
 	SendMessage(m_Hwnd, WM_CLOSE, 0, 0);
 	m_IsRunning = false;
-	m_Renderer->Unlock();
+	//m_Renderer->Unlock();
 }
 
 

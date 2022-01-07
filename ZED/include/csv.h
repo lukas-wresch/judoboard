@@ -154,7 +154,7 @@ namespace ZED
 			Value.clear();
 			while (m_stream.peek() != EOF)
 			{
-				char c = m_stream.get();
+				char c = (char)m_stream.get();
 				if (c == ',' || c == '\r' || c == '\n' || c == '\0')
 					break;
 				Value += c;

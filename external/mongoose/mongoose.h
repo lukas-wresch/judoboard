@@ -19,7 +19,7 @@
 // THE SOFTWARE.
 
 #ifndef MONGOOSE_HEADER_INCLUDED
-#define  MONGOOSE_HEADER_INCLUDED
+#define MONGOOSE_HEADER_INCLUDED
 
 #include <stddef.h>
 #include <stdio.h>
@@ -46,7 +46,8 @@ struct mg_connection;  // Handle for the individual connection
 
 
 // This structure contains information about the HTTP request.
-struct mg_request_info {
+struct mg_request_info
+{
   void *user_data;       // User-defined pointer passed to mg_start()
   char *request_method;  // "GET", "POST", etc
   char *uri;             // URL-decoded URI
@@ -85,7 +86,8 @@ typedef struct ssl_ctx_st SSL_CTX;
 
 
 // NOTE(lsm): this enum shoulds be in sync with the config_options below.
-enum {
+enum
+{
     CGI_EXTENSIONS, CGI_ENVIRONMENT, PUT_DELETE_PASSWORDS_FILE, CGI_INTERPRETER,
     PROTECT_URI, AUTHENTICATION_DOMAIN, SSI_EXTENSIONS, ACCESS_LOG_FILE,
     SSL_CHAIN_FILE, ENABLE_DIRECTORY_LISTING, ERROR_LOG_FILE,
@@ -117,7 +119,8 @@ typedef void (*mg_callback_t)(enum mg_event event, struct mg_connection* conn);
 
 // Unified socket address. For IPv6 support, add IPv6 address structure
 // in the union u.
-union usa {
+union usa
+{
     struct sockaddr sa;
     struct sockaddr_in sin;
 #if defined(USE_IPV6)
@@ -126,7 +129,8 @@ union usa {
 };
 
 // Describes a string (chunk of memory).
-struct vec {
+struct vec
+{
     const char* ptr;
     size_t len;
 };
@@ -279,7 +283,7 @@ const struct mg_request_info *mg_get_request_info(struct mg_connection *);
 
 
 // Send data to the client.
-int mg_write(struct mg_connection *, const void *buf, size_t len);
+int64_t mg_write(struct mg_connection *, const void *buf, size_t len);
 
 
 // Send data to the browser using printf() semantics.
@@ -288,7 +292,7 @@ int mg_write(struct mg_connection *, const void *buf, size_t len);
 // Note that mg_printf() uses internal buffer of size IO_BUF_SIZE
 // (8 Kb by default) as temporary message storage for formatting. Do not
 // print data that is bigger than that, otherwise it will be truncated.
-int mg_printf(struct mg_connection *, const char *fmt, ...)
+int64_t mg_printf(struct mg_connection *, const char *fmt, ...)
 #ifdef __GNUC__
 __attribute__((format(printf, 2, 3)))
 #endif

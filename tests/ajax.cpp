@@ -31,7 +31,7 @@ TEST(Ajax, GetMats)
 	EXPECT_TRUE(id == 1);
 	EXPECT_TRUE(type == (int)Mat::Type::LocalMat);
 	EXPECT_TRUE(name == "Mat 1");
-	EXPECT_TRUE(style == (int)IMat::IpponDisplayStyle::DoubleDigit);
+	EXPECT_TRUE(style == (int)IMat::IpponStyle::DoubleDigit);
 }
 
 
@@ -129,32 +129,199 @@ TEST(Ajax, UpdateMat)
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 
-		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0"));
+		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&timerStyle=1"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 5);
 		EXPECT_TRUE(app.GetDefaultMat()->GetName()  == "Test");
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponDisplayStyle() == 0);
+		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 0);
+		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 1);
 
 
-
-		app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1"));
-
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
-		EXPECT_TRUE(app.GetDefaultMat()->GetName() == "Test2");
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponDisplayStyle() == 1);
-
-
-		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test2&ipponStyle=2"));
+		app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&timerStyle=2"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
 		EXPECT_TRUE(app.GetDefaultMat()->GetName() == "Test2");
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponDisplayStyle() == 2);
+		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 1);
+		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 2);
+
+
+		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test2&ipponStyle=2&timerStyle=0"));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+		EXPECT_TRUE(app.GetDefaultMat()->GetName() == "Test2");
+		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 2);
+		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 0);
+	}
+}
+
+
+
+TEST(Ajax, SetFullscreen)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		Mat* mat = (Mat*)app.GetDefaultMat();
+
+		app.Ajax_SetFullscreen(true, HttpServer::Request("id=1"));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsFullscreen());
+		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+
+
+		app.Ajax_SetFullscreen(false, HttpServer::Request("id=1"));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_FALSE(app.GetDefaultMat()->IsFullscreen());
+		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+
+
+		app.Ajax_SetFullscreen(true, HttpServer::Request("id=1"));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetDefaultMat()->IsFullscreen());
+		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+	}
+}
+
+
+
+TEST(Ajax, Ajax_GetHansokumake)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+		IMat* mat = app.FindMat(1);
+
+		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+
+		auto ret = app.Ajax_GetHansokumake();
+		EXPECT_EQ(ret.length(), 0);
+
+		mat->StartMatch(&match);
+		mat->AddHansokuMake(f);
+		
+		ZED::CSV ret2 = app.Ajax_GetHansokumake();
+
+		int id, mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
+		std::string white_name, blue_name, color, matchtable_name;
+		ret2 >> id >> white_name >> blue_name >> mat_id >> state >> color >> matchtable >> matchtable_name;
+		ret2 >> hansokumake_fighter >> hansokumake_state;
+
+		EXPECT_EQ(id, match.GetID());
+		EXPECT_EQ(white_name, match.GetFighter(Fighter::White)->GetName());
+		EXPECT_EQ(blue_name,  match.GetFighter(Fighter::Blue )->GetName());
+		EXPECT_EQ(hansokumake_fighter, (int)f);
+		EXPECT_EQ(hansokumake_state, (int)IMat::Scoreboard::DisqualificationState::Unknown);
+	}
+
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+		IMat* mat = app.FindMat(1);
+
+		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+
+		auto ret = app.Ajax_GetHansokumake();
+		EXPECT_EQ(ret.length(), 0);
+
+		mat->StartMatch(&match);
+		mat->AddHansokuMake(f);
+		mat->AddDisqualification(f);
+
+		ZED::CSV ret2 = app.Ajax_GetHansokumake();
+
+		int id, mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
+		std::string white_name, blue_name, color, matchtable_name;
+		ret2 >> id >> white_name >> blue_name >> mat_id >> state >> color >> matchtable >> matchtable_name;
+		ret2 >> hansokumake_fighter >> hansokumake_state;
+
+		EXPECT_EQ(id, match.GetID());
+		EXPECT_EQ(white_name, match.GetFighter(Fighter::White)->GetName());
+		EXPECT_EQ(blue_name, match.GetFighter(Fighter::Blue)->GetName());
+		EXPECT_EQ(hansokumake_fighter, (int)f);
+		EXPECT_EQ(hansokumake_state, (int)IMat::Scoreboard::DisqualificationState::Disqualified);
+	}
+
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+		IMat* mat = app.FindMat(1);
+
+		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+
+		auto ret = app.Ajax_GetHansokumake();
+		EXPECT_EQ(ret.length(), 0);
+
+		mat->StartMatch(&match);
+		mat->AddHansokuMake(f);
+		mat->AddNotDisqualification(f);
+
+		ZED::CSV ret2 = app.Ajax_GetHansokumake();
+
+		int id, mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
+		std::string white_name, blue_name, color, matchtable_name;
+		ret2 >> id >> white_name >> blue_name >> mat_id >> state >> color >> matchtable >> matchtable_name;
+		ret2 >> hansokumake_fighter >> hansokumake_state;
+
+		EXPECT_EQ(id, match.GetID());
+		EXPECT_EQ(white_name, match.GetFighter(Fighter::White)->GetName());
+		EXPECT_EQ(blue_name, match.GetFighter(Fighter::Blue)->GetName());
+		EXPECT_EQ(hansokumake_fighter, (int)f);
+		EXPECT_EQ(hansokumake_state, (int)IMat::Scoreboard::DisqualificationState::NotDisqualified);
+	}
+}
+
+
+
+TEST(Ajax, Ajax_GetHansokumake2)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+		IMat* mat = app.FindMat(1);
+
+		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+
+		auto ret = app.Ajax_GetHansokumake();
+		EXPECT_EQ(ret.length(), 0);
+
+		mat->StartMatch(&match);
+		for (int i = 0;i < 5; i++)
+			mat->AddShido(f);
+
+		auto ret2 = app.Ajax_GetHansokumake();
+
+		EXPECT_EQ(ret2.length(), 0);
 	}
 }
 
@@ -175,8 +342,8 @@ TEST(Ajax, ListClubs)
 		std::string name1, name2;
 		csv >> id1 >> name1;
 
-		EXPECT_TRUE(id1 == 2);
-		EXPECT_TRUE(name1 == "Club 1");
+		EXPECT_EQ(id1, 3);
+		EXPECT_EQ(name1, "Club 1");
 
 
 		app.GetDatabase().AddClub(new Club("Club 2"));
@@ -185,10 +352,10 @@ TEST(Ajax, ListClubs)
 
 		csv2 >> id1 >> name1 >> id2 >> name2;
 
-		EXPECT_TRUE(id1 == 2);
-		EXPECT_TRUE(name1 == "Club 1");
-		EXPECT_TRUE(id2 == 3);
-		EXPECT_TRUE(name2 == "Club 2");
+		EXPECT_EQ(id1, 3);
+		EXPECT_EQ(name1, "Club 1");
+		EXPECT_EQ(id2, 4);
+		EXPECT_EQ(name2, "Club 2");
 	}
 }
 
@@ -225,5 +392,138 @@ TEST(Ajax, Uptime)
 			csv >> uptime;
 			EXPECT_TRUE(uptime < 2100);
 		}
+	}
+}
+
+
+
+TEST(Ajax, AddDisqualification)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+		IMat* mat = app.FindMat(1);
+
+		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+
+		mat->StartMatch(&match);
+		mat->AddHansokuMake(f);
+
+		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
+		EXPECT_TRUE(mat->GetScoreboard(f).IsUnknownDisqualification());
+
+		app.Ajax_AddDisqualification(f, HttpServer::Request("id=1"));
+
+		EXPECT_TRUE(mat->GetScoreboard(f).IsDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsUnknownDisqualification());
+	}
+}
+
+
+
+TEST(Ajax, NoDisqualification)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+		IMat* mat = app.FindMat(1);
+
+		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+
+		mat->StartMatch(&match);
+		mat->AddHansokuMake(f);
+
+		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
+		EXPECT_TRUE(mat->GetScoreboard(f).IsUnknownDisqualification());
+
+		app.Ajax_NoDisqualification(f, HttpServer::Request("id=1"));
+
+		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
+		EXPECT_TRUE(mat->GetScoreboard(f).IsNotDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsUnknownDisqualification());
+	}
+}
+
+
+
+TEST(Ajax, GetParticipantsFromMatchTable)
+{
+	initialize();
+
+	Application app;
+
+	auto j1 = new Judoka(GetRandomName(), GetRandomName(), 50);
+	auto j2 = new Judoka(GetRandomName(), GetRandomName(), 50);
+	auto j3 = new Judoka(GetRandomName(), GetRandomName(), 50);
+
+	app.GetTournament()->AddParticipant(j1);
+	//app.GetTournament()->AddParticipant(j2);
+	//app.GetTournament()->AddParticipant(j3);
+
+	auto table = new Weightclass(app.GetTournament(), 10, 100);
+	app.GetTournament()->AddMatchTable(table);
+
+	ZED::CSV result = app.Ajax_GetParticipantsFromMatchTable(HttpServer::Request("id=" + std::to_string(table->GetID())));
+
+	int id;
+	std::string name;
+
+	result >> id >> name;
+	EXPECT_EQ(j1->GetID(), id);
+	EXPECT_EQ(j1->GetName(), name);
+
+	//Changed to only 1 judoka since there is now guarantee that the judoka will come out in the same order
+
+	/*result >> id >> name;
+	EXPECT_EQ(j2->GetID(), id);
+	EXPECT_EQ(j2->GetName(), name);
+
+	result >> id >> name;
+	EXPECT_EQ(j3->GetID(), id);
+	EXPECT_EQ(j3->GetName(), name);*/
+}
+
+
+
+TEST(Ajax, GetMatchesFromMatchTable)
+{
+	initialize();
+
+	Application app;
+
+	auto j1 = new Judoka(GetRandomName(), GetRandomName(), 50);
+	auto j2 = new Judoka(GetRandomName(), GetRandomName(), 50);
+	auto j3 = new Judoka(GetRandomName(), GetRandomName(), 50);
+
+	app.GetTournament()->AddParticipant(j1);
+	app.GetTournament()->AddParticipant(j2);
+	app.GetTournament()->AddParticipant(j3);
+
+	auto table = new Weightclass(app.GetTournament(), 10, 100);
+	app.GetTournament()->AddMatchTable(table);
+
+	ZED::CSV result = app.Ajax_GetMatchesFromMatchTable(HttpServer::Request("id=" + std::to_string(table->GetID())));
+
+	int id, matID, state, tableID;
+	std::string name1, name2, tableName, color;
+
+	for (int i = 0; i < 3; i++)
+	{
+		result >> id >> name1 >> name2 >> matID >> state >> color >> tableID >> tableName;
+		EXPECT_EQ(table->GetSchedule()[i]->GetID(), id);
+		EXPECT_EQ(table->GetSchedule()[i]->GetFighter(Fighter::White)->GetName(), name1);
+		EXPECT_EQ(table->GetSchedule()[i]->GetFighter(Fighter::Blue )->GetName(), name2);
+		EXPECT_EQ(table->GetSchedule()[i]->GetMatID(), matID);
 	}
 }

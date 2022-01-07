@@ -1,3 +1,4 @@
+#include <iostream>
 #include "app.h"
 #include "database.h"
 #include "tournament.h"
@@ -44,15 +45,18 @@ int main(int argc, char** argv)
 	bool show_test_screen = false;
 	bool demo = false;
 	bool nowindow = false;
+	bool version  = false;
 
 #ifdef _WIN32
 	std::string cmd(lpcmdline);
 	if (cmd.find("--testscreen") != std::string::npos)
 		show_test_screen = true;
-	if (cmd.find("--demo") != std::string::npos)
+	else if (cmd.find("--demo") != std::string::npos)
 		demo = true;
-	if (cmd.find("--nowindow") != std::string::npos)
+	else if (cmd.find("--nowindow") != std::string::npos)
 		nowindow = true;
+	else if (cmd.find("--version") != std::string::npos)
+		version = true;
 #else
 	for (int i = 1; i < argc; i++)
 	{
@@ -64,11 +68,19 @@ int main(int argc, char** argv)
 			demo = true;
 		else if (std::string(argv[i]) == "--nowindow")
 			nowindow = true;
+		else if (std::string(argv[i]) == "--version")
+			version = true;
 	}
 #endif
 
 	//TODO load config file
 	Judoboard::Localizer::SetLanguage(Judoboard::Language::German);
+
+	if (version)
+	{
+		std::cout << Judoboard::Application::Version;
+		return 0;
+	}
 
 	if (nowindow)
 		Judoboard::Application::NoWindow = true;
@@ -83,7 +95,7 @@ int main(int argc, char** argv)
 
 		Judoboard::Mat* mat = (Judoboard::Mat*)app.GetDefaultMat();
 
-		mat->GetWindow().Fullscreen();
+		mat->SetFullscreen();
 		ZED::Core::Pause(5000);
 
 		srand(ZED::Core::CurrentTimestamp());
@@ -271,7 +283,13 @@ int main(int argc, char** argv)
 	//if (app.GetTournamentList().size() == 0)
 		//app.AddTournament(new Judoboard::Tournament("Test Tournament", app.GetDatabase().FindRuleSet("Default")));
 
-	ZED::Core::Pause(1000);
+	ZED::Core::Pause(3000);
+
+#ifdef WIN32
+#ifndef _DEBUG
+	ShellExecute(NULL, L"open", L"http://localhost:8080", NULL, NULL, 0);
+#endif
+#endif
 
 #ifdef _DEBUG
 	if (app.GetDatabase().GetNumJudoka() < 5)

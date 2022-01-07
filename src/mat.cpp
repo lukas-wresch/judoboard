@@ -33,6 +33,8 @@ bool Mat::Open()
 
 	m_Thread = std::thread([this]()
 	{
+		//m_Window = Window(Application::Name);//Recreate
+
 		if (!m_Window.OpenWindow())
 			ZED::Log::Warn("Could not open window");
 
@@ -52,7 +54,6 @@ bool Mat::Open()
 
 		double tiny = 20.0, middle = 50.0, large = 70.0, huge = 100.0, gigantic = 170.0, gigantic2 = 250.0;
 		m_ScalingFactor = display_width / 1920.0;
-		//m_ScalingFactor = 1.0;
 
 		tiny *= m_ScalingFactor;
 		middle *= m_ScalingFactor;
@@ -734,6 +735,7 @@ void Mat::AddHansokuMake(Fighter Whom, bool Direct)
 	{
 		m_mutex.lock();
 		SetScoreboard(Whom).m_HansokuMake = true;
+		SetScoreboard(Whom).m_HansokuMake_Direct = Direct;
 
 		if (Direct)
 			AddEvent(Whom, MatchLog::BiasedEvent::AddHansokuMake_Direct);
@@ -759,6 +761,7 @@ void Mat::RemoveHansokuMake(Fighter Whom)
 	{
 		m_mutex.lock();
 		SetScoreboard(Whom).m_HansokuMake = false;
+		SetScoreboard(Whom).m_HansokuMake_Direct = false;
 
 		AddEvent(Whom, MatchLog::BiasedEvent::RemoveHansokuMake);
 		m_Graphics["effect_hansokumake_" + Fighter2String(Whom)].StopAllAnimations().SetAlpha(0);
@@ -771,7 +774,7 @@ void Mat::RemoveHansokuMake(Fighter Whom)
 
 void Mat::AddDisqualification(Fighter Whom)
 {
-	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && !GetScoreboard(Whom).IsDisqualified())
+	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && GetScoreboard(Whom).m_HansokuMake_Direct && !GetScoreboard(Whom).IsDisqualified())
 	{
 		m_mutex.lock();
 		SetScoreboard(Whom).m_Disqualification = Scoreboard::DisqualificationState::Disqualified;
@@ -786,7 +789,20 @@ void Mat::AddDisqualification(Fighter Whom)
 
 void Mat::AddNotDisqualification(Fighter Whom)
 {
-	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && !GetScoreboard(Whom).IsDisqualified())
+	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && GetScoreboard(Whom).m_HansokuMake_Direct && GetScoreboard(Whom).IsDisqualified())
+	{
+		//Can we simply remove the previous disqualification?
+		if (m_pMatch && !m_pMatch->HasConcluded())
+		{
+			m_mutex.lock();
+			SetScoreboard(Whom).m_Disqualification = Scoreboard::DisqualificationState::Unknown;
+			AddEvent(Whom, MatchLog::BiasedEvent::RemoveDisqualification);
+			m_mutex.unlock();
+		}
+	}
+
+
+	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && GetScoreboard(Whom).m_HansokuMake_Direct && !GetScoreboard(Whom).IsDisqualified())
 	{
 		m_mutex.lock();
 		SetScoreboard(Whom).m_Disqualification = Scoreboard::DisqualificationState::NotDisqualified;
@@ -1247,20 +1263,20 @@ void Mat::NextState(State NextState) const
 
 				shift *= m_ScalingFactor;
 
-				if (m_Graphics["next_matches_blue_" + std::to_string(i)])//TODO improve this
+				
 				m_Graphics["next_matches_blue_" + std::to_string(i)].StopAllAnimations()
 																	 .SetPosition(40 - 1320, (int)shift, 0)
 																	 .AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
-				if (m_Graphics["next_matches_white_" + std::to_string(i)])//TODO improve this
+				
 				m_Graphics["next_matches_white_"  + std::to_string(i)].StopAllAnimations().Right()
 																	 .SetPosition(width - 40 + 1320, (int)shift, 0)
 																	 .AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
 
-				if (m_Graphics["next_matches_blue2_" + std::to_string(i)])//TODO improve this
+				
 				m_Graphics["next_matches_blue2_" + std::to_string(i)].StopAllAnimations()
 																	 .SetPosition(40 - 1320, (int)shift + (int)(165.0*m_ScalingFactor), 0)
 																	 .AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
-				if (m_Graphics["next_matches_white2_" + std::to_string(i)])//TODO improve this
+				
 				m_Graphics["next_matches_white2_"  + std::to_string(i)].StopAllAnimations().Right()
 																	 .SetPosition(width - 40 + 1320, (int)shift + (int)(165.0*m_ScalingFactor), 0)
 																	 .AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
@@ -1333,7 +1349,7 @@ void Mat::UpdateGraphics() const
 		//ZED::FontSize FontSize = ZED::FontSize::Huge;
 		ZED::FontSize FontSize = ZED::FontSize::Gigantic;
 
-		for (size_t i = m_NextMatches.size(); i < 4; i++)
+		for (size_t i = m_NextMatches.size(); i < 2; i++)
 		{
 			m_Graphics["next_matches_white_" + std::to_string(i)].Clear();
 			m_Graphics["next_matches_blue_"  + std::to_string(i)].Clear();
@@ -1386,14 +1402,14 @@ void Mat::UpdateGraphics() const
 	case State::Running:
 	{
 		//Update scoreboard
-		switch (GetIpponDisplayStyle())
+		switch (GetIpponStyle())
 		{
-		case IpponDisplayStyle::SingleDigit:
+		case IpponStyle::SingleDigit:
 			m_Graphics["white_wazari"].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::White).m_Ippon ? 2 : GetScoreboard(Fighter::White).m_WazaAri), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic);
 			m_Graphics["blue_wazari" ].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::Blue ).m_Ippon ? 2 : GetScoreboard(Fighter::Blue ).m_WazaAri), ZED::Color(255, 255, 255), ZED::FontSize::Gigantic);
 			break;
 
-		case IpponDisplayStyle::DoubleDigit:
+		case IpponStyle::DoubleDigit:
 			m_Graphics["white_ippon" ].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::White).m_Ippon), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic);
 			m_Graphics["white_wazari"].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::White).m_Ippon ? 0 : GetScoreboard(Fighter::White).m_WazaAri), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic);
 
@@ -1401,7 +1417,7 @@ void Mat::UpdateGraphics() const
 			m_Graphics["blue_wazari"].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::Blue).m_Ippon ? 0 : GetScoreboard(Fighter::Blue).m_WazaAri), ZED::Color(255, 255, 255), ZED::FontSize::Gigantic);
 			break;
 
-		case IpponDisplayStyle::SpelledOut:
+		case IpponStyle::SpelledOut:
 		{
 			std::string spelled_out_white, spelled_out_blue;
 
@@ -1439,7 +1455,12 @@ void Mat::UpdateGraphics() const
 
 			//Update timer
 			Timer time(GetTime2Display());
-			m_Graphics["timer"].UpdateTexture(renderer, time.ToString(), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic2);
+			if (GetTimerStyle() == TimerStyle::HundredsMS)
+				m_Graphics["timer"].UpdateTexture(renderer, time.ToStringWithHundreds(), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic2);
+			else if (GetTimerStyle() == TimerStyle::OnlySeconds)
+				m_Graphics["timer"].UpdateTexture(renderer, time.ToStringInSeconds(),    ZED::Color(0, 0, 0), ZED::FontSize::Gigantic2);
+			else if (GetTimerStyle() == TimerStyle::Full)
+				m_Graphics["timer"].UpdateTexture(renderer, time.ToString(), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic2);
 			
 			
 			//Update osaekomi
@@ -1452,7 +1473,7 @@ void Mat::UpdateGraphics() const
 				auto& osaekomi_text = m_Graphics["osaekomi_text"];
 				auto& osaekomi_bar  = m_Graphics["osaekomi_bar"];
 
-				osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringInSeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
+				osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
 
 				const int new_width = m_OsaekomiTimer[(int)fighter].GetElapsedTime() * osaekomi_max_width / (EndTimeOfOsaekomi() * 1000);
 
@@ -1539,7 +1560,7 @@ void Mat::RenderScore(double dt) const
 {
 	auto& renderer = m_Window.GetRenderer();
 
-	if (GetIpponDisplayStyle() == IpponDisplayStyle::DoubleDigit)
+	if (GetIpponStyle() == IpponStyle::DoubleDigit)
 	{
 		m_Graphics["white_ippon"].Render(renderer, dt);
 		m_Graphics["blue_ippon" ].Render(renderer, dt);
@@ -1683,9 +1704,9 @@ bool Mat::Render(double dt) const
 
 	if (dt > 0.2)//In case the application was stuck for some time
 		dt = 0.2;//Might happen on device with a small amount of RAM during swapping
-
+	
 	UpdateGraphics();
-
+	
 	auto& renderer = m_Window.GetRenderer();
 	renderer.Lock();
 	renderer.ClearDisplay();
@@ -1698,14 +1719,14 @@ bool Mat::Render(double dt) const
 	renderer.FillRect(ZED::Rect(0, 0, width/2 - 50, height), 0, 0, 255);
 	renderer.FillRect(ZED::Rect(width/2 + 50, 0, width, height), 255, 255, 255);
 
-	if (m_Background->GetType() == ZED::Type::OpenGL)
+	if (m_Background && m_Background->GetType() == ZED::Type::OpenGL)
 	{
 		m_Background->SetSizeX(1.0f);
 		m_Background->SetSizeY(20.0f);
 		m_Background->SetAngle(0.0f);
 		renderer.RenderTransformedRotated(*m_Background, width / 2 - 50, 0);
 	}
-	else
+	else if (m_Background)
 	{
 		m_Background->SetAngle(0.0f);
 		for (int y = 0; y < height + 100; y += 100)
@@ -2035,7 +2056,8 @@ bool Mat::Render(double dt) const
 		{
 			auto lambda = [&](ZED::PNG&& Img) {
 				Img.ConvertTo(ZED::ColorType::R8G8B8);
-				Img.Flip();
+				if (renderer.GetType() == ZED::Type::OpenGL)
+					Img.Flip();
 				m_Screenshot = ZED::PNG::Compress(Img);//Compress image
 				//Img.Save("screenshot.png");
 			};
