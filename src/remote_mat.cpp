@@ -160,6 +160,80 @@ void RemoteMat::RemoveWazaAri(Fighter Whom)
 
 
 
+void RemoteMat::AddYuko(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/+yuko?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::RemoveYuko(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/-yuko?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::AddKoka(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/+koka?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::RemoveKoka(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/-koka?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::Hantei(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/hantei?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::SetAsDraw(bool Enable)
+{
+	if (Enable)
+		SendCommand("/ajax/mat/+draw?id=" + std::to_string(GetMatID()));
+	else
+		SendCommand("/ajax/mat/-draw?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::AddShido(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/+shido?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::RemoveShido(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/-shido?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::AddHansokuMake(Fighter Whom, bool Direct)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/+hansokumake?id=" + std::to_string(GetMatID()));
+	//TODO send disqualification command in case of a direct hansokumake
+}
+
+
+
+void RemoteMat::RemoveHansokuMake(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/-hansokumake?id=" + std::to_string(GetMatID()));
+}
+
+
+
 ZED::Blob RemoteMat::RequestScreenshot() const
 {
 	ZED::Blob data(SendRequest("/ajax/mat/screenshot?id=" + std::to_string(GetMatID())).body);

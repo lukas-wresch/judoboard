@@ -756,6 +756,74 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 			return Error();//OK
 		});
 
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+yuko", [this, fighter](auto& Request) -> std::string {
+			auto account = IsLoggedIn(Request);
+			if (!account)
+				return Error(Error::Type::NotLoggedIn);
+
+			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+			if (id <= 0)
+				return Error(Error::Type::InvalidID);
+
+			auto mat = FindMat(id);
+
+			if (mat)
+				mat->AddYuko(fighter);
+			return Error();//OK
+		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-yuko", [this, fighter](auto& Request) -> std::string {
+			auto account = IsLoggedIn(Request);
+			if (!account)
+				return Error(Error::Type::NotLoggedIn);
+
+			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+			if (id <= 0)
+				return Error(Error::Type::InvalidID);
+
+			auto mat = FindMat(id);
+
+			if (mat)
+				mat->RemoveYuko(fighter);
+			return Error();//OK
+		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+koka", [this, fighter](auto& Request) -> std::string {
+			auto account = IsLoggedIn(Request);
+			if (!account)
+				return Error(Error::Type::NotLoggedIn);
+
+			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+			if (id <= 0)
+				return Error(Error::Type::InvalidID);
+
+			auto mat = FindMat(id);
+
+			if (mat)
+				mat->AddKoka(fighter);
+			return Error();//OK
+		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-koka", [this, fighter](auto& Request) -> std::string {
+			auto account = IsLoggedIn(Request);
+			if (!account)
+				return Error(Error::Type::NotLoggedIn);
+
+			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+			if (id <= 0)
+				return Error(Error::Type::InvalidID);
+
+			auto mat = FindMat(id);
+
+			if (mat)
+				mat->RemoveKoka(fighter);
+			return Error();//OK
+		});
+
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/osaekomi", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
 			if (!account)

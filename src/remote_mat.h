@@ -51,20 +51,20 @@ namespace Judoboard
 		virtual void AddWazaAri(Fighter Whom) override;
 		virtual void RemoveWazaAri(Fighter Whom) override;
 
-		virtual void AddYuko(Fighter Whom) override {}
-		virtual void RemoveYuko(Fighter Whom) override {}
+		virtual void AddYuko(Fighter Whom) override;
+		virtual void RemoveYuko(Fighter Whom) override;
 
-		virtual void AddKoka(Fighter Whom) override {}
-		virtual void RemoveKoka(Fighter Whom) override {}
+		virtual void AddKoka(Fighter Whom) override;
+		virtual void RemoveKoka(Fighter Whom) override;
 
-		virtual void Hantei(Fighter Whom) override {}
-		virtual void SetAsDraw(bool Enable = true) override {}
+		virtual void Hantei(Fighter Whom) override;
+		virtual void SetAsDraw(bool Enable = true) override;
 
-		virtual void AddShido(Fighter Whom) override {}
-		virtual void RemoveShido(Fighter Whom) override {}
+		virtual void AddShido(Fighter Whom) override;
+		virtual void RemoveShido(Fighter Whom) override;
 
-		virtual void AddHansokuMake(Fighter Whom, bool Direct = true) override {}
-		virtual void RemoveHansokuMake(Fighter Whom) override {}
+		virtual void AddHansokuMake(Fighter Whom, bool Direct = true) override;
+		virtual void RemoveHansokuMake(Fighter Whom) override;
 
 		virtual void AddDisqualification(Fighter Whom) override {}
 		virtual void AddNotDisqualification(Fighter Whom) override {}
