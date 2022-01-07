@@ -2,7 +2,7 @@
 
 
 
-/*TEST(RemoteMat, OpenAndClose)
+TEST(RemoteMat, OpenAndClose)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
