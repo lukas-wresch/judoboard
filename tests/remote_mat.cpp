@@ -329,8 +329,8 @@ TEST(RemoteMat, CorrectWinner)
 
 			if (i == 4)
 				m->SetAsDraw();
-
-			EXPECT_TRUE(m->EndMatch());
+			else
+				EXPECT_TRUE(m->EndMatch());
 
 			ZED::Core::Pause(500);
 
@@ -2320,17 +2320,27 @@ TEST(RemoteMat, Draw)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
 
 	IMat* m = master.FindMat(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-	match.SetMatID(1);
-	match.SetRuleSet(new RuleSet("Test", 10, 60, 30, 20, false, false, true, 0));
-	EXPECT_TRUE(m->StartMatch(&match));
+	auto j1 = new Judoka(GetRandomName(), GetRandomName());
+	auto j2 = new Judoka(GetRandomName(), GetRandomName());
+	master.GetDatabase().AddJudoka(j1);
+	master.GetDatabase().AddJudoka(j2);
+
+	auto rules = new RuleSet("Test", 10, 60, 30, 20, false, false, true, 0);
+	master.GetDatabase().AddRuleSet(rules);
+
+	Match* match = new Match(nullptr, j1, j2);
+	match->SetMatID(1);
+	match->SetRuleSet(rules);
+	master.GetTournament()->AddMatch(match);
+
+	EXPECT_TRUE(m->StartMatch(match));
 
 	m->Hajime();
 
@@ -2357,17 +2367,27 @@ TEST(RemoteMat, Draw2)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
 
 	IMat* m = master.FindMat(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-	match.SetMatID(1);
-	match.SetRuleSet(new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0));
-	EXPECT_TRUE(m->StartMatch(&match));
+	auto j1 = new Judoka(GetRandomName(), GetRandomName());
+	auto j2 = new Judoka(GetRandomName(), GetRandomName());
+	master.GetDatabase().AddJudoka(j1);
+	master.GetDatabase().AddJudoka(j2);
+
+	auto rules = new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0);
+	master.GetDatabase().AddRuleSet(rules);
+
+	Match* match = new Match(nullptr, j1, j2);
+	match->SetMatID(1);
+	match->SetRuleSet(rules);
+	master.GetTournament()->AddMatch(match);
+	
+	EXPECT_TRUE(m->StartMatch(match));
 
 	m->Hajime();
 

@@ -241,6 +241,20 @@ void RemoteMat::RemoveHansokuMake(Fighter Whom)
 
 
 
+void RemoteMat::AddDisqualification(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/+disqualification?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::AddNotDisqualification(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/-disqualification?id=" + std::to_string(GetMatID()));
+}
+
+
+
 ZED::Blob RemoteMat::RequestScreenshot() const
 {
 	ZED::Blob data(SendRequest("/ajax/mat/screenshot?id=" + std::to_string(GetMatID())).body);

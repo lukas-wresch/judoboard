@@ -66,8 +66,8 @@ namespace Judoboard
 		virtual void AddHansokuMake(Fighter Whom, bool Direct = true) override;
 		virtual void RemoveHansokuMake(Fighter Whom) override;
 
-		virtual void AddDisqualification(Fighter Whom) override {}
-		virtual void AddNotDisqualification(Fighter Whom) override {}
+		virtual void AddDisqualification(Fighter Whom) override;
+		virtual void AddNotDisqualification(Fighter Whom) override;
 		virtual void RemoveDisqualification(Fighter Whom) override {}
 
 		virtual void AddMedicalExamination(Fighter Whom) override {}
