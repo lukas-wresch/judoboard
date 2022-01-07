@@ -2188,7 +2188,7 @@ void Application::SetupHttpServer()
 		return Error();//OK
 	});
 
-	m_Server.RegisterResource("/ajax/master/find_participant", [this](auto& Request) -> std::string {
+	m_Server.RegisterResource("/ajax/master/find_judoka", [this](auto& Request) -> std::string {
 		if (!IsMaster())
 			return "You are not allowed to connect";
 
@@ -2196,13 +2196,31 @@ void Application::SetupHttpServer()
 
 		ZED::Log::Info("Slave requested participant info");
 
-		auto judoka = GetTournament()->FindParticipant(UUID(std::move(uuid)));
+		auto judoka = GetDatabase().FindJudoka(UUID(std::move(uuid)));
 
 		if (!judoka)
 			return "Not found";
 
 		ZED::CSV csv;
 		*judoka >> csv;
+		return csv;
+	});
+
+	m_Server.RegisterResource("/ajax/master/find_ruleset", [this](auto& Request) -> std::string {
+		if (!IsMaster())
+			return "You are not allowed to connect";
+
+		auto uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "uuid");
+
+		ZED::Log::Info("Slave requested rule set info");
+
+		auto rule_set = GetDatabase().FindRuleSet(UUID(std::move(uuid)));
+
+		if (!rule_set)
+			return "Not found";
+
+		ZED::CSV csv;
+		*rule_set >> csv;
 		return csv;
 	});
 
@@ -2220,10 +2238,32 @@ void Application::SetupHttpServer()
 		auto match = GetTournament()->FindMatch(posted_match);
 
 		if (!match)
+		{
+			ZED::Log::Error("Could not store match result that was sent by slave");
 			return "Not found";
+		}
 
 		*match = posted_match;
 		return "ok";
+	});
+
+	m_Server.RegisterResource("/ajax/master/get_next_matches", [this](auto& Request) -> std::string {
+		if (!IsMaster())
+			return "You are not allowed to connect";
+
+		//TODO check security token
+
+		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		auto next_matches = GetNextMatches(matID);
+
+		ZED::CSV match_data;
+		match_data << next_matches.size();//TODO add number of matches to send
+
+		for (auto match : next_matches)
+			*match >> match_data;
+
+		return match_data;
 	});
 }
 
