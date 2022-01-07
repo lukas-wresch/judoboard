@@ -293,7 +293,7 @@ bool RemoteMat::PostData(const std::string& URL, const ZED::CSV& Data) const
 
 
 
-RemoteMat::InternalState RemoteMat::GetState(bool& Success) const
+RemoteMat::InternalState RemoteMat::GetState(bool* pSuccess) const
 {
 	std::string response = SendRequest("/ajax/mat/get_score?id=" + std::to_string(GetMatID()));
 	InternalState internalState = {};
@@ -301,11 +301,13 @@ RemoteMat::InternalState RemoteMat::GetState(bool& Success) const
 	if (std::count(response.begin(), response.end(), ',') < 10)
 	{
 		ZED::Log::Warn("Invalid response: " + response);
-		Success = false;
+		if (pSuccess)
+			*pSuccess = false;
 		return internalState;
 	}
 
-	Success = true;
+	if (pSuccess)
+		*pSuccess = true;
 
 	ZED::CSV state(response);
 

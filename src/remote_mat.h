@@ -31,9 +31,9 @@ namespace Judoboard
 		virtual uint32_t GetTimeElapsed()  const override { return 0; }
 		virtual uint32_t GetTime2Display() const override { return 0; }
 
-		virtual bool IsHajime()      const override { return false; }
-		virtual bool IsOutOfTime()   const override { return false; }
-		virtual bool IsGoldenScore() const override { return false; }
+		virtual bool IsHajime()      const override { return GetState().hajime; }
+		virtual bool IsOutOfTime()   const override { return GetState().isoutoftime; }
+		virtual bool IsGoldenScore() const override { return GetState().isgoldenscore; }
 		virtual bool EnableGoldenScore(bool GoldenScore = true) override { return false; }
 
 		virtual bool IsOsaekomiRunning() const override { return false; };//Returns true if one of the osaekomi clocks are running
@@ -112,8 +112,7 @@ namespace Judoboard
 
 		virtual const Scoreboard& GetScoreboard(Fighter Whom) const override
 		{
-			bool success;
-			GetState(success);
+			GetState();
 
 			if (Whom == Fighter::White)
 				return m_Scoreboards[0];
@@ -126,7 +125,7 @@ namespace Judoboard
 			return m_Scoreboards[1];
 		}
 
-		InternalState GetState(bool& Success) const;
+		InternalState GetState(bool* pSuccess = nullptr) const;
 
 		mutable Scoreboard m_Scoreboards[2];
 
