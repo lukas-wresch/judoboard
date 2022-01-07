@@ -112,6 +112,9 @@ namespace Judoboard
 
 		virtual const Scoreboard& GetScoreboard(Fighter Whom) const override
 		{
+			bool success;
+			GetState(success);
+
 			if (Whom == Fighter::White)
 				return m_Scoreboards[0];
 			return m_Scoreboards[1];

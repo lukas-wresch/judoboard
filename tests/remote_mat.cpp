@@ -2012,7 +2012,7 @@ TEST(RemoteMat, Koka)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2021,16 +2021,27 @@ TEST(RemoteMat, Koka)
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-		match.SetMatID(1);
-		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, true, false, 0));
-		EXPECT_TRUE(m->StartMatch(&match));
+		auto j1 = new Judoka(GetRandomName(), GetRandomName());
+		auto j2 = new Judoka(GetRandomName(), GetRandomName());
+		master.GetDatabase().AddJudoka(j1);
+		master.GetDatabase().AddJudoka(j2);
+
+		auto rules = new RuleSet("Test", 60, 60, 30, 20, false, true, false, 0);
+		master.GetDatabase().AddRuleSet(rules);
+
+		Match* match = new Match(nullptr, j1, j2);
+		match->SetMatID(1);
+		match->SetRuleSet(rules);
+		master.GetTournament()->AddMatch(match);
+
+		EXPECT_TRUE(m->StartMatch(match));
 
 
 		EXPECT_TRUE(m->GetScoreboard(f).m_Koka == 0);
 		for (int k = 1; k < 25; k++)
 		{
 			m->AddKoka(f);
+			ZED::Core::Pause(100);
 			EXPECT_TRUE(m->GetScoreboard(f).m_Koka == k);
 		}
 		for (int k = 1; k < 25; k++)
