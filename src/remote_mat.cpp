@@ -248,7 +248,7 @@ void RemoteMat::AddDisqualification(Fighter Whom)
 
 
 
-void RemoteMat::AddNotDisqualification(Fighter Whom)
+void RemoteMat::AddNoDisqualification(Fighter Whom)
 {
 	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/-disqualification?id=" + std::to_string(GetMatID()));
 }

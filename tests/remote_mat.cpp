@@ -322,7 +322,7 @@ TEST(RemoteMat, CorrectWinner)
 			else
 			{
 				m->AddHansokuMake(!f);
-				m->AddNotDisqualification(!f);
+				m->AddNoDisqualification(!f);
 			}
 
 			ZED::Core::Pause(5500);
@@ -1113,7 +1113,7 @@ TEST(RemoteMat, HansokumakeResultsInMate)
 
 		EXPECT_FALSE(m->IsHajime());
 
-		m->AddNotDisqualification(f);
+		m->AddNoDisqualification(f);
 
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());
@@ -1203,8 +1203,8 @@ TEST(RemoteMat, DoubleHansokumake)
 		EXPECT_TRUE(m->GetScoreboard(f).m_HansokuMake);
 		EXPECT_TRUE(m->GetScoreboard(!f).m_HansokuMake);
 
-		m->AddNotDisqualification(f);
-		m->AddNotDisqualification(!f);
+		m->AddNoDisqualification(f);
+		m->AddNoDisqualification(!f);
 
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());
@@ -2259,7 +2259,7 @@ TEST(RemoteMat, HansokumakeDuringOsaekomi)
 			m->Mate();
 			ZED::Core::Pause(3000);
 			m->AddHansokuMake(hansokumake_committer);
-			m->AddNotDisqualification(hansokumake_committer);
+			m->AddNoDisqualification(hansokumake_committer);
 			ZED::Core::Pause(3000);
 
 			EXPECT_FALSE(m->IsHajime());
