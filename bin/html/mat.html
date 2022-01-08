@@ -117,11 +117,11 @@
     <td style="text-align: center;">
       <div id="additional4" style="display: none; height: 0px;">
         <div style="font-size: 16pt;">
-          <label>Medical Examinations:</label> <span id="white_medics">0</span></h2>
+          <label class="medical_examiniations">Medical Examinations</label>: <span id="white_medics">0</span></h2>
         </div>
-        <button class="add"    style="width: 5.5cm;" onclick="SetScore('white', '+medic');">+Medical Examination</button>
+        <button class="add add_medical_examiniations"       style="width: 5.5cm;" onclick="SetScore('white', '+medic');">+Medical Examination</button>
         <br/>
-        <button class="remove" style="width: 5.5cm;" onclick="SetScore('white', '-medic');">-Medical Examination</button>
+        <button class="remove remove_medical_examiniations" style="width: 5.5cm;" onclick="SetScore('white', '-medic');">-Medical Examination</button>
         <br/>
       </div>
     </td>
@@ -129,11 +129,11 @@
     <td style="text-align: center;">
       <div id="additional3" style="display: none; height: 0px;">
         <div style="font-size: 16pt;">
-          <label>Medical Examinations:</label> <span id="blue_medics">0</span></h2>
+          <label class="medical_examiniations">Medical Examinations:</label> <span id="blue_medics">0</span></h2>
         </div>
-        <button class="add"    style="width: 5.5cm;" onclick="SetScore('blue', '+medic');">+Medical Examination</button>
+        <button class="add add_medical_examiniations"    style="width: 5.5cm;" onclick="SetScore('blue', '+medic');">+Medical Examination</button>
         <br/>
-        <button class="remove" style="width: 5.5cm;" onclick="SetScore('blue', '-medic');">-Medical Examination</button>
+        <button class="remove remove_medical_examiniations" style="width: 5.5cm;" onclick="SetScore('blue', '-medic');">-Medical Examination</button>
         <br/>
       </div>
     </td>
@@ -616,5 +616,12 @@ document.getElementById("waiting_blue").innerHTML  = lang.blue;
 
 document.getElementById("osaekomi_time").innerHTML = lang.time;
 document.getElementById("osaekomi_for").innerHTML  = lang.for;
+
+for (const el of document.getElementsByClassName("medical_examiniations"))
+    el.innerHTML = lang.medical_examiniations;
+for (const el of document.getElementsByClassName("add_medical_examiniations"))
+    el.innerHTML = "+" + lang.medical_examiniations;
+    for (const el of document.getElementsByClassName("remove_medical_examiniations"))
+    el.innerHTML = "-" + lang.medical_examiniations;
 
 </script>

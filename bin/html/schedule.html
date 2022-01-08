@@ -12,13 +12,13 @@
     <h2 id="hansokumake-headline">Hansokumake</h2>
     <table id="hansokumake" border="1" rules="all" style="margin-bottom: 1cm;">
         <tr>
-            <th style="width: 0.5cm;" id="no">No.</th>
-            <th style="width: 4cm;" id="white">White</th>
-            <th style="width: 4cm;" id="blue">Blue</th>
-            <th style="width: 2cm; text-align: center;" id="class">Class</th>
-            <th style="width: 1cm;" id="mat">Mat</th>
-            <th style="width: 2.5cm; text-align: center;" id="mat">Status</th>
-            <th style="width: 4.5cm; text-align: center;">Options</th>
+            <th style="width: 0.5cm;" class="no">No.</th>
+            <th style="width: 4cm;" class="white">White</th>
+            <th style="width: 4cm;" class="blue">Blue</th>
+            <th style="width: 2cm; text-align: center;" class="class">Class</th>
+            <th style="width: 1cm;" class="mat">Mat</th>
+            <th style="width: 2.5cm; text-align: center;" class="status">Status</th>
+            <th style="width: 4.5cm; text-align: center;" class="options">Options</th>
         </tr>
     </table>
 </div>
@@ -26,13 +26,13 @@
 <h2 id="headline">Schedule</h2>
 <table id="schedule" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
-    <th style="width: 0.5cm;" id="no">No.</th>
-    <th style="width: 4cm;" id="white">White</th>
-    <th style="width: 4cm;" id="blue">Blue</th>
-    <th style="width: 2cm; text-align: center;" id="class">Class</th>
-    <th style="width: 1cm;" id="mat">Mat</th>
-    <th style="width: 2.5cm; text-align: center;" id="mat">Status</th>
-    <th style="width: 2.5cm; text-align: center;">Options</th>
+    <th style="width: 0.5cm;" class="no">No.</th>
+    <th style="width: 4cm;" class="white">White</th>
+    <th style="width: 4cm;" class="blue">Blue</th>
+    <th style="width: 2cm; text-align: center;" class="class">Class</th>
+    <th style="width: 1cm;" class="mat">Mat</th>
+    <th style="width: 2.5cm; text-align: center;" class="status">Status</th>
+    <th style="width: 2.5cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
   
@@ -40,11 +40,11 @@
 <h2 id="headline-participants">Participants</h2>
 <table id="participants" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
-    <th style="width: 0.5cm;" id="no">No.</th>
+    <th style="width: 0.5cm;" class="no">No.</th>
     <th style="width: 4cm;" id="name">Name</th>
     <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
     <th style="width: 2cm; text-align: center;" id="matches">#Matches</th>
-    <th style="width: 3.0cm; text-align: center;">Options</th>
+    <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
 
@@ -454,9 +454,9 @@ function Update()
       if (hansokumake_state == 0)
         cell5.innerHTML = "Hansokumake " + lang.for + " ";
       else if (hansokumake_state == 1)
-        cell5.innerHTML = "Disqualification " + lang.for + " ";
+        cell5.innerHTML = lang.disqualification + " " + lang.for + " ";
       else if (hansokumake_state == 2)
-        cell5.innerHTML = "No Disqualification " + lang.for + " ";
+        cell5.innerHTML = lang.no_disqualification + " " + lang.for + " ";
 
       if (hansokumake_fighter == 0)
         cell5.innerHTML += lang.white;
@@ -476,7 +476,7 @@ function Update()
       }
       else if (hansokumake_state == 2)
       {
-      cell6.innerHTML = "<button class=\"neutral\" style=\"width: 6.5cm; height: 0.9cm;\" onclick=\"return RemoveNoDisqualify(" + hansokumake_fighter + ',' + +mat_id+")\">" + "Revoke No Disqualification" + "</button>";
+        cell6.innerHTML = "<button class=\"neutral\" style=\"width: 6.5cm; height: 0.9cm;\" onclick=\"return RemoveNoDisqualify(" + hansokumake_fighter + ',' + +mat_id+")\">" + "Revoke No Disqualification" + "</button>";
       }
 
       cell6.style.textAlign = "center";
@@ -507,9 +507,22 @@ document.getElementById("new_participant").innerHTML = lang.new_participant;
 document.getElementById("new_match").innerHTML = lang.new_match;
 document.getElementById("new_matchtable").innerHTML = lang.add_matchtable;
 
-document.getElementById("white").innerHTML = lang.white;
-document.getElementById("blue").innerHTML  = lang.blue;
-document.getElementById("mat").innerHTML   = lang.mat;
+//document.getElementById("white").innerHTML = lang.white;
+//document.getElementById("blue").innerHTML  = lang.blue;
+//document.getElementById("mat").innerHTML   = lang.mat;
+
+for (const el of document.getElementsByClassName("no"))
+    el.innerHTML = lang.no;
+for (const el of document.getElementsByClassName("white"))
+    el.innerHTML = lang.white;
+for (const el of document.getElementsByClassName("blue"))
+    el.innerHTML = lang.blue;
+for (const el of document.getElementsByClassName("class"))
+    el.innerHTML = lang.matchtable;
+for (const el of document.getElementsByClassName("mat"))
+    el.innerHTML = lang.mat;
+for (const el of document.getElementsByClassName("options"))
+    el.innerHTML = lang.options;
 
 document.getElementById("new_participant").innerHTML  = lang.new_participant;
 document.getElementById("new_match").innerHTML  = lang.new_match;
