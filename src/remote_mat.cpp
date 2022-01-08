@@ -258,7 +258,6 @@ void RemoteMat::AddNotDisqualification(Fighter Whom)
 ZED::Blob RemoteMat::RequestScreenshot() const
 {
 	ZED::Blob data(SendRequest("/ajax/mat/screenshot?id=" + std::to_string(GetMatID())).body);
-	//return ZED::PNG(std::move(data));
 	return data;
 }
 
@@ -274,7 +273,7 @@ bool RemoteMat::SendCommand(const std::string& URL) const
 
 ZED::HttpClient::Packet RemoteMat::SendRequest(const std::string& URL) const
 {
-	ZED::Log::Debug("Sending request: " + URL);
+	//ZED::Log::Debug("Sending request: " + URL);
 
 	ZED::HttpClient client(m_Hostname, m_Port);
 	return client.GET(URL, "Cookie: token=test");

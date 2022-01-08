@@ -4105,34 +4105,36 @@ static void process_new_connection(struct mg_connection *conn)
 // Worker threads take accepted socket from the queue
 static int consume_socket(struct mg_context *ctx, struct socket *sp)
 {
-  pthread_mutex_lock(&ctx->mutex);
-  ZED::Log::Debug(("going idle"));
+    pthread_mutex_lock(&ctx->mutex);
+    //ZED::Log::Debug(("going idle"));
 
-  // If the queue is empty, wait. We're idle at this point.
-  while (ctx->sq_head == ctx->sq_tail && ctx->stop_flag == 0)
-    pthread_cond_wait(&ctx->sq_full, &ctx->mutex);
+    // If the queue is empty, wait. We're idle at this point.
+    while (ctx->sq_head == ctx->sq_tail && ctx->stop_flag == 0)
+        pthread_cond_wait(&ctx->sq_full, &ctx->mutex);
 
-  // If we're stopping, sq_head may be equal to sq_tail.
-  if (ctx->sq_head > ctx->sq_tail)
-  {
-    // Copy socket from the queue and increment tail
-    *sp = ctx->queue[ctx->sq_tail % ARRAY_SIZE(ctx->queue)];
-    ctx->sq_tail++;
-    ZED::Log::Debug("grabbed socket, going busy " +  std::to_string(sp->sock));
-
-    // Wrap pointers if needed
-    while (ctx->sq_tail > (int) ARRAY_SIZE(ctx->queue))
+    // If we're stopping, sq_head may be equal to sq_tail.
+    if (ctx->sq_head > ctx->sq_tail)
     {
-      ctx->sq_tail -= ARRAY_SIZE(ctx->queue);
-      ctx->sq_head -= ARRAY_SIZE(ctx->queue);
+        // Copy socket from the queue and increment tail
+        *sp = ctx->queue[ctx->sq_tail % ARRAY_SIZE(ctx->queue)];
+        ctx->sq_tail++;
+        //ZED::Log::Debug("grabbed socket, going busy " +  std::to_string(sp->sock));
+
+        // Wrap pointers if needed
+        while (ctx->sq_tail > (int) ARRAY_SIZE(ctx->queue))
+        {
+            ctx->sq_tail -= ARRAY_SIZE(ctx->queue);
+            ctx->sq_head -= ARRAY_SIZE(ctx->queue);
+        }
     }
-  }
 
-  pthread_cond_signal(&ctx->sq_empty);
-  pthread_mutex_unlock(&ctx->mutex);
+    pthread_cond_signal(&ctx->sq_empty);
+    pthread_mutex_unlock(&ctx->mutex);
 
-  return !ctx->stop_flag;
+    return !ctx->stop_flag;
 }
+
+
 
 static void worker_thread(struct mg_context *ctx)
 {
@@ -4179,56 +4181,62 @@ static void worker_thread(struct mg_context *ctx)
     assert(ctx->num_threads >= 0);
     pthread_mutex_unlock(&ctx->mutex);
 
-    ZED::Log::Debug("worker exiting");
+    //ZED::Log::Debug("worker exiting");
 }
+
+
 
 // Master thread adds accepted socket to a queue
 static void produce_socket(struct mg_context *ctx, const struct socket *sp)
 {
-  pthread_mutex_lock(&ctx->mutex);
+    pthread_mutex_lock(&ctx->mutex);
 
-  // If the queue is full, wait
-  while (ctx->stop_flag == 0 && ctx->sq_head - ctx->sq_tail >= (int) ARRAY_SIZE(ctx->queue))
-    pthread_cond_wait(&ctx->sq_empty, &ctx->mutex);
+    // If the queue is full, wait
+    while (ctx->stop_flag == 0 && ctx->sq_head - ctx->sq_tail >= (int) ARRAY_SIZE(ctx->queue))
+        pthread_cond_wait(&ctx->sq_empty, &ctx->mutex);
 
-  if (ctx->sq_head - ctx->sq_tail < (int) ARRAY_SIZE(ctx->queue))
-  {
-    // Copy socket to the queue and increment head
-    ctx->queue[ctx->sq_head % ARRAY_SIZE(ctx->queue)] = *sp;
-    ctx->sq_head++;
-    ZED::Log::Debug("queued socket " + std::to_string(sp->sock));
-  }
+    if (ctx->sq_head - ctx->sq_tail < (int) ARRAY_SIZE(ctx->queue))
+    {
+        // Copy socket to the queue and increment head
+        ctx->queue[ctx->sq_head % ARRAY_SIZE(ctx->queue)] = *sp;
+        ctx->sq_head++;
+        //ZED::Log::Debug("queued socket " + std::to_string(sp->sock));
+    }
 
-  pthread_cond_signal(&ctx->sq_full);
-  pthread_mutex_unlock(&ctx->mutex);
+    pthread_cond_signal(&ctx->sq_full);
+    pthread_mutex_unlock(&ctx->mutex);
 }
+
+
 
 static void accept_new_connection(const struct socket *listener, struct mg_context *ctx)
 {
-  struct socket accepted;
-  char src_addr[20];
+    struct socket accepted;
+    char src_addr[20];
 
-  socklen_t len = sizeof(accepted.rsa);
-  accepted.lsa = listener->lsa;
-  accepted.sock = accept(listener->sock, &accepted.rsa.sa, &len);
-  if (accepted.sock != INVALID_SOCKET)
-  {
-    int allowed = check_acl(ctx, &accepted.rsa);
-    if (allowed)
+    socklen_t len = sizeof(accepted.rsa);
+    accepted.lsa = listener->lsa;
+    accepted.sock = accept(listener->sock, &accepted.rsa.sa, &len);
+    if (accepted.sock != INVALID_SOCKET)
     {
-      // Put accepted socket structure into the queue
-      ZED::Log::Debug("accepted socket " + std::to_string(accepted.sock));
-      accepted.is_ssl = listener->is_ssl;
-      produce_socket(ctx, &accepted);
+        int allowed = check_acl(ctx, &accepted.rsa);
+        if (allowed)
+        {
+            // Put accepted socket structure into the queue
+            //ZED::Log::Debug("accepted socket " + std::to_string(accepted.sock));
+            accepted.is_ssl = listener->is_ssl;
+            produce_socket(ctx, &accepted);
+        }
+        else
+        {
+            sockaddr_to_string(src_addr, sizeof(src_addr), &accepted.rsa);
+            cry(fc(ctx), "%s: %s is not allowed to connect", __func__, src_addr);
+            closesocket(accepted.sock);
+        }
     }
-    else
-    {
-      sockaddr_to_string(src_addr, sizeof(src_addr), &accepted.rsa);
-      cry(fc(ctx), "%s: %s is not allowed to connect", __func__, src_addr);
-      closesocket(accepted.sock);
-    }
-  }
 }
+
+
 
 static void master_thread(struct mg_context *ctx)
 {
