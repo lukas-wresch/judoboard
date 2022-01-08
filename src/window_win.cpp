@@ -29,6 +29,9 @@ LRESULT CALLBACK Judoboard::WindowProc(HWND Hwnd, UINT Message, WPARAM wParam, L
 		//case WM_EXITSIZEMOVE:
 		case WM_SIZE:
 		{
+			if (wParam == SIZE_MINIMIZED)//Window has been minimized
+				return 0;//Don't do anything, otherwise the viewport will be set to 0x0 which would make screeenshots impossible
+
 			RECT rect;
 			GetClientRect(Hwnd, &rect);
 

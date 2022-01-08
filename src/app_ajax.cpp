@@ -893,7 +893,19 @@ void Application::SetupHttpServer()
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-disqualification", [this, fighter](auto& Request) -> std::string {
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
+			return Ajax_RemoveDisqualification(fighter, Request);
+		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+nodisqualification", [this, fighter](auto& Request) -> std::string {
+			if (!IsLoggedIn(Request))
+				return Error(Error::Type::NotLoggedIn);
 			return Ajax_NoDisqualification(fighter, Request);
+		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-nodisqualification", [this, fighter](auto& Request) -> std::string {
+			if (!IsLoggedIn(Request))
+				return Error(Error::Type::NotLoggedIn);
+			return Ajax_RemoveNoDisqualification(fighter, Request);
 		});
 
 
@@ -2499,6 +2511,24 @@ Error Application::Ajax_AddDisqualification(Fighter Whom, const HttpServer::Requ
 
 
 
+Error Application::Ajax_RemoveDisqualification(Fighter Whom, const HttpServer::Request& Request)
+{
+	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	if (id <= 0)
+		return Error::Type::InvalidID;
+
+	auto mat = FindMat(id);
+
+	if (!mat)
+		return Error::Type::MatNotFound;
+
+	mat->RemoveDisqualification(Whom);
+	return Error();//OK
+}
+
+
+
 Error Application::Ajax_NoDisqualification(Fighter Whom, const HttpServer::Request& Request)
 {
 	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -2511,7 +2541,25 @@ Error Application::Ajax_NoDisqualification(Fighter Whom, const HttpServer::Reque
 	if (!mat)
 		return Error::Type::MatNotFound;
 
-	mat->AddNotDisqualification(Whom);
+	mat->AddNoDisqualification(Whom);
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_RemoveNoDisqualification(Fighter Whom, const HttpServer::Request& Request)
+{
+	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	if (id <= 0)
+		return Error::Type::InvalidID;
+
+	auto mat = FindMat(id);
+
+	if (!mat)
+		return Error::Type::MatNotFound;
+
+	mat->RemoveNoDisqualification(Whom);
 	return Error();//OK
 }
 

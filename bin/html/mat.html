@@ -117,11 +117,11 @@
     <td style="text-align: center;">
       <div id="additional4" style="display: none; height: 0px;">
         <div style="font-size: 16pt;">
-          <label>Medical Examinations:</label> <span id="white_medics">0</span></h2>
+          <label class="medical_examiniations">Medical Examinations</label>: <span id="white_medics">0</span></h2>
         </div>
-        <button class="add"    style="width: 5.5cm;" onclick="SetScore('white', '+medic');">+Medical Examination</button>
+        <button class="add add_medical_examiniations"       style="width: 5.5cm;" onclick="SetScore('white', '+medic');">+Medical Examination</button>
         <br/>
-        <button class="remove" style="width: 5.5cm;" onclick="SetScore('white', '-medic');">-Medical Examination</button>
+        <button class="remove remove_medical_examiniations" style="width: 5.5cm;" onclick="SetScore('white', '-medic');">-Medical Examination</button>
         <br/>
       </div>
     </td>
@@ -129,11 +129,11 @@
     <td style="text-align: center;">
       <div id="additional3" style="display: none; height: 0px;">
         <div style="font-size: 16pt;">
-          <label>Medical Examinations:</label> <span id="blue_medics">0</span></h2>
+          <label class="medical_examiniations">Medical Examinations:</label> <span id="blue_medics">0</span></h2>
         </div>
-        <button class="add"    style="width: 5.5cm;" onclick="SetScore('blue', '+medic');">+Medical Examination</button>
+        <button class="add add_medical_examiniations"    style="width: 5.5cm;" onclick="SetScore('blue', '+medic');">+Medical Examination</button>
         <br/>
-        <button class="remove" style="width: 5.5cm;" onclick="SetScore('blue', '-medic');">-Medical Examination</button>
+        <button class="remove remove_medical_examiniations" style="width: 5.5cm;" onclick="SetScore('blue', '-medic');">-Medical Examination</button>
         <br/>
       </div>
     </td>
@@ -162,7 +162,7 @@
 
       <p style="font-size: 16pt; text-decoration: underline;" id="next_matches">Next Matches</p>
       <table id="waiting_list" border="1" rules="all">
-        <tr><th style="width: 5.0cm;" id="waiting_blue">Blue</th><th style="width: 5.0cm;" id="waiting_white">White</th></tr>
+        <tr><th style="width: 5.0cm;" id="waiting_white">White</th><th style="width: 5.0cm;" id="waiting_blue">Blue</th></tr>
       </table>
     </td>
 
@@ -488,8 +488,8 @@ function GetJudokaName()
         var cell1 = row.insertCell(0);
         var cell2 = row.insertCell(1);
 
-        cell1.innerHTML = res[i+1];
-        cell2.innerHTML = res[i];
+        cell1.innerHTML = res[i];
+        cell2.innerHTML = res[i+1];
       }
     }
 
@@ -616,5 +616,12 @@ document.getElementById("waiting_blue").innerHTML  = lang.blue;
 
 document.getElementById("osaekomi_time").innerHTML = lang.time;
 document.getElementById("osaekomi_for").innerHTML  = lang.for;
+
+for (const el of document.getElementsByClassName("medical_examiniations"))
+    el.innerHTML = lang.medical_examiniations;
+for (const el of document.getElementsByClassName("add_medical_examiniations"))
+    el.innerHTML = "+" + lang.medical_examiniations;
+    for (const el of document.getElementsByClassName("remove_medical_examiniations"))
+    el.innerHTML = "-" + lang.medical_examiniations;
 
 </script>
