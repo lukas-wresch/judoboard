@@ -280,7 +280,7 @@ TEST(Ajax, Ajax_GetHansokumake)
 
 		mat->StartMatch(&match);
 		mat->AddHansokuMake(f);
-		mat->AddNotDisqualification(f);
+		mat->AddNoDisqualification(f);
 
 		ZED::CSV ret2 = app.Ajax_GetHansokumake();
 
@@ -427,6 +427,48 @@ TEST(Ajax, AddDisqualification)
 
 
 
+TEST(Ajax, RemoveDisqualification)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+		IMat* mat = app.FindMat(1);
+
+		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+
+		mat->StartMatch(&match);
+		mat->AddHansokuMake(f);
+
+		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
+		EXPECT_TRUE(mat->GetScoreboard(f).IsUnknownDisqualification());
+
+		app.Ajax_AddDisqualification(f, HttpServer::Request("id=1"));
+
+		EXPECT_TRUE(mat->GetScoreboard(f).IsDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsUnknownDisqualification());
+
+		app.Ajax_RemoveDisqualification(f, HttpServer::Request("id=2"));
+
+		EXPECT_TRUE(mat->GetScoreboard(f).IsDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsUnknownDisqualification());
+
+		app.Ajax_RemoveDisqualification(f, HttpServer::Request("id=1"));
+
+		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
+		EXPECT_TRUE(mat->GetScoreboard(f).IsUnknownDisqualification());
+	}
+}
+
+
+
 TEST(Ajax, NoDisqualification)
 {
 	initialize();
@@ -452,6 +494,42 @@ TEST(Ajax, NoDisqualification)
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
 		EXPECT_TRUE(mat->GetScoreboard(f).IsNotDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsUnknownDisqualification());
+	}
+}
+
+
+
+TEST(Ajax, RemoveNoDisqualification)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+		IMat* mat = app.FindMat(1);
+
+		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+
+		mat->StartMatch(&match);
+		mat->AddHansokuMake(f);
+
+		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
+		EXPECT_TRUE(mat->GetScoreboard(f).IsUnknownDisqualification());
+
+		app.Ajax_NoDisqualification(f, HttpServer::Request("id=1"));
+
+		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
+		EXPECT_TRUE(mat->GetScoreboard(f).IsNotDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsUnknownDisqualification());
+
+		app.Ajax_RemoveNoDisqualification(f, HttpServer::Request("id=1"));
+
+		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
+		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
+		EXPECT_TRUE(mat->GetScoreboard(f).IsUnknownDisqualification());
 	}
 }
 

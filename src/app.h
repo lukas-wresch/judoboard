@@ -96,7 +96,9 @@ namespace Judoboard
 
 		//Commands
 		Error Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request);
+		Error Ajax_RemoveDisqualification(Fighter Whom, const HttpServer::Request& Request);
 		Error Ajax_NoDisqualification(Fighter Whom, const HttpServer::Request& Request);
+		Error Ajax_RemoveNoDisqualification(Fighter Whom, const HttpServer::Request& Request);
 
 		//Schedule
 		std::string Ajax_GetHansokumake() const;//Returns matches that are in progress and have a direct hansokumake

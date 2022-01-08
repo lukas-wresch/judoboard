@@ -162,7 +162,7 @@
 
       <p style="font-size: 16pt; text-decoration: underline;" id="next_matches">Next Matches</p>
       <table id="waiting_list" border="1" rules="all">
-        <tr><th style="width: 5.0cm;" id="waiting_blue">Blue</th><th style="width: 5.0cm;" id="waiting_white">White</th></tr>
+        <tr><th style="width: 5.0cm;" id="waiting_white">White</th><th style="width: 5.0cm;" id="waiting_blue">Blue</th></tr>
       </table>
     </td>
 
@@ -488,8 +488,8 @@ function GetJudokaName()
         var cell1 = row.insertCell(0);
         var cell2 = row.insertCell(1);
 
-        cell1.innerHTML = res[i+1];
-        cell2.innerHTML = res[i];
+        cell1.innerHTML = res[i];
+        cell2.innerHTML = res[i+1];
       }
     }
 

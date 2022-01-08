@@ -8,7 +8,7 @@ namespace Judoboard
 {
 	enum class Fighter
 	{
-		White, Blue
+		White = 0, Blue
 	};
 
 
@@ -105,8 +105,9 @@ namespace Judoboard
 			AddMedicalExamination, RemoveMedicalExamination,
 			Hantei,
 			AddDisqualification,
-			AddNotDisqualification,
+			AddNoDisqualification,
 			RemoveDisqualification,
+			RemoveNoDisqualification,
 			AddGachi,
 			RemoveGachi,
 		};

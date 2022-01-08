@@ -797,7 +797,7 @@ void Mat::AddDisqualification(Fighter Whom)
 
 
 
-void Mat::AddNotDisqualification(Fighter Whom)
+void Mat::AddNoDisqualification(Fighter Whom)
 {
 	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && GetScoreboard(Whom).m_HansokuMake_Direct && GetScoreboard(Whom).IsDisqualified())
 	{
@@ -817,7 +817,7 @@ void Mat::AddNotDisqualification(Fighter Whom)
 		m_mutex.lock();
 		SetScoreboard(Whom).m_Disqualification = Scoreboard::DisqualificationState::NotDisqualified;
 
-		AddEvent(Whom, MatchLog::BiasedEvent::AddNotDisqualification);
+		AddEvent(Whom, MatchLog::BiasedEvent::AddNoDisqualification);
 
 		m_mutex.unlock();
 	}
@@ -833,6 +833,21 @@ void Mat::RemoveDisqualification(Fighter Whom)
 		SetScoreboard(Whom).m_Disqualification = Scoreboard::DisqualificationState::Unknown;
 
 		AddEvent(Whom, MatchLog::BiasedEvent::RemoveDisqualification);
+
+		m_mutex.unlock();
+	}
+}
+
+
+
+void Mat::RemoveNoDisqualification(Fighter Whom)
+{
+	if (AreFightersOnMat() && GetScoreboard(Whom).IsNotDisqualified())
+	{
+		m_mutex.lock();
+		SetScoreboard(Whom).m_Disqualification = Scoreboard::DisqualificationState::Unknown;
+
+		AddEvent(Whom, MatchLog::BiasedEvent::RemoveNoDisqualification);
 
 		m_mutex.unlock();
 	}

@@ -215,7 +215,7 @@ int main(int argc, char** argv)
 					mat->Mate();
 					ZED::Core::Pause(3000);
 					mat->AddHansokuMake(f);
-					mat->AddNotDisqualification(f);
+					mat->AddNoDisqualification(f);
 					ZED::Core::Pause(3000);
 				}
 				else if (rnd <= 30)

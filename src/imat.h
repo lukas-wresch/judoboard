@@ -156,8 +156,9 @@ namespace Judoboard
 		virtual void RemoveHansokuMake(Fighter Whom) = 0;
 
 		virtual void AddDisqualification(Fighter Whom) = 0;
-		virtual void AddNotDisqualification(Fighter Whom) = 0;
+		virtual void AddNoDisqualification(Fighter Whom) = 0;
 		virtual void RemoveDisqualification(Fighter Whom) = 0;
+		virtual void RemoveNoDisqualification(Fighter Whom) = 0;
 
 		virtual void AddMedicalExamination(Fighter Whom) = 0;
 		virtual void RemoveMedicalExamination(Fighter Whom) = 0;
