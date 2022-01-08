@@ -248,9 +248,23 @@ void RemoteMat::AddDisqualification(Fighter Whom)
 
 
 
-void RemoteMat::AddNoDisqualification(Fighter Whom)
+void RemoteMat::RemoveDisqualification(Fighter Whom)
 {
 	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/-disqualification?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::AddNoDisqualification(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/+nodisqualification?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::RemoveNoDisqualification(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/-nodisqualification?id=" + std::to_string(GetMatID()));
 }
 
 

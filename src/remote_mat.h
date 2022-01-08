@@ -68,8 +68,8 @@ namespace Judoboard
 
 		virtual void AddDisqualification(Fighter Whom) override;
 		virtual void AddNoDisqualification(Fighter Whom) override;
-		virtual void RemoveDisqualification(Fighter Whom) override {}
-		virtual void RemoveNoDisqualification(Fighter Whom) override {}
+		virtual void RemoveDisqualification(Fighter Whom) override;
+		virtual void RemoveNoDisqualification(Fighter Whom) override;
 
 		virtual void AddMedicalExamination(Fighter Whom) override {}
 		virtual void RemoveMedicalExamination(Fighter Whom) override {}
