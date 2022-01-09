@@ -279,6 +279,34 @@ void RemoteMat::RemoveNoDisqualification(Fighter Whom)
 
 
 
+void RemoteMat::AddMedicalExamination(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/+medic?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::RemoveMedicalExamination(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/-medic?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::Osaekomi(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/osaekomi?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::Tokeda()
+{
+	SendCommand("/ajax/mat/tokeda?id=" + std::to_string(GetMatID()));
+}
+
+
+
 ZED::Blob RemoteMat::RequestScreenshot() const
 {
 	ZED::Blob data(SendRequest("/ajax/mat/screenshot?id=" + std::to_string(GetMatID())).body);

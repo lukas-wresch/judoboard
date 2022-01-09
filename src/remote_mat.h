@@ -71,14 +71,14 @@ namespace Judoboard
 		virtual void RemoveDisqualification(Fighter Whom) override;
 		virtual void RemoveNoDisqualification(Fighter Whom) override;
 
-		virtual void AddMedicalExamination(Fighter Whom) override {}
-		virtual void RemoveMedicalExamination(Fighter Whom) override {}
+		virtual void AddMedicalExamination(Fighter Whom) override;
+		virtual void RemoveMedicalExamination(Fighter Whom) override;
 
 		virtual void AddGachi(Fighter Whom) override {}
 		virtual void RemoveGachi(Fighter Whom) override {}
 
-		virtual void Osaekomi(Fighter Whom) override {}
-		virtual void Tokeda() override {}
+		virtual void Osaekomi(Fighter Whom) override;
+		virtual void Tokeda() override;
 
 		//Output
 		virtual Match::Result GetResult() const { Match::Result ret; return ret; };

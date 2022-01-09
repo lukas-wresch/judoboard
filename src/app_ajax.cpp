@@ -924,7 +924,7 @@ void Application::SetupHttpServer()
 			if (mat)
 				mat->AddMedicalExamination(fighter);
 			return Error();//OK
-			});
+		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-medic", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
@@ -2206,7 +2206,7 @@ void Application::SetupHttpServer()
 
 		auto uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "uuid");
 
-		ZED::Log::Info("Slave requested participant info");
+		//ZED::Log::Debug("Slave requested participant info");
 
 		auto judoka = GetDatabase().FindJudoka(UUID(std::move(uuid)));
 
