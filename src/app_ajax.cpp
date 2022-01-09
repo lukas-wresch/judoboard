@@ -35,7 +35,7 @@ void Application::SetupHttpServer()
 	m_Server.RegisterResource("/menu.png", [](auto& Request) { return HttpServer::LoadFile("html/menu.png"); }, HttpServer::ResourceType::Image_PNG);
 
 
-	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "add_judoka", "list_judoka", "judoka_edit",
+	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit",
 		"club_list", "club_add", "add_match", "edit_match", "account_add", "account_edit", "account_list",
 		"matchtable_list", "matchtable_add", "rule_add", "rule_list", "tournament_list", "tournament_add",
 		"server_config"
@@ -1068,7 +1068,7 @@ void Application::SetupHttpServer()
 			return GetTournament()->GetDatabase().JudokaToJSON();
 
 		return m_Database.JudokaToJSON();
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/judoka/add", [this](auto& Request) -> std::string {
@@ -1080,14 +1080,19 @@ void Application::SetupHttpServer()
 		auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
 		int  weight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "weight"));
 		Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+		int  clubID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "club"));
 
 		if (weight < 0)
 			weight = 0;
 
 		if (!firstname.size() || !lastname.size() || (gender != Gender::Male && gender != Gender::Female))
-			return std::string("Invalid input");
+			return (std::string)(Error)Error::Type::InvalidInput;
 
-		m_Database.AddJudoka(Judoka(firstname, lastname, weight, gender));
+		Judoka new_judoka(firstname, lastname, weight, gender);
+		if (clubID >= 0)
+			new_judoka.SetClub(GetDatabase().FindClub(clubID));
+
+		m_Database.AddJudoka(std::move(new_judoka));
 		m_Database.Save();
 		return Error();//OK
 	});
@@ -1139,12 +1144,13 @@ void Application::SetupHttpServer()
 		auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
 		int  weight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "weight"));
 		Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+		int  clubID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "club"));
 
 		if (weight < 0)
 			weight = 0;
 
 		if (!firstname.size() || !lastname.size() || (gender != Gender::Male && gender != Gender::Female))
-			return std::string("Invalid input");
+			return (std::string)(Error)Error::Type::InvalidInput;
 
 		auto judoka = m_Database.FindJudoka(id);
 
@@ -1155,6 +1161,11 @@ void Application::SetupHttpServer()
 		judoka->SetLastname(lastname);
 		judoka->SetWeight(weight);
 		judoka->SetGender(gender);
+		if (clubID >= 0)
+			judoka->SetClub(GetDatabase().FindClub(clubID));
+		else
+			judoka->SetClub(nullptr);
+
 		return Error();//OK
 	});
 

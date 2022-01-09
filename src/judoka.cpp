@@ -90,17 +90,6 @@ uint16_t Judoka::GetAge() const
 
 
 
-/*const std::string Judoka::GetShortName() const
-{
-	if (m_Firstname.length() > 20)
-		return m_Firstname;
-	else if (GetName().length() > 20)
-		return m_Firstname + " " + m_Lastname[0] + ".";
-	return GetName();
-}*/
-
-
-
 void Judoka::SetWeight(uint16_t NewWeight)
 {
 	if (NewWeight < 1000)
@@ -113,5 +102,11 @@ const std::string Judoka::ToString() const
 {
 	ZED::CSV ret;
 	ret << GetID() << m_Firstname << m_Lastname << m_Weight << m_Gender << m_Birthyear;
+
+	if (m_pClub)
+		ret << m_pClub->GetID();
+	else
+		ret << -1;
+
 	return ret;
 }

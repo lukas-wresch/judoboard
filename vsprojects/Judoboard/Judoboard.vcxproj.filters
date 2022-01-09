@@ -220,7 +220,7 @@
     <None Include="..\..\bin\html\add_match.html">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\bin\html\add_judoka.html">
+    <None Include="..\..\bin\html\judoka_add.html">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\bin\html\matchtable_list.html">
@@ -238,10 +238,7 @@
     <None Include="..\..\bin\html\index.html">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\bin\html\judoka_edit.html">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\bin\html\list_judoka.html">
+    <None Include="..\..\bin\html\judoka_list.html">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\bin\html\login.html">
