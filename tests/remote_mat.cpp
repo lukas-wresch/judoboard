@@ -756,7 +756,7 @@ TEST(RemoteMat, DirectHansokumakeDoesNotConcludeMatch)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -765,15 +765,26 @@ TEST(RemoteMat, DirectHansokumakeDoesNotConcludeMatch)
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-		match.SetMatID(1);
-		EXPECT_TRUE(m->StartMatch(&match));
+		auto j1 = new Judoka(GetRandomName(), GetRandomName());
+		auto j2 = new Judoka(GetRandomName(), GetRandomName());
+		master.GetDatabase().AddJudoka(j1);
+		master.GetDatabase().AddJudoka(j2);
 
+		Match* match = new Match(nullptr, j1, j2);
+		match->SetMatID(1);
+		master.GetTournament()->AddMatch(match);
+
+		EXPECT_TRUE(m->StartMatch(match));
 
 		m->AddHansokuMake(f);
 
+		ZED::Core::Pause(100);
+
 		EXPECT_FALSE(m->HasConcluded());
 		EXPECT_FALSE(m->EndMatch());
+
+		m->AddDisqualification(f);
+		EXPECT_TRUE(m->EndMatch());
 	}
 }
 
@@ -792,9 +803,16 @@ TEST(RemoteMat, DirectHansokumakeAndDisqDoesConcludeMatch)
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-		match.SetMatID(1);
-		EXPECT_TRUE(m->StartMatch(&match));
+		auto j1 = new Judoka(GetRandomName(), GetRandomName());
+		auto j2 = new Judoka(GetRandomName(), GetRandomName());
+		master.GetDatabase().AddJudoka(j1);
+		master.GetDatabase().AddJudoka(j2);
+
+		Match* match = new Match(nullptr, j1, j2);
+		match->SetMatID(1);
+		master.GetTournament()->AddMatch(match);
+
+		EXPECT_TRUE(m->StartMatch(match));
 
 
 		m->AddHansokuMake(f);
@@ -1200,11 +1218,15 @@ TEST(RemoteMat, DoubleHansokumake)
 		m->AddShido(f);
 		m->AddShido(!f);
 
+		ZED::Core::Pause(100);
+
 		EXPECT_TRUE(m->GetScoreboard(f).m_HansokuMake);
 		EXPECT_TRUE(m->GetScoreboard(!f).m_HansokuMake);
 
 		m->AddNoDisqualification(f);
 		m->AddNoDisqualification(!f);
+
+		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());

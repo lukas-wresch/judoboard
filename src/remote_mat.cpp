@@ -333,6 +333,10 @@ RemoteMat::InternalState RemoteMat::GetState(bool* pSuccess) const
 	state >> SetScoreboard(Fighter::White).m_Shido >> SetScoreboard(Fighter::Blue).m_Shido;
 	state >> SetScoreboard(Fighter::White).m_MedicalExamination >> SetScoreboard(Fighter::Blue).m_MedicalExamination;
 
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; ++f)
+		if (m_Scoreboards[(int)f].m_Shido >= 3)
+			SetScoreboard(f).m_HansokuMake = true;
+
 	state >> internalState.display_time >> internalState.hajime;
 
 	state >> internalState.white_osaekomi_time >> internalState.white_osaekomi;
