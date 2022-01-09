@@ -334,8 +334,7 @@ RemoteMat::InternalState RemoteMat::GetState(bool* pSuccess) const
 	state >> SetScoreboard(Fighter::White).m_MedicalExamination >> SetScoreboard(Fighter::Blue).m_MedicalExamination;
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; ++f)
-		if (m_Scoreboards[(int)f].m_Shido >= 3)
-			SetScoreboard(f).m_HansokuMake = true;
+		SetScoreboard(f).m_HansokuMake = m_Scoreboards[(int)f].m_Shido >= 3;
 
 	state >> internalState.display_time >> internalState.hajime;
 

@@ -539,15 +539,19 @@ TEST(RemoteMat, Shido)
 
 		EXPECT_TRUE(m->GetScoreboard(f).m_Shido == 3);
 		m->AddShido(f);
+		ZED::Core::Pause(100);
 		EXPECT_TRUE(m->GetScoreboard(f).m_Shido == 3);
 		EXPECT_TRUE(m->GetScoreboard(f).m_HansokuMake);
 
 		m->RemoveShido(f);
+		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m->GetScoreboard(f).m_Shido == 2);
 		EXPECT_FALSE(m->GetScoreboard(f).m_HansokuMake);
 
 		m->AddShido(f);
+		ZED::Core::Pause(100);
+
 		EXPECT_TRUE(m->GetScoreboard(f).m_Shido == 3);
 		EXPECT_TRUE(m->GetScoreboard(f).m_HansokuMake);
 
@@ -2449,23 +2453,27 @@ TEST(RemoteMat, WazariAwaseteIppon)
 		EXPECT_TRUE(m->GetScoreboard(f).m_WazaAri == 0);
 		EXPECT_FALSE(m->EndMatch());
 
-		m->AddWazaAri(f);				
+		m->AddWazaAri(f);
+		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon == 0);
 		EXPECT_TRUE(m->GetScoreboard(f).m_WazaAri == 1);
 		EXPECT_FALSE(m->EndMatch());
 
 		m->AddWazaAri(f);
+		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon == 1);
 		EXPECT_TRUE(m->GetScoreboard(f).m_WazaAri == 2);
 
 		m->RemoveWazaAri(f);
+		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon == 0);
 		EXPECT_TRUE(m->GetScoreboard(f).m_WazaAri == 1);
 
 		m->AddWazaAri(f);
+		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon == 1);
 		EXPECT_TRUE(m->GetScoreboard(f).m_WazaAri == 2);
