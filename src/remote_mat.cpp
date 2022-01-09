@@ -118,6 +118,16 @@ bool RemoteMat::EndMatch()
 
 
 
+bool RemoteMat::EnableGoldenScore(bool GoldenScore)
+{
+	if (GoldenScore)
+		return SendCommand("/ajax/mat/+golden_score?id=" + std::to_string(GetMatID()));
+	else
+		return SendCommand("/ajax/mat/-golden_score?id=" + std::to_string(GetMatID()));
+}
+
+
+
 void RemoteMat::Hajime()
 {
 	SendCommand("/ajax/mat/hajime?id=" + std::to_string(GetMatID()));

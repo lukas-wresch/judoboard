@@ -34,7 +34,7 @@ namespace Judoboard
 		virtual bool IsHajime()      const override { return GetState().hajime; }
 		virtual bool IsOutOfTime()   const override { return GetState().isoutoftime; }
 		virtual bool IsGoldenScore() const override { return GetState().isgoldenscore; }
-		virtual bool EnableGoldenScore(bool GoldenScore = true) override { return false; }
+		virtual bool EnableGoldenScore(bool GoldenScore = true) override;
 
 		virtual bool IsOsaekomiRunning() const override { return false; };//Returns true if one of the osaekomi clocks are running
 		virtual bool IsOsaekomi() const override { return false; };//Returns true during an osaekomi situation

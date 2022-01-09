@@ -889,7 +889,7 @@ TEST(RemoteMat, DoubleIppon)
 	//allotted for regular time, the contest shall be decided by a “golden score” period
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -898,9 +898,16 @@ TEST(RemoteMat, DoubleIppon)
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-		match.SetMatID(1);
-		EXPECT_TRUE(m->StartMatch(&match));
+		auto j1 = new Judoka(GetRandomName(), GetRandomName());
+		auto j2 = new Judoka(GetRandomName(), GetRandomName());
+		master.GetDatabase().AddJudoka(j1);
+		master.GetDatabase().AddJudoka(j2);
+
+		Match* match = new Match(nullptr, j1, j2);
+		match->SetMatID(1);
+		master.GetTournament()->AddMatch(match);
+
+		EXPECT_TRUE(m->StartMatch(match));
 
 		m->AddIppon(f);
 		m->AddIppon(!f);
@@ -908,11 +915,15 @@ TEST(RemoteMat, DoubleIppon)
 		EXPECT_FALSE(m->HasConcluded());
 		m->EnableGoldenScore();
 
+		ZED::Core::Pause(100);
+
 		EXPECT_TRUE(m->IsGoldenScore());
 
 		EXPECT_FALSE(m->IsHajime());
 
 		m->AddIppon(f);
+
+		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());
@@ -936,9 +947,16 @@ TEST(RemoteMat, DoubleIpponFightersKeepWazaari)
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-		match.SetMatID(1);
-		EXPECT_TRUE(m->StartMatch(&match));
+		auto j1 = new Judoka(GetRandomName(), GetRandomName());
+		auto j2 = new Judoka(GetRandomName(), GetRandomName());
+		master.GetDatabase().AddJudoka(j1);
+		master.GetDatabase().AddJudoka(j2);
+
+		Match* match = new Match(nullptr, j1, j2);
+		match->SetMatID(1);
+		master.GetTournament()->AddMatch(match);
+
+		EXPECT_TRUE(m->StartMatch(match));
 
 		m->AddWazaAri(f);
 		m->AddWazaAri(!f);
@@ -1050,6 +1068,7 @@ TEST(RemoteMat, DoubleIpponDuringGoldenScoreFightersKeepWazaari)
 		ZED::Core::Pause(2000);
 
 		EXPECT_TRUE(m->EnableGoldenScore());
+		ZED::Core::Pause(100);
 		EXPECT_TRUE(m->IsGoldenScore());
 
 		m->Hajime();
@@ -1059,11 +1078,13 @@ TEST(RemoteMat, DoubleIpponDuringGoldenScoreFightersKeepWazaari)
 		EXPECT_FALSE(m->IsHajime());
 		EXPECT_FALSE(m->HasConcluded());
 
-		EXPECT_TRUE(m->GetScoreboard(Fighter::White).m_WazaAri == 1);
-		EXPECT_TRUE(m->GetScoreboard(Fighter::Blue ).m_WazaAri == 1);
+		EXPECT_EQ(m->GetScoreboard(Fighter::White).m_WazaAri, 1);
+		EXPECT_EQ(m->GetScoreboard(Fighter::Blue ).m_WazaAri, 1);
 
 		m->Hajime();
+		ZED::Core::Pause(100);
 		m->AddIppon(f);
+		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());
@@ -2747,7 +2768,7 @@ TEST(RemoteMat, Hantei)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2779,6 +2800,7 @@ TEST(RemoteMat, Hantei)
 		EXPECT_FALSE(m->HasConcluded());
 
 		m->Hantei(f);
+		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());
