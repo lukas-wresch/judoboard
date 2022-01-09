@@ -36,9 +36,19 @@ namespace Judoboard
 		virtual bool IsGoldenScore() const override { return GetState().isgoldenscore; }
 		virtual bool EnableGoldenScore(bool GoldenScore = true) override;
 
-		virtual bool IsOsaekomiRunning() const override { return false; };//Returns true if one of the osaekomi clocks are running
-		virtual bool IsOsaekomi() const override { return false; };//Returns true during an osaekomi situation
-		virtual Fighter GetOsaekomiHolder() const override { return Fighter::White; }
+		virtual bool IsOsaekomiRunning() const override {//Returns true if one of the osaekomi clocks are running
+			auto state = GetState();
+			return state.white_osaekomi || state.blue_osaekomi;
+		}
+		virtual bool IsOsaekomi() const override {//Returns true during an osaekomi situation (even during yoshi!)
+			auto state = GetState();
+			return state.white_osaekomi || state.blue_osaekomi || state.white_osaekomi_time > 0 || state.blue_osaekomi_time > 0;
+		};//Returns true during an osaekomi situation
+		virtual Fighter GetOsaekomiHolder() const override {
+			if (GetState().white_osaekomi_time > 0)
+				return Fighter::White;
+			return Fighter::Blue;
+		}
 
 		//Commands by judge
 		virtual void Hajime() override;

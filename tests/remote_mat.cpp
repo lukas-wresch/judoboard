@@ -1480,7 +1480,7 @@ TEST(RemoteMat, GoldenScoreTime)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1509,6 +1509,7 @@ TEST(RemoteMat, GoldenScoreTime)
 
 		ZED::Core::Pause(6 * 1000);
 		m->EnableGoldenScore();
+		ZED::Core::Pause(100);
 		m->Hajime();
 
 		for (int k = 0; k < time - 1; k++)
