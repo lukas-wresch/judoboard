@@ -39,6 +39,10 @@ Error::operator std::string ()
 
 		case Type::OperationFailed:
 			return Localizer::Translate("Operation failed");
+		case Type::InvalidFormat:
+			return Localizer::Translate("Invalid format");
+		case Type::InvalidInput:
+			return Localizer::Translate("Invalid input");
 	}
 
 	return Localizer::Translate("Unknown error");

@@ -327,6 +327,24 @@ TEST(Ajax, Ajax_GetHansokumake2)
 
 
 
+TEST(Ajax, AddClub)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club")), "ok");
+
+		auto clubs = app.GetDatabase().GetAllClubs();
+
+		ASSERT_EQ(clubs.size(), 1);
+		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
+	}
+}
+
+
+
 TEST(Ajax, ListClubs)
 {
 	initialize();

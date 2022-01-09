@@ -104,6 +104,7 @@ namespace Judoboard
 		std::string Ajax_GetHansokumake() const;//Returns matches that are in progress and have a direct hansokumake
 
 		//Clubs
+		Error Ajax_AddClub(const HttpServer::Request& Request);
 		ZED::CSV Ajax_ListClubs();
 
 		//Match tables

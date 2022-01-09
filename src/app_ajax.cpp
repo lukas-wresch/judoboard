@@ -1180,6 +1180,15 @@ void Application::SetupHttpServer()
 	});
 
 
+	//Clubs
+	m_Server.RegisterResource("/ajax/club/add", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_AddClub(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/club/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -2363,6 +2372,20 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 	}
 
 	return Error::Type::MatNotFound;
+}
+
+
+
+Error Application::Ajax_AddClub(const HttpServer::Request& Request)
+{
+	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+
+	if (name.size() == 0)
+		return Error::Type::InvalidInput;
+
+	m_Database.AddClub(new Club(name));
+	m_Database.Save();
+	return Error();//OK
 }
 
 
