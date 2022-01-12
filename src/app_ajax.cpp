@@ -2277,10 +2277,14 @@ ZED::CSV Application::Ajax_GetMats() const
 			if (!mat)
 			{
 				std::string mat_name = Localizer::Translate("Mat") + " " + std::to_string(id);
-				ret << id << IMat::Type::Unknown << false << mat_name << 0 << 0 << false;
+				ret << id << IMat::Type::Unknown << false << mat_name << 0 << 0 << false << false << "-";
 			}
 			else
-				ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponStyle() << mat->GetTimerStyle() << mat->IsFullscreen();
+			{
+				ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName();
+				ret << mat->GetIpponStyle() << mat->GetTimerStyle() << mat->IsFullscreen();
+				ret << mat->IsSoundEnabled() << mat->GetSoundFilename();
+			}
 		}
 	}
 
@@ -2348,6 +2352,8 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 	auto name  = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
+	bool sound = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "sound")) == 1;
+	std::string soundFilename = HttpServer::DecodeURLEncoded(Request.m_Body, "sound_filename");
 
 	if (id <= 0 || new_id <= 0)
 		return Error::Type::InvalidID;
@@ -2377,6 +2383,8 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 			mat->SetName(name);
 			mat->SetIpponStyle((Mat::IpponStyle)ipponStyle);
 			mat->SetTimerStyle((Mat::TimerStyle)timerStyle);
+			mat->EnableSound(sound);
+			mat->SetSoundFilename(soundFilename);
 
 			return Error();//OK
 		}

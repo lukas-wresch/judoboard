@@ -14,7 +14,11 @@ TEST(Ajax, GetMats)
 	int highestID, id, type;
 	std::string name;
 	bool isOpen;
-	int style;
+	int style_ippon;
+	int style_timer;
+	bool fullscreen;
+	bool sound;
+	std::string sound_filename;
 
 	csv >> highestID;
 
@@ -25,13 +29,17 @@ TEST(Ajax, GetMats)
 	auto csv2 = app.Ajax_GetMats();
 
 	//csv
-	csv2 >> highestID >> id >> type >> isOpen >> name >> style;
+	csv2 >> highestID >> id >> type >> isOpen >> name >> style_ippon >> style_timer >> fullscreen >> sound >> sound_filename;
 
 	EXPECT_TRUE(highestID == 2);
 	EXPECT_TRUE(id == 1);
 	EXPECT_TRUE(type == (int)Mat::Type::LocalMat);
 	EXPECT_TRUE(name == "Mat 1");
-	EXPECT_TRUE(style == (int)IMat::IpponStyle::DoubleDigit);
+	EXPECT_TRUE(style_ippon == (int)IMat::IpponStyle::DoubleDigit);
+	EXPECT_TRUE(style_timer == (int)IMat::TimerStyle::HundredsMS);
+	EXPECT_TRUE(fullscreen);
+	EXPECT_TRUE(sound);
+	EXPECT_EQ(sound_filename, "test");
 }
 
 
@@ -129,7 +137,7 @@ TEST(Ajax, UpdateMat)
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 
-		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&timerStyle=1"));
+		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&timerStyle=1&sound=0&sound_filename=changed"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
@@ -137,6 +145,8 @@ TEST(Ajax, UpdateMat)
 		EXPECT_TRUE(app.GetDefaultMat()->GetName()  == "Test");
 		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 0);
 		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 1);
+		EXPECT_FALSE(app.GetDefaultMat()->IsSoundEnabled());
+		EXPECT_EQ(app.GetDefaultMat()->GetSoundFilename(), "changed");
 
 
 		app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&timerStyle=2"));
@@ -149,7 +159,7 @@ TEST(Ajax, UpdateMat)
 		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 2);
 
 
-		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test2&ipponStyle=2&timerStyle=0"));
+		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test2&ipponStyle=2&timerStyle=0&sound=1&sound_filename=changed2"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
@@ -157,6 +167,8 @@ TEST(Ajax, UpdateMat)
 		EXPECT_TRUE(app.GetDefaultMat()->GetName() == "Test2");
 		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 2);
 		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 0);
+		EXPECT_TRUE(app.GetDefaultMat()->IsSoundEnabled());
+		EXPECT_EQ(app.GetDefaultMat()->GetSoundFilename(), "changed2");
 	}
 }
 

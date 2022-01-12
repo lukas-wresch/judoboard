@@ -31,6 +31,21 @@
   </select>
 </div>
 
+<div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_sound">Sounds</label>
+  <input type="checkbox" id="sound" class="switch-input">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="sound">
+    <span class="toggle-on" id="sound_enabled">Enabled</span><span class="toggle-off" for="sound" id="sound_disabled">Disabled</span>
+  </label>
+</div>
+
+<div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_sound_filename">Sound Type</label>
+  <select style="margin-bottom:20px;" id="sound_filename">
+    <option selected value="0">test</option>
+  </select>
+</div>
+
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateMat()" id="update">Update Mat</button>
 
 </form>
@@ -61,10 +76,12 @@ function CloseMat()
 function UpdateMat()
 {
   var params = URLEncode({
-    id:          document.getElementById("id").value,
-    name:        document.getElementById("name").value,
-    ipponStyle:  document.getElementById("ipponStyle").value,
-    timerStyle:  document.getElementById("timerStyle").value,
+    id:              document.getElementById("id").value,
+    name:            document.getElementById("name").value,
+    ipponStyle:      document.getElementById("ipponStyle").value,
+    timerStyle:      document.getElementById("timerStyle").value,
+    sound:           document.getElementById("sound").checked,
+    sound_filename:  document.getElementById("sound_filename").value,
   });
 
   AjaxPost('/ajax/config/set_mat?id=' + id, params, function() {
@@ -121,5 +138,7 @@ function GetMat(id)
 var id = URLDecode(URL, "id");
 GetMat(id);
 
+document.getElementById("sound_enabled").innerHTML  = lang.enabled;
+document.getElementById("sound_disabled").innerHTML = lang.disabled;
 
 </script>
