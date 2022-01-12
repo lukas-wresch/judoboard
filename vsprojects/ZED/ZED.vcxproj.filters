@@ -69,6 +69,9 @@
     <ClCompile Include="..\..\ZED\src\sha256.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\ZED\src\sound.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ZED\include\blob.h">

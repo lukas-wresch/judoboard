@@ -77,6 +77,15 @@ bool Mat::Open()
 			m_Logo = m_Window.GetRenderer().CreateTexture("assets/logo.png");
 
 		ZED::Log::Info("Logo loaded");
+			
+		if (!m_Sound)
+		{
+			m_Sound = std::move(ZED::Sound("assets/sounds/test.wav"));
+			if (m_Sound)
+				ZED::Log::Info("Sound file loaded");
+			else
+				ZED::Log::Warn("Could not load sound file");
+		}
 
 		while (m_Window.IsRunning())
 			Mainloop();
@@ -1023,13 +1032,17 @@ void Mat::Process()
 				AddWazaAri(fighter);
 			else
 				AddIppon(fighter);
+
+			m_Sound.Play();
 		}
 	}
 
 	if (IsOutOfTime() && IsHajime())
+	{
 		Mate();
+		m_Sound.Play();
+	}
 }
-
 
 
 
