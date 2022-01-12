@@ -80,7 +80,7 @@ bool Mat::Open()
 			
 		if (!m_Sound)
 		{
-			m_Sound = std::move(ZED::Sound("assets/sounds/test.wav"));
+			m_Sound = std::move(ZED::Sound("assets/sounds/" + GetSoundFilename() + ".wav"));
 			if (m_Sound)
 				ZED::Log::Info("Sound file loaded");
 			else
@@ -1033,14 +1033,16 @@ void Mat::Process()
 			else
 				AddIppon(fighter);
 
-			m_Sound.Play();
+			if (IsSoundEnabled())
+				m_Sound.Play();
 		}
 	}
 
 	if (IsOutOfTime() && IsHajime())
 	{
 		Mate();
-		m_Sound.Play();
+		if (IsSoundEnabled())
+			m_Sound.Play();
 	}
 }
 
