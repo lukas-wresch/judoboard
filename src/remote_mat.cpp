@@ -293,6 +293,20 @@ void RemoteMat::RemoveMedicalExamination(Fighter Whom)
 
 
 
+void RemoteMat::AddGachi(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/+gachi?id=" + std::to_string(GetMatID()));
+}
+
+
+
+void RemoteMat::RemoveGachi(Fighter Whom)
+{
+	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/-gachi?id=" + std::to_string(GetMatID()));
+}
+
+
+
 void RemoteMat::Osaekomi(Fighter Whom)
 {
 	SendCommand("/ajax/mat/" + Fighter2String(Whom) + "/osaekomi?id=" + std::to_string(GetMatID()));

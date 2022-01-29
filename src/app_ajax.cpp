@@ -917,7 +917,7 @@ void Application::SetupHttpServer()
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 			if (id <= 0)
-				return "Invalid id";
+				return Error(Error::Type::InvalidID);
 
 			auto mat = FindMat(id);
 
@@ -940,6 +940,40 @@ void Application::SetupHttpServer()
 
 			if (mat)
 				mat->RemoveMedicalExamination(fighter);
+			return Error();//OK
+		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+gachi", [this, fighter](auto& Request) -> std::string {
+			auto account = IsLoggedIn(Request);
+			if (!account)
+				return Error(Error::Type::NotLoggedIn);
+
+			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+			if (id <= 0)
+				return Error(Error::Type::InvalidID);
+
+			auto mat = FindMat(id);
+
+			if (mat)
+				mat->AddGachi(fighter);
+			return Error();//OK
+		});
+
+		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-gachi", [this, fighter](auto& Request) -> std::string {
+			auto account = IsLoggedIn(Request);
+			if (!account)
+				return Error(Error::Type::NotLoggedIn);
+
+			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+			if (id <= 0)
+				return Error(Error::Type::InvalidID);
+
+			auto mat = FindMat(id);
+
+			if (mat)
+				mat->RemoveGachi(fighter);
 			return Error();//OK
 		});
 

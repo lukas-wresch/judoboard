@@ -382,9 +382,16 @@ TEST(RemoteMat, RemoveIpponShouldRecoverPreviousWazaari)
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-		match.SetMatID(1);
-		EXPECT_TRUE(m->StartMatch(&match));
+		auto j1 = new Judoka(GetRandomName(), GetRandomName());
+		auto j2 = new Judoka(GetRandomName(), GetRandomName());
+		master.GetDatabase().AddJudoka(j1);
+		master.GetDatabase().AddJudoka(j2);
+
+		Match* match = new Match(nullptr, j1, j2);
+		match->SetMatID(1);
+		master.GetTournament()->AddMatch(match);
+
+		EXPECT_TRUE(m->StartMatch(match));
 
 		m->AddWazaAri(f);
 		m->AddIppon(f);
@@ -420,9 +427,16 @@ TEST(RemoteMat, RemoveWazariShouldRemoveIppon)
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-		match.SetMatID(1);
-		EXPECT_TRUE(m->StartMatch(&match));
+		auto j1 = new Judoka(GetRandomName(), GetRandomName());
+		auto j2 = new Judoka(GetRandomName(), GetRandomName());
+		master.GetDatabase().AddJudoka(j1);
+		master.GetDatabase().AddJudoka(j2);
+
+		Match* match = new Match(nullptr, j1, j2);
+		match->SetMatID(1);
+		master.GetTournament()->AddMatch(match);
+
+		EXPECT_TRUE(m->StartMatch(match));
 
 		m->AddWazaAri(f);
 		m->AddWazaAri(f);
@@ -842,9 +856,16 @@ TEST(RemoteMat, Gachi)
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-		match.SetMatID(1);
-		EXPECT_TRUE(m->StartMatch(&match));
+		auto j1 = new Judoka(GetRandomName(), GetRandomName());
+		auto j2 = new Judoka(GetRandomName(), GetRandomName());
+		master.GetDatabase().AddJudoka(j1);
+		master.GetDatabase().AddJudoka(j2);
+
+		Match* match = new Match(nullptr, j1, j2);
+		match->SetMatID(1);
+		master.GetTournament()->AddMatch(match);
+
+		EXPECT_TRUE(m->StartMatch(match));
 
 		m->AddGachi(f);
 
@@ -868,9 +889,16 @@ TEST(RemoteMat, GachiResultsInMate)
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-		match.SetMatID(1);
-		EXPECT_TRUE(m->StartMatch(&match));
+		auto j1 = new Judoka(GetRandomName(), GetRandomName());
+		auto j2 = new Judoka(GetRandomName(), GetRandomName());
+		master.GetDatabase().AddJudoka(j1);
+		master.GetDatabase().AddJudoka(j2);
+
+		Match* match = new Match(nullptr, j1, j2);
+		match->SetMatID(1);
+		master.GetTournament()->AddMatch(match);
+
+		EXPECT_TRUE(m->StartMatch(match));
 
 		m->AddGachi(f);
 

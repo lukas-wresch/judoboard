@@ -84,8 +84,8 @@ namespace Judoboard
 		virtual void AddMedicalExamination(Fighter Whom) override;
 		virtual void RemoveMedicalExamination(Fighter Whom) override;
 
-		virtual void AddGachi(Fighter Whom) override {}
-		virtual void RemoveGachi(Fighter Whom) override {}
+		virtual void AddGachi(Fighter Whom) override;
+		virtual void RemoveGachi(Fighter Whom) override;
 
 		virtual void Osaekomi(Fighter Whom) override;
 		virtual void Tokeda() override;
