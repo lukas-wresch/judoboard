@@ -2159,7 +2159,7 @@ Match::Result Mat::GetResult() const
 {
 	auto time = m_HajimeTimer.GetElapsedTime();
 
-	if (IsGoldenScore())
+	if (IsGoldenScore() && m_pMatch)
 		time += m_pMatch->GetRuleSet().GetMatchTime() * 1000;
 
 	//Double hansokumake

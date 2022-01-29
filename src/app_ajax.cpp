@@ -1031,8 +1031,12 @@ void Application::SetupHttpServer()
 
 			auto mat = FindMat(id);
 
-			if (mat)
-				mat->EnableGoldenScore();
+			if (!mat)
+				return Error(Error::Type::MatNotFound);
+
+			if (!mat->EnableGoldenScore())
+				return Error(Error::Type::OperationFailed);
+
 			return Error();//OK
 		});
 	}
