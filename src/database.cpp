@@ -171,14 +171,13 @@ Judoka* Database::UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly,
 
 
 
-const Account* Database::AddAccount(const Account& NewAccount)
+const Account* Database::AddAccount(Account* NewAccount)
 {
-	Account* new_account = new Account(NewAccount);
-	m_Accounts.push_back(new_account);
+	m_Accounts.push_back(NewAccount);
 
-	Save(m_Filename);
+	Save();
 
-	return new_account;
+	return NewAccount;
 }
 
 

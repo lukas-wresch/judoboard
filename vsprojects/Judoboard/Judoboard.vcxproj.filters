@@ -298,5 +298,8 @@
     <None Include="..\..\compile64.bat">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\bin\html\account_change_password.html">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

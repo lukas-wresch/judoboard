@@ -839,7 +839,7 @@ bool TextureOpenGL::LoadTexture() const
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 
-	ZED::Log::Debug("Texture id="+std::to_string(m_gl_texture)+" created with size"+std::to_string(m_surface->w)+"x"+ std::to_string(m_surface->h));
+	//ZED::Log::Debug("Texture id="+std::to_string(m_gl_texture)+" created with size "+std::to_string(m_surface->w)+"x"+ std::to_string(m_surface->h));
 
 	//(const_cast<TextureOpenGL*>(this))->TextureSDL2::Unload();
 

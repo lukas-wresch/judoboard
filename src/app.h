@@ -87,6 +87,9 @@ namespace Judoboard
 
 		//AJAX requests
 
+		//General
+		Error Ajax_UpdatePassword(Account* Account, const HttpServer::Request& Request);
+
 		//Mat
 		ZED::CSV Ajax_GetMats() const;
 		Error Ajax_OpenMat(  const HttpServer::Request& Request);

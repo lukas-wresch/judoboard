@@ -43,19 +43,20 @@
   <section class="menu-section">
     <h3 class="menu-section-title" id="navi_database">Database</h3>
     <ul class="menu-section-list">
-      <li><a id="navi_add_judoka" href="#judoka_add.html">New Judoka</a></li>
-      <li><a id="navi_list_judoka" href="#judoka_list.html">List Judokas</a></li>
-      <li><a id="navi_list_club"   href="#club_list.html">List Clubs</a></li>
-      <li><a id="navi_list_account" href="#account_list.html">List Accounts</a></li>
-      <li><a id="navi_list_tournament" href="#tournament_list.html">Tournaments</a></li>
-      <li><a id="navi_list_rule" href="#rule_list.html">Rule Sets</a></li>
+      <li><a id="navi_change_password" href="#account_change_password.html">Change Password</a></li>
+      <li><a id="navi_add_judoka" style="display: none;" href="#judoka_add.html">New Judoka</a></li>
+      <li><a id="navi_list_judoka" style="display: none;" href="#judoka_list.html">List Judokas</a></li>
+      <li><a id="navi_list_club"   style="display: none;" href="#club_list.html">List Clubs</a></li>
+      <li><a id="navi_list_account" style="display: none;" href="#account_list.html">List Accounts</a></li>
+      <li><a id="navi_list_tournament" style="display: none;" href="#tournament_list.html">Tournaments</a></li>
+      <li><a id="navi_list_rule" style="display: none;" href="#rule_list.html">Rule Sets</a></li>
     </ul>
   </section>
 
   <section class="menu-section">
     <h3 class="menu-section-title">Server</h3>
     <ul class="menu-section-list">
-      <li><a id="navi_add_judoka" href="#server_config.html">Configuration</a></li>
+      <li><a id="navi_server_config" style="display: none;" href="#server_config.html">Configuration</a></li>
     </ul>
   </section>
 
@@ -173,6 +174,7 @@ document.getElementById("navi_configure_mats").innerHTML = lang.settings;
 document.getElementById("navi_show_mats").innerHTML = lang.show_mats;
 
 document.getElementById("navi_database").innerHTML = lang.database;
+document.getElementById("navi_change_password").innerHTML = lang.change_password;
 document.getElementById("navi_add_judoka").innerHTML = lang.new_judoka;
 document.getElementById("navi_list_judoka").innerHTML = lang.list_judokas;
 document.getElementById("navi_list_account").innerHTML = lang.list_accounts;
@@ -181,6 +183,26 @@ document.getElementById("navi_list_tournament").innerHTML = lang.tournaments;
 document.getElementById("navi_list_club").innerHTML = lang.list_clubs;
 
 document.getElementById("navi_list_class").innerHTML = lang.match_tables;
+
+
+AjaxCallback("/ajax/get_status", function(response) {
+    var status = response;
+
+    if (status >= 2)
+    {
+        $("#navi_add_judoka").show();
+        $("#navi_list_judoka").show();
+        $("#navi_list_club").show();
+        $("#navi_list_account").show();
+        $("#navi_list_tournament").show();
+        $("#navi_list_rule").show();
+    }
+
+    if (status >= 3)
+    {
+        $("#navi_server_config").show();
+    }
+});
 
 
 Update_MatCount();

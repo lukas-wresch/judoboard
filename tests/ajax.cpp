@@ -162,6 +162,35 @@ TEST(Ajax, UpdateMat)
 
 
 
+TEST(Ajax, UpdatePassword)
+{
+	initialize();
+
+	{
+		Application app;
+
+		Account* acc = new Account("test", "pwd1");
+		app.GetDatabase().AddAccount(acc);
+
+		app.Ajax_UpdatePassword(nullptr, HttpServer::Request("", "password=pwd2"));
+
+		EXPECT_EQ(acc->GetPassword(), "pwd1");
+		EXPECT_EQ(acc->GetAccessLevel(), Account::AccessLevel::User);
+
+		app.Ajax_UpdatePassword(acc, HttpServer::Request("", "password=pwd2"));
+
+		EXPECT_EQ(acc->GetPassword(), "pwd2");
+		EXPECT_EQ(acc->GetAccessLevel(), Account::AccessLevel::User);
+
+		app.Ajax_UpdatePassword(acc, HttpServer::Request("", "password=pwd3"));
+
+		EXPECT_EQ(acc->GetPassword(), "pwd3");
+		EXPECT_EQ(acc->GetAccessLevel(), Account::AccessLevel::User);
+	}
+}
+
+
+
 TEST(Ajax, SetFullscreen)
 {
 	initialize();

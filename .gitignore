@@ -388,3 +388,4 @@ FodyWeavers.xsd
 /bin/GoogleTest_Debug.exe
 /bin/Judoboard.exe
 /bin/Judoboard_Debug.exe
+*.wav

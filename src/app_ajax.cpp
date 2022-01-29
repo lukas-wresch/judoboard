@@ -36,7 +36,7 @@ void Application::SetupHttpServer()
 
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit",
-		"club_list", "club_add", "add_match", "edit_match", "account_add", "account_edit", "account_list",
+		"club_list", "club_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
 		"matchtable_list", "matchtable_add", "rule_add", "rule_list", "tournament_list", "tournament_add",
 		"server_config"
 	};
@@ -140,6 +140,15 @@ void Application::SetupHttpServer()
 		Request.m_ResponseHeader = HttpServer::CookieHeader("session", response);
 
 		return Error();//OK
+	});
+
+
+	m_Server.RegisterResource("/ajax/get_status", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return "0";
+
+		return std::to_string((int)account->GetAccessLevel());
 	});
 
 
@@ -1322,6 +1331,15 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/account/update_password", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return std::string(Error(Error::Type::NotLoggedIn));
+
+		return Ajax_UpdatePassword((Account*)account, Request);
+	});
+
+
 	m_Server.RegisterResource("/ajax/account/delete", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
@@ -2257,6 +2275,23 @@ void Application::SetupHttpServer()
 		*match = posted_match;
 		return "ok";
 	});
+}
+
+
+
+Error Application::Ajax_UpdatePassword(Account* Account, const HttpServer::Request& Request)
+{
+	if (!Account)
+		return Error::Type::InternalError;
+
+	auto password = HttpServer::DecodeURLEncoded(Request.m_Body, "password");
+
+	if (password.length() <= 0)//Password not changed
+		return Error::Type::InvalidInput;
+
+	Account->SetPassword(password);
+	m_Database.Save();
+	return Error::Type::NoError;//OK
 }
 
 
