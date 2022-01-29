@@ -1493,11 +1493,13 @@ TEST(RemoteMat, MatchTime)
 
 		m->Hajime();
 
-		for (int k = 0; k < time - 1; k++)
+		for (int k = 0; k < time - 10; k++)
 		{
 			EXPECT_FALSE(m->IsOutOfTime());
 			ZED::Core::Pause(1000);
 		}
+
+		ZED::Core::Pause(10 * 1000);
 
 		ZED::Core::Pause(2000);
 		EXPECT_TRUE(m->IsOutOfTime());
@@ -1542,12 +1544,13 @@ TEST(RemoteMat, GoldenScoreTime)
 		ZED::Core::Pause(100);
 		m->Hajime();
 
-		for (int k = 0; k < time - 1; k++)
+		for (int k = 0; k < time - 10; k++)
 		{
 			EXPECT_FALSE(m->IsOutOfTime());
 			ZED::Core::Pause(1000);
 		}
 
+		ZED::Core::Pause(10 * 1000);
 		ZED::Core::Pause(2000);
 		EXPECT_TRUE(m->IsOutOfTime());
 	}
@@ -2951,17 +2954,20 @@ TEST(RemoteMat, BreakTime)
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());
 
-		Match match2(nullptr, j1, j3, 1);
-		match2.SetRuleSet(rule_set);
+		Match* match2 = new Match(nullptr, j1, j3);
+		match2->SetMatID(1);
+		match2->SetRuleSet(rule_set);
+		master.GetTournament()->AddMatch(match2);
 
-		for (int k = 0; k < time-1; k++)
+		for (int k = 0; k < time-10; k++)
 		{
-			EXPECT_FALSE(m->StartMatch(&match2));
+			EXPECT_FALSE(m->StartMatch(match2));
 			ZED::Core::Pause(1000);
 		}
 
+		ZED::Core::Pause(10 * 1000);
 		ZED::Core::Pause(2000);
 
-		EXPECT_TRUE(m->StartMatch(&match2));
+		EXPECT_TRUE(m->StartMatch(match2));
 	}
 }
