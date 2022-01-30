@@ -146,9 +146,9 @@ bool RemoteMat::HasConcluded() const
 bool RemoteMat::EndMatch()
 {
 	//Used to keep the judoka data in sync
-	if (m_pMatch->GetFighter(Fighter::White))
+	if (m_pMatch && m_pMatch->GetFighter(Fighter::White))
 		m_pMatch->GetFighter(Fighter::White)->StartBreak();
-	if (m_pMatch->GetFighter(Fighter::Blue))
+	if (m_pMatch && m_pMatch->GetFighter(Fighter::Blue))
 		m_pMatch->GetFighter(Fighter::Blue)->StartBreak();
 
 	const bool ret = SendCommand("/ajax/mat/end_match?id=" + std::to_string(GetMatID()));
