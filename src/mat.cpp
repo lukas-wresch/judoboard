@@ -334,8 +334,10 @@ bool Mat::EnableGoldenScore(bool GoldenScore)
 ZED::CSV Mat::Scoreboard2String() const
 {
 	ZED::CSV ret;
-	ret << GetScoreboard(Fighter::White).m_Ippon << (GetScoreboard(Fighter::White).m_Ippon ? 0 : GetScoreboard(Fighter::White).m_WazaAri);
-	ret << GetScoreboard(Fighter::Blue).m_Ippon  << (GetScoreboard(Fighter::Blue ).m_Ippon ? 0 : GetScoreboard(Fighter::Blue ).m_WazaAri);
+	//ret << GetScoreboard(Fighter::White).m_Ippon << (GetScoreboard(Fighter::White).m_Ippon ? 0 : GetScoreboard(Fighter::White).m_WazaAri);
+	//ret << GetScoreboard(Fighter::Blue).m_Ippon  << (GetScoreboard(Fighter::Blue ).m_Ippon ? 0 : GetScoreboard(Fighter::Blue ).m_WazaAri);
+	ret << GetScoreboard(Fighter::White).m_Ippon << GetScoreboard(Fighter::White).m_WazaAri;
+	ret << GetScoreboard(Fighter::Blue).m_Ippon  << GetScoreboard(Fighter::Blue ).m_WazaAri;
 
 	if (m_pMatch && m_pMatch->GetRuleSet().IsYukoEnabled())
 		ret << GetScoreboard(Fighter::White).m_Yuko << GetScoreboard(Fighter::Blue).m_Yuko;

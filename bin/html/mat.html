@@ -352,10 +352,23 @@ function GetScore()
     var res = response.split(",");
 
     var i=0;
-    document.getElementById("white_ippon").innerHTML   = res[i++];
-    document.getElementById("white_wazaari").innerHTML = res[i++];
-    document.getElementById("blue_ippon").innerHTML    = res[i++];
-    document.getElementById("blue_wazaari").innerHTML  = res[i++];
+
+    var white_ippon   = res[i++];
+    var white_wazaari = res[i++];
+    var blue_ippon    = res[i++];
+    var blue_wazaari  = res[i++];
+
+    document.getElementById("white_ippon").innerHTML = white_ippon;
+    if (white_ippon == 1)
+        document.getElementById("white_wazaari").innerHTML = 0;
+    else
+        document.getElementById("white_wazaari").innerHTML = white_wazaari;
+
+    document.getElementById("blue_ippon").innerHTML = blue_ippon;
+    if (white_ippon == 1)
+        document.getElementById("blue_wazaari").innerHTML = 0;
+    else
+        document.getElementById("blue_wazaari").innerHTML = blue_wazaari;
 
     var white_yuko = res[i++];
     var blue_yuko  = res[i++];
