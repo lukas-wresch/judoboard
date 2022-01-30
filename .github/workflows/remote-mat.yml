@@ -17,10 +17,10 @@ jobs:
       run: chmod u+x *.sh && ./dependencies.sh
     - name: make
       run: ./compile.sh
-    - name: run tests
-      run: ./run_tests.sh
     - name: run tests debug
       run: ./run_tests_debug.sh
+    - name: run tests
+      run: ./run_tests.sh
       
   build2:
     name: Build and Test on Raspberry Pi 4
@@ -32,7 +32,7 @@ jobs:
       run: chmod u+x *.sh
     - name: make
       run: ./compile.sh
-    - name: run tests
-      run: ./run_tests.sh
     - name: run tests debug
       run: ./run_tests_debug.sh
+    - name: run tests
+      run: ./run_tests.sh
