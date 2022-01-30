@@ -93,7 +93,12 @@ bool RemoteMat::StartMatch(Match* NewMatch)
 	ZED::CSV csv;
 	*NewMatch >> csv;
 
-	return PostData("/ajax/slave/start_match?id=" + std::to_string(GetMatID()), csv);
+	const bool ret = PostData("/ajax/slave/start_match?id=" + std::to_string(GetMatID()), csv);
+
+	if (ret)
+		m_pMatch = NewMatch;
+
+	return ret;
 }
 
 
@@ -113,7 +118,18 @@ bool RemoteMat::HasConcluded() const
 
 bool RemoteMat::EndMatch()
 {
-	return SendCommand("/ajax/mat/end_match?id=" + std::to_string(GetMatID()));
+	//Used to keep the judoka data in sync
+	if (m_pMatch->GetFighter(Fighter::White))
+		m_pMatch->GetFighter(Fighter::White)->StartBreak();
+	if (m_pMatch->GetFighter(Fighter::Blue))
+		m_pMatch->GetFighter(Fighter::Blue)->StartBreak();
+
+	const bool ret = SendCommand("/ajax/mat/end_match?id=" + std::to_string(GetMatID()));
+
+	if (ret)
+		m_pMatch = nullptr;
+
+	return ret;
 }
 
 

@@ -138,7 +138,9 @@ namespace Judoboard
 
 		InternalState GetState(bool* pSuccess = nullptr) const;
 
+
 		mutable Scoreboard m_Scoreboards[2];
+		Match* m_pMatch = nullptr;//Reference to the current match used for caching
 
 		std::vector<OsaekomiEntry> m_OsaekomiList;
 

@@ -74,6 +74,11 @@ Judoka* RemoteTournament::FindParticipant(const UUID& UUID)
 
 	ZED::CSV csv(response);
 	Judoka* judoka = new Judoka(csv);
+
+	uint32_t timestampOfLastMatch = 0;
+	csv >> timestampOfLastMatch;
+	judoka->GetTimestampOfLastMatch(timestampOfLastMatch);
+
 	m_StandingData.AddJudoka(judoka);//Add to cache
 
 	return judoka;

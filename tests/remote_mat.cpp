@@ -11,6 +11,8 @@ TEST(RemoteMat, OpenAndClose)
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
 
+	ZED::Core::Pause(100);
+
 	IMat* m = master.FindMat(1);
 	ASSERT_TRUE(m);
 
@@ -48,11 +50,12 @@ TEST(RemoteMat, QuickClose)
 
 		ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 		ASSERT_TRUE(slave.StartLocalMat(1));
+		ZED::Core::Pause(100);
 
 		IMat* m = master.FindMat(1);
 		ASSERT_TRUE(m);
 	}
-	EXPECT_LE(ZED::Core::CurrentTimestamp() - time, 3500u);
+	EXPECT_LE(ZED::Core::CurrentTimestamp() - time, 4000u);
 }
 
 
@@ -71,6 +74,7 @@ TEST(RemoteMat, SlaveOpensMatTwice)
 
 	master.StartLocalMat(1);
 	slave.StartLocalMat(2);
+	ZED::Core::Pause(100);
 
 	IMat* mat[2];
 	mat[0] = master.FindMat(1);
@@ -1481,7 +1485,7 @@ TEST(RemoteMat, MatchTime)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		auto rules = new RuleSet("Test", time, 60, 30, 20, false, false, false, 0);
+		auto rules = new RuleSet("Test" + std::to_string(time), time, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
 		Match* match = new Match(nullptr, j1, j2);
@@ -1527,7 +1531,7 @@ TEST(RemoteMat, GoldenScoreTime)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		auto rules = new RuleSet("Test", 5, time, 30, 20, false, false, false, 0);
+		auto rules = new RuleSet("Test" + std::to_string(time), 5, time, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
 		Match* match = new Match(nullptr, j1, j2);
@@ -1538,11 +1542,13 @@ TEST(RemoteMat, GoldenScoreTime)
 		EXPECT_TRUE(m->StartMatch(match));
 
 		m->Hajime();
+		ZED::Core::Pause(6000);
 
-		ZED::Core::Pause(6 * 1000);
-		m->EnableGoldenScore();
+		EXPECT_TRUE(m->EnableGoldenScore());
 		ZED::Core::Pause(100);
+
 		m->Hajime();
+		ZED::Core::Pause(100);
 
 		for (int k = 0; k < time - 10; k++)
 		{
@@ -1553,6 +1559,10 @@ TEST(RemoteMat, GoldenScoreTime)
 		ZED::Core::Pause(10 * 1000);
 		ZED::Core::Pause(2000);
 		EXPECT_TRUE(m->IsOutOfTime());
+
+		m->AddIppon(Fighter::White);
+		ZED::Core::Pause(100);
+		EXPECT_TRUE(m->EndMatch());
 	}
 }
 
@@ -2122,6 +2132,7 @@ TEST(RemoteMat, MatchContinuesDuringOsaekomi)
 		m->Hajime();
 		ZED::Core::Pause(8 * 1000);
 		m->Osaekomi(f);
+		ZED::Core::Pause(100);
 
 		for (int k = 0; k < 9; k++)
 		{
@@ -2931,7 +2942,7 @@ TEST(RemoteMat, BreakTime)
 	srand(ZED::Core::CurrentTimestamp());
 	for (int time = 55; time <= 3 * 60; time += 60 + rand() % 60)
 	{
-		RuleSet* rule_set = new RuleSet("Test", 10, 10, 30, 20, false, false, false, time);
+		RuleSet* rule_set = new RuleSet("Test" + std::to_string(time), 10, 10, 30, 20, false, false, false, time);
 		master.GetDatabase().AddRuleSet(rule_set);
 
 		Judoka* j1 = new Judoka("Needs", "Break");
@@ -2947,12 +2958,15 @@ TEST(RemoteMat, BreakTime)
 		master.GetTournament()->AddMatch(match);
 
 		EXPECT_TRUE(m->StartMatch(match));
+		ZED::Core::Pause(100);
 
 		m->Hajime();
 		m->AddIppon((Fighter)(rand()%2));
+		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());
+		ZED::Core::Pause(100);
 
 		Match* match2 = new Match(nullptr, j1, j3);
 		match2->SetMatID(1);
@@ -2966,8 +2980,12 @@ TEST(RemoteMat, BreakTime)
 		}
 
 		ZED::Core::Pause(10 * 1000);
-		ZED::Core::Pause(2000);
+		ZED::Core::Pause(3000);
 
 		EXPECT_TRUE(m->StartMatch(match2));
+		ZED::Core::Pause(200);
+		m->AddIppon((Fighter)(rand() % 2));
+		EXPECT_TRUE(m->EndMatch());
+		ZED::Core::Pause(100);
 	}
 }

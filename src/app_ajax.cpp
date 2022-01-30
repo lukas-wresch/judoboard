@@ -2253,6 +2253,7 @@ void Application::SetupHttpServer()
 
 		ZED::CSV csv;
 		*judoka >> csv;
+		csv << judoka->GetTimestampOfLastMatch();
 		return csv;
 	});
 

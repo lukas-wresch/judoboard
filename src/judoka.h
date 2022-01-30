@@ -52,6 +52,9 @@ namespace Judoboard
 		void StartBreak() const { m_LastMatch_Timestamp = Timer::GetTimestamp(); }
 		uint32_t GetLengthOfBreak()  const { return (Timer::GetTimestamp() - m_LastMatch_Timestamp) / 1000; }//Returns the number of seconds this judoka had a break
 
+		uint32_t GetTimestampOfLastMatch() const { return m_LastMatch_Timestamp; }
+		void GetTimestampOfLastMatch(uint32_t Timestamp) const { m_LastMatch_Timestamp = Timestamp; }
+
 		const std::string ToString() const;
 
 		void operator >> (ZED::CSV& Stream) const;
