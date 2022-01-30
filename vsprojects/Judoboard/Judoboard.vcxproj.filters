@@ -301,5 +301,8 @@
     <None Include="..\..\bin\html\account_change_password.html">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\run_tests_debug.sh">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

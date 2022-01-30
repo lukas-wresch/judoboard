@@ -269,6 +269,7 @@
     <None Include="..\..\package.bat" />
     <None Include="..\..\README.md" />
     <None Include="..\..\run_tests.sh" />
+    <None Include="..\..\run_tests_debug.sh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
