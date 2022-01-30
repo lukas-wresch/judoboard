@@ -32,3 +32,5 @@ jobs:
       run: ./compile.sh
     - name: run tests
       run: ./run_tests.sh
+    - name: run tests debug
+      run: ./run_tests_debug.sh
