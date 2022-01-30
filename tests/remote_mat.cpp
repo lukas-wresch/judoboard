@@ -1997,7 +1997,7 @@ TEST(RemoteMat, Tokeda)
 
 		ASSERT_EQ(m->GetOsaekomiList().size(), 1);
 		EXPECT_TRUE(m->GetOsaekomiList()[0].m_Who == f);
-		EXPECT_LE(std::abs((int)m->GetOsaekomiList()[0].m_Time - 5000), 20);
+		EXPECT_LE(std::abs((int)m->GetOsaekomiList()[0].m_Time - 5000), 200);
 
 		ZED::Core::Pause(5000);
 
@@ -2017,7 +2017,7 @@ TEST(RemoteMat, Tokeda)
 
 		ASSERT_EQ(m->GetOsaekomiList().size(), 2);
 		EXPECT_TRUE(m->GetOsaekomiList()[1].m_Who == f);
-		EXPECT_TRUE(std::abs((int)m->GetOsaekomiList()[1].m_Time - 5000) < 20);
+		EXPECT_TRUE(std::abs((int)m->GetOsaekomiList()[1].m_Time - 5000) < 200);
 
 		ZED::Core::Pause(10 * 1000);
 

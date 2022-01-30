@@ -19,7 +19,7 @@ namespace Judoboard
 
 		virtual bool IsConnected() const override;
 
-		virtual const std::vector<OsaekomiEntry>& GetOsaekomiList() const override { return m_OsaekomiList; };
+		virtual const std::vector<OsaekomiEntry>& GetOsaekomiList() const override;
 
 		virtual bool AreFightersOnMat() const override;
 
@@ -142,7 +142,7 @@ namespace Judoboard
 		mutable Scoreboard m_Scoreboards[2];
 		Match* m_pMatch = nullptr;//Reference to the current match used for caching
 
-		std::vector<OsaekomiEntry> m_OsaekomiList;
+		mutable std::vector<OsaekomiEntry> m_OsaekomiList;
 
 		std::string m_Hostname;
 		uint16_t m_Port;

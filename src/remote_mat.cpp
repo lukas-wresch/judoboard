@@ -56,6 +56,33 @@ bool RemoteMat::IsConnected() const
 
 
 
+const std::vector<IMat::OsaekomiEntry>& RemoteMat::GetOsaekomiList() const
+{
+	std::string response = SendRequest("/ajax/mat/get_osaekomilist?id=" + std::to_string(GetMatID()));
+
+	auto count = std::count(response.begin(), response.end(), ',');
+
+	m_OsaekomiList.clear();
+
+	if (count > 0)
+	{
+		ZED::CSV data(response);
+
+		for (int i = 0; i < count; i+=2)
+		{
+			Fighter who;
+			uint32_t time;
+			data >> who >> time;
+
+			m_OsaekomiList.emplace_back(OsaekomiEntry(who, time));
+		}
+	}
+
+	return m_OsaekomiList;
+}
+
+
+
 bool RemoteMat::AreFightersOnMat() const
 {
 	bool success;
