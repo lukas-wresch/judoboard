@@ -840,7 +840,7 @@ void Application::SetupHttpServer()
 			if (mat)
 				mat->AddShido(fighter);
 			return Error();//OK
-			});
+		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-shido", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
@@ -857,7 +857,7 @@ void Application::SetupHttpServer()
 			if (mat)
 				mat->RemoveShido(fighter);
 			return Error();//OK
-			});
+		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+hansokumake", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
@@ -933,7 +933,7 @@ void Application::SetupHttpServer()
 			if (mat)
 				mat->AddMedicalExamination(fighter);
 			return Error();//OK
-			});
+		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-medic", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
