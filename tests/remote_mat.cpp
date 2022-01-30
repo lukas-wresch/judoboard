@@ -2001,7 +2001,20 @@ TEST(RemoteMat, Tokeda)
 		EXPECT_TRUE(m->GetOsaekomiList()[0].m_Who == f);
 		EXPECT_LE(std::abs((int)m->GetOsaekomiList()[0].m_Time - 5000), 200);
 
+		EXPECT_FALSE(m->IsOsaekomi());
+		EXPECT_FALSE(m->IsOsaekomiRunning());
+
+		ASSERT_EQ(m->GetOsaekomiList().size(), 1);
+		EXPECT_TRUE(m->GetOsaekomiList()[0].m_Who == f);
+		EXPECT_LE(std::abs((int)m->GetOsaekomiList()[0].m_Time - 5000), 20);
+
 		ZED::Core::Pause(5000);
+
+		m->Osaekomi(f);
+		ZED::Core::Pause(100);
+
+		EXPECT_TRUE(m->IsOsaekomi());
+		EXPECT_TRUE(m->IsOsaekomiRunning());
 
 		m->Osaekomi(f);
 		ZED::Core::Pause(100);
@@ -2081,7 +2094,19 @@ TEST(RemoteMat, OsaekomiSwitch)
 		EXPECT_TRUE(m->IsOsaekomi());
 		EXPECT_TRUE(m->IsOsaekomiRunning());
 
+		m->Osaekomi(!f);
+		ZED::Core::Pause(100);
+
+		EXPECT_TRUE(m->IsOsaekomi());
+		EXPECT_TRUE(m->IsOsaekomiRunning());
+
 		ZED::Core::Pause(10 * 1000);
+
+		m->Osaekomi(f);
+		ZED::Core::Pause(100);
+
+		EXPECT_TRUE(m->IsOsaekomi());
+		EXPECT_TRUE(m->IsOsaekomiRunning());
 
 		m->Osaekomi(f);
 		ZED::Core::Pause(100);

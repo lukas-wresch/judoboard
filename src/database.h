@@ -32,7 +32,8 @@ namespace Judoboard
 		Judoka* UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly, std::string& Output);
 
 		//Accounts
-		const Account* AddAccount(const Account& NewAccount);
+		const Account* AddAccount(const Account& NewAccount) { return AddAccount(new Account(NewAccount)); }
+		const Account* AddAccount(Account* NewAccount);
 		size_t GetNumAccounts() const { return m_Accounts.size(); }
 		const Account* GetAccount(size_t Index) const { if (Index >= m_Accounts.size()) return nullptr; return m_Accounts[Index]; }
 		Account* SetAccount(size_t Index) { if (Index >= m_Accounts.size()) return nullptr; return m_Accounts[Index]; }

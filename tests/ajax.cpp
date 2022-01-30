@@ -162,6 +162,35 @@ TEST(Ajax, UpdateMat)
 
 
 
+TEST(Ajax, UpdatePassword)
+{
+	initialize();
+
+	{
+		Application app;
+
+		Account* acc = new Account("test", "pwd1");
+		app.GetDatabase().AddAccount(acc);
+
+		app.Ajax_UpdatePassword(nullptr, HttpServer::Request("", "password=pwd2"));
+
+		EXPECT_EQ(acc->GetPassword(), "pwd1");
+		EXPECT_EQ(acc->GetAccessLevel(), Account::AccessLevel::User);
+
+		app.Ajax_UpdatePassword(acc, HttpServer::Request("", "password=pwd2"));
+
+		EXPECT_EQ(acc->GetPassword(), "pwd2");
+		EXPECT_EQ(acc->GetAccessLevel(), Account::AccessLevel::User);
+
+		app.Ajax_UpdatePassword(acc, HttpServer::Request("", "password=pwd3"));
+
+		EXPECT_EQ(acc->GetPassword(), "pwd3");
+		EXPECT_EQ(acc->GetAccessLevel(), Account::AccessLevel::User);
+	}
+}
+
+
+
 TEST(Ajax, SetFullscreen)
 {
 	initialize();
@@ -322,6 +351,24 @@ TEST(Ajax, Ajax_GetHansokumake2)
 		auto ret2 = app.Ajax_GetHansokumake();
 
 		EXPECT_EQ(ret2.length(), 0);
+	}
+}
+
+
+
+TEST(Ajax, AddClub)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club")), "ok");
+
+		auto clubs = app.GetDatabase().GetAllClubs();
+
+		ASSERT_EQ(clubs.size(), 1);
+		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
 	}
 }
 

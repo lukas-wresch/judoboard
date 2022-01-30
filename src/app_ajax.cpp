@@ -35,8 +35,8 @@ void Application::SetupHttpServer()
 	m_Server.RegisterResource("/menu.png", [](auto& Request) { return HttpServer::LoadFile("html/menu.png"); }, HttpServer::ResourceType::Image_PNG);
 
 
-	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "add_judoka", "list_judoka", "judoka_edit",
-		"club_list", "club_add", "add_match", "edit_match", "account_add", "account_edit", "account_list",
+	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit",
+		"club_list", "club_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
 		"matchtable_list", "matchtable_add", "rule_add", "rule_list", "tournament_list", "tournament_add",
 		"server_config"
 	};
@@ -140,6 +140,15 @@ void Application::SetupHttpServer()
 		Request.m_ResponseHeader = HttpServer::CookieHeader("session", response);
 
 		return Error();//OK
+	});
+
+
+	m_Server.RegisterResource("/ajax/get_status", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return "0";
+
+		return std::to_string((int)account->GetAccessLevel());
 	});
 
 
@@ -831,7 +840,7 @@ void Application::SetupHttpServer()
 			if (mat)
 				mat->AddShido(fighter);
 			return Error();//OK
-			});
+		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-shido", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
@@ -848,7 +857,7 @@ void Application::SetupHttpServer()
 			if (mat)
 				mat->RemoveShido(fighter);
 			return Error();//OK
-			});
+		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+hansokumake", [this, fighter](auto& Request) -> std::string {
 			auto account = IsLoggedIn(Request);
@@ -1106,7 +1115,7 @@ void Application::SetupHttpServer()
 			return GetTournament()->GetDatabase().JudokaToJSON();
 
 		return m_Database.JudokaToJSON();
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/judoka/add", [this](auto& Request) -> std::string {
@@ -1118,14 +1127,19 @@ void Application::SetupHttpServer()
 		auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
 		int  weight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "weight"));
 		Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+		int  clubID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "club"));
 
 		if (weight < 0)
 			weight = 0;
 
 		if (!firstname.size() || !lastname.size() || (gender != Gender::Male && gender != Gender::Female))
-			return std::string("Invalid input");
+			return (std::string)(Error)Error::Type::InvalidInput;
 
-		m_Database.AddJudoka(Judoka(firstname, lastname, weight, gender));
+		Judoka new_judoka(firstname, lastname, weight, gender);
+		if (clubID >= 0)
+			new_judoka.SetClub(GetDatabase().FindClub(clubID));
+
+		m_Database.AddJudoka(std::move(new_judoka));
 		m_Database.Save();
 		return Error();//OK
 	});
@@ -1177,12 +1191,13 @@ void Application::SetupHttpServer()
 		auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
 		int  weight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "weight"));
 		Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+		int  clubID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "club"));
 
 		if (weight < 0)
 			weight = 0;
 
 		if (!firstname.size() || !lastname.size() || (gender != Gender::Male && gender != Gender::Female))
-			return std::string("Invalid input");
+			return (std::string)(Error)Error::Type::InvalidInput;
 
 		auto judoka = m_Database.FindJudoka(id);
 
@@ -1193,6 +1208,11 @@ void Application::SetupHttpServer()
 		judoka->SetLastname(lastname);
 		judoka->SetWeight(weight);
 		judoka->SetGender(gender);
+		if (clubID >= 0)
+			judoka->SetClub(GetDatabase().FindClub(clubID));
+		else
+			judoka->SetClub(nullptr);
+
 		return Error();//OK
 	});
 
@@ -1217,6 +1237,15 @@ void Application::SetupHttpServer()
 		return Error();//OK
 	});
 
+
+	//Clubs
+	m_Server.RegisterResource("/ajax/club/add", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_AddClub(Request);
+	});
 
 	m_Server.RegisterResource("/ajax/club/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -1337,6 +1366,15 @@ void Application::SetupHttpServer()
 
 		m_Database.Save();
 		return Error();//OK
+	});
+
+
+	m_Server.RegisterResource("/ajax/account/update_password", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return std::string(Error(Error::Type::NotLoggedIn));
+
+		return Ajax_UpdatePassword((Account*)account, Request);
 	});
 
 
@@ -2320,6 +2358,23 @@ void Application::SetupHttpServer()
 
 
 
+Error Application::Ajax_UpdatePassword(Account* Account, const HttpServer::Request& Request)
+{
+	if (!Account)
+		return Error::Type::InternalError;
+
+	auto password = HttpServer::DecodeURLEncoded(Request.m_Body, "password");
+
+	if (password.length() <= 0)//Password not changed
+		return Error::Type::InvalidInput;
+
+	Account->SetPassword(password);
+	m_Database.Save();
+	return Error::Type::NoError;//OK
+}
+
+
+
 ZED::CSV Application::Ajax_GetMats() const
 {
 	ZED::CSV ret;
@@ -2442,6 +2497,20 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 	}
 
 	return Error::Type::MatNotFound;
+}
+
+
+
+Error Application::Ajax_AddClub(const HttpServer::Request& Request)
+{
+	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+
+	if (name.size() == 0)
+		return Error::Type::InvalidInput;
+
+	m_Database.AddClub(new Club(name));
+	m_Database.Save();
+	return Error();//OK
 }
 
 

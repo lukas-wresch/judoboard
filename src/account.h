@@ -51,6 +51,8 @@ namespace Judoboard
 		const std::string GetPassword() const { return m_Password; }
 		AccessLevel GetAccessLevel() const { return m_AccessLevel; }
 
+		void SetPassword(const std::string& NewPassword) { m_Password = NewPassword; }
+
 		const std::string ToString(AccessLevel RequestersAccessLevel) const;
 
 		bool Verify(const Nonce& Nonce, const std::string& Response) const;

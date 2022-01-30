@@ -242,9 +242,10 @@
     <None Include="..\..\.github\workflows\tests.yml" />
     <None Include="..\..\.gitignore" />
     <None Include="..\..\bin\html\account_add.html" />
+    <None Include="..\..\bin\html\account_change_password.html" />
     <None Include="..\..\bin\html\account_list.html" />
     <None Include="..\..\bin\html\add_match.html" />
-    <None Include="..\..\bin\html\add_judoka.html" />
+    <None Include="..\..\bin\html\judoka_add.html" />
     <None Include="..\..\bin\html\matchtable_list.html" />
     <None Include="..\..\bin\html\club_add.html" />
     <None Include="..\..\bin\html\club_list.html" />
@@ -252,8 +253,7 @@
     <None Include="..\..\bin\html\dm4.html" />
     <None Include="..\..\bin\html\edit_match.html" />
     <None Include="..\..\bin\html\index.html" />
-    <None Include="..\..\bin\html\judoka_edit.html" />
-    <None Include="..\..\bin\html\list_judoka.html" />
+    <None Include="..\..\bin\html\judoka_list.html" />
     <None Include="..\..\bin\html\login.html" />
     <None Include="..\..\bin\html\mat.html" />
     <None Include="..\..\bin\html\matchtable_add.html" />
@@ -274,6 +274,7 @@
     <None Include="..\..\package.bat" />
     <None Include="..\..\README.md" />
     <None Include="..\..\run_tests.sh" />
+    <None Include="..\..\run_tests_debug.sh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
