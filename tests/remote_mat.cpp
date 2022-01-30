@@ -50,7 +50,7 @@ TEST(RemoteMat, QuickClose)
 
 		ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 		ASSERT_TRUE(slave.StartLocalMat(1));
-		ZED::Core::Pause(100);
+		ZED::Core::Pause(1000);
 
 		IMat* m = master.FindMat(1);
 		ASSERT_TRUE(m);
@@ -99,6 +99,8 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 
 	master.StartLocalMat(1);
 	ASSERT_TRUE(slave.StartLocalMat(2));
+
+	ZED::Core::Pause(2000);
 
 	Judoka j1(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
 	Judoka j2(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
@@ -2566,7 +2568,7 @@ TEST(RemoteMat, WazariAwaseteIppon)
 		ZED::Core::Pause(100);
 
 		EXPECT_EQ(m->GetScoreboard(f).m_Ippon, 1);
-		EXPECT_EQ(m->GetScoreboard(f).m_WazaAri, 0);
+		EXPECT_EQ(m->GetScoreboard(f).m_WazaAri, 2);
 
 		m->RemoveWazaAri(f);
 		ZED::Core::Pause(100);
@@ -2578,7 +2580,7 @@ TEST(RemoteMat, WazariAwaseteIppon)
 		ZED::Core::Pause(100);
 
 		EXPECT_EQ(m->GetScoreboard(f).m_Ippon, 1);
-		EXPECT_EQ(m->GetScoreboard(f).m_WazaAri, 0);
+		EXPECT_EQ(m->GetScoreboard(f).m_WazaAri, 2);
 
 		EXPECT_TRUE(m->EndMatch());
 	}
