@@ -19,6 +19,8 @@ jobs:
       run: ./compile.sh
     - name: run tests
       run: ./run_tests.sh
+    - name: run tests debug
+      run: ./run_tests_debug.sh
       
   build2:
     name: Build and Test on Raspberry Pi 4
