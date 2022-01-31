@@ -57,8 +57,10 @@
 #include <stdio.h>
 
 #if defined(_WIN32) && !defined(__SYMBIAN32__) // Windows specific
-#define _WIN32_WINNT 0x0400 // To make it link in VS2005
-#include <windows.h>
+//#define _WIN32_WINNT _WIN32_WINNT_NT4 // To make it link in VS2005
+#define _WIN32_WINNT _WIN32_WINNT_VISTA
+//#include <windows.h>
+#include <winsock2.h>
 
 #ifndef PATH_MAX
 #define PATH_MAX MAX_PATH
@@ -173,7 +175,8 @@ typedef struct DIR {
 #else    // UNIX  specific
 #include <sys/wait.h>
 #include <sys/socket.h>
-#include <sys/select.h>
+//#include <sys/select.h>
+#include <sys/poll.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/time.h>
@@ -428,8 +431,9 @@ static void sockaddr_to_string(char *buf, size_t len, const union usa *usa)
             (void *) &usa->sin.sin_addr :
             (void *) &usa->sin6.sin6_addr, buf, len);
 #elif defined(_WIN32)
-  // Only Windoze Vista (and newer) have inet_ntop()
+  // Only Windows Vista (and newer) have inet_ntop()
   strncpy(buf, inet_ntoa(usa->sin.sin_addr), len);
+  //strncpy(buf, inet_ntop(usa->sin.sin_addr), len);
 #else
   inet_ntop(usa->sa.sa_family, (void *) &usa->sin.sin_addr, buf, len);
 #endif
@@ -4294,9 +4298,9 @@ static void master_thread(struct mg_context *ctx)
     pthread_setschedparam(pthread_self(), SCHED_RR, &sched_param);
 #endif
 
-    while (ctx->stop_flag == 0)
+    while (ctx->stop_flag == 0 && ctx->listening_sockets)
     {
-        fd_set read_set;
+        /*fd_set read_set;
         FD_ZERO(&read_set);
         int max_fd = -1;
 
@@ -4306,9 +4310,19 @@ static void master_thread(struct mg_context *ctx)
 
         struct timeval tv;
         tv.tv_sec = 0;
-        tv.tv_usec = 200 * 1000;
+        tv.tv_usec = 200 * 1000;*/
 
-        if (select(max_fd + 1, &read_set, NULL, NULL, &tv) < 0)
+        pollfd set;
+        set.fd = ctx->listening_sockets->sock;
+        set.events = POLLRDNORM;
+
+#ifdef _WIN32
+        if (WSAPoll(&set, 1, 200) < 0)
+#else
+        if (poll(&set, 1, 200) < 0)
+#endif
+
+        //if (select(max_fd + 1, &read_set, NULL, NULL, &tv) < 0)
         {
 #ifdef _WIN32
         // On windows, if read_set and write_set are empty,
@@ -4319,7 +4333,9 @@ static void master_thread(struct mg_context *ctx)
         }
         else
         {
-            for (struct socket* sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
+            accept_new_connection(ctx->listening_sockets, ctx);
+
+            /*for (struct socket* sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
             {
 #ifndef _WIN32
                 //Under Linux FD_ISSET() crashes when the the first argument is too high
@@ -4331,7 +4347,7 @@ static void master_thread(struct mg_context *ctx)
 #endif
                 if (ctx->stop_flag == 0 && FD_ISSET(sp->sock, &read_set))
                     accept_new_connection(sp, ctx);
-            }
+            }*/
         }
     }
     ZED::Log::Debug("stopping workers");
