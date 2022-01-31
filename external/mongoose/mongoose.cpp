@@ -3882,26 +3882,33 @@ static void reset_per_request_attributes(struct mg_connection *conn)
   conn->must_close = 0;
 }
 
-static void close_socket_gracefully(SOCKET sock) {
-  char buf[MG_BUF_LEN];
-  struct linger linger;
-  int n;
 
-  // Set linger option to avoid socket hanging out after close. This prevent
-  // ephemeral port exhaust problem under high QPS.
-  linger.l_onoff = 1;
-  linger.l_linger = 1;
-  setsockopt(sock, SOL_SOCKET, SO_LINGER, (char*)&linger, sizeof(linger));
+
+static void close_socket_gracefully(SOCKET sock)
+{
+  //Set linger option to avoid socket hanging out after close. This prevent
+  //ephemeral port exhaust problem under high QPS.
+  //struct linger linger;
+  //linger.l_onoff = 1;
+  //linger.l_linger = 1;
+  //setsockopt(sock, SOL_SOCKET, SO_LINGER, (char*)&linger, sizeof(linger));
+
+  //first clear any errors, which can cause close to fail
+  int err = 1;
+  socklen_t len = sizeof(err);
+  getsockopt(sock, SOL_SOCKET, SO_ERROR, (char*)&err, &len);
 
   // Send FIN to the client
   shutdown(sock, SHUT_WR);
-  set_non_blocking_mode(sock);
+  //set_non_blocking_mode(sock);
 
   // Read and discard pending data. If we do not do that and close the
   // socket, the data in the send buffer may be discarded. This
   // behaviour is seen on Windows, when client keeps sending data
   // when server decide to close the connection; then when client
   // does recv() it gets no data back.
+  char buf[MG_BUF_LEN];
+  int n;
   do
   {
     n = pull(NULL, sock, NULL, buf, sizeof(buf));
@@ -3911,23 +3918,29 @@ static void close_socket_gracefully(SOCKET sock) {
   closesocket(sock);
 }
 
+
+
 static void close_connection(struct mg_connection *conn)
 {
-  if (conn->ssl)
-  {
-    SSL_free(conn->ssl);
-    conn->ssl = NULL;
-  }
+    if (conn->ssl)
+    {
+        SSL_free(conn->ssl);
+        conn->ssl = NULL;
+    }
 
-  if (conn->client.sock != INVALID_SOCKET)
-    close_socket_gracefully(conn->client.sock);
+    if (conn->client.sock != INVALID_SOCKET)
+        close_socket_gracefully(conn->client.sock);
 }
+
+
 
 void mg_close_connection(struct mg_connection *conn)
 {
-  close_connection(conn);
-  free(conn);
+    close_connection(conn);
+    free(conn);
 }
+
+
 
 struct mg_connection* mg_connect(struct mg_context *ctx, const char *host, int port, int use_ssl)
 {
