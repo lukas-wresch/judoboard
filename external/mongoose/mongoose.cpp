@@ -4063,25 +4063,27 @@ FILE* mg_fetch(struct mg_context *ctx, const char *url, const char *path, char *
   return fp;
 }
 
+
+
 static void discard_current_request_from_buffer(struct mg_connection *conn)
 {
-  char *buffered;
-  int buffered_len, body_len;
+    char* buffered = conn->buf + conn->request_len;
+    int buffered_len = conn->data_len - conn->request_len;
+    assert(buffered_len >= 0);
 
-  buffered = conn->buf + conn->request_len;
-  buffered_len = conn->data_len - conn->request_len;
-  assert(buffered_len >= 0);
+    int body_len;
+    if (conn->content_len <= 0)
+        body_len = 0;// Protect from negative Content-Length, too
+    else if (conn->content_len < (int64_t) buffered_len)
+        body_len = (int) conn->content_len;
+    else
+        body_len = buffered_len;
 
-  if (conn->content_len <= 0)
-    body_len = 0;// Protect from negative Content-Length, too
-  else if (conn->content_len < (int64_t) buffered_len)
-    body_len = (int) conn->content_len;
-  else
-    body_len = buffered_len;
-
-  conn->data_len -= conn->request_len + body_len;
-  memmove(conn->buf, conn->buf + conn->request_len + body_len, (size_t) conn->data_len);
+    conn->data_len -= conn->request_len + body_len;
+    memmove(conn->buf, conn->buf + conn->request_len + body_len, (size_t) conn->data_len);
 }
+
+
 
 static int is_valid_uri(const char *uri)
 {
@@ -4090,13 +4092,14 @@ static int is_valid_uri(const char *uri)
   return uri[0] == '/' || (uri[0] == '*' && uri[1] == '\0');
 }
 
+
+
 static void process_new_connection(struct mg_connection *conn)
 {
     struct mg_request_info *ri = &conn->request_info;
-    int keep_alive_enabled;
     const char *cl;
 
-    keep_alive_enabled = !strcmp(conn->ctx->config[ENABLE_KEEP_ALIVE], "yes");
+    int keep_alive_enabled = !strcmp(conn->ctx->config[ENABLE_KEEP_ALIVE], "yes");
 
     do
     {
@@ -4249,7 +4252,6 @@ static void produce_socket(struct mg_context *ctx, const struct socket *sp)
 static void accept_new_connection(const struct socket *listener, struct mg_context *ctx)
 {
     struct socket accepted;
-    char src_addr[20];
 
     socklen_t len = sizeof(accepted.rsa);
     accepted.lsa = listener->lsa;
@@ -4266,6 +4268,7 @@ static void accept_new_connection(const struct socket *listener, struct mg_conte
         }
         else
         {
+            char src_addr[20];
             sockaddr_to_string(src_addr, sizeof(src_addr), &accepted.rsa);
             cry(fc(ctx), "%s: %s is not allowed to connect", __func__, src_addr);
             closesocket(accepted.sock);
@@ -4318,7 +4321,7 @@ static void master_thread(struct mg_context *ctx)
         {
             for (struct socket* sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
             {
-#ifdef LINUX
+#ifndef _WIN32
                 //Under Linux FD_ISSET() crashes when the the first argument is too high
                 if (sp->sock >= FD_SETSIZE)
                 {

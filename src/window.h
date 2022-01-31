@@ -3,7 +3,7 @@
 #include "../ZED/include/renderer_opengl.h"
 //#include "../ZED/include/renderer_opengles1_1.h"
 #include "../ZED/include/renderer_sdl2.h"
-#ifdef LINUX
+#ifndef _WIN32
 #include <gtk/gtk.h>
 #endif
 
