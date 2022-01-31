@@ -225,66 +225,108 @@ const Club* StandingData::FindClubByName(const std::string& Name) const
 
 RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName)
 {
+	RuleSet* ret = nullptr;
+	m_Mutex.lock();
+
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetName() == RuleSetName)
-			return rule;
+		{
+			ret = rule;
+			break;
+		}
 
-	return nullptr;
+	m_Mutex.unlock();
+	return ret;
 }
 
 
 
 const RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName) const
 {
+	const RuleSet* ret = nullptr;
+	m_Mutex.lock();
+
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetName() == RuleSetName)
-			return rule;
+		{
+			ret = rule;
+			break;
+		}
 
-	return nullptr;
+	m_Mutex.unlock();
+	return ret;
 }
 
 
 
 RuleSet* StandingData::FindRuleSet(const UUID& UUID)
 {
+	RuleSet* ret = nullptr;
+	m_Mutex.lock();
+
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetUUID() == UUID)
-			return rule;
+		{
+			ret = rule;
+			break;
+		}
 
-	return nullptr;
+	m_Mutex.unlock();
+	return ret;
 }
 
 
 
 const RuleSet* StandingData::FindRuleSet(const UUID& UUID) const
 {
+	const RuleSet* ret = nullptr;
+	m_Mutex.lock();
+
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetUUID() == UUID)
-			return rule;
+		{
+			ret = rule;
+			break;
+		}
 
-	return nullptr;
+	m_Mutex.unlock();
+	return ret;
 }
 
 
 
 RuleSet* StandingData::FindRuleSet(uint32_t ID)
 {
+	RuleSet* ret = nullptr;
+	m_Mutex.lock();
+
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetID() == ID)
-			return rule;
+		{
+			ret = rule;
+			break;
+		}
 
-	return nullptr;
+	m_Mutex.unlock();
+	return ret;
 }
 
 
 
 const RuleSet* StandingData::FindRuleSet(uint32_t ID) const
 {
+	const RuleSet* ret = nullptr;
+	m_Mutex.lock();
+
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetID() == ID)
-			return rule;
+		{
+			ret = rule;
+			break;
+		}
 
-	return nullptr;
+	m_Mutex.unlock();
+	return ret;
 }
 
 
@@ -294,7 +336,10 @@ bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
 	if (!NewRuleSet || FindRuleSet(NewRuleSet->GetUUID()))
 		return false;
 
+	m_Mutex.lock();
 	m_RuleSets.emplace_back(NewRuleSet);
+	m_Mutex.unlock();
+
 	return true;
 }
 

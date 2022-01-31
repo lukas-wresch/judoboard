@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <mutex>
 #include <unordered_map>
 #include "judoka.h"
 #include "club.h"
@@ -74,5 +75,7 @@ namespace Judoboard
 		std::vector<Club*> m_Clubs;
 
 		std::vector<RuleSet*> m_RuleSets;
+
+		mutable  std::mutex m_Mutex;
 	};
 }
