@@ -275,9 +275,12 @@ TEST(App, MatchOnSlave)
 	slave.StartLocalMat(2);
 
 
-	Judoka j1("White", "LastnameW");
-	Judoka j2("Blue",  "LastnameB");
-	Match match(nullptr, &j1, &j2);
+	auto j1 = new Judoka(GetRandomName(), GetRandomName());
+	auto j2 = new Judoka(GetRandomName(), GetRandomName());
+	master.GetDatabase().AddJudoka(j1);
+	master.GetDatabase().AddJudoka(j2);
+
+	Match match(nullptr, j1, j2);
 	match.SetMatID(2);
 
 	master.GetTournament()->AddMatch(&match);
