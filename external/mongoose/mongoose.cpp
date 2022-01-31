@@ -4318,6 +4318,14 @@ static void master_thread(struct mg_context *ctx)
         {
             for (struct socket* sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
             {
+#ifdef LINUX
+                //Under Linux FD_ISSET() crashes when the the first argument is too high
+                if (sp->sock >= FD_SETSIZE)
+                {
+                    ZED::Log::Error("Socket id too high!");
+                    break;
+                }
+#endif
                 if (ctx->stop_flag == 0 && FD_ISSET(sp->sock, &read_set))
                     accept_new_connection(sp, ctx);
             }
