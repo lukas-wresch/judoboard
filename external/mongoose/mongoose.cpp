@@ -4291,9 +4291,6 @@ static void master_thread(struct mg_context *ctx)
     if (!ctx)
         return;
 
-    if (ctx->listening_sockets)
-        set_non_blocking_mode(ctx->listening_sockets->sock);
-
     // Increase priority of the master thread
 #if defined(_WIN32)
     SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
@@ -4324,21 +4321,21 @@ static void master_thread(struct mg_context *ctx)
         set.events = POLLRDNORM;
 
 #ifdef _WIN32
-        if (WSAPoll(&set, 1, 200) < 0)
+        if (WSAPoll(&set, 1, 200) > 0)
 #else
-        if (poll(&set, 1, 200) < 0)
+        if (poll(&set, 1, 200) > 0)
 #endif
 
         //if (select(max_fd + 1, &read_set, NULL, NULL, &tv) < 0)
-        {
+        //{
 #ifdef _WIN32
         // On windows, if read_set and write_set are empty,
         // select() returns "Invalid parameter" error
         // (at least on my Windows XP Pro). So in this case, we sleep here.
-        mg_sleep(1000);
+        //mg_sleep(1000);
 #endif // _WIN32
-        }
-        else
+        //}
+        //else
         {
             accept_new_connection(ctx->listening_sockets, ctx);
 
