@@ -17,6 +17,8 @@ jobs:
       run: chmod u+x *.sh && ./dependencies.sh && XDG_RUNTIME_DIR=. && sudo apt-get install gdb
     - name: make
       run: ./compile.sh
+    - name: run tests debug with O3
+      run: cd bin ; gdb -ex=r -ex=bt -ex="set confirm off" -ex=q --args ./judoboard_test_debugo3 --gtest_output=xml
     - name: run tests debug
       run: ./run_tests_debug.sh
     - name: run tests
@@ -32,6 +34,8 @@ jobs:
       run: chmod u+x *.sh
     - name: make
       run: ./compile.sh
+    - name: run tests debug with O3
+      run: cd bin ; gdb -ex=r -ex=bt -ex="set confirm off" -ex=q --args ./judoboard_test_debugo3 --gtest_output=xml
     - name: run tests debug
       run: ./run_tests_debug.sh
     - name: run tests
