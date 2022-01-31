@@ -304,11 +304,11 @@ TEST(App, MatchOnSlave)
 
 
 
-/*TEST(App, MasterSlaveForceClose)
+TEST(App, MasterSlaveForceClose)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080  + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
@@ -372,7 +372,7 @@ TEST(App, MasterSlaveFullTournament)
 	initialize();
 
 	Application master(8080 + rand()%10000);
-	Application slave(8080  + rand()%10000);
+	Application slave( 8080 + rand()%10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
@@ -466,4 +466,4 @@ TEST(App, MasterSlaveFullTournament)
 		EXPECT_TRUE(mat->EndMatch());
 		ZED::Core::Pause(8000);
 	}
-}*/
+}
