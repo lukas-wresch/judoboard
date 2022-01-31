@@ -205,7 +205,7 @@ const RuleSet& Match::GetRuleSet() const
 	if (GetTournament() && GetTournament()->GetDefaultRuleSet())
 		return *GetTournament()->GetDefaultRuleSet();
 
-	ZED::Log::Debug("Could not find rule set, using the default rule set");
+	//ZED::Log::Debug("Could not find rule set, using the default rule set");
 
 	return s_default_rules;
 }
