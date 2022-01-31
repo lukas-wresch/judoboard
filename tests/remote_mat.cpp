@@ -55,7 +55,7 @@ TEST(RemoteMat, QuickClose)
 		IMat* m = master.FindMat(1);
 		ASSERT_TRUE(m);
 	}
-	EXPECT_LE(ZED::Core::CurrentTimestamp() - time, 4000u);
+	EXPECT_LE(ZED::Core::CurrentTimestamp() - time, 5000u);
 }
 
 
@@ -2031,8 +2031,8 @@ TEST(RemoteMat, Tokeda)
 		EXPECT_FALSE(m->IsOsaekomiRunning());
 
 		ASSERT_EQ(m->GetOsaekomiList().size(), 2);
-		EXPECT_TRUE(m->GetOsaekomiList()[1].m_Who == f);
-		EXPECT_TRUE(std::abs((int)m->GetOsaekomiList()[1].m_Time - 5000) < 200);
+		EXPECT_EQ(m->GetOsaekomiList()[1].m_Who, f);
+		EXPECT_LE(std::abs((int)m->GetOsaekomiList()[1].m_Time - 5000), 250);
 
 		ZED::Core::Pause(10 * 1000);
 
