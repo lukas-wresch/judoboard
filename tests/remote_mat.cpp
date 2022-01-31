@@ -1496,6 +1496,7 @@ TEST(RemoteMat, MatchTime)
 		master.GetTournament()->AddMatch(match);
 
 		EXPECT_TRUE(m->StartMatch(match));
+		ZED::Core::Pause(100);
 
 		m->Hajime();
 
