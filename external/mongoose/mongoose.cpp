@@ -3485,6 +3485,8 @@ static void handle_request(struct mg_connection* conn)
   }*/
 }
 
+
+
 static void close_all_listening_sockets(struct mg_context *ctx)
 {
   struct socket *sp, *tmp;
@@ -3495,6 +3497,8 @@ static void close_all_listening_sockets(struct mg_context *ctx)
     free(sp);
   }
 }
+
+
 
 // Valid listening port specification is: [ip_address:]port[s]
 // Examples: 80, 443s, 127.0.0.1:3128,1.2.3.4:8080s
@@ -4286,6 +4290,9 @@ static void master_thread(struct mg_context *ctx)
 {
     if (!ctx)
         return;
+
+    if (ctx->listening_sockets)
+        set_non_blocking_mode(ctx->listening_sockets->sock);
 
     // Increase priority of the master thread
 #if defined(_WIN32)

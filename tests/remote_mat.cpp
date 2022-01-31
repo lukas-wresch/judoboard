@@ -48,6 +48,9 @@ TEST(RemoteMat, QuickClose)
 		Application master(8080 + rand() % 10000);
 		Application slave( 8080 + rand() % 10000);
 
+		ASSERT_TRUE(master.GetHttpServer().IsRunning());
+		ASSERT_TRUE( slave.GetHttpServer().IsRunning());
+
 		ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 		ASSERT_TRUE(slave.StartLocalMat(1));
 		ZED::Core::Pause(1000);

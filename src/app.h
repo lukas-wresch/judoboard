@@ -37,6 +37,8 @@ namespace Judoboard
 		[[nodiscard]]
 		auto GetPort()   const { return m_Server.GetPort(); }
 
+		const HttpServer& GetHttpServer() const { return m_Server; }
+
 		[[nodiscard]]
 		const Database& GetDatabase() const { return m_Database; }
 		[[nodiscard]]
