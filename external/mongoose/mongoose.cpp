@@ -478,23 +478,32 @@ static void cry(struct mg_connection *conn, const char *fmt, ...)
   conn->request_info.log_message = NULL;
 }
 
+
+
 // Return fake connection structure. Used for logging, if connection
 // is not applicable at the moment of logging.
 static struct mg_connection *fc(struct mg_context *ctx)
 {
-  static struct mg_connection fake_connection;
-  fake_connection.ctx = ctx;
-  return &fake_connection;
+    static struct mg_connection fake_connection;
+    fake_connection.ctx = ctx;
+    return &fake_connection;
 }
+
+
 
 const char *mg_version(void)
 {
   return MONGOOSE_VERSION;
 }
 
-const struct mg_request_info *mg_get_request_info(struct mg_connection *conn) {
+
+
+const struct mg_request_info *mg_get_request_info(struct mg_connection *conn)
+{
   return &conn->request_info;
 }
+
+
 
 static void mg_strlcpy(char *dst, const char *src, size_t n)
 {
@@ -3908,7 +3917,7 @@ static void close_socket_gracefully(SOCKET sock)
 
   // Send FIN to the client
   shutdown(sock, SHUT_WR);
-  //set_non_blocking_mode(sock);
+  set_non_blocking_mode(sock);
 
   // Read and discard pending data. If we do not do that and close the
   // socket, the data in the send buffer may be discarded. This
@@ -3916,11 +3925,13 @@ static void close_socket_gracefully(SOCKET sock)
   // when server decide to close the connection; then when client
   // does recv() it gets no data back.
   char buf[MG_BUF_LEN];
-  int n;
-  do
+  auto start_time = time(NULL);
+  while (pull(NULL, sock, NULL, buf, sizeof(buf)) > 0)
   {
-    n = pull(NULL, sock, NULL, buf, sizeof(buf));
-  } while (n > 0);
+      ZED::Core::Pause(100);
+      if (time(NULL) - start_time > 5)//Waited for more than 5 seconds?
+          break;
+  }
 
   // Now we know that our FIN is ACK-ed, safe to close
   closesocket(sock);
