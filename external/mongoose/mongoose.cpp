@@ -3692,9 +3692,9 @@ static int check_acl(struct mg_context *ctx, const union usa *usa)
 
 static void add_to_set(SOCKET fd, fd_set& set, int& max_fd)
 {
-  FD_SET(fd, &set);
-  if (fd > (SOCKET)max_fd)
-    max_fd = (int) fd;
+    FD_SET(fd, &set);
+    if (fd > (SOCKET)max_fd)
+        max_fd = (int) fd;
 }
 
 
@@ -4265,9 +4265,8 @@ static void master_thread(struct mg_context *ctx)
         FD_ZERO(&read_set);
         int max_fd = -1;
 
-        struct socket* sp;
-        // Add listening sockets to the read set
-        for (sp = ctx->listening_sockets; sp != nullptr; sp = sp->next)
+        //Add listening sockets to the read set
+        for (struct socket* sp = ctx->listening_sockets; sp != nullptr; sp = sp->next)
             add_to_set(sp->sock, read_set, max_fd);
 
         struct timeval tv;
@@ -4285,7 +4284,7 @@ static void master_thread(struct mg_context *ctx)
         }
         else
         {
-            for (sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
+            for (struct socket* sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
             {
                 if (ctx->stop_flag == 0 && FD_ISSET(sp->sock, &read_set))
                     accept_new_connection(sp, ctx);
@@ -4335,14 +4334,17 @@ static void free_context(struct mg_context *ctx)
     for (int i = 0; i < NUM_OPTIONS; i++)
     {
         if (ctx->config[i])
+        {
             free(ctx->config[i]);
+            ctx->config[i] = nullptr;
+        }
     }
 
   // Deallocate SSL context
     if (ctx->ssl_ctx)
         SSL_CTX_free(ctx->ssl_ctx);
   
-  if (ctx->client_ssl_ctx)
+    if (ctx->client_ssl_ctx)
         SSL_CTX_free(ctx->client_ssl_ctx);
   
 #ifndef NO_SSL
@@ -4358,6 +4360,7 @@ static void free_context(struct mg_context *ctx)
 
 void mg_stop(struct mg_context *ctx)
 {
+    ZED::Log::Debug("mg_stop() called");
     ctx->stop_flag = 1;
 
     // Wait until mg_fini() stops
@@ -4370,6 +4373,7 @@ void mg_stop(struct mg_context *ctx)
         i++;
     }
 
+    ZED::Log::Debug("Freeing mongoose context");
     mg_sleep(100);
     free_context(ctx);
 
