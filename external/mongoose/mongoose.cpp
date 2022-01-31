@@ -3692,6 +3692,14 @@ static int check_acl(struct mg_context *ctx, const union usa *usa)
 
 static void add_to_set(SOCKET fd, fd_set& set, int& max_fd)
 {
+#ifndef _WIN32
+    //FD_SET() has a shitty implementation under Linux/OpenBSD an crashes when fd is larger than 1024
+    if (fd >= FD_SETSIZE)
+    {
+        ZED::Log::Error("add_to_set() can not add socket to FD_SET");
+        return;
+    }
+#endif
     FD_SET(fd, &set);
     if (fd > (SOCKET)max_fd)
         max_fd = (int) fd;
