@@ -1,4 +1,3 @@
-#pragma once
 #include <cassert>
 #include "md5.h"
 #include "../ZED/include/log.h"
