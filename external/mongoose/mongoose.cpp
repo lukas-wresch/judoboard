@@ -3688,31 +3688,36 @@ static int check_acl(struct mg_context *ctx, const union usa *usa)
   return allowed == '+';
 }
 
-static void add_to_set(SOCKET fd, fd_set *set, int *max_fd)
+
+
+static void add_to_set(SOCKET fd, fd_set& set, int& max_fd)
 {
-  FD_SET(fd, set);
-  if (fd > (SOCKET) *max_fd)
-    *max_fd = (int) fd;
+  FD_SET(fd, &set);
+  if (fd > (SOCKET)max_fd)
+    max_fd = (int) fd;
 }
 
+
+
 #if !defined(_WIN32)
-static int set_uid_option(struct mg_context *ctx) {
+static int set_uid_option(struct mg_context *ctx)
+{
   struct passwd *pw;
   const char *uid = ctx->config[RUN_AS_USER];
   int success = 0;
 
-  if (uid == NULL) {
+  if (uid == NULL)
     success = 1;
-  } else {
-    if ((pw = getpwnam(uid)) == NULL) {
+  else
+  {
+    if ((pw = getpwnam(uid)) == NULL)
       cry(fc(ctx), "%s: unknown user [%s]", __func__, uid);
-    } else if (setgid(pw->pw_gid) == -1) {
+    else if (setgid(pw->pw_gid) == -1)
       cry(fc(ctx), "%s: setgid(%s): %s", __func__, uid, strerror(errno));
-    } else if (setuid(pw->pw_uid) == -1) {
+    else if (setuid(pw->pw_uid) == -1)
       cry(fc(ctx), "%s: setuid(%s): %s", __func__, uid, strerror(errno));
-    } else {
+    else
       success = 1;
-    }
   }
 
   return success;
@@ -4240,82 +4245,83 @@ static void accept_new_connection(const struct socket *listener, struct mg_conte
 
 static void master_thread(struct mg_context *ctx)
 {
-  fd_set read_set;
-  struct timeval tv;
-  struct socket *sp;
-  int max_fd;
+    if (!ctx)
+        return;
 
-  // Increase priority of the master thread
+    // Increase priority of the master thread
 #if defined(_WIN32)
-  SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
 #endif
   
 #if defined(ISSUE_317)
-  struct sched_param sched_param;
-  sched_param.sched_priority = sched_get_priority_max(SCHED_RR);
-  pthread_setschedparam(pthread_self(), SCHED_RR, &sched_param);
+    struct sched_param sched_param;
+    sched_param.sched_priority = sched_get_priority_max(SCHED_RR);
+    pthread_setschedparam(pthread_self(), SCHED_RR, &sched_param);
 #endif
 
-  while (ctx->stop_flag == 0)
-  {
-    FD_ZERO(&read_set);
-    max_fd = -1;
-
-    // Add listening sockets to the read set
-    for (sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
-      add_to_set(sp->sock, &read_set, &max_fd);
-
-    tv.tv_sec = 0;
-    tv.tv_usec = 200 * 1000;
-
-    if (select(max_fd + 1, &read_set, NULL, NULL, &tv) < 0)
+    while (ctx->stop_flag == 0)
     {
+        fd_set read_set;
+        FD_ZERO(&read_set);
+        int max_fd = -1;
+
+        struct socket* sp;
+        // Add listening sockets to the read set
+        for (sp = ctx->listening_sockets; sp != nullptr; sp = sp->next)
+            add_to_set(sp->sock, read_set, max_fd);
+
+        struct timeval tv;
+        tv.tv_sec = 0;
+        tv.tv_usec = 200 * 1000;
+
+        if (select(max_fd + 1, &read_set, NULL, NULL, &tv) < 0)
+        {
 #ifdef _WIN32
-      // On windows, if read_set and write_set are empty,
-      // select() returns "Invalid parameter" error
-      // (at least on my Windows XP Pro). So in this case, we sleep here.
-      mg_sleep(1000);
+        // On windows, if read_set and write_set are empty,
+        // select() returns "Invalid parameter" error
+        // (at least on my Windows XP Pro). So in this case, we sleep here.
+        mg_sleep(1000);
 #endif // _WIN32
+        }
+        else
+        {
+            for (sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
+            {
+                if (ctx->stop_flag == 0 && FD_ISSET(sp->sock, &read_set))
+                    accept_new_connection(sp, ctx);
+            }
+        }
     }
-    else
-    {
-      for (sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
-      {
-        if (ctx->stop_flag == 0 && FD_ISSET(sp->sock, &read_set))
-          accept_new_connection(sp, ctx);
-      }
-    }
-  }
-  ZED::Log::Debug("stopping workers");
+    ZED::Log::Debug("stopping workers");
 
-  // Stop signal received: somebody called mg_stop. Quit.
-  close_all_listening_sockets(ctx);
+    // Stop signal received: somebody called mg_stop. Quit.
+    close_all_listening_sockets(ctx);
 
-  // Wakeup workers that are waiting for connections to handle.
-  pthread_cond_broadcast(&ctx->sq_full);
+    // Wakeup workers that are waiting for connections to handle.
+    pthread_cond_broadcast(&ctx->sq_full);
 
-  // Wait until all threads finish
-  pthread_mutex_lock(&ctx->mutex);
-  while (ctx->num_threads > 0)
-    pthread_cond_wait(&ctx->cond, &ctx->mutex);
-  pthread_mutex_unlock(&ctx->mutex);
+    // Wait until all threads finish
+    pthread_mutex_lock(&ctx->mutex);
+    while (ctx->num_threads > 0)
+        pthread_cond_wait(&ctx->cond, &ctx->mutex);
+    pthread_mutex_unlock(&ctx->mutex);
 
-  ZED::Log::Debug("all workers stopped");
+    ZED::Log::Debug("all workers stopped");
 
-  // All threads exited, no sync is needed. Destroy mutex and condvars
-  pthread_mutex_destroy(&ctx->mutex);
-  pthread_cond_destroy(&ctx->cond);
-  pthread_cond_destroy(&ctx->sq_empty);
-  pthread_cond_destroy(&ctx->sq_full);
+    // All threads exited, no sync is needed. Destroy mutex and condvars
+    pthread_mutex_destroy(&ctx->mutex);
+    pthread_cond_destroy(&ctx->cond);
+    pthread_cond_destroy(&ctx->sq_empty);
+    pthread_cond_destroy(&ctx->sq_full);
 
 #if !defined(NO_SSL)
-  uninitialize_ssl(ctx);
+    uninitialize_ssl(ctx);
 #endif
 
-  // Signal mg_stop() that we're done
-  ctx->stop_flag = 2;
+    // Signal mg_stop() that we're done
+    ctx->stop_flag = 2;
 
-  ZED::Log::Debug("exiting");
+    ZED::Log::Debug("exiting");
 }
 
 
