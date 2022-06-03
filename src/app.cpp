@@ -5,6 +5,7 @@
 #include "remote_mat.h"
 #include "tournament.h"
 #include "remote_tournament.h"
+#include "dmf.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/csv.h"
 #include "../ZED/include/http_client.h"
@@ -121,6 +122,58 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 
 	for (auto dm4_judoka : File.GetParticipants())
 	{
+		auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);		
+
+		//Judoka is now added/updated
+
+		if (!ParseOnly && new_judoka)
+		{//Add to the current tournament
+			GetTournament()->AddParticipant(new_judoka);
+		}
+	}
+
+	return ret;
+}
+
+
+
+std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSuccess)
+{
+	std::string ret;
+
+	if (!File)
+	{
+		ZED::Log::Warn("Invalid DMF file");
+		if (pSuccess)
+			*pSuccess = false;
+		return ret;
+	}
+
+	ret += "Tournament name: " + File.GetTournamentName() + "<br/>";
+	ret += "Tournament date: " + File.GetTournamentDate() + "<br/>";
+
+
+	const auto club = GetDatabase().FindClubByName(File.GetClub().Name);
+
+	if (!club)
+	{
+		ZED::Log::Warn("Could not find club");
+		if (pSuccess)
+			*pSuccess = false;
+		return ret;
+	}
+
+	for (auto dmf_judoka : File.GetParticipants())
+	{
+		//Convert to DM4 participant
+		MD5::Participant dm4_judoka;
+		dm4_judoka.Firstname = dmf_judoka.Firstname;
+		dm4_judoka.Lastname = dmf_judoka.Lastname;
+		dm4_judoka.WeightInGramm = dmf_judoka.Weight*1000;
+		dm4_judoka.Birthyear = dmf_judoka.Birthyear;
+		//dm4_judoka.Gender = File.GetGender();
+		//dm4_judoka.Club = club;
+
 		auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);		
 
 		//Judoka is now added/updated

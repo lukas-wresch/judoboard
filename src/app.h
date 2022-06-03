@@ -4,6 +4,7 @@
 #include "database.h"
 #include "tournament.h"
 #include "account.h"
+#include "dmf.h"
 #include "imat.h"
 #include "error.h"
 #include "HttpServer/HttpServer.h"
@@ -47,6 +48,9 @@ namespace Judoboard
 
 		//DM4
 		std::string AddDM4File(const DM4& File, bool ParseOnly = false, bool* pSuccess = nullptr);
+
+		//DMF
+		std::string AddDMFFile(const DMF& File, bool ParseOnly = false, bool* pSuccess = nullptr);
 
 		//Tournaments
 		[[nodiscard]]
