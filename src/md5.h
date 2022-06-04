@@ -286,6 +286,8 @@ namespace Judoboard
 		MD5(ZED::Blob&& Data) { Parse(std::move(Data)); }
 		~MD5();
 
+		bool Save(const std::string& Filename) const;
+
 		Association* FindAssociation(int AssociationID);
 		Club*        FindClub(int ClubID);
 		Participant* FindParticipant(int ParticipantID);

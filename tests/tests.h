@@ -27,6 +27,7 @@
 #include "../ZED/include/sha256.h"
 #include "../ZED/include/sha512.h"
 #include "../ZED/include/log.h"
+#include "../ZED/include/file.h"
 
 
 using namespace Judoboard;

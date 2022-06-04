@@ -40,6 +40,30 @@ size_t File::GetSize() const
 
 
 
+bool File::Write(const uint8_t Value)
+{
+	if (!IsOpen())
+		return false;
+
+	return fwrite(&Value, sizeof(uint8_t), 1, m_File) == 1;
+}
+
+
+
+bool File::Write(const char* String)
+{
+	if (!IsOpen())
+		return false;
+
+	int len = 0;
+	while (String[len])
+		len++;
+
+	return fwrite(String, sizeof(char), len, m_File) == len;
+}
+
+
+
 bool File::Write(const void* Data, size_t Size)
 {
 	if (!IsOpen())

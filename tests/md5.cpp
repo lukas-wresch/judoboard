@@ -1245,3 +1245,30 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 
 	ZED::Core::RemoveFile("deleteMe");
 }
+
+
+
+TEST(MD5, Export)
+{
+	initialize();
+
+#ifdef _WIN32
+	MD5 file("../test-data/Test.md5");
+	const auto hash_expected = ZED::SHA512(ZED::File("../test-data/Test.md5"));
+#else
+	MD5 file("test-data/Test.md5");
+	const auto hash_expected = ZED::SHA512(ZED::File("test-data/Test.md5"));
+#endif
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	EXPECT_TRUE(file.Save("deleteMe"));
+
+	const auto hash_has = ZED::SHA512(ZED::File("deleteMe"));
+
+	EXPECT_EQ(hash_has, hash_expected);
+
+	ZED::Core::RemoveFile("deleteMe");
+}

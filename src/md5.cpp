@@ -1,4 +1,5 @@
 #include <cassert>
+#include <array>
 #include "md5.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/file.h"
@@ -33,6 +34,80 @@ MD5::~MD5()
 		delete weightclass;
 	for (auto participant : m_Participants)
 		delete participant;
+}
+
+
+
+bool MD5::Save(const std::string& Filename) const
+{
+	ZED::File file(Filename, true);
+
+	if (!file)
+	{
+		ZED::Log::Warn("Could not open file " + Filename);
+		return false;
+	}
+
+	auto Write_Line = [&](const std::string& Line) {
+		file.Write((uint8_t)Line.length());
+		file.Write(Line);
+	};
+
+	auto Write_0D0A = [&]() {
+		const uint8_t data[] = { 0x0D, 0x0A };
+		file.Write(data, 2);
+	};
+
+	auto Write_0D0A00 = [&]() {
+		const uint8_t data[] = { 0x0D, 0x0A, 0x00 };
+		file.Write(data, 3);
+	};
+
+	file.Write((uint8_t)0x00);
+
+	Write_Line("MMW98");
+	Write_0D0A00();
+
+	file.Write("3");
+	file.Write((uint8_t)0x00);
+
+	Write_Line("Version 51");
+	Write_0D0A00();
+
+	Write_Line(GetFileDate());
+	Write_0D0A00();
+
+	file.Write((uint8_t)0x00);
+
+	{
+		Write_0D0A00();
+
+		Write_Line("Turnier");
+		Write_0D0A00();
+
+		std::array rows{ "Bezeichnung", "VorzugsschemaPK", "Ort", "DatumVon", "DatumBis", "LosEbenePK", "VerbandPK", "VerbandEbenePK", "KuerzelEbenePK", "MAXJGJ", "KampfumPlatz3", "KampfUmPlatz5", "SportlicheLeitung", "AnzWeitermelden", "LOSVERFAHREN", "AktVereinPK", "AktTNPK", "AktVerbandPK", "Meldegeld", "Meldegelderhoeht", "JGJIgnoreNegativeUnterbew" };
+
+		file.Write((uint8_t)rows.size());//Number of rows
+		file.Write((uint8_t)0x00);
+
+		for (auto& row : rows)
+		{
+			Write_Line(row);
+			file.Write((uint8_t)0x00);
+		}
+
+		Write_0D0A00();
+
+		file.Write(0x01);//Number of columns
+		file.Write((uint8_t)0x00);
+
+		Write_Line(GetDescription());
+		file.Write((uint8_t)0x00);
+
+		//TODO
+	}
+
+	return false;
 }
 
 

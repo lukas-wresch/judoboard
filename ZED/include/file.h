@@ -21,6 +21,9 @@ namespace ZED
 		DLLEXPORT void Close();
 		DLLEXPORT size_t GetSize() const;
 
+		DLLEXPORT bool Write(const uint8_t Value);//Write single byte
+		DLLEXPORT bool Write(const char* String);//Write string without \0
+		DLLEXPORT bool Write(const std::string& String) { return Write(String.c_str()); }//Write string without \0
 		DLLEXPORT bool Write(const void* Data, size_t Size);
 		DLLEXPORT bool Read(void* Data, size_t Size) const;
 
