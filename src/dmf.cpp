@@ -178,8 +178,9 @@ bool DMF::Parse(ZED::Blob&& Data)
 			ZED::Log::Warn("Could not parse birthyear");
 
 		line = ReadLine(Data);
-		if (sscanf_s(line.c_str(), "-%d", &new_participant.Weight) != 1)
+		if (sscanf_s(line.c_str(), "-%d", &new_participant.WeightInGrams) != 1)
 			ZED::Log::Warn("Could not parse weight");
+		new_participant.WeightInGrams *= 1000;//Convert to gram
 
 		m_Participants.emplace_back(new_participant);
 

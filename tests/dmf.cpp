@@ -33,7 +33,7 @@ TEST(DMF, Read_first_age_group1_m)
 	ASSERT_EQ(file.GetParticipants().size(), 1);
 	EXPECT_EQ(file.GetParticipants()[0].Firstname, "firstname");
 	EXPECT_EQ(file.GetParticipants()[0].Lastname,  "lastname");
-	EXPECT_EQ(file.GetParticipants()[0].Weight, 50);
+	EXPECT_EQ(file.GetParticipants()[0].WeightInGrams, 50 * 1000);
 	EXPECT_EQ(file.GetParticipants()[0].Birthyear, 1990);
 }
 
@@ -70,12 +70,12 @@ TEST(DMF, Read_second_age_group1_m)
 	ASSERT_EQ(file.GetParticipants().size(), 2);
 	EXPECT_EQ(file.GetParticipants()[0].Firstname, "lastname2");
 	EXPECT_EQ(file.GetParticipants()[0].Lastname,  "firstname2");
-	EXPECT_EQ(file.GetParticipants()[0].Weight, 60);
+	EXPECT_EQ(file.GetParticipants()[0].WeightInGrams, 60 * 1000);
 	EXPECT_EQ(file.GetParticipants()[0].Birthyear, 1995);
 
 	EXPECT_EQ(file.GetParticipants()[1].Firstname, "firstname");
 	EXPECT_EQ(file.GetParticipants()[1].Lastname,  "lastname");
-	EXPECT_EQ(file.GetParticipants()[1].Weight, 50);
+	EXPECT_EQ(file.GetParticipants()[1].WeightInGrams, 50 * 1000);
 	EXPECT_EQ(file.GetParticipants()[1].Birthyear, 1990);
 }
 
@@ -112,16 +112,16 @@ TEST(DMF, Read_third_age_group_w)
 	ASSERT_EQ(file.GetParticipants().size(), 3);
 	EXPECT_EQ(file.GetParticipants()[0].Firstname, "first1");
 	EXPECT_EQ(file.GetParticipants()[0].Lastname,  "name1");
-	EXPECT_EQ(file.GetParticipants()[0].Weight, 40);
+	EXPECT_EQ(file.GetParticipants()[0].WeightInGrams, 40 * 1000);
 	EXPECT_EQ(file.GetParticipants()[0].Birthyear, 1990);
 
 	EXPECT_EQ(file.GetParticipants()[1].Firstname, "first2");
 	EXPECT_EQ(file.GetParticipants()[1].Lastname,  "name2");
-	EXPECT_EQ(file.GetParticipants()[1].Weight, 50);
+	EXPECT_EQ(file.GetParticipants()[1].WeightInGrams, 50 * 1000);
 	EXPECT_EQ(file.GetParticipants()[1].Birthyear, 1995);
 
 	EXPECT_EQ(file.GetParticipants()[2].Firstname, "first3");
 	EXPECT_EQ(file.GetParticipants()[2].Lastname,  "name3");
-	EXPECT_EQ(file.GetParticipants()[2].Weight, 70);
+	EXPECT_EQ(file.GetParticipants()[2].WeightInGrams, 70 * 1000);
 	EXPECT_EQ(file.GetParticipants()[2].Birthyear, 2000);
 }

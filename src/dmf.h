@@ -29,14 +29,14 @@ namespace Judoboard
 				Firstname = Judoka.Firstname;
 				Lastname  = Judoka.Lastname;
 
-				if (Judoka.WeightInGramm > 0)
-					Weight = Judoka.WeightInGramm / 1000;
+				if (Judoka.WeightInGrams > 0)
+					WeightInGrams = Judoka.WeightInGrams;
 			}
 
 			std::string Firstname;
 			std::string Lastname;
 
-			int Weight = -1;//< 0 if no weight is known
+			int WeightInGrams = -1;//< 0 if no weight is known
 			int Birthyear = -1;//< 0 if no value is known
 		};
 

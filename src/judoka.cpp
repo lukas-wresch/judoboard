@@ -11,7 +11,7 @@ using namespace Judoboard;
 Judoka::Judoka(const std::string& Firstname, const std::string& Lastname, uint16_t Weight, Gender Gender) : m_Firstname(Firstname), m_Lastname(Lastname)
 {
 	if (Weight < 1000)
-		m_Weight = Weight;
+		m_WeightInGrams = Weight * 1000;
 	if (Gender == Gender::Male || Gender == Gender::Female)
 		m_Gender = Gender;
 }
@@ -21,7 +21,7 @@ Judoka::Judoka(const std::string& Firstname, const std::string& Lastname, uint16
 Judoka::Judoka(ZED::CSV& Stream, const StandingData* pStandingData)
 {
 	std::string uuid, club_uuid;
-	Stream >> m_Firstname >> m_Lastname >> m_Weight >> m_Gender >> m_Birthyear >> uuid >> club_uuid;
+	Stream >> m_Firstname >> m_Lastname >> m_WeightInGrams >> m_Gender >> m_Birthyear >> uuid >> club_uuid;
 	SetUUID(std::move(uuid));
 
 	if (pStandingData && club_uuid.length() > 1)
@@ -38,8 +38,8 @@ Judoka::Judoka(const DM4::Participant& Participant, const StandingData* pStandin
 
 	if (Participant.Birthyear > 0)
 		m_Birthyear = Participant.Birthyear;
-	if (Participant.Weight > 0)
-		m_Weight = Participant.Weight;
+	if (Participant.WeightInGrams > 0)
+		m_WeightInGrams = Participant.WeightInGrams;
 
 	if (pStandingData && Participant.Club)
 		m_pClub = pStandingData->FindClubByName(Participant.Club->Name);
@@ -56,8 +56,8 @@ Judoka::Judoka(const MD5::Participant& Participant, const StandingData* pStandin
 
 	if (Participant.Birthyear > 0)
 		m_Birthyear = Participant.Birthyear;
-	if (Participant.WeightInGramm > 0)
-		m_Weight = Participant.WeightInGramm/1000;//TODO Loss of information!!
+	if (Participant.WeightInGrams > 0)
+		m_WeightInGrams = Participant.WeightInGrams;
 
 	if (pStandingData && Participant.Club)
 		m_pClub = pStandingData->FindClubByName(Participant.Club->Name);
@@ -69,7 +69,7 @@ void Judoka::operator >> (ZED::CSV& Stream) const
 {
 	Stream << m_Firstname;
 	Stream << m_Lastname;
-	Stream << m_Weight << m_Gender << m_Birthyear;
+	Stream << m_WeightInGrams << m_Gender << m_Birthyear;
 	Stream << (std::string)GetUUID();
 
 	if (m_pClub)
@@ -93,7 +93,15 @@ uint16_t Judoka::GetAge() const
 void Judoka::SetWeight(uint16_t NewWeight)
 {
 	if (NewWeight < 1000)
-		m_Weight = NewWeight;
+		m_WeightInGrams = NewWeight * 1000;
+}
+
+
+
+void Judoka::SetWeightInGrams(uint32_t NewWeight)
+{
+	if (NewWeight < 1000 * 1000)
+		m_WeightInGrams = NewWeight;
 }
 
 
@@ -101,7 +109,7 @@ void Judoka::SetWeight(uint16_t NewWeight)
 const std::string Judoka::ToString() const
 {
 	ZED::CSV ret;
-	ret << GetID() << m_Firstname << m_Lastname << m_Weight << m_Gender << m_Birthyear;
+	ret << GetID() << m_Firstname << m_Lastname << m_WeightInGrams << m_Gender << m_Birthyear;
 
 	if (m_pClub)
 		ret << m_pClub->GetID();

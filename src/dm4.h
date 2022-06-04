@@ -32,8 +32,8 @@ namespace Judoboard
 				if (Judoka.AgeGroup)
 					Gender = Judoka.AgeGroup->Gender;
 
-				if (Judoka.WeightInGramm > 0)
-					Weight = Judoka.WeightInGramm / 1000;
+				if (Judoka.WeightInGrams > 0)
+					WeightInGrams = Judoka.WeightInGrams;
 			}
 
 			int ID = -1;
@@ -46,7 +46,7 @@ namespace Judoboard
 
 			Gender Gender;
 
-			int Weight = -1;//< 0 if no weight is known
+			int WeightInGrams = -1;//< 0 if no weight is known
 			int Birthyear = -1;//< 0 if no value is known
 		};
 

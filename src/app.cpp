@@ -169,7 +169,7 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 		MD5::Participant dm4_judoka;
 		dm4_judoka.Firstname = dmf_judoka.Firstname;
 		dm4_judoka.Lastname = dmf_judoka.Lastname;
-		dm4_judoka.WeightInGramm = dmf_judoka.Weight*1000;
+		dm4_judoka.WeightInGrams = dmf_judoka.WeightInGrams;
 		dm4_judoka.Birthyear = dmf_judoka.Birthyear;
 		//dm4_judoka.Gender = File.GetGender();
 		//dm4_judoka.Club = club;

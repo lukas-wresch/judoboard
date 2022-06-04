@@ -127,7 +127,7 @@ namespace Judoboard
 			int GKParticipantID = -1;//GK = ???
 
 			bool MoneyIncreased = false;
-			int  WeightInGramm = -1;
+			int  WeightInGrams  = -1;
 
 			mutable void* pUserData = nullptr;
 		};

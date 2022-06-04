@@ -1462,7 +1462,7 @@ bool MD5::ReadParticipants(ZED::Blob& Data)
 						new_participant.MoneyIncreased = data[i] != "F";
 					else if (header[i] == "Gewichtgramm")
 					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.WeightInGramm) != 1)
+						if (sscanf_s(data[i].c_str(), "%d", &new_participant.WeightInGrams) != 1)
 							ZED::Log::Warn("Could not read WeightInGramm of participant");
 					}
 				}

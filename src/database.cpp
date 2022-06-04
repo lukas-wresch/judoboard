@@ -145,8 +145,8 @@ Judoka* Database::UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly,
 					old_judoka->SetClub(FindClubByName(NewJudoka.Club->Name));
 				if (NewJudoka.Birthyear > 0)
 					old_judoka->SetBirthyear(NewJudoka.Birthyear);
-				if (NewJudoka.Weight > 0)
-					old_judoka->SetWeight(NewJudoka.Weight);
+				if (NewJudoka.WeightInGrams > 0)
+					old_judoka->SetWeightInGrams(NewJudoka.WeightInGrams);
 			}
 
 			return old_judoka;
