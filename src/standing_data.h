@@ -34,6 +34,9 @@ namespace Judoboard
 		Judoka* FindJudoka(const UUID& UUID);
 		const Judoka* FindJudoka(const UUID& UUID) const;
 
+		Judoka* FindJudoka_ExactMatch(const Judoka& NewJudoka);
+		Judoka* FindJudoka_SameName(const Judoka& NewJudoka);
+
 		Judoka* FindJudoka_DM4_ExactMatch(const DM4::Participant& NewJudoka);
 		Judoka* FindJudoka_DM4_SameName(const DM4::Participant& NewJudoka);
 

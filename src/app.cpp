@@ -165,16 +165,12 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 
 	for (auto dmf_judoka : File.GetParticipants())
 	{
-		//Convert to DM4 participant
-		MD5::Participant dm4_judoka;
-		dm4_judoka.Firstname = dmf_judoka.Firstname;
-		dm4_judoka.Lastname = dmf_judoka.Lastname;
-		dm4_judoka.WeightInGrams = dmf_judoka.WeightInGrams;
-		dm4_judoka.Birthyear = dmf_judoka.Birthyear;
-		//dm4_judoka.Gender = File.GetGender();
-		//dm4_judoka.Club = club;
+		//Convert to judoka
+		Judoka judoka(dmf_judoka);
+		judoka.SetGender(File.GetGender());
+		judoka.SetClub(club);
 
-		auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);		
+		auto new_judoka = GetDatabase().UpdateOrAdd(judoka, ParseOnly, ret);		
 
 		//Judoka is now added/updated
 

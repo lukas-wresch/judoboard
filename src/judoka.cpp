@@ -65,6 +65,19 @@ Judoka::Judoka(const MD5::Participant& Participant, const StandingData* pStandin
 
 
 
+Judoka::Judoka(const DMF::Participant& Participant)
+{
+	m_Firstname = Participant.Firstname;
+	m_Lastname  = Participant.Lastname;
+
+	if (Participant.Birthyear > 0)
+		m_Birthyear = Participant.Birthyear;
+	if (Participant.WeightInGrams > 0)
+		m_WeightInGrams = Participant.WeightInGrams;
+}
+
+
+
 void Judoka::operator >> (ZED::CSV& Stream) const
 {
 	Stream << m_Firstname;

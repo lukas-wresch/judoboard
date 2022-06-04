@@ -30,6 +30,7 @@ namespace Judoboard
 		//Judoka
 		Judoka* UpdateOrAdd(const MD5::Participant& NewJudoka);
 		Judoka* UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly, std::string& Output);
+		Judoka* UpdateOrAdd(const Judoka& NewJudoka, bool ParseOnly, std::string& Output);
 
 		//Accounts
 		const Account* AddAccount(const Account& NewAccount) { return AddAccount(new Account(NewAccount)); }

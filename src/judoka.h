@@ -28,11 +28,11 @@ namespace Judoboard
 		Judoka(ZED::CSV& Stream, const StandingData* pStandingData = nullptr);//Load judoka from file
 		Judoka(const DM4::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from DM4 data
 		Judoka(const MD5::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from MD5 data
-		Judoka(const DMF::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from DMF data
+		Judoka(const DMF::Participant& Participant);//Load judoka from DMF data
 
 		Gender GetGender()   const { return m_Gender; }
 		uint16_t GetWeight() const { return m_WeightInGrams / 1000; }
-		uint16_t GetWeightInGram() const { return m_WeightInGrams; }
+		uint16_t GetWeightInGrams() const { return m_WeightInGrams; }
 		uint16_t GetAge() const;
 		const std::string GetName() const { return m_Firstname + " " + m_Lastname; }
 
@@ -69,7 +69,7 @@ namespace Judoboard
 		std::string m_Lastname;
 
 		uint32_t m_WeightInGrams = 0;
-		Gender m_Gender = Gender::Male;
+		Gender m_Gender = Gender::Unknown;
 
 		uint16_t m_Birthyear = 0;
 
