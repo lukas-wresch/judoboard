@@ -141,8 +141,8 @@ namespace Judoboard
 			int WeightLargerThan  = -1;
 			int WeightSmallerThan = -1;
 
-			int WeightInGrammsLargerThan  = -1;
-			int WeightInGrammsSmallerThan = -1;
+			int WeightInGrammsLargerThan  = 0;
+			int WeightInGrammsSmallerThan = 0;
 
 			int MaxPooled = -1;
 

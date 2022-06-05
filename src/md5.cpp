@@ -205,8 +205,7 @@ bool MD5::Save(const std::string& Filename) const
 
 			Write_Line(age_group->PoolSystem ? "T" : "F");
 			Write_Line(age_group->AllParticipantsInResultTable ? "T" : "F");
-			//Write_Line(age_group->Team ? "T" : "");
-			Write_Line("");//Format unclear (TODO)
+			Write_Line(age_group->Team ? "T" : "");//Format unclear (TODO)
 		}
 
 		file.Seek(-1);//Delete last \0
@@ -258,7 +257,38 @@ bool MD5::Save(const std::string& Filename) const
 		Write_0D0A00();
 	}
 
-	Write_Line("\\end");
+	{//ImportVerband
+		Write_String("ImportVerband");
+		Write_0D0A00();
+
+		std::array rows{ "VerbandPK", "EbenePK", "Bezeichnung", "Kuerzel", "Nummer", "NaechsteEbenePK", "Aktiv" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Associations.size());//Number of columns
+
+		for (auto& association : m_Associations)
+		{
+			Write_Int(association->ID);
+			Write_Int(association->TierID);
+			Write_Line(association->Description);
+			Write_Line(association->ShortName);
+			Write_Int(association->Number);
+			Write_Int(association->NextAsscociationID);
+			Write_Int(association->Active);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	Write_Line("\\\\end");
 
 	return true;
 }
