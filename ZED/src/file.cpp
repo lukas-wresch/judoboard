@@ -40,6 +40,14 @@ size_t File::GetSize() const
 
 
 
+void File::Seek(int32_t RelativeOffset)
+{
+	if (IsOpen())
+		fseek(m_File, RelativeOffset, SEEK_CUR);
+}
+
+
+
 bool File::Write(const uint8_t Value)
 {
 	if (!IsOpen())

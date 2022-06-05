@@ -90,7 +90,7 @@ namespace Judoboard
 
 			int Tolerance = -1;
 
-			std::string Team;//Format is unclear
+			bool Team;
 		};
 
 		struct Participant
@@ -337,7 +337,7 @@ namespace Judoboard
 
 
 		std::vector<Association*> m_Associations;
-		std::vector<Club*> m_Clubs;
+		std::vector<Club*>        m_Clubs;
 		std::vector<Participant*> m_Participants;
 		std::vector<AgeGroup*>    m_AgeGroups;
 		std::vector<Weightclass*> m_Weightclasses;

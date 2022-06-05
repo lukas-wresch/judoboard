@@ -48,9 +48,27 @@ bool MD5::Save(const std::string& Filename) const
 		return false;
 	}
 
+	auto Write_String = [&](const std::string& Line) {
+		file.Write((uint8_t)Line.length());
+		file.Write(Line);
+	};
+
 	auto Write_Line = [&](const std::string& Line) {
 		file.Write((uint8_t)Line.length());
 		file.Write(Line);
+		file.Write((uint8_t)0x00);
+	};
+
+	auto Write_Int = [&](int32_t Num) {
+		std::string line(std::to_string(Num));
+		file.Write((uint8_t)line.length());
+		file.Write(line);
+		file.Write((uint8_t)0x00);
+	};
+
+	auto Write_IntRaw = [&](int32_t Num) {
+		file.Write((uint8_t)Num);
+		file.Write((uint8_t)0x00);
 	};
 
 	auto Write_0D0A = [&]() {
@@ -65,49 +83,184 @@ bool MD5::Save(const std::string& Filename) const
 
 	file.Write((uint8_t)0x00);
 
-	Write_Line("MMW98");
+	Write_String("MMW98");
 	Write_0D0A00();
 
 	file.Write("3");
 	file.Write((uint8_t)0x00);
 
-	Write_Line("Version 51");
+	Write_String("Version 51");
 	Write_0D0A00();
 
-	Write_Line(GetFileDate());
+	Write_String(GetFileDate());
 	Write_0D0A00();
 
 	file.Write((uint8_t)0x00);
+	Write_0D0A00();
 
 	{
-		Write_0D0A00();
-
-		Write_Line("Turnier");
+		Write_String("Turnier");
 		Write_0D0A00();
 
 		std::array rows{ "Bezeichnung", "VorzugsschemaPK", "Ort", "DatumVon", "DatumBis", "LosEbenePK", "VerbandPK", "VerbandEbenePK", "KuerzelEbenePK", "MAXJGJ", "KampfumPlatz3", "KampfUmPlatz5", "SportlicheLeitung", "AnzWeitermelden", "LOSVERFAHREN", "AktVereinPK", "AktTNPK", "AktVerbandPK", "Meldegeld", "Meldegelderhoeht", "JGJIgnoreNegativeUnterbew" };
 
-		file.Write((uint8_t)rows.size());//Number of rows
-		file.Write((uint8_t)0x00);
+		Write_IntRaw(rows.size());//Number of rows
 
 		for (auto& row : rows)
-		{
 			Write_Line(row);
-			file.Write((uint8_t)0x00);
-		}
 
+		file.Seek(-1);//Delete last \0
 		Write_0D0A00();
 
-		file.Write(0x01);//Number of columns
-		file.Write((uint8_t)0x00);
+		Write_IntRaw(1);//Number of columns
 
 		Write_Line(GetDescription());
-		file.Write((uint8_t)0x00);
+		Write_Int(m_SchemaID);
+		Write_Line(m_Place);
+		Write_Line(m_DateStart);
+		Write_Line(m_DateEnd);
+		Write_Int(m_LotteryLevelID);
+		Write_Int(m_AssociationID);
+		Write_Int(m_AssociationLevelID);
+		Write_Int(m_LevelShortID);		
+		Write_Int(m_MAXJGJ);		
+		Write_Int(m_ThirdPlaceMatch ? 0 : -1);		
+		Write_Int(m_FifthPlaceMatch ? 0 : -1);		
+		Write_Line(m_SportAdministrator);		
+		Write_Int(m_NumOfRelays);
+		Write_Int(m_LotteryProcess);			
+		Write_Int(m_NumClubs);		
+		Write_Int(m_NumParticipants);		
+		Write_Int(m_NumAssociations);		
+		Write_Int(m_Money);		
+		Write_Int(m_MoneyIncreased);		
+		Write_Int(m_IgnoreNegativeScores ? 0 : -1);
 
-		//TODO
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
 	}
 
-	return false;
+	{//Rank -> Points
+		Write_String("Vereinsw");
+		Write_0D0A00();
+
+		std::array rows{ "PlatzPK", "Punkte" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_RankToPoints.size());//Number of columns
+
+		for (auto& rank2points : m_RankToPoints)
+		{
+			Write_Int(rank2points.Rank);
+			Write_Int(rank2points.Points);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Age groups
+		Write_String("AktAltersgruppe");
+		Write_0D0A00();
+
+		std::array rows{ "AltersgruppePK", "Bezeichnung", "MinJahrgang", "MaxJahrgang", "Geschlecht", "Aufruecken", "Toleranz", "GewichtAnWaageAendern", "LosverfahrenPK", "Allkategorie", "Kata", "Meldegeld", "MeldegeldKata", "MeldegeldAllkategorie", "Meldegelderhoeht", "MeldegeldKataerhoeht", "MeldegeldAllkategorieerho", "Poolsystem", "AlleTNinErgebnisliste", "Mannschaft" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_AgeGroups.size());//Number of columns
+
+		for (auto& age_group : m_AgeGroups)
+		{
+			Write_Int(age_group->ID);
+			Write_Line(age_group->Name);
+			Write_Int(age_group->MinBirthyear);
+			Write_Int(age_group->MaxBirthyear);
+			Write_Line((age_group->Gender == Gender::Male) ? "m" : "w");
+			Write_Int(age_group->MoveUp ? 1 : 0);
+			Write_Int(age_group->Tolerance);
+			Write_Int(age_group->ChangeWeightAtScale);
+			Write_Int(age_group->LotterySchemaID);
+			Write_Line(age_group->AllCategories ? "T" : "F");
+			Write_Line(age_group->Kata ? "T" : "F");
+
+			Write_Int(age_group->Money);
+			Write_Int(age_group->MoneyKata);
+			Write_Int(age_group->MoneyAllCategories);
+			Write_Int(age_group->MoneyIncreased);
+			Write_Int(age_group->MoneyKataIncreased);
+			Write_Int(age_group->MoneyAllCategoriesIncreased);
+
+			Write_Line(age_group->PoolSystem ? "T" : "F");
+			Write_Line(age_group->AllParticipantsInResultTable ? "T" : "F");
+			//Write_Line(age_group->Team ? "T" : "");
+			Write_Line("");//Format unclear (TODO)
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Weightclasses
+		Write_String("AktGewichtsklasse");
+		Write_0D0A00();
+
+		std::array rows{ "AltersgruppePK", "GewichtsklassePK", "GewichtGroesser", "GewichtKleiner", "Bezeichnung", "Status", "WettkampfsystemPK", "WettkampfsystemTypPK", "KampfUmPlatz3", "KampfUmPlatz5", "Datum", "Weitermelden", "MaxJGJ", "Identifikation", "ForReference", "GewichtGroesserGramm", "GewichtKleinerGramm", "MaxVorgepoolt" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_AgeGroups.size());//Number of columns
+
+		for (auto& weightclass : m_Weightclasses)
+		{
+			Write_Int(weightclass->AgeGroupID);
+			Write_Int(weightclass->ID);
+			Write_Int(weightclass->WeightLargerThan);
+			Write_Int(weightclass->WeightSmallerThan);
+
+			Write_Line(weightclass->Description);
+			Write_Int(weightclass->Status);
+			Write_Int(weightclass->FightSystemID);
+			Write_Int(weightclass->FightSystemTypeID);
+
+			Write_Int(weightclass->MatchForThirdPlace);
+			Write_Int(weightclass->MatchForFifthPlace);
+			Write_Line(weightclass->Date);
+			Write_Int(weightclass->Relay);
+			Write_Int(weightclass->MaxJGJ);
+			Write_Line(weightclass->Identifier);
+			Write_Line(weightclass->ForReference);
+
+			Write_Int(weightclass->WeightInGrammsLargerThan);
+			Write_Int(weightclass->WeightInGrammsSmallerThan);
+			Write_Int(weightclass->MaxPooled);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	Write_Line("\\end");
+
+	return true;
 }
 
 
@@ -504,7 +657,7 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 							ZED::Log::Warn("Could not parse schema Money");
 					}
 					else if (header[i] == "JGJIgnoreNegativeUnterbew")
-						m_IgnoreNegativeScores = data[i] != "0";
+						m_IgnoreNegativeScores = data[i] == "0";
 				}
 
 				return true;
@@ -522,6 +675,7 @@ bool MD5::ReadRankScore(ZED::Blob& Data)
 	std::vector<std::string> header;
 	std::vector<std::string> data;
 	bool are_in_data_part = false;
+	bool end_of_data_part = false;
 
 	while (!Data.EndReached())
 	{
@@ -529,7 +683,7 @@ bool MD5::ReadRankScore(ZED::Blob& Data)
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
 		if (are_in_data_part && newline)//Read all data blocks?
-			return true;
+			end_of_data_part = true;
 
 		if (start_of_heading)
 			are_in_data_part = true;
@@ -561,6 +715,9 @@ bool MD5::ReadRankScore(ZED::Blob& Data)
 				m_RankToPoints.emplace_back(new_ranktopoints);
 
 				data.clear();//Clear block
+
+				if (end_of_data_part)//Last data entry read?
+					return true;
 			}
 		}
 	}
@@ -668,7 +825,7 @@ bool MD5::ReadAgeGroups(ZED::Blob& Data)
 					else if (header[i] == "AlleTNinErgebnisliste")
 						age_group.AllParticipantsInResultTable = data[i] == "T";
 					else if (header[i] == "Mannschaft")
-						age_group.Team = data[i];
+						age_group.Team = data[i] == "T";
 				}
 
 				m_AgeGroups.emplace_back(new AgeGroup(age_group));
@@ -761,7 +918,7 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 					else if (header[i] == "KampfUmPlatz5")
 						new_weightclass.MatchForFifthPlace = data[i] != "-1";
 					else if (header[i] == "Datum")
-						new_weightclass.Date = header[i];
+						new_weightclass.Date = data[i];
 					else if (header[i] == "Weitermelden")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.Relay) != 1)
