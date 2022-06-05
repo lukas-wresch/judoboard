@@ -226,7 +226,7 @@ bool MD5::Save(const std::string& Filename) const
 		file.Seek(-1);//Delete last \0
 		Write_0D0A00();
 
-		Write_IntRaw(m_AgeGroups.size());//Number of columns
+		Write_IntRaw(m_Weightclasses.size());//Number of columns
 
 		for (auto& weightclass : m_Weightclasses)
 		{
@@ -282,6 +282,50 @@ bool MD5::Save(const std::string& Filename) const
 			Write_Int(association->Number);
 			Write_Int(association->NextAsscociationID);
 			Write_Int(association->Active);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Verein
+		Write_String("Verein");
+		Write_0D0A00();
+
+		std::array rows{ "VereinPK", "Sortierbezeichnung", "Bezeichnung", "Nachname", "Vorname", "Strasse", "Ort", "PLZ", "Telp", "Teld", "Handy", "email", "fax", "Vereinsnummer", "StatusAenderung" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Clubs.size());//Number of columns
+
+		for (auto& club : m_Clubs)
+		{
+			Write_Int(club->ID);
+			Write_Line(club->Name_ForSorting);
+			Write_Line(club->Name);
+
+			Write_Line(club->Representative_Lastname);
+			Write_Line(club->Representative_Firstname);
+			Write_Line(club->Representative_Street);
+			Write_Line(club->Representative_Place);
+			Write_Line(club->Representative_TelPrivate);
+			Write_Line(club->Representative_TelProfessional);
+			Write_Line(club->Representative_TelMobil);
+			Write_Line(club->Representative_Email);
+			Write_Line(club->Representative_Fax);
+
+			if (club->OfficialClubNo <= 0)
+				Write_Line("");
+			else
+				Write_Int(club->OfficialClubNo);
+
+			Write_Line(club->StatusChanged ? "T" : "");//Format unclear (TODO)
 		}
 
 		file.Seek(-1);//Delete last \0
@@ -1881,10 +1925,7 @@ bool MD5::ReadClubs(ZED::Blob& Data)
 							ZED::Log::Warn("Could not read club number");
 					}
 					else if (header[i] == "StatusAenderung")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_club.StatusChanged) != 1)
-							ZED::Log::Warn("Could not read status changed of club");
-					}
+						new_club.StatusChanged = data[i] == "T";
 				}
 
 				m_Clubs.emplace_back(new Club(new_club));
