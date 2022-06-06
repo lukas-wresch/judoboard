@@ -1100,14 +1100,16 @@ bool MD5::ReadRelationClubAssociation(ZED::Blob& Data)
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
-		//if (Line == "\r\n")
-			//return true;
-
-		if (start_of_heading)
-			are_in_data_part = true;
-
 		if (!are_in_data_part)//We are reading the header
+		{
 			header.emplace_back(Line);
+			if (newline)
+			{
+				//Read number of columns
+				ReadLine(Data, &start_of_heading, &newline);
+				are_in_data_part = true;
+			}
+		}
 		else
 		{
 			data.emplace_back(Line);
