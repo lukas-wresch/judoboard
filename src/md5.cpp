@@ -122,18 +122,18 @@ bool MD5::Save(const std::string& Filename) const
 		Write_Int(m_LotteryLevelID);
 		Write_Int(m_AssociationID);
 		Write_Int(m_AssociationLevelID);
-		Write_Int(m_LevelShortID);		
-		Write_Int(m_MAXJGJ);		
-		Write_Int(m_ThirdPlaceMatch ? 0 : -1);		
-		Write_Int(m_FifthPlaceMatch ? 0 : -1);		
-		Write_Line(m_SportAdministrator);		
+		Write_Int(m_LevelShortID);
+		Write_Int(m_MAXJGJ);
+		Write_Int(m_ThirdPlaceMatch ? 0 : -1);
+		Write_Int(m_FifthPlaceMatch ? 0 : -1);
+		Write_Line(m_SportAdministrator);
 		Write_Int(m_NumOfRelays);
-		Write_Int(m_LotteryProcess);			
-		Write_Int(m_NumClubs);		
-		Write_Int(m_NumParticipants);		
-		Write_Int(m_NumAssociations);		
-		Write_Int(m_Money);		
-		Write_Int(m_MoneyIncreased);		
+		Write_Int(m_LotteryProcess);
+		Write_Int(m_NumClubs);
+		Write_Int(m_NumParticipants);
+		Write_Int(m_NumAssociations);
+		Write_Int(m_Money);
+		Write_Int(m_MoneyIncreased);
 		Write_Int(m_IgnoreNegativeScores ? 0 : -1);
 
 		file.Seek(-1);//Delete last \0
@@ -377,6 +377,281 @@ bool MD5::Save(const std::string& Filename) const
 			Write_Int(rel.ClubID);
 			Write_Int(rel.TierID);
 			Write_Int(rel.AssociationID);			
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//AktLosschema
+		Write_String("AktLosschema");
+		Write_0D0A00();
+
+		std::array rows{ "LosSchemaPK", "Bezeichnung", "VerbandPK", "EbenePK"};
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_LotterySchemas.size());//Number of columns
+
+		for (auto& schema : m_LotterySchemas)
+		{
+			Write_Int(schema.ID);
+			Write_Line(UTF8ToLatin1(schema.Description));
+			Write_Int(schema.AssociationID);
+			Write_Int(schema.TierID);			
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//AktLosschemaZeile
+		Write_String("AktLosschemaZeile");
+		Write_0D0A00();
+
+		std::array rows{ "LosschemaPK", "PosPK", "VerbandPK", "PlatzPK"};
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_LotterySchemaLines.size());//Number of columns
+
+		for (auto& schema : m_LotterySchemaLines)
+		{
+			Write_Int(schema.LotterySchemaID);
+			Write_Int(schema.PositionID);
+			Write_Int(schema.AssociationID);
+			Write_Int(schema.RankID);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Teilnehmer
+		Write_String("Teilnehmer");
+		Write_0D0A00();
+
+		std::array rows{ "TeilnehmerPK", "AltersgruppePK", "VereinPK", "Nachname", "Vorname", "GradPK", "GewichtsklassePK", "gewogen", "Geburtsjahr", "StartNR", "PlatzPK", "StatusAenderung", "REDAusgeschrieben", "REDKuerzel", "AllkategorieTNPK", "KataTNPK", "GKTNPK", "Meldegelderhoeht", "Gewichtgramm" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Participants.size());//Number of columns
+
+		for (auto& judoka : m_Participants)
+		{
+			Write_Int(judoka->ID);
+			Write_Int(judoka->AgeGroupID);
+			Write_Int(judoka->ClubID);
+			Write_Line(judoka->Lastname);
+			Write_Line(judoka->Firstname);
+			Write_Int(judoka->Graduation);
+			Write_Int(judoka->WeightclassID);
+			Write_Int(judoka->HasBeenWeighted);
+			Write_Int(judoka->Birthyear);
+			Write_Int(judoka->StartNo);
+			Write_Int(judoka->RankID);
+			Write_Int(judoka->StatusChanged);
+			Write_Line(judoka->ClubFullname);
+			Write_Line(judoka->ClubShortname);
+			Write_Int(judoka->AllCategoriesParticipantID);
+			Write_Int(judoka->KataParticipantID);
+			Write_Int(judoka->GKParticipantID);
+			Write_Line(judoka->MoneyIncreased ? "T" : "F");
+			Write_Int(judoka->WeightInGramm);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Lose
+		Write_String("Lose");
+		Write_0D0A00();
+
+		std::array rows{ "VerbandPK", "LosNR" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Lottery.size());//Number of columns
+
+		for (auto& lot : m_Lottery)
+		{
+			Write_Int(lot.AssociationID);
+			Write_Int(lot.StartNo);			
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//SystemZuordnung
+		Write_String("SystemZuordnung");
+		Write_0D0A00();
+
+		std::array rows{ "AltersgruppePK", "GewichtsklassePK", "StartNR", "TeilnehmerPK" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Relations.size());//Number of columns
+
+		for (auto& rel : m_Relations)
+		{
+			Write_Int(rel.AgeGroupID);
+			Write_Int(rel.WeightclassID);
+			Write_Int(rel.StartNo);
+			Write_Int(rel.ParticipantID);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Fortfuehrung
+		Write_String("Fortfuehrung");
+		Write_0D0A00();
+
+		std::array rows{ "AltersgruppePK", "GewichtsklassePK", "KampfNR", "StartNRRot", "RotPK", "RotAusKampfNR", "RotTyp", "StartNRWeiss", "WeissPK", "WeissAusKampfNR", "WeissTyp", "SiegerPK", "SiegerKampfNR", "SiegerFarbe", "VerliererPK", "VerliererKampfNR", "VerliererFarbe", "WarteAufSiegerAusKampf", "Zeit", "Bewertung", "UnterbewertungSieger", "UnterbewertungVerlierer", "Status", "RotAusgeschiedenKampfNR", "WeissAusgeschiedenKampfNR", "Pool", "DritterKampfNR", "DritterFarbe", "BereichPK" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Matches.size());//Number of columns
+
+		for (auto& match : m_Matches)
+		{
+			Write_Int(match.AgeGroupID);
+			Write_Int(match.WeightclassID);
+			Write_Int(match.MatchNo);
+
+			Write_Int(match.StartNoRed);
+			Write_Int(match.RedID);
+			Write_Int(match.RedFromMatch);
+			Write_Int(match.RedTyp);
+
+			Write_Int(match.StartNoWhite);
+			Write_Int(match.WhiteID);
+			Write_Int(match.WhiteFromMatch);
+			Write_Int(match.WhiteTyp);
+
+			Write_Int(match.WinnerID);
+			Write_Int(match.WinnerMatchNo);
+			Write_Int(match.WinnerColor);
+
+			Write_Int(match.LoserID);
+			Write_Int(match.LoserMatchNo);
+			Write_Int(match.LoserColor);
+
+			Write_Int(match.LoserID);
+			Write_Int(match.LoserMatchNo);
+			Write_Int(match.LoserColor);
+
+			Write_Int(match.WaitingForWinnerFromMatch);
+
+			Write_Int(match.Time);
+			Write_Int(match.Result);
+			Write_Int(match.ScoreWinner);
+			Write_Int(match.ScoreLoser);
+
+			Write_Int(match.Status);
+			Write_Int(match.RedOutMatchID);
+			Write_Int(match.WhiteOutMatchID);
+
+			Write_Int(match.Pool);
+			Write_Int(match.ThirdMatchNo);
+			Write_Int(match.ThirdColor);
+			Write_Int(match.AreaID);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Ergebnis
+		Write_String("Ergebnis");
+		Write_0D0A00();
+
+		std::array rows{ "AltersgruppePK", "GewichtsklassePK", "PlatzPK", "Pool", "PlatzNR", "KampfNR", "Platztyp", "TeilnehmerPK", "PunktePl", "PunkteMi", "UnterbewertungPl", "UnterbewertungMi", "Weitermelden", "AusPool" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Results.size());//Number of columns
+
+		for (auto& result : m_Results)
+		{
+			Write_Int(result.AgeGroupID);
+			Write_Int(result.WeightclassID);
+			Write_Int(result.RankID);
+
+			Write_Int(result.Pool);
+			Write_Int(result.RankNo);
+			Write_Int(result.MatchNo);
+			Write_Int(result.RankType);
+
+			Write_Int(result.ParticipantID);
+
+			if (result.PointsPlus < 0)
+				Write_Line("");
+			else
+				Write_Int(result.PointsPlus);
+
+			if (result.PointsMinus < 0)
+				Write_Line("");
+			else
+				Write_Int(result.PointsMinus);
+
+			if (result.ScorePlus < 0)
+				Write_Line("");
+			else
+				Write_Int(result.ScorePlus);
+
+			if (result.ScoreMinus < 0)
+				Write_Line("");
+			else
+				Write_Int(result.ScoreMinus);
+
+			Write_Int(result.Relay);
+			Write_Int(result.FromPool);			
 		}
 
 		file.Seek(-1);//Delete last \0
@@ -764,22 +1039,22 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 					else if (header[i] == "AktTNPK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &m_NumParticipants) != 1)
-							ZED::Log::Warn("Could not parse schema m_NumParticipants");
+							ZED::Log::Warn("Could not parse m_NumParticipants");
 					}
 					else if (header[i] == "AktVerbandPK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &m_NumAssociations) != 1)
-							ZED::Log::Warn("Could not parse schema m_NumAssociations");
+							ZED::Log::Warn("Could not parse m_NumAssociations");
 					}
 					else if (header[i] == "Meldegeld")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &m_Money) != 1)
-							ZED::Log::Warn("Could not parse schema Money");
+							ZED::Log::Warn("Could not parse Money");
 					}
 					else if (header[i] == "Meldegelderhoeht")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &m_MoneyIncreased) != 1)
-							ZED::Log::Warn("Could not parse schema Money");
+							ZED::Log::Warn("Could not parse Money Increased");
 					}
 					else if (header[i] == "JGJIgnoreNegativeUnterbew")
 						m_IgnoreNegativeScores = data[i] == "0";
