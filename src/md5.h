@@ -45,7 +45,7 @@ namespace Judoboard
 			std::string Description;
 			std::string ShortName;
 
-			int Number = -1;
+			std::string Number;//"Number" of the association, can also include characters like '.'
 			int NextAsscociationID = -1;
 			const Association* NextAsscociation = nullptr;
 
@@ -141,8 +141,8 @@ namespace Judoboard
 			int WeightLargerThan  = -1;
 			int WeightSmallerThan = -1;
 
-			int WeightInGrammsLargerThan  = 0;
-			int WeightInGrammsSmallerThan = 0;
+			int WeightInGrammsLargerThan  = -1;
+			int WeightInGrammsSmallerThan = -1;
 
 			int MaxPooled = -1;
 

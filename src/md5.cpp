@@ -185,7 +185,7 @@ bool MD5::Save(const std::string& Filename) const
 		for (auto& age_group : m_AgeGroups)
 		{
 			Write_Int(age_group->ID);
-			Write_Line(age_group->Name);
+			Write_Line(UTF8ToLatin1(age_group->Name));
 			Write_Int(age_group->MinBirthyear);
 			Write_Int(age_group->MaxBirthyear);
 			Write_Line((age_group->Gender == Gender::Male) ? "m" : "w");
@@ -232,25 +232,48 @@ bool MD5::Save(const std::string& Filename) const
 		{
 			Write_Int(weightclass->AgeGroupID);
 			Write_Int(weightclass->ID);
-			Write_Int(weightclass->WeightLargerThan);
-			Write_Int(weightclass->WeightSmallerThan);
 
-			Write_Line(weightclass->Description);
+			if (weightclass->WeightLargerThan < 0)
+				Write_Line("");
+			else
+				Write_Int(weightclass->WeightLargerThan);
+
+			if (weightclass->WeightSmallerThan < 0)
+				Write_Line("");
+			else
+				Write_Int(weightclass->WeightSmallerThan);
+
+			Write_Line(UTF8ToLatin1(weightclass->Description));
 			Write_Int(weightclass->Status);
-			Write_Int(weightclass->FightSystemID);
+
+			if (weightclass->FightSystemID < 0)
+				Write_Line("");
+			else
+				Write_Int(weightclass->FightSystemID);
+
 			Write_Int(weightclass->FightSystemTypeID);
 
-			Write_Int(weightclass->MatchForThirdPlace);
-			Write_Int(weightclass->MatchForFifthPlace);
+			Write_Int(weightclass->MatchForThirdPlace ? 0 : -1);
+			Write_Int(weightclass->MatchForFifthPlace ? 0 : -1);
 			Write_Line(weightclass->Date);
 			Write_Int(weightclass->Relay);
 			Write_Int(weightclass->MaxJGJ);
 			Write_Line(weightclass->Identifier);
 			Write_Line(weightclass->ForReference);
 
-			Write_Int(weightclass->WeightInGrammsLargerThan);
-			Write_Int(weightclass->WeightInGrammsSmallerThan);
-			Write_Int(weightclass->MaxPooled);
+			if (weightclass->WeightInGrammsLargerThan < 0)
+				Write_Line("");
+			else
+				Write_Int(weightclass->WeightInGrammsLargerThan);
+			if (weightclass->WeightInGrammsSmallerThan < 0)
+				Write_Line("");
+			else
+				Write_Int(weightclass->WeightInGrammsSmallerThan);
+
+			if (weightclass->MaxPooled < 0)
+				Write_Line("");
+			else
+				Write_Int(weightclass->MaxPooled);
 		}
 
 		file.Seek(-1);//Delete last \0
@@ -277,9 +300,9 @@ bool MD5::Save(const std::string& Filename) const
 		{
 			Write_Int(association->ID);
 			Write_Int(association->TierID);
-			Write_Line(association->Description);
-			Write_Line(association->ShortName);
-			Write_Int(association->Number);
+			Write_Line(UTF8ToLatin1(association->Description));
+			Write_Line(UTF8ToLatin1(association->ShortName));
+			Write_Line(association->Number);
 			Write_Int(association->NextAsscociationID);
 			Write_Int(association->Active);
 		}
@@ -307,13 +330,14 @@ bool MD5::Save(const std::string& Filename) const
 		for (auto& club : m_Clubs)
 		{
 			Write_Int(club->ID);
-			Write_Line(club->Name_ForSorting);
-			Write_Line(club->Name);
+			Write_Line(UTF8ToLatin1(club->Name_ForSorting));
+			Write_Line(UTF8ToLatin1(club->Name));
 
-			Write_Line(club->Representative_Lastname);
-			Write_Line(club->Representative_Firstname);
-			Write_Line(club->Representative_Street);
-			Write_Line(club->Representative_Place);
+			Write_Line(UTF8ToLatin1(club->Representative_Lastname));
+			Write_Line(UTF8ToLatin1(club->Representative_Firstname));
+			Write_Line(UTF8ToLatin1(club->Representative_Street));
+			Write_Line(UTF8ToLatin1(club->Representative_Place));
+			Write_Line(club->Representative_ZipCode);
 			Write_Line(club->Representative_TelPrivate);
 			Write_Line(club->Representative_TelProfessional);
 			Write_Line(club->Representative_TelMobil);
@@ -326,6 +350,33 @@ bool MD5::Save(const std::string& Filename) const
 				Write_Int(club->OfficialClubNo);
 
 			Write_Line(club->StatusChanged ? "T" : "");//Format unclear (TODO)
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//VereinVerband
+		Write_String("VereinVerband");
+		Write_0D0A00();
+
+		std::array rows{ "VereinPK", "EbenePK", "VerbandPK" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_ClubRelations.size());//Number of columns
+
+		for (auto& rel : m_ClubRelations)
+		{
+			Write_Int(rel.ClubID);
+			Write_Int(rel.TierID);
+			Write_Int(rel.AssociationID);			
 		}
 
 		file.Seek(-1);//Delete last \0
@@ -1837,10 +1888,7 @@ bool MD5::ReadAssociation(ZED::Blob& Data)
 					else if (header[i] == "Kuerzel")
 						new_association.ShortName   = Latin1ToUTF8(data[i]);
 					else if (header[i] == "Nummer")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_association.Number) != 1)
-							ZED::Log::Warn("Could not read number of association");
-					}
+						new_association.Number = data[i];
 					else if (header[i] == "NaechsteEbenePK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_association.NextAsscociationID) != 1)
