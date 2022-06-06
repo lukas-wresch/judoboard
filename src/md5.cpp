@@ -560,23 +560,37 @@ bool MD5::Save(const std::string& Filename) const
 
 			Write_Int(match.StartNoRed);
 			Write_Int(match.RedID);
-			Write_Int(match.RedFromMatch);
+			if (match.RedFromMatch < 0)
+				Write_Line("");
+			else
+				Write_Int(match.RedFromMatch);
 			Write_Int(match.RedTyp);
 
 			Write_Int(match.StartNoWhite);
 			Write_Int(match.WhiteID);
-			Write_Int(match.WhiteFromMatch);
+			if (match.WhiteFromMatch < 0)
+				Write_Line("");
+			else
+				Write_Int(match.WhiteFromMatch);
 			Write_Int(match.WhiteTyp);
 
-			Write_Int(match.WinnerID);
-			Write_Int(match.WinnerMatchNo);
+			if (match.WinnerID < 0)
+				Write_Line("");
+			else
+				Write_Int(match.WinnerID);
+			if (match.WinnerMatchNo < 0)
+				Write_Line("");
+			else
+				Write_Int(match.WinnerMatchNo);
 			Write_Int(match.WinnerColor);
 
-			Write_Int(match.LoserID);
-			Write_Int(match.LoserMatchNo);
-			Write_Int(match.LoserColor);
-
-			Write_Int(match.LoserID);
+			if (match.LoserID < 0)
+				Write_Line("");
+			else
+				Write_Int(match.LoserID);
+			if (match.LoserMatchNo < 0)
+				Write_Line("");
+			else
 			Write_Int(match.LoserMatchNo);
 			Write_Int(match.LoserColor);
 
