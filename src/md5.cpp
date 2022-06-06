@@ -460,22 +460,35 @@ bool MD5::Save(const std::string& Filename) const
 			Write_Int(judoka->ID);
 			Write_Int(judoka->AgeGroupID);
 			Write_Int(judoka->ClubID);
-			Write_Line(judoka->Lastname);
-			Write_Line(judoka->Firstname);
+			Write_Line(UTF8ToLatin1(judoka->Lastname));
+			Write_Line(UTF8ToLatin1(judoka->Firstname));
 			Write_Int(judoka->Graduation);
 			Write_Int(judoka->WeightclassID);
-			Write_Int(judoka->HasBeenWeighted);
-			Write_Int(judoka->Birthyear);
-			Write_Int(judoka->StartNo);
+			Write_Line(judoka->HasBeenWeighted ? "x" : "");
+
+			if (judoka->Birthyear < 0)
+				Write_Line("");
+			else
+				Write_Int(judoka->Birthyear);
+
+			if (judoka->StartNo < 0)
+				Write_Line("");
+			else
+				Write_Int(judoka->StartNo);
+
 			Write_Int(judoka->RankID);
-			Write_Int(judoka->StatusChanged);
-			Write_Line(judoka->ClubFullname);
-			Write_Line(judoka->ClubShortname);
+			Write_Line(judoka->StatusChanged ? "1" : "");
+			Write_Line(UTF8ToLatin1(judoka->ClubFullname));
+			Write_Line(UTF8ToLatin1(judoka->ClubShortname));
 			Write_Int(judoka->AllCategoriesParticipantID);
 			Write_Int(judoka->KataParticipantID);
 			Write_Int(judoka->GKParticipantID);
 			Write_Line(judoka->MoneyIncreased ? "T" : "F");
-			Write_Int(judoka->WeightInGramm);
+
+			if (judoka->WeightInGramm < 0)
+				Write_Line("");
+			else
+				Write_Int(judoka->WeightInGramm);
 		}
 
 		file.Seek(-1);//Delete last \0
@@ -591,19 +604,42 @@ bool MD5::Save(const std::string& Filename) const
 			if (match.LoserMatchNo < 0)
 				Write_Line("");
 			else
-			Write_Int(match.LoserMatchNo);
+				Write_Int(match.LoserMatchNo);
 			Write_Int(match.LoserColor);
 
 			Write_Int(match.WaitingForWinnerFromMatch);
 
-			Write_Int(match.Time);
-			Write_Int(match.Result);
-			Write_Int(match.ScoreWinner);
-			Write_Int(match.ScoreLoser);
+			if (match.Time < 0)
+				Write_Line("");
+			else
+				Write_Int(match.Time);
+
+			if (match.Result < 0)
+				Write_Line("");
+			else
+				Write_Int(match.Result);
+
+			if (match.ScoreWinner < 0)
+				Write_Line("");
+			else
+				Write_Int(match.ScoreWinner);
+
+			if (match.ScoreLoser < 0)
+				Write_Line("");
+			else
+				Write_Int(match.ScoreLoser);
 
 			Write_Int(match.Status);
-			Write_Int(match.RedOutMatchID);
-			Write_Int(match.WhiteOutMatchID);
+
+			if (match.RedOutMatchID < 0)
+				Write_Line("");
+			else
+				Write_Int(match.RedOutMatchID);
+
+			if (match.WhiteOutMatchID < 0)
+				Write_Line("");
+			else
+				Write_Int(match.WhiteOutMatchID);
 
 			Write_Int(match.Pool);
 			Write_Int(match.ThirdMatchNo);
@@ -639,8 +675,14 @@ bool MD5::Save(const std::string& Filename) const
 
 			Write_Int(result.Pool);
 			Write_Int(result.RankNo);
-			Write_Int(result.MatchNo);
-			Write_Int(result.RankType);
+			if (result.MatchNo < 0)
+				Write_Line("");
+			else
+				Write_Int(result.MatchNo);
+			if (result.RankType < 0)
+				Write_Line("");
+			else
+				Write_Int(result.RankType);
 
 			Write_Int(result.ParticipantID);
 
@@ -665,7 +707,7 @@ bool MD5::Save(const std::string& Filename) const
 				Write_Int(result.ScoreMinus);
 
 			Write_Int(result.Relay);
-			Write_Int(result.FromPool);			
+			Write_Int(result.FromPool);		
 		}
 
 		file.Seek(-1);//Delete last \0
@@ -866,7 +908,8 @@ bool MD5::Parse(ZED::Blob&& Data)
 
 	while (!Data.EndReached() && is_ok)
 	{
-		auto line = ReadLine(Data);
+		bool start_of_heading, newline;
+		auto line = ReadLine(Data, &start_of_heading, &newline);
 
 		if (line == "Turnier")
 			is_ok &= ReadTournamentData(Data);
@@ -897,7 +940,7 @@ bool MD5::Parse(ZED::Blob&& Data)
 		else if (line == "Ergebnis")
 			is_ok &= ReadResult(Data);
 
-		else if (line == "\r\n")
+		else if (newline)
 			continue;
 		else if (line == "\\\\end")
 		{
@@ -1245,7 +1288,7 @@ bool MD5::ReadAgeGroups(ZED::Blob& Data)
 				m_AgeGroups.emplace_back(new AgeGroup(age_group));
 				data.clear();
 
-				if (Line == "\r\n")
+				if (newline)
 					return true;
 			}
 		}
@@ -1452,12 +1495,6 @@ bool MD5::ReadLottery(ZED::Blob& Data)
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
-		if (Line == "\r\n")
-			return true;
-
-		//if (start_of_heading)
-			//are_in_data_part = true;
-
 		if (!are_in_data_part)//We are reading the header
 		{
 			header.emplace_back(Line);
@@ -1508,17 +1545,16 @@ bool MD5::ReadLotteryScheme(ZED::Blob& Data)
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading;
-		auto Line = ReadLine(Data, &start_of_heading);
-
-		if (Line == "\r\n")
-			return true;
-
-		if (start_of_heading)
-			are_in_data_part = true;
+		bool start_of_heading, newline;
+		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
 		if (!are_in_data_part)//We are reading the header
+		{
 			header.emplace_back(Line);
+
+			if (newline)
+				are_in_data_part = true;
+		}
 		else
 		{
 			data.emplace_back(Line);
@@ -1549,9 +1585,11 @@ bool MD5::ReadLotteryScheme(ZED::Blob& Data)
 				}
 
 				m_LotterySchemas.emplace_back(new_lotteryschema);
-
 				data.clear();
 			}
+
+			if (newline)
+				return true;
 		}
 	}
 
@@ -1568,17 +1606,16 @@ bool MD5::ReadLotterySchemaLine(ZED::Blob& Data)
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading;
-		auto Line = ReadLine(Data, &start_of_heading);
-
-		if (Line == "\r\n")
-			return true;
-
-		if (start_of_heading)
-			are_in_data_part = true;
+		bool start_of_heading, newline;
+		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
 		if (!are_in_data_part)//We are reading the header
+		{
 			header.emplace_back(Line);
+
+			if (newline)
+				are_in_data_part = true;
+		}
 		else
 		{
 			data.emplace_back(Line);
@@ -1612,9 +1649,11 @@ bool MD5::ReadLotterySchemaLine(ZED::Blob& Data)
 				}
 
 				m_LotterySchemaLines.emplace_back(new_lotteryschemaline);
-
 				data.clear();
 			}
+
+			if (newline)
+				return true;
 		}
 	}
 
@@ -1634,12 +1673,6 @@ bool MD5::ReadRelationParticipantMatchTable(ZED::Blob& Data)
 	{
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
-
-		if (Line == "\r\n")
-			return true;
-
-		//if (start_of_heading)
-			//are_in_data_part = true;
 
 		if (are_in_header_part)//We are reading the header
 		{
@@ -1706,9 +1739,6 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 	{
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
-
-		if (Line == "\r\n")
-			return true;
 
 		if (are_in_header_part)//We are reading the header
 		{
@@ -1800,7 +1830,7 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 					}
 					else if (header[i] == "VerliererPK")
 					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.LoserColor) != 1)
+						if (sscanf_s(data[i].c_str(), "%d", &new_match.LoserID) != 1)
 							ZED::Log::Warn("Could not read LoserColor of match");
 					}
 					else if (header[i] == "VerliererKampfNR")
@@ -1900,9 +1930,6 @@ bool MD5::ReadResult(ZED::Blob& Data)
 	{
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
-
-		if (Line == "\r\n")
-			return true;
 
 		if (are_in_header_part)//We are reading the header
 		{
@@ -2088,9 +2115,9 @@ bool MD5::ReadParticipants(ZED::Blob& Data)
 					else if (header[i] == "StatusAenderung")
 						new_participant.StatusChanged = data[i] == "1";
 					else if (header[i] == "REDAusgeschrieben")
-						new_participant.ClubFullname = data[i];
+						new_participant.ClubFullname = Latin1ToUTF8(data[i]);
 					else if (header[i] == "REDKuerzel")
-						new_participant.ClubShortname = data[i];
+						new_participant.ClubShortname = Latin1ToUTF8(data[i]);
 					else if (header[i] == "AllkategorieTNPK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_participant.AllCategoriesParticipantID) != 1)
@@ -2385,8 +2412,6 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pStartOfHeading, bool* pNewLine
 			newline = true;
 			if (pNewLine && carry_return)
 				*pNewLine = true;
-			if (Line.length() == 1)
-				Line += c;
 		}
 		else//Printable character
 		{

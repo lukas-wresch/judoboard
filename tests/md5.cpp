@@ -1253,11 +1253,11 @@ TEST(MD5, Export)
 	initialize();
 
 #ifdef _WIN32
-	MD5 file("../test-data/Test.md5");
-	const auto hash_expected = ZED::SHA512(ZED::File("../test-data/Test.md5"));
+	MD5 file("../test-data/Test-cleaned.md5");
+	const auto hash_expected = ZED::SHA512(ZED::File("../test-data/Test-cleaned.md5"));
 #else
-	MD5 file("test-data/Test.md5");
-	const auto hash_expected = ZED::SHA512(ZED::File("test-data/Test.md5"));
+	MD5 file("test-data/Test-cleaned.md5");
+	const auto hash_expected = ZED::SHA512(ZED::File("test-data/Test-cleaned.md5"));
 #endif
 
 	ASSERT_TRUE(file);
