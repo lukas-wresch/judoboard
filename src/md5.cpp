@@ -714,7 +714,7 @@ bool MD5::Save(const std::string& Filename) const
 		Write_0D0A00();
 	}
 
-	Write_Line("\\\\end");
+	Write_String("\\\\end");
 
 	return true;
 }
