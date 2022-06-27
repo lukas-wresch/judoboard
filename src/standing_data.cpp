@@ -1,5 +1,7 @@
 #include <fstream>
 #include <random>
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/sha512.h"
 #include "standing_data.h"
@@ -61,6 +63,29 @@ void StandingData::operator >> (ZED::CSV& Stream) const
 	for (auto rule : m_RuleSets)
 		if (rule)
 			*rule >> Stream;
+}
+
+
+
+void StandingData::operator >> (YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginSeq;
+
+	for (auto [id, judoka] : m_Judokas)
+	{
+		if (judoka)
+			*judoka >> Yaml;
+	}
+
+	Yaml << YAML::EndSeq;
+	
+	Yaml << YAML::BeginSeq;
+
+	for (auto rule : m_RuleSets)
+		if (rule)
+			*rule >> Yaml;
+
+	Yaml << YAML::EndSeq;
 }
 
 

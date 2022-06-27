@@ -6,6 +6,8 @@
 #include "database.h"
 #include "weightclass.h"
 #include "md5.h"
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 
 
 
@@ -284,6 +286,55 @@ bool Tournament::Save(const std::string& Filename) const
 		*match >> stream;
 
 	stream >> file;
+	ZED::Log::Info("Tournament " + Filename + " saved successfully");
+	return true;
+}
+
+
+
+bool Tournament::SaveYAML(const std::string& Filename) const
+{
+	std::ofstream file(Filename);
+
+	if (!file)
+		return false;
+
+	YAML::Emitter yaml;
+
+	yaml << YAML::BeginMap;
+	yaml << YAML::Key << "name";
+	yaml << YAML::Value << m_Name;
+	yaml << YAML::Key << "version";
+	yaml << YAML::Value << "1";
+	yaml << YAML::EndMap;
+
+	m_StandingData >> yaml;
+
+	yaml << YAML::BeginSeq;
+	for (const auto& judoka_uuid : m_DisqualifiedJudoka)
+		yaml << (std::string)judoka_uuid;
+	yaml << YAML::EndSeq;
+
+	if (m_pDefaultRules)
+		*m_pDefaultRules >> yaml;
+	else
+	{
+		RuleSet temp;
+		temp >> yaml;
+	}
+
+	/*stream << m_MatchTables.size();
+
+	for (auto table : m_MatchTables)
+		*table >> stream;
+
+	stream << m_Schedule.size();
+
+	for (auto match : m_Schedule)
+		*match >> stream;*/
+
+	file << yaml.c_str();
+
 	ZED::Log::Info("Tournament " + Filename + " saved successfully");
 	return true;
 }

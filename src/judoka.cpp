@@ -1,3 +1,5 @@
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include "../ZED/include/core.h"
 #include "judoka.h"
 #include "database.h"
@@ -78,6 +80,22 @@ void Judoka::operator >> (ZED::CSV& Stream) const
 		Stream << "?";
 
 	Stream.AddNewline();//Also needed to flush the stream
+}
+
+
+
+void Judoka::operator >> (YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+	Yaml << YAML::Key << "uuid"      << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "firstname" << YAML::Value << m_Firstname;
+	Yaml << YAML::Key << "lastname"  << YAML::Value << m_Lastname;
+	Yaml << YAML::Key << "weight"    << YAML::Value << m_Weight;
+	Yaml << YAML::Key << "gender"    << YAML::Value << (int)m_Gender;
+	Yaml << YAML::Key << "birthyear" << YAML::Value << m_Birthyear;
+	if (m_pClub)
+		Yaml << YAML::Key << "club"  << YAML::Value << (std::string)m_pClub->GetUUID();
+	Yaml << YAML::EndMap;
 }
 
 

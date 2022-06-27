@@ -1,3 +1,5 @@
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include "rule_set.h"
 
 
@@ -48,6 +50,27 @@ void RuleSet::operator >>(ZED::CSV& Stream) const
 	Stream << m_MatchTime << m_GoldenScoreTime << m_OsaeKomiTime << m_OsaeKomiTime_With_WazaAri << m_BreakTime;
 	Stream << m_Yuko << m_Koka << m_Draw;
 	Stream.AddNewline();//Also needed to flush the stream
+}
+
+
+
+void RuleSet::operator >> (YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
+
+	Yaml << YAML::Key << "match_time"        << YAML::Value << m_MatchTime;
+	Yaml << YAML::Key << "golden_score_time" << YAML::Value << m_GoldenScoreTime;
+
+	Yaml << YAML::Key << "osaekomi_time" << YAML::Value << m_OsaeKomiTime;
+	Yaml << YAML::Key << "osaekomi_with_wazaari_time" << YAML::Value << m_OsaeKomiTime_With_WazaAri;
+	Yaml << YAML::Key << "break_time" << YAML::Value << m_BreakTime;
+
+	Yaml << YAML::Key << "yuko" << YAML::Value << m_Yuko;
+	Yaml << YAML::Key << "koka" << YAML::Value << m_Koka;
+	Yaml << YAML::Key << "draw" << YAML::Value << m_Draw;
+	Yaml << YAML::EndMap;
 }
 
 

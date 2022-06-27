@@ -116,12 +116,14 @@ namespace Judoboard
 
 		bool Save() const {
 			if (!m_AutoSave) return true;
+			SaveYAML("tournaments/" + m_Name + ".yml");
 			return Save("tournaments/" + m_Name);
 		}
 
 	private:
 		bool Load(const std::string& Filename);
 		bool Save(const std::string& Filename) const;
+		bool SaveYAML(const std::string& Filename) const;
 
 		int32_t  GetMaxScheduleIndex(uint32_t Mat = 0) const;
 		uint32_t GetMaxEntriesAtScheduleIndex(uint32_t MatID, int32_t ScheduleIndex) const;

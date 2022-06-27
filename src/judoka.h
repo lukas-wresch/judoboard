@@ -8,6 +8,12 @@
 #include "md5.h"
 
 
+namespace YAML
+{
+	class Emitter;
+}
+
+
 
 namespace Judoboard
 {
@@ -55,6 +61,7 @@ namespace Judoboard
 		const std::string ToString() const;
 
 		void operator >> (ZED::CSV& Stream) const;
+		void operator >> (YAML::Emitter& Yaml) const;
 
 		bool operator ==(const Judoka& cmp) const { return GetID() == cmp.GetID(); }
 

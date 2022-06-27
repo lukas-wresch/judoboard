@@ -7,6 +7,12 @@
 #include "dm4.h"
 
 
+namespace YAML
+{
+	class Emitter;
+}
+
+
 
 namespace Judoboard
 {
@@ -18,6 +24,7 @@ namespace Judoboard
 
 		void operator << (ZED::CSV& Stream);
 		void operator >> (ZED::CSV& Stream) const;
+		void operator >> (YAML::Emitter& Yaml) const;
 
 		void AddMD5File(const MD5& File);
 
