@@ -3,6 +3,12 @@
 #include "../ZED/include/csv.h"
 
 
+namespace YAML
+{
+	class Emitter;
+}
+
+
 
 namespace Judoboard
 {
@@ -124,7 +130,7 @@ namespace Judoboard
 
 		void operator << (ZED::CSV& Stream);
 		void operator >> (ZED::CSV& Stream) const;
-
+		void operator >> (YAML::Emitter& Yaml) const;
 
 	private:
 		struct Event

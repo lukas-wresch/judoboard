@@ -69,6 +69,8 @@ void StandingData::operator >> (ZED::CSV& Stream) const
 
 void StandingData::operator >> (YAML::Emitter& Yaml) const
 {
+	Yaml << YAML::Key << "judoka";
+	Yaml << YAML::Value;
 	Yaml << YAML::BeginSeq;
 
 	for (auto [id, judoka] : m_Judokas)
@@ -79,6 +81,8 @@ void StandingData::operator >> (YAML::Emitter& Yaml) const
 
 	Yaml << YAML::EndSeq;
 	
+	Yaml << YAML::Key << "rule_sets";
+	Yaml << YAML::Value;
 	Yaml << YAML::BeginSeq;
 
 	for (auto rule : m_RuleSets)

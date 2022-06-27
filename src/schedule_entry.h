@@ -1,4 +1,6 @@
 #pragma once
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include "../ZED/include/csv.h"
 #include "id.h"
 
@@ -180,6 +182,12 @@ namespace Judoboard
 			Stream << (std::string)GetUUID();
 			Stream << m_ScheduleIndex << m_MatID;
 			m_Color >> Stream;
+		}
+		void operator >> (YAML::Emitter& Yaml) const {
+			Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+			Yaml << YAML::Key << "schedule_index" << YAML::Value << m_ScheduleIndex;
+			Yaml << YAML::Key << "mat_id" << YAML::Value << m_MatID;
+			Yaml << YAML::Key << "color"  << YAML::Value << (int)m_Color;
 		}
 
 	private:

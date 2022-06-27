@@ -113,6 +113,7 @@ namespace Judoboard
 		virtual const std::string ToString() const;
 
 		virtual void operator >> (ZED::CSV& Stream) const;
+		virtual void operator >> (YAML::Emitter& Yaml) const;
 
 		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
 

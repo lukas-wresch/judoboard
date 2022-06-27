@@ -112,6 +112,7 @@ namespace Judoboard
 		ZED::CSV AllToString() const;
 
 		void operator >>(ZED::CSV& Stream) const;
+		void operator >>(YAML::Emitter& Yaml) const;
 
 	private:
 		void SetState(Status NewState) { m_State = NewState; }

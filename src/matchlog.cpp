@@ -1,3 +1,5 @@
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include <sstream>
 #include "matchlog.h"
 
@@ -46,4 +48,22 @@ void MatchLog::operator >> (ZED::CSV& Stream) const
 
 	for (auto& event : m_Events)
 		Stream << event.m_Group << event.m_Event << event.m_Timestamp;
+}
+
+
+
+void MatchLog::operator >> (YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginSeq;
+
+	for (auto& event : m_Events)
+	{
+		Yaml << YAML::BeginMap;
+		Yaml << YAML::Key << "group"     << YAML::Value << (int)event.m_Group;
+		Yaml << YAML::Key << "event"     << YAML::Value << (int)event.m_Event;
+		Yaml << YAML::Key << "timestamp" << YAML::Value << event.m_Timestamp;
+		Yaml << YAML::EndMap;
+	}
+
+	Yaml << YAML::EndSeq;
 }

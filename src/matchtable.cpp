@@ -1,3 +1,5 @@
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include "../ZED/include/log.h"
 #include "matchtable.h"
 #include "match.h"
@@ -317,6 +319,31 @@ void MatchTable::operator >> (ZED::CSV& Stream) const
 	Stream << m_Participants.size();
 	for (auto judoka : m_Participants)
 		Stream << (std::string)judoka->GetUUID();
+}
+
+
+
+void MatchTable::operator >> (YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+
+	Schedulable::operator >>(Yaml);
+
+	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
+	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
+
+	if (m_Rules)
+		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
+
+	Yaml << YAML::Key << "participants";
+	Yaml << YAML::BeginSeq;
+
+	for (auto judoka : m_Participants)
+		Yaml << (std::string)judoka->GetUUID();
+
+	Yaml << YAML::EndSeq;
+
+	Yaml << YAML::EndMap;
 }
 
 

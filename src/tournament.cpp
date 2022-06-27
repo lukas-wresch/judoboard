@@ -308,31 +308,45 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 	yaml << YAML::Value << "1";
 	yaml << YAML::EndMap;
 
+	yaml << YAML::BeginMap;
+
 	m_StandingData >> yaml;
 
+	yaml << YAML::Key << "disqualified_judoka";
+	yaml << YAML::Value;
 	yaml << YAML::BeginSeq;
+
 	for (const auto& judoka_uuid : m_DisqualifiedJudoka)
 		yaml << (std::string)judoka_uuid;
+
 	yaml << YAML::EndSeq;
 
 	if (m_pDefaultRules)
-		*m_pDefaultRules >> yaml;
-	else
 	{
-		RuleSet temp;
-		temp >> yaml;
+		yaml << YAML::Key << "default_rule_set";
+		yaml << YAML::Value;
+		*m_pDefaultRules >> yaml;
 	}
 
-	/*stream << m_MatchTables.size();
+	yaml << YAML::Key << "match_tables";
+	yaml << YAML::Value;
+	yaml << YAML::BeginSeq;
 
 	for (auto table : m_MatchTables)
-		*table >> stream;
+		*table >> yaml;
 
-	stream << m_Schedule.size();
+	yaml << YAML::EndSeq;
+
+	yaml << YAML::Key << "schedule";
+	yaml << YAML::Value;
+	yaml << YAML::BeginSeq;
 
 	for (auto match : m_Schedule)
-		*match >> stream;*/
+		*match >> yaml;
 
+	yaml << YAML::EndSeq;
+
+	yaml << YAML::EndMap;
 	file << yaml.c_str();
 
 	ZED::Log::Info("Tournament " + Filename + " saved successfully");
