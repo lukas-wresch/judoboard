@@ -306,9 +306,6 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 	yaml << YAML::Value << m_Name;
 	yaml << YAML::Key << "version";
 	yaml << YAML::Value << "1";
-	yaml << YAML::EndMap;
-
-	yaml << YAML::BeginMap;
 
 	m_StandingData >> yaml;
 
