@@ -42,6 +42,31 @@ void MatchLog::operator << (ZED::CSV& Stream)
 
 
 
+void MatchLog::operator << (const YAML::Node& Yaml)
+{
+	if (!Yaml.IsSequence())
+		return;
+
+	for (const auto& node : Yaml)
+	{
+		if (!node.IsMap())
+			continue;
+
+		if (node["group"] && node["event"] && node["timestamp"])
+		{
+			if ((EventGroup)node["group"].as<int>() == EventGroup::Neutral)
+				m_Events.emplace_back(Event((NeutralEvent)node["event"].as<int>(),
+											node["timestamp"].as<int>()));
+			else
+				m_Events.emplace_back(Event((Fighter)node["group"].as<int>(),
+											(BiasedEvent)node["event"].as<int>(),
+											node["timestamp"].as<int>()));
+		}
+	}
+}
+
+
+
 void MatchLog::operator >> (ZED::CSV& Stream) const
 {
 	Stream << m_Events.size();

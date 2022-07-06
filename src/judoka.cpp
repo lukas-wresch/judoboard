@@ -10,9 +10,9 @@ using namespace Judoboard;
 
 
 
-Judoka::Judoka(const std::string& Firstname, const std::string& Lastname, uint16_t Weight, Gender Gender) : m_Firstname(Firstname), m_Lastname(Lastname)
+Judoka::Judoka(const std::string& Firstname, const std::string& Lastname, uint32_t Weight, Gender Gender) : m_Firstname(Firstname), m_Lastname(Lastname)
 {
-	if (Weight < 1000)
+	if (Weight < 1000 * 1000)
 		m_Weight = Weight;
 	if (Gender == Gender::Male || Gender == Gender::Female)
 		m_Gender = Gender;
@@ -28,6 +28,26 @@ Judoka::Judoka(ZED::CSV& Stream, const StandingData* pStandingData)
 
 	if (pStandingData && club_uuid.length() > 1)
 		m_pClub = pStandingData->FindClub(UUID(std::move(club_uuid)));
+}
+
+
+
+Judoka::Judoka(const YAML::Node& Yaml, const StandingData* pStandingData)
+{
+	if (Yaml["uuid"])
+		SetUUID(Yaml["uuid"].as<std::string>());
+	if (Yaml["firstname"])
+		m_Firstname = Yaml["firstname"].as<std::string>();
+	if (Yaml["lastname"])
+		m_Lastname = Yaml["lastname"].as<std::string>();
+	if (Yaml["weight"])
+		m_Weight = Yaml["weight"].as<int>();
+	if (Yaml["gender"])
+		m_Gender = (Gender)Yaml["gender"].as<int>();
+	if (Yaml["birthyear"])
+		m_Birthyear = Yaml["birthyear"].as<int>();
+	if (Yaml["club"] && pStandingData)
+		m_pClub = pStandingData->FindClub(Yaml["club"].as<std::string>());
 }
 
 
@@ -108,9 +128,9 @@ uint16_t Judoka::GetAge() const
 
 
 
-void Judoka::SetWeight(uint16_t NewWeight)
+void Judoka::SetWeight(uint32_t NewWeight)
 {
-	if (NewWeight < 1000)
+	if (NewWeight < 1000 * 1000)
 		m_Weight = NewWeight;
 }
 

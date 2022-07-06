@@ -10,6 +10,7 @@
 namespace YAML
 {
 	class Emitter;
+	class Node;
 }
 
 
@@ -23,6 +24,7 @@ namespace Judoboard
 		void Reset();
 
 		void operator << (ZED::CSV& Stream);
+		void operator << (YAML::Node& Yaml);
 		void operator >> (ZED::CSV& Stream) const;
 		void operator >> (YAML::Emitter& Yaml) const;
 

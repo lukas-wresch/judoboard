@@ -1606,11 +1606,7 @@ void Application::SetupHttpServer()
 
 			table->SetMinWeight(minWeight);
 			table->SetMaxWeight(maxWeight);
-
-			if (gender < 0 || gender >= 2)
-				table->EnforceGender(false);
-			else
-				table->SetGender((Gender)gender);
+			table->SetGender((Gender)gender);
 
 			GetTournament()->Unlock();
 			break;
@@ -1833,18 +1829,17 @@ void Application::SetupHttpServer()
 			return std::string("Could not find rule set in database");
 
 		auto rule = rules[index];
-		if (!rule)
-			return std::string("Internal error");
 
 		Tournament* new_tournament = new Tournament(name);
-		new_tournament->SetDefaultRuleSet(rule);
+		if (rule)//If available, set default rule set
+			new_tournament->SetDefaultRuleSet(rule);
 
 		if (!AddTournament(new_tournament))
 			return std::string("Could not add tournament");
 
 		new_tournament->Save();
 		return Error();//OK
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/tournament/get", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);

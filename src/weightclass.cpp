@@ -25,7 +25,6 @@ Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint
 Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight, Gender Gender) : Weightclass(Tournament, MinWeight, MaxWeight)
 {
 	m_Gender = Gender;
-	m_GenderEnforced = true;
 
 	SetName(Localizer::Translate("Weightclass") + " " + GetDescription());
 }
@@ -34,7 +33,19 @@ Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint
 
 Weightclass::Weightclass(ZED::CSV& Stream, ITournament* Tournament) : MatchTable(Stream, Tournament)
 {
-	Stream >> m_MinWeight >> m_MaxWeight >> m_Gender >> m_GenderEnforced;
+	Stream >> m_MinWeight >> m_MaxWeight >> m_Gender;
+}
+
+
+
+Weightclass::Weightclass(const YAML::Node& Yaml, ITournament* Tournament) : MatchTable(Yaml, Tournament)
+{
+	if (Yaml["min_weight"])
+		m_MinWeight = Yaml["min_weight"].as<int>();
+	if (Yaml["max_weight"])
+		m_MaxWeight = Yaml["max_weight"].as<int>();
+	if (Yaml["gender"])
+		m_Gender = (Gender)Yaml["gender"].as<int>();
 }
 
 
@@ -54,7 +65,6 @@ Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament*
 	if (Weightclass.AgeGroup)
 	{
 		m_Gender = Weightclass.AgeGroup->Gender;
-		m_GenderEnforced = true;
 
 		//TODO convert birthyear to actual age limit
 		//m_MinAge = Weightclass.AgeGroup->MinBirthyear;
@@ -68,7 +78,22 @@ Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament*
 void Weightclass::operator >> (ZED::CSV& Stream) const
 {
 	MatchTable::operator >>(Stream);
-	Stream << m_MinWeight << m_MaxWeight << m_Gender << m_GenderEnforced;
+	Stream << m_MinWeight << m_MaxWeight << m_Gender;
+}
+
+
+
+void Weightclass::operator >> (YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+
+	MatchTable::operator >>(Yaml);
+
+	Yaml << YAML::Key << "min_weight" << YAML::Value << m_MinWeight;
+	Yaml << YAML::Key << "max_weight" << YAML::Value << m_MaxWeight;
+	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;
+
+	Yaml << YAML::EndMap;
 }
 
 
@@ -76,7 +101,7 @@ void Weightclass::operator >> (ZED::CSV& Stream) const
 const std::string Weightclass::GetDescription() const
 {
 	std::string name = std::to_string(m_MinWeight) + " - " + std::to_string(m_MaxWeight) + " kg";
-	if (m_GenderEnforced)
+	if (m_Gender != Gender::Unknown)
 		name += (m_Gender == Gender::Male) ? " (m)" : " (f)";
 	return name;
 }
@@ -125,7 +150,7 @@ std::string Weightclass::GetHTMLForm()
 <div>
   <label style="width:150px;float:left;margin-top:5px;" id="label_gender">Gender</label>
   <select style="margin-bottom:10px;" id="gender">
-    <option selected value="2" id="all">All</option>
+    <option selected value="-1" id="all">All</option>
     <option value="0" id="male">Male</option>
     <option value="1" id="female">Female</option>
   </select>
@@ -146,7 +171,7 @@ bool Weightclass::IsElgiable(const Judoka& Fighter) const
 		if (m_MinAge > Fighter.GetAge() || Fighter.GetAge() > m_MaxAge)
 			return false;
 
-	if (m_GenderEnforced)
+	if (m_Gender != Gender::Unknown)//Gender enforced?
 		if (m_Gender != Fighter.GetGender())
 			return false;
 
@@ -376,10 +401,7 @@ const std::string Weightclass::ToString() const
 	ZED::CSV ret(MatchTable::ToString());
 	ret << m_MinWeight << m_MaxWeight;
 
-	if (!m_GenderEnforced)
-		ret << 2;
-	else
-		ret << m_Gender;
+	ret << m_Gender;
 
 	return ret;
 }

@@ -11,6 +11,7 @@
 namespace YAML
 {
 	class Emitter;
+	class Node;
 }
 
 
@@ -29,13 +30,14 @@ namespace Judoboard
 		friend class Match;
 
 	public:
-		Judoka(const std::string& Firstname, const std::string& Lastname, uint16_t Weight = 0, Gender Gender = Gender::Male);
+		Judoka(const std::string& Firstname, const std::string& Lastname, uint32_t Weight = 0, Gender Gender = Gender::Male);
 		Judoka(ZED::CSV& Stream, const StandingData* pStandingData = nullptr);//Load judoka from file
+		Judoka(const YAML::Node& Yaml, const StandingData* pStandingData = nullptr);//Load judoka from file
 		Judoka(const DM4::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from DM4 data
 		Judoka(const MD5::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from MD5 data
 
 		Gender GetGender()   const { return m_Gender; }
-		uint16_t GetWeight() const { return m_Weight; }
+		uint32_t GetWeight() const { return m_Weight; }
 		uint16_t GetAge() const;
 		const std::string GetName() const { return m_Firstname + " " + m_Lastname; }
 
@@ -51,7 +53,7 @@ namespace Judoboard
 		void SetFirstname(const std::string& Firstname) { m_Firstname = Firstname; }
 		void SetLastname( const std::string& Lastname)  { m_Lastname  = Lastname; }
 		void SetGender(Gender NewGender) { m_Gender = NewGender; }
-		void SetWeight(uint16_t NewWight);
+		void SetWeight(uint32_t NewWight);
 		void SetBirthyear(uint16_t NewBirthyear) { m_Birthyear = NewBirthyear; }
 		void SetClub(const Club* NewClub) { m_pClub = NewClub; }
 
@@ -71,7 +73,7 @@ namespace Judoboard
 		std::string m_Firstname;
 		std::string m_Lastname;
 
-		uint16_t m_Weight = 0;
+		uint32_t m_Weight = 0;//Weight in grams
 		Gender m_Gender = Gender::Male;
 
 		uint16_t m_Birthyear = 0;

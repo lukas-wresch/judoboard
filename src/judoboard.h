@@ -8,6 +8,7 @@ namespace Judoboard
 {
 	enum class Gender
 	{
+		Unknown = -1,
 		Male, Female
 	};
 

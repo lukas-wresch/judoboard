@@ -68,6 +68,7 @@ namespace Judoboard
 
 		MatchTable(const ITournament* Tournament) : Schedulable(Tournament) {}
 		MatchTable(ZED::CSV& Stream, ITournament* Tournament);
+		MatchTable(const YAML::Node& Yaml, ITournament* Tournament);
 		MatchTable(MatchTable&) = delete;
 		MatchTable(const MatchTable&) = delete;
 
@@ -112,9 +113,6 @@ namespace Judoboard
 		//Serialization
 		virtual const std::string ToString() const;
 
-		virtual void operator >> (ZED::CSV& Stream) const;
-		virtual void operator >> (YAML::Emitter& Yaml) const;
-
 		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
 
 	protected:
@@ -122,6 +120,9 @@ namespace Judoboard
 
 		Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
+
+		virtual void operator >> (ZED::CSV& Stream) const;
+		virtual void operator >> (YAML::Emitter& Yaml) const;
 
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called

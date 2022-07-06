@@ -88,7 +88,10 @@ namespace Judoboard
 
 		//Rule Sets
 		virtual const RuleSet* GetDefaultRuleSet() const override { return m_pDefaultRules; }
-		virtual void SetDefaultRuleSet(const RuleSet* NewDefaultRuleSet) override { m_pDefaultRules = NewDefaultRuleSet; }
+		virtual void SetDefaultRuleSet(RuleSet* NewDefaultRuleSet) override {
+			m_StandingData.AddRuleSet(NewDefaultRuleSet);
+			m_pDefaultRules = NewDefaultRuleSet;
+		}
 		virtual const RuleSet* FindRuleSetByName(const std::string& Name) const override { return m_StandingData.FindRuleSetByName(Name); }
 		virtual RuleSet* FindRuleSetByName(const std::string& Name) override { return m_StandingData.FindRuleSetByName(Name); }
 		virtual const RuleSet* FindRuleSet(const UUID& UUID) const override { return m_StandingData.FindRuleSet(UUID); }
@@ -116,12 +119,14 @@ namespace Judoboard
 
 		bool Save() const {
 			if (!m_AutoSave) return true;
-			SaveYAML("tournaments/" + m_Name + ".yml");
-			return Save("tournaments/" + m_Name);
+			return SaveYAML("tournaments/" + m_Name + ".yml");
 		}
 
 	private:
+		[[deprecated]]
 		bool Load(const std::string& Filename);
+		bool LoadYAML(const std::string& Filename);
+		[[deprecated]]
 		bool Save(const std::string& Filename) const;
 		bool SaveYAML(const std::string& Filename) const;
 

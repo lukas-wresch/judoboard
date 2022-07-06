@@ -17,7 +17,7 @@ using namespace Judoboard;
 
 Tournament::Tournament(const std::string& Name) : m_Name(Name)
 {
-	Load("tournaments/" + Name);
+	LoadYAML("tournaments/" + Name + ".yml");
 	//if (!Load("tournaments/" + Name))
 		//m_pDefaultRules = new RuleSet();
 }
@@ -26,7 +26,7 @@ Tournament::Tournament(const std::string& Name) : m_Name(Name)
 
 Tournament::Tournament(const std::string& Name, const RuleSet* RuleSet) : m_pDefaultRules(RuleSet), m_Name(Name)
 {
-	Load("tournaments/" + Name);
+	LoadYAML("tournaments/" + Name + ".yml");
 }
 
 
@@ -249,6 +249,100 @@ bool Tournament::Load(const std::string& Filename)
 
 
 
+bool Tournament::LoadYAML(const std::string& Filename)
+{
+	std::ifstream file(Filename);
+	if (!file)
+	{
+		ZED::Log::Warn("Could not open file " + Filename);
+		return false;
+	}
+
+	YAML::Node yaml = YAML::LoadFile(Filename);
+
+	if (!yaml)
+	{
+		ZED::Log::Warn("Could not open file " + Filename);
+		return false;
+	}
+
+	if (!yaml["version"] || !yaml["name"])
+	{
+		ZED::Log::Warn("File " + Filename + " is not a valid tournament file");
+		return false;
+	}
+
+	if (yaml["version"].as<int>() != 1)
+	{
+		ZED::Log::Warn("Tournament file has been written with a new version. Please update this software!");
+		return false;
+	}
+
+	//Read standing data
+	m_StandingData << yaml;
+
+	if (yaml["disqualified_judoka"] && yaml["disqualified_judoka"].IsSequence())
+	{
+		for (const auto& node : yaml["disqualified_judoka"])
+			m_DisqualifiedJudoka.insert(node.as<std::string>());
+	}
+
+	if (yaml["default_rule_set"])
+		m_pDefaultRules = m_StandingData.FindRuleSet(yaml["default_rule_set"].as<std::string>());
+	else
+		m_pDefaultRules = nullptr;
+
+	if (yaml["match_tables"] && yaml["match_tables"].IsSequence())
+	{
+		for (const auto& node : yaml["match_tables"])
+		{
+			if (!node["type"])
+			{
+				ZED::Log::Warn("match table has no attribute 'type'. Can not load this match table!");
+				continue;
+			}
+
+			MatchTable* new_table = nullptr;
+
+			switch ((MatchTable::Type)node["type"].as<int>())
+			{
+			case MatchTable::Type::Weightclass:
+				new_table = new Weightclass(node, this);
+				break;
+			}
+
+			if (new_table)
+			{
+				m_MatchTables.push_back(new_table);
+				m_SchedulePlanner.push_back(new_table);
+			}
+		}
+	}
+
+	m_Schedule.clear();
+
+	if (yaml["schedule"] && yaml["schedule"].IsSequence())
+	{
+		for (const auto& node : yaml["schedule"])
+		{
+			Match* new_match = new Match(node, this);
+
+			if (new_match->GetMatchTable())
+			{
+				auto id = new_match->GetMatchTable()->GetID();
+				FindMatchTable(id)->SetSchedule().emplace_back(new_match);
+			}
+
+			m_Schedule.emplace_back(new_match);
+		}
+	}
+
+	ZED::Log::Info("Tournament " + Filename + " loaded successfully");
+	return true;
+}
+
+
+
 bool Tournament::Save(const std::string& Filename) const
 {
 	std::ofstream file(Filename, std::ios::binary);
@@ -321,8 +415,7 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 	if (m_pDefaultRules)
 	{
 		yaml << YAML::Key << "default_rule_set";
-		yaml << YAML::Value;
-		*m_pDefaultRules >> yaml;
+		yaml << YAML::Value << (std::string)m_pDefaultRules->GetUUID();
 	}
 
 	yaml << YAML::Key << "match_tables";
@@ -403,6 +496,14 @@ void Tournament::ConnectToDatabase(Database& db)
 
 
 	//Do the same for rule sets
+
+	if (m_pDefaultRules)
+	{
+		auto db_ref = db.FindRuleSet(m_pDefaultRules->GetUUID());
+		if (db_ref)
+			m_pDefaultRules = db_ref;
+	}
+
 	std::vector<RuleSet*> rule_sets_to_add;
 
 	for (auto it = m_StandingData.GetRuleSets().begin(); it != m_StandingData.GetRuleSets().end();)
@@ -420,13 +521,6 @@ void Tournament::ConnectToDatabase(Database& db)
 
 	for (auto rule : rule_sets_to_add)
 		m_StandingData.AddRuleSet(rule);
-
-	if (m_pDefaultRules)
-	{
-		auto db_ref = db.FindRuleSet(m_pDefaultRules->GetUUID());
-		if (db_ref)
-			m_pDefaultRules = db_ref;
-	}
 }
 
 

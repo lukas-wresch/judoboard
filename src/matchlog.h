@@ -6,6 +6,7 @@
 namespace YAML
 {
 	class Emitter;
+	class Node;
 }
 
 
@@ -86,7 +87,7 @@ namespace Judoboard
 	public:
 		enum class EventGroup
 		{
-			White, Blue, Neutral
+			White, Blue, Neutral = 2
 		};
 
 		enum class NeutralEvent
@@ -129,6 +130,7 @@ namespace Judoboard
 		const std::string ToString() const;
 
 		void operator << (ZED::CSV& Stream);
+		void operator << (const YAML::Node& Yaml);
 		void operator >> (ZED::CSV& Stream) const;
 		void operator >> (YAML::Emitter& Yaml) const;
 

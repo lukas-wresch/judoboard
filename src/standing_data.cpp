@@ -48,6 +48,30 @@ void StandingData::operator << (ZED::CSV& Stream)
 
 
 
+void StandingData::operator << (YAML::Node& Yaml)
+{
+	if (Yaml["judoka"] && Yaml["judoka"].IsSequence())
+	{
+		for (const auto& node : Yaml["judoka"])
+		{
+			Judoka* newJudoka = new Judoka(node);
+			m_Judokas.insert({ newJudoka->GetID(), newJudoka });
+		}
+	}
+
+
+	if (Yaml["rule_sets"] && Yaml["rule_sets"].IsSequence())
+	{
+		for (const auto& node : Yaml["rule_sets"])
+		{
+			auto new_rule_set = new RuleSet(node);
+			m_RuleSets.emplace_back(new_rule_set);
+		}
+	}
+}
+
+
+
 void StandingData::operator >> (ZED::CSV& Stream) const
 {
 	Stream << m_Judokas.size();

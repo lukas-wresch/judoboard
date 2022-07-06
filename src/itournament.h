@@ -77,7 +77,7 @@ namespace Judoboard
 
 		//Rule Sets
 		virtual const RuleSet* GetDefaultRuleSet() const { return nullptr; }
-		virtual void SetDefaultRuleSet(const RuleSet* NewDefaultRuleSet) {}
+		virtual void SetDefaultRuleSet(RuleSet* NewDefaultRuleSet) {}
 		virtual const RuleSet* FindRuleSetByName(const std::string& Name) const { return nullptr; }
 		virtual RuleSet* FindRuleSetByName(const std::string& Name) { return nullptr; }
 		virtual const RuleSet* FindRuleSet(const UUID& UUID) const { return nullptr; }

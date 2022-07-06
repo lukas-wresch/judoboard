@@ -155,6 +155,17 @@ namespace Judoboard
 			Stream >> m_ScheduleIndex >> m_MatID;
 			m_Color << Stream;
 		}
+		Schedulable(const YAML::Node& Yaml, const ITournament* Tournament) : m_Tournament(Tournament)
+		{
+			if (Yaml["uuid"])
+				SetUUID(Yaml["uuid"].as<std::string>());
+			if (Yaml["schedule_index"])
+				m_ScheduleIndex = Yaml["schedule_index"].as<int>();
+			if (Yaml["mat_id"])
+				m_MatID = Yaml["mat_id"].as<int>();
+			if (Yaml["color"])
+				m_Color = Yaml["color"].as<int>();
+		}
 		Schedulable(ZED::Blob& Stream, const ITournament* Tournament) : ID(Stream), m_Tournament(Tournament)
 		{
 			//Stream >> m_ScheduleIndex >> m_MatID;

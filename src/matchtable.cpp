@@ -301,6 +301,27 @@ MatchTable::MatchTable(ZED::CSV& Stream, ITournament* Tournament) : Schedulable(
 
 
 
+MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : Schedulable(Yaml, Tournament)
+{
+	if (Yaml["name"])
+		m_Name = Yaml["name"].as<std::string>();
+
+	if (Yaml["rule_set"])
+		m_Rules = Tournament->FindRuleSet(Yaml["rule_set"].as<std::string>());
+
+	if (Yaml["participants"] && Yaml["participants"].IsSequence())
+	{
+		for (const auto& node : Yaml["participants"])
+		{
+			auto participant = Tournament->FindParticipant(node.as<std::string>());
+			if (participant)
+				m_Participants.emplace_back(participant);
+		}
+	}
+}
+
+
+
 void MatchTable::operator >> (ZED::CSV& Stream) const
 {
 	Stream << GetType();
@@ -325,8 +346,6 @@ void MatchTable::operator >> (ZED::CSV& Stream) const
 
 void MatchTable::operator >> (YAML::Emitter& Yaml) const
 {
-	Yaml << YAML::BeginMap;
-
 	Schedulable::operator >>(Yaml);
 
 	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
@@ -342,8 +361,6 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 		Yaml << (std::string)judoka->GetUUID();
 
 	Yaml << YAML::EndSeq;
-
-	Yaml << YAML::EndMap;
 }
 
 

@@ -41,6 +41,34 @@ RuleSet::RuleSet(ZED::CSV& Stream)
 
 
 
+RuleSet::RuleSet(const YAML::Node& Yaml)
+{
+	if (Yaml["uuid"])
+		SetUUID(Yaml["uuid"].as<std::string>());
+	if (Yaml["name"])
+		m_Name = Yaml["name"].as<std::string>();
+
+	if (Yaml["match_time"])
+		m_MatchTime = Yaml["match_time"].as<int>();
+	if (Yaml["golden_score_time"])
+		m_GoldenScoreTime = Yaml["golden_score_time"].as<int>();
+	if (Yaml["osaekomi_time"])
+		m_OsaeKomiTime = Yaml["osaekomi_time"].as<int>();
+	if (Yaml["osaekomi_with_wazaari_time"])
+		m_OsaeKomiTime_With_WazaAri = Yaml["osaekomi_with_wazaari_time"].as<int>();
+	if (Yaml["break_time"])
+		m_BreakTime = Yaml["break_time"].as<int>();
+
+	if (Yaml["yuko"])
+		m_Yuko = Yaml["yuko"].as<bool>();
+	if (Yaml["koka"])
+		m_Koka = Yaml["koka"].as<bool>();
+	if (Yaml["draw"])
+		m_Draw = Yaml["draw"].as<bool>();
+}
+
+
+
 void RuleSet::operator >>(ZED::CSV& Stream) const
 {
 	Stream << m_Name;

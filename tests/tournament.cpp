@@ -331,8 +331,38 @@ TEST(Tournament, HasDefaultRuleSet)
 	Database d;
 	d.EnableAutoSave(false);
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 	Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
+	EXPECT_TRUE(tourney.AddParticipant(new Judoka("temp", "temp", 50)));
+	tourney.Reset();
+
+	tourney.EnableAutoSave(false);
+
+
+	Tournament t("deleteMe");
+	t.ConnectToDatabase(d);
+	t.EnableAutoSave(false);
+
+	ASSERT_FALSE(t.GetDefaultRuleSet());
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Tournament, HasDefaultRuleSet2)
+{
+	initialize();
+	Database d;
+	d.EnableAutoSave(false);
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	auto rules = new RuleSet("Default", 60, 30, 20, 10);
+	d.AddRuleSet(rules);
+
+	Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
+	tourney.SetDefaultRuleSet(rules);
 	EXPECT_TRUE(tourney.AddParticipant(new Judoka("temp", "temp", 50)));
 	tourney.Reset();
 
@@ -348,7 +378,12 @@ TEST(Tournament, HasDefaultRuleSet)
 	EXPECT_EQ(t.GetDefaultRuleSet()->GetID(),   d.FindRuleSetByName("Default")->GetID());
 	EXPECT_EQ(t.GetDefaultRuleSet()->GetUUID(), d.FindRuleSetByName("Default")->GetUUID());
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	EXPECT_EQ(t.GetDefaultRuleSet()->GetMatchTime(),         60);
+	EXPECT_EQ(t.GetDefaultRuleSet()->GetGoldenScoreTime(),   30);
+	EXPECT_EQ(t.GetDefaultRuleSet()->GetOsaeKomiTime(false), 20);
+	EXPECT_EQ(t.GetDefaultRuleSet()->GetOsaeKomiTime(true),  10);
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
 
 
@@ -356,7 +391,7 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 {
 	initialize();
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
 		Database d;
@@ -387,7 +422,7 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 		EXPECT_TRUE(t.FindRuleSetByName("Test")->GetUUID() == d.FindRuleSetByName("Test")->GetUUID());
 	}
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
 
 
@@ -396,7 +431,7 @@ TEST(Tournament, SaveAndLoad)
 {
 	initialize();
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
 		Database d;
@@ -448,7 +483,7 @@ TEST(Tournament, SaveAndLoad)
 		EXPECT_FALSE(t.IsDisqualified(j4));
 	}
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
 
 
@@ -457,7 +492,7 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 {
 	initialize();
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
 		Database d;
@@ -512,7 +547,7 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 		}
 	}
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
 
 
@@ -521,7 +556,7 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 TEST(Tournament, AddMatchAfterConclusion)
 {
 	initialize();
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
 		Database d;
@@ -563,7 +598,7 @@ TEST(Tournament, AddMatchAfterConclusion)
 		delete mat;
 	}
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
 
 
