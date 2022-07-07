@@ -7,6 +7,9 @@
 
 namespace Judoboard
 {
+	class ITournament;
+
+
 	//A *.md5 is a proprietary file format for storing tournament information
 
 	class MD5
@@ -284,6 +287,7 @@ namespace Judoboard
 
 		MD5(const std::string& Filename);
 		MD5(ZED::Blob&& Data) { Parse(std::move(Data)); }
+		MD5(const ITournament* Tournament);
 		~MD5();
 
 		bool Save(const std::string& Filename) const;

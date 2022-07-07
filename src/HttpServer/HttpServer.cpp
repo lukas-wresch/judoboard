@@ -103,6 +103,8 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
             MIMEType = "image/jpeg";
         else if (Type == ResourceType::Image_PNG)
             MIMEType = "image/png";
+        else if (Type == ResourceType::Binary)
+            MIMEType = "application/octet-stream";
 
 
         if (request.m_ResponseHeader.length() > 0)

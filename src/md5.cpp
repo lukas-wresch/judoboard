@@ -22,6 +22,19 @@ MD5::MD5(const std::string& Filename)
 
 
 
+MD5::MD5(const ITournament* Tournament)
+{
+	if (!Tournament)
+	{
+		ZED::Log::Error("Internal error");
+		return;
+	}
+
+	ZED::Log::Error("NOT IMPLEMENTED");
+}
+
+
+
 MD5::~MD5()
 {
 	for (auto association : m_Associations)
@@ -66,7 +79,7 @@ bool MD5::Save(const std::string& Filename) const
 		file.Write((uint8_t)0x00);
 	};
 
-	auto Write_IntRaw = [&](int32_t Num) {
+	auto Write_IntRaw = [&](int64_t Num) {
 		file.Write((uint8_t)Num);
 		file.Write((uint8_t)0x00);
 	};

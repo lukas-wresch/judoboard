@@ -1919,13 +1919,54 @@ void Application::SetupHttpServer()
 		if (GetTournament()->GetID() == m_Tournaments[index]->GetID())
 			return Error(Error::Type::OperationFailed);
 
-		ZED::Core::RemoveFile("tournaments/" + m_Tournaments[index]->GetName());
+		ZED::Core::RemoveFile("tournaments/" + m_Tournaments[index]->GetName() + ".yml");
 
 		delete m_Tournaments[index];
 		m_Tournaments.erase(m_Tournaments.begin() + index);
 
 		return Error();//OK
 	});
+
+	m_Server.RegisterResource("/ajax/tournament/download", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id < 0)
+			return Error(Error::Type::InvalidID);
+
+		if (GetTournament()->GetID() == id)
+			return Error(Error::Type::OperationFailed);
+
+		std::string filename = "tournaments/" + GetTournament()->GetName();
+		return HttpServer::LoadFile(filename);
+	}, HttpServer::ResourceType::Binary);
+
+	m_Server.RegisterResource("/ajax/tournament/export-md5", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id < 0)
+			return Error(Error::Type::InvalidID);
+
+		if (GetTournament()->GetID() == id)
+			return Error(Error::Type::OperationFailed);
+
+		//GetTournament()
+
+		//TODO convert to MD5 and save
+		MD5 md5_tournament(GetTournament());
+
+		std::string filename = GetTournament()->GetName() + ".md5";
+		md5_tournament.Save(filename);
+
+		return HttpServer::LoadFile(filename);
+	}, HttpServer::ResourceType::Binary);
 
 	m_Server.RegisterResource("/ajax/tournament/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
