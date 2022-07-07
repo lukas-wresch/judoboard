@@ -166,7 +166,7 @@ TEST(Mat, CorrectWinner)
 
 			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 			match.SetMatID(1);
-			match.SetRuleSet(new RuleSet("Test", 5, 0, 30, 20, true, true, true, 0));
+			match.SetRuleSet(new RuleSet("Test", 2, 0, 30, 20, true, true, true, 0));
 
 			EXPECT_TRUE(m.StartMatch(&match));
 			m.Hajime();
@@ -187,7 +187,7 @@ TEST(Mat, CorrectWinner)
 				m.AddNoDisqualification(!f);
 			}
 
-			ZED::Core::Pause(5500);
+			ZED::Core::Pause(2500);
 
 			if (i == 4)
 				m.SetAsDraw();
@@ -387,12 +387,12 @@ TEST(Mat, ShidoDoesntEndGoldenScore)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		match.SetRuleSet(new RuleSet("Test", 5, 60, 30, 20, false, false, true, 0));
+		match.SetRuleSet(new RuleSet("Test", 2, 60, 30, 20, false, false, true, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 
-		ZED::Core::Pause(6 * 1000);
+		ZED::Core::Pause(2500);
 		EXPECT_TRUE(m.IsOutOfTime());
 
 		EXPECT_FALSE(m.HasConcluded());
@@ -425,12 +425,12 @@ TEST(Mat, ScoreEndsGoldenScore)
 
 			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 			match.SetMatID(1);
-			match.SetRuleSet(new RuleSet("Test", 5, 60, 30, 20, true, true, true, 0));
+			match.SetRuleSet(new RuleSet("Test", 2, 60, 30, 20, true, true, true, 0));
 
 			EXPECT_TRUE(m.StartMatch(&match));
 			m.Hajime();
 
-			ZED::Core::Pause(5500);
+			ZED::Core::Pause(2500);
 
 			EXPECT_TRUE(m.EnableGoldenScore());
 			m.Hajime();
@@ -1040,7 +1040,7 @@ TEST(Mat, MatchTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 120; time <= 5*60 ; time += 80 + rand()%60)
+	for (int time = 120; time <= 5*60 ; time += 90 + rand()%60)
 	{
 		Application app;
 		Mat m(1);
@@ -1069,7 +1069,7 @@ TEST(Mat, GoldenScoreTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 30; time <= 3 * 60; time += 60 + rand() % 50)
+	for (int time = 30; time <= 3 * 60; time += 65 + rand() % 50)
 	{
 		Application app;
 		Mat m(1);
@@ -1102,7 +1102,7 @@ TEST(Mat, OsaekomiTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time <= 30; time += 6 + rand() % 8)
+	for (int time = 5; time <= 30; time += 6 + rand() % 8)
 	{
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 		{
@@ -1138,7 +1138,7 @@ TEST(Mat, OsaekomiWithWazaAriTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time <= 25; time += 5 + rand() % 8)
+	for (int time = 5; time <= 25; time += 5 + rand() % 8)
 	{
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 		{
@@ -1188,7 +1188,7 @@ TEST(Mat, OsaekomiUkeGainsIppon)
 		m.Hajime();
 		m.Osaekomi(f);
 
-		ZED::Core::Pause(5000);
+		ZED::Core::Pause(2000);
 
 		m.AddIppon(!f);
 
@@ -1220,7 +1220,7 @@ TEST(Mat, OsaekomiToriGivesUp)
 		m.Hajime();
 		m.Osaekomi(f);
 
-		ZED::Core::Pause(5000);
+		ZED::Core::Pause(2000);
 
 		m.AddGachi(f);
 
@@ -1239,7 +1239,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time <= 25; time += 5 + rand() % 8)
+	for (int time = 5; time <= 25; time += 5 + rand() % 8)
 	{
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 		{
@@ -1291,7 +1291,7 @@ TEST(Mat, OsaekomiTillEndDuringGoldenScore)
 	//and now get cancelled after reaching the wazaari time
 
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time <= 25; time += 5 + rand() % 8)
+	for (int time = 2; time <= 25; time += 5 + rand() % 8)
 	{
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 		{
@@ -1300,11 +1300,11 @@ TEST(Mat, OsaekomiTillEndDuringGoldenScore)
 
 			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 			match.SetMatID(1);
-			match.SetRuleSet(new RuleSet("Test", 5, 60, 2*time, time, false, false, false, 0));
+			match.SetRuleSet(new RuleSet("Test", 2, 60, 2*time, time, false, false, false, 0));
 			EXPECT_TRUE(m.StartMatch(&match));
 
 			m.Hajime();
-			ZED::Core::Pause(6000);
+			ZED::Core::Pause(2500);
 
 			m.EnableGoldenScore();
 			m.Hajime();
@@ -1432,7 +1432,7 @@ TEST(Mat, Tokeda)
 
 		EXPECT_FALSE(m.HasConcluded());
 
-		ZED::Core::Pause(6 * 1000);
+		ZED::Core::Pause(6000);
 
 		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 1);
 		EXPECT_TRUE(m.HasConcluded());
@@ -1834,12 +1834,12 @@ TEST(Mat, GoldenScore)
 
 	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 	match.SetMatID(1);
-	match.SetRuleSet(new RuleSet("Test", 10, 10, 30, 20, false, false, true, 0));
+	match.SetRuleSet(new RuleSet("Test", 2, 10, 30, 20, false, false, true, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
 
 	m.Hajime();
 
-	ZED::Core::Pause(11 * 1000);
+	ZED::Core::Pause(3000);
 	EXPECT_TRUE(m.IsOutOfTime());
 
 	EXPECT_FALSE(m.HasConcluded());
@@ -2045,12 +2045,12 @@ TEST(Mat, Hantei)
 
 		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 		match.SetMatID(1);
-		match.SetRuleSet(new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0));
+		match.SetRuleSet(new RuleSet("Test", 2, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 
-		ZED::Core::Pause(11 * 1000);
+		ZED::Core::Pause(3000);
 		EXPECT_TRUE(m.IsOutOfTime());
 
 		EXPECT_FALSE(m.HasConcluded());
