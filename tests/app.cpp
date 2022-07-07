@@ -52,7 +52,8 @@ TEST(App, Tournaments)
 	EXPECT_EQ(app.GetTournamentList().size(), 1);
 	EXPECT_EQ((*app.GetTournamentList().begin())->GetName(), t->GetName());
 
-	EXPECT_TRUE(app.OpenTournament(0));
+	EXPECT_TRUE(app.OpenTournament(t->GetID()));
+	ASSERT_TRUE(app.GetTournament());
 	EXPECT_EQ(app.GetTournament()->GetName(), t->GetName());
 	EXPECT_TRUE(app.CloseTournament());
 
