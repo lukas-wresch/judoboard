@@ -22,6 +22,9 @@ namespace Judoboard
 
 		std::string GetName() const { return m_Name; }
 
+		void SetMinAge(uint32_t Age) { m_MinAge = Age; }
+		void SetMaxAge(uint32_t Age) { m_MaxAge = Age; }
+
 		void operator >> (YAML::Emitter& Yaml) const;
 
 	private:
