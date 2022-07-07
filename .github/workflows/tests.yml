@@ -53,7 +53,7 @@ jobs:
     - name: nuget2
       run: dir; cd vsprojects; dir; nuget install GoogleTest\packages.config -OutputDirectory packages
     - name: compile
-      run: dir; .\compile.bat
+      run: dir; .\compile64.bat
     - name: create folder
       run: dir; cd bin\Release; xcopy ..\assets assets\ /S /Y; xcopy ..\html   html\   /S /Y; mkdir tournaments
     - name: Run Tests
