@@ -6,7 +6,7 @@ TEST(Match, ExportImport)
 {
 	initialize();
 	
-	for (int i = 0; i < 1000 * 10; i++)
+	for (int i = 0; i < 1000 * 5; i++)
 	{
 		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));

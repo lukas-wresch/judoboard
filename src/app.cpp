@@ -344,7 +344,7 @@ bool Application::AddTournament(Tournament* NewTournament)
 		return false;
 	}
 
-	NewTournament->ConnectToDatabase(m_Database);
+	//NewTournament->ConnectToDatabase(m_Database);
 	m_Tournaments.emplace_back(NewTournament);
 
 	if (NewTournament->GetStatus() == Status::Scheduled)//Fresh new tournament

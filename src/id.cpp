@@ -1,6 +1,6 @@
 #include <random>
 #include "../ZED/include/log.h"
-#include "../ZED/include/sha512.h"
+#include "../ZED/include/sha256.h"
 #include "id.h"
 #include "timer.h"
 
@@ -31,7 +31,7 @@ ID::ID()
 ID::ID(ZED::Blob& Stream)
 {
 	Stream >> m_ID;
-	ZED::SHA512 hash;
+	ZED::SHA256 hash;
 	Stream >> hash;
 	m_UUID = hash;
 }
@@ -75,7 +75,7 @@ const UUID ID::GenerateUUID()
 				entropyInput += std::to_string(rd());
 		}
 
-		ZED::SHA512 hash(entropyInput);
+		ZED::SHA256 hash(entropyInput);
 		const UUID uuid(hash);
 
 		if (s_UsedUUIDs.find(uuid) == s_UsedUUIDs.end())//Check if there is a collision

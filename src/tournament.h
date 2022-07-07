@@ -33,6 +33,7 @@ namespace Judoboard
 		~Tournament();
 
 		void Reset();
+		[[deprecated]]
 		void ConnectToDatabase(Database& db);//Replaces all local references to judoka with reference to the database (as long as the tournament is not finalized)
 
 		[[nodiscard]]
