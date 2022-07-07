@@ -213,6 +213,7 @@
     <ClInclude Include="..\..\src\database.h" />
     <ClInclude Include="..\..\src\dm4.h" />
     <ClInclude Include="..\..\src\error.h" />
+    <ClInclude Include="..\..\src\HttpServer\HttpServer.h" />
     <ClInclude Include="..\..\src\id.h" />
     <ClInclude Include="..\..\src\imat.h" />
     <ClInclude Include="..\..\src\itournament.h" />
@@ -235,7 +236,6 @@
     <ClInclude Include="..\..\src\virtual_mat.h" />
     <ClInclude Include="..\..\src\weightclass.h" />
     <ClInclude Include="..\..\src\window.h" />
-    <ClInclude Include="src\HttpServer\HttpServer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\.gitattributes" />

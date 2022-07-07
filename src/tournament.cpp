@@ -278,6 +278,8 @@ bool Tournament::LoadYAML(const std::string& Filename)
 		return false;
 	}
 
+	m_Name = yaml["name"].as<std::string>();
+
 	//Read standing data
 	m_StandingData << yaml;
 

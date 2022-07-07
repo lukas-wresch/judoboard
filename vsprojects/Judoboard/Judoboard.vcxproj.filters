@@ -104,9 +104,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\HttpServer\HttpServer.h">
-      <Filter>HttpServer</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -193,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\customtable.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\HttpServer\HttpServer.h">
+      <Filter>HttpServer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

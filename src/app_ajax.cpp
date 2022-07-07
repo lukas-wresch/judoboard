@@ -1941,6 +1941,9 @@ void Application::SetupHttpServer()
 			return std::string("Could not find tournament");
 
 		std::string filename = "tournaments/" + tournament->GetName() + ".yml";
+
+		Request.m_ResponseHeader = std::string("Content-Disposition: attachment; filename=") + tournament->GetName() + ".yml";
+
 		return HttpServer::LoadFile(filename);
 	}, HttpServer::ResourceType::Binary);
 
@@ -1963,6 +1966,8 @@ void Application::SetupHttpServer()
 
 		std::string filename = tournament->GetName() + ".md5";
 		md5_tournament.Save(filename);
+		
+		Request.m_ResponseHeader = std::string("Content-Disposition: attachment; filename=") + filename;
 
 		return HttpServer::LoadFile(filename);
 	}, HttpServer::ResourceType::Binary);
