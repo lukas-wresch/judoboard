@@ -1254,10 +1254,10 @@ TEST(MD5, Export)
 
 #ifdef _WIN32
 	MD5 file("../test-data/Test-cleaned.md5");
-	const auto hash_expected = ZED::SHA512(ZED::File("../test-data/Test-cleaned.md5"));
+	const auto hash_expected = ZED::SHA512(ZED::Blob(ZED::File("../test-data/Test-cleaned.md5")));
 #else
 	MD5 file("test-data/Test-cleaned.md5");
-	const auto hash_expected = ZED::SHA512(ZED::File("test-data/Test-cleaned.md5"));
+	const auto hash_expected = ZED::SHA512(ZED::Blob(ZED::File("test-data/Test-cleaned.md5")));
 #endif
 
 	ASSERT_TRUE(file);
@@ -1266,7 +1266,7 @@ TEST(MD5, Export)
 
 	EXPECT_TRUE(file.Save("deleteMe"));
 
-	const auto hash_has = ZED::SHA512(ZED::File("deleteMe"));
+	const auto hash_has = ZED::SHA512(ZED::Blob(ZED::File("deleteMe")));
 
 	EXPECT_EQ(hash_has, hash_expected);
 
