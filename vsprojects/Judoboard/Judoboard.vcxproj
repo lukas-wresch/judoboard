@@ -74,7 +74,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>..\..\external;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\bin\$(Configuration);..\..\external;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
     <TargetName>$(ProjectName)_Debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -87,7 +87,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>..\..\external;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\bin\$(Configuration);..\..\external;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
     <TargetName>$(ProjectName)_Debug</TargetName>
     <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
