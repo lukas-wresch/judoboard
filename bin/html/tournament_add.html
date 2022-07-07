@@ -32,7 +32,7 @@ function AddTournament()
 {
   var params = URLEncode({
     name:        document.getElementById("name").value,
-    rules:       document.getElementById("rules").value
+    rules:       document.getElementById("rule").value
   });
 
   AjaxPost('ajax/tournament/add', params, function() {
@@ -47,7 +47,7 @@ function UpdateTournament()
 {
   var params = URLEncode({
     name:        document.getElementById("name").value,
-    rules:       document.getElementById("rules").value
+    rules:       document.getElementById("rule").value
   });
 
   AjaxPost('ajax/tournament/update?id='+id, params, function() {

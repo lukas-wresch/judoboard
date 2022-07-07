@@ -1823,21 +1823,17 @@ void Application::SetupHttpServer()
 			return error;
 
 		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "rules"));
+		auto rule_id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "rules"));
 
 		if (FindTournament(name))
 			return std::string("There is already a tournament with that name");
 
-		auto& rules = m_Database.GetRuleSets();
-		if (index < 0 || (uint32_t)index >= rules.size())
-			return std::string("Could not find rule set in database");
-
-		auto rule = rules[index];
-		if (!rule)
-			return std::string("Internal error");
+		auto rules = m_Database.FindRuleSet(rule_id);
+		if (!rules)
+			ZED::Log::Warn("Adding tournament: Could not find rule set in database");
 
 		Tournament* new_tournament = new Tournament(name);
-		new_tournament->SetDefaultRuleSet(rule);
+		new_tournament->SetDefaultRuleSet(rules);
 
 		if (!AddTournament(new_tournament))
 			return std::string("Could not add tournament");
