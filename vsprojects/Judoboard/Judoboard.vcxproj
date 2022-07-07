@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\external\mongoose\mongoose.cpp" />
     <ClCompile Include="..\..\src\account.cpp" />
+    <ClCompile Include="..\..\src\age_group.cpp" />
     <ClCompile Include="..\..\src\app.cpp" />
     <ClCompile Include="..\..\src\app_ajax.cpp" />
     <ClCompile Include="..\..\src\club.cpp" />
@@ -207,6 +208,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\account.h" />
+    <ClInclude Include="..\..\src\age_group.h" />
     <ClInclude Include="..\..\src\app.h" />
     <ClInclude Include="..\..\src\club.h" />
     <ClInclude Include="..\..\src\customtable.h" />
