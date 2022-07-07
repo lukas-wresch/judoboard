@@ -49,11 +49,11 @@ TEST(App, Tournaments)
 	EXPECT_TRUE(app.AddTournament(t));
 	EXPECT_TRUE(app.GetTournament());
 
-	EXPECT_TRUE(app.GetTournamentList().size() == 1);
-	EXPECT_TRUE((*app.GetTournamentList().begin())->GetName() == t->GetName());
+	EXPECT_EQ(app.GetTournamentList().size(), 1);
+	EXPECT_EQ((*app.GetTournamentList().begin())->GetName(), t->GetName());
 
 	EXPECT_TRUE(app.OpenTournament(0));
-	EXPECT_TRUE(app.GetTournament()->GetName() == t->GetName());
+	EXPECT_EQ(app.GetTournament()->GetName(), t->GetName());
 	EXPECT_TRUE(app.CloseTournament());
 
 	EXPECT_EQ(app.FindTournament("Tournament Name")->GetName(), t->GetName());
@@ -66,8 +66,8 @@ TEST(App, Mats)
 	initialize();
 	Application app;
 
-	EXPECT_TRUE(app.GetMats().size() == 0);
-	EXPECT_TRUE(app.FindDefaultMatID() == 0);
+	EXPECT_EQ(app.GetMats().size(), 0);
+	EXPECT_EQ(app.FindDefaultMatID(), 0);
 	EXPECT_TRUE(app.GetDefaultMat() == nullptr);
 	EXPECT_TRUE(app.FindMat(1) == nullptr);
 
@@ -124,7 +124,8 @@ TEST(App, FullTournament)
 	tourney->EnableAutoSave(false);
 	EXPECT_TRUE(app.AddTournament(tourney));
 
-	app.OpenTournament(app.FindTournamentIndex(tournament_name));
+	ASSERT_TRUE(app.FindTournament(tournament_name));
+	EXPECT_TRUE(app.OpenTournament(app.FindTournament(tournament_name)->GetID()));
 
 	tourney->AddParticipant(&j1);
 	tourney->AddParticipant(&j2);

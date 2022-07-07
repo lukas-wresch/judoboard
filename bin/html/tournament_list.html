@@ -32,7 +32,7 @@ function GetTournaments()
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    for (var i=0; i < res.length; i+=5)
+    for (var i=0; i < res.length;)
     {
       var row = table.insertRow(-1);
       var cell1 = row.insertCell(0);
@@ -40,27 +40,34 @@ function GetTournaments()
       var cell3 = row.insertCell(2);
       var cell4 = row.insertCell(3);
 
-      cell1.innerHTML = res[i+0];
+      var id            = res[i++];
+      var name          = res[i++];
+      var num_part      = res[i++];
+      var schedule_size = res[i++];
+      var status        = res[i++];
+      var is_open       = res[i++];
 
-      cell2.innerHTML = res[i+1] + " " + lang.participants + "<br/>" + res[i+2] + " " + lang.matches;
+      cell1.innerHTML = name;
 
-      if (res[i+3] == 0)
+      cell2.innerHTML = num_part + " " + lang.participants + "<br/>" + schedule_size + " " + lang.matches;
+
+      if (status == 0)
         cell3.innerHTML = lang.scheduled;
-      else if (res[i+3] == 1)
+      else if (status == 1)
       {
         cell3.innerHTML = lang.running;
         cell3.style.color = "red";
       }
-      else if (res[i+3] == 2)
+      else if (status == 2)
       {
         cell3.innerHTML = lang.concluded;
         cell3.style.color = "green";
       }
 
-      if (res[i+4] == 0)
-        cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenTournament(" + i/5 + ");\">Open</button>" + "<button class=\"neutral\" onclick=\"navigate('tournament_add.html?id=" + i/5 + "');\">Edit</button>";
+      if (is_open == 0)
+        cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenTournament(" + id + ");\">Open</button>" + "<button class=\"neutral\" onclick=\"navigate('tournament_add.html?id=" + id + "');\">Edit</button>";
       else
-        cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseTournament(" + i/5 + ");\">Close</button>";
+        cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseTournament(" + id + ");\">Close</button>";
     }
   });
 }

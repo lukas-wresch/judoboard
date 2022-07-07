@@ -58,12 +58,13 @@ namespace Judoboard
 		const auto& GetTournamentList() const { return m_Tournaments; }
 		[[nodiscard]]
 		auto& SetTournamentList() { return m_Tournaments; }
-		bool OpenTournament(uint32_t Index);
+		bool OpenTournament(uint32_t ID);
 		bool CloseTournament();
 		bool AddTournament(Tournament* NewTournament);
+		bool DeleteTournament(uint32_t ID);
+		Tournament* FindTournament(uint32_t ID);
+		const Tournament* FindTournament(uint32_t ID) const;
 		const Tournament* FindTournament(const std::string& Name) const;
-		[[nodiscard]]
-		int FindTournamentIndex(const std::string& Name) const;
 
 		//Mats
 		const std::vector<IMat*>& GetMats() const { return m_Mats; }

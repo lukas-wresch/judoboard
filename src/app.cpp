@@ -136,15 +136,12 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 
 
 
-bool Application::OpenTournament(uint32_t Index)
+bool Application::OpenTournament(uint32_t ID)
 {
-	if (Index >= m_Tournaments.size())
-		return false;
-
 	if (!CloseTournament())
 		return false;
 
-	m_CurrentTournament = m_Tournaments[Index];
+	m_CurrentTournament = FindTournament(ID);
 	return true;
 }
 
@@ -358,22 +355,52 @@ bool Application::AddTournament(Tournament* NewTournament)
 
 
 
-const Tournament* Application::FindTournament(const std::string& Name) const
+bool Application::DeleteTournament(uint32_t ID)
 {
-	for (auto* tournament : m_Tournaments)
-		if (tournament && tournament->GetName() == Name)
+	for (auto it = m_Tournaments.begin(); it != m_Tournaments.end(); ++it)
+	{
+		if (*it && (*it)->GetID() == ID)
+		{
+			bool ret = ZED::Core::RemoveFile("tournaments/" + (*it)->GetName() + ".yml");
+
+			delete *it;
+			it = m_Tournaments.erase(it);
+
+			return ret;
+		}
+	}
+
+	return false;
+}
+
+
+
+Tournament* Application::FindTournament(uint32_t ID)
+{
+	for (auto tournament : m_Tournaments)
+		if (tournament && tournament->GetID() == ID)
 			return tournament;
 	return nullptr;
 }
 
 
 
-int Application::FindTournamentIndex(const std::string& Name) const
+const Tournament* Application::FindTournament(uint32_t ID) const
 {
-	for (uint32_t i = 0;i < m_Tournaments.size();i++)
-		if (m_Tournaments[i] && m_Tournaments[i]->GetName() == Name)
-			return i;
-	return -1;
+	for (auto tournament : m_Tournaments)
+		if (tournament && tournament->GetID() == ID)
+			return tournament;
+	return nullptr;
+}
+
+
+
+const Tournament* Application::FindTournament(const std::string& Name) const
+{
+	for (auto* tournament : m_Tournaments)
+		if (tournament && tournament->GetName() == Name)
+			return tournament;
+	return nullptr;
 }
 
 
