@@ -1819,20 +1819,17 @@ void Application::SetupHttpServer()
 			return error;
 
 		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "rules"));
+		auto rule_id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "rules"));
 
 		if (FindTournament(name))
 			return std::string("There is already a tournament with that name");
 
-		auto& rules = m_Database.GetRuleSets();
-		if (index < 0 || (uint32_t)index >= rules.size())
-			return std::string("Could not find rule set in database");
-
-		auto rule = rules[index];
+		auto rules = m_Database.FindRuleSet(rule_id);
+		if (!rules)
+			ZED::Log::Warn("Adding tournament: Could not find rule set in database");
 
 		Tournament* new_tournament = new Tournament(name);
-		if (rule)//If available, set default rule set
-			new_tournament->SetDefaultRuleSet(rule);
+		new_tournament->SetDefaultRuleSet(rules);
 
 		if (!AddTournament(new_tournament))
 			return std::string("Could not add tournament");
@@ -1846,16 +1843,20 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		if (index < 0 || (uint32_t)index >= m_Tournaments.size())
+		if (id < 0)
 			return std::string("Invalid tournament id");
 
+		auto tournament = FindTournament(id);
+		if (!tournament)
+			return std::string("Could not find tournament");
+
 		ZED::CSV ret;
-		ret << m_Tournaments[index]->GetName() << m_Tournaments[index]->GetParticipants().size();
-		ret << m_Tournaments[index]->GetSchedule().size() << m_Tournaments[index]->GetStatus();
-		if (m_Tournaments[index]->GetDefaultRuleSet())
-			ret << m_Tournaments[index]->GetDefaultRuleSet()->GetID();
+		ret << tournament->GetName() << tournament->GetParticipants().size();
+		ret << tournament->GetSchedule().size() << tournament->GetStatus();
+		if (tournament->GetDefaultRuleSet())
+			ret << tournament->GetDefaultRuleSet()->GetID();
 		else
 			ret << -1;
 		return ret;
@@ -1866,12 +1867,12 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		if (index < 0 || (uint32_t)index >= m_Tournaments.size())
+		if (id < 0)
 			return std::string("Invalid tournament id");
 
-		if (!OpenTournament(index))
+		if (!OpenTournament(id))
 			return std::string("Could not open tournament");
 
 		return Error();//OK
@@ -1889,19 +1890,23 @@ void Application::SetupHttpServer()
 			return std::string("Could not close tournament");
 
 		return Error();//OK
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/tournament/empty", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
 			return error;
 
-		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		if (index < 0 || (uint32_t)index >= m_Tournaments.size())
+		if (id < 0)
 			return Error(Error::Type::InvalidID);
 
-		m_Tournaments[index]->DeleteAllMatchResults();
+		auto tournament = FindTournament(id);
+		if (!tournament)
+			return std::string("Could not find tournament");
+
+		tournament->DeleteAllMatchResults();
 		return Error();//OK
 	});
 
@@ -1910,21 +1915,57 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		if (index < 0 || (uint32_t)index >= m_Tournaments.size())
+		if (id < 0)
 			return Error(Error::Type::InvalidID);
 
-		if (GetTournament()->GetID() == m_Tournaments[index]->GetID())
+		if (!DeleteTournament(id))
 			return Error(Error::Type::OperationFailed);
-
-		ZED::Core::RemoveFile("tournaments/" + m_Tournaments[index]->GetName());
-
-		delete m_Tournaments[index];
-		m_Tournaments.erase(m_Tournaments.begin() + index);
 
 		return Error();//OK
 	});
+
+	m_Server.RegisterResource("/ajax/tournament/download", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id < 0)
+			return Error(Error::Type::InvalidID);
+
+		auto tournament = FindTournament(id);
+		if (!tournament)
+			return std::string("Could not find tournament");
+
+		std::string filename = "tournaments/" + tournament->GetName() + ".yml";
+		return HttpServer::LoadFile(filename);
+	}, HttpServer::ResourceType::Binary);
+
+	m_Server.RegisterResource("/ajax/tournament/export-md5", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id < 0)
+			return Error(Error::Type::InvalidID);
+
+		auto tournament = FindTournament(id);
+		if (!tournament)
+			return std::string("Could not find tournament");
+
+		//Convert to MD5 and save
+		MD5 md5_tournament(GetTournament());
+
+		std::string filename = tournament->GetName() + ".md5";
+		md5_tournament.Save(filename);
+
+		return HttpServer::LoadFile(filename);
+	}, HttpServer::ResourceType::Binary);
 
 	m_Server.RegisterResource("/ajax/tournament/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -1936,8 +1977,9 @@ void Application::SetupHttpServer()
 		{
 			if (tournament)//Filter out temporary tournament
 			{
-				ret << tournament->GetName() << tournament->GetParticipants().size() << tournament->GetSchedule().size() << tournament->GetStatus();
-				ret << (m_CurrentTournament && tournament->GetName() == m_CurrentTournament->GetName());
+				ret << tournament->GetID() << tournament->GetName() << tournament->GetParticipants().size() << tournament->GetSchedule().size() << tournament->GetStatus();
+				//Is the tournament open?
+				ret << (m_CurrentTournament && tournament->GetID() == m_CurrentTournament->GetID());
 			}
 		}
 

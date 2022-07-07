@@ -14,12 +14,16 @@
 
 <div>
   <label style="width:200px; float:left; margin-top:4px;" id="label_rules">Default Rule Set</label>
-  <select style="margin-bottom:20px; width: 1.8cm;" id="rule">
+  <select style="margin-bottom:20px; width: 3.5cm;" id="rule">
   </select>
 </div>
 
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddTournament()" id="add">New Tournament</button>
-<button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateTournament()" id="update">Update Tournament</button>
+<button class="add" style="margin-top: 0.8cm;" onclick="return UpdateTournament()" id="update">Save Tournament</button>
+<br/>
+<button class="neutral" style="margin-top: 0.8cm;" onclick="return DownloadTournament()" id="download">Download Tournament</button>
+<button class="neutral" style="margin-top: 0.8cm;" onclick="return ExportTournament()"   id="export">Export to MD5</button>
+<br/>
 <button class="remove"  style="margin-top: 0.8cm;" onclick="return EmptyTournament()"  id="empty">Delete Match Results</button>
 <button class="remove"  style="margin-top: 0.8cm;" onclick="return DeleteTournament()" id="delete">Delete Tournament</button>
 
@@ -32,7 +36,7 @@ function AddTournament()
 {
   var params = URLEncode({
     name:        document.getElementById("name").value,
-    rules:       document.getElementById("rules").value
+    rules:       document.getElementById("rule").value
   });
 
   AjaxPost('ajax/tournament/add', params, function() {
@@ -47,7 +51,7 @@ function UpdateTournament()
 {
   var params = URLEncode({
     name:        document.getElementById("name").value,
-    rules:       document.getElementById("rules").value
+    rules:       document.getElementById("rule").value
   });
 
   AjaxPost('ajax/tournament/update?id='+id, params, function() {
@@ -90,6 +94,20 @@ function DeleteTournament()
 }
 
 
+function DownloadTournament()
+{
+  Ajax('ajax/tournament/download?id='+id);
+  return false;
+}
+
+
+function ExportTournament()
+{
+  Ajax('ajax/tournament/export-md5?id='+id);
+  return false;
+}
+
+
 function GetTournament(id)
 {
   AjaxCallback("ajax/tournament/get?id="+id, function(response) {
@@ -118,8 +136,7 @@ function GetTournament(id)
 
 
 document.getElementById("add").innerHTML    = lang.new_tournament;
-document.getElementById("update").innerHTML = lang.update_tournament;
-document.getElementById("label_name").innerHTML             = lang.name;
+document.getElementById("label_name").innerHTML = lang.name;
 
 
 var id = URLDecode(URL, "id");
@@ -127,6 +144,7 @@ var id = URLDecode(URL, "id");
 if (id)
 {
   document.getElementById("headline").innerHTML = lang.update_tournament;
+  document.getElementById("update").innerHTML = lang.save;
   document.getElementById("add").style.display = "none";
   GetTournament(id);
 }
@@ -135,6 +153,8 @@ else
   document.getElementById("headline").innerHTML = lang.new_tournament;
   document.getElementById("update").style.display = "none";
   document.getElementById("div_status").style.display = "none";
+  document.getElementById("download").style.display = "none";
+  document.getElementById("export").style.display = "none";
   document.getElementById("empty").style.display = "none";
   document.getElementById("delete").style.display = "none";
 

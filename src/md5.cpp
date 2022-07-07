@@ -1,4 +1,5 @@
 #include <cassert>
+#include <array>
 #include "md5.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/file.h"
@@ -21,6 +22,19 @@ MD5::MD5(const std::string& Filename)
 
 
 
+MD5::MD5(const ITournament* Tournament)
+{
+	if (!Tournament)
+	{
+		ZED::Log::Error("Internal error");
+		return;
+	}
+
+	ZED::Log::Error("NOT IMPLEMENTED");
+}
+
+
+
 MD5::~MD5()
 {
 	for (auto association : m_Associations)
@@ -33,6 +47,689 @@ MD5::~MD5()
 		delete weightclass;
 	for (auto participant : m_Participants)
 		delete participant;
+}
+
+
+
+bool MD5::Save(const std::string& Filename) const
+{
+	ZED::File file(Filename, true);
+
+	if (!file)
+	{
+		ZED::Log::Warn("Could not open file " + Filename);
+		return false;
+	}
+
+	auto Write_String = [&](const std::string& Line) {
+		file.Write((uint8_t)Line.length());
+		file.Write(Line);
+	};
+
+	auto Write_Line = [&](const std::string& Line) {
+		file.Write((uint8_t)Line.length());
+		file.Write(Line);
+		file.Write((uint8_t)0x00);
+	};
+
+	auto Write_Int = [&](int32_t Num) {
+		std::string line(std::to_string(Num));
+		file.Write((uint8_t)line.length());
+		file.Write(line);
+		file.Write((uint8_t)0x00);
+	};
+
+	auto Write_IntRaw = [&](int64_t Num) {
+		file.Write((uint8_t)Num);
+		file.Write((uint8_t)0x00);
+	};
+
+	auto Write_0D0A = [&]() {
+		const uint8_t data[] = { 0x0D, 0x0A };
+		file.Write(data, 2);
+	};
+
+	auto Write_0D0A00 = [&]() {
+		const uint8_t data[] = { 0x0D, 0x0A, 0x00 };
+		file.Write(data, 3);
+	};
+
+	file.Write((uint8_t)0x00);
+
+	Write_String("MMW98");
+	Write_0D0A00();
+
+	file.Write("3");
+	file.Write((uint8_t)0x00);
+
+	Write_String("Version 51");
+	Write_0D0A00();
+
+	Write_String(GetFileDate());
+	Write_0D0A00();
+
+	file.Write((uint8_t)0x00);
+	Write_0D0A00();
+
+	{
+		Write_String("Turnier");
+		Write_0D0A00();
+
+		std::array rows{ "Bezeichnung", "VorzugsschemaPK", "Ort", "DatumVon", "DatumBis", "LosEbenePK", "VerbandPK", "VerbandEbenePK", "KuerzelEbenePK", "MAXJGJ", "KampfumPlatz3", "KampfUmPlatz5", "SportlicheLeitung", "AnzWeitermelden", "LOSVERFAHREN", "AktVereinPK", "AktTNPK", "AktVerbandPK", "Meldegeld", "Meldegelderhoeht", "JGJIgnoreNegativeUnterbew" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(1);//Number of columns
+
+		Write_Line(GetDescription());
+		Write_Int(m_SchemaID);
+		Write_Line(m_Place);
+		Write_Line(m_DateStart);
+		Write_Line(m_DateEnd);
+		Write_Int(m_LotteryLevelID);
+		Write_Int(m_AssociationID);
+		Write_Int(m_AssociationLevelID);
+		Write_Int(m_LevelShortID);
+		Write_Int(m_MAXJGJ);
+		Write_Int(m_ThirdPlaceMatch ? 0 : -1);
+		Write_Int(m_FifthPlaceMatch ? 0 : -1);
+		Write_Line(m_SportAdministrator);
+		Write_Int(m_NumOfRelays);
+		Write_Int(m_LotteryProcess);
+		Write_Int(m_NumClubs);
+		Write_Int(m_NumParticipants);
+		Write_Int(m_NumAssociations);
+		Write_Int(m_Money);
+		Write_Int(m_MoneyIncreased);
+		Write_Int(m_IgnoreNegativeScores ? 0 : -1);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Rank -> Points
+		Write_String("Vereinsw");
+		Write_0D0A00();
+
+		std::array rows{ "PlatzPK", "Punkte" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_RankToPoints.size());//Number of columns
+
+		for (auto& rank2points : m_RankToPoints)
+		{
+			Write_Int(rank2points.Rank);
+			Write_Int(rank2points.Points);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Age groups
+		Write_String("AktAltersgruppe");
+		Write_0D0A00();
+
+		std::array rows{ "AltersgruppePK", "Bezeichnung", "MinJahrgang", "MaxJahrgang", "Geschlecht", "Aufruecken", "Toleranz", "GewichtAnWaageAendern", "LosverfahrenPK", "Allkategorie", "Kata", "Meldegeld", "MeldegeldKata", "MeldegeldAllkategorie", "Meldegelderhoeht", "MeldegeldKataerhoeht", "MeldegeldAllkategorieerho", "Poolsystem", "AlleTNinErgebnisliste", "Mannschaft" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_AgeGroups.size());//Number of columns
+
+		for (auto& age_group : m_AgeGroups)
+		{
+			Write_Int(age_group->ID);
+			Write_Line(UTF8ToLatin1(age_group->Name));
+			Write_Int(age_group->MinBirthyear);
+			Write_Int(age_group->MaxBirthyear);
+			Write_Line((age_group->Gender == Gender::Male) ? "m" : "w");
+			Write_Int(age_group->MoveUp ? 1 : 0);
+			Write_Int(age_group->Tolerance);
+			Write_Int(age_group->ChangeWeightAtScale);
+			Write_Int(age_group->LotterySchemaID);
+			Write_Line(age_group->AllCategories ? "T" : "F");
+			Write_Line(age_group->Kata ? "T" : "F");
+
+			Write_Int(age_group->Money);
+			Write_Int(age_group->MoneyKata);
+			Write_Int(age_group->MoneyAllCategories);
+			Write_Int(age_group->MoneyIncreased);
+			Write_Int(age_group->MoneyKataIncreased);
+			Write_Int(age_group->MoneyAllCategoriesIncreased);
+
+			Write_Line(age_group->PoolSystem ? "T" : "F");
+			Write_Line(age_group->AllParticipantsInResultTable ? "T" : "F");
+			Write_Line(age_group->Team ? "T" : "");//Format unclear (TODO)
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Weightclasses
+		Write_String("AktGewichtsklasse");
+		Write_0D0A00();
+
+		std::array rows{ "AltersgruppePK", "GewichtsklassePK", "GewichtGroesser", "GewichtKleiner", "Bezeichnung", "Status", "WettkampfsystemPK", "WettkampfsystemTypPK", "KampfUmPlatz3", "KampfUmPlatz5", "Datum", "Weitermelden", "MaxJGJ", "Identifikation", "ForReference", "GewichtGroesserGramm", "GewichtKleinerGramm", "MaxVorgepoolt" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Weightclasses.size());//Number of columns
+
+		for (auto& weightclass : m_Weightclasses)
+		{
+			Write_Int(weightclass->AgeGroupID);
+			Write_Int(weightclass->ID);
+
+			if (weightclass->WeightLargerThan < 0)
+				Write_Line("");
+			else
+				Write_Int(weightclass->WeightLargerThan);
+
+			if (weightclass->WeightSmallerThan < 0)
+				Write_Line("");
+			else
+				Write_Int(weightclass->WeightSmallerThan);
+
+			Write_Line(UTF8ToLatin1(weightclass->Description));
+			Write_Int(weightclass->Status);
+
+			if (weightclass->FightSystemID < 0)
+				Write_Line("");
+			else
+				Write_Int(weightclass->FightSystemID);
+
+			Write_Int(weightclass->FightSystemTypeID);
+
+			Write_Int(weightclass->MatchForThirdPlace ? 0 : -1);
+			Write_Int(weightclass->MatchForFifthPlace ? 0 : -1);
+			Write_Line(weightclass->Date);
+			Write_Int(weightclass->Relay);
+			Write_Int(weightclass->MaxJGJ);
+			Write_Line(weightclass->Identifier);
+			Write_Line(weightclass->ForReference);
+
+			if (weightclass->WeightInGrammsLargerThan < 0)
+				Write_Line("");
+			else
+				Write_Int(weightclass->WeightInGrammsLargerThan);
+			if (weightclass->WeightInGrammsSmallerThan < 0)
+				Write_Line("");
+			else
+				Write_Int(weightclass->WeightInGrammsSmallerThan);
+
+			if (weightclass->MaxPooled < 0)
+				Write_Line("");
+			else
+				Write_Int(weightclass->MaxPooled);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//ImportVerband
+		Write_String("ImportVerband");
+		Write_0D0A00();
+
+		std::array rows{ "VerbandPK", "EbenePK", "Bezeichnung", "Kuerzel", "Nummer", "NaechsteEbenePK", "Aktiv" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Associations.size());//Number of columns
+
+		for (auto& association : m_Associations)
+		{
+			Write_Int(association->ID);
+			Write_Int(association->TierID);
+			Write_Line(UTF8ToLatin1(association->Description));
+			Write_Line(UTF8ToLatin1(association->ShortName));
+			Write_Line(association->Number);
+			Write_Int(association->NextAsscociationID);
+			Write_Int(association->Active);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Verein
+		Write_String("Verein");
+		Write_0D0A00();
+
+		std::array rows{ "VereinPK", "Sortierbezeichnung", "Bezeichnung", "Nachname", "Vorname", "Strasse", "Ort", "PLZ", "Telp", "Teld", "Handy", "email", "fax", "Vereinsnummer", "StatusAenderung" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Clubs.size());//Number of columns
+
+		for (auto& club : m_Clubs)
+		{
+			Write_Int(club->ID);
+			Write_Line(UTF8ToLatin1(club->Name_ForSorting));
+			Write_Line(UTF8ToLatin1(club->Name));
+
+			Write_Line(UTF8ToLatin1(club->Representative_Lastname));
+			Write_Line(UTF8ToLatin1(club->Representative_Firstname));
+			Write_Line(UTF8ToLatin1(club->Representative_Street));
+			Write_Line(UTF8ToLatin1(club->Representative_Place));
+			Write_Line(club->Representative_ZipCode);
+			Write_Line(club->Representative_TelPrivate);
+			Write_Line(club->Representative_TelProfessional);
+			Write_Line(club->Representative_TelMobil);
+			Write_Line(club->Representative_Email);
+			Write_Line(club->Representative_Fax);
+
+			if (club->OfficialClubNo <= 0)
+				Write_Line("");
+			else
+				Write_Int(club->OfficialClubNo);
+
+			Write_Line(club->StatusChanged ? "T" : "");//Format unclear (TODO)
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//VereinVerband
+		Write_String("VereinVerband");
+		Write_0D0A00();
+
+		std::array rows{ "VereinPK", "EbenePK", "VerbandPK" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_ClubRelations.size());//Number of columns
+
+		for (auto& rel : m_ClubRelations)
+		{
+			Write_Int(rel.ClubID);
+			Write_Int(rel.TierID);
+			Write_Int(rel.AssociationID);			
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//AktLosschema
+		Write_String("AktLosschema");
+		Write_0D0A00();
+
+		std::array rows{ "LosSchemaPK", "Bezeichnung", "VerbandPK", "EbenePK"};
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_LotterySchemas.size());//Number of columns
+
+		for (auto& schema : m_LotterySchemas)
+		{
+			Write_Int(schema.ID);
+			Write_Line(UTF8ToLatin1(schema.Description));
+			Write_Int(schema.AssociationID);
+			Write_Int(schema.TierID);			
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//AktLosschemaZeile
+		Write_String("AktLosschemaZeile");
+		Write_0D0A00();
+
+		std::array rows{ "LosschemaPK", "PosPK", "VerbandPK", "PlatzPK"};
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_LotterySchemaLines.size());//Number of columns
+
+		for (auto& schema : m_LotterySchemaLines)
+		{
+			Write_Int(schema.LotterySchemaID);
+			Write_Int(schema.PositionID);
+			Write_Int(schema.AssociationID);
+			Write_Int(schema.RankID);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Teilnehmer
+		Write_String("Teilnehmer");
+		Write_0D0A00();
+
+		std::array rows{ "TeilnehmerPK", "AltersgruppePK", "VereinPK", "Nachname", "Vorname", "GradPK", "GewichtsklassePK", "gewogen", "Geburtsjahr", "StartNR", "PlatzPK", "StatusAenderung", "REDAusgeschrieben", "REDKuerzel", "AllkategorieTNPK", "KataTNPK", "GKTNPK", "Meldegelderhoeht", "Gewichtgramm" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Participants.size());//Number of columns
+
+		for (auto& judoka : m_Participants)
+		{
+			Write_Int(judoka->ID);
+			Write_Int(judoka->AgeGroupID);
+			Write_Int(judoka->ClubID);
+			Write_Line(UTF8ToLatin1(judoka->Lastname));
+			Write_Line(UTF8ToLatin1(judoka->Firstname));
+			Write_Int(judoka->Graduation);
+			Write_Int(judoka->WeightclassID);
+			Write_Line(judoka->HasBeenWeighted ? "x" : "");
+
+			if (judoka->Birthyear < 0)
+				Write_Line("");
+			else
+				Write_Int(judoka->Birthyear);
+
+			if (judoka->StartNo < 0)
+				Write_Line("");
+			else
+				Write_Int(judoka->StartNo);
+
+			Write_Int(judoka->RankID);
+			Write_Line(judoka->StatusChanged ? "1" : "");
+			Write_Line(UTF8ToLatin1(judoka->ClubFullname));
+			Write_Line(UTF8ToLatin1(judoka->ClubShortname));
+			Write_Int(judoka->AllCategoriesParticipantID);
+			Write_Int(judoka->KataParticipantID);
+			Write_Int(judoka->GKParticipantID);
+			Write_Line(judoka->MoneyIncreased ? "T" : "F");
+
+			if (judoka->WeightInGramm < 0)
+				Write_Line("");
+			else
+				Write_Int(judoka->WeightInGramm);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Lose
+		Write_String("Lose");
+		Write_0D0A00();
+
+		std::array rows{ "VerbandPK", "LosNR" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Lottery.size());//Number of columns
+
+		for (auto& lot : m_Lottery)
+		{
+			Write_Int(lot.AssociationID);
+			Write_Int(lot.StartNo);			
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//SystemZuordnung
+		Write_String("SystemZuordnung");
+		Write_0D0A00();
+
+		std::array rows{ "AltersgruppePK", "GewichtsklassePK", "StartNR", "TeilnehmerPK" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Relations.size());//Number of columns
+
+		for (auto& rel : m_Relations)
+		{
+			Write_Int(rel.AgeGroupID);
+			Write_Int(rel.WeightclassID);
+			Write_Int(rel.StartNo);
+			Write_Int(rel.ParticipantID);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Fortfuehrung
+		Write_String("Fortfuehrung");
+		Write_0D0A00();
+
+		std::array rows{ "AltersgruppePK", "GewichtsklassePK", "KampfNR", "StartNRRot", "RotPK", "RotAusKampfNR", "RotTyp", "StartNRWeiss", "WeissPK", "WeissAusKampfNR", "WeissTyp", "SiegerPK", "SiegerKampfNR", "SiegerFarbe", "VerliererPK", "VerliererKampfNR", "VerliererFarbe", "WarteAufSiegerAusKampf", "Zeit", "Bewertung", "UnterbewertungSieger", "UnterbewertungVerlierer", "Status", "RotAusgeschiedenKampfNR", "WeissAusgeschiedenKampfNR", "Pool", "DritterKampfNR", "DritterFarbe", "BereichPK" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Matches.size());//Number of columns
+
+		for (auto& match : m_Matches)
+		{
+			Write_Int(match.AgeGroupID);
+			Write_Int(match.WeightclassID);
+			Write_Int(match.MatchNo);
+
+			Write_Int(match.StartNoRed);
+			Write_Int(match.RedID);
+			if (match.RedFromMatch < 0)
+				Write_Line("");
+			else
+				Write_Int(match.RedFromMatch);
+			Write_Int(match.RedTyp);
+
+			Write_Int(match.StartNoWhite);
+			Write_Int(match.WhiteID);
+			if (match.WhiteFromMatch < 0)
+				Write_Line("");
+			else
+				Write_Int(match.WhiteFromMatch);
+			Write_Int(match.WhiteTyp);
+
+			if (match.WinnerID < 0)
+				Write_Line("");
+			else
+				Write_Int(match.WinnerID);
+			if (match.WinnerMatchNo < 0)
+				Write_Line("");
+			else
+				Write_Int(match.WinnerMatchNo);
+			Write_Int(match.WinnerColor);
+
+			if (match.LoserID < 0)
+				Write_Line("");
+			else
+				Write_Int(match.LoserID);
+			if (match.LoserMatchNo < 0)
+				Write_Line("");
+			else
+				Write_Int(match.LoserMatchNo);
+			Write_Int(match.LoserColor);
+
+			Write_Int(match.WaitingForWinnerFromMatch);
+
+			if (match.Time < 0)
+				Write_Line("");
+			else
+				Write_Int(match.Time);
+
+			if (match.Result < 0)
+				Write_Line("");
+			else
+				Write_Int(match.Result);
+
+			if (match.ScoreWinner < 0)
+				Write_Line("");
+			else
+				Write_Int(match.ScoreWinner);
+
+			if (match.ScoreLoser < 0)
+				Write_Line("");
+			else
+				Write_Int(match.ScoreLoser);
+
+			Write_Int(match.Status);
+
+			if (match.RedOutMatchID < 0)
+				Write_Line("");
+			else
+				Write_Int(match.RedOutMatchID);
+
+			if (match.WhiteOutMatchID < 0)
+				Write_Line("");
+			else
+				Write_Int(match.WhiteOutMatchID);
+
+			Write_Int(match.Pool);
+			Write_Int(match.ThirdMatchNo);
+			Write_Int(match.ThirdColor);
+			Write_Int(match.AreaID);
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	{//Ergebnis
+		Write_String("Ergebnis");
+		Write_0D0A00();
+
+		std::array rows{ "AltersgruppePK", "GewichtsklassePK", "PlatzPK", "Pool", "PlatzNR", "KampfNR", "Platztyp", "TeilnehmerPK", "PunktePl", "PunkteMi", "UnterbewertungPl", "UnterbewertungMi", "Weitermelden", "AusPool" };
+
+		Write_IntRaw(rows.size());//Number of rows
+
+		for (auto& row : rows)
+			Write_Line(row);
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+
+		Write_IntRaw(m_Results.size());//Number of columns
+
+		for (auto& result : m_Results)
+		{
+			Write_Int(result.AgeGroupID);
+			Write_Int(result.WeightclassID);
+			Write_Int(result.RankID);
+
+			Write_Int(result.Pool);
+			Write_Int(result.RankNo);
+			if (result.MatchNo < 0)
+				Write_Line("");
+			else
+				Write_Int(result.MatchNo);
+			if (result.RankType < 0)
+				Write_Line("");
+			else
+				Write_Int(result.RankType);
+
+			Write_Int(result.ParticipantID);
+
+			if (result.PointsPlus < 0)
+				Write_Line("");
+			else
+				Write_Int(result.PointsPlus);
+
+			if (result.PointsMinus < 0)
+				Write_Line("");
+			else
+				Write_Int(result.PointsMinus);
+
+			if (result.ScorePlus < 0)
+				Write_Line("");
+			else
+				Write_Int(result.ScorePlus);
+
+			if (result.ScoreMinus < 0)
+				Write_Line("");
+			else
+				Write_Int(result.ScoreMinus);
+
+			Write_Int(result.Relay);
+			Write_Int(result.FromPool);		
+		}
+
+		file.Seek(-1);//Delete last \0
+		Write_0D0A00();
+	}
+
+	Write_String("\\\\end");
+
+	return true;
 }
 
 
@@ -224,7 +921,8 @@ bool MD5::Parse(ZED::Blob&& Data)
 
 	while (!Data.EndReached() && is_ok)
 	{
-		auto line = ReadLine(Data);
+		bool start_of_heading, newline;
+		auto line = ReadLine(Data, &start_of_heading, &newline);
 
 		if (line == "Turnier")
 			is_ok &= ReadTournamentData(Data);
@@ -255,7 +953,7 @@ bool MD5::Parse(ZED::Blob&& Data)
 		else if (line == "Ergebnis")
 			is_ok &= ReadResult(Data);
 
-		else if (line == "\r\n")
+		else if (newline)
 			continue;
 		else if (line == "\\\\end")
 		{
@@ -411,25 +1109,25 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 					else if (header[i] == "AktTNPK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &m_NumParticipants) != 1)
-							ZED::Log::Warn("Could not parse schema m_NumParticipants");
+							ZED::Log::Warn("Could not parse m_NumParticipants");
 					}
 					else if (header[i] == "AktVerbandPK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &m_NumAssociations) != 1)
-							ZED::Log::Warn("Could not parse schema m_NumAssociations");
+							ZED::Log::Warn("Could not parse m_NumAssociations");
 					}
 					else if (header[i] == "Meldegeld")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &m_Money) != 1)
-							ZED::Log::Warn("Could not parse schema Money");
+							ZED::Log::Warn("Could not parse Money");
 					}
 					else if (header[i] == "Meldegelderhoeht")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &m_MoneyIncreased) != 1)
-							ZED::Log::Warn("Could not parse schema Money");
+							ZED::Log::Warn("Could not parse Money Increased");
 					}
 					else if (header[i] == "JGJIgnoreNegativeUnterbew")
-						m_IgnoreNegativeScores = data[i] != "0";
+						m_IgnoreNegativeScores = data[i] == "0";
 				}
 
 				return true;
@@ -447,6 +1145,7 @@ bool MD5::ReadRankScore(ZED::Blob& Data)
 	std::vector<std::string> header;
 	std::vector<std::string> data;
 	bool are_in_data_part = false;
+	bool end_of_data_part = false;
 
 	while (!Data.EndReached())
 	{
@@ -454,7 +1153,7 @@ bool MD5::ReadRankScore(ZED::Blob& Data)
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
 		if (are_in_data_part && newline)//Read all data blocks?
-			return true;
+			end_of_data_part = true;
 
 		if (start_of_heading)
 			are_in_data_part = true;
@@ -486,6 +1185,9 @@ bool MD5::ReadRankScore(ZED::Blob& Data)
 				m_RankToPoints.emplace_back(new_ranktopoints);
 
 				data.clear();//Clear block
+
+				if (end_of_data_part)//Last data entry read?
+					return true;
 			}
 		}
 	}
@@ -593,13 +1295,13 @@ bool MD5::ReadAgeGroups(ZED::Blob& Data)
 					else if (header[i] == "AlleTNinErgebnisliste")
 						age_group.AllParticipantsInResultTable = data[i] == "T";
 					else if (header[i] == "Mannschaft")
-						age_group.Team = data[i];
+						age_group.Team = data[i] == "T";
 				}
 
 				m_AgeGroups.emplace_back(new AgeGroup(age_group));
 				data.clear();
 
-				if (Line == "\r\n")
+				if (newline)
 					return true;
 			}
 		}
@@ -686,7 +1388,7 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 					else if (header[i] == "KampfUmPlatz5")
 						new_weightclass.MatchForFifthPlace = data[i] != "-1";
 					else if (header[i] == "Datum")
-						new_weightclass.Date = header[i];
+						new_weightclass.Date = data[i];
 					else if (header[i] == "Weitermelden")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.Relay) != 1)
@@ -743,14 +1445,16 @@ bool MD5::ReadRelationClubAssociation(ZED::Blob& Data)
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
-		//if (Line == "\r\n")
-			//return true;
-
-		if (start_of_heading)
-			are_in_data_part = true;
-
 		if (!are_in_data_part)//We are reading the header
+		{
 			header.emplace_back(Line);
+			if (newline)
+			{
+				//Read number of columns
+				ReadLine(Data, &start_of_heading, &newline);
+				are_in_data_part = true;
+			}
+		}
 		else
 		{
 			data.emplace_back(Line);
@@ -804,12 +1508,6 @@ bool MD5::ReadLottery(ZED::Blob& Data)
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
-		if (Line == "\r\n")
-			return true;
-
-		//if (start_of_heading)
-			//are_in_data_part = true;
-
 		if (!are_in_data_part)//We are reading the header
 		{
 			header.emplace_back(Line);
@@ -860,17 +1558,16 @@ bool MD5::ReadLotteryScheme(ZED::Blob& Data)
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading;
-		auto Line = ReadLine(Data, &start_of_heading);
-
-		if (Line == "\r\n")
-			return true;
-
-		if (start_of_heading)
-			are_in_data_part = true;
+		bool start_of_heading, newline;
+		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
 		if (!are_in_data_part)//We are reading the header
+		{
 			header.emplace_back(Line);
+
+			if (newline)
+				are_in_data_part = true;
+		}
 		else
 		{
 			data.emplace_back(Line);
@@ -901,9 +1598,11 @@ bool MD5::ReadLotteryScheme(ZED::Blob& Data)
 				}
 
 				m_LotterySchemas.emplace_back(new_lotteryschema);
-
 				data.clear();
 			}
+
+			if (newline)
+				return true;
 		}
 	}
 
@@ -920,17 +1619,16 @@ bool MD5::ReadLotterySchemaLine(ZED::Blob& Data)
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading;
-		auto Line = ReadLine(Data, &start_of_heading);
-
-		if (Line == "\r\n")
-			return true;
-
-		if (start_of_heading)
-			are_in_data_part = true;
+		bool start_of_heading, newline;
+		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
 		if (!are_in_data_part)//We are reading the header
+		{
 			header.emplace_back(Line);
+
+			if (newline)
+				are_in_data_part = true;
+		}
 		else
 		{
 			data.emplace_back(Line);
@@ -964,9 +1662,11 @@ bool MD5::ReadLotterySchemaLine(ZED::Blob& Data)
 				}
 
 				m_LotterySchemaLines.emplace_back(new_lotteryschemaline);
-
 				data.clear();
 			}
+
+			if (newline)
+				return true;
 		}
 	}
 
@@ -986,12 +1686,6 @@ bool MD5::ReadRelationParticipantMatchTable(ZED::Blob& Data)
 	{
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
-
-		if (Line == "\r\n")
-			return true;
-
-		//if (start_of_heading)
-			//are_in_data_part = true;
 
 		if (are_in_header_part)//We are reading the header
 		{
@@ -1058,9 +1752,6 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 	{
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
-
-		if (Line == "\r\n")
-			return true;
 
 		if (are_in_header_part)//We are reading the header
 		{
@@ -1152,7 +1843,7 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 					}
 					else if (header[i] == "VerliererPK")
 					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.LoserColor) != 1)
+						if (sscanf_s(data[i].c_str(), "%d", &new_match.LoserID) != 1)
 							ZED::Log::Warn("Could not read LoserColor of match");
 					}
 					else if (header[i] == "VerliererKampfNR")
@@ -1252,9 +1943,6 @@ bool MD5::ReadResult(ZED::Blob& Data)
 	{
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
-
-		if (Line == "\r\n")
-			return true;
 
 		if (are_in_header_part)//We are reading the header
 		{
@@ -1440,9 +2128,9 @@ bool MD5::ReadParticipants(ZED::Blob& Data)
 					else if (header[i] == "StatusAenderung")
 						new_participant.StatusChanged = data[i] == "1";
 					else if (header[i] == "REDAusgeschrieben")
-						new_participant.ClubFullname = data[i];
+						new_participant.ClubFullname = Latin1ToUTF8(data[i]);
 					else if (header[i] == "REDKuerzel")
-						new_participant.ClubShortname = data[i];
+						new_participant.ClubShortname = Latin1ToUTF8(data[i]);
 					else if (header[i] == "AllkategorieTNPK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_participant.AllCategoriesParticipantID) != 1)
@@ -1531,10 +2219,7 @@ bool MD5::ReadAssociation(ZED::Blob& Data)
 					else if (header[i] == "Kuerzel")
 						new_association.ShortName   = Latin1ToUTF8(data[i]);
 					else if (header[i] == "Nummer")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_association.Number) != 1)
-							ZED::Log::Warn("Could not read number of association");
-					}
+						new_association.Number = data[i];
 					else if (header[i] == "NaechsteEbenePK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_association.NextAsscociationID) != 1)
@@ -1619,10 +2304,7 @@ bool MD5::ReadClubs(ZED::Blob& Data)
 							ZED::Log::Warn("Could not read club number");
 					}
 					else if (header[i] == "StatusAenderung")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_club.StatusChanged) != 1)
-							ZED::Log::Warn("Could not read status changed of club");
-					}
+						new_club.StatusChanged = data[i] == "T";
 				}
 
 				m_Clubs.emplace_back(new Club(new_club));
@@ -1743,8 +2425,6 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pStartOfHeading, bool* pNewLine
 			newline = true;
 			if (pNewLine && carry_return)
 				*pNewLine = true;
-			if (Line.length() == 1)
-				Line += c;
 		}
 		else//Printable character
 		{

@@ -76,7 +76,8 @@ TEST(Mat, ForcedCloseDuringMatch)
 	tourney->EnableAutoSave(false);
 	EXPECT_TRUE(app.AddTournament(tourney));
 
-	app.OpenTournament(app.FindTournamentIndex(tournament_name));
+	ASSERT_TRUE(app.FindTournament(tournament_name));
+	EXPECT_TRUE(app.OpenTournament(app.FindTournament(tournament_name)->GetID()));
 
 	tourney->AddParticipant(&j1);
 	tourney->AddParticipant(&j2);

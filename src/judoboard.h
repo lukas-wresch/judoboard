@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <cassert>
 #include "id.h"
 
 
@@ -27,6 +28,48 @@ namespace Judoboard
 				ret += 0xc2 + (c > 0xbf);
 				ret += (c & 0x3f) + 0x80;
 			}
+		}
+
+		return ret;
+	}
+
+	inline size_t UTF8_GetLength(unsigned char c)
+	{
+		if (c < 0x80) return 1;
+		else if (!(c & 0x20)) return 2;
+		else if (!(c & 0x10)) return 3;
+		else if (!(c & 0x08)) return 4;
+		else if (!(c & 0x04)) return 5;
+		else return 6;
+	}
+
+	inline unsigned char UTF8_GetValue(std::string::const_iterator& it)
+	{
+		size_t len = UTF8_GetLength(*it);
+
+		if (len == 1)
+			return *it;
+
+		unsigned char res = (unsigned char) (*it & (0xff >> (len + 1))) << ((len - 1) * 6);
+
+		for (--len; len; --len)
+			res |= ((unsigned char) (*(++it)) - 0x80) << ((len - 1) * 6);
+
+		return res;
+	}
+
+	inline std::string UTF8ToLatin1(const std::string& Input)
+	{
+		std::string ret;
+
+		for (auto it = Input.begin(); it != Input.end(); ++it)
+		{
+			unsigned char value = UTF8_GetValue(it);
+#ifdef _DEBUG
+			if (value > 0xff)//Can not encode character into latin1
+				assert(false);
+#endif
+			ret += (char)value;
 		}
 
 		return ret;

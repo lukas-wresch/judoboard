@@ -23,7 +23,8 @@ public:
 		CSS,
 		JavaScript,
 		Image_JPG,
-		Image_PNG
+		Image_PNG,
+		Binary//Arbitrary binary data (to force downloads)
 	};
 
 	struct RequestHeader

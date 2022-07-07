@@ -7,6 +7,9 @@
 
 namespace Judoboard
 {
+	class ITournament;
+
+
 	//A *.md5 is a proprietary file format for storing tournament information
 
 	class MD5
@@ -33,8 +36,8 @@ namespace Judoboard
 			std::string Representative_Email;
 			std::string Representative_Fax;
 
-			int OfficialClubNo = -1;//Official no. of the club
-			int StatusChanged  = -1;//Could also be a boolean
+			int OfficialClubNo = 0;//Official no. of the club
+			bool StatusChanged;//Could also be a boolean
 		};
 
 		struct Association
@@ -45,7 +48,7 @@ namespace Judoboard
 			std::string Description;
 			std::string ShortName;
 
-			int Number = -1;
+			std::string Number;//"Number" of the association, can also include characters like '.'
 			int NextAsscociationID = -1;
 			const Association* NextAsscociation = nullptr;
 
@@ -90,7 +93,7 @@ namespace Judoboard
 
 			int Tolerance = -1;
 
-			std::string Team;//Format is unclear
+			bool Team;
 		};
 
 		struct Participant
@@ -284,7 +287,10 @@ namespace Judoboard
 
 		MD5(const std::string& Filename);
 		MD5(ZED::Blob&& Data) { Parse(std::move(Data)); }
+		MD5(const ITournament* Tournament);
 		~MD5();
+
+		bool Save(const std::string& Filename) const;
 
 		Association* FindAssociation(int AssociationID);
 		Club*        FindClub(int ClubID);
@@ -335,7 +341,7 @@ namespace Judoboard
 
 
 		std::vector<Association*> m_Associations;
-		std::vector<Club*> m_Clubs;
+		std::vector<Club*>        m_Clubs;
 		std::vector<Participant*> m_Participants;
 		std::vector<AgeGroup*>    m_AgeGroups;
 		std::vector<Weightclass*> m_Weightclasses;
