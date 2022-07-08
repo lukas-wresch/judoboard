@@ -6,11 +6,7 @@ TEST(MD5, ReadTestData)
 {
 	initialize();
 
-#ifdef _WIN32
-	MD5 file("../test-data/Test.md5");
-#else
 	MD5 file("test-data/Test.md5");
-#endif
 
 	ASSERT_TRUE(file);
 
@@ -296,11 +292,7 @@ TEST(MD5, CreateTournamentFromTestData)
 {
 	initialize();
 
-#ifdef _WIN32
-	MD5 file("../test-data/Test.md5");
-#else
 	MD5 file("test-data/Test.md5");
-#endif
 
 	ASSERT_TRUE(file);
 
@@ -316,11 +308,7 @@ TEST(MD5, CreateTournamentFromTestData2)
 {
 	initialize();
 
-#ifdef _WIN32
-	MD5 file("../test-data/Test.md5");
-#else
 	MD5 file("test-data/Test.md5");
-#endif
 
 	ASSERT_TRUE(file);
 
@@ -337,11 +325,7 @@ TEST(MD5, ImportIntoTournament)
 {
 	initialize();
 
-#ifdef _WIN32
-	MD5 file("../test-data/Test.md5");
-#else
 	MD5 file("test-data/Test.md5");
-#endif
 
 	ASSERT_TRUE(file);
 
@@ -789,11 +773,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 {
 	initialize();
 
-#ifdef _WIN32
-	MD5 file("../test-data/Test.md5");
-#else
 	MD5 file("test-data/Test.md5");
-#endif
 
 	ASSERT_TRUE(file);
 
@@ -1252,13 +1232,8 @@ TEST(MD5, Export)
 {
 	initialize();
 
-#ifdef _WIN32
-	MD5 file("../test-data/Test-cleaned.md5");
-	const auto hash_expected = ZED::SHA512(ZED::Blob(ZED::File("../test-data/Test-cleaned.md5")));
-#else
 	MD5 file("test-data/Test-cleaned.md5");
 	const auto hash_expected = ZED::SHA512(ZED::Blob(ZED::File("test-data/Test-cleaned.md5")));
-#endif
 
 	ASSERT_TRUE(file);
 
