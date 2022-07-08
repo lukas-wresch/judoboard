@@ -31,6 +31,8 @@ namespace Judoboard
 
 		void AddMD5File(const MD5& File);
 
+		virtual uint32_t GetYear() const;
+
 		//Judokas
 		uint32_t AddJudoka(Judoka&& NewJudoka) { return AddJudoka(new Judoka(NewJudoka)); }//Adds a judoka to the database
 		bool AddJudoka(Judoka* NewJudoka);//Adds a judoka to the database by reference

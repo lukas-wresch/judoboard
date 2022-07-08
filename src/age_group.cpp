@@ -10,7 +10,8 @@ using namespace Judoboard;
 
 
 
-AgeGroup::AgeGroup(const std::string& Name, uint32_t MinAge, uint32_t MaxAge, const RuleSet* Rules) : m_Name(Name), m_pRules(Rules)
+AgeGroup::AgeGroup(const std::string& Name, uint32_t MinAge, uint32_t MaxAge, const RuleSet* Rules, const StandingData& StandingData)
+	: m_Name(Name), m_pRules(Rules), m_StandingData(StandingData)
 {
 	m_MinAge = MinAge;
 	m_MaxAge = MaxAge;
@@ -18,7 +19,8 @@ AgeGroup::AgeGroup(const std::string& Name, uint32_t MinAge, uint32_t MaxAge, co
 
 
 
-AgeGroup::AgeGroup(const YAML::Node& Yaml, const StandingData* pStandingData)
+AgeGroup::AgeGroup(const YAML::Node& Yaml, const StandingData& StandingData)
+	: m_StandingData(StandingData)
 {
 	if (Yaml["uuid"])
 		SetUUID(Yaml["uuid"].as<std::string>());
@@ -29,8 +31,16 @@ AgeGroup::AgeGroup(const YAML::Node& Yaml, const StandingData* pStandingData)
 	if (Yaml["max_age"])
 		m_MinAge = Yaml["max_age"].as<uint32_t>();
 
-	if (Yaml["rules"] && pStandingData)
-		m_pRules = pStandingData->FindRuleSet(Yaml["rules"].as<std::string>());
+	if (Yaml["rules"])
+		m_pRules = StandingData.FindRuleSet(Yaml["rules"].as<std::string>());
+}
+
+
+
+bool AgeGroup::IsElgiable(const Judoka& Fighter) const
+{
+	uint32_t age = m_StandingData.GetYear() - Fighter.GetBirthyear();
+	return m_MinAge <= age && age <= m_MaxAge;
 }
 
 

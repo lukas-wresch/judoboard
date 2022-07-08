@@ -11,12 +11,12 @@ TEST(AgeGroup, ExportImport)
 		Database d;
 		auto r = new RuleSet(GetRandomName(), rand(), rand(), rand(), rand());
 		d.AddRuleSet(r);
-		AgeGroup a(GetRandomName(), rand(), rand(), r);
+		AgeGroup a(GetRandomName(), rand(), rand(), r, d);
 
 		YAML::Emitter yaml;
 		a >> yaml;
 
-		AgeGroup a2(YAML::Load(yaml.c_str()), &d);
+		AgeGroup a2(YAML::Load(yaml.c_str()), d);
 
 		EXPECT_EQ(a.GetUUID(), a2.GetUUID());
 		EXPECT_EQ(a.GetName(), a2.GetName());

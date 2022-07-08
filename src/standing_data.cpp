@@ -74,7 +74,7 @@ void StandingData::operator << (YAML::Node& Yaml)
 	{
 		for (const auto& node : Yaml["age_groups"])
 		{
-			auto new_age_group = new AgeGroup(node);
+			auto new_age_group = new AgeGroup(node, *this);
 			m_AgeGroups.emplace_back(new_age_group);
 		}
 	}
@@ -147,6 +147,14 @@ void StandingData::AddMD5File(const MD5& File)
 
 	for (auto judoka : File.GetParticipants())
 		AddJudoka(new Judoka(*judoka));
+}
+
+
+
+uint32_t StandingData::GetYear() const
+{
+	auto date = ZED::Core::GetDate();
+	return date.year;
 }
 
 
