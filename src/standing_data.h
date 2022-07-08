@@ -87,6 +87,7 @@ namespace Judoboard
 		const AgeGroup* FindAgeGroup(uint32_t ID) const;
 
 		bool AddAgeGroup(AgeGroup* NewAgeGroup);
+		bool RemoveAgeGroup(const UUID& UUID);
 		std::vector<AgeGroup*>& GetAgeGroups() { return m_AgeGroups; }
 		const std::vector<AgeGroup*>& GetAgeGroups() const { return m_AgeGroups; }
 

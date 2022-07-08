@@ -814,12 +814,14 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 
 	for (auto table : m_MatchTables)
 	{
-		if (table->IsElgiable(*Judoka))
+		if (table && table->IsElgiable(*Judoka))
 		{
 			table->AddParticipant(Judoka);
 			table->GenerateSchedule();
 		}
 	}
+
+	FindAgeGroupForJudoka(*Judoka);
 
 	GenerateSchedule();
 	Unlock();
@@ -854,6 +856,8 @@ bool Tournament::RemoveParticipant(uint32_t ID)
 			}
 		}
 	}
+
+	m_JudokaToAgeGroup.erase(deleted_judoka->GetUUID());
 
 	GenerateSchedule();//Recalculate schedule
 
@@ -1044,6 +1048,86 @@ bool Tournament::DeleteMatchTable(uint32_t ID)
 			break;
 		}
 	}
+
+	return true;
+}
+
+
+
+bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
+{
+	if (!NewAgeGroup)
+		return false;
+
+	if (m_StandingData.FindAgeGroup(NewAgeGroup->GetUUID()))
+		return false;
+
+	if (!m_StandingData.AddAgeGroup(NewAgeGroup))
+		return false;
+
+	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
+	{
+		auto age_group = GetAgeGroupOfJudoka(judoka);
+
+		//Not assigned to any age group and eligable for this new one?
+		if (!age_group && NewAgeGroup->IsElgiable(*judoka))
+		{
+			//Add him to his new age group
+			m_JudokaToAgeGroup.insert({ judoka->GetUUID(), NewAgeGroup->GetUUID() });
+		}
+	}
+
+	return true;
+}
+
+
+
+bool Tournament::RemoveAgeGroup(UUID& UUID)
+{
+	auto age_group_to_remove = m_StandingData.FindAgeGroup(UUID);
+
+	if (!age_group_to_remove)
+		return false;
+
+	if (!m_StandingData.RemoveAgeGroup(UUID))
+		return false;
+
+	//Remove all participants from this age group
+	for (auto [judoka, age_group] : m_JudokaToAgeGroup)
+	{
+		if (age_group == UUID)
+			m_JudokaToAgeGroup.erase(judoka);//Remove the participant
+	}
+
+	//Assign not-assigned judoka to a age group if possible
+	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
+	{
+		//Not assigned to any age group?
+		if (judoka && !GetAgeGroupOfJudoka(judoka))
+			FindAgeGroupForJudoka(*judoka);
+	}
+
+	return true;
+}
+
+
+
+bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup)
+{
+	if (!Judoka || !AgeGroup)
+		return false;
+
+	if (!IsParticipant(*Judoka))
+		return false;
+
+	if (!m_StandingData.FindAgeGroup(AgeGroup->GetUUID()))
+		return false;
+
+	//Remove judoka to the age group he currently belongs to
+	m_JudokaToAgeGroup.erase(Judoka->GetUUID());
+
+	//Add him to his new age group
+	m_JudokaToAgeGroup.insert({ Judoka->GetUUID(), AgeGroup->GetUUID() });
 
 	return true;
 }
@@ -1288,6 +1372,23 @@ const std::string Tournament::MasterSchedule2String() const
 
 	Unlock();
 	return ret;
+}
+
+
+
+void Tournament::FindAgeGroupForJudoka(const Judoka& Judoka)
+{
+	//Find age groups this judoka can belong to
+	std::vector<AgeGroup*> EligableAgeGroups;
+	for (auto age_group : m_StandingData.GetAgeGroups())
+	{
+		if (age_group && age_group->IsElgiable(Judoka))
+			EligableAgeGroups.emplace_back(age_group);
+	}
+
+	//Only one choice?
+	if (EligableAgeGroups.size() == 1)//Add judoka to age group
+		m_JudokaToAgeGroup.insert({ Judoka.GetUUID(), EligableAgeGroups[0]->GetUUID() });
 }
 
 

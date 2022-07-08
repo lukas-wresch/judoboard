@@ -483,6 +483,22 @@ bool StandingData::AddAgeGroup(AgeGroup* NewAgeGroup)
 
 
 
+bool StandingData::RemoveAgeGroup(const UUID& UUID)
+{
+	for (auto it = m_AgeGroups.begin(); it != m_AgeGroups.end(); ++it)
+	{
+		if ((*it)->GetUUID() == UUID)
+		{
+			m_AgeGroups.erase(it);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
 Judoka* StandingData::FindJudoka(uint32_t ID)
 {
 	auto item = m_Judokas.find(ID);

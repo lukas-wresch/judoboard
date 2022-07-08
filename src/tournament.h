@@ -98,6 +98,18 @@ namespace Judoboard
 		virtual const RuleSet* FindRuleSet(const UUID& UUID) const override { return m_StandingData.FindRuleSet(UUID); }
 		virtual RuleSet* FindRuleSet(const UUID& UUID) override { return m_StandingData.FindRuleSet(UUID); }
 
+		//Age groups
+		bool AddAgeGroup(AgeGroup* NewAgeGroup);
+		bool RemoveAgeGroup(UUID& UUID);
+		bool AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup);
+		const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) {
+			if (!Judoka) return nullptr;
+			auto it = m_JudokaToAgeGroup.find(Judoka->GetUUID());
+			if (it != m_JudokaToAgeGroup.end())
+				return m_StandingData.FindAgeGroup(it->second);
+			return nullptr;
+		}
+
 		//Master schedule / schedule entries
 		Schedulable* GetScheduleEntry(uint32_t Index) override;
 		bool MoveScheduleEntryUp(uint32_t ID) override;
@@ -131,6 +143,8 @@ namespace Judoboard
 		bool Save(const std::string& Filename) const;
 		bool SaveYAML(const std::string& Filename) const;
 
+		void FindAgeGroupForJudoka(const Judoka& Judoka);
+
 		int32_t  GetMaxScheduleIndex(uint32_t Mat = 0) const;
 		uint32_t GetMaxEntriesAtScheduleIndex(uint32_t MatID, int32_t ScheduleIndex) const;
 
@@ -147,5 +161,7 @@ namespace Judoboard
 		const RuleSet* m_pDefaultRules = nullptr;//Default rule set of the tournament
 
 		std::unordered_set<UUID> m_DisqualifiedJudoka;
+
+		std::unordered_map<UUID, UUID> m_JudokaToAgeGroup;//Maps judoka to the age group he/she is starting in
 	};
 }
