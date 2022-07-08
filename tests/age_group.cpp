@@ -219,3 +219,43 @@ TEST(AgeGroup, Default2022)
 		EXPECT_TRUE( sen->IsElgiable(j02));
 	}
 }
+
+
+
+TEST(AgeGroup, Default2022HasCorrectMatchTime)
+{
+	initialize();
+
+	{
+		Database d;
+		d.SetYear(2022);
+
+		auto u11 = d.FindAgeGroupByName("U11");
+		auto u13 = d.FindAgeGroupByName("U13");
+		auto u15 = d.FindAgeGroupByName("U15");
+		auto u18 = d.FindAgeGroupByName("U18");
+		auto u21 = d.FindAgeGroupByName("U21");
+		auto sen = d.FindAgeGroupByName("Seniors");
+
+		ASSERT_TRUE(u11);
+		ASSERT_TRUE(u13);
+		ASSERT_TRUE(u15);
+		ASSERT_TRUE(u18);
+		ASSERT_TRUE(u21);
+		ASSERT_TRUE(sen);
+
+		ASSERT_TRUE(u11->GetRuleSet());
+		ASSERT_TRUE(u13->GetRuleSet());
+		ASSERT_TRUE(u15->GetRuleSet());
+		ASSERT_TRUE(u18->GetRuleSet());
+		ASSERT_TRUE(u21->GetRuleSet());
+		ASSERT_TRUE(sen->GetRuleSet());
+
+		EXPECT_EQ(u11->GetRuleSet()->GetMatchTime(), 2*60);
+		EXPECT_EQ(u13->GetRuleSet()->GetMatchTime(), 3*60);
+		EXPECT_EQ(u15->GetRuleSet()->GetMatchTime(), 3*60);
+		EXPECT_EQ(u18->GetRuleSet()->GetMatchTime(), 4*60);
+		EXPECT_EQ(u21->GetRuleSet()->GetMatchTime(), 4*60);
+		EXPECT_EQ(sen->GetRuleSet()->GetMatchTime(), 4*60);
+	}
+}
