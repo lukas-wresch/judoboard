@@ -111,6 +111,11 @@ namespace Judoboard
 		Error Ajax_AddClub(const HttpServer::Request& Request);
 		ZED::CSV Ajax_ListClubs();
 
+		//Rule sets
+
+		//Age groups
+		std::string Ajax_ListAgeGroups() const;
+
 		//Match tables
 		ZED::CSV Ajax_ListMatchTables(const HttpServer::Request& Request);
 		std::string Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request);

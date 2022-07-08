@@ -31,13 +31,15 @@ void Application::SetupHttpServer()
 	m_Server.RegisterResource("/sha512.min.js", [](auto& Request) { return HttpServer::LoadFile("html/sha512.min.js"); }, HttpServer::ResourceType::JavaScript);
 	m_Server.RegisterResource("/jquery-ui.css", [](auto& Request) { return HttpServer::LoadFile("html/jquery-ui.css"); }, HttpServer::ResourceType::CSS);
 
+	m_Server.RegisterResource("/yaml.min.js", [](auto& Request) { return HttpServer::LoadFile("html/yaml.min.js"); }, HttpServer::ResourceType::JavaScript);
+
 	m_Server.RegisterResource("/slideout.min.js", [](auto& Request) { return HttpServer::LoadFile("html/slideout.min.js"); }, HttpServer::ResourceType::JavaScript);
 	m_Server.RegisterResource("/menu.png", [](auto& Request) { return HttpServer::LoadFile("html/menu.png"); }, HttpServer::ResourceType::Image_PNG);
 
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit",
 		"club_list", "club_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
-		"matchtable_list", "matchtable_add", "rule_add", "rule_list", "tournament_list", "tournament_add",
+		"matchtable_list", "matchtable_add", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "tournament_list", "tournament_add",
 		"server_config"
 	};
 
@@ -1808,7 +1810,18 @@ void Application::SetupHttpServer()
 		}
 
 		return (std::string)ret;
-		});
+	});
+
+
+	//Age groups
+
+	m_Server.RegisterResource("/ajax/age_groups/list", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_ListAgeGroups();		
+	});
 
 
 	//Tournaments
@@ -2487,6 +2500,21 @@ ZED::CSV Application::Ajax_ListClubs()
 	}
 	ret.AddNewline();
 	return ret;
+}
+
+
+
+std::string Application::Ajax_ListAgeGroups() const
+{
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
+	for (const auto& age_group : GetDatabase().GetAgeGroups())
+		if (age_group)
+			*age_group >> ret;
+
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 

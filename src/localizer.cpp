@@ -47,10 +47,10 @@ void Localizer::Initialize(Language NewLanguage)
 			s_de["Following Match"] = "Nachfolgender Kampf";
 			s_de["Default"] = "Standard";
 
-			s_de["Childen"] = "Kinder";
-			s_de["Youth"]   = "Jugendliche";
-			s_de["Adults"]  = "Erwachsene";
-			s_de["Seniors"] = "Senioren";
+			s_de["Children"] = "Kinder";
+			s_de["Youth"]    = "Jugendliche";
+			s_de["Adults"]   = "Erwachsene";
+			s_de["Seniors"]  = "Senioren";
 			
 			break;
 		}
