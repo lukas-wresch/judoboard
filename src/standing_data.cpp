@@ -45,6 +45,8 @@ void StandingData::operator << (ZED::CSV& Stream)
 	uint32_t ruleSetsCount = 0;
 	Stream >> ruleSetsCount;
 
+	m_RuleSets.clear();
+
 	for (uint32_t i = 0; i < ruleSetsCount; i++)
 	{
 		auto new_rule_set = new RuleSet(Stream);
@@ -61,6 +63,8 @@ void StandingData::operator << (YAML::Node& Yaml)
 
 	if (Yaml["judoka"] && Yaml["judoka"].IsSequence())
 	{
+		m_Judokas.clear();
+
 		for (const auto& node : Yaml["judoka"])
 		{
 			Judoka* newJudoka = new Judoka(node);
@@ -71,6 +75,8 @@ void StandingData::operator << (YAML::Node& Yaml)
 
 	if (Yaml["rule_sets"] && Yaml["rule_sets"].IsSequence())
 	{
+		m_RuleSets.clear();
+
 		for (const auto& node : Yaml["rule_sets"])
 		{
 			auto new_rule_set = new RuleSet(node);
@@ -81,6 +87,8 @@ void StandingData::operator << (YAML::Node& Yaml)
 
 	if (Yaml["age_groups"] && Yaml["age_groups"].IsSequence())
 	{
+		m_AgeGroups.clear();
+
 		for (const auto& node : Yaml["age_groups"])
 		{
 			auto new_age_group = new AgeGroup(node, *this);

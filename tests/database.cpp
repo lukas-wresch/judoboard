@@ -58,8 +58,8 @@ TEST(Database, SaveAndLoad)
 	{
 		Database d;
 
-		EXPECT_TRUE(d.GetNumJudoka() == 0);
-		EXPECT_TRUE(d.GetRuleSets().size() == 1);
+		EXPECT_EQ(d.GetNumJudoka(), 0);
+		EXPECT_EQ(d.GetRuleSets().size(), 3);
 
 		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
 		Judoka j2("Firstname2", "Lastname2", 60, Gender::Female);
@@ -126,7 +126,7 @@ TEST(Database, OnlyOneDefaultRuleSet)
 		Database d3;
 		d3.Load("temp.csv");
 
-		EXPECT_TRUE(d3.GetRuleSets().size() == 1);
+		EXPECT_EQ(d3.GetRuleSets().size(), 3);
 	}
 
 	ZED::Core::RemoveFile("temp.csv");
@@ -141,8 +141,10 @@ TEST(Database, EmptyDatabaseShouldHaveDefaultRuleSet)
 
 	EXPECT_EQ(d.GetNumAccounts(), 0);
 
-	EXPECT_EQ(d.GetRuleSets().size(), 1);
-	EXPECT_EQ(d.GetRuleSets()[0]->GetName(), "Default");
+	EXPECT_EQ(d.GetRuleSets().size(), 3);
+	EXPECT_EQ(d.GetRuleSets()[0]->GetName(), "Children");
+	EXPECT_EQ(d.GetRuleSets()[1]->GetName(), "Youth");
+	EXPECT_EQ(d.GetRuleSets()[2]->GetName(), "Adults");
 }
 
 
