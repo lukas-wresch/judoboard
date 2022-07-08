@@ -68,6 +68,16 @@ void StandingData::operator << (YAML::Node& Yaml)
 			m_RuleSets.emplace_back(new_rule_set);
 		}
 	}
+
+
+	if (Yaml["age_groups"] && Yaml["age_groups"].IsSequence())
+	{
+		for (const auto& node : Yaml["age_groups"])
+		{
+			auto new_age_group = new AgeGroup(node);
+			m_AgeGroups.emplace_back(new_age_group);
+		}
+	}
 }
 
 
@@ -105,6 +115,7 @@ void StandingData::operator >> (YAML::Emitter& Yaml) const
 
 	Yaml << YAML::EndSeq;
 	
+	//Export rule sets
 	Yaml << YAML::Key << "rule_sets";
 	Yaml << YAML::Value;
 	Yaml << YAML::BeginSeq;
@@ -112,6 +123,17 @@ void StandingData::operator >> (YAML::Emitter& Yaml) const
 	for (auto rule : m_RuleSets)
 		if (rule)
 			*rule >> Yaml;
+
+	Yaml << YAML::EndSeq;
+
+	//Export age groups
+	Yaml << YAML::Key << "age_groups";
+	Yaml << YAML::Value;
+	Yaml << YAML::BeginSeq;
+
+	for (auto age_group : m_AgeGroups)
+		if (age_group)
+			*age_group >> Yaml;
 
 	Yaml << YAML::EndSeq;
 }
@@ -348,6 +370,61 @@ bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
 		return false;
 
 	m_RuleSets.emplace_back(NewRuleSet);
+	return true;
+}
+
+
+
+AgeGroup* StandingData::FindAgeGroup(const UUID& UUID)
+{
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetUUID() == UUID)
+			return age_group;
+
+	return nullptr;
+}
+
+
+
+const AgeGroup* StandingData::FindAgeGroup(const UUID& UUID) const
+{
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetUUID() == UUID)
+			return age_group;
+
+	return nullptr;
+}
+
+
+
+AgeGroup* StandingData::FindAgeGroup(uint32_t ID)
+{
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetID() == ID)
+			return age_group;
+
+	return nullptr;
+}
+
+
+
+const AgeGroup* StandingData::FindAgeGroup(uint32_t ID) const
+{
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetID() == ID)
+			return age_group;
+
+	return nullptr;
+}
+
+
+
+bool StandingData::AddAgeGroup(AgeGroup* NewAgeGroup)
+{
+	if (!NewAgeGroup || FindRuleSet(NewAgeGroup->GetUUID()))
+		return false;
+
+	m_AgeGroups.emplace_back(NewAgeGroup);
 	return true;
 }
 

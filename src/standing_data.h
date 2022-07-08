@@ -4,6 +4,7 @@
 #include "judoka.h"
 #include "club.h"
 #include "rule_set.h"
+#include "age_group.h"
 #include "dm4.h"
 
 
@@ -70,9 +71,19 @@ namespace Judoboard
 		RuleSet* FindRuleSet(uint32_t ID);
 		const RuleSet* FindRuleSet(uint32_t ID) const;
 
-		bool  AddRuleSet(RuleSet* NewRuleSet);
+		bool AddRuleSet(RuleSet* NewRuleSet);
 		std::vector<RuleSet*>& GetRuleSets() { return m_RuleSets; }
 		const std::vector<RuleSet*>& GetRuleSets() const { return m_RuleSets; }
+
+		//Age groups
+		AgeGroup* FindAgeGroup(const UUID& UUID);
+		const AgeGroup* FindAgeGroup(const UUID& UUID) const;
+		AgeGroup* FindAgeGroup(uint32_t ID);
+		const AgeGroup* FindAgeGroup(uint32_t ID) const;
+
+		bool AddAgeGroup(AgeGroup* NewAgeGroup);
+		std::vector<AgeGroup*>& GetAgeGroups() { return m_AgeGroups; }
+		const std::vector<AgeGroup*>& GetAgeGroups() const { return m_AgeGroups; }
 
 		//Serialization
 		const std::string JudokaToJSON() const;
@@ -83,5 +94,6 @@ namespace Judoboard
 		std::vector<Club*> m_Clubs;
 
 		std::vector<RuleSet*> m_RuleSets;
+		std::vector<AgeGroup*> m_AgeGroups;
 	};
 }
