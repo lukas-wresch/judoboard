@@ -379,6 +379,7 @@ TEST(Ajax, ListClubs)
 	initialize();
 
 	{
+		ZED::Core::RemoveFile("database.csv");
 		Application app;
 
 		app.GetDatabase().AddClub(new Club("Club 1"));
@@ -651,4 +652,27 @@ TEST(Ajax, GetMatchesFromMatchTable)
 		EXPECT_EQ(table->GetSchedule()[i]->GetFighter(Fighter::Blue )->GetName(), name2);
 		EXPECT_EQ(table->GetSchedule()[i]->GetMatID(), matID);
 	}
+}
+
+
+
+TEST(Ajax, ListAgeGroups)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("database.csv");
+	Application app;
+
+	YAML::Node result = YAML::Load(app.Ajax_ListAgeGroups());
+
+	ASSERT_TRUE(result);
+	ASSERT_TRUE(result.IsSequence());
+	ASSERT_EQ(result.size(), 6);
+
+	EXPECT_EQ(result[0]["name"].as<std::string>(), "U11");
+	EXPECT_EQ(result[1]["name"].as<std::string>(), "U13");
+	EXPECT_EQ(result[2]["name"].as<std::string>(), "U15");
+	EXPECT_EQ(result[3]["name"].as<std::string>(), "U18");
+	EXPECT_EQ(result[4]["name"].as<std::string>(), "U21");
+	EXPECT_EQ(result[5]["name"].as<std::string>(), "Seniors");
 }
