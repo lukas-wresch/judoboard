@@ -40,6 +40,12 @@ AgeGroup::AgeGroup(const YAML::Node& Yaml, const StandingData& StandingData)
 bool AgeGroup::IsElgiable(const Judoka& Fighter) const
 {
 	uint32_t age = m_StandingData.GetYear() - Fighter.GetBirthyear();
+
+	if (m_MinAge == 0)//No min age
+		return age <= m_MaxAge;
+	if (m_MaxAge == 0)//No max age
+		return m_MinAge <= age;
+
 	return m_MinAge <= age && age <= m_MaxAge;
 }
 

@@ -31,7 +31,8 @@ namespace Judoboard
 
 		void AddMD5File(const MD5& File);
 
-		virtual uint32_t GetYear() const;
+		uint32_t GetYear() const;
+		void SetYear(uint32_t NewYear) { m_Year = NewYear; }
 
 		//Judokas
 		uint32_t AddJudoka(Judoka&& NewJudoka) { return AddJudoka(new Judoka(NewJudoka)); }//Adds a judoka to the database
@@ -78,6 +79,8 @@ namespace Judoboard
 		const std::vector<RuleSet*>& GetRuleSets() const { return m_RuleSets; }
 
 		//Age groups
+		AgeGroup* FindAgeGroupByName(const std::string& AgeGroupName);
+		const AgeGroup* FindAgeGroupByName(const std::string& AgeGroupName) const;
 		AgeGroup* FindAgeGroup(const UUID& UUID);
 		const AgeGroup* FindAgeGroup(const UUID& UUID) const;
 		AgeGroup* FindAgeGroup(uint32_t ID);
@@ -97,5 +100,8 @@ namespace Judoboard
 
 		std::vector<RuleSet*> m_RuleSets;
 		std::vector<AgeGroup*> m_AgeGroups;
+
+	private:
+		uint32_t m_Year = 0;//Relative year for calculating the age groups. Set to 0 to use the current year
 	};
 }

@@ -21,6 +21,12 @@ void StandingData::Reset()
 	for (auto rule : m_RuleSets)
 		delete rule;
 	m_RuleSets.clear();
+
+	for (auto age_group : m_AgeGroups)
+		delete age_group;
+	m_AgeGroups.clear();
+
+	m_Year = 0;
 }
 
 
@@ -50,6 +56,9 @@ void StandingData::operator << (ZED::CSV& Stream)
 
 void StandingData::operator << (YAML::Node& Yaml)
 {
+	if (Yaml["year"])
+		m_Year = Yaml["year"].as<uint32_t>();
+
 	if (Yaml["judoka"] && Yaml["judoka"].IsSequence())
 	{
 		for (const auto& node : Yaml["judoka"])
@@ -103,6 +112,9 @@ void StandingData::operator >> (ZED::CSV& Stream) const
 
 void StandingData::operator >> (YAML::Emitter& Yaml) const
 {
+	if (m_Year > 0)//No the default (current) year?
+		Yaml << YAML::Key << "year" << YAML::Value << m_Year;
+
 	Yaml << YAML::Key << "judoka";
 	Yaml << YAML::Value;
 	Yaml << YAML::BeginSeq;
@@ -153,6 +165,9 @@ void StandingData::AddMD5File(const MD5& File)
 
 uint32_t StandingData::GetYear() const
 {
+	if (m_Year != 0)
+		return m_Year;
+
 	auto date = ZED::Core::GetDate();
 	return date.year;
 }
@@ -383,6 +398,28 @@ bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
 
 
 
+AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName)
+{
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetName() == AgeGroupName)
+			return age_group;
+
+	return nullptr;
+}
+
+
+
+const AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName) const
+{
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetName() == AgeGroupName)
+			return age_group;
+
+	return nullptr;
+}
+
+
+
 AgeGroup* StandingData::FindAgeGroup(const UUID& UUID)
 {
 	for (auto age_group : m_AgeGroups)
@@ -429,7 +466,7 @@ const AgeGroup* StandingData::FindAgeGroup(uint32_t ID) const
 
 bool StandingData::AddAgeGroup(AgeGroup* NewAgeGroup)
 {
-	if (!NewAgeGroup || FindRuleSet(NewAgeGroup->GetUUID()))
+	if (!NewAgeGroup || FindAgeGroup(NewAgeGroup->GetUUID()))
 		return false;
 
 	m_AgeGroups.emplace_back(NewAgeGroup);
