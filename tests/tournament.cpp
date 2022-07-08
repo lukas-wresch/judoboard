@@ -377,7 +377,7 @@ TEST(Tournament, HasDefaultRuleSet2)
 	ASSERT_TRUE(t.GetDefaultRuleSet());
 	ASSERT_TRUE(d.FindRuleSetByName("Default"));
 	EXPECT_NE(t.GetDefaultRuleSet()->GetID(),   d.FindRuleSetByName("Default")->GetID());
-	EXPECT_NE(t.GetDefaultRuleSet()->GetUUID(), d.FindRuleSetByName("Default")->GetUUID());
+	EXPECT_EQ(t.GetDefaultRuleSet()->GetUUID(), d.FindRuleSetByName("Default")->GetUUID());
 
 	EXPECT_EQ(t.GetDefaultRuleSet()->GetMatchTime(),         60);
 	EXPECT_EQ(t.GetDefaultRuleSet()->GetGoldenScoreTime(),   30);
