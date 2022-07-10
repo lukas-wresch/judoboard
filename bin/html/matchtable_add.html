@@ -86,6 +86,10 @@
 <script>
 
 
+var g_yaml;
+
+
+
 function GetForm(callback)
 {
   AjaxCallback('ajax/matchtable/get_form?type=' + document.getElementById("type").value, function(response) {
@@ -97,6 +101,13 @@ function GetForm(callback)
     document.getElementById("all").innerHTML    = lang.all;
     document.getElementById("male").innerHTML   = lang.male;
     document.getElementById("female").innerHTML = lang.female;
+
+    if (g_yaml && g_yaml["min_weight"])
+      document.getElementById("minWeight").value = g_yaml["min_weight"];
+    if (g_yaml && g_yaml["max_weight"])
+      document.getElementById("maxWeight").value = g_yaml["max_weight"];
+    if (g_yaml && g_yaml["gender"])
+      document.getElementById("gender").value = g_yaml["gender"];
 
     if (typeof callback !== 'undefined')
       callback();
@@ -125,7 +136,7 @@ function AddMatchtable()
   console.log(params);
 
   AjaxPost('ajax/matchtable/add?type=' + document.getElementById("type").value, params, function() {
-    navigate("class_list.html");
+    navigate("matchtable_list.html");
   });
 
   return false;
@@ -144,12 +155,13 @@ function UpdateMatchtable()
   data["name"]  = document.getElementById("name").value;
   data["color"] = document.getElementById("color").value;
   data["mat"]   = document.getElementById("mat").value;
+  data["age_group"] = document.getElementById("age_group").value;
   data["rule"]  = document.getElementById("rule").value;
 
   var params = URLEncode(data);
 
   AjaxPost('ajax/matchtable/update?id=' + id, params, function() {
-    navigate("class_list.html");
+    navigate("matchtable_list.html");
   });
 
   return false;
@@ -162,7 +174,7 @@ function DeleteMatchtable()
   if (confirm(lang.delete_matchtable_confirm))
   {
     AjaxCallback('ajax/matchtable/delete?id=' + id, function() {
-      navigate("class_list.html");
+      navigate("matchtable_list.html");
     });
   }
 
@@ -175,95 +187,72 @@ function GetMatchTable(id)
 {
   AjaxCallback("ajax/matchtable/get?id="+id, function(response) {
     console.log(response);
-    var res = response.split(",");
+    var res = YAML.parse(response);
+    g_yaml = res;
 
     var elements = document.getElementById("form").elements;
 
-    var i = 0;
-    var id   = res[i++];
-    var type = res[i++];
-    var schedule_index = res[i++];
-    var matID  = res[i++];
-    var color  = res[i++];
-    var ruleID = res[i++];
-    var name   = res[i++];
-
-    document.getElementById("name").value = name;
-    document.getElementById("type").value = type;
+    document.getElementById("name").value = res.name;
+    document.getElementById("type").value = res.type;
     document.getElementById("type").onchange();
 
-    for (var j=i;j < res.length;j++)
-    {
-      console.log(elements[j-i]);
-      elements[j-i].value = res[j];
-    }
-
     GetMats(function() {
-      document.getElementById("mat").value = matID;
+      document.getElementById("mat").value = res.mat_id;
     });
 
     GetRuleSets(function() {
-      document.getElementById("rule").value = ruleID;
+      document.getElementById("rule").value = res.rule_set;
     });
 
     GetColors(function() {
-      document.getElementById("color").value = color;
+      document.getElementById("color").value = res.color;
       document.getElementById("color").onchange();
     });
+        
 
-
-    AjaxCallback("ajax/matchtable/get_participants?id="+id, function(response) {
-      console.log(response);
-      var res = response.split(",");
-
-      if (res.length < 2)
-        return;
-
+    if (res["participants"])
+    {
       var table = document.getElementById("participants");
 
       while (table.rows.length > 1)
         table.deleteRow(table.rows.length-1);
 
-      var i = 0;
       var no = 0;
-      for (var i=0; i < res.length;)
+      for (const judoka of res["participants"])
       {
-      no++;
-      var id   = res[i++];
-      var name = res[i++];
+         var row = table.insertRow(-1);
+         var cell0 = row.insertCell(0);
+         var cell1 = row.insertCell(1);
+         var cell2 = row.insertCell(2);
+         var cell3 = row.insertCell(3);
+         var cell4 = row.insertCell(4);
 
-      var row = table.insertRow(-1);
-      var cell0 = row.insertCell(0);
-      var cell1 = row.insertCell(1);
-      var cell2 = row.insertCell(2);
-      var cell3 = row.insertCell(3);
-      var cell4 = row.insertCell(4);
+         no++;
+         if (no%2 == 0)
+           row.style.backgroundColor = "#eee";
 
-      if (no%2 == 0)
-        row.style.backgroundColor = "#eee";
+         cell0.innerHTML = no;
+         cell0.style.textAlign = "center";
+         cell0.style.fontSize  = "14pt";
 
-      cell0.innerHTML = no;
-      cell0.style.textAlign = "center";
-      cell0.style.fontSize  = "14pt";
+         cell1.innerHTML = "<a href=\"#judoka_edit.html?id=" + judoka.uuid + "\">" + judoka.firstname + " " + judoka.lastname + "</a>";
+         //cell2.innerHTML = weight + " kg";
+         cell2.style.textAlign = "center";
+         cell2.style.fontSize  = "16pt";
 
-      cell1.innerHTML = "<a href=\"#judoka_edit.html?id=" + id + "\">" + name + "</a>";
-      //cell2.innerHTML = weight + " kg";
-      cell2.style.textAlign = "center";
-      cell2.style.fontSize  = "16pt";
+         cell3.style.textAlign = "center";
+         cell3.style.fontSize  = "16pt";
 
-      //cell3.innerHTML = matches;
-      cell3.style.textAlign = "center";
-      cell3.style.fontSize  = "16pt";
-
-      cell4.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+id+")\">" + lang.remove + "</button>";
-      cell4.style.textAlign = "center";
-      }
-    });
+         cell4.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+judoka.uuid+")\">" + lang.remove + "</button>";
+         cell4.style.textAlign = "center";
+       }
+     }
   });
 
 
+
   AjaxCallback("ajax/matchtable/get_matches?id="+id, function(response) {
-    var res = response.split(",");
+    var res = YAML.parse(response);
 
     if (res.length < 4)
       return;
@@ -273,30 +262,18 @@ function GetMatchTable(id)
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    console.log(response);
-
     var no = 0;
-    for (var i=0; i < res.length;)
+    for (const match of res)
     {
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
       var cell1 = row.insertCell(1);
       var cell2 = row.insertCell(2);
-      //var cell3 = row.insertCell(3);
       var cell4 = row.insertCell(3);
       var cell5 = row.insertCell(4);
       var cell6 = row.insertCell(5);
 
       no++;
-      var id    = res[i++];
-      var white = res[i++];
-      var blue  = res[i++];
-      var matID = res[i++];
-      var state = res[i++];
-      var color = res[i++];
-      var matchtableID   = res[i++];
-      var matchtableName = res[i++];
-
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
 
@@ -305,37 +282,29 @@ function GetMatchTable(id)
       cell0.style.fontSize  = "14pt";
       cell0.style.height    = "1.5cm";
 
-      cell1.innerHTML = white;
-      cell2.innerHTML = blue;
+      cell1.innerHTML = match.white;
+      cell2.innerHTML = match.blue;
 
-      /*if (matchtableID > 0)
-        cell3.innerHTML = "<a href=\"#matchtable_add.html?id="+matchtableID+"\">" + matchtableName + "</a>";
-      else
-        cell3.innerHTML = matchtableName;
-
-      cell3.style.backgroundColor = color;
-      cell3.style.textAlign = "center";*/
-
-      if (matID <= 0)
+      if (match.mat_id <= 0)
       {
         cell4.style.fontWeight = "bold";
         cell4.innerHTML = "None";
       }
       else
-        cell4.innerHTML = matID;
+        cell4.innerHTML = match.mat_id;
 
-      cell4.style.backgroundColor = Color(matID);
+      cell4.style.backgroundColor = Color(match.mat_id);
       cell4.style.textAlign = "center";
       cell4.style.fontSize  = "16pt";
 
-      if (state == 0)
+      if (match.state == 0)
         cell5.innerHTML = lang.scheduled;
-      else if (state == 1)
+      else if (match.state == 1)
       {
         cell5.style.color = "red";
         cell5.innerHTML = lang.running;
       }
-      else if (state == 2)
+      else if (match.state == 2)
       {
         cell5.style.color = "green";
         cell5.innerHTML = lang.concluded;
@@ -348,7 +317,7 @@ function GetMatchTable(id)
       var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
 
 
-      var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 2.2cm; margin-right: 0mm;\" onclick=navigate(\"edit_match.html?id="+id+"\");>" + lang.details + "</button></td>";
+      var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 2.2cm; margin-right: 0mm;\" onclick=navigate(\"edit_match.html?id="+match.uuid+"\");>" + lang.details + "</button></td>";
 
       options += "<td></td></tr><tr><td></td></tr></table>";
 

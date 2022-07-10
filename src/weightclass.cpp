@@ -316,7 +316,7 @@ const std::string Weightclass::ToHTML() const
 {
 	std::string ret;
 
-	ret += "<a href=\"#matchtable_add.html?id=" + std::to_string(GetID()) + "\">" + GetName() + "</a><br/>";
+	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetName() + "</a><br/>";
 
 	ret += GetDescription() + " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 

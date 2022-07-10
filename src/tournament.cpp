@@ -940,16 +940,6 @@ MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
 
 
 
-int Tournament::FindMatchTableIndex(uint32_t ID) const
-{
-	for (uint32_t i = 0;i < m_MatchTables.size();i++)
-		if (m_MatchTables[i] && m_MatchTables[i]->GetID() == ID)
-			return i;
-	return -1;
-}
-
-
-
 uint32_t Tournament::GetFreeMatchTableID() const
 {
 	uint32_t unusedID = 1;
@@ -1082,7 +1072,7 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 
 
 
-bool Tournament::RemoveAgeGroup(UUID& UUID)
+bool Tournament::RemoveAgeGroup(const UUID& UUID)
 {
 	auto age_group_to_remove = m_StandingData.FindAgeGroup(UUID);
 

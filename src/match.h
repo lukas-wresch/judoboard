@@ -111,6 +111,7 @@ namespace Judoboard
 		//Serialize
 		ZED::CSV ToString() const;
 		ZED::CSV AllToString() const;
+		void ToString(YAML::Emitter& Yaml) const;
 
 		void operator >>(ZED::CSV& Stream) const;
 		void operator >>(YAML::Emitter& Yaml) const;

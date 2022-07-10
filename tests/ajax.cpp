@@ -384,23 +384,19 @@ TEST(Ajax, ListClubs)
 
 		app.GetDatabase().AddClub(new Club("Club 1"));
 
-		auto csv = app.Ajax_ListClubs();
+		YAML::Node yaml = YAML::Load(app.Ajax_ListClubs());
 
-		int id1, id2;
-		std::string name1, name2;
-		csv >> id1 >> name1;
-
-		EXPECT_EQ(name1, "Club 1");
+		ASSERT_EQ(yaml.size(), 1);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
 
 
 		app.GetDatabase().AddClub(new Club("Club 2"));
 
-		auto csv2 = app.Ajax_ListClubs();
+		yaml = YAML::Load(app.Ajax_ListClubs());
 
-		csv2 >> id1 >> name1 >> id2 >> name2;
-
-		EXPECT_EQ(name1, "Club 1");
-		EXPECT_EQ(name2, "Club 2");
+		ASSERT_EQ(yaml.size(), 2);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
+		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "Club 2");
 	}
 }
 
@@ -597,16 +593,14 @@ TEST(Ajax, GetParticipantsFromMatchTable)
 	auto table = new Weightclass(app.GetTournament(), 10, 100);
 	app.GetTournament()->AddMatchTable(table);
 
-	ZED::CSV result = app.Ajax_GetParticipantsFromMatchTable(HttpServer::Request("id=" + std::to_string(table->GetID())));
+	YAML::Node yaml = YAML::Load(app.Ajax_GetParticipantsFromMatchTable(HttpServer::Request("id=" + (std::string)table->GetUUID())));
 
-	int id;
-	std::string name;
+	ASSERT_EQ(yaml.size(), 1);
+	EXPECT_EQ(j1->GetUUID(), yaml[0]["uuid"].as<std::string>());
+	EXPECT_EQ(j1->GetFirstname(), yaml[0]["firstname"].as<std::string>());
+	EXPECT_EQ(j1->GetLastname(),  yaml[0]["lastname" ].as<std::string>());
 
-	result >> id >> name;
-	EXPECT_EQ(j1->GetID(), id);
-	EXPECT_EQ(j1->GetName(), name);
-
-	//Changed to only 1 judoka since there is now guarantee that the judoka will come out in the same order
+	//Changed to only 1 judoka since there is no guarantee that the judoka will come out in the same order
 
 	/*result >> id >> name;
 	EXPECT_EQ(j2->GetID(), id);
@@ -636,18 +630,18 @@ TEST(Ajax, GetMatchesFromMatchTable)
 	auto table = new Weightclass(app.GetTournament(), 10, 100);
 	app.GetTournament()->AddMatchTable(table);
 
-	ZED::CSV result = app.Ajax_GetMatchesFromMatchTable(HttpServer::Request("id=" + std::to_string(table->GetID())));
+	YAML::Node yaml = YAML::Load(app.Ajax_GetMatchesFromMatchTable(HttpServer::Request("id=" + (std::string)table->GetUUID())));
 
-	int id, matID, state, tableID;
-	std::string name1, name2, tableName, color;
+	ASSERT_EQ(yaml.size(), 3);
 
-	for (int i = 0; i < 3; i++)
+	int i = 0;
+	for (const auto& node : yaml)
 	{
-		result >> id >> name1 >> name2 >> matID >> state >> color >> tableID >> tableName;
-		EXPECT_EQ(table->GetSchedule()[i]->GetID(), id);
-		EXPECT_EQ(table->GetSchedule()[i]->GetFighter(Fighter::White)->GetName(), name1);
-		EXPECT_EQ(table->GetSchedule()[i]->GetFighter(Fighter::Blue )->GetName(), name2);
-		EXPECT_EQ(table->GetSchedule()[i]->GetMatID(), matID);
+		EXPECT_EQ(node["uuid"].as<std::string>(),       (std::string)table->GetSchedule()[i]->GetUUID());
+		EXPECT_EQ(node["white_name"].as<std::string>(), table->GetSchedule()[i]->GetFighter(Fighter::White)->GetName());
+		EXPECT_EQ(node["blue_name"].as<std::string>(),  table->GetSchedule()[i]->GetFighter(Fighter::Blue )->GetName());
+		EXPECT_EQ(node["mat_id"].as<int>(),             table->GetSchedule()[i]->GetMatID());
+		i++;
 	}
 }
 

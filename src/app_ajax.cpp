@@ -1560,55 +1560,62 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament is open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 		int color = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "color"));
 		int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
-		int rule = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "rule"));
+		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Body, "age_group");
+		UUID rule_set_id  = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		auto table = GetTournament()->FindMatchTable(id);
 
-		auto& tables = GetTournament()->SetMatchTables();
-		auto  table_index = GetTournament()->FindMatchTableIndex(id);
-
-		if (table_index < 0 || !tables[table_index])
+		if (!table)
 			return std::string("Could not find class");
 
+		auto age_group = m_Database.FindAgeGroup(age_group_id);
+		auto rule_set  = m_Database.FindRuleSet(rule_set_id);
 
 		GetTournament()->Lock();
 
 		if (color >= 0)
-			tables[table_index]->SetColor(color);
+			table->SetColor(color);
 
-		tables[table_index]->SetName(name);
+		table->SetName(name);
 
 		if (mat >= 0)
-			tables[table_index]->SetMatID(mat);
-		if (m_Database.FindRuleSet(rule))
-			tables[table_index]->SetRuleSet(m_Database.FindRuleSet(rule));
+			table->SetMatID(mat);
+		if (age_group)
+		{
+			table->SetAgeGroup(age_group);
+			GetTournament()->AddAgeGroup(age_group);
+		}
+		if (rule_set)
+		{
+			table->SetRuleSet(rule_set);
+			GetTournament()->AddRuleSet(rule_set);
+		}
 
 		GetTournament()->Unlock();
 
 
-		switch (tables[table_index]->GetType())
+		switch (table->GetType())
 		{
 		case MatchTable::Type::Weightclass:
 		{
 			int minWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight"));
 			int maxWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight"));
-			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+			int gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 
 			if (minWeight < 0 || maxWeight < 0)
 				return std::string("Invalid value");
 
-			Weightclass* table = (Weightclass*)tables[table_index];
+			Weightclass* weight_table = (Weightclass*)table;
 
 			GetTournament()->Lock();
 
-			table->SetMinWeight(minWeight);
-			table->SetMaxWeight(maxWeight);
-			table->SetGender((Gender)gender);
+			weight_table->SetMinWeight(minWeight);
+			weight_table->SetMaxWeight(maxWeight);
+			weight_table->SetGender((Gender)gender);
 
 			GetTournament()->Unlock();
 			break;
@@ -1631,11 +1638,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament is open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
-
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		GetTournament()->Lock();
 		bool ret = GetTournament()->DeleteMatchTable(id);
@@ -1656,15 +1659,16 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament is open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		if (id < 0)
-			return std::string("Invalid id");
+		auto match_table = GetTournament()->FindMatchTable(id);
 
-		if (!GetTournament()->FindMatchTable(id))
+		if (!match_table)
 			return std::string("Could not find class");
 
-		return GetTournament()->FindMatchTable(id)->ToString();
+		YAML::Emitter ret;
+		*match_table >> ret;
+		return ret.c_str();
 	});
 
 
@@ -1678,13 +1682,13 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::TournamentNotOpen);
 
 		int whiteID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "white"));
-		int blueID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "blue"));
+		int blueID  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "blue"));
 
 		if (whiteID < 0 || blueID < 0)
 			return Error(Error::Type::InvalidID);
 
 		auto white = m_Database.FindJudoka(whiteID);
-		auto blue = m_Database.FindJudoka(blueID);
+		auto blue  = m_Database.FindJudoka(blueID);
 
 		if (!white || !blue)//Judokas exist?
 			return std::string("Judoka not found in database");
@@ -2490,16 +2494,19 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 
 
 
-ZED::CSV Application::Ajax_ListClubs()
+std::string Application::Ajax_ListClubs()
 {
-	ZED::CSV ret;
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
 	for (auto club : m_Database.GetAllClubs())
 	{
 		if (club)
-			ret << club->GetID() << club->GetName();
+			*club >> ret;
 	}
-	ret.AddNewline();
-	return ret;
+
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 
@@ -2509,7 +2516,7 @@ std::string Application::Ajax_ListAgeGroups() const
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
 
-	for (const auto& age_group : GetDatabase().GetAgeGroups())
+	for (const auto age_group : GetDatabase().GetAgeGroups())
 		if (age_group)
 			*age_group >> ret;
 
@@ -2524,10 +2531,7 @@ std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Re
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
 
-	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-	if (id < 0)
-		return Error(Error::Type::InvalidID);
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 	auto table = GetTournament()->FindMatchTable(id);
 
@@ -2537,14 +2541,16 @@ std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Re
 
 	GetTournament()->Lock();
 
-	ZED::CSV ret;
-	for (auto judoka : table->GetParticipants())
-		ret << judoka->GetID() << judoka->GetName();
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
 
+	for (auto judoka : table->GetParticipants())
+		*judoka >> ret;
+
+	ret << YAML::EndSeq;
 	GetTournament()->Unlock();
 	
-	ret.AddNewline();
-	return ret;
+	return ret.c_str();
 }
 
 
@@ -2554,10 +2560,7 @@ std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
 
-	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-	if (id < 0)
-		return Error(Error::Type::InvalidID);
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 	auto table = GetTournament()->FindMatchTable(id);
 
@@ -2567,14 +2570,15 @@ std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request
 
 	GetTournament()->Lock();
 
-	ZED::CSV ret;
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
 	for (auto match : table->GetSchedule())
-		ret << match->ToString();
+		match->ToString(ret);
+	ret << YAML::EndSeq;
 
 	GetTournament()->Unlock();
 
-	ret.AddNewline();
-	return ret;
+	return ret.c_str();
 }
 
 

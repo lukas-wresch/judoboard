@@ -4,6 +4,13 @@
 #include "../ZED/include/csv.h"
 
 
+namespace YAML
+{
+	class Emitter;
+	class Node;
+}
+
+
 
 namespace Judoboard
 {
@@ -19,6 +26,7 @@ namespace Judoboard
 		std::string GetName() const { return m_Name; }
 
 		void operator >> (ZED::CSV& Stream) const;
+		void operator >> (YAML::Emitter& Yaml) const;
 
 	private:
 		std::string m_Name;

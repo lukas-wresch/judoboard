@@ -54,8 +54,12 @@ namespace Judoboard
 		//Match tables
 		//uint32_t GetFreeMatchTableID() const;//Returns an unused/free ID that should be used for the next match table
 		virtual void AddMatchTable(MatchTable* NewMatchTable) {}
+		[[deprecated]]
 		virtual void UpdateMatchTable(uint32_t ID) {}//Calling this function we recalculate the given match table
+		virtual void UpdateMatchTable(const UUID& UUID) {}
+		[[deprecated]]
 		virtual bool DeleteMatchTable(uint32_t ID) { return false; }
+		virtual bool DeleteMatchTable(const UUID& UUID) { return false; }
 		virtual const std::vector<MatchTable*>& GetMatchTables() const {
 			assert(false);
 			static std::vector<MatchTable*> ret;
@@ -68,21 +72,25 @@ namespace Judoboard
 			return ret;
 		}
 
+		[[deprecated]]
 		virtual MatchTable* FindMatchTable(uint32_t ID) { return nullptr; }
+		[[deprecated]]
 		virtual const MatchTable* FindMatchTable(uint32_t ID) const { return nullptr; }
 		virtual MatchTable* FindMatchTable(const UUID& ID) { return nullptr; }
 		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
-		virtual int FindMatchTableIndex(uint32_t ID) const { return -1; }
 
 		//Rule Sets
 		virtual const RuleSet* GetDefaultRuleSet() const { return nullptr; }
 		virtual void SetDefaultRuleSet(RuleSet* NewDefaultRuleSet) {}
+		virtual bool AddRuleSet(RuleSet* NewRuleSet) { return false; }
 		virtual const RuleSet* FindRuleSetByName(const std::string& Name) const { return nullptr; }
 		virtual RuleSet* FindRuleSetByName(const std::string& Name) { return nullptr; }
 		virtual const RuleSet* FindRuleSet(const UUID& UUID) const { return nullptr; }
 		virtual RuleSet* FindRuleSet(const UUID& UUID) { return nullptr; }
 
 		//Age groups
+		virtual bool AddAgeGroup(AgeGroup* NewAgeGroup) { return false; }
+		virtual bool RemoveAgeGroup(const UUID& UUID) { return false; }
 		virtual AgeGroup* FindAgeGroup(const UUID& UUID) { return nullptr; }
 		virtual const AgeGroup* FindAgeGroup(const UUID& UUID) const { return nullptr; }
 		virtual const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) const { return nullptr; }

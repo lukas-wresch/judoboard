@@ -88,7 +88,6 @@ namespace Judoboard
 		virtual MatchTable* FindMatchTable(const UUID& ID) override;
 		virtual const MatchTable* FindMatchTable(const UUID& ID) const override;
 		MatchTable* FindMatchTableByName(const std::string& Name);
-		int FindMatchTableIndex(uint32_t ID) const;
 
 		//Rule Sets
 		virtual const RuleSet* GetDefaultRuleSet() const override { return m_pDefaultRules; }
@@ -96,14 +95,15 @@ namespace Judoboard
 			m_StandingData.AddRuleSet(NewDefaultRuleSet);
 			m_pDefaultRules = NewDefaultRuleSet;
 		}
+		virtual bool AddRuleSet(RuleSet* NewRuleSet) override { return m_StandingData.AddRuleSet(NewRuleSet); }
 		virtual const RuleSet* FindRuleSetByName(const std::string& Name) const override { return m_StandingData.FindRuleSetByName(Name); }
 		virtual RuleSet* FindRuleSetByName(const std::string& Name) override { return m_StandingData.FindRuleSetByName(Name); }
 		virtual const RuleSet* FindRuleSet(const UUID& UUID) const override { return m_StandingData.FindRuleSet(UUID); }
 		virtual RuleSet* FindRuleSet(const UUID& UUID) override { return m_StandingData.FindRuleSet(UUID); }
 
 		//Age groups
-		bool AddAgeGroup(AgeGroup* NewAgeGroup);
-		bool RemoveAgeGroup(UUID& UUID);
+		bool AddAgeGroup(AgeGroup* NewAgeGroup) override;
+		bool RemoveAgeGroup(const UUID& UUID) override;
 		bool AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup);
 		virtual const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) const override {
 			if (!Judoka) return nullptr;

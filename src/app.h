@@ -109,7 +109,7 @@ namespace Judoboard
 
 		//Clubs
 		Error Ajax_AddClub(const HttpServer::Request& Request);
-		ZED::CSV Ajax_ListClubs();
+		std::string Ajax_ListClubs();
 
 		//Rule sets
 
