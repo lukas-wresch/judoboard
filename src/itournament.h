@@ -19,10 +19,9 @@ namespace Judoboard
 		virtual Match* FindMatch(const UUID& UUID) const { return nullptr; }
 		[[nodiscard]]
 		Match* FindMatch(const Match& Match) const { return FindMatch(Match.GetUUID()); }
-		[[nodiscard]]
-		const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
-
-		//void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
+		//[[nodiscard]]
+		//const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
+		virtual const std::string JudokaToJSON() const { return ""; }
 
 		virtual Status GetStatus() const { return Status::Concluded; }
 		virtual bool CanCloseTournament() const { return false; }
@@ -82,6 +81,10 @@ namespace Judoboard
 		virtual RuleSet* FindRuleSetByName(const std::string& Name) { return nullptr; }
 		virtual const RuleSet* FindRuleSet(const UUID& UUID) const { return nullptr; }
 		virtual RuleSet* FindRuleSet(const UUID& UUID) { return nullptr; }
+
+		//Age groups
+		virtual AgeGroup* FindAgeGroup(const UUID& UUID) { return nullptr; }
+		virtual const AgeGroup* FindAgeGroup(const UUID& UUID) const { return nullptr; }
 
 		//Master schedule / schedule entries
 		virtual Schedulable* GetScheduleEntry(uint32_t Index) { return nullptr; }

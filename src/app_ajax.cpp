@@ -1080,7 +1080,7 @@ void Application::SetupHttpServer()
 		bool filter = HttpServer::DecodeURLEncoded(Request.m_Query, "filter") == "true";
 
 		if (filter && GetTournament())
-			return GetTournament()->GetDatabase().JudokaToJSON();
+			return GetTournament()->JudokaToJSON();
 
 		return m_Database.JudokaToJSON();
 	});

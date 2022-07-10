@@ -13,6 +13,7 @@ namespace Judoboard
 	class Tournament;
 	class Match;
 	class RuleSet;
+	class AgeGroup;
 
 
 
@@ -103,6 +104,9 @@ namespace Judoboard
 		const RuleSet& GetRuleSet() const;
 		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
 
+		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
+		void SetAgeGroup(const AgeGroup* NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
+
 		const std::string GetName() const override { return m_Name; }
 		void SetName(const std::string& Name)
 		{
@@ -132,7 +136,9 @@ namespace Judoboard
 		std::vector<Match*>& SetSchedule() { return m_Schedule; }
 
 		std::vector<Judoka*> m_Participants;
-		const RuleSet* m_Rules = nullptr;//Custom rule set for the match (if available)
+		const RuleSet* m_Rules = nullptr;//Custom rule set for the matches (if available)
+
+		const AgeGroup* m_pAgeGroup = nullptr;//Age group for the matches (if available)
 
 		std::string m_Name;
 	};

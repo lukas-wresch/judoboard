@@ -115,79 +115,6 @@ const RuleSet& MatchTable::GetRuleSet() const
 
 
 
-/*int MatchTable::CompareFighterScore(const void* A, const void* B)
-{
-	const Result* a = (Result*)A;
-	const Result* b = (Result*)B;
-
-	if (a->Wins < b->Wins)
-		return 1;
-	if (a->Wins > b->Wins)
-		return -1;
-
-	if (a->Score < b->Score)
-		return 1;
-	if (a->Score > b->Score)
-		return -1;
-
-	//Direct comparision
-	auto matches = a->MatchTable->FindMatches(*a->Judoka, *b->Judoka);
-
-	int a_wins = 0,  b_wins = 0;
-	int a_score = 0, b_score = 0;
-
-	for (auto match : matches)
-	{
-		if (!match->HasConcluded())
-			continue;
-
-		auto result = match->GetMatchResult();
-
-		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetID() == a->Judoka->GetID())
-		{
-			a_wins++;
-			a_score += (int)match->GetMatchResult().m_Score;
-		}
-
-		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetID() == b->Judoka->GetID())
-		{
-			b_wins++;
-			b_score += (int)match->GetMatchResult().m_Score;
-		}
-	}
-
-	if (a_wins < b_wins)
-		return 1;
-	if (a_wins > b_wins)
-		return -1;
-
-	if (a_score < b_score)
-		return 1;
-	if (a_score > b_score)
-		return -1;
-
-	if (a->Time < b->Time)
-		return -1;
-	if (a->Time > b->Time)
-		return 1;
-
-	//This ensures that everything is well-ordered, however if this is necessary a flag is raised!
-	if (a->Judoka->GetID() < b->Judoka->GetID())
-	{
-		a->NotSortable = b->NotSortable = true;
-		return -1;
-	}
-	if (a->Judoka->GetID() > b->Judoka->GetID())
-	{
-		a->NotSortable = b->NotSortable = true;
-		return 1;
-	}
-
-	return 0;
-}*/
-
-
-
 bool MatchTable::Result::operator < (const Result& rhs) const
 {
 	if (Wins < rhs.Wins)
@@ -309,6 +236,9 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : Schedu
 	if (Yaml["rule_set"])
 		m_Rules = Tournament->FindRuleSet(Yaml["rule_set"].as<std::string>());
 
+	if (Yaml["age_group"])
+		m_pAgeGroup = Tournament->FindAgeGroup(Yaml["age_group"].as<std::string>());
+
 	if (Yaml["participants"] && Yaml["participants"].IsSequence())
 	{
 		for (const auto& node : Yaml["participants"])
@@ -353,6 +283,8 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 
 	if (m_Rules)
 		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
+	if (m_pAgeGroup)
+		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)m_pAgeGroup->GetUUID();
 
 	Yaml << YAML::Key << "participants";
 	Yaml << YAML::BeginSeq;
