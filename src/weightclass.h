@@ -45,10 +45,6 @@ namespace Judoboard
 		uint16_t m_MinWeight = 10;
 		uint16_t m_MaxWeight = 100;
 
-		uint16_t m_MinAge = 0;
-		uint16_t m_MaxAge = 100;
-		bool m_AgeEnforced = false;
-
 		Gender m_Gender = Gender::Unknown;
 	};
 }

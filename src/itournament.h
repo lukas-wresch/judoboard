@@ -85,6 +85,7 @@ namespace Judoboard
 		//Age groups
 		virtual AgeGroup* FindAgeGroup(const UUID& UUID) { return nullptr; }
 		virtual const AgeGroup* FindAgeGroup(const UUID& UUID) const { return nullptr; }
+		virtual const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) const { return nullptr; }
 
 		//Master schedule / schedule entries
 		virtual Schedulable* GetScheduleEntry(uint32_t Index) { return nullptr; }

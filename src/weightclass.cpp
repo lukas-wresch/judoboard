@@ -103,6 +103,8 @@ const std::string Weightclass::GetDescription() const
 	std::string name = std::to_string(m_MinWeight) + " - " + std::to_string(m_MaxWeight) + " kg";
 	if (m_Gender != Gender::Unknown)
 		name += (m_Gender == Gender::Male) ? " (m)" : " (f)";
+	if (GetAgeGroup())
+		name += " - " + GetAgeGroup()->GetName();
 	return name;
 }
 
@@ -167,9 +169,20 @@ bool Weightclass::IsElgiable(const Judoka& Fighter) const
 	if (m_MinWeight > Fighter.GetWeight() || Fighter.GetWeight() > m_MaxWeight)
 		return false;
 
-	if (m_AgeEnforced)
-		if (m_MinAge > Fighter.GetAge() || Fighter.GetAge() > m_MaxAge)
+	if (GetAgeGroup())
+	{
+		//Does the judoka belong in this age group?
+		if (!GetAgeGroup()->IsElgiable(Fighter))
 			return false;
+
+		//Check if the judoka is indeed starting for that age group
+		if (GetTournament())
+		{
+			auto age_group_starting_for = GetTournament()->GetAgeGroupOfJudoka(&Fighter);
+			if (!age_group_starting_for || GetAgeGroup()->GetUUID() != age_group_starting_for->GetUUID())
+				return false;
+		}
+	}
 
 	if (m_Gender != Gender::Unknown)//Gender enforced?
 		if (m_Gender != Fighter.GetGender())

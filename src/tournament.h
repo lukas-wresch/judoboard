@@ -105,7 +105,7 @@ namespace Judoboard
 		bool AddAgeGroup(AgeGroup* NewAgeGroup);
 		bool RemoveAgeGroup(UUID& UUID);
 		bool AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup);
-		const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) {
+		virtual const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) const override {
 			if (!Judoka) return nullptr;
 			auto it = m_JudokaToAgeGroup.find(Judoka->GetUUID());
 			if (it != m_JudokaToAgeGroup.end())
