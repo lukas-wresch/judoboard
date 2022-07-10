@@ -987,12 +987,12 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 
 
-void Tournament::UpdateMatchTable(uint32_t ID)
+bool Tournament::UpdateMatchTable(const UUID& UUID)
 {
-	auto matchTable = FindMatchTable(ID);
+	auto matchTable = FindMatchTable(UUID);
 
 	if (!matchTable)
-		return;
+		return false;
 
 	if (matchTable->GetStatus() == Status::Scheduled)//Can safely recalculate the match table
 	{
@@ -1007,13 +1007,15 @@ void Tournament::UpdateMatchTable(uint32_t ID)
 		matchTable->GenerateSchedule();
 		GenerateSchedule();
 	}
+
+	return true;
 }
 
 
 
-bool Tournament::DeleteMatchTable(uint32_t ID)
+bool Tournament::DeleteMatchTable(const UUID& UUID)
 {
-	auto matchTable = FindMatchTable(ID);
+	auto matchTable = FindMatchTable(UUID);
 
 	if (!matchTable)
 		return false;
@@ -1024,7 +1026,7 @@ bool Tournament::DeleteMatchTable(uint32_t ID)
 	//Remove match table
 	for (auto table = m_MatchTables.begin(); table != m_MatchTables.end(); ++table)
 	{
-		if (*table && (*table)->GetID() == ID)
+		if (*table && (*table)->GetUUID() == UUID)
 		{
 			table = m_MatchTables.erase(table);
 			break;
@@ -1034,7 +1036,7 @@ bool Tournament::DeleteMatchTable(uint32_t ID)
 	//Remove the table for the schedule
 	for (auto schedule_entry = m_SchedulePlanner.begin(); schedule_entry != m_SchedulePlanner.end(); ++schedule_entry)
 	{
-		if (*schedule_entry && (*schedule_entry)->GetID() == ID)
+		if (*schedule_entry && (*schedule_entry)->GetUUID() == UUID)
 		{
 			schedule_entry = m_SchedulePlanner.erase(schedule_entry);
 			break;

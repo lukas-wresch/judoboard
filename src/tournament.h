@@ -80,8 +80,8 @@ namespace Judoboard
 		//Match tables
 		uint32_t GetFreeMatchTableID() const;//Returns an unused/free ID that should be used for the next match table
 		void AddMatchTable(MatchTable* NewMatchTable);
-		void UpdateMatchTable(uint32_t ID);//Calling this function we recalculate the given match table
-		bool DeleteMatchTable(uint32_t ID);
+		bool UpdateMatchTable(const UUID& UUID);//Calling this function we recalculate the given match table
+		bool DeleteMatchTable(const UUID& UUID);
 		const std::vector<MatchTable*>& GetMatchTables() const { return m_MatchTables; }
 		virtual MatchTable* FindMatchTable(uint32_t ID) override;
 		virtual const MatchTable* FindMatchTable(uint32_t ID) const override;

@@ -42,8 +42,11 @@ namespace Judoboard
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;
 		//const std::unordered_map<uint32_t, Judoka*>& GetParticipants() const { return m_StandingData.GetAllJudokas(); }
 		virtual bool AddParticipant(Judoka* Judoka) { return false; }
+		[[deprecated]]
 		virtual bool RemoveParticipant(uint32_t ID) { return false; }
+		[[deprecated]]
 		virtual Judoka* FindParticipant(uint32_t ID) { return nullptr; }
+		[[deprecated]]
 		virtual const Judoka* FindParticipant(uint32_t ID) const { return nullptr; }
 		virtual Judoka* FindParticipant(const UUID& UUID) = 0;
 		virtual const Judoka* FindParticipant(const UUID& UUID) const = 0;
@@ -52,13 +55,8 @@ namespace Judoboard
 		virtual bool IsMatUsed(uint32_t ID) const { return false; }
 
 		//Match tables
-		//uint32_t GetFreeMatchTableID() const;//Returns an unused/free ID that should be used for the next match table
 		virtual void AddMatchTable(MatchTable* NewMatchTable) {}
-		[[deprecated]]
-		virtual void UpdateMatchTable(uint32_t ID) {}//Calling this function we recalculate the given match table
-		virtual void UpdateMatchTable(const UUID& UUID) {}
-		[[deprecated]]
-		virtual bool DeleteMatchTable(uint32_t ID) { return false; }
+		virtual bool UpdateMatchTable(const UUID& UUID) { return false; }//Calling this function we recalculate the given match table
 		virtual bool DeleteMatchTable(const UUID& UUID) { return false; }
 		virtual const std::vector<MatchTable*>& GetMatchTables() const {
 			assert(false);

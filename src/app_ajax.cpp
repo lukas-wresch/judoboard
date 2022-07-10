@@ -1625,7 +1625,7 @@ void Application::SetupHttpServer()
 			return std::string("Class is not a weightclass");
 		}
 
-		GetTournament()->UpdateMatchTable(id);
+		assert(GetTournament()->UpdateMatchTable(id));
 		return Error();//OK
 	});
 

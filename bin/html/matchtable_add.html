@@ -102,13 +102,13 @@ function GetForm(callback)
     document.getElementById("male").innerHTML   = lang.male;
     document.getElementById("female").innerHTML = lang.female;
 
-    if (g_yaml && g_yaml["min_weight"])
+    if (g_yaml && typeof g_yaml["min_weight"] !== 'undefined')
       document.getElementById("minWeight").value = g_yaml["min_weight"];
-    if (g_yaml && g_yaml["max_weight"])
+    if (g_yaml && typeof g_yaml["max_weight"] !== 'undefined')
       document.getElementById("maxWeight").value = g_yaml["max_weight"];
-    if (g_yaml && g_yaml["gender"])
+    if (g_yaml && typeof g_yaml["gender"] !== 'undefined')
       document.getElementById("gender").value = g_yaml["gender"];
-
+      
     if (typeof callback !== 'undefined')
       callback();
   });
@@ -333,9 +333,7 @@ var id = URLDecode(URL, "id");
 
 if (id)
 {
-  GetForm(function (){
-    GetMatchTable(id);  
-  });
+  GetMatchTable(id);
  
   document.getElementById("headline").innerHTML = lang.update_matchtable; 
   document.getElementById("add").style.display = "none";
