@@ -1308,7 +1308,7 @@ const std::string Tournament::Participants2String() const
 				num_matches++;
 		}
 
-		ret << id << judoka->GetName() << judoka->GetWeight() << num_matches;
+		ret << (std::string)judoka->GetUUID() << judoka->GetName() << judoka->GetWeight() << num_matches;
 	}
 	Unlock();
 	return ret;
