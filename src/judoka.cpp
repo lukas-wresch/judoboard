@@ -133,18 +133,3 @@ void Judoka::SetWeight(uint32_t NewWeight)
 	if (NewWeight < 1000 * 1000)
 		m_Weight = NewWeight;
 }
-
-
-
-const std::string Judoka::ToString() const
-{
-	ZED::CSV ret;
-	ret << GetID() << m_Firstname << m_Lastname << m_Weight << m_Gender << m_Birthyear;
-
-	if (m_pClub)
-		ret << m_pClub->GetID();
-	else
-		ret << -1;
-
-	return ret;
-}
