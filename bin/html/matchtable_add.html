@@ -210,7 +210,7 @@ function GetMatchTable(id)
     });
         
 
-    if (typeof res["participants"] !== 'undefined')
+    if (typeof res.participants !== 'undefined')
     {
       var table = document.getElementById("participants");
 
@@ -218,7 +218,7 @@ function GetMatchTable(id)
         table.deleteRow(table.rows.length-1);
 
       var no = 0;
-      for (const judoka of res["participants"])
+      for (const judoka of res.participants)
       {
          var row = table.insertRow(-1);
          var cell0 = row.insertCell(0);

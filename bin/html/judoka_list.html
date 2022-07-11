@@ -8,7 +8,7 @@
     <th style="width: 4cm;" id="lastname">Lastname</th>
     <th style="width: 2cm;" id="weight">Weight</th>
     <th style="width: 2cm;" id="gender">Gender</th>
-    <th style="width: 2cm;"></th>
+    <th style="width: 2cm;" id="options">Options</th>
   </tr>
 </table>
 
@@ -19,17 +19,14 @@ function GetJudokaList()
 {
   AjaxCallback("ajax/judoka/list", function(response) {
     console.log(response);
-    var res = response.split(",");
-
-    if (res.length < 4)
-      return;
+    var res = YAML.parse(response);
 
     var table = document.getElementById("list");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    for (var i=0; i < res.length;)
+    for (const judoka of res)
     {
       var row = table.insertRow(-1);
       var cell1 = row.insertCell(0);
@@ -38,23 +35,19 @@ function GetJudokaList()
       var cell4 = row.insertCell(3);
       var cell5 = row.insertCell(4);
 
-      var id = res[i++];
-      cell1.innerHTML = res[i++];
-      cell2.innerHTML = res[i++];
-      cell3.innerHTML = res[i++] + " kg";
-      var gender    = res[i++];
-      var birthyear = res[i++];
-      var clubID    = res[i++];
+      cell1.innerHTML = judoka.firstname;
+      cell2.innerHTML = judoka.lastname;
+      cell3.innerHTML = judoka.weight + " kg";
 
 
-      if (gender == 0)
+      if (judoka.gender == 0)
         cell4.innerHTML = lang.male;
       else
         cell4.innerHTML = lang.female;
       
 
       //cell5.innerHTML = "<a href=\"#judoka_edit.html?id="+id+"\">Edit Judoka</a>";
-      cell5.innerHTML = "<button class=\"white\" style=\"width: 3.3cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"judoka_add.html?id="+id+"\");>Edit Judoka</button>";
+      cell5.innerHTML = "<button class=\"white\" style=\"width: 3.3cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"judoka_add.html?id="+judoka.uuid+"\");>Edit Judoka</button>";
     }
   });
 }

@@ -70,14 +70,15 @@ function AddJudoka()
 function GetJudoka(id)
 {
   AjaxCallback("ajax/judoka/get?id="+id, function(response) {
-    var res = response.split(",");
+    console.log(response);
+    var res = YAML.parse(response);
 
-    document.getElementById("firstname").value = res[1];
-    document.getElementById("lastname").value  = res[2];
-    document.getElementById("weight").value    = res[3];
-    document.getElementById("gender").value    = res[4];
-    var birthyear = res[5];
-    var clubID = res[6];
+    document.getElementById("firstname").value = res.firstname;
+    document.getElementById("lastname").value  = res.lastname;
+    document.getElementById("weight").value    = res.weight;
+    document.getElementById("gender").value    = res.gender;
+    var birthyear = res.birthyear;
+    var clubID    = res.club;
 
 
     AjaxCallback("ajax/club/list", function(response) {
