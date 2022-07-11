@@ -17,9 +17,9 @@ TEST(Ajax, GetMats)
 	yaml = YAML::Load(app.Ajax_GetMats());
 
 	EXPECT_EQ(yaml["highest_mat_id"].as<int>(), 2);
-	EXPECT_EQ(yaml["0"]["type"].as<int>(), (int)Mat::Type::LocalMat);
-	EXPECT_EQ(yaml["0"]["name"].as<std::string>(), "Mat 1");
-	EXPECT_EQ(yaml["0"]["ippon_style"].as<int>(), (int)IMat::IpponStyle::DoubleDigit);
+	EXPECT_EQ(yaml["mats"][0]["type"].as<int>(), (int)Mat::Type::LocalMat);
+	EXPECT_EQ(yaml["mats"][0]["name"].as<std::string>(), "Mat 1");
+	EXPECT_EQ(yaml["mats"][0]["ippon_style"].as<int>(), (int)IMat::IpponStyle::DoubleDigit);
 }
 
 
@@ -37,7 +37,7 @@ TEST(Ajax, OpenMat)
 
 		app.Ajax_OpenMat(HttpServer::Request("id=1"));
 
-		EXPECT_TRUE(app.GetDefaultMat());
+		ASSERT_TRUE(app.GetDefaultMat());
 		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 	}
@@ -55,8 +55,8 @@ TEST(Ajax, OpenMat)
 
 		app.Ajax_OpenMat(HttpServer::Request("id=5"));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 5);
+		ASSERT_TRUE(app.GetDefaultMat());
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 5);
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 	}
 }
