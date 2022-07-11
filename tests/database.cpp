@@ -25,14 +25,14 @@ TEST(Database, JudokaTest)
 		EXPECT_TRUE(d.Save("temp.csv"));
 		EXPECT_TRUE(d.Save("temp2.csv"));
 
-		ASSERT_TRUE(d.DeleteJudoka(j1.GetID()));
-		EXPECT_FALSE(d.DeleteJudoka(j1.GetID()));
+		ASSERT_TRUE(d.DeleteJudoka(j1.GetUUID()));
+		EXPECT_FALSE(d.DeleteJudoka(j1.GetUUID()));
 
 		ASSERT_TRUE(d.FindJudoka(j1.GetID()) == nullptr);
 		EXPECT_TRUE(d.FindJudoka(j2.GetID())->GetWeight() == 60);
 
-		EXPECT_TRUE(d.DeleteJudoka(j2.GetID()));
-		EXPECT_FALSE(d.DeleteJudoka(j2.GetID()));
+		EXPECT_TRUE(d.DeleteJudoka(j2.GetUUID()));
+		EXPECT_FALSE(d.DeleteJudoka(j2.GetUUID()));
 
 		EXPECT_TRUE(d.FindJudoka(j1.GetID()) == nullptr);
 		EXPECT_TRUE(d.FindJudoka(j2.GetID()) == nullptr);

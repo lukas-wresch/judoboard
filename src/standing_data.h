@@ -50,7 +50,7 @@ namespace Judoboard
 		Judoka* FindJudoka_DM4_ExactMatch(const DM4::Participant& NewJudoka);
 		Judoka* FindJudoka_DM4_SameName(const DM4::Participant& NewJudoka);
 
-		bool DeleteJudoka(uint32_t ID);
+		bool DeleteJudoka(const UUID& UUID);
 
 		//Clubs
 		auto& GetAllClubs() const { return m_Clubs; }

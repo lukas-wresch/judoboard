@@ -193,11 +193,11 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 
 
 
-bool StandingData::DeleteJudoka(uint32_t ID)
+bool StandingData::DeleteJudoka(const UUID& UUID)
 {
 	for (auto it = m_Judokas.begin(); it != m_Judokas.end(); ++it)
 	{
-		if (it->first == ID)
+		if (it->second && it->second->GetUUID() == UUID)
 		{
 			m_Judokas.erase(it);
 			return true;

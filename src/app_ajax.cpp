@@ -1190,16 +1190,14 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto judoka = m_Database.FindJudoka(id);
 
 		if (!judoka)
 			return std::string("Judoka not found");
 
-		if (!m_Database.DeleteJudoka(judoka->GetID()))
+		if (!m_Database.DeleteJudoka(judoka->GetUUID()))
 			return std::string("Failed to delete");
 
 		return Error();//OK
@@ -1260,10 +1258,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		if (GetTournament() && GetTournament()->RemoveParticipant(id))
 			return Error();//OK

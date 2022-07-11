@@ -42,8 +42,7 @@ namespace Judoboard
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;
 		//const std::unordered_map<uint32_t, Judoka*>& GetParticipants() const { return m_StandingData.GetAllJudokas(); }
 		virtual bool AddParticipant(Judoka* Judoka) { return false; }
-		[[deprecated]]
-		virtual bool RemoveParticipant(uint32_t ID) { return false; }
+		virtual bool RemoveParticipant(const UUID& ID) { return false; }
 		[[deprecated]]
 		virtual Judoka* FindParticipant(uint32_t ID) { return nullptr; }
 		[[deprecated]]

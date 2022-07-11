@@ -833,14 +833,14 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 
 
 
-bool Tournament::RemoveParticipant(uint32_t ID)
+bool Tournament::RemoveParticipant(const UUID& UUID)
 {
-	const Judoka* deleted_judoka = m_StandingData.FindJudoka(ID);
+	const Judoka* deleted_judoka = m_StandingData.FindJudoka(UUID);
 
 	if (!deleted_judoka)
 		return false;
 
-	m_StandingData.DeleteJudoka(ID);
+	m_StandingData.DeleteJudoka(UUID);
 
 	for (auto table : m_MatchTables)
 	{
