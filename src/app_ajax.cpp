@@ -1802,6 +1802,7 @@ void Application::SetupHttpServer()
 			ret << YAML::Key << "default" << YAML::Value << (std::string)GetTournament()->GetDefaultRuleSet()->GetUUID();
 
 		ret << YAML::Key << "rules" << YAML::Value;
+		ret << YAML::BeginSeq;
 
 		for (auto rule : rules)
 		{
@@ -1815,6 +1816,8 @@ void Application::SetupHttpServer()
 				ret << YAML::EndMap;
 			}
 		}
+
+		ret << YAML::EndSeq;
 		ret << YAML::EndMap;
 
 		return ret.c_str();
@@ -2365,10 +2368,11 @@ std::string Application::Ajax_GetMats() const
 	if (GetTournament())
 	{//Show all mats that are available/used and an additional one
 		auto max = std::max(GetHighestMatID(), GetTournament()->GetHighestMatIDUsed()) + 1;
-		ret << max;
 
+		ret << YAML::BeginMap;
 		ret << YAML::Key << "highest_mat_id" << YAML::Value << max;
 
+		ret << YAML::Key << "mats" << YAML::Value;
 		ret << YAML::BeginSeq;
 
 		for (uint32_t id = 1; id <= max; id++)
@@ -2380,16 +2384,16 @@ std::string Application::Ajax_GetMats() const
 				std::string mat_name = Localizer::Translate("Mat") + " " + std::to_string(id);
 				//ret << id << IMat::Type::Unknown << false << mat_name << 0 << 0 << false;
 
-				ret << YAML::Key << id;
 				ret << YAML::BeginMap;
+				ret << YAML::Key << "id"   << YAML::Value << id;
 				ret << YAML::Key << "name" << YAML::Value << mat_name;
 				ret << YAML::EndMap;
 			}
 			else
 			{
 				//ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponStyle() << mat->GetTimerStyle() << mat->IsFullscreen();
-				ret << YAML::Key << id;
 				ret << YAML::BeginMap;
+				ret << YAML::Key << "id"      << YAML::Value << id;
 				ret << YAML::Key << "name"    << YAML::Value << mat->GetName();
 				ret << YAML::Key << "type"    << YAML::Value << (int)mat->GetType();
 				ret << YAML::Key << "is_open" << YAML::Value << mat->IsOpen();
@@ -2401,6 +2405,7 @@ std::string Application::Ajax_GetMats() const
 		}
 
 		ret << YAML::EndSeq;
+		ret << YAML::EndMap;
 	}
 
 	return ret.c_str();

@@ -390,3 +390,4 @@ FodyWeavers.xsd
 /bin/Judoboard_Debug.exe
 *.wav
 *.yml
+*.md5
