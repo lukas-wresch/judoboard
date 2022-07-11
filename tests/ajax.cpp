@@ -8,30 +8,18 @@ TEST(Ajax, GetMats)
 
 	Application app;
 
-	auto csv = app.Ajax_GetMats();
+	auto yaml = YAML::Load(app.Ajax_GetMats());
 
-	//csv
-	int highestID, id, type;
-	std::string name;
-	bool isOpen;
-	int style;
-
-	csv >> highestID;
-
-	EXPECT_TRUE(highestID == 1);
+	EXPECT_TRUE(yaml["highest_mat_id"].as<int>() == 1);
 
 	app.StartLocalMat(1);
 
-	auto csv2 = app.Ajax_GetMats();
+	yaml = YAML::Load(app.Ajax_GetMats());
 
-	//csv
-	csv2 >> highestID >> id >> type >> isOpen >> name >> style;
-
-	EXPECT_TRUE(highestID == 2);
-	EXPECT_TRUE(id == 1);
-	EXPECT_TRUE(type == (int)Mat::Type::LocalMat);
-	EXPECT_TRUE(name == "Mat 1");
-	EXPECT_TRUE(style == (int)IMat::IpponStyle::DoubleDigit);
+	EXPECT_EQ(yaml["highest_mat_id"].as<int>(), 2);
+	EXPECT_EQ(yaml["0"]["type"].as<int>(), (int)Mat::Type::LocalMat);
+	EXPECT_EQ(yaml["0"]["name"].as<std::string>(), "Mat 1");
+	EXPECT_EQ(yaml["0"]["ippon_style"].as<int>(), (int)IMat::IpponStyle::DoubleDigit);
 }
 
 
@@ -50,7 +38,7 @@ TEST(Ajax, OpenMat)
 		app.Ajax_OpenMat(HttpServer::Request("id=1"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 	}
 

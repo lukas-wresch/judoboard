@@ -7,7 +7,6 @@
 #include "imat.h"
 #include "error.h"
 #include "HttpServer/HttpServer.h"
-#include "../ZED/include/csv.h"
 
 
 
@@ -92,7 +91,7 @@ namespace Judoboard
 		Error Ajax_UpdatePassword(Account* Account, const HttpServer::Request& Request);
 
 		//Mat
-		ZED::CSV Ajax_GetMats() const;
+		std::string Ajax_GetMats() const;
 		Error Ajax_OpenMat(  const HttpServer::Request& Request);
 		Error Ajax_CloseMat( const HttpServer::Request& Request);
 		Error Ajax_UpdateMat(const HttpServer::Request& Request);

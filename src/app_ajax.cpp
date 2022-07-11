@@ -6,7 +6,6 @@
 #include "remote_mat.h"
 #include "tournament.h"
 #include "../ZED/include/log.h"
-#include "../ZED/include/csv.h"
 #include "../ZED/include/http_client.h"
 
 
@@ -93,7 +92,7 @@ void Application::SetupHttpServer()
 		}
 
 		return Error(Error::Type::InvalidFormat);
-		});
+	});
 
 	m_Server.RegisterResource("/upload/md5", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -2349,14 +2348,18 @@ Error Application::Ajax_UpdatePassword(Account* Account, const HttpServer::Reque
 
 
 
-ZED::CSV Application::Ajax_GetMats() const
+std::string Application::Ajax_GetMats() const
 {
-	ZED::CSV ret;
+	YAML::Emitter ret;
 
 	if (GetTournament())
 	{//Show all mats that are available/used and an additional one
 		auto max = std::max(GetHighestMatID(), GetTournament()->GetHighestMatIDUsed()) + 1;
 		ret << max;
+
+		ret << YAML::Key << "highest_mat_id" << YAML::Value << max;
+
+		ret << YAML::BeginSeq;
 
 		for (uint32_t id = 1; id <= max; id++)
 		{
@@ -2365,15 +2368,32 @@ ZED::CSV Application::Ajax_GetMats() const
 			if (!mat)
 			{
 				std::string mat_name = Localizer::Translate("Mat") + " " + std::to_string(id);
-				ret << id << IMat::Type::Unknown << false << mat_name << 0 << 0 << false;
+				//ret << id << IMat::Type::Unknown << false << mat_name << 0 << 0 << false;
+
+				ret << YAML::Key << id;
+				ret << YAML::BeginMap;
+				ret << YAML::Key << "name" << YAML::Value << mat_name;
+				ret << YAML::EndMap;
 			}
 			else
-				ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponStyle() << mat->GetTimerStyle() << mat->IsFullscreen();
+			{
+				//ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponStyle() << mat->GetTimerStyle() << mat->IsFullscreen();
+				ret << YAML::Key << id;
+				ret << YAML::BeginMap;
+				ret << YAML::Key << "name"    << YAML::Value << mat->GetName();
+				ret << YAML::Key << "type"    << YAML::Value << (int)mat->GetType();
+				ret << YAML::Key << "is_open" << YAML::Value << mat->IsOpen();
+				ret << YAML::Key << "ippon_style"   << YAML::Value << (int)mat->GetIpponStyle();
+				ret << YAML::Key << "timer_style"   << YAML::Value << (int)mat->GetTimerStyle();
+				ret << YAML::Key << "is_fullscreen" << YAML::Value << mat->IsFullscreen();
+				ret << YAML::EndMap;
+			}
 		}
+
+		ret << YAML::EndSeq;
 	}
 
-	ret.AddNewline();
-	return ret;
+	return ret.c_str();
 }
 
 
