@@ -210,7 +210,7 @@ function GetMatchTable(id)
     });
         
 
-    if (res["participants"])
+    if (typeof res["participants"] !== 'undefined')
     {
       var table = document.getElementById("participants");
 

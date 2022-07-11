@@ -493,28 +493,20 @@ function GetColors(callback)
 function GetMats(callback)
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
-    var res = response.split(",");
+    var res = YAML.parse(response);
 
     if (res.length < 2)
       return;
 
-    var mat = document.getElementById("mat");
-    var maxID = res[0];
+    var ui_mats = document.getElementById("mat");
 
-    for (var i=1; i < res.length;)
+    for (const mat of res.mats)
     {
-      var matID   = res[i++];
-      var type    = res[i++];
-      var is_open = res[i++];
-      var name    = res[i++];
-      var showIpponAsTwoWazaari = res[i++];
-      var timerStyle = res[i++];
-      var fullscreen = res[i++];
-
       var option = document.createElement("option");
-      option.text  = name;
-      option.value = matID;
-      mat.add(option);
+      option.text  = mat.name;
+      option.value = mat.id;
+
+      ui_mats.add(option);
     }
 
     if (typeof callback !== 'undefined')

@@ -63,6 +63,7 @@ bool Application::LoadDataFromDisk()
 
 	ZED::Core::Indexer([this](auto Filename) {
 		Filename = Filename.substr(Filename.find_last_of(ZED::Core::Separator) + 1);
+		Filename = Filename.substr(0, Filename.length() - 4);//Remove .yml
 		AddTournament(new Tournament(Filename));
 		return true;
 		}, "tournaments");

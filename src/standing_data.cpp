@@ -217,7 +217,7 @@ const std::string StandingData::JudokaToJSON() const
 	{
 		if (ret.length() > 1)
 			ret += ",";
-		ret += "{\"label\":\"" + judoka->GetName() + " (" + std::to_string(judoka->GetWeight()) +" kg)\", \"value\":\"" + std::to_string(id) + "\"}";
+		ret += "{\"label\":\"" + judoka->GetName() + " (" + std::to_string(judoka->GetWeight()) +" kg)\", \"value\":\"" + (std::string)judoka->GetUUID() + "\"}";
 	}
 
 	ret += "]";

@@ -792,6 +792,8 @@ std::vector<const Match*> Tournament::GetNextMatches(uint32_t MatID) const
 {
 	std::vector<const Match*> ret;
 
+	Lock();
+
 	uint32_t id = 0;
 	for (int i = 0; i < 5; i++)
 	{
@@ -801,6 +803,7 @@ std::vector<const Match*> Tournament::GetNextMatches(uint32_t MatID) const
 			ret.push_back(nextMatch);
 	}
 
+	Unlock();
 	return ret;
 }
 
