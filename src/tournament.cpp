@@ -788,9 +788,9 @@ bool Tournament::MoveMatchDown(uint32_t MatchID)
 
 
 
-std::vector<const Match*> Tournament::GetNextMatches(uint32_t MatID) const
+std::vector<Match> Tournament::GetNextMatches(uint32_t MatID) const
 {
-	std::vector<const Match*> ret;
+	std::vector<Match> ret;
 
 	Lock();
 
@@ -800,7 +800,7 @@ std::vector<const Match*> Tournament::GetNextMatches(uint32_t MatID) const
 		auto nextMatch = GetNextMatch(MatID, id);
 
 		if (nextMatch)
-			ret.push_back(nextMatch);
+			ret.push_back(*nextMatch);
 	}
 
 	Unlock();
@@ -1363,7 +1363,7 @@ const std::string Tournament::MasterSchedule2String() const
 
 			ret << max << entries.size();
 			for (auto [index, entry] : entries)
-				ret << entry->IsEditable() << index << entry->GetID() << entry->GetColor().ToHexString() << entry->GetMatID() << entry->GetName();
+				ret << entry->IsEditable() << index << entry->GetUUID() << entry->GetColor().ToHexString() << entry->GetMatID() << entry->GetName();
 		}
 	}
 
@@ -1429,6 +1429,8 @@ void Tournament::GenerateSchedule()
 	if (GetStatus() != Status::Scheduled)
 		return;
 
+	Lock();
+
 	for (auto match : m_Schedule)
 		delete match;
 	m_Schedule.clear();
@@ -1479,6 +1481,8 @@ void Tournament::GenerateSchedule()
 				break;
 		}
 	}
+
+	Unlock();
 
 	assert(Save());
 }

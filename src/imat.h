@@ -111,7 +111,7 @@ namespace Judoboard
 		virtual bool AreFightersOnMat() const = 0;
 
 		virtual const Match* GetMatch() const { return nullptr; }
-		virtual const std::vector<const Match*> GetNextMatches() const { return m_NextMatches; }
+		virtual const std::vector<Match> GetNextMatches() const { return m_NextMatches; }
 
 		virtual bool CanNextMatchStart() const = 0;
 		virtual bool StartMatch(Match* NewMatch) = 0;//Creates a new match. Both judoka are copied to the mat. Returns false when a match is still progressing and hence a new match can not be started
@@ -190,7 +190,7 @@ namespace Judoboard
 		virtual void SetTimerStyle(TimerStyle NewStyle) { m_TimerStyle = NewStyle; }
 		virtual void SetIsFullscreen(bool Enabled) { m_IsFullscreen = Enabled; }
 
-		std::vector<const Match*> m_NextMatches;
+		std::vector<Match> m_NextMatches;
 
 	private:
 		std::string m_Name;

@@ -14,10 +14,10 @@ RemoteTournament::RemoteTournament(const std::string& Host, uint16_t Port) : m_H
 
 
 
-std::vector<const Match*> RemoteTournament::GetNextMatches(uint32_t MatID) const
+std::vector<Match> RemoteTournament::GetNextMatches(uint32_t MatID) const
 {
 	ZED::Log::Error("NOT IMPLEMENTED");
-	std::vector<const Match*> ret;
+	std::vector<Match> ret;
 	return ret;
 }
 

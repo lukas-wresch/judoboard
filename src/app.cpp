@@ -316,11 +316,11 @@ bool Application::StartLocalMat(uint32_t ID)
 
 
 
-std::vector<const Match*> Application::GetNextMatches(uint32_t MatID) const
+std::vector<Match> Application::GetNextMatches(uint32_t MatID) const
 {
 	if (!GetTournament())
 	{
-		std::vector<const Match*> empty;
+		std::vector<Match> empty;
 		return empty;
 	}
 	return GetTournament()->GetNextMatches(MatID);

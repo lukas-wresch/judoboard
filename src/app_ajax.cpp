@@ -283,9 +283,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = (HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		GetTournament()->MoveScheduleEntryUp(id);
 		return Error();//OK
@@ -300,9 +298,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		GetTournament()->MoveScheduleEntryDown(id);
 		return Error();//OK
@@ -395,9 +391,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return std::string();
+		UUID id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		GetTournament()->MoveMatchUp(id);
 
@@ -412,9 +406,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return std::string();
+		UUID id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		GetTournament()->MoveMatchDown(id);
 
@@ -1062,8 +1054,8 @@ void Application::SetupHttpServer()
 		auto nextMatches = mat->GetNextMatches();
 		for (auto match : nextMatches)
 		{
-			if (match && match->GetFighter(Fighter::White) && match->GetFighter(Fighter::Blue))
-				ret << match->GetFighter(Fighter::White)->GetName() << match->GetFighter(Fighter::Blue)->GetName();
+			if (match.GetFighter(Fighter::White) && match.GetFighter(Fighter::Blue))
+				ret << match.GetFighter(Fighter::White)->GetName() << match.GetFighter(Fighter::Blue)->GetName();
 		}
 
 		return ret;

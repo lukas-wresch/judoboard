@@ -32,7 +32,7 @@ namespace Judoboard
 		virtual Match* GetNextMatch(int32_t MatID = -1) const { return nullptr; }//Returns the next match for a given mat if available, otherwise null pointer is returned
 		//const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 
-		virtual std::vector<const Match*> GetNextMatches(uint32_t MatID) const = 0;
+		virtual std::vector<Match> GetNextMatches(uint32_t MatID) const = 0;
 
 		virtual bool DeleteMatch(uint32_t MatchID) { return false; }
 		virtual bool MoveMatchUp(uint32_t MatchID) { return false; }
