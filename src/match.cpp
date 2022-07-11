@@ -186,10 +186,10 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 
 bool Match::Contains(const Judoka& Judoka) const
 {
-	if (m_White.m_Judoka && m_White.m_Judoka->GetID() == Judoka.GetID())
+	if (m_White.m_Judoka && m_White.m_Judoka->GetUUID() == Judoka.GetUUID())
 		return true;
 
-	if (m_Blue.m_Judoka  && m_Blue.m_Judoka->GetID()  == Judoka.GetID())
+	if (m_Blue.m_Judoka  && m_Blue.m_Judoka->GetUUID()  == Judoka.GetUUID())
 		return true;
 
 	return false;
@@ -199,7 +199,7 @@ bool Match::Contains(const Judoka& Judoka) const
 
 Fighter Match::GetColorOfFighter(const Judoka& Judoka) const
 {
-	if (m_White.m_Judoka && m_White.m_Judoka->GetID() == Judoka.GetID())
+	if (m_White.m_Judoka && m_White.m_Judoka->GetUUID() == Judoka.GetUUID())
 		return Fighter::White;
 	return Fighter::Blue;
 }
@@ -208,10 +208,10 @@ Fighter Match::GetColorOfFighter(const Judoka& Judoka) const
 
 const Judoka* Match::GetEnemyOf(const Judoka& Judoka) const
 {
-	if (m_White.m_Judoka && m_White.m_Judoka->GetID() == Judoka.GetID())
+	if (m_White.m_Judoka && m_White.m_Judoka->GetUUID() == Judoka.GetUUID())
 		return m_Blue.m_Judoka;
 
-	if (m_Blue.m_Judoka  && m_Blue.m_Judoka->GetID()  == Judoka.GetID())
+	if (m_Blue.m_Judoka  && m_Blue.m_Judoka->GetUUID()  == Judoka.GetUUID())
 		return m_White.m_Judoka;
 
 	return nullptr;

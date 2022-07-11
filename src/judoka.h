@@ -63,7 +63,7 @@ namespace Judoboard
 		void operator >> (ZED::CSV& Stream) const;
 		void operator >> (YAML::Emitter& Yaml) const;
 
-		bool operator ==(const Judoka& cmp) const { return GetID() == cmp.GetID(); }
+		bool operator ==(const Judoka& cmp) const { return GetUUID() == cmp.GetUUID(); }
 
 	private:
 		Judoka() = default;//Create empty judoka (for class Mat)

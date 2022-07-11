@@ -376,7 +376,6 @@ TEST(Tournament, HasDefaultRuleSet2)
 
 	ASSERT_TRUE(t.GetDefaultRuleSet());
 	ASSERT_TRUE(d.FindRuleSetByName("Default"));
-	EXPECT_NE(t.GetDefaultRuleSet()->GetID(),   d.FindRuleSetByName("Default")->GetID());
 	EXPECT_EQ(t.GetDefaultRuleSet()->GetUUID(), d.FindRuleSetByName("Default")->GetUUID());
 
 	EXPECT_EQ(t.GetDefaultRuleSet()->GetMatchTime(),         60);
@@ -446,7 +445,6 @@ TEST(Tournament, SaveAndLoad)
 		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
 		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
 
-		EXPECT_NE(j1.GetID(),   j2.GetID());
 		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
 
 		d.AddJudoka(&j1);
@@ -507,7 +505,6 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
 		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
 
-		EXPECT_NE(j1.GetID(), j2.GetID());
 		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
 
 		d.AddJudoka(&j1);

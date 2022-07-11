@@ -39,7 +39,7 @@ void StandingData::operator << (ZED::CSV& Stream)
 	for (uint32_t i = 0; i < judokaCount; i++)
 	{
 		Judoka* newJudoka = new Judoka(Stream);
-		m_Judokas.insert({ newJudoka->GetID(), newJudoka });
+		m_Judokas.insert({ (std::string)newJudoka->GetUUID(), newJudoka });
 	}
 
 	uint32_t ruleSetsCount = 0;
@@ -68,7 +68,7 @@ void StandingData::operator << (YAML::Node& Yaml)
 		for (const auto& node : Yaml["judoka"])
 		{
 			Judoka* newJudoka = new Judoka(node);
-			m_Judokas.insert({ newJudoka->GetID(), newJudoka });
+			m_Judokas.insert({ (std::string)newJudoka->GetUUID(), newJudoka });
 		}
 	}
 
@@ -187,7 +187,7 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 	if (!NewJudoka)
 		return false;
 
-	m_Judokas.insert({ NewJudoka->GetID(), NewJudoka });
+	m_Judokas.insert({ (std::string)NewJudoka->GetUUID(), NewJudoka });
 	return true;
 }
 
@@ -259,28 +259,6 @@ bool StandingData::AddClub(Club* NewClub)
 
 	m_Clubs.emplace_back(NewClub);
 	return true;
-}
-
-
-
-Club* StandingData::FindClub(uint32_t ID)
-{
-	for (auto club : m_Clubs)
-		if (club && club->GetID() == ID)
-			return club;
-
-	return nullptr;
-}
-
-
-
-const Club* StandingData::FindClub(uint32_t ID) const
-{
-	for (auto club : m_Clubs)
-		if (club && club->GetID() == ID)
-			return club;
-
-	return nullptr;
 }
 
 
@@ -373,28 +351,6 @@ const RuleSet* StandingData::FindRuleSet(const UUID& UUID) const
 
 
 
-RuleSet* StandingData::FindRuleSet(uint32_t ID)
-{
-	for (auto rule : m_RuleSets)
-		if (rule && rule->GetID() == ID)
-			return rule;
-
-	return nullptr;
-}
-
-
-
-const RuleSet* StandingData::FindRuleSet(uint32_t ID) const
-{
-	for (auto rule : m_RuleSets)
-		if (rule && rule->GetID() == ID)
-			return rule;
-
-	return nullptr;
-}
-
-
-
 bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
 {
 	if (!NewRuleSet || FindRuleSet(NewRuleSet->GetUUID()))
@@ -450,28 +406,6 @@ const AgeGroup* StandingData::FindAgeGroup(const UUID& UUID) const
 
 
 
-AgeGroup* StandingData::FindAgeGroup(uint32_t ID)
-{
-	for (auto age_group : m_AgeGroups)
-		if (age_group && age_group->GetID() == ID)
-			return age_group;
-
-	return nullptr;
-}
-
-
-
-const AgeGroup* StandingData::FindAgeGroup(uint32_t ID) const
-{
-	for (auto age_group : m_AgeGroups)
-		if (age_group && age_group->GetID() == ID)
-			return age_group;
-
-	return nullptr;
-}
-
-
-
 bool StandingData::AddAgeGroup(AgeGroup* NewAgeGroup)
 {
 	if (!NewAgeGroup || FindAgeGroup(NewAgeGroup->GetUUID()))
@@ -495,28 +429,6 @@ bool StandingData::RemoveAgeGroup(const UUID& UUID)
 	}
 
 	return false;
-}
-
-
-
-Judoka* StandingData::FindJudoka(uint32_t ID)
-{
-	auto item = m_Judokas.find(ID);
-	if (item == m_Judokas.end())
-		return nullptr;
-
-	return item->second;
-}
-
-
-
-const Judoka* StandingData::FindJudoka(uint32_t ID) const
-{
-	auto item = m_Judokas.find(ID);
-	if (item == m_Judokas.end())
-		return nullptr;
-
-	return item->second;
 }
 
 

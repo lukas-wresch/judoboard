@@ -283,7 +283,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		UUID id = (HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		GetTournament()->MoveScheduleEntryUp(id);
 		return Error();//OK
@@ -298,7 +298,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		UUID id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		GetTournament()->MoveScheduleEntryDown(id);
 		return Error();//OK
@@ -313,9 +313,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
 		auto match = GetTournament()->FindMatch(id);
@@ -335,18 +333,16 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "index"));
-		int mat   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
+		UUID id  = HttpServer::DecodeURLEncoded(Request.m_Query, "index");
+		int  mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
 
-		if (index < 0)
-			return Error(Error::Type::InvalidID);
 		if (mat <= 0)
 			return std::string("Invalid mat id");
 
 		if (GetTournament()->GetStatus() == Status::Concluded)
 			return std::string("Tournament is already finalized");
 
-		auto entry = GetTournament()->GetScheduleEntry(index);
+		auto entry = GetTournament()->GetScheduleEntry(id);
 
 		if (!entry)
 			return Error(Error::Type::ItemNotFound);
@@ -364,11 +360,8 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		auto rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
-
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
 
 		auto match = GetTournament()->FindMatch(id);
 		auto ruleSet = m_Database.FindRuleSetByName(rule);
@@ -380,7 +373,7 @@ void Application::SetupHttpServer()
 
 		match->SetRuleSet(ruleSet);
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/match/move_up", [this](auto& Request) -> std::string {
@@ -391,7 +384,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		UUID id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		GetTournament()->MoveMatchUp(id);
 
@@ -406,7 +399,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		UUID id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		GetTournament()->MoveMatchDown(id);
 
@@ -421,11 +414,9 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return std::string();
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		bool success = GetTournament()->DeleteMatch(id);
+		bool success = GetTournament()->RemoveMatch(id);
 
 		return std::string();
 		});
@@ -438,9 +429,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return std::string();
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto match = GetTournament()->FindMatch(id);
 
@@ -1624,7 +1613,7 @@ void Application::SetupHttpServer()
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		GetTournament()->Lock();
-		bool ret = GetTournament()->DeleteMatchTable(id);
+		bool ret = GetTournament()->RemoveMatchTable(id);
 		GetTournament()->Unlock();
 
 		if (!ret)
@@ -1835,9 +1824,9 @@ void Application::SetupHttpServer()
 			return error;
 
 		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-		auto rule_id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "rules"));
+		UUID rule_id = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
 
-		if (FindTournament(name))
+		if (FindTournamentByName(name))
 			return std::string("There is already a tournament with that name");
 
 		auto rules = m_Database.FindRuleSet(rule_id);
@@ -1859,10 +1848,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return std::string("Invalid tournament id");
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto tournament = FindTournament(id);
 		if (!tournament)
@@ -1872,7 +1858,7 @@ void Application::SetupHttpServer()
 		ret << tournament->GetName() << tournament->GetParticipants().size();
 		ret << tournament->GetSchedule().size() << tournament->GetStatus();
 		if (tournament->GetDefaultRuleSet())
-			ret << tournament->GetDefaultRuleSet()->GetID();
+			ret << (std::string)tournament->GetDefaultRuleSet()->GetUUID();
 		else
 			ret << -1;
 		return ret;
@@ -1883,10 +1869,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return std::string("Invalid tournament id");
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		if (!OpenTournament(id))
 			return std::string("Could not open tournament");
@@ -1913,10 +1896,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto tournament = FindTournament(id);
 		if (!tournament)
@@ -1931,10 +1911,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		if (!DeleteTournament(id))
 			return Error(Error::Type::OperationFailed);
@@ -1947,10 +1924,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto tournament = FindTournament(id);
 		if (!tournament)
@@ -1965,10 +1939,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto tournament = FindTournament(id);
 		if (!tournament)
@@ -1993,9 +1964,9 @@ void Application::SetupHttpServer()
 		{
 			if (tournament)//Filter out temporary tournament
 			{
-				ret << tournament->GetID() << tournament->GetName() << tournament->GetParticipants().size() << tournament->GetSchedule().size() << tournament->GetStatus();
+				ret << (std::string)tournament->GetUUID() << tournament->GetName() << tournament->GetParticipants().size() << tournament->GetSchedule().size() << tournament->GetStatus();
 				//Is the tournament open?
-				ret << (m_CurrentTournament && tournament->GetID() == m_CurrentTournament->GetID());
+				ret << (m_CurrentTournament && tournament->GetUUID() == m_CurrentTournament->GetUUID());
 			}
 		}
 

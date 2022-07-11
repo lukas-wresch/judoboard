@@ -49,7 +49,7 @@ namespace Judoboard
 		static const UUID GenerateUUID();
 		static void Reset();
 
-		uint32_t GetID() const { return m_ID; }
+		//uint32_t GetID() const { return m_ID; }
 		const UUID& GetUUID() const { return m_UUID; }
 
 		operator const UUID& () const { return m_UUID; }

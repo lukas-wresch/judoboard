@@ -52,12 +52,12 @@ TEST(App, Tournaments)
 	EXPECT_EQ(app.GetTournamentList().size(), 1);
 	EXPECT_EQ((*app.GetTournamentList().begin())->GetName(), t->GetName());
 
-	EXPECT_TRUE(app.OpenTournament(t->GetID()));
+	EXPECT_TRUE(app.OpenTournament(t->GetUUID()));
 	ASSERT_TRUE(app.GetTournament());
 	EXPECT_EQ(app.GetTournament()->GetName(), t->GetName());
 	EXPECT_TRUE(app.CloseTournament());
 
-	EXPECT_EQ(app.FindTournament("Tournament Name")->GetName(), t->GetName());
+	EXPECT_EQ(app.FindTournamentByName("Tournament Name")->GetName(), t->GetName());
 }
 
 
@@ -125,8 +125,8 @@ TEST(App, FullTournament)
 	tourney->EnableAutoSave(false);
 	EXPECT_TRUE(app.AddTournament(tourney));
 
-	ASSERT_TRUE(app.FindTournament(tournament_name));
-	EXPECT_TRUE(app.OpenTournament(app.FindTournament(tournament_name)->GetID()));
+	ASSERT_TRUE(app.FindTournamentByName(tournament_name));
+	EXPECT_TRUE(app.OpenTournament(app.FindTournamentByName(tournament_name)->GetUUID()));
 
 	tourney->AddParticipant(&j1);
 	tourney->AddParticipant(&j2);

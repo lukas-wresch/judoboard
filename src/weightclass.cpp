@@ -282,7 +282,7 @@ std::vector<MatchTable::Result> Weightclass::CalculateResults() const
 			if (!enemy)
 				continue;
 
-			if (fighter->GetID() == enemy->GetID())
+			if (fighter->GetUUID() == enemy->GetUUID())
 				continue;
 
 			auto matches = FindMatches(*fighter, *enemy);//Find all matches of these two
@@ -294,7 +294,7 @@ std::vector<MatchTable::Result> Weightclass::CalculateResults() const
 
 				const auto& result = matches[0]->GetMatchResult();
 
-				if (matches[0]->GetWinningJudoka()->GetID() == fighter->GetID())
+				if (matches[0]->GetWinningJudoka()->GetUUID() == fighter->GetUUID())
 				{
 					ret[i].Wins++;
 					ret[i].Score += (uint32_t)result.m_Score;
@@ -355,18 +355,18 @@ const std::string Weightclass::ToHTML() const
 			else
 			{
 				if (matches[0]->IsRunning())
-					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">In Progress</a></td>";
+					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">In Progress</a></td>";
 				else if (!matches[0]->HasConcluded())
-					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">- - -</a></td>";
-				else if (matches[0]->GetWinningJudoka()->GetID() == fighter->GetID())
+					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">- - -</a></td>";
+				else if (matches[0]->GetWinningJudoka()->GetUUID() == fighter->GetUUID())
 				{
 					const auto& result = matches[0]->GetMatchResult();
-					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
+					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
 				}
 				else
 				{
 					const auto& result = matches[0]->GetMatchResult();
-					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">0 (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
+					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">0 (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
 				}
 			}
 		}

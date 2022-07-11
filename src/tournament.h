@@ -57,20 +57,18 @@ namespace Judoboard
 		Match* GetNextMatch(int32_t MatID = -1) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 		const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 
-		bool DeleteMatch(uint32_t MatchID);
-		bool MoveMatchUp(uint32_t MatchID);
-		bool MoveMatchDown(uint32_t MatchID);
+		bool RemoveMatch(const UUID& MatchID);
+		bool MoveMatchUp(const UUID&  MatchID);
+		bool MoveMatchDown(const UUID&  MatchID);
 
 		std::vector<Match> GetNextMatches(uint32_t MatID) const;
 
 		//Participant / Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const override { return m_StandingData.FindJudoka(Judoka.GetUUID()); }
-		const std::unordered_map<uint32_t, Judoka*>& GetParticipants() const { return m_StandingData.GetAllJudokas(); }
+		const std::unordered_map<std::string, Judoka*>& GetParticipants() const { return m_StandingData.GetAllJudokas(); }
 		virtual bool AddParticipant(Judoka* Judoka) override;
 		virtual bool RemoveParticipant(const UUID& UUID) override;
 
-		virtual       Judoka* FindParticipant(uint32_t ID)            override { return m_StandingData.FindJudoka(ID); }
-		virtual const Judoka* FindParticipant(uint32_t ID) const      override { return m_StandingData.FindJudoka(ID); }
 		virtual       Judoka* FindParticipant(const UUID& UUID)       override { return m_StandingData.FindJudoka(UUID); }
 		virtual const Judoka* FindParticipant(const UUID& UUID) const override { return m_StandingData.FindJudoka(UUID); }
 
@@ -78,13 +76,10 @@ namespace Judoboard
 		bool IsMatUsed(uint32_t ID) const;
 
 		//Match tables
-		uint32_t GetFreeMatchTableID() const;//Returns an unused/free ID that should be used for the next match table
 		void AddMatchTable(MatchTable* NewMatchTable);
 		bool UpdateMatchTable(const UUID& UUID);//Calling this function we recalculate the given match table
-		bool DeleteMatchTable(const UUID& UUID);
+		bool RemoveMatchTable(const UUID& UUID);
 		const std::vector<MatchTable*>& GetMatchTables() const { return m_MatchTables; }
-		virtual MatchTable* FindMatchTable(uint32_t ID) override;
-		virtual const MatchTable* FindMatchTable(uint32_t ID) const override;
 		virtual MatchTable* FindMatchTable(const UUID& ID) override;
 		virtual const MatchTable* FindMatchTable(const UUID& ID) const override;
 		MatchTable* FindMatchTableByName(const std::string& Name);
@@ -116,9 +111,9 @@ namespace Judoboard
 		const AgeGroup* FindAgeGroup(const UUID& UUID) const { return m_StandingData.FindAgeGroup(UUID); }
 
 		//Master schedule / schedule entries
-		Schedulable* GetScheduleEntry(uint32_t Index) override;
-		bool MoveScheduleEntryUp(uint32_t ID) override;
-		bool MoveScheduleEntryDown(uint32_t ID) override;
+		Schedulable* GetScheduleEntry(const UUID& UUID) override;
+		bool MoveScheduleEntryUp(const UUID& UUID) override;
+		bool MoveScheduleEntryDown(const UUID& UUID) override;
 
 		//Disqualifications
 		bool IsDisqualified(const Judoka& Judoka) const;

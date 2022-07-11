@@ -33,7 +33,7 @@ void MatchTable::SetMatID(int32_t MatID)
 bool MatchTable::IsIncluded(const Judoka& Fighter) const
 {
 	for (auto& participant : m_Participants)
-		if (participant && participant->GetID() == Fighter.GetID())
+		if (participant && participant->GetUUID() == Fighter.GetUUID())
 			return true;
 	return false;
 }
@@ -140,13 +140,13 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 
 		auto result = match->GetMatchResult();
 
-		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetID() == Judoka->GetID())
+		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetUUID() == Judoka->GetUUID())
 		{
 			a_wins++;
 			a_score += (int)match->GetMatchResult().m_Score;
 		}
 
-		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetID() == rhs.Judoka->GetID())
+		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetUUID() == rhs.Judoka->GetUUID())
 		{
 			b_wins++;
 			b_score += (int)match->GetMatchResult().m_Score;
@@ -169,12 +169,12 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 		return false;
 
 	//This ensures that everything is well-ordered, however if this is necessary a flag is raised!
-	if (Judoka->GetID() < rhs.Judoka->GetID())
+	if ((std::string)Judoka->GetUUID() < (std::string)rhs.Judoka->GetUUID())
 	{
 		NotSortable = rhs.NotSortable = true;
 		return true;
 	}
-	if (Judoka->GetID() > rhs.Judoka->GetID())
+	if ((std::string)Judoka->GetUUID() > (std::string)rhs.Judoka->GetUUID())
 	{
 		NotSortable = rhs.NotSortable = true;
 		return false;
@@ -188,7 +188,7 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 const std::string MatchTable::ToString() const
 {
 	ZED::CSV ret;
-	ret << GetID() << GetType() << GetScheduleIndex() << GetMatID() << GetColor() << GetRuleSet().GetID() << m_Name;
+	ret << (std::string)GetUUID() << GetType() << GetScheduleIndex() << GetMatID() << GetColor() << (std::string)GetRuleSet().GetUUID() << m_Name;
 	return ret;
 }
 

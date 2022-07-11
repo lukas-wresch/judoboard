@@ -19,8 +19,8 @@ TEST(Database, JudokaTest)
 		d.AddJudoka(&j1);
 		d.AddJudoka(&j2);
 
-		EXPECT_TRUE(d.FindJudoka(j1.GetID())->GetWeight() == 50);
-		EXPECT_TRUE(d.FindJudoka(j2.GetID())->GetWeight() == 60);
+		EXPECT_TRUE(d.FindJudoka(j1.GetUUID())->GetWeight() == 50);
+		EXPECT_TRUE(d.FindJudoka(j2.GetUUID())->GetWeight() == 60);
 
 		EXPECT_TRUE(d.Save("temp.csv"));
 		EXPECT_TRUE(d.Save("temp2.csv"));
@@ -28,14 +28,14 @@ TEST(Database, JudokaTest)
 		ASSERT_TRUE(d.DeleteJudoka(j1.GetUUID()));
 		EXPECT_FALSE(d.DeleteJudoka(j1.GetUUID()));
 
-		ASSERT_TRUE(d.FindJudoka(j1.GetID()) == nullptr);
-		EXPECT_TRUE(d.FindJudoka(j2.GetID())->GetWeight() == 60);
+		ASSERT_TRUE(d.FindJudoka(j1.GetUUID()) == nullptr);
+		EXPECT_TRUE(d.FindJudoka(j2.GetUUID())->GetWeight() == 60);
 
 		EXPECT_TRUE(d.DeleteJudoka(j2.GetUUID()));
 		EXPECT_FALSE(d.DeleteJudoka(j2.GetUUID()));
 
-		EXPECT_TRUE(d.FindJudoka(j1.GetID()) == nullptr);
-		EXPECT_TRUE(d.FindJudoka(j2.GetID()) == nullptr);
+		EXPECT_TRUE(d.FindJudoka(j1.GetUUID()) == nullptr);
+		EXPECT_TRUE(d.FindJudoka(j2.GetUUID()) == nullptr);
 
 		EXPECT_TRUE(d.Load("temp.csv"));
 
@@ -67,13 +67,12 @@ TEST(Database, SaveAndLoad)
 		d.AddJudoka(&j1);
 		d.AddJudoka(&j2);
 
-		EXPECT_NE(j1.GetID(),   j2.GetID());
 		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
 
 		d.AddRuleSet(new RuleSet("Test", 60, 30, 20, 10, true, true, true, 1));
 
-		EXPECT_TRUE(d.FindJudoka(j1.GetID())->GetWeight() == 50);
-		EXPECT_TRUE(d.FindJudoka(j2.GetID())->GetWeight() == 60);
+		EXPECT_TRUE(d.FindJudoka(j1.GetUUID())->GetWeight() == 50);
+		EXPECT_TRUE(d.FindJudoka(j2.GetUUID())->GetWeight() == 60);
 
 		EXPECT_TRUE(d.Save("temp.csv"));
 

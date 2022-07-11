@@ -15,7 +15,6 @@ namespace Judoboard
 	public:
 		virtual std::string GetName() const { return ""; }//Returns the name of the tournament
 		//const auto& GetSchedule() const { return m_Schedule; }
-		virtual Match* FindMatch(uint32_t ID) const { return nullptr; }
 		virtual Match* FindMatch(const UUID& UUID) const { return nullptr; }
 		[[nodiscard]]
 		Match* FindMatch(const Match& Match) const { return FindMatch(Match.GetUUID()); }
@@ -34,19 +33,15 @@ namespace Judoboard
 
 		virtual std::vector<Match> GetNextMatches(uint32_t MatID) const = 0;
 
-		virtual bool DeleteMatch(uint32_t MatchID) { return false; }
-		virtual bool MoveMatchUp(uint32_t MatchID) { return false; }
-		virtual bool MoveMatchDown(uint32_t MatchID) { return false; }
+		virtual bool RemoveMatch(const UUID& MatchID) { return false; }
+		virtual bool MoveMatchUp(const UUID& MatchID) { return false; }
+		virtual bool MoveMatchDown(const UUID& MatchID) { return false; }
 
 		//Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;
 		//const std::unordered_map<uint32_t, Judoka*>& GetParticipants() const { return m_StandingData.GetAllJudokas(); }
 		virtual bool AddParticipant(Judoka* Judoka) { return false; }
 		virtual bool RemoveParticipant(const UUID& ID) { return false; }
-		[[deprecated]]
-		virtual Judoka* FindParticipant(uint32_t ID) { return nullptr; }
-		[[deprecated]]
-		virtual const Judoka* FindParticipant(uint32_t ID) const { return nullptr; }
 		virtual Judoka* FindParticipant(const UUID& UUID) = 0;
 		virtual const Judoka* FindParticipant(const UUID& UUID) const = 0;
 
@@ -56,7 +51,7 @@ namespace Judoboard
 		//Match tables
 		virtual void AddMatchTable(MatchTable* NewMatchTable) {}
 		virtual bool UpdateMatchTable(const UUID& UUID) { return false; }//Calling this function we recalculate the given match table
-		virtual bool DeleteMatchTable(const UUID& UUID) { return false; }
+		virtual bool RemoveMatchTable(const UUID& UUID) { return false; }
 		virtual const std::vector<MatchTable*>& GetMatchTables() const {
 			assert(false);
 			static std::vector<MatchTable*> ret;
@@ -69,10 +64,6 @@ namespace Judoboard
 			return ret;
 		}
 
-		[[deprecated]]
-		virtual MatchTable* FindMatchTable(uint32_t ID) { return nullptr; }
-		[[deprecated]]
-		virtual const MatchTable* FindMatchTable(uint32_t ID) const { return nullptr; }
 		virtual MatchTable* FindMatchTable(const UUID& ID) { return nullptr; }
 		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
 
@@ -93,9 +84,9 @@ namespace Judoboard
 		virtual const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) const { return nullptr; }
 
 		//Master schedule / schedule entries
-		virtual Schedulable* GetScheduleEntry(uint32_t Index) { return nullptr; }
-		virtual bool MoveScheduleEntryUp(uint32_t ID) { return false; }
-		virtual bool MoveScheduleEntryDown(uint32_t ID) { return false; }
+		virtual Schedulable* GetScheduleEntry(const UUID& UUID) { return nullptr; }
+		virtual bool MoveScheduleEntryUp(const UUID& UUID) { return false; }
+		virtual bool MoveScheduleEntryDown(const UUID& UUID) { return false; }
 
 		//Disqualifications
 		virtual void Disqualify(const Judoka& Judoka) {}

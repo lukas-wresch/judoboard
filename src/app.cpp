@@ -137,12 +137,12 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 
 
 
-bool Application::OpenTournament(uint32_t ID)
+bool Application::OpenTournament(const UUID& UUID)
 {
 	if (!CloseTournament())
 		return false;
 
-	m_CurrentTournament = FindTournament(ID);
+	m_CurrentTournament = FindTournament(UUID);
 	return true;
 }
 
@@ -336,7 +336,7 @@ bool Application::AddTournament(Tournament* NewTournament)
 		return false;
 	}
 
-	if (FindTournament(NewTournament->GetName()))
+	if (FindTournamentByName(NewTournament->GetName()))
 	{
 		ZED::Log::Warn("Tournament with this name already exists");
 		return false;
@@ -356,11 +356,11 @@ bool Application::AddTournament(Tournament* NewTournament)
 
 
 
-bool Application::DeleteTournament(uint32_t ID)
+bool Application::DeleteTournament(const UUID& UUID)
 {
 	for (auto it = m_Tournaments.begin(); it != m_Tournaments.end(); ++it)
 	{
-		if (*it && (*it)->GetID() == ID)
+		if (*it && (*it)->GetUUID() == UUID)
 		{
 			bool ret = ZED::Core::RemoveFile("tournaments/" + (*it)->GetName() + ".yml");
 
@@ -376,29 +376,29 @@ bool Application::DeleteTournament(uint32_t ID)
 
 
 
-Tournament* Application::FindTournament(uint32_t ID)
+Tournament* Application::FindTournament(const UUID& UUID)
 {
 	for (auto tournament : m_Tournaments)
-		if (tournament && tournament->GetID() == ID)
+		if (tournament && tournament->GetUUID() == UUID)
 			return tournament;
 	return nullptr;
 }
 
 
 
-const Tournament* Application::FindTournament(uint32_t ID) const
+const Tournament* Application::FindTournament(const UUID& UUID) const
 {
 	for (auto tournament : m_Tournaments)
-		if (tournament && tournament->GetID() == ID)
+		if (tournament && tournament->GetUUID() == UUID)
 			return tournament;
 	return nullptr;
 }
 
 
 
-const Tournament* Application::FindTournament(const std::string& Name) const
+const Tournament* Application::FindTournamentByName(const std::string& Name) const
 {
-	for (auto* tournament : m_Tournaments)
+	for (auto tournament : m_Tournaments)
 		if (tournament && tournament->GetName() == Name)
 			return tournament;
 	return nullptr;
