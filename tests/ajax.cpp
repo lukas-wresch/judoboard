@@ -239,12 +239,13 @@ TEST(Ajax, Ajax_GetHansokumake)
 		
 		ZED::CSV ret2 = app.Ajax_GetHansokumake();
 
-		int id, mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
+		std::string id;
+		int mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
 		std::string white_name, blue_name, color, matchtable_name;
 		ret2 >> id >> white_name >> blue_name >> mat_id >> state >> color >> matchtable >> matchtable_name;
 		ret2 >> hansokumake_fighter >> hansokumake_state;
 
-		EXPECT_EQ(id, match.GetID());
+		EXPECT_EQ(id, (std::string)match.GetUUID());
 		EXPECT_EQ(white_name, match.GetFighter(Fighter::White)->GetName());
 		EXPECT_EQ(blue_name,  match.GetFighter(Fighter::Blue )->GetName());
 		EXPECT_EQ(hansokumake_fighter, (int)f);
@@ -270,14 +271,15 @@ TEST(Ajax, Ajax_GetHansokumake)
 
 		ZED::CSV ret2 = app.Ajax_GetHansokumake();
 
-		int id, mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
+		std::string id;
+		int mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
 		std::string white_name, blue_name, color, matchtable_name;
 		ret2 >> id >> white_name >> blue_name >> mat_id >> state >> color >> matchtable >> matchtable_name;
 		ret2 >> hansokumake_fighter >> hansokumake_state;
 
-		EXPECT_EQ(id, match.GetID());
+		EXPECT_EQ(id, (std::string)match.GetUUID());
 		EXPECT_EQ(white_name, match.GetFighter(Fighter::White)->GetName());
-		EXPECT_EQ(blue_name, match.GetFighter(Fighter::Blue)->GetName());
+		EXPECT_EQ(blue_name,  match.GetFighter(Fighter::Blue)->GetName());
 		EXPECT_EQ(hansokumake_fighter, (int)f);
 		EXPECT_EQ(hansokumake_state, (int)IMat::Scoreboard::DisqualificationState::Disqualified);
 	}
@@ -301,14 +303,15 @@ TEST(Ajax, Ajax_GetHansokumake)
 
 		ZED::CSV ret2 = app.Ajax_GetHansokumake();
 
-		int id, mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
+		std::string id;
+		int mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
 		std::string white_name, blue_name, color, matchtable_name;
 		ret2 >> id >> white_name >> blue_name >> mat_id >> state >> color >> matchtable >> matchtable_name;
 		ret2 >> hansokumake_fighter >> hansokumake_state;
 
-		EXPECT_EQ(id, match.GetID());
+		EXPECT_EQ(id, (std::string)match.GetUUID());
 		EXPECT_EQ(white_name, match.GetFighter(Fighter::White)->GetName());
-		EXPECT_EQ(blue_name, match.GetFighter(Fighter::Blue)->GetName());
+		EXPECT_EQ(blue_name,  match.GetFighter(Fighter::Blue)->GetName());
 		EXPECT_EQ(hansokumake_fighter, (int)f);
 		EXPECT_EQ(hansokumake_state, (int)IMat::Scoreboard::DisqualificationState::NotDisqualified);
 	}
