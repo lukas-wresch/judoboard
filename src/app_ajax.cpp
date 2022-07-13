@@ -1075,6 +1075,7 @@ void Application::SetupHttpServer()
 		auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
 		int  weight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "weight"));
 		Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+		int  birthyear = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "birthyear"));
 		UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");
 
 		if (weight < 0)
@@ -1084,6 +1085,8 @@ void Application::SetupHttpServer()
 			return (std::string)(Error)Error::Type::InvalidInput;
 
 		Judoka new_judoka(firstname, lastname, weight, gender);
+		if (birthyear > 1900 && birthyear < 2100)
+			new_judoka.SetBirthyear(birthyear);
 		new_judoka.SetClub(GetDatabase().FindClub(clubID));
 
 		m_Database.AddJudoka(std::move(new_judoka));
@@ -1883,6 +1886,37 @@ void Application::SetupHttpServer()
 		return Error();//OK
 	});
 
+	m_Server.RegisterResource("/ajax/tournament/update", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+		UUID rule_id = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
+
+		auto tournament = FindTournament(id);
+		if (!tournament)
+			return Error(Error::Type::ItemNotFound);
+
+		//Check if the tournament is closed
+		if (tournament->GetName() == GetTournament()->GetName())
+			return Error(Error::Type::OperationFailed);
+
+		auto rules = m_Database.FindRuleSet(rule_id);
+		if (!rules)
+			ZED::Log::Warn("Adding tournament: Could not find rule set in database");
+
+		tournament->SetName(name);
+		tournament->SetDefaultRuleSet(rules);
+		if (!tournament->Save())
+			return Error(Error::Type::OperationFailed);
+
+		//TODO delete the old tournament file
+
+		return Error();//OK
+	});
+
 	m_Server.RegisterResource("/ajax/tournament/get", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -1902,6 +1936,26 @@ void Application::SetupHttpServer()
 		else
 			ret << -1;
 		return ret;
+	});
+
+	m_Server.RegisterResource("/ajax/tournament/assign_age_group", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		UUID id           = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "age");
+
+		auto judoka    = GetTournament()->FindParticipant(id);
+		auto age_group = GetTournament()->FindAgeGroup(age_group_id);
+
+		if (!judoka || !age_group)
+			return Error(Error::Type::ItemNotFound);
+
+		if (!GetTournament()->AssignJudokaToAgeGroup(judoka, age_group))
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/open", [this](auto& Request) -> std::string {

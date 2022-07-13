@@ -79,6 +79,7 @@ namespace Judoboard
 		//Age groups
 		virtual bool AddAgeGroup(AgeGroup* NewAgeGroup) { return false; }
 		virtual bool RemoveAgeGroup(const UUID& UUID) { return false; }
+		virtual bool AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup) { return false; }
 		virtual AgeGroup* FindAgeGroup(const UUID& UUID) { return nullptr; }
 		virtual const AgeGroup* FindAgeGroup(const UUID& UUID) const { return nullptr; }
 		virtual const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) const { return nullptr; }

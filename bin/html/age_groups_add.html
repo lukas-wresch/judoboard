@@ -1,0 +1,107 @@
+<h1 id="headline">New Age Group</h1>
+
+<form>
+
+<div>
+    <label style="width:150px;float:left;margin-top:4px;" id="label_name">Name</label>
+    <input style="margin-bottom:20px;" type="text" id="name" value="" size="40" maxlength="64"/>
+</div>
+
+<div>
+    <label style="width:150px;float:left;margin-top:4px;" id="label_min_age">Min Age</label>
+    <input style="margin-bottom:20px;" type="number" id="min_age" value="" min="0" max="100" />
+</div>
+
+<div>
+    <label style="width:150px;float:left;margin-top:4px;" id="label_max_age">Max Age</label>
+    <input style="margin-bottom:20px;" type="number" id="max_age" value="" min="0" max="100" />
+</div>
+
+<button class="add" id="add" onclick="return Add()">New Age Group</button>
+<button class="neutral" style="margin-right: 2cm;" onclick="return Update()" id="update">Save</button>
+<button class="remove" onclick="return Delete()" id="delete">Delete</button>
+
+</form>
+
+
+<script>
+
+function Add()
+{
+  var params = URLEncode({
+    name:    document.getElementById("name").value,
+    min_age: document.getElementById("min_age").value,
+    min_age: document.getElementById("max_age").value,
+  });
+
+  AjaxPost('ajax/age_groups/add', params, function() {    
+    navigate('age_groups_list.html');
+  });
+
+  return false;
+}
+
+
+
+function GetAgeGroup(id)
+{
+  AjaxCallback("ajax/age_groups/get?id="+id, function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    document.getElementById("name").value    = res.name;
+    document.getElementById("min_age").value = res.min_age;
+    document.getElementById("max_age").value = res.max_age;
+  });
+
+  return false;
+}
+
+
+
+function Update()
+{
+  var params = URLEncode({
+    name:    document.getElementById("name").value,
+    min_age: document.getElementById("min_age").value,
+    min_age: document.getElementById("max_age").value,
+  });
+
+  AjaxPost('ajax/age_groups/update?id='+id, params, function() {
+    navigate('age_groups_list.html');
+  });
+
+  return false;
+}
+
+
+
+function Delete()
+{
+  if (confirm(lang.delete_age_group_confirm))
+  {
+    Ajax('ajax/age_groups/delete?id='+id);
+    navigate('age_groups_list.html');
+  }
+
+  return false;
+}
+
+
+
+var id = URLDecode(URL, "id");
+
+if (id)
+{
+    document.getElementById("add").style.display  = "none";
+    document.getElementById("headline").innerHTML = lang.edit_age_group;
+    GetAgeGroup(id);
+}
+else
+{
+    document.getElementById("headline").innerHTML = lang.new_age_group;
+    document.getElementById("update").style.display = "none";
+    document.getElementById("delete").style.display = "none";
+}
+
+</script>

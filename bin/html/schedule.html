@@ -58,7 +58,7 @@
     <th style="width: 4cm;" id="name">Name</th>
     <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
     <th style="width: 2cm; text-align: center;" id="matches">#Matches</th>
-    <th style="width: 2cm; text-align: center;" id="age_group">Age group</th>
+    <th style="width: 2.5cm; text-align: center;" id="age_group">Age group</th>
     <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -170,6 +170,14 @@ function RemoveNoDisqualify(fighter, matID)
     else
         AjaxCallback('/ajax/mat/blue/-nodisqualification?id='  + matID, Update);
   
+  return false;
+}
+
+
+
+function AssignAgeGroup(judoka_id, age_group_id)
+{
+  AjaxCallback('/ajax/tournament/assign_age_group?id=' + judoka_id + '&age=' + age_group_id, Update);
   return false;
 }
 
@@ -455,20 +463,31 @@ function Update()
       
       if (judoka.age_groups.length == 0)
         cell4.innerHTML = "- - -";
-
-      var select = document.createElement("select");
-
-      for (const age_group of judoka.age_groups)
+      else
       {
-        var option = document.createElement("option");
+        var select = document.createElement("select");
+        select.style.width = "1.7cm";
+        select.style.fontSize  = "14pt";
 
-        option.value = age_group.uuid;
-        option.text  = age_group.name;
+        for (const age_group of judoka.age_groups)
+        {
+          var option = document.createElement("option");
+          option.value = age_group.uuid;
+          option.text  = age_group.name;
 
-        select.appendChild(option);
+          select.appendChild(option);
+        }
+
+        if (typeof judoka.age_group_uuid !== 'undefined')
+          select.value = judoka.age_group_uuid;
+
+        select.onchange = function(e)
+        {
+          AssignAgeGroup(judoka.uuid, select.value);
+        }
+
+        cell4.appendChild(select);
       }
-
-      cell4.appendChild(select);
 
       cell5.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + lang.remove + "</button>";
       cell5.style.textAlign = "center";

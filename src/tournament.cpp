@@ -1340,6 +1340,9 @@ const std::string Tournament::Participants2String() const
 		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight();
 		ret << YAML::Key << "num_matches" << YAML::Value << num_matches;
 
+		if (judoka_age_group)
+			ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
+
 		//Calculate eligable age groups
 		ret << YAML::Key << "age_groups" << YAML::Value;
 		ret << YAML::BeginSeq;
@@ -1351,8 +1354,6 @@ const std::string Tournament::Participants2String() const
 				ret << YAML::BeginMap;
 				ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
 				ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
-				if (judoka_age_group)
-					ret << YAML::Key << "is_assigned" << YAML::Value << (age_group->GetUUID() == judoka_age_group->GetUUID());
 				ret << YAML::EndMap;
 			}
 		}

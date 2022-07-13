@@ -316,5 +316,8 @@
     <None Include="..\..\bin\html\age_groups_select.html">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\bin\html\age_groups_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

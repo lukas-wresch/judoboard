@@ -97,9 +97,9 @@ namespace Judoboard
 		virtual RuleSet* FindRuleSet(const UUID& UUID) override { return m_StandingData.FindRuleSet(UUID); }
 
 		//Age groups
-		bool AddAgeGroup(AgeGroup* NewAgeGroup) override;
-		bool RemoveAgeGroup(const UUID& UUID) override;
-		bool AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup);
+		virtual bool AddAgeGroup(AgeGroup* NewAgeGroup) override;
+		virtual bool RemoveAgeGroup(const UUID& UUID) override;
+		virtual bool AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup) override;
 		virtual const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) const override {
 			if (!Judoka) return nullptr;
 			auto it = m_JudokaToAgeGroup.find(Judoka->GetUUID());

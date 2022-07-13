@@ -31,7 +31,7 @@ Judoboard::Judoka CreateRandomJudoka()
 		ret = Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Female);
 	}
 
-	ret.SetBirthyear(2000 + rand()%20);
+	ret.SetBirthyear(1990 + rand()%20);
 
 	//TODO assign random club
 
