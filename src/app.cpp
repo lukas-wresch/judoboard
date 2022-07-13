@@ -365,7 +365,7 @@ bool Application::DeleteTournament(const UUID& UUID)
 			bool ret = ZED::Core::RemoveFile("tournaments/" + (*it)->GetName() + ".yml");
 
 			delete *it;
-			it = m_Tournaments.erase(it);
+			m_Tournaments.erase(it);
 
 			return ret;
 		}

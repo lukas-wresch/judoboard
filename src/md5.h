@@ -93,7 +93,7 @@ namespace Judoboard
 
 			int Tolerance = -1;
 
-			bool Team;
+			bool Team;//TODO set default
 		};
 
 		struct Participant

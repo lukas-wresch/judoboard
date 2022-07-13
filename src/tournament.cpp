@@ -193,7 +193,7 @@ bool Tournament::Load(const std::string& Filename)
 	{
 		std::string uuid;
 		csv >> uuid;
-		m_DisqualifiedJudoka.insert(UUID(std::move(uuid)));
+		m_DisqualifiedJudoka.emplace(UUID(std::move(uuid)));
 	}
 
 	m_pDefaultRules = new RuleSet(csv);
@@ -1116,7 +1116,7 @@ bool Tournament::MoveScheduleEntryUp(const UUID& UUID)
 	if (index >= m_SchedulePlanner.size() || !m_SchedulePlanner[index])
 		return false;
 
-	if (!m_SchedulePlanner[index] || m_SchedulePlanner[index]->GetScheduleIndex() <= 0)
+	if (m_SchedulePlanner[index]->GetScheduleIndex() <= 0)
 		return false;
 
 	if (m_SchedulePlanner[index]->GetStatus() != Status::Scheduled)//Don't move if already started
