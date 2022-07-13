@@ -31,6 +31,7 @@ namespace Judoboard
 		bool IsElgiable(const Judoka& Fighter) const;
 
 		void operator >> (YAML::Emitter& Yaml) const;
+		void ToString(YAML::Emitter& Yaml) const;
 
 	private:
 		std::string m_Name;

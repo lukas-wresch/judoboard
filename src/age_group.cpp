@@ -64,3 +64,26 @@ void AgeGroup::operator >> (YAML::Emitter& Yaml) const
 
 	Yaml << YAML::EndMap;
 }
+
+
+
+void AgeGroup::ToString(YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::Key << "uuid"    << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "name"    << YAML::Value << m_Name;
+	Yaml << YAML::Key << "min_age" << YAML::Value << m_MinAge;
+	Yaml << YAML::Key << "max_age" << YAML::Value << m_MaxAge;
+
+	std::string desc;
+	if (m_MinAge == 0)
+		desc = "-" + std::to_string(m_MaxAge);
+	else if (m_MaxAge == 0)
+		desc = std::to_string(m_MinAge) + "+";
+	else
+		desc = std::to_string(m_MinAge) + " - " + std::to_string(m_MaxAge);
+
+	Yaml << YAML::Key << "desc" << YAML::Value << desc;
+
+	if (m_pRules)
+		Yaml << YAML::Key << "rules" << YAML::Value << (std::string)m_pRules->GetUUID();
+}

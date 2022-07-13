@@ -38,7 +38,7 @@ void Application::SetupHttpServer()
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit",
 		"club_list", "club_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
-		"matchtable_list", "matchtable_add", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "tournament_list", "tournament_add",
+		"matchtable_list", "matchtable_add", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add",
 		"server_config"
 	};
 
@@ -1816,13 +1816,43 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/age_groups/get", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
+		if (!IsLoggedIn(Request))
+			return (std::string)Error(Error::Type::NotLoggedIn);
 
 		YAML::Emitter yaml;
 		GetTournament()->ListAgeGroups(yaml);
 		return yaml.c_str();
+	});
+
+	m_Server.RegisterResource("/ajax/age_groups/select", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+		auto age_group = m_Database.FindAgeGroup(age_group_id);
+
+		if (!age_group)
+			return Error(Error::Type::ItemNotFound);
+
+		if (!GetTournament()->AddAgeGroup(age_group))
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/age_groups/remove", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+		if (!GetTournament()->RemoveAgeGroup(age_group_id))
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
 	});
 
 
@@ -2520,8 +2550,18 @@ std::string Application::Ajax_ListAllAgeGroups() const
 	ret << YAML::BeginSeq;
 
 	for (const auto age_group : GetDatabase().GetAgeGroups())
+	{
 		if (age_group)
-			*age_group >> ret;
+		{
+			ret << YAML::BeginMap;
+
+			age_group->ToString(ret);
+			bool is_used = GetTournament()->FindAgeGroup(age_group->GetUUID());
+			ret << YAML::Key << "is_used" << YAML::Value << is_used;
+
+			ret << YAML::EndMap;
+		}
+	}
 
 	ret << YAML::EndSeq;
 	return ret.c_str();
