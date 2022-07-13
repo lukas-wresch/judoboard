@@ -333,7 +333,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		UUID id  = HttpServer::DecodeURLEncoded(Request.m_Query, "index");
+		UUID id  = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		int  mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
 
 		if (mat <= 0)

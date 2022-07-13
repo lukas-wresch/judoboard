@@ -72,9 +72,9 @@ function MoveEntryDown(id)
 
 
 
-function SetEntryMat(index, mat)
+function SetEntryMat(id, mat)
 {
-  AjaxCallback('ajax/masterschedule/set_mat?index='+index+'&mat='+mat, function() {
+  AjaxCallback('ajax/masterschedule/set_mat?id='+id+'&mat='+mat, function() {
     Update();
   });
 
@@ -223,10 +223,10 @@ function Update()
           else
             contents = name + "<br/>";
 
-          contents += "<table><tr><td rowspan=\"2\"><a style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat(" + index + "," + (matID-1) + ");\"></a></td>";
-          contents += "           <td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp("   + index + ");\"></a></td>";
-          contents += "           <td rowspan=\"2\"><a style=\"" + style + "transform: rotate(-45deg); \" href=\"#\" onclick=\"SetEntryMat(" + index + "," + (matID+1) + ");\"></a></td></tr>";
-          contents += "       <tr><td><a style=\"" + style + "transform: rotate(45deg);\"    href=\"#\" onclick=\"return MoveEntryDown(" + index + ");\"></a></td></tr></table>";
+          contents += "<table><tr><td rowspan=\"2\"><a style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat('" + id + "'," + (matID-1) + ");\"></a></td>";
+          contents += "           <td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp('"   + id + "');\"></a></td>";
+          contents += "           <td rowspan=\"2\"><a style=\"" + style + "transform: rotate(-45deg); \" href=\"#\" onclick=\"SetEntryMat('" + id + "'," + (matID+1) + ");\"></a></td></tr>";
+          contents += "       <tr><td><a style=\"" + style + "transform: rotate(45deg);\"    href=\"#\" onclick=\"return MoveEntryDown('" + id + "');\"></a></td></tr></table>";
 
 
           cell.innerHTML = contents;
