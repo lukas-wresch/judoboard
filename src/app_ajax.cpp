@@ -1812,7 +1812,17 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		return Ajax_ListAgeGroups();		
+		return Ajax_ListAllAgeGroups();
+	});
+
+	m_Server.RegisterResource("/ajax/age_groups/get", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		YAML::Emitter yaml;
+		GetTournament()->ListAgeGroups(yaml);
+		return yaml.c_str();
 	});
 
 
@@ -2504,7 +2514,7 @@ std::string Application::Ajax_ListClubs()
 
 
 
-std::string Application::Ajax_ListAgeGroups() const
+std::string Application::Ajax_ListAllAgeGroups() const
 {
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;

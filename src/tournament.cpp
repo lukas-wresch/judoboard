@@ -1091,6 +1091,47 @@ bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* Ag
 
 
 
+void Tournament::ListAgeGroups(YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginSeq;
+
+	for (auto age_group : m_StandingData.GetAgeGroups())
+	{
+		Yaml << YAML::BeginMap;
+
+		Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
+		Yaml << YAML::Key << "name" << YAML::Value << age_group->GetName();
+
+		size_t num_match_tables = 0;
+		size_t num_matches = 0;
+		for (auto match_table : m_MatchTables)
+		{
+			if (match_table->GetAgeGroup()->GetUUID() == age_group->GetUUID())
+			{
+				num_match_tables++;
+				num_matches += match_table->GetSchedule().size();
+			}
+		}
+
+		Yaml << YAML::Key << "num_match_tables" << YAML::Value << num_match_tables;
+		Yaml << YAML::Key << "num_matches" << YAML::Value << num_matches;
+
+		size_t num_participants = 0;
+		for (auto& [judoka_id, age_group_id] : m_JudokaToAgeGroup)
+		{
+			if (age_group_id == age_group->GetUUID())
+				num_participants++;
+		}
+
+		Yaml << YAML::Key << "num_participants" << YAML::Value << num_participants;
+		Yaml << YAML::EndMap;
+	}
+
+	Yaml << YAML::EndSeq;
+}
+
+
+
 Schedulable* Tournament::GetScheduleEntry(const UUID& UUID)
 {
 	for (auto entry : m_SchedulePlanner)

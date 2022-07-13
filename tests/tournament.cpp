@@ -310,17 +310,18 @@ TEST(Tournament, ParticipantHasSameIDAsInDatabase)
 	tourney.Reset();
 
 	EXPECT_TRUE(tourney.AddParticipant(&j1));
+	ASSERT_TRUE(tourney.FindParticipant(j1.GetUUID()));
+	EXPECT_EQ(j1.GetUUID(), tourney.FindParticipant(j1.GetUUID())->GetUUID());
 	//tourney gets saved now
 
 	tourney.EnableAutoSave(false);
 
 
 	Tournament t("deleteMe");
-	//t.ConnectToDatabase(d);
 	t.EnableAutoSave(false);
-	EXPECT_TRUE(t.GetParticipants().size() == 1);
-	EXPECT_TRUE(t.FindParticipant(j1.GetUUID()));
-	//EXPECT_TRUE(t.FindParticipant(j1.GetID()));
+	EXPECT_EQ(t.GetParticipants().size(), 1);
+	ASSERT_TRUE(t.FindParticipant(j1.GetUUID()));
+	EXPECT_EQ(j1.GetUUID(), t.FindParticipant(j1.GetUUID())->GetUUID());
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }

@@ -113,10 +113,10 @@ namespace Judoboard
 		//Rule sets
 
 		//Age groups
-		std::string Ajax_ListAgeGroups() const;
+		std::string Ajax_ListAllAgeGroups() const;
 
 		//Match tables
-		ZED::CSV Ajax_ListMatchTables(const HttpServer::Request& Request);
+		std::string Ajax_ListAllMatchTables(const HttpServer::Request& Request);
 		std::string Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_GetMatchesFromMatchTable(const HttpServer::Request& Request);
 

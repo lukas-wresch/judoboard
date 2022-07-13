@@ -109,6 +109,7 @@ namespace Judoboard
 		}
 		AgeGroup* FindAgeGroup(const UUID& UUID) { return m_StandingData.FindAgeGroup(UUID); }
 		const AgeGroup* FindAgeGroup(const UUID& UUID) const { return m_StandingData.FindAgeGroup(UUID); }
+		virtual void ListAgeGroups(YAML::Emitter& Yaml) const override;
 
 		//Master schedule / schedule entries
 		Schedulable* GetScheduleEntry(const UUID& UUID) override;

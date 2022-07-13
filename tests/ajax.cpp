@@ -645,7 +645,7 @@ TEST(Ajax, ListAgeGroups)
 	ZED::Core::RemoveFile("database.csv");
 	Application app;
 
-	YAML::Node result = YAML::Load(app.Ajax_ListAgeGroups());
+	YAML::Node result = YAML::Load(app.Ajax_ListAllAgeGroups());
 
 	ASSERT_TRUE(result);
 	ASSERT_TRUE(result.IsSequence());
