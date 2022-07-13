@@ -58,6 +58,7 @@
     <th style="width: 4cm;" id="name">Name</th>
     <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
     <th style="width: 2cm; text-align: center;" id="matches">#Matches</th>
+    <th style="width: 2cm; text-align: center;" id="age_group">Age group</th>
     <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -415,17 +416,15 @@ function Update()
 
   AjaxCallback("ajax/participants/get", function(response) {
     console.log(response);
-    var res = response.split(",");
-
-    if (res.length < 4)
-      return;
+    var res = YAML.parse(response);
 
     var table = document.getElementById("participants");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    for (var i=0; i < res.length; i+=4)
+    var no = 0;
+    for (const judoka of res)
     {
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
@@ -433,25 +432,46 @@ function Update()
       var cell2 = row.insertCell(2);
       var cell3 = row.insertCell(3);
       var cell4 = row.insertCell(4);
+      var cell5 = row.insertCell(5);
 
-      if ((i/4)%2 == 0)
+      if (no%2 == 0)
         row.style.backgroundColor = "#eee";
+      no++;
 
-      cell0.innerHTML = i/4+1;
+      cell0.innerHTML = no;
       cell0.style.textAlign = "center";
       cell0.style.fontSize  = "14pt";
 
-      cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + res[i] + "\">" + res[i+1] + "</a>";
-      cell2.innerHTML = res[i+2] + " kg";
+      cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.name + "</a>";
+      cell2.innerHTML = judoka.weight + " kg";
       cell2.style.textAlign = "center";
       cell2.style.fontSize  = "16pt";
 
-      cell3.innerHTML = res[i+3];
+      cell3.innerHTML = judoka.num_matches;
       cell3.style.textAlign = "center";
       cell3.style.fontSize  = "16pt";
 
-      cell4.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+res[i]+")\">" + lang.remove + "</button>";
       cell4.style.textAlign = "center";
+      
+      if (judoka.age_groups.length == 0)
+        cell4.innerHTML = "- - -";
+
+      var select = document.createElement("select");
+
+      for (const age_group of judoka.age_groups)
+      {
+        var option = document.createElement("option");
+
+        option.value = age_group.uuid;
+        option.text  = age_group.name;
+
+        select.appendChild(option);
+      }
+
+      cell4.appendChild(select);
+
+      cell5.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + lang.remove + "</button>";
+      cell5.style.textAlign = "center";
     }
   });
 

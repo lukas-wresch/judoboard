@@ -1022,6 +1022,7 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 	if (!m_StandingData.AddAgeGroup(NewAgeGroup))
 		return false;
 
+	Lock();
 	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
 	{
 		auto age_group = GetAgeGroupOfJudoka(judoka);
@@ -1033,7 +1034,9 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 			m_JudokaToAgeGroup.insert({ judoka->GetUUID(), NewAgeGroup->GetUUID() });
 		}
 	}
+	Unlock();
 
+	Save();
 	return true;
 }
 
@@ -1049,11 +1052,13 @@ bool Tournament::RemoveAgeGroup(const UUID& UUID)
 	if (!m_StandingData.RemoveAgeGroup(UUID))
 		return false;
 
-	//Remove all participants from this age group
+	Lock();
+
+	//Remove all assignments from this age group
 	for (auto [judoka, age_group] : m_JudokaToAgeGroup)
 	{
 		if (age_group == UUID)
-			m_JudokaToAgeGroup.erase(judoka);//Remove the participant
+			m_JudokaToAgeGroup.erase(judoka);//Remove the assignment
 	}
 
 	//Assign not-assigned judoka to a age group if possible
@@ -1064,6 +1069,9 @@ bool Tournament::RemoveAgeGroup(const UUID& UUID)
 			FindAgeGroupForJudoka(*judoka);
 	}
 
+	Unlock();
+
+	Save();
 	return true;
 }
 
@@ -1080,12 +1088,17 @@ bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* Ag
 	if (!m_StandingData.FindAgeGroup(AgeGroup->GetUUID()))
 		return false;
 
+	Lock();
+
 	//Remove judoka to the age group he currently belongs to
 	m_JudokaToAgeGroup.erase(Judoka->GetUUID());
 
 	//Add him to his new age group
 	m_JudokaToAgeGroup.insert({ Judoka->GetUUID(), AgeGroup->GetUUID() });
 
+	Unlock();
+
+	Save();
 	return true;
 }
 
@@ -1306,7 +1319,8 @@ const std::string Tournament::Schedule2String() const
 
 const std::string Tournament::Participants2String() const
 {
-	ZED::CSV ret;
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
 	Lock();
 	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
 	{
@@ -1317,10 +1331,39 @@ const std::string Tournament::Participants2String() const
 				num_matches++;
 		}
 
-		ret << (std::string)judoka->GetUUID() << judoka->GetName() << judoka->GetWeight() << num_matches;
+		auto judoka_age_group = GetAgeGroupOfJudoka(judoka);
+
+		ret << YAML::BeginMap;
+
+		ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
+		ret << YAML::Key << "name" << YAML::Value << judoka->GetName();
+		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight();
+		ret << YAML::Key << "num_matches" << YAML::Value << num_matches;
+
+		//Calculate eligable age groups
+		ret << YAML::Key << "age_groups" << YAML::Value;
+		ret << YAML::BeginSeq;
+
+		for (auto age_group : m_StandingData.GetAgeGroups())
+		{
+			if (age_group->IsElgiable(*judoka))
+			{
+				ret << YAML::BeginMap;
+				ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
+				ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
+				if (judoka_age_group)
+					ret << YAML::Key << "is_assigned" << YAML::Value << (age_group->GetUUID() == judoka_age_group->GetUUID());
+				ret << YAML::EndMap;
+			}
+		}
+
+		ret << YAML::EndSeq;
+
+		ret << YAML::EndMap;
 	}
 	Unlock();
-	return ret;
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 

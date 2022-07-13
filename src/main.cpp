@@ -10,22 +10,32 @@
 Judoboard::Judoka CreateRandomJudoka()
 {
 	const std::string firstname_male[] =
-	{ "Ben", "Friedrich", "Phillipp", "Tim", "Lukas", "Marco", "Peter", "Martin", "Detlef", "Andreas", "Dominik", "Mathias", "Stephan", u8"Sören", "Eric", "Finn", "Felix", "Julian", "Maximilian" };
+	{ "Ben", "Friedrich", "Phillipp", "Tim", "Lukas", "Marco", "Peter", "Martin", "Detlef", "Andreas", "Dominik", "Mathias", "Stephan", u8"Sören", "Eric", "Finn", "Felix", "Julian", "Maximilian", "Jannik"};
 	const std::string firstname_female[] =
-	{ "Emma", "Stephanie", "Julia", "Jana", "Uta", "Petra", "Sophie", "Kerstin", "Lena", "Jennifer", "Kathrin", "Katherina", "Anna", "Carla", "Paulina" };
+	{ "Emma", "Stephanie", "Julia", "Jana", "Uta", "Petra", "Sophie", "Kerstin", "Lena", "Jennifer", "Kathrin", "Katherina", "Anna", "Carla", "Paulina", "Clara", "Hanna" };
 	const std::string lastname[] =
 	{ "Ehrlichmann", "Dresdner", "Biermann", "Fisher", "Vogler", "Pfaff", "Eberhart", "Frankfurter", u8"König", "Pabst", "Ziegler", "Hartmann", "Pabst", "Kortig", "Schweitzer", "Luft", "Wexler", "Kaufmann", u8"Frühauf", "Bieber", "Schumacher", u8"Müncher", "Schmidt", "Meier", "Fischer", "Weber", "Meyer", "Wagner", "Becker", "Schulz", "Hoffmann" };
+
+	Judoboard::Judoka ret("", "");
 
 	if (rand() & 1)
 	{
 		auto fname = firstname_male[rand() % (sizeof(firstname_male) / sizeof(firstname_male[0]) - 1)];
 		auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
-		return Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Male);
+		ret = Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Male);
+	}
+	else
+	{
+		auto fname = firstname_female[rand() % (sizeof(firstname_female) / sizeof(firstname_female[0]) - 1)];
+		auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
+		ret = Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Female);
 	}
 
-	auto fname = firstname_female[rand() % (sizeof(firstname_female) / sizeof(firstname_female[0]) - 1)];
-	auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
-	return Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Female);
+	ret.SetBirthyear(2000 + rand()%20);
+
+	//TODO assign random club
+
+	return ret;
 }
 
 
@@ -296,7 +306,7 @@ int main(int argc, char** argv)
 	{
 		ZED::Log::Debug("Adding debug judoka");
 
-		for (int i = 0; i < 30; i++)
+		for (int i = 0; i < 35; i++)
 			app.GetDatabase().AddJudoka(CreateRandomJudoka());
 	}
 #endif

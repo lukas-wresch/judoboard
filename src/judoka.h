@@ -30,7 +30,7 @@ namespace Judoboard
 		friend class Match;
 
 	public:
-		Judoka(const std::string& Firstname, const std::string& Lastname, uint32_t Weight = 0, Gender Gender = Gender::Male);
+		Judoka(const std::string& Firstname, const std::string& Lastname, uint32_t Weight = 0, Gender Gender = Gender::Male, uint32_t Birthyear = 0);
 		Judoka(ZED::CSV& Stream, const StandingData* pStandingData = nullptr);//Load judoka from file
 		Judoka(const YAML::Node& Yaml, const StandingData* pStandingData = nullptr);//Load judoka from file
 		Judoka(const DM4::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from DM4 data
