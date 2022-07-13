@@ -29,7 +29,7 @@ AgeGroup::AgeGroup(const YAML::Node& Yaml, const StandingData& StandingData)
 	if (Yaml["min_age"])
 		m_MinAge = Yaml["min_age"].as<uint32_t>();
 	if (Yaml["max_age"])
-		m_MinAge = Yaml["max_age"].as<uint32_t>();
+		m_MaxAge = Yaml["max_age"].as<uint32_t>();
 
 	if (Yaml["rules"])
 		m_pRules = StandingData.FindRuleSet(Yaml["rules"].as<std::string>());

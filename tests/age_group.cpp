@@ -20,6 +20,8 @@ TEST(AgeGroup, ExportImport)
 
 		EXPECT_EQ(a.GetUUID(), a2.GetUUID());
 		EXPECT_EQ(a.GetName(), a2.GetName());
+		EXPECT_EQ(a.GetMinAge(), a2.GetMinAge());
+		EXPECT_EQ(a.GetMaxAge(), a2.GetMaxAge());
 		ASSERT_TRUE(a.GetRuleSet());
 		ASSERT_TRUE(a2.GetRuleSet());
 		EXPECT_EQ(a.GetRuleSet()->GetName(),      a2.GetRuleSet()->GetName());

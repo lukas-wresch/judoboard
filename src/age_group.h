@@ -25,6 +25,8 @@ namespace Judoboard
 		std::string GetName() const { return m_Name; }
 		const RuleSet* GetRuleSet() const { return m_pRules; }
 
+		int GetMinAge() const { return m_MinAge; }
+		int GetMaxAge() const { return m_MaxAge; }
 		void SetMinAge(uint32_t Age) { m_MinAge = Age; }
 		void SetMaxAge(uint32_t Age) { m_MaxAge = Age; }
 
