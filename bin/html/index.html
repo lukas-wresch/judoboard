@@ -129,19 +129,16 @@ function Update_MatCount()
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
     console.log(response);
-    var res = response.split(",");
-
-    if (res.length < 2)
-      return;
-
+    var res = YAML.parse(response);
+    
     var matlist = document.getElementById("navi_mats");
 
     matlist.innerHTML = "";
 
-    for (var i=1; i < res.length; i+=5)
+    for (const mat of res.mats)
     {
-      if ( (res[i+1] == 1 || res[i+1] == 3) && res[i+2] == 1)//Local or remote mat and is open
-        matlist.innerHTML += "<li><a href=\"#mat.html?id=" + res[i] + "\">" + lang.mat + " " + res[i] + "</a></li>"
+      if (typeof mat.is_open !== 'undefined' && mat.is_open)
+        matlist.innerHTML += "<li><a href=\"#mat.html?id=" + mat.id + "\">" + lang.mat + " " + mat.id + "</a></li>"
     }
   });
 }
