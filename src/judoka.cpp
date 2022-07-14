@@ -123,6 +123,26 @@ void Judoka::operator >> (YAML::Emitter& Yaml) const
 
 
 
+void Judoka::ToString(YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+	Yaml << YAML::Key << "uuid"      << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "firstname" << YAML::Value << m_Firstname;
+	Yaml << YAML::Key << "lastname"  << YAML::Value << m_Lastname;
+	Yaml << YAML::Key << "weight"    << YAML::Value << m_Weight;
+	Yaml << YAML::Key << "gender"    << YAML::Value << (int)m_Gender;
+	Yaml << YAML::Key << "birthyear" << YAML::Value << m_Birthyear;
+
+	if (m_pClub)
+	{
+		Yaml << YAML::Key << "club_uuid" << YAML::Value << (std::string)m_pClub->GetUUID();
+		Yaml << YAML::Key << "club_name" << YAML::Value << (std::string)m_pClub->GetName();
+	}
+	Yaml << YAML::EndMap;
+}
+
+
+
 uint16_t Judoka::GetAge() const
 {
 	auto date = ZED::Core::GetDate();

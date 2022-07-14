@@ -42,8 +42,6 @@ namespace Judoboard
 		size_t GetNumJudoka() const { return m_Judokas.size(); }
 		size_t GetNumClubs()  const { return m_Clubs.size(); }
 
-		Judoka* FindJudoka(uint32_t ID);
-		const Judoka* FindJudoka(uint32_t ID) const;
 		Judoka* FindJudoka(const UUID& UUID);
 		const Judoka* FindJudoka(const UUID& UUID) const;
 
@@ -57,14 +55,10 @@ namespace Judoboard
 		Club* AddClub(const MD5::Club& NewClub);
 		bool  AddClub(Club* NewClub);
 
-		Club* FindClub(uint32_t ID);
-		const Club* FindClub(uint32_t ID) const;
 		Club* FindClub(const UUID& UUID);
 		const Club* FindClub(const UUID& UUID) const;
 		Club* FindClubByName(const std::string& Name);
 		const Club* FindClubByName(const std::string& Name) const;
-
-		bool DeleteClub(uint32_t ID);
 
 		//Rule sets
 		RuleSet* FindRuleSetByName(const std::string& RuleSetName);

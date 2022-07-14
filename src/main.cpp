@@ -3,11 +3,12 @@
 #include "database.h"
 #include "tournament.h"
 #include "weightclass.h"
+#include "standing_data.h"
 #include "../ZED/include/log.h"
 
 
 
-Judoboard::Judoka CreateRandomJudoka()
+Judoboard::Judoka CreateRandomJudoka(const Judoboard::StandingData* db)
 {
 	const std::string firstname_male[] =
 	{ "Ben", "Friedrich", "Phillipp", "Tim", "Lukas", "Marco", "Peter", "Martin", "Detlef", "Andreas", "Dominik", "Mathias", "Stephan", u8"Sören", "Eric", "Finn", "Felix", "Julian", "Maximilian", "Jannik"};
@@ -33,7 +34,12 @@ Judoboard::Judoka CreateRandomJudoka()
 
 	ret.SetBirthyear(1990 + rand()%20);
 
-	//TODO assign random club
+	if (db && db->GetAllClubs().size() >= 1)
+	{
+		int club_index = rand() % db->GetAllClubs().size();
+		auto club = db->GetAllClubs()[club_index];
+		ret.SetClub(club);
+	}
 
 	return ret;
 }
@@ -109,8 +115,8 @@ int main(int argc, char** argv)
 		ZED::Core::Pause(5000);
 
 		srand(ZED::Core::CurrentTimestamp());
-		auto j1 = CreateRandomJudoka();
-		auto j2 = CreateRandomJudoka();
+		auto j1 = CreateRandomJudoka(&app.GetDatabase());
+		auto j2 = CreateRandomJudoka(&app.GetDatabase());
 		Judoboard::Match match(nullptr, &j1, &j2, mat->GetMatID());
 		//Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, true, true);
 		Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, false, false);
@@ -187,7 +193,7 @@ int main(int argc, char** argv)
 		for (int i = 0; i < 5; i++)
 		{
 			//app.GetDatabase().AddJudoka(CreateRandomJudoka());
-			tourney->AddParticipant(new Judoboard::Judoka(CreateRandomJudoka()));
+			tourney->AddParticipant(new Judoboard::Judoka(CreateRandomJudoka(&app.GetDatabase())));
 		}
 
 		app.AddTournament(tourney);
@@ -304,10 +310,14 @@ int main(int argc, char** argv)
 #ifdef _DEBUG
 	if (app.GetDatabase().GetNumJudoka() < 5)
 	{
+		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
+		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
+		app.GetDatabase().AddClub(new Judoboard::Club("Senne"));
+
 		ZED::Log::Debug("Adding debug judoka");
 
 		for (int i = 0; i < 35; i++)
-			app.GetDatabase().AddJudoka(CreateRandomJudoka());
+			app.GetDatabase().AddJudoka(CreateRandomJudoka(&app.GetDatabase()));
 	}
 #endif
 

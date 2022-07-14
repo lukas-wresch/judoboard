@@ -138,11 +138,7 @@ namespace Judoboard
 		}
 
 	private:
-		[[deprecated]]
-		bool Load(const std::string& Filename);
 		bool LoadYAML(const std::string& Filename);
-		[[deprecated]]
-		bool Save(const std::string& Filename) const;
 		bool SaveYAML(const std::string& Filename) const;
 
 		void FindAgeGroupForJudoka(const Judoka& Judoka);

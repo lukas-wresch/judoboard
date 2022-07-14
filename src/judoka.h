@@ -62,6 +62,7 @@ namespace Judoboard
 
 		void operator >> (ZED::CSV& Stream) const;
 		void operator >> (YAML::Emitter& Yaml) const;
+		void ToString(YAML::Emitter& Yaml) const;
 
 		bool operator ==(const Judoka& cmp) const { return GetUUID() == cmp.GetUUID(); }
 

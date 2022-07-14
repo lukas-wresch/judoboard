@@ -520,13 +520,13 @@ void Application::SetupHttpServer()
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		if (id <= 0)
+		if (matID <= 0)
 			return Error(Error::Type::InvalidID);
 
 		LockTillScopeEnd();
-		auto mat = FindMat(id);
+		auto mat = FindMat(matID);
 
 		if (!mat)
 			return Error(Error::Type::MatNotFound);
@@ -543,15 +543,16 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return "No Tournament is currently open";
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		if (id <= 0)
+		if (matID <= 0)
 			return Error(Error::Type::InvalidID);
 
-		auto mat = FindMat(id);
+		LockTillScopeEnd();
+		auto mat = FindMat(matID);
 
 		if (!mat)
-			return "Mat not found";
+			return Error(Error::Type::MatNotFound);
 
 		auto nextMatch = GetTournament()->GetNextMatch(mat->GetMatID());
 		if (nextMatch)
@@ -565,12 +566,13 @@ void Application::SetupHttpServer()
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		if (id <= 0)
+		if (matID <= 0)
 			return Error(Error::Type::InvalidID);
 
-		auto mat = FindMat(id);
+		LockTillScopeEnd();
+		auto mat = FindMat(matID);
 
 		if (!mat)
 			return Error(Error::Type::MatNotFound);
@@ -589,15 +591,15 @@ void Application::SetupHttpServer()
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
-			return std::string();
+			return Error(Error::Type::InvalidID);
 
 		auto mat = FindMat(id);
 
 		if (!mat)
-			return std::string();
+			return Error(Error::Type::MatNotFound);
 
 		return std::to_string(mat->GetTimeElapsed()) + "," + (mat->IsHajime() ? "1" : "0");
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/mat/get_score", [this](auto& Request) -> std::string {
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -1135,7 +1137,7 @@ void Application::SetupHttpServer()
 		for (auto [id, judoka] : m_Database.GetAllJudokas())
 		{
 			if (judoka)
-				*judoka >> ret;
+				judoka->ToString(ret);
 		}
 		ret << YAML::EndSeq;
 		return ret.c_str();
@@ -2374,18 +2376,18 @@ void Application::SetupHttpServer()
 		if (!IsMaster())
 			return "You are not allowed to connect";
 
-		auto uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "uuid");
+		UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "uuid");
 
 		ZED::Log::Info("Slave requested participant info");
 
-		auto judoka = GetTournament()->FindParticipant(UUID(std::move(uuid)));
+		auto judoka = GetTournament()->FindParticipant(uuid);
 
 		if (!judoka)
 			return "Not found";
 
-		ZED::CSV csv;
-		*judoka >> csv;
-		return csv;
+		YAML::Emitter yaml;
+		*judoka >> yaml;
+		return yaml.c_str();
 	});
 
 	m_Server.RegisterResource("/ajax/master/post_match_result", [this](auto& Request) -> std::string {

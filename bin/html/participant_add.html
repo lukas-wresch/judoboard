@@ -14,8 +14,6 @@
   </tr>
 </table>
 
-<button class="add" id="add" onclick="return AddParticipant()">Add Participant</button>
-
 <form style="display: inline;" action="/upload/dm4" method="post" id="upload_form" enctype="multipart/form-data">
     <input id="file" name="file" type="file" accept="text/*.*" onchange="document.getElementById('upload_form').submit();" hidden/>
     <button class="add" id="add" onclick="document.getElementById('file').click(); return false;">Upload DM4 File</button>
@@ -131,25 +129,6 @@ document.getElementById("name").oninput = function(e)
 };
 
 
-$("#white").autocomplete({
-    minLength: 1 ,
-    focus:  function( event, ui ) { this.value = ui.item.label; return false; },
-    select: function( event, ui ) { this.value = ui.item.label; $( "#white_id" ).val(ui.item.value);return false; }
-});
-
-
-$.ajax({
-      url: "ajax/judoka/autocomplete",
-      success: function(data)
-      {
-        var obj = jQuery.parseJSON(data);
-
-        $("#white").autocomplete( "option", "source", obj );
-      }
-    }); 
-
-
-document.getElementById("add").innerHTML      = lang.add_participant;
 document.getElementById("headline").innerHTML = lang.new_participant;
 
 </script>
