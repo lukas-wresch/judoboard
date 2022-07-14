@@ -1104,6 +1104,21 @@ bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* Ag
 
 
 
+std::vector<const AgeGroup*> Tournament::GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const
+{
+	std::vector<const AgeGroup*> ret;
+
+	for (auto age_group : m_StandingData.GetAgeGroups())
+	{
+		if (Judoka && age_group->IsElgiable(*Judoka))
+			ret.emplace_back(age_group);
+	}
+
+	return ret;
+}
+
+
+
 void Tournament::ListAgeGroups(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginSeq;
@@ -1347,21 +1362,20 @@ const std::string Tournament::Participants2String() const
 		ret << YAML::Key << "age_groups" << YAML::Value;
 		ret << YAML::BeginSeq;
 
-		for (auto age_group : m_StandingData.GetAgeGroups())
+		auto age_groups = GetEligableAgeGroupsOfJudoka(judoka);
+		for (auto age_group : age_groups)
 		{
-			if (age_group->IsElgiable(*judoka))
-			{
-				ret << YAML::BeginMap;
-				ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
-				ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
-				ret << YAML::EndMap;
-			}
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
+			ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
+			ret << YAML::EndMap;
 		}
 
 		ret << YAML::EndSeq;
 
 		ret << YAML::EndMap;
 	}
+
 	Unlock();
 	ret << YAML::EndSeq;
 	return ret.c_str();

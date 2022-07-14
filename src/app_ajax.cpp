@@ -258,6 +258,16 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/judoka/search", [this](auto& Request) -> std::string {
+		if (!IsLoggedIn(Request))
+			return Error(Error::Type::NotLoggedIn);
+
+		auto search_string = HttpServer::DecodeURLEncoded(Request.m_Query, "name");
+
+		return m_Database.Judoka2String(search_string, GetTournament());
+	});
+
+
 	m_Server.RegisterResource("/ajax/hansokumake/get", [this](auto& Request) -> std::string {
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
@@ -1052,7 +1062,7 @@ void Application::SetupHttpServer()
 
 
 
-	m_Server.RegisterResource("/ajax/judoka/autocomplete", [this](auto& Request) -> std::string {
+	/*m_Server.RegisterResource("/ajax/judoka/autocomplete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1063,7 +1073,7 @@ void Application::SetupHttpServer()
 			return GetTournament()->JudokaToJSON();
 
 		return m_Database.JudokaToJSON();
-	});
+	});*/
 
 
 	m_Server.RegisterResource("/ajax/judoka/add", [this](auto& Request) -> std::string {
@@ -1210,7 +1220,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Body, "id");
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto judoka = m_Database.FindJudoka(id);
 

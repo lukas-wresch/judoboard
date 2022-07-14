@@ -1,13 +1,18 @@
 <h1 id="headline">New Participant</h1>
 
 <div>
-    <label id="label_white" style="width:150px;float:left;margin-top:5px;">Name</label>
-    <input style="margin-bottom:20px;" size="50" id="white" value="">
-    <input type="hidden" id="white_id" value=""/>
+  <label id="label_name" style="width:150px;float:left;margin-top:5px;">Name</label>
+  <input style="margin-bottom:20px;" size="50" id="name" value="">
 </div>
 
-<div id="note" style="display: none; font-weight: bold;">
-</div>
+<table id="judokas" border="1" rules="all" style="margin-bottom: 1cm;">
+  <tr>
+    <th style="width: 0.5cm;" class="no">No.</th>
+    <th style="width: 6.2cm;" id="name">Name</th>
+    <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
+    <th style="width: 5.1cm; text-align: center;" class="options">Options</th>
+  </tr>
+</table>
 
 <button class="add" id="add" onclick="return AddParticipant()">Add Participant</button>
 
@@ -19,22 +24,111 @@
 
 <script>
 
-function AddParticipant()
+function AddParticipant(id)
 {
-  var params = URLEncode({
-    id: document.getElementById("white_id").value
-  });
-
-  AjaxPost('ajax/participant/add', params, function() {
-    $("#note").text(document.getElementById("white").value + " added to tournament.");
-    $("#note").show(1000).delay(3000).hide(2000);
-
-    document.getElementById("white").value = "";
-    document.getElementById("white_id").value = "";
-  });
+  var select = document.getElementById("select_" + id);
+  if (typeof select !== 'undefined')
+  {
+    if (select.value == 0)
+    {
+        alert("Select age group");
+        return false;
+    }
+    
+    AjaxCallback('ajax/participant/add?id=' + id, function() {
+      AjaxCallback('/ajax/tournament/assign_age_group?id=' + id + '&age=' + select.value, Update);
+    });
+  }
+  else
+    AjaxCallback('ajax/participant/add?id=' + id, Update);
 
   return false;
 }
+
+
+function RemoveParticipant(id)
+{
+  AjaxCallback('/ajax/participant/remove?id=' + id, Update);
+  return false;
+}
+
+
+
+function Update()
+{
+  AjaxCallback('ajax/judoka/search?name=' + document.getElementById("name").value, function(response) {
+    var res = YAML.parse(response);
+
+    var table = document.getElementById("judokas");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    var no = 0;
+    for (const judoka of res)
+    {
+      var row = table.insertRow(-1);
+      var cell0 = row.insertCell(0);
+      var cell1 = row.insertCell(1);
+      var cell2 = row.insertCell(2);
+      var cell3 = row.insertCell(3);
+
+      if (no%2 == 0)
+        row.style.backgroundColor = "#eee";
+      no++;
+
+      cell0.innerHTML = no;
+      cell0.style.textAlign = "center";
+      cell0.style.fontSize  = "16pt";
+
+      cell1.innerHTML = judoka.name;
+      cell1.style.fontSize  = "16pt";
+
+      cell2.innerHTML = judoka.weight + " kg";
+      cell2.style.textAlign = "center";
+      cell2.style.fontSize  = "16pt";
+
+      if (judoka.is_participant)
+        cell3.innerHTML = "<button class=\"remove\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + lang.remove + "</button>";
+      else
+      {
+        if (judoka.age_groups.length > 1)
+        {
+          var select = document.createElement("select");
+          select.style.width = "2.0cm";
+          select.style.fontSize  = "14pt";
+          select.id = "select_" + judoka.uuid;
+
+          var option = document.createElement("option");
+          option.value = 0;
+          option.text  = "None";
+          select.appendChild(option);
+
+          for (const age_group of judoka.age_groups)
+          {
+            var option = document.createElement("option");
+            option.value = age_group.uuid;
+            option.text  = age_group.name;
+
+            select.appendChild(option);
+          }
+
+          cell3.appendChild(select);
+        }
+
+        cell3.innerHTML += "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return AddParticipant('"+judoka.uuid+"')\">" + lang.add + "</button>";
+      }
+      cell3.style.textAlign = "right";
+    }
+  });
+}
+
+
+
+document.getElementById("name").oninput = function(e)
+{
+  Update();
+};
 
 
 $("#white").autocomplete({
@@ -55,7 +149,7 @@ $.ajax({
     }); 
 
 
-document.getElementById("add").innerHTML       = lang.add_participant;
-document.getElementById("headline").innerHTML  = lang.new_participant;
+document.getElementById("add").innerHTML      = lang.add_participant;
+document.getElementById("headline").innerHTML = lang.new_participant;
 
 </script>

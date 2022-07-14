@@ -92,7 +92,7 @@ namespace Judoboard
 		const std::vector<AgeGroup*>& GetAgeGroups() const { return m_AgeGroups; }
 
 		//Serialization
-		const std::string JudokaToJSON() const;
+		const std::string Judoka2String(std::string SearchString, const ITournament* Tournament) const;
 
 	protected:
 		std::unordered_map<std::string, Judoka*> m_Judokas;

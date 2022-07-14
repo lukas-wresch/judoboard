@@ -83,6 +83,10 @@ namespace Judoboard
 		virtual AgeGroup* FindAgeGroup(const UUID& UUID) { return nullptr; }
 		virtual const AgeGroup* FindAgeGroup(const UUID& UUID) const { return nullptr; }
 		virtual const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) const { return nullptr; }
+		virtual std::vector<const AgeGroup*> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const {
+			std::vector<const AgeGroup*> ret;
+			return ret;
+		}
 		virtual void ListAgeGroups(YAML::Emitter& Yaml) const {}
 
 		//Master schedule / schedule entries

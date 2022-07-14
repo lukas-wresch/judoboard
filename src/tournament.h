@@ -43,7 +43,7 @@ namespace Judoboard
 		Match* FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
 		const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
-		virtual const std::string JudokaToJSON() const override { return m_StandingData.JudokaToJSON(); }
+		//virtual const std::string JudokaToJSON() const override { return m_StandingData.JudokaToJSON(); }
 
 		void SetName(const std::string& NewName) { m_Name = NewName; }
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
@@ -109,6 +109,7 @@ namespace Judoboard
 		}
 		AgeGroup* FindAgeGroup(const UUID& UUID) { return m_StandingData.FindAgeGroup(UUID); }
 		const AgeGroup* FindAgeGroup(const UUID& UUID) const { return m_StandingData.FindAgeGroup(UUID); }
+		virtual std::vector<const AgeGroup*> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const override;
 		virtual void ListAgeGroups(YAML::Emitter& Yaml) const override;
 
 		//Master schedule / schedule entries
