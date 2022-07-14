@@ -87,12 +87,18 @@ namespace Judoboard
 			std::vector<const AgeGroup*> ret;
 			return ret;
 		}
+		virtual std::vector<const AgeGroup*> GetAgeGroups() const {
+			std::vector<const AgeGroup*> ret;
+			return ret;
+		}
 		virtual void ListAgeGroups(YAML::Emitter& Yaml) const {}
 
 		//Master schedule / schedule entries
 		virtual Schedulable* GetScheduleEntry(const UUID& UUID) { return nullptr; }
 		virtual bool MoveScheduleEntryUp(const UUID& UUID) { return false; }
 		virtual bool MoveScheduleEntryDown(const UUID& UUID) { return false; }
+
+		virtual void GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups) {}
 
 		//Disqualifications
 		virtual void Disqualify(const Judoka& Judoka) {}

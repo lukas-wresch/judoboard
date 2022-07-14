@@ -1617,6 +1617,36 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/matchtable/generate", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		if (!GetTournament())
+			return std::string("No tournament is open");
+
+		auto min  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "min"));
+		auto max  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "max"));
+		auto diff = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "diff"));
+
+		if (min <= 0 || max <= 0 || diff <= 0)
+			return Error(Error::Type::InvalidInput);
+
+		auto age_groups = GetTournament()->GetAgeGroups();
+		for (auto it = age_groups.begin(); it != age_groups.end();)
+		{
+			if (ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, (std::string)(*it)->GetUUID())) != 1)
+				it = age_groups.erase(it);
+			else
+				++it;
+		}
+
+		GetTournament()->GenerateWeightclasses(min, max, diff, age_groups);
+
+		return Error();//OK
+	});
+
+
 	m_Server.RegisterResource("/ajax/matchtable/delete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)

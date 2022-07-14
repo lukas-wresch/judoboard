@@ -110,12 +110,15 @@ namespace Judoboard
 		AgeGroup* FindAgeGroup(const UUID& UUID) { return m_StandingData.FindAgeGroup(UUID); }
 		const AgeGroup* FindAgeGroup(const UUID& UUID) const { return m_StandingData.FindAgeGroup(UUID); }
 		virtual std::vector<const AgeGroup*> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const override;
+		virtual std::vector<const AgeGroup*> GetAgeGroups() const override;
 		virtual void ListAgeGroups(YAML::Emitter& Yaml) const override;
 
 		//Master schedule / schedule entries
 		Schedulable* GetScheduleEntry(const UUID& UUID) override;
 		bool MoveScheduleEntryUp(const UUID& UUID) override;
 		bool MoveScheduleEntryDown(const UUID& UUID) override;
+
+		virtual void GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups) override;
 
 		//Disqualifications
 		bool IsDisqualified(const Judoka& Judoka) const;

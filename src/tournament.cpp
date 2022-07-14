@@ -978,6 +978,18 @@ std::vector<const AgeGroup*> Tournament::GetEligableAgeGroupsOfJudoka(const Judo
 
 
 
+std::vector<const AgeGroup*> Tournament::GetAgeGroups() const
+{
+	std::vector<const AgeGroup*> ret;
+
+	for (auto age_group : m_StandingData.GetAgeGroups())
+		ret.emplace_back(age_group);
+
+	return ret;
+}
+
+
+
 void Tournament::ListAgeGroups(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginSeq;
@@ -1090,6 +1102,13 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 	GenerateSchedule();
 	Unlock();
 	return true;
+}
+
+
+
+void Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups)
+{
+	//TODO
 }
 
 
