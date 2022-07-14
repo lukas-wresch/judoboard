@@ -678,9 +678,9 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 	}
 
 	FindAgeGroupForJudoka(*Judoka);
+	Unlock();
 
 	GenerateSchedule();
-	Unlock();
 
 	return true;
 }
@@ -1106,9 +1106,106 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 
 
 
-void Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups)
+struct Generator
 {
-	//TODO
+	int m_Min;
+	int m_Max;
+	int m_Diff;
+
+	bool split(std::vector<std::pair<int, int>>& WeightsSlots, int Start, int End)
+	{
+		auto calculateMedian = [](std::vector<std::pair<int, int>>& v, int Start, int End) -> int
+		{
+			if ((End-Start) % 2 == 0)
+			{
+				size_t n = (End-Start) / 2;
+				return (v[Start+n].first + v[Start+n+1].first) / 2;
+			}
+			else
+			{
+				size_t n = (End-Start) / 2;
+				std::nth_element(v.begin(), v.begin() + n, v.end());
+				return v[Start+n].first;
+			}
+		};
+
+
+		static int next_weight_id = 1;
+
+		int median = calculateMedian(WeightsSlots, Start, End);
+		int count = End-Start;
+
+		int min = 1000;
+		int max = 0;
+		for (int i = Start; i < End; ++i)
+		{
+			if (WeightsSlots[i].first < min)
+				min = WeightsSlots[i].first;
+			if (WeightsSlots[i].first > max)
+				max = WeightsSlots[i].first;
+		}
+
+		bool need_split = count > m_Max;//Must split
+		need_split |= (count >= 2 * m_Min) && (max - min > m_Diff);
+
+		if (need_split)
+		{
+			int Middle = Start;
+			for (int i = Start; i < End; ++i)
+			{
+				if (WeightsSlots[i].first < median)
+				{
+					WeightsSlots[i].second = next_weight_id;
+					Middle = i;
+				}
+				else
+					WeightsSlots[i].second = next_weight_id + 1;
+			}
+
+			next_weight_id += 2;
+
+			split(WeightsSlots, Start, Middle + 1);
+			split(WeightsSlots, Middle + 1, End);
+		}
+
+		return need_split;
+	}
+};
+
+
+
+std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups)
+{
+	YAML::Emitter ret;
+
+	for (auto age_group : AgeGroups)
+	{
+		std::vector<std::pair<int, int>> weightsSlots;
+		int min = 1000;
+		int max = 0;
+		for (const auto [id, judoka] : m_StandingData.GetAllJudokas())
+		{
+			auto age_group_of_judoka = GetAgeGroupOfJudoka(judoka);
+			if (age_group_of_judoka && age_group_of_judoka->GetUUID() == age_group->GetUUID())
+			{
+				const int weight = judoka->GetWeight();
+				weightsSlots.emplace_back(weight, 0);
+			}
+		}
+
+		std::sort(weightsSlots.begin(), weightsSlots.end(),
+			[](const std::pair<int, int>& a, const std::pair<int, int>& b) {
+			return a.first < b.first;
+		});
+
+		Generator gen;
+		gen.m_Min  = Min;
+		gen.m_Max  = Max;
+		gen.m_Diff = Diff;
+		gen.split(weightsSlots, 0, (int)weightsSlots.size());
+	}
+
+	return ret.c_str();
 }
 
 
@@ -1429,5 +1526,5 @@ void Tournament::GenerateSchedule()
 
 	Unlock();
 
-	assert(Save());
+	Save();
 }
