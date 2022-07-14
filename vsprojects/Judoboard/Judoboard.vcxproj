@@ -86,14 +86,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>..\..\external;$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\bin\$(Configuration);..\..\external;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\bin;..\..\external;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\bin\</OutDir>
     <TargetName>$(ProjectName)_Debug</TargetName>
     <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>..\..\bin\$(Configuration);..\..\external;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\bin;..\..\external;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <IncludePath>..\..\external;$(IncludePath)</IncludePath>
