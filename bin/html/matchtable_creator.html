@@ -1,0 +1,92 @@
+<h1 id="headline">New Matchtables</h1>
+
+
+<div id="age_groups" style="margin-bottom: 1cm; font-size: 14pt;">
+  <label id="label_age_group" style="width:100px;margin-top:5px;">Age Groups</label><br/>
+</div>
+
+<div style="margin-bottom: 5mm; font-size: 14pt; width: 100%;">
+  <label id="label_max_participants_" style="width:80cm;margin-top:5px;">Max Participants</label>:
+  <span id="value_max_participants">5</span>
+  <input type="range" min="1" max="10" value="5" class="slider" id="max_participants">
+</div>
+
+<div style="margin-bottom: 5mm; font-size: 14pt; width: 100%;">
+  <label id="label_min_participants" style="width:100px;margin-top:5px;">Min Participants</label>:
+  <span id="value_min_participants">2</span>
+  <input type="range" min="1" max="10" value="2" class="slider" id="min_participants">
+</div>
+
+<div style="margin-bottom: 5mm; font-size: 14pt; width: 100%;">
+  <label id="label_weight_diff" style="width:100px;margin-top:5px;">Max Weight difference</label>:
+  <span id="value_weight_diff">10</span>%
+  <input type="range" min="1" max="100" value="10" class="slider" id="weight_diff">
+</div>
+
+<div id="div_matchtables" style="margin-top: 1cm;">
+  <h2>Match tables</h2>
+  <table id="matchtables" border="1" rules="all" style="margin-bottom: 1cm;">
+    <tr>
+      <th style="width: 0.5cm;" id="no">No.</th>
+      <th style="width: 4cm;" id="name">Name</th>
+      <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
+      <th style="width: 3.0cm; text-align: center;">Options</th>
+    </tr>
+  </table>
+</div>
+
+
+<button id="add" class="add" onclick="return Add();"></button>
+
+<script>
+
+
+document.getElementById("max_participants").oninput = function() {
+  document.getElementById("value_max_participants").innerHTML = this.value;
+  Update();
+}
+
+document.getElementById("min_participants").oninput = function() {
+  document.getElementById("value_min_participants").innerHTML = this.value;
+  Update();
+}
+
+document.getElementById("weight_diff").oninput = function() {
+  document.getElementById("value_weight_diff").innerHTML = this.value;
+  Update();
+}
+
+
+
+function Update()
+{
+
+}
+
+
+
+function GetAgeGroups_Multiple()
+{
+  AjaxCallback("ajax/age_groups/list", function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    var ages = document.getElementById("age_groups");
+
+    for (const age of res)
+    {
+      ages.innerHTML += "<label><input type=\"checkbox\" value=\"" + age.uuid + "\" />" + age.name + "</label><br/>";
+    }
+  });
+}
+
+
+
+
+GetAgeGroups_Multiple();
+Update();
+
+
+document.getElementById("add").innerHTML = lang.add_matchtable;
+
+</script>

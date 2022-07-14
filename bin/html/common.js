@@ -11,6 +11,7 @@ var lang_en = {
     add: "Add",
     add_match: "Add Match",
     add_matchtable: "Add Match Table",
+    generate_matchtables: "Generate Match Tables",
     update_matchtable: "Update Match Table",
     delete_matchtable: "Delete Match Table",
     matchtable: "Match Table",
@@ -120,6 +121,7 @@ var lang_de = {
     add: "Hinzuf&uuml;gen",
     add_match: "Kampf hinzuf&uuml;gen",
     add_matchtable: "Kampfliste hinzuf&uuml;gen",
+    generate_matchtables: "Kampflisten generieren",
     update_matchtable: "Kampfliste &auml;ndern",
     delete_matchtable: "Kampfliste l&ouml;schen",
     matchtable: "Kampfliste",
@@ -444,6 +446,32 @@ function GetRuleSets(callback)
 
     if (typeof res.default !== 'undefined' && rule.uuid == res.default)
         rules.value = res.default;
+
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+}
+
+
+
+function GetAgeGroups(callback)
+{
+  AjaxCallback("ajax/age_groups/list", function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    var ages = document.getElementById("age_group");
+
+    while (ages.length >= 1)
+      ages.remove(ages.length-1);
+
+    for (const age of res)
+    {
+      var option = document.createElement("option");
+      option.value = age.uuid;
+      option.text  = age.name;
+      ages.add(option);
+    }
 
     if (typeof callback !== 'undefined')
       callback();
