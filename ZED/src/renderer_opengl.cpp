@@ -61,6 +61,8 @@ bool ZED::RendererOpenGL::Init(HWND Hwnd)
 bool ZED::RendererOpenGL::Init(GtkWindow* DrawingArea)
 #endif
 {
+	Log::Info("Starting OpenGL renderer");
+
 #ifdef _WIN32
 	if (!RendererSDL2::Init(Hwnd))
 #else

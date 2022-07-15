@@ -31,6 +31,8 @@ bool RendererSDL2::Init(HWND Hwnd)
 bool RendererSDL2::Init(GtkWindow* DrawingArea)
 #endif
 {
+	Log::Info("Starting SDL2 renderer");
+
 	//Make sure the window has been created and has received WM_CREATE otherwise SDL2 might crash in SetProp() in SDL_CreateWindowFrom()
 #ifdef _WIN32
 	if (!IsWindow(Hwnd))
