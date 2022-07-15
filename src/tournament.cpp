@@ -1146,9 +1146,8 @@ std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const 
 		for (auto [weight, weightclass] : weightsSlots)
 		{
 			//New weightclass
-			if (currentClass != weightclass)
+			if (currentClass != weightclass && currentClass != -1)
 			{
-				currentClass = weightclass;
 				weight_max = weight;
 
 				//Close weightclass
@@ -1165,6 +1164,7 @@ std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const 
 			}
 
 			judoka_count++;
+			currentClass = weightclass;
 		}
 
 		//Close weightclass

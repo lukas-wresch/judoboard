@@ -22,5 +22,15 @@ namespace Judoboard
 
 		static int calculateMedian(std::vector<std::pair<int, int>>& v, int Start, int End);
 		bool split(std::vector<std::pair<int, int>>& WeightsSlots, int Start, int End);
+
+		std::vector<std::pair<int, int>> split(const std::vector<int>& Weights)
+		{
+			std::vector<std::pair<int, int>> weightsSlots;
+			for (auto weight : Weights)
+				weightsSlots.emplace_back(weight, 0);
+
+			split(weightsSlots, 0, (int)weightsSlots.size());
+			return weightsSlots;
+		}
 	};
 }

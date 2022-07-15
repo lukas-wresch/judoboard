@@ -33,7 +33,7 @@ bool Generator::split(std::vector<std::pair<int, int>>& WeightsSlots, int Start,
 	static int next_weight_id = 1;
 
 	int median = calculateMedian(WeightsSlots, Start, End);
-	int count = End-Start;
+	int count  = End-Start;
 
 	int min = 1000;
 	int max = 0;
