@@ -80,6 +80,7 @@
     <ClCompile Include="..\..\tests\remote_mat.cpp" />
     <ClCompile Include="..\..\tests\timer.cpp" />
     <ClCompile Include="..\..\tests\tournament.cpp" />
+    <ClCompile Include="..\..\tests\weightclass_generator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Judoboard\Judoboard.vcxproj">
@@ -128,7 +129,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>account.obj;age_group.obj;app.obj;app_ajax.obj;club.obj;customtable.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;yaml-cpp\yaml-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;age_group.obj;app.obj;app_ajax.obj;club.obj;customtable.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;weightclass_generator.obj;window_win.obj;yaml-cpp\yaml-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -169,7 +170,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;customtable.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;yaml-cpp\yaml-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;customtable.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;weightclass_generator.obj;window_win.obj;yaml-cpp\yaml-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

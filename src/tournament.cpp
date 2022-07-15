@@ -5,6 +5,7 @@
 #include "tournament.h"
 #include "database.h"
 #include "weightclass.h"
+#include "weightclass_generator.h"
 #include "md5.h"
 #define YAML_CPP_STATIC_DEFINE
 #include "yaml-cpp/yaml.h"
@@ -1106,77 +1107,10 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 
 
 
-struct Generator
-{
-	int m_Min;
-	int m_Max;
-	int m_Diff;
-
-	bool split(std::vector<std::pair<int, int>>& WeightsSlots, int Start, int End)
-	{
-		auto calculateMedian = [](std::vector<std::pair<int, int>>& v, int Start, int End) -> int
-		{
-			if ((End-Start) % 2 == 0)
-			{
-				size_t n = (End-Start) / 2;
-				return (v[Start+n].first + v[Start+n+1].first) / 2;
-			}
-			else
-			{
-				size_t n = (End-Start) / 2;
-				std::nth_element(v.begin(), v.begin() + n, v.end());
-				return v[Start+n].first;
-			}
-		};
-
-
-		static int next_weight_id = 1;
-
-		int median = calculateMedian(WeightsSlots, Start, End);
-		int count = End-Start;
-
-		int min = 1000;
-		int max = 0;
-		for (int i = Start; i < End; ++i)
-		{
-			if (WeightsSlots[i].first < min)
-				min = WeightsSlots[i].first;
-			if (WeightsSlots[i].first > max)
-				max = WeightsSlots[i].first;
-		}
-
-		bool need_split = count > m_Max;//Must split
-		need_split |= (count >= 2 * m_Min) && (max - min > m_Diff);
-
-		if (need_split)
-		{
-			int Middle = Start;
-			for (int i = Start; i < End; ++i)
-			{
-				if (WeightsSlots[i].first < median)
-				{
-					WeightsSlots[i].second = next_weight_id;
-					Middle = i;
-				}
-				else
-					WeightsSlots[i].second = next_weight_id + 1;
-			}
-
-			next_weight_id += 2;
-
-			split(WeightsSlots, Start, Middle + 1);
-			split(WeightsSlots, Middle + 1, End);
-		}
-
-		return need_split;
-	}
-};
-
-
-
 std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups)
 {
 	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
 
 	for (auto age_group : AgeGroups)
 	{
@@ -1203,8 +1137,46 @@ std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const 
 		gen.m_Max  = Max;
 		gen.m_Diff = Diff;
 		gen.split(weightsSlots, 0, (int)weightsSlots.size());
+
+		//Generate yaml output
+		int currentClass = -1;
+		int weight_min = 0;
+		int weight_max = 0;
+		int judoka_count = 0;
+		for (auto [weight, weightclass] : weightsSlots)
+		{
+			//New weightclass
+			if (currentClass != weightclass)
+			{
+				currentClass = weightclass;
+				weight_max = weight;
+
+				//Close weightclass
+				ret << YAML::BeginMap;
+				ret << YAML::Key << "min" << YAML::Value << weight_min;
+				ret << YAML::Key << "max" << YAML::Value << weight_max;
+				std::string name = age_group->GetName() + " " + std::to_string(min) + " - " + std::to_string(max);
+				ret << YAML::Key << "name" << YAML::Value << name;
+				ret << YAML::Key << "num_participants" << YAML::Value << judoka_count;
+				ret << YAML::EndMap;
+
+				weight_min = weight;
+				judoka_count = 0;
+			}
+
+			judoka_count++;
+		}
+
+		//Close weightclass
+		ret << YAML::BeginMap;
+		ret << YAML::Key << "min" << YAML::Value << weight_min;
+		std::string name = age_group->GetName() + " " + std::to_string(min) + "+";
+		ret << YAML::Key << "name" << YAML::Value << name;
+		ret << YAML::Key << "num_participants" << YAML::Value << judoka_count;
+		ret << YAML::EndMap;
 	}
 
+	ret << YAML::EndSeq;
 	return ret.c_str();
 }
 
