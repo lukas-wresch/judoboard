@@ -32,7 +32,7 @@ Judoboard::Judoka CreateRandomJudoka(const Judoboard::StandingData* db)
 		ret = Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Female);
 	}
 
-	ret.SetBirthyear(1990 + rand()%20);
+	ret.SetBirthyear(1990 + rand()%25);
 
 	if (db && db->GetAllClubs().size() >= 1)
 	{

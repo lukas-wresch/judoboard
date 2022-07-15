@@ -10,6 +10,7 @@
     <th style="width: 0.5cm;" class="no">No.</th>
     <th style="width: 6.2cm;" id="name">Name</th>
     <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
+    <th style="width: 2cm; text-align: center;" id="birthyear">Birthyear</th>
     <th style="width: 5.1cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -70,6 +71,7 @@ function Update()
       var cell1 = row.insertCell(1);
       var cell2 = row.insertCell(2);
       var cell3 = row.insertCell(3);
+      var cell4 = row.insertCell(4);
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
@@ -86,15 +88,19 @@ function Update()
       cell2.style.textAlign = "center";
       cell2.style.fontSize  = "16pt";
 
+      cell3.innerHTML = judoka.birthyear;
+      cell3.style.textAlign = "center";
+      cell3.style.fontSize  = "16pt";
+
       if (judoka.is_participant)
-        cell3.innerHTML = "<button class=\"remove\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + lang.remove + "</button>";
+        cell4.innerHTML = "<button class=\"remove\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + lang.remove + "</button>";
       else
       {
         if (judoka.age_groups.length > 1)
         {
           var select = document.createElement("select");
           select.style.width = "2.0cm";
-          select.style.fontSize  = "14pt";
+          select.style.fontSize = "14pt";
           select.id = "select_" + judoka.uuid;
 
           var option = document.createElement("option");
@@ -111,12 +117,12 @@ function Update()
             select.appendChild(option);
           }
 
-          cell3.appendChild(select);
+          cell4.appendChild(select);
         }
 
-        cell3.innerHTML += "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return AddParticipant('"+judoka.uuid+"')\">" + lang.add + "</button>";
+        cell4.innerHTML += "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return AddParticipant('"+judoka.uuid+"')\">" + lang.add + "</button>";
       }
-      cell3.style.textAlign = "right";
+      cell4.style.textAlign = "right";
     }
   });
 }
