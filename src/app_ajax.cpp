@@ -1641,9 +1641,9 @@ void Application::SetupHttpServer()
 				++it;
 		}
 
-		GetTournament()->GenerateWeightclasses(min, max, diff, age_groups);
+		return GetTournament()->GenerateWeightclasses(min, max, diff, age_groups);
 
-		return Error();//OK
+		//return Error();//OK
 	});
 
 

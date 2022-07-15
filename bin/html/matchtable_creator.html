@@ -83,9 +83,8 @@ function Update()
   console.log(data);
 
   var params = URLEncode(data);
-  console.log(params);
 
-  AjaxPost("ajax/matchtable/generate", params, function(response) {
+  AjaxPostToYaml("ajax/matchtable/generate", params, function(response) {
     console.log(response);
     var res = YAML.parse(response);
 
@@ -95,7 +94,7 @@ function Update()
       table.deleteRow(table.rows.length-1);
 
     var no = 0;
-    for (const weightclass in res)
+    for (const weightclass of res)
     {
       var row = table.insertRow(-1);
       var cell1 = row.insertCell(0);
@@ -103,14 +102,25 @@ function Update()
       var cell3 = row.insertCell(2);
       var cell4 = row.insertCell(3);
 
+      console.log(weightclass);
+
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
       no++;
       cell1.innerHTML = no;
+      cell1.style.fontSize  = "16pt";
 
       cell2.innerHTML = weightclass.name;
+      cell2.style.textAlign = "center";
+      cell2.style.fontSize  = "16pt";
 
-      cell3.innerHTML = weightclass.num_participants;
+      cell3.innerHTML = weightclass.min + " - " + weightclass.max;
+      cell3.style.textAlign = "center";
+      cell3.style.fontSize  = "16pt";
+
+      cell4.innerHTML = weightclass.num_participants;
+      cell4.style.textAlign = "center";
+      cell4.style.fontSize  = "16pt";
     }
   });
 }

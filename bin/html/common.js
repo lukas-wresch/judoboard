@@ -350,6 +350,23 @@ function AjaxPost(url, params, callback)
 
 
 
+function AjaxPostToYaml(url, params, callback)
+{
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", url);
+  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+  xhttp.onreadystatechange = function()
+  {
+    if (this.readyState == 4 && this.status == 200 && typeof callback !== 'undefined')
+      callback(this.responseText);
+  };
+
+  xhttp.send(params);
+}
+
+
+
 function Color(index)
 {
   if (index == 1)
