@@ -55,4 +55,6 @@ jobs:
     - name: compile
       run: dir; .\compile64.bat
     - name: Run Tests
+      run: dir; cd bin; dir; .\GoogleTest.exe --gtest_filter=Matnothing
+    - name: Debug Tests
       run: dir; cd bin; dir; .\GoogleTest_Debug.exe --gtest_filter=Matnothing
