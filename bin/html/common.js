@@ -1,4 +1,6 @@
 var lang_en = {
+    age_group: "Age group",
+    age_groups: "Age groups",
     name: "Name",
     username: "Username",
     password: "Password",
@@ -18,6 +20,8 @@ var lang_en = {
     matchtables: "Match Tables",
     new_club: "New Club",
     new_match: "New Match",
+    num_matches: "#Matches",
+    num_participants: "#Participants",
     participants: "Participants",
     database: "Database",
     new_judoka: "New Judoka",
@@ -109,6 +113,8 @@ var lang_en = {
 
 
 var lang_de = {
+    age_group: "Altersklasse",
+    age_groups: "Altersklassen",
     name: "Name",
     username: "Benutzername",
     password: "Passwort",
@@ -128,6 +134,8 @@ var lang_de = {
     matchtables: "Kampflisten",
     new_club: "Neuer Verein",
     new_match: "Neuer Kampf",
+    num_matches: "#K&auml;mpfe",
+    num_participants: "#Teilnehmer",
     new_participant: "Neuer Teilnehmer",
     add_participant: "Teilnehmer  hinzuf&uuml;gen",
     participants: "Teilnehmer",

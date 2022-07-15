@@ -36,7 +36,11 @@ bool Mat::Open()
 		//m_Window = Window(Application::Name);//Recreate
 
 		if (!m_Window.OpenWindow())
+		{
 			ZED::Log::Warn("Could not open window");
+			if (Window::IsDisplayConnected())//Should be able to create a window
+				return;//Couldn't create a renderer (possibly)
+		}
 
 		for (int i = 0; i < 10; i++)
 		{
