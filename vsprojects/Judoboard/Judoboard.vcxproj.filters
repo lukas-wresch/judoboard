@@ -105,6 +105,9 @@
     <ClCompile Include="..\..\src\age_group.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\weightclass_generator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\HttpServer\HttpServer.h">
@@ -198,6 +201,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\age_group.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weightclass_generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -317,6 +323,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\bin\html\age_groups_add.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\matchtable_creator.html">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

@@ -5,6 +5,7 @@
 #include "tournament.h"
 #include "database.h"
 #include "weightclass.h"
+#include "weightclass_generator.h"
 #include "md5.h"
 #define YAML_CPP_STATIC_DEFINE
 #include "yaml-cpp/yaml.h"
@@ -678,9 +679,9 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 	}
 
 	FindAgeGroupForJudoka(*Judoka);
+	Unlock();
 
 	GenerateSchedule();
-	Unlock();
 
 	return true;
 }
@@ -978,6 +979,18 @@ std::vector<const AgeGroup*> Tournament::GetEligableAgeGroupsOfJudoka(const Judo
 
 
 
+std::vector<const AgeGroup*> Tournament::GetAgeGroups() const
+{
+	std::vector<const AgeGroup*> ret;
+
+	for (auto age_group : m_StandingData.GetAgeGroups())
+		ret.emplace_back(age_group);
+
+	return ret;
+}
+
+
+
 void Tournament::ListAgeGroups(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginSeq;
@@ -1090,6 +1103,81 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 	GenerateSchedule();
 	Unlock();
 	return true;
+}
+
+
+
+std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups)
+{
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
+	for (auto age_group : AgeGroups)
+	{
+		std::vector<std::pair<int, int>> weightsSlots;
+		int min = 1000;
+		int max = 0;
+		for (const auto [id, judoka] : m_StandingData.GetAllJudokas())
+		{
+			auto age_group_of_judoka = GetAgeGroupOfJudoka(judoka);
+			if (age_group_of_judoka && age_group_of_judoka->GetUUID() == age_group->GetUUID())
+			{
+				const int weight = judoka->GetWeight();
+				weightsSlots.emplace_back(weight, 0);
+			}
+		}
+
+		std::sort(weightsSlots.begin(), weightsSlots.end(),
+			[](const std::pair<int, int>& a, const std::pair<int, int>& b) {
+			return a.first < b.first;
+		});
+
+		Generator gen;
+		gen.m_Min  = Min;
+		gen.m_Max  = Max;
+		gen.m_Diff = Diff;
+		gen.split(weightsSlots, 0, (int)weightsSlots.size());
+
+		//Generate yaml output
+		int currentClass = -1;
+		int weight_min = 0;
+		int weight_max = 0;
+		int judoka_count = 0;
+		for (auto [weight, weightclass] : weightsSlots)
+		{
+			//New weightclass
+			if (currentClass != weightclass && currentClass != -1)
+			{
+				weight_max = weight;
+
+				//Close weightclass
+				ret << YAML::BeginMap;
+				ret << YAML::Key << "min" << YAML::Value << weight_min;
+				ret << YAML::Key << "max" << YAML::Value << weight_max;
+				std::string name = age_group->GetName() + " " + std::to_string(weight_min) + " - " + std::to_string(weight_max);
+				ret << YAML::Key << "name" << YAML::Value << name;
+				ret << YAML::Key << "num_participants" << YAML::Value << judoka_count;
+				ret << YAML::EndMap;
+
+				weight_min = weight;
+				judoka_count = 0;
+			}
+
+			judoka_count++;
+			currentClass = weightclass;
+		}
+
+		//Close weightclass
+		ret << YAML::BeginMap;
+		ret << YAML::Key << "min" << YAML::Value << weight_min;
+		std::string name = age_group->GetName() + " " + std::to_string(weight_min) + "+";
+		ret << YAML::Key << "name" << YAML::Value << name;
+		ret << YAML::Key << "num_participants" << YAML::Value << judoka_count;
+		ret << YAML::EndMap;
+	}
+
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 
@@ -1410,5 +1498,5 @@ void Tournament::GenerateSchedule()
 
 	Unlock();
 
-	assert(Save());
+	Save();
 }

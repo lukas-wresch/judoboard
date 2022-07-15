@@ -38,7 +38,7 @@ void Application::SetupHttpServer()
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit",
 		"club_list", "club_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
-		"matchtable_list", "matchtable_add", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add",
+		"matchtable_list", "matchtable_add", "matchtable_creator", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add",
 		"server_config"
 	};
 
@@ -1614,6 +1614,36 @@ void Application::SetupHttpServer()
 
 		assert(GetTournament()->UpdateMatchTable(id));
 		return Error();//OK
+	});
+
+
+	m_Server.RegisterResource("/ajax/matchtable/generate", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		if (!GetTournament())
+			return std::string("No tournament is open");
+
+		auto min  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "min"));
+		auto max  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "max"));
+		auto diff = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "diff"));
+
+		if (min <= 0 || max <= 0 || diff <= 0)
+			return Error(Error::Type::InvalidInput);
+
+		auto age_groups = GetTournament()->GetAgeGroups();
+		for (auto it = age_groups.begin(); it != age_groups.end();)
+		{
+			if (ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, (std::string)(*it)->GetUUID())) != 1)
+				it = age_groups.erase(it);
+			else
+				++it;
+		}
+
+		return GetTournament()->GenerateWeightclasses(min, max, diff, age_groups);
+
+		//return Error();//OK
 	});
 
 

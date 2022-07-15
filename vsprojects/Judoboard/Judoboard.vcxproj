@@ -198,6 +198,7 @@
     <ClCompile Include="..\..\src\timer.cpp" />
     <ClCompile Include="..\..\src\tournament.cpp" />
     <ClCompile Include="..\..\src\weightclass.cpp" />
+    <ClCompile Include="..\..\src\weightclass_generator.cpp" />
     <ClCompile Include="..\..\src\window_linux.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -236,6 +237,7 @@
     <ClInclude Include="..\..\src\tournament.h" />
     <ClInclude Include="..\..\src\virtual_mat.h" />
     <ClInclude Include="..\..\src\weightclass.h" />
+    <ClInclude Include="..\..\src\weightclass_generator.h" />
     <ClInclude Include="..\..\src\window.h" />
     <ClInclude Include="src\HttpServer\HttpServer.h" />
   </ItemGroup>
@@ -250,6 +252,7 @@
     <None Include="..\..\bin\html\age_groups_list.html" />
     <None Include="..\..\bin\html\age_groups_select.html" />
     <None Include="..\..\bin\html\judoka_add.html" />
+    <None Include="..\..\bin\html\matchtable_creator.html" />
     <None Include="..\..\bin\html\matchtable_list.html" />
     <None Include="..\..\bin\html\club_add.html" />
     <None Include="..\..\bin\html\club_list.html" />
