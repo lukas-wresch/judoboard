@@ -68,7 +68,10 @@ bool RendererSDL2::Init(GtkWindow* DrawingArea)
 	m_SDL_window = SDL_CreateWindowFrom(Hwnd, SDL_TRUE);
 
 	if (!m_SDL_window)
+	{
+		Log::Error("Could not create SDL window");
 		return false;
+	}
 
 	RECT rect;
 	GetClientRect(Hwnd, &rect);
