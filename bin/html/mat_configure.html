@@ -79,7 +79,7 @@ function Update()
         else
           cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenMat(" + mat.id + ");\">Start</button>";
 
-        if (mat.is_fullscreen == 0)
+        if (!mat.is_fullscreen)
           cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('fullscreen'," + mat.id + ");\">Fullscreen</button>";
         else
           cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('windowed'," + mat.id + ");\">Window Mode</button>";

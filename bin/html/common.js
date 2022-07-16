@@ -1,6 +1,7 @@
 var lang_en = {
     age_group: "Age group",
     age_groups: "Age groups",
+    club: "Club",
     name: "Name",
     username: "Username",
     password: "Password",
@@ -115,6 +116,7 @@ var lang_en = {
 var lang_de = {
     age_group: "Altersklasse",
     age_groups: "Altersklassen",
+    club: "Verein",
     name: "Name",
     username: "Benutzername",
     password: "Passwort",
@@ -413,17 +415,9 @@ function navigate(url)
   if (window.innerWidth <= 900)//Mobile
     slideout.close();
 
-  //$( "#main" ).load(url);
   return false;
 }
 
-
-
-/*$(window).on('hashchange', function(e)
-{
-  console.log(location.hash.slice(1));
-  navigate(location.hash.slice(1));
-});*/
 
 window.onhashchange = function(e)
 {
@@ -496,6 +490,37 @@ function GetAgeGroups(callback)
       option.value = age.uuid;
       option.text  = age.name;
       ages.add(option);
+    }
+
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+}
+
+
+
+function GetClubs(callback)
+{
+  AjaxCallback("ajax/club/list", function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    var clubs = document.getElementById("clubs");
+
+    while (clubs.length >= 1)
+      clubs.remove(clubs.length-1);
+
+    var option = document.createElement("option");
+    option.value = 0;
+    option.text  = "(None)";
+    clubs.add(option);
+
+    for (const club of res)
+    {
+      var option = document.createElement("option");
+      option.value = club.uuid;
+      option.text  = club.name;
+      clubs.add(option);
     }
 
     if (typeof callback !== 'undefined')

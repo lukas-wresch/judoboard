@@ -84,30 +84,10 @@ function GetJudoka(id)
     document.getElementById("weight").value    = res.weight;
     document.getElementById("gender").value    = res.gender;
     document.getElementById("birthyear").value = res.birthyear;
-    var clubID    = res.club;
 
-
-    AjaxCallback("ajax/club/list", function(response) {
-      var res = response.split(",");
-
-      if (res.length < 2)
-        return;
-
-      for (var i=0; i < res.length;)
-      {
-        var id   = res[i++];
-        var name = res[i++];
-
-        var option = document.createElement("option");
-
-        option.value = id;
-        option.text  = name;
-
-        document.getElementById("clubs").add(option);
-      }
-
-      if (clubID >= 0)
-        document.getElementById("clubs").value = clubID;
+    GetClubs(function(response) {
+      if (res.club != null)
+        document.getElementById("clubs").value = res.club;
     });
   });
 }
@@ -166,6 +146,7 @@ document.getElementById("label_firstname").innerHTML = lang.firstname;
 document.getElementById("label_lastname").innerHTML  = lang.lastname;
 document.getElementById("label_weight").innerHTML  = lang.weight;
 document.getElementById("label_gender").innerHTML  = lang.gender;
+document.getElementById("label_club").innerHTML    = lang.club;
 document.getElementById("male").innerHTML  = lang.male;
 document.getElementById("female").innerHTML  = lang.female;
 document.getElementById("add").innerHTML     = lang.new_judoka;

@@ -1866,6 +1866,8 @@ void Application::SetupHttpServer()
 		if (!IsLoggedIn(Request))
 			return (std::string)Error(Error::Type::NotLoggedIn);
 
+		LockTillScopeEnd();//In case the tournament gets closed at the same time
+
 		YAML::Emitter yaml;
 		GetTournament()->ListAgeGroups(yaml);
 		return yaml.c_str();
@@ -1883,6 +1885,8 @@ void Application::SetupHttpServer()
 		if (!age_group)
 			return Error(Error::Type::ItemNotFound);
 
+		LockTillScopeEnd();//In case the tournament gets closed at the same time
+
 		if (!GetTournament()->AddAgeGroup(age_group))
 			return Error(Error::Type::OperationFailed);
 
@@ -1895,6 +1899,8 @@ void Application::SetupHttpServer()
 			return error;
 
 		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+		LockTillScopeEnd();//In case the tournament gets closed at the same time
 
 		if (!GetTournament()->RemoveAgeGroup(age_group_id))
 			return Error(Error::Type::OperationFailed);
@@ -1923,6 +1929,8 @@ void Application::SetupHttpServer()
 		Tournament* new_tournament = new Tournament(name);
 		new_tournament->SetDefaultRuleSet(rules);
 
+		LockTillScopeEnd();//In case the tournament gets closed at the same time
+
 		if (!AddTournament(new_tournament))
 			return std::string("Could not add tournament");
 
@@ -1938,6 +1946,8 @@ void Application::SetupHttpServer()
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 		UUID rule_id = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
+
+		LockTillScopeEnd();
 
 		auto tournament = FindTournament(id);
 		if (!tournament)
@@ -1996,6 +2006,8 @@ void Application::SetupHttpServer()
 		if (!judoka || !age_group)
 			return Error(Error::Type::ItemNotFound);
 
+		LockTillScopeEnd();//In case the tournament gets closed at the same time
+
 		if (!GetTournament()->AssignJudokaToAgeGroup(judoka, age_group))
 			return Error(Error::Type::OperationFailed);
 
@@ -2009,6 +2021,8 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
+
 		if (!OpenTournament(id))
 			return std::string("Could not open tournament");
 
@@ -2019,6 +2033,8 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
+
+		LockTillScopeEnd();
 
 		if (GetTournament())
 			GetTournament()->Save();
@@ -2040,6 +2056,8 @@ void Application::SetupHttpServer()
 		if (!tournament)
 			return std::string("Could not find tournament");
 
+		LockTillScopeEnd();
+
 		tournament->DeleteAllMatchResults();
 		return Error();//OK
 	});
@@ -2050,6 +2068,8 @@ void Application::SetupHttpServer()
 			return error;
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+		LockTillScopeEnd();
 
 		if (!DeleteTournament(id))
 			return Error(Error::Type::OperationFailed);
