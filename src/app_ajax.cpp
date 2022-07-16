@@ -1424,6 +1424,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
+		GetTournament()->Lock();
 		std::string ret;
 		for (auto table : GetTournament()->GetMatchTables())
 		{
@@ -1433,6 +1434,7 @@ void Application::SetupHttpServer()
 			ret += table->ToHTML();
 			ret += "<br/><br/><br/>";
 		}
+		GetTournament()->Unlock();
 
 		return ret;
 	});
@@ -1612,7 +1614,7 @@ void Application::SetupHttpServer()
 			return std::string("Class is not a weightclass");
 		}
 
-		assert(GetTournament()->UpdateMatchTable(id));
+		GetTournament()->UpdateMatchTable(id);
 		return Error();//OK
 	});
 

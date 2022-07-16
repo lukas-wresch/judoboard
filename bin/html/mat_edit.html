@@ -80,31 +80,19 @@ function GetMat(id)
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
     console.log(response);
-    var res = response.split(",");
+    var res = YAML.parse(response);
 
-    if (res.length < 3)
-      return;
-
-    var maxID = res[0];
-
-    for (var i=1; i < res.length;)
+    for (const mat of res.mats)
     {
-      var matID   = res[i++];
-      var type    = res[i++];
-      var is_open = res[i++];
-      var name    = res[i++];
-      var ipponStyle = res[i++];
-      var timerStyle = res[i++];
-
-      if (matID == id)
+      if (id == mat.id)
       {
-        document.getElementById("name").value = name;
-        document.getElementById("ipponStyle").value = ipponStyle;
-        document.getElementById("timerStyle").value = timerStyle;
+        document.getElementById("name").value = mat.name;
+        document.getElementById("ipponStyle").value = mat.ippon_style;
+        document.getElementById("timerStyle").value = mat.timer_style;
       }
     }
 
-    for (var i=1; i <= maxID; i++)
+    for (var i=1; i <= res.highest_mat_id; i++)
     {
       var option = document.createElement("option");
       option.text  = i;
