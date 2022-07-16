@@ -42,9 +42,10 @@ void Localizer::Initialize(Language NewLanguage)
 			s_de["Time"]   = u8"Zeit";
 
 			s_de["Weightclass"] = "Gewichtsklasse";
-			s_de["Next Match"]  = u8"N\u00e4chster Kampf";
+			s_de["Current Match"] = "Aktueller Kampf";
+			s_de["Next Match"]    = u8"N\u00e4chster Kampf";
 			s_de["Following Matches"] = u8"Nachfolgende K\u00e4mpfe";
-			s_de["Following Match"] = "Nachfolgender Kampf";
+			s_de["Following Match"]   = "Nachfolgender Kampf";
 			s_de["Default"] = "Standard";
 
 			s_de["Children"] = "Kinder";

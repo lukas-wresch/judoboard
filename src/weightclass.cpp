@@ -88,13 +88,13 @@ std::string Weightclass::GetDescription() const
 
 	if (GetAgeGroup())
 	{
-		desc = GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender) + " - ";
-		desc += std::to_string(m_MinWeight) + " - " + std::to_string(m_MaxWeight) + " kg";
+		desc = GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender);
+		desc += " -" + std::to_string(m_MaxWeight) + " kg";
 	}
 
 	else
 	{
-		desc = std::to_string(m_MinWeight) + " - " + std::to_string(m_MaxWeight) + " kg";
+		desc = "-" + std::to_string(m_MaxWeight) + " kg";
 
 		if (m_Gender == Gender::Male)
 			desc += " (m)";

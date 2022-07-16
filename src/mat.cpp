@@ -1362,9 +1362,18 @@ void Mat::UpdateGraphics() const
 
 	//Update graphics
 
-	m_Graphics["next_match"     ].UpdateTexture(renderer, Localizer::Translate("Next Match"), ZED::Color(255, 0, 0), ZED::FontSize::Huge);
-	//m_Graphics["following_match"].UpdateTexture(renderer, Localizer::Translate("Following Matches"), ZED::Color(255, 0, 0), ZED::FontSize::Huge);
-	m_Graphics["following_match"].UpdateTexture(renderer, Localizer::Translate("Following Match"), ZED::Color(255, 0, 0), ZED::FontSize::Huge);
+	std::string name = Localizer::Translate("Current Match");
+
+	if (m_NextMatches.size() >= 1 && m_NextMatches[0].GetMatchTable())
+		name += " (" + m_NextMatches[0].GetMatchTable()->GetDescription() + ")";
+
+	m_Graphics["next_match"     ].UpdateTexture(renderer, name, ZED::Color(255, 0, 0), ZED::FontSize::Huge);
+
+	name = Localizer::Translate("Next Match");
+	if (m_NextMatches.size() >= 2 && m_NextMatches[1].GetMatchTable())
+		name += " (" + m_NextMatches[1].GetMatchTable()->GetDescription() + ")";
+
+	m_Graphics["following_match"].UpdateTexture(renderer, name, ZED::Color(255, 0, 0), ZED::FontSize::Huge);
 
 	m_Graphics["mat_name"].UpdateTexture(renderer, GetName(), ZED::Color(255, 255, 255), ZED::FontSize::Middle);
 
@@ -1411,8 +1420,9 @@ void Mat::UpdateGraphics() const
 			//FontSize = ZED::FontSize::Large;
 			i++;
 		}
+
+		break;
 	}
-	break;
 
 
 
@@ -1464,7 +1474,7 @@ void Mat::UpdateGraphics() const
 			m_Graphics["blue_wazari" ].UpdateTexture(renderer, spelled_out_blue,  ZED::Color(255, 255, 255), ZED::FontSize::Huge);
 			break;
 		}
-	}
+		}//End of switch (GetIpponStyle())
 
 
 		m_Graphics["white_yuko"].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::White).m_Yuko), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic);
@@ -1476,10 +1486,15 @@ void Mat::UpdateGraphics() const
 
 		if (m_pMatch)
 		{
-			if (m_pMatch->GetMatchTable())//Update match table
-				m_Graphics["matchtable"].UpdateTexture(renderer, m_pMatch->GetMatchTable()->GetName(), ZED::Color(255, 255, 255), ZED::FontSize::Middle);
-			else
-				m_Graphics["matchtable"].Clear();
+			//if (m_pMatch->GetMatchTable())//Update match table
+				//m_Graphics["matchtable"].UpdateTexture(renderer, m_pMatch->GetMatchTable()->GetName(), ZED::Color(255, 255, 255), ZED::FontSize::Middle);
+			//else
+				//m_Graphics["matchtable"].Clear();
+
+			std::string mat_matchtable = GetName();
+			if (m_pMatch->GetMatchTable())
+				mat_matchtable += "   " + m_pMatch->GetMatchTable()->GetDescription();
+			m_Graphics["mat_name"].UpdateTexture(renderer, mat_matchtable, ZED::Color(255, 255, 255), ZED::FontSize::Middle);
 
 
 			//Update timer
