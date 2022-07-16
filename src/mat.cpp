@@ -943,16 +943,10 @@ void Mat::Osaekomi(Fighter Whom)
 			m_OsaekomiTimer[(int)Whom] = m_OsaekomiTimer[(int)!Whom];
 			m_OsaekomiTimer[(int)!Whom].Stop();
 
-			//m_Graphics["osaekomi_text"].SetPosition(0, 0, 255);
-			//m_Graphics["osaekomi_bar_border"].SetPosition(0, 0, 255);
-			//m_Graphics["osaekomi_bar"].SetPosition(0, 0, 255);
 			m_Graphics["osaekomi_bar"].m_width = 0;//Recalculate osaekomi bar
 
 			m_Graphics["effect_osaekomi_" + Fighter2String(!Whom)].StopAllAnimations().SetAlpha(0);
 			m_Graphics["effect_osaekomi_" + Fighter2String(Whom) ].StopAllAnimations().SetAlpha(255);
-
-			//m_Graphics["osaekomi_text"].AddAnimation(Animation(0.0, 0.0, -45.0));
-			//m_Graphics["osaekomi_bar" ].AddAnimation(Animation(0.0, 0.0, -45.0));
 		}
 	}
 
@@ -1135,11 +1129,16 @@ void Mat::NextState(State NextState) const
 	auto width  = m_Window.GetRenderer().GetWidth();
 	auto height = m_Window.GetRenderer().GetHeight();
 
-	const int name_height = (int)(35.0 * m_ScalingFactor);
+	const int name_height   = (int)(30.0 * m_ScalingFactor);
+	const int club_height   = name_height + (int)(92.0 * m_ScalingFactor);
 
-	const int score_height  = (int)(240.0 * m_ScalingFactor);
+	const int score_height  = (int)(290.0 * m_ScalingFactor);
 	const int score_margin  = (int)(120.0 * m_ScalingFactor);
 	const int score_padding = (int)(200.0 * m_ScalingFactor);
+
+	const int effect_row1 = height/2    + (int)(30.0 * m_ScalingFactor);
+	const int effect_row2 = effect_row1 + (int)(98.0 * m_ScalingFactor);
+	const int effect_row3 = effect_row2 + (int)(96.0 * m_ScalingFactor);
 
 	auto& renderer = m_Window.GetRenderer();
 
@@ -1204,6 +1203,12 @@ void Mat::NextState(State NextState) const
 			m_Graphics["white_name"].SetPosition(width/2 + 60, name_height-620, 80)
 								   .AddAnimation(Animation(0.0, 67.0, 20.0, [=](auto& g) { return g.m_y < name_height; }));
 
+			m_Graphics["blue_club"].SetPosition(50, club_height, 80)
+				.AddAnimation(Animation(0.0, 0.0, 20.0));
+
+			m_Graphics["white_club"].SetPosition(width/2 + 60, club_height, 80)
+				.AddAnimation(Animation(0.0, 0.0, 20.0));
+
 
 			double a = 25.0;
 			m_Graphics["blue_ippon"].SetPosition(score_margin, score_height - 500, 80).Center()
@@ -1233,7 +1238,7 @@ void Mat::NextState(State NextState) const
 			m_Graphics["timer"].SetPosition(width/2, height/2, -120).Center()
 							   .AddAnimation(Animation(0.0, 0.0, 33.0, [](auto& g) { return g.m_a < 255.0; }));
 
-			m_Graphics["matchtable"].SetAlpha(-100.0).AddAnimation(Animation(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
+			//m_Graphics["matchtable"].SetAlpha(-100.0).AddAnimation(Animation(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
 			m_Graphics["mat_name"  ].AddAnimation(Animation(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
 
 			m_Graphics["next_match"].StopAllAnimations()
@@ -1270,6 +1275,32 @@ void Mat::NextState(State NextState) const
 
 			m_Graphics["effect_hansokumake_white"].UpdateTexture(renderer, "Hansokumake", ZED::Color(255, 0, 0));
 			m_Graphics["effect_hansokumake_blue" ].UpdateTexture(renderer, "Hansokumake", ZED::Color(255, 0, 0));
+
+			m_Graphics["effect_ippon_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row1);
+			m_Graphics["effect_ippon_white"].SetPosition(width - (int)(550.0 * m_ScalingFactor), effect_row1);
+
+			m_Graphics["effect_wazaari_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row2);
+			m_Graphics["effect_wazaari_white"].SetPosition(width - (int)(550.0 * m_ScalingFactor), effect_row2);
+
+			m_Graphics["effect_yuko_blue" ].SetPosition((int)(300.0 * m_ScalingFactor), effect_row1);
+			m_Graphics["effect_yuko_white"].SetPosition(width - (int)(270.0 * m_ScalingFactor), effect_row1);
+
+			m_Graphics["effect_koka_blue" ].SetPosition((int)(300.0 * m_ScalingFactor), effect_row2);
+			m_Graphics["effect_koka_white"].SetPosition(width - (int)(270.0 * m_ScalingFactor), effect_row2);
+
+			m_Graphics["effect_osaekomi_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row3);
+			m_Graphics["effect_osaekomi_white"].SetPosition(width - (int)(490.0 * m_ScalingFactor), effect_row3);
+
+			m_Graphics["effect_tokeda_blue" ].SetPosition((int)(520.0 * m_ScalingFactor), effect_row3);
+			m_Graphics["effect_tokeda_white"].SetPosition(width - (int)(850.0 * m_ScalingFactor), effect_row3);
+
+			//Same as ippon
+			m_Graphics["effect_shido_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row1);
+			m_Graphics["effect_shido_white"].SetPosition(width - (int)(550.0 * m_ScalingFactor), effect_row1);
+
+			//Almost the same as wazaari
+			m_Graphics["effect_hansokumake_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row3);
+			m_Graphics["effect_hansokumake_white"].SetPosition(width - (int)(645.0 * m_ScalingFactor), effect_row3);
 
 			break;
 		}
@@ -1367,7 +1398,7 @@ void Mat::UpdateGraphics() const
 	if (m_NextMatches.size() >= 1 && m_NextMatches[0].GetMatchTable())
 		name += " (" + m_NextMatches[0].GetMatchTable()->GetDescription() + ")";
 
-	m_Graphics["next_match"     ].UpdateTexture(renderer, name, ZED::Color(255, 0, 0), ZED::FontSize::Huge);
+	m_Graphics["next_match"].UpdateTexture(renderer, name, ZED::Color(255, 0, 0), ZED::FontSize::Huge);
 
 	name = Localizer::Translate("Next Match");
 	if (m_NextMatches.size() >= 2 && m_NextMatches[1].GetMatchTable())
@@ -1435,6 +1466,15 @@ void Mat::UpdateGraphics() const
 			m_Graphics["white_name"].Shorten(renderer);
 		while (m_Graphics["blue_name" ] && m_Graphics["blue_name" ]->GetWidth() > std::max((width - 25.0*m_ScalingFactor)/2, 100.0))
 			m_Graphics["blue_name"].Shorten(renderer);
+
+		if (GetFighter(Fighter::White).GetClub())
+			m_Graphics["white_club"].UpdateTexture(renderer, GetFighter(Fighter::White).GetClub()->GetName(), ZED::Color(0, 0, 0), ZED::FontSize::Large);
+		else
+			m_Graphics["white_club"].Clear();
+		if (GetFighter(Fighter::Blue).GetClub())
+			m_Graphics["blue_club" ].UpdateTexture(renderer, GetFighter(Fighter::Blue ).GetClub()->GetName(), ZED::Color(255, 255, 255), ZED::FontSize::Large);
+		else
+			m_Graphics["blue_club" ].Clear();
 
 	//fall through
 
@@ -1511,7 +1551,7 @@ void Mat::UpdateGraphics() const
 			if (IsOsaekomi())
 			{
 				const int osaekomi_max_width = width;
-				const int osaekomi_y = height/2 + (int)(295.0*m_ScalingFactor);
+				const int osaekomi_y = height/2 + (int)(340.0*m_ScalingFactor);
 
 				Fighter fighter = GetOsaekomiHolder();
 				auto& osaekomi_text = m_Graphics["osaekomi_text"];
@@ -1559,36 +1599,6 @@ void Mat::UpdateGraphics() const
 				m_Graphics["sonomama"].SetPosition(width/2  + (int)(100.0*m_ScalingFactor),
 												   height/2 + (int)(m_Graphics["timer"]->GetHeight() * 0.40));
 			}
-
-			const int effect_row1 = height/2    - (int)( 5.0 * m_ScalingFactor);
-			const int effect_row2 = effect_row1 + (int)(98.0 * m_ScalingFactor);
-			const int effect_row3 = effect_row2 + (int)(96.0 * m_ScalingFactor);
-
-			m_Graphics["effect_ippon_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row1);
-			m_Graphics["effect_ippon_white"].SetPosition(width - (int)(550.0 * m_ScalingFactor), effect_row1);
-
-			m_Graphics["effect_wazaari_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row2);
-			m_Graphics["effect_wazaari_white"].SetPosition(width - (int)(550.0 * m_ScalingFactor), effect_row2);
-
-			m_Graphics["effect_yuko_blue" ].SetPosition((int)(300.0 * m_ScalingFactor), effect_row1);
-			m_Graphics["effect_yuko_white"].SetPosition(width - (int)(270.0 * m_ScalingFactor), effect_row1);
-
-			m_Graphics["effect_koka_blue" ].SetPosition((int)(300.0 * m_ScalingFactor), effect_row2);
-			m_Graphics["effect_koka_white"].SetPosition(width - (int)(270.0 * m_ScalingFactor), effect_row2);
-
-			m_Graphics["effect_osaekomi_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row3);
-			m_Graphics["effect_osaekomi_white"].SetPosition(width - (int)(490.0 * m_ScalingFactor), effect_row3);
-
-			m_Graphics["effect_tokeda_blue" ].SetPosition((int)(520.0 * m_ScalingFactor), effect_row3);
-			m_Graphics["effect_tokeda_white"].SetPosition(width - (int)(850.0 * m_ScalingFactor), effect_row3);
-
-			//Same as ippon
-			m_Graphics["effect_shido_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row1);
-			m_Graphics["effect_shido_white"].SetPosition(width - (int)(550.0 * m_ScalingFactor), effect_row1);
-
-			//Almost the same as wazaari
-			m_Graphics["effect_hansokumake_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row3);
-			m_Graphics["effect_hansokumake_white"].SetPosition(width - (int)(645.0 * m_ScalingFactor), effect_row3);
 		}
 	}
 	break;
@@ -1679,7 +1689,7 @@ void Mat::RenderShidos(double dt) const
 	{
 		//Render shidos
 		int shido_start_x = (int)(50.0 * m_ScalingFactor);
-		int shido_start_y = (int)(330.0 * m_ScalingFactor);
+		int shido_start_y = (int)(380.0 * m_ScalingFactor);
 
 		if (fighter == Fighter::White)
 			shido_start_x = width - (int)(540.0 * m_ScalingFactor);
@@ -1688,7 +1698,6 @@ void Mat::RenderShidos(double dt) const
 		int shido_y = shido_start_y;
 
 		const int shido_width = (int)(100.0 * m_ScalingFactor);
-		//const int shido_height = (int)(130.0 * m_ScalingFactor);
 		const int shido_height = (int)(1.375 * shido_width);//Same aspect ratio as in football
 		const int margin = (int)(10.0 * m_ScalingFactor);
 
@@ -1957,6 +1966,8 @@ bool Mat::Render(double dt) const
 
 		m_Graphics["white_name"].Render(renderer, dt);
 		m_Graphics["blue_name" ].Render(renderer, dt);
+		m_Graphics["white_club"].Render(renderer, dt);
+		m_Graphics["blue_club" ].Render(renderer, dt);
 
 		RenderScore(dt);
 		RenderTimer(dt);
@@ -2010,6 +2021,8 @@ bool Mat::Render(double dt) const
 
 		m_Graphics["white_name"].Render(renderer, dt);
 		m_Graphics["blue_name" ].Render(renderer, dt);
+		m_Graphics["white_club"].Render(renderer, dt);
+		m_Graphics["blue_club" ].Render(renderer, dt);
 
 		RenderScore(dt);
 		RenderTimer(dt);

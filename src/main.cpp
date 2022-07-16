@@ -114,15 +114,20 @@ int main(int argc, char** argv)
 		mat->SetFullscreen();
 		ZED::Core::Pause(5000);
 
+		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
+		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
+		app.GetDatabase().AddClub(new Judoboard::Club("Senne"));
+
 		srand(ZED::Core::CurrentTimestamp());
 		auto j1 = CreateRandomJudoka(&app.GetDatabase());
 		auto j2 = CreateRandomJudoka(&app.GetDatabase());
 		Judoboard::Match match(nullptr, &j1, &j2, mat->GetMatID());
 		//Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, true, true);
 		Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, false, false);
+		Judoboard::AgeGroup age_group("U18", 15, 18, &rules, app.GetDatabase());
 		match.SetRuleSet(&rules);
 		Judoboard::Weightclass* table = new Judoboard::Weightclass(nullptr, 10, 100);
-		table->SetName(Judoboard::Localizer::Translate("Weightclass") + " -100 kg");
+		table->SetAgeGroup(&age_group);
 		match.SetMatchTable(table);
 
 		mat->StartMatch(&match);
