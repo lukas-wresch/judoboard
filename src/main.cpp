@@ -181,9 +181,7 @@ int main(int argc, char** argv)
 
 		Judoboard::Mat* mat = (Judoboard::Mat*)app.GetDefaultMat();
 
-#ifndef _DEBUG
 		mat->GetWindow().Fullscreen();
-#endif
 		ZED::Core::Pause(5000);
 
 		srand(ZED::Core::CurrentTimestamp());
@@ -195,11 +193,12 @@ int main(int argc, char** argv)
 		tourney->AddMatchTable(m1);
 		m1->SetMatID(1);
 
+		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
+		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
+		app.GetDatabase().AddClub(new Judoboard::Club("Senne"));
+
 		for (int i = 0; i < 5; i++)
-		{
-			//app.GetDatabase().AddJudoka(CreateRandomJudoka());
 			tourney->AddParticipant(new Judoboard::Judoka(CreateRandomJudoka(&app.GetDatabase())));
-		}
 
 		app.AddTournament(tourney);
 

@@ -1130,7 +1130,7 @@ void Mat::NextState(State NextState) const
 	auto height = m_Window.GetRenderer().GetHeight();
 
 	const int name_height   = (int)(30.0 * m_ScalingFactor);
-	const int club_height   = name_height + (int)(92.0 * m_ScalingFactor);
+	const int club_height   = name_height + (int)(95.0 * m_ScalingFactor);
 
 	const int score_height  = (int)(290.0 * m_ScalingFactor);
 	const int score_margin  = (int)(120.0 * m_ScalingFactor);
@@ -1203,11 +1203,11 @@ void Mat::NextState(State NextState) const
 			m_Graphics["white_name"].SetPosition(width/2 + 60, name_height-620, 80)
 								   .AddAnimation(Animation(0.0, 67.0, 20.0, [=](auto& g) { return g.m_y < name_height; }));
 
-			m_Graphics["blue_club"].SetPosition(50, club_height, 80)
-				.AddAnimation(Animation(0.0, 0.0, 20.0));
+			m_Graphics["blue_club"].SetPosition(50, club_height, -150)
+				.AddAnimation(Animation(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
 
-			m_Graphics["white_club"].SetPosition(width/2 + 60, club_height, 80)
-				.AddAnimation(Animation(0.0, 0.0, 20.0));
+			m_Graphics["white_club"].SetPosition(width/2 + 60, club_height, -150)
+				.AddAnimation(Animation(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
 
 
 			double a = 25.0;
@@ -1358,6 +1358,9 @@ void Mat::NextState(State NextState) const
 
 			m_Graphics["white_name"].AddAnimation(Animation(0.0, -67.0, -25.0));
 			m_Graphics["blue_name" ].AddAnimation(Animation(0.0, -67.0, -25.0));
+
+			m_Graphics["white_club"].AddAnimation(Animation(0.0, -67.0, -25.0));
+			m_Graphics["blue_club" ].AddAnimation(Animation(0.0, -67.0, -25.0));
 
 			m_Graphics["white_ippon" ].AddAnimation(Animation(0.0, -67.0, -18.0));
 			m_Graphics["white_wazari"].AddAnimation(Animation(0.0, -67.0, -18.0));
