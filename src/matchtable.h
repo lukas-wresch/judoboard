@@ -108,11 +108,7 @@ namespace Judoboard
 		void SetAgeGroup(const AgeGroup* NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
 
 		const std::string GetName() const override { return m_Name; }
-		void SetName(const std::string& Name)
-		{
-			m_Name = Name;
-			ReplaceAll(m_Name, ",", "&#44;");//Escape all ','
-		}
+		void SetName(const std::string& Name) { m_Name = Name; }
 
 		//Serialization
 		virtual const std::string ToString() const;

@@ -16,8 +16,6 @@ Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint
 {
 	m_MinWeight = MinWeight;
 	m_MaxWeight = MaxWeight;
-
-	SetName(Localizer::Translate("Weightclass") + " " + GetDescription());
 }
 
 
@@ -25,15 +23,6 @@ Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint
 Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight, Gender Gender) : Weightclass(Tournament, MinWeight, MaxWeight)
 {
 	m_Gender = Gender;
-
-	SetName(Localizer::Translate("Weightclass") + " " + GetDescription());
-}
-
-
-
-Weightclass::Weightclass(ZED::CSV& Stream, ITournament* Tournament) : MatchTable(Stream, Tournament)
-{
-	Stream >> m_MinWeight >> m_MaxWeight >> m_Gender;
 }
 
 
@@ -75,14 +64,6 @@ Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament*
 
 
 
-void Weightclass::operator >> (ZED::CSV& Stream) const
-{
-	MatchTable::operator >>(Stream);
-	Stream << m_MinWeight << m_MaxWeight << m_Gender;
-}
-
-
-
 void Weightclass::operator >> (YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginMap;
@@ -100,12 +81,24 @@ void Weightclass::operator >> (YAML::Emitter& Yaml) const
 
 const std::string Weightclass::GetDescription() const
 {
-	std::string name = std::to_string(m_MinWeight) + " - " + std::to_string(m_MaxWeight) + " kg";
-	if (m_Gender != Gender::Unknown)
-		name += (m_Gender == Gender::Male) ? " (m)" : " (f)";
+	std::string desc = GetName();
+
+	if (desc.length() > 0)
+		return desc;
+
 	if (GetAgeGroup())
-		name += " - " + GetAgeGroup()->GetName();
-	return name;
+	{
+		desc = GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender) + " - ";
+		desc += std::to_string(m_MinWeight) + " - " + std::to_string(m_MaxWeight) + " kg";
+	}
+
+	else
+	{
+		desc = std::to_string(m_MinWeight) + " - " + std::to_string(m_MaxWeight) + " kg";
+		desc += (m_Gender == Gender::Male) ? " (m)" : " (f)";
+	}
+
+	return desc;
 }
 
 
@@ -316,9 +309,9 @@ const std::string Weightclass::ToHTML() const
 {
 	std::string ret;
 
-	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetName() + "</a><br/>";
+	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
 
-	ret += GetDescription() + " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
+	ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 
 	ret += R"(<table width="50%" border="1" rules="all"><tr><th style="text-align: center;">)" + Localizer::Translate("No.")
 		+ "</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name") + "</th>";

@@ -13,7 +13,6 @@ namespace Judoboard
 	public:
 		Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight);
 		Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight, Gender Gender);
-		Weightclass(ZED::CSV& Stream, ITournament* Tournament);
 		Weightclass(const YAML::Node& Yaml, ITournament* Tournament);
 		Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament);
 
@@ -37,7 +36,6 @@ namespace Judoboard
 		virtual const std::string ToHTML() const override;
 		virtual const std::string ToString() const override;
 
-		virtual void operator >> (ZED::CSV& Stream) const override;
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
 
 

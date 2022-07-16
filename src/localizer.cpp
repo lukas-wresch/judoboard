@@ -77,3 +77,20 @@ std::string Localizer::Translate(const std::string& English)
 
 	return English;
 }
+
+
+
+std::string Localizer::Gender2ShortForm(Gender Gender)
+{
+	switch (s_CurrentLanguage)
+	{
+	case Language::German:
+	{
+		return (Gender == Gender::Male) ? "m" : "w";
+	}
+
+	case Language::English:
+	default:
+		return (Gender == Gender::Male) ? "m" : "f";
+	}
+}

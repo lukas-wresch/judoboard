@@ -279,7 +279,8 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 	Schedulable::operator >>(Yaml);
 
 	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
-	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
+	if (m_Name.length() > 0)
+		Yaml << YAML::Key << "name" << YAML::Value << m_Name;
 
 	if (m_Rules)
 		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
