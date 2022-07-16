@@ -102,7 +102,9 @@ bool RendererSDL2::Init(GtkWindow* DrawingArea)
 	Uint32 amask = 0x00000000;
 	m_SDL_screen = SDL_CreateRGBSurface(0, m_screen_w, m_screen_h, 24, rmask, gmask, bmask, amask);
 
-	//m_SDL_renderer = SDL_CreateRenderer(m_SDL_window, -1, SDL_RENDERER_ACCELERATED);
+	//Needed to raise a flag inside SDL to mark the window as using OpenGL
+	//without this an OpenGL context can not be created for this window
+	m_SDL_renderer = SDL_CreateRenderer(m_SDL_window, -1, SDL_RENDERER_ACCELERATED);
 
 	ZED::Log::Debug("SDL2 renderer initialized with size " + std::to_string(m_screen_w) + "x" + std::to_string(m_screen_h));
 	return true;
