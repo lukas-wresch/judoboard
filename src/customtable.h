@@ -16,6 +16,7 @@ namespace Judoboard
 		static std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::Custom; }
+		virtual std::string GetDescription() const override { return GetName() + " Custom"; }
 
 		virtual Status GetStatus() const override;
 

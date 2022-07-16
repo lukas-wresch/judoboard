@@ -244,6 +244,7 @@ void Application::SetupHttpServer()
 	m_Server.RegisterResource("/ajax/get_schedule", [this](auto& Request) -> std::string {
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
+		LockTillScopeEnd();
 		return GetTournament()->Schedule2String();
 	});
 
@@ -254,6 +255,8 @@ void Application::SetupHttpServer()
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
+
+		LockTillScopeEnd();
 		return GetTournament()->Participants2String();
 	});
 
@@ -263,6 +266,8 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::NotLoggedIn);
 
 		auto search_string = HttpServer::DecodeURLEncoded(Request.m_Query, "name");
+
+		LockTillScopeEnd();
 
 		return m_Database.Judoka2String(search_string, GetTournament());
 	});
@@ -281,6 +286,8 @@ void Application::SetupHttpServer()
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
+
+		LockTillScopeEnd();
 		return GetTournament()->MasterSchedule2String();
 	});
 
@@ -295,6 +302,7 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
 		GetTournament()->MoveScheduleEntryUp(id);
 		return Error();//OK
 	});
@@ -310,6 +318,7 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
 		GetTournament()->MoveScheduleEntryDown(id);
 		return Error();//OK
 	});
@@ -349,6 +358,8 @@ void Application::SetupHttpServer()
 		if (mat <= 0)
 			return std::string("Invalid mat id");
 
+		LockTillScopeEnd();
+
 		if (GetTournament()->GetStatus() == Status::Concluded)
 			return std::string("Tournament is already finalized");
 
@@ -373,6 +384,8 @@ void Application::SetupHttpServer()
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		auto rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 
+		LockTillScopeEnd();
+
 		auto match = GetTournament()->FindMatch(id);
 		auto ruleSet = m_Database.FindRuleSetByName(rule);
 
@@ -396,6 +409,7 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
 		GetTournament()->MoveMatchUp(id);
 
 		return std::string();
@@ -411,6 +425,7 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
 		GetTournament()->MoveMatchDown(id);
 
 		return std::string();
@@ -426,10 +441,11 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
 		bool success = GetTournament()->RemoveMatch(id);
 
 		return std::string();
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/match/get_log", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
@@ -441,6 +457,7 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
 		auto match = GetTournament()->FindMatch(id);
 
 		if (!match)

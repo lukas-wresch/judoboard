@@ -1377,7 +1377,7 @@ const std::string Tournament::MasterSchedule2String() const
 
 			ret << max << entries.size();
 			for (auto [index, entry] : entries)
-				ret << entry->IsEditable() << index << (std::string)entry->GetUUID() << entry->GetColor().ToHexString() << entry->GetMatID() << entry->GetName();
+				ret << entry->IsEditable() << index << (std::string)entry->GetUUID() << entry->GetColor().ToHexString() << entry->GetMatID() << entry->GetDescription();
 		}
 	}
 

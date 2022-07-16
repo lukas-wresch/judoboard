@@ -20,7 +20,7 @@ namespace Judoboard
 
 		virtual Type GetType() const override { return Type::Weightclass; }
 
-		const std::string GetDescription() const;
+		virtual std::string GetDescription() const override;
 		virtual Status GetStatus() const override;
 
 		virtual std::vector<Result> CalculateResults() const override;

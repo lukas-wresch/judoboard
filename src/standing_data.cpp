@@ -237,6 +237,9 @@ const std::string StandingData::Judoka2String(std::string SearchString, const IT
 		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight();
 		ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
 
+		if (judoka->GetClub())
+			ret << YAML::Key << "club" << YAML::Value << judoka->GetClub()->GetName();
+
 		ret << YAML::Key << "is_participant" << YAML::Value << Tournament->IsParticipant(*judoka);
 
 		auto judoka_age_group = Tournament->GetAgeGroupOfJudoka(judoka);

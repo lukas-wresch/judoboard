@@ -7,8 +7,9 @@
 
 <table id="judokas" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
-    <th style="width: 0.5cm;" class="no">No.</th>
+    <th style="width: 0.5cm;" id="no">No.</th>
     <th style="width: 6.2cm;" id="name">Name</th>
+    <th style="width: 6.2cm;" id="club">Club</th>
     <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
     <th style="width: 2cm; text-align: center;" id="birthyear">Birthyear</th>
     <th style="width: 5.1cm; text-align: center;" class="options">Options</th>
@@ -56,6 +57,7 @@ function RemoveParticipant(id)
 function Update()
 {
   AjaxCallback('ajax/judoka/search?name=' + document.getElementById("name").value, function(response) {
+    console.log(response);
     var res = YAML.parse(response);
 
     var table = document.getElementById("judokas");
@@ -72,6 +74,7 @@ function Update()
       var cell2 = row.insertCell(2);
       var cell3 = row.insertCell(3);
       var cell4 = row.insertCell(4);
+      var cell5 = row.insertCell(5);
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
@@ -84,16 +87,22 @@ function Update()
       cell1.innerHTML = judoka.name;
       cell1.style.fontSize  = "16pt";
 
-      cell2.innerHTML = judoka.weight + " kg";
-      cell2.style.textAlign = "center";
+      if (typeof judoka.club === 'undefined')
+        cell2.innerHTML = "- - -";
+      else
+        cell2.innerHTML = judoka.club;
       cell2.style.fontSize  = "16pt";
 
-      cell3.innerHTML = judoka.birthyear;
+      cell3.innerHTML = judoka.weight + " kg";
       cell3.style.textAlign = "center";
       cell3.style.fontSize  = "16pt";
 
+      cell4.innerHTML = judoka.birthyear;
+      cell4.style.textAlign = "center";
+      cell4.style.fontSize  = "16pt";
+
       if (judoka.is_participant)
-        cell4.innerHTML = "<button class=\"remove\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + lang.remove + "</button>";
+        cell5.innerHTML = "<button class=\"remove\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + lang.remove + "</button>";
       else
       {
         if (judoka.age_groups.length > 1)
@@ -117,12 +126,12 @@ function Update()
             select.appendChild(option);
           }
 
-          cell4.appendChild(select);
+          cell5.appendChild(select);
         }
 
-        cell4.innerHTML += "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return AddParticipant('"+judoka.uuid+"')\">" + lang.add + "</button>";
+        cell5.innerHTML += "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return AddParticipant('"+judoka.uuid+"')\">" + lang.add + "</button>";
       }
-      cell4.style.textAlign = "right";
+      cell5.style.textAlign = "right";
     }
   });
 }
@@ -136,5 +145,7 @@ document.getElementById("name").oninput = function(e)
 
 
 document.getElementById("headline").innerHTML = lang.new_participant;
+document.getElementById("no").innerHTML   = lang.no;
+document.getElementById("club").innerHTML = lang.club;
 
 </script>

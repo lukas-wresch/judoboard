@@ -55,7 +55,7 @@ namespace Judoboard
 
 		//Virtuals
 		virtual const std::vector<Match*> GetSchedule() const override { std::vector<Match*> schedule{ (Match*)this }; return schedule; }
-		virtual const std::string GetName() const override {
+		virtual std::string GetDescription() const override {
 			if (!HasValidFighters())
 				return "T.b.d. vs. T.b.d.";
 			return GetFighter(Fighter::White)->GetName() + " vs. " + GetFighter(Fighter::Blue)->GetName();

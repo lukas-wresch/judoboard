@@ -295,7 +295,7 @@ ZED::CSV Match::ToString() const
 	ret << GetMatID() << m_State << GetColor().ToHexString();
 
 	if (GetMatchTable())
-		ret << (std::string)GetMatchTable()->GetUUID() << GetMatchTable()->GetName();
+		ret << (std::string)GetMatchTable()->GetUUID() << GetMatchTable()->GetDescription();
 	else
 		ret << "0,- - -";
 

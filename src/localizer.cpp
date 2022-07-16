@@ -86,11 +86,19 @@ std::string Localizer::Gender2ShortForm(Gender Gender)
 	{
 	case Language::German:
 	{
-		return (Gender == Gender::Male) ? "m" : "w";
+		if (Gender == Gender::Male)
+			return  "m";
+		else if (Gender == Gender::Female)
+			return "w";
+		return "";
 	}
 
 	case Language::English:
 	default:
-		return (Gender == Gender::Male) ? "m" : "f";
+		if (Gender == Gender::Male)
+			return  "m";
+		else if (Gender == Gender::Female)
+			return "f";
+		return "";
 	}
 }

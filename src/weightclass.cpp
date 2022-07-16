@@ -79,7 +79,7 @@ void Weightclass::operator >> (YAML::Emitter& Yaml) const
 
 
 
-const std::string Weightclass::GetDescription() const
+std::string Weightclass::GetDescription() const
 {
 	std::string desc = GetName();
 
@@ -95,7 +95,11 @@ const std::string Weightclass::GetDescription() const
 	else
 	{
 		desc = std::to_string(m_MinWeight) + " - " + std::to_string(m_MaxWeight) + " kg";
-		desc += (m_Gender == Gender::Male) ? " (m)" : " (f)";
+
+		if (m_Gender == Gender::Male)
+			desc += " (m)";
+		else if (m_Gender == Gender::Female)
+			desc += " (f)";
 	}
 
 	return desc;
