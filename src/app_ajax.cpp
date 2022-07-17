@@ -1482,12 +1482,12 @@ void Application::SetupHttpServer()
 	});
 
 
-	m_Server.RegisterResource("/ajax/matchtable/get_participants", [this](auto& Request) -> std::string {
+	/*m_Server.RegisterResource("/ajax/matchtable/get_participants", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
 		return Ajax_GetParticipantsFromMatchTable(Request);
-	});
+	});*/
 
 
 	m_Server.RegisterResource("/ajax/matchtable/get_matches", [this](auto& Request) -> std::string {
@@ -1697,13 +1697,15 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
+
 		auto match_table = GetTournament()->FindMatchTable(id);
 
 		if (!match_table)
 			return std::string("Could not find class");
 
 		YAML::Emitter ret;
-		*match_table >> ret;
+		match_table->ToString(ret);
 		return ret.c_str();
 	});
 
@@ -2711,6 +2713,8 @@ std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Re
 
 	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+	LockTillScopeEnd();
+
 	auto table = GetTournament()->FindMatchTable(id);
 
 	if (!table)
@@ -2723,7 +2727,7 @@ std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Re
 	ret << YAML::BeginSeq;
 
 	for (auto judoka : table->GetParticipants())
-		*judoka >> ret;
+		judoka->ToString(ret);
 
 	ret << YAML::EndSeq;
 	GetTournament()->Unlock();

@@ -125,6 +125,7 @@ namespace Judoboard
 
 		virtual void operator >> (ZED::CSV& Stream) const;
 		virtual void operator >> (YAML::Emitter& Yaml) const;
+		virtual void ToString(YAML::Emitter& Yaml) const;
 
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called

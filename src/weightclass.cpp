@@ -79,6 +79,21 @@ void Weightclass::operator >> (YAML::Emitter& Yaml) const
 
 
 
+void Weightclass::ToString(YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+
+	MatchTable::ToString(Yaml);
+
+	Yaml << YAML::Key << "min_weight" << YAML::Value << m_MinWeight;
+	Yaml << YAML::Key << "max_weight" << YAML::Value << m_MaxWeight;
+	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;
+
+	Yaml << YAML::EndMap;
+}
+
+
+
 std::string Weightclass::GetDescription() const
 {
 	std::string desc = GetName();
@@ -400,18 +415,6 @@ const std::string Weightclass::ToHTML() const
 	}
 
 	ret += "</table>";
-
-	return ret;
-}
-
-
-
-const std::string Weightclass::ToString() const
-{
-	ZED::CSV ret(MatchTable::ToString());
-	ret << m_MinWeight << m_MaxWeight;
-
-	ret << m_Gender;
 
 	return ret;
 }

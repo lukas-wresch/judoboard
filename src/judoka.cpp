@@ -136,7 +136,7 @@ void Judoka::ToString(YAML::Emitter& Yaml) const
 	if (m_pClub)
 	{
 		Yaml << YAML::Key << "club_uuid" << YAML::Value << (std::string)m_pClub->GetUUID();
-		Yaml << YAML::Key << "club_name" << YAML::Value << (std::string)m_pClub->GetName();
+		Yaml << YAML::Key << "club_name" << YAML::Value << m_pClub->GetName();
 	}
 	Yaml << YAML::EndMap;
 }

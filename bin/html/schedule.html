@@ -56,6 +56,7 @@
   <tr>
     <th style="width: 0.5cm;" class="no">No.</th>
     <th style="width: 4cm;" id="name">Name</th>
+    <th style="width: 2cm; text-align: center;" class="club">Club</th>
     <th style="width: 2cm; text-align: center;" id="weight" class="weight">Weight</th>
     <th style="width: 2cm; text-align: center;" id="matches" class="num_matches">#Matches</th>
     <th style="width: 2.5cm; text-align: center;" id="age_group" class="age_group">Age group</th>
@@ -447,10 +448,11 @@ function Update()
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
       var cell1 = row.insertCell(1);
-      var cell2 = row.insertCell(2);
-      var cell3 = row.insertCell(3);
-      var cell4 = row.insertCell(4);
-      var cell5 = row.insertCell(5);
+      var cell6 = row.insertCell(2);
+      var cell2 = row.insertCell(3);
+      var cell3 = row.insertCell(4);
+      var cell4 = row.insertCell(5);
+      var cell5 = row.insertCell(6);
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
@@ -464,6 +466,13 @@ function Update()
       cell2.innerHTML = judoka.weight + " kg";
       cell2.style.textAlign = "center";
       cell2.style.fontSize  = "16pt";
+
+      if (typeof judoka.club_name !== 'undefined')
+        cell6.innerHTML = judoka.club_name;
+      else
+        cell6.innerHTML = "- - -";
+      cell6.style.textAlign = "center";
+      cell6.style.fontSize  = "16pt";
 
       cell3.innerHTML = judoka.num_matches;
       cell3.style.textAlign = "center";
@@ -644,6 +653,8 @@ for (const el of document.getElementsByClassName("weight"))
     el.innerHTML = lang.weight;
 for (const el of document.getElementsByClassName("num_matches"))
     el.innerHTML = lang.num_matches;
+for (const el of document.getElementsByClassName("club"))
+    el.innerHTML = lang.club;
 for (const el of document.getElementsByClassName("age_group"))
     el.innerHTML = lang.age_group;
 

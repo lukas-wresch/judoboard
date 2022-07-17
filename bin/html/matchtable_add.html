@@ -236,7 +236,7 @@ function GetMatchTable(id)
          cell0.style.fontSize  = "14pt";
 
          cell1.innerHTML = "<a href=\"#judoka_edit.html?id=" + judoka.uuid + "\">" + judoka.firstname + " " + judoka.lastname + "</a>";
-         //cell2.innerHTML = weight + " kg";
+         cell2.innerHTML = judoka.weight + " kg";
          cell2.style.textAlign = "center";
          cell2.style.fontSize  = "16pt";
 
@@ -252,10 +252,8 @@ function GetMatchTable(id)
 
 
   AjaxCallback("ajax/matchtable/get_matches?id="+id, function(response) {
+    console.log(response);
     var res = YAML.parse(response);
-
-    if (res.length < 4)
-      return;
 
     var table = document.getElementById("schedule");
 
@@ -282,8 +280,8 @@ function GetMatchTable(id)
       cell0.style.fontSize  = "14pt";
       cell0.style.height    = "1.5cm";
 
-      cell1.innerHTML = match.white;
-      cell2.innerHTML = match.blue;
+      cell1.innerHTML = match.white_name;
+      cell2.innerHTML = match.blue_name;
 
       if (match.mat_id <= 0)
       {

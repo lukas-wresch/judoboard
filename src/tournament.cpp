@@ -1304,6 +1304,12 @@ const std::string Tournament::Participants2String() const
 		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight();
 		ret << YAML::Key << "num_matches" << YAML::Value << num_matches;
 
+		if (judoka->GetClub())
+		{
+			ret << YAML::Key << "club_uuid" << YAML::Value << (std::string)judoka->GetClub()->GetUUID();
+			ret << YAML::Key << "club_name" << YAML::Value << judoka->GetClub()->GetName();
+		}
+
 		if (judoka_age_group)
 			ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
 

@@ -298,6 +298,30 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 
 
 
+void MatchTable::ToString(YAML::Emitter& Yaml) const
+{
+	Schedulable::operator >>(Yaml);
+
+	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
+	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
+	Yaml << YAML::Key << "description" << YAML::Value << GetDescription();
+
+	if (m_Rules)
+		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
+	if (m_pAgeGroup)
+		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)m_pAgeGroup->GetUUID();
+
+	Yaml << YAML::Key << "participants";
+	Yaml << YAML::BeginSeq;
+
+	for (auto judoka : m_Participants)
+		judoka->ToString(Yaml);
+
+	Yaml << YAML::EndSeq;
+}
+
+
+
 Match* MatchTable::AddAutoMatch(size_t WhiteIndex, size_t BlueIndex)
 {
 	if (!GetParticipant(WhiteIndex) || !GetParticipant(BlueIndex))
