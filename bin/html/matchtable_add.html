@@ -102,11 +102,11 @@ function GetForm(callback)
     document.getElementById("male").innerHTML   = lang.male;
     document.getElementById("female").innerHTML = lang.female;
 
-    if (g_yaml && typeof g_yaml["min_weight"] !== 'undefined')
+    if (g_yaml && typeof g_yaml.min_weight !== 'undefined')
       document.getElementById("minWeight").value = g_yaml["min_weight"];
-    if (g_yaml && typeof g_yaml["max_weight"] !== 'undefined')
+    if (g_yaml && typeof g_yaml.max_weight !== 'undefined')
       document.getElementById("maxWeight").value = g_yaml["max_weight"];
-    if (g_yaml && typeof g_yaml["gender"] !== 'undefined')
+    if (g_yaml && typeof g_yaml.gender !== 'undefined')
       document.getElementById("gender").value = g_yaml["gender"];
       
     if (typeof callback !== 'undefined')
@@ -129,6 +129,7 @@ function AddMatchtable()
 
   data["mat"]  = document.getElementById("mat").value;
   data["rule"] = document.getElementById("rule").value;
+  data["age_group"] = document.getElementById("age_group").value;
 
   console.log(data);
 
@@ -198,6 +199,11 @@ function GetMatchTable(id)
 
     GetMats(function() {
       document.getElementById("mat").value = res.mat_id;
+    });
+
+    GetAgeGroups(function() {
+      if (typeof res.age_group !== 'undefined')
+        document.getElementById("age_group").value = res.age_group;
     });
 
     GetRuleSets(function() {

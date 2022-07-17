@@ -449,6 +449,11 @@ function GetRuleSets(callback)
     while (rules.length >= 1)
       rules.remove(rules.length-1);
 
+    var option = document.createElement("option");
+    option.value = 0;
+    option.text = "None";
+    rules.add(option);
+
     for (const rule of res.rules)
     {
       var option = document.createElement("option");

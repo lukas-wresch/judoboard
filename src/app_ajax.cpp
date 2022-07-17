@@ -1507,6 +1507,10 @@ void Application::SetupHttpServer()
 			return std::string("No tournament is open");
 
 		MatchTable::Type type = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "type"));
+		int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
+		UUID rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
+		UUID age_group = HttpServer::DecodeURLEncoded(Request.m_Body, "age_group");
+
 		MatchTable* new_table = nullptr;
 
 		switch (type)
@@ -1520,10 +1524,11 @@ void Application::SetupHttpServer()
 
 			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 
-			if (gender < 0 || gender >= 2)
-				new_table = new Weightclass(GetTournament(), minWeight, maxWeight);
-			else
+			if (gender == 0 || gender == 1)
 				new_table = new Weightclass(GetTournament(), minWeight, maxWeight, (Gender)gender);
+			else
+				new_table = new Weightclass(GetTournament(), minWeight, maxWeight);
+				
 			break;
 		}
 
@@ -1539,19 +1544,17 @@ void Application::SetupHttpServer()
 			return std::string("Unknown type");
 		}
 
-		int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
-		auto ruleName = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");//TODO Use ID instead
-
-		new_table->SetMatID(FindDefaultMatID());
 		if (mat >= 0)
 			new_table->SetMatID(mat);
-		if (m_Database.FindRuleSetByName(ruleName))
-			new_table->SetRuleSet(m_Database.FindRuleSetByName(ruleName));
+		else
+			new_table->SetMatID(FindDefaultMatID());
 
+		new_table->SetRuleSet(m_Database.FindRuleSet(rule));
+		new_table->SetAgeGroup(m_Database.FindAgeGroup(age_group));
 
+		LockTillScopeEnd();
 		GetTournament()->Lock();
 		GetTournament()->AddMatchTable(new_table);
-		GetTournament()->GenerateSchedule();
 		GetTournament()->Unlock();
 		return Error();//OK
 	});
@@ -1590,16 +1593,12 @@ void Application::SetupHttpServer()
 
 		if (mat >= 0)
 			table->SetMatID(mat);
-		if (age_group)
-		{
-			table->SetAgeGroup(age_group);
-			GetTournament()->AddAgeGroup(age_group);
-		}
-		if (rule_set)
-		{
-			table->SetRuleSet(rule_set);
-			GetTournament()->AddRuleSet(rule_set);
-		}
+		
+		table->SetAgeGroup(age_group);
+		GetTournament()->AddAgeGroup(age_group);
+		
+		table->SetRuleSet(rule_set);
+		GetTournament()->AddRuleSet(rule_set);
 
 		GetTournament()->Unlock();
 
@@ -1731,7 +1730,7 @@ void Application::SetupHttpServer()
 		GetTournament()->AddMatch(Match(GetTournament(), white, blue, FindDefaultMatID()));
 
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/match/set_mat", [this](auto& Request) -> std::string {
@@ -1747,6 +1746,8 @@ void Application::SetupHttpServer()
 
 		if (matID < 0)
 			return Error(Error::Type::InvalidID);
+
+		LockTillScopeEnd();
 
 		auto match = GetTournament()->FindMatch(matchID);
 
@@ -1822,9 +1823,6 @@ void Application::SetupHttpServer()
 
 		YAML::Emitter ret;
 		*rule >> ret;
-		//ret << rule->GetName() << rule->GetMatchTime() << rule->GetGoldenScoreTime();
-		//ret << rule->GetOsaeKomiTime(false) << rule->GetOsaeKomiTime(true);
-		//ret << rule->IsYukoEnabled() << rule->IsKokaEnabled() << rule->IsDrawAllowed() << rule->GetBreakTime();
 		return ret.c_str();
 	});
 
@@ -1835,13 +1833,6 @@ void Application::SetupHttpServer()
 
 		auto& rules = m_Database.GetRuleSets();
 		YAML::Emitter ret;
-
-		/*if (GetTournament() && GetTournament()->GetDefaultRuleSet())
-			ret << GetTournament()->GetDefaultRuleSet()->GetID();
-		else if (!rules.empty())
-			ret << rules[0]->GetID();
-		else
-			ret << 0;*/
 
 		ret << YAML::BeginMap;
 
@@ -1855,7 +1846,6 @@ void Application::SetupHttpServer()
 		{
 			if (rule)
 			{
-				//ret << rule->GetID() << rule->GetName() << rule->GetDescription();
 				ret << YAML::BeginMap;
 				ret << YAML::Key << "uuid" << YAML::Value << (std::string)rule->GetUUID();
 				ret << YAML::Key << "name" << YAML::Value << (std::string)rule->GetName();
@@ -2071,11 +2061,11 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
+
 		auto tournament = FindTournament(id);
 		if (!tournament)
 			return std::string("Could not find tournament");
-
-		LockTillScopeEnd();
 
 		tournament->DeleteAllMatchResults();
 		return Error();//OK
