@@ -1152,11 +1152,6 @@ void Mat::NextState(State NextState) const
 			for (auto& g : m_Graphics)
 				g.second.StopAllAnimations();
 
-			m_Graphics["hajime"].UpdateTexture(renderer, "Hajime", ZED::Color(255, 0, 0));
-			m_Graphics["mate"].UpdateTexture(renderer, "Mate", ZED::Color(255, 0, 0));
-			m_Graphics["sonomama"].UpdateTexture(renderer, "Sonomama", ZED::Color(255, 0, 0));
-			m_Graphics["yoshi"].UpdateTexture(renderer, "Yoshi", ZED::Color(255, 0, 0));
-
 			m_Graphics["hajime"].SetAlpha(0.0);
 			m_Graphics["mate"].SetAlpha(0.0);
 			m_Graphics["sonomama"].SetAlpha(0.0);
@@ -1240,7 +1235,6 @@ void Mat::NextState(State NextState) const
 			m_Graphics["timer"].SetPosition(width/2, height/2, -120).Center()
 							   .AddAnimation(Animation(0.0, 0.0, 33.0, [](auto& g) { return g.m_a < 255.0; }));
 
-			//m_Graphics["matchtable"].SetAlpha(-100.0).AddAnimation(Animation(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
 			m_Graphics["mat_name"  ].AddAnimation(Animation(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
 
 			m_Graphics["next_match"].StopAllAnimations()
@@ -1249,34 +1243,34 @@ void Mat::NextState(State NextState) const
 			m_Graphics["following_match"].StopAllAnimations()
 										 .AddAnimation(Animation(0.0, 0.0, -40.0, [](auto& g) { return g.m_a > 0.0; }));
 
-			m_Graphics["hajime"].UpdateTexture(renderer, "Hajime", ZED::Color(255, 0, 0));
-			m_Graphics["mate"  ].UpdateTexture(renderer, "Mate",   ZED::Color(255, 0, 0));
-			m_Graphics["sonomama"].UpdateTexture(renderer, "Sonomama", ZED::Color(255, 0, 0));
-			m_Graphics["yoshi"].UpdateTexture(renderer, "Yoshi", ZED::Color(255, 0, 0));
+			m_Graphics["hajime"].UpdateTexture(renderer, "Hajime", ZED::Color(255, 255, 255));
+			m_Graphics["mate"  ].UpdateTexture(renderer, "Mate",   ZED::Color(0, 0, 0));
+			m_Graphics["sonomama"].UpdateTexture(renderer, "Sonomama", ZED::Color(0, 0, 0));
+			m_Graphics["yoshi"].UpdateTexture(renderer, "Yoshi", ZED::Color(255, 255, 255));
 
-			m_Graphics["effect_ippon_white"].UpdateTexture(renderer, "Ippon", ZED::Color(255, 0, 0));
-			m_Graphics["effect_ippon_blue" ].UpdateTexture(renderer, "Ippon", ZED::Color(255, 0, 0));
+			m_Graphics["effect_ippon_white"].UpdateTexture(renderer, "Ippon", ZED::Color(0, 0, 0));
+			m_Graphics["effect_ippon_blue" ].UpdateTexture(renderer, "Ippon", ZED::Color(255, 255, 255));
 
-			m_Graphics["effect_wazaari_white"].UpdateTexture(renderer, "Wazaari", ZED::Color(255, 0, 0));
-			m_Graphics["effect_wazaari_blue" ].UpdateTexture(renderer, "Wazaari", ZED::Color(255, 0, 0));
+			m_Graphics["effect_wazaari_white"].UpdateTexture(renderer, "Wazaari", ZED::Color(0, 0, 0));
+			m_Graphics["effect_wazaari_blue" ].UpdateTexture(renderer, "Wazaari", ZED::Color(255, 255, 255));
 
-			m_Graphics["effect_yuko_white"].UpdateTexture(renderer, "Yuko", ZED::Color(255, 0, 0));
-			m_Graphics["effect_yuko_blue" ].UpdateTexture(renderer, "Yuko", ZED::Color(255, 0, 0));
+			m_Graphics["effect_yuko_white"].UpdateTexture(renderer, "Yuko", ZED::Color(0, 0, 0));
+			m_Graphics["effect_yuko_blue" ].UpdateTexture(renderer, "Yuko", ZED::Color(255, 255, 255));
 
-			m_Graphics["effect_koka_white"].UpdateTexture(renderer, "Koka", ZED::Color(255, 0, 0));
-			m_Graphics["effect_koka_blue" ].UpdateTexture(renderer, "Koka", ZED::Color(255, 0, 0));
+			m_Graphics["effect_koka_white"].UpdateTexture(renderer, "Koka", ZED::Color(0, 0, 0));
+			m_Graphics["effect_koka_blue" ].UpdateTexture(renderer, "Koka", ZED::Color(255, 255, 255));
 
-			m_Graphics["effect_osaekomi_white"].UpdateTexture(renderer, "Osaekomi", ZED::Color(255, 0, 0));
-			m_Graphics["effect_osaekomi_blue" ].UpdateTexture(renderer, "Osaekomi", ZED::Color(255, 0, 0));
+			m_Graphics["effect_osaekomi_white"].UpdateTexture(renderer, "Osaekomi", ZED::Color(0, 0, 0));
+			m_Graphics["effect_osaekomi_blue" ].UpdateTexture(renderer, "Osaekomi", ZED::Color(255, 255, 255));
 
-			m_Graphics["effect_tokeda_white"].UpdateTexture(renderer, "Tokeda", ZED::Color(255, 0, 0));
-			m_Graphics["effect_tokeda_blue" ].UpdateTexture(renderer, "Tokeda", ZED::Color(255, 0, 0));
+			m_Graphics["effect_tokeda_white"].UpdateTexture(renderer, "Tokeda", ZED::Color(0, 0, 0));
+			m_Graphics["effect_tokeda_blue" ].UpdateTexture(renderer, "Tokeda", ZED::Color(255, 255, 255));
 
-			m_Graphics["effect_shido_white"].UpdateTexture(renderer, "Shido", ZED::Color(255, 0, 0));
-			m_Graphics["effect_shido_blue" ].UpdateTexture(renderer, "Shido", ZED::Color(255, 0, 0));
+			m_Graphics["effect_shido_white"].UpdateTexture(renderer, "Shido", ZED::Color(0, 0, 0));
+			m_Graphics["effect_shido_blue" ].UpdateTexture(renderer, "Shido", ZED::Color(255, 255, 255));
 
-			m_Graphics["effect_hansokumake_white"].UpdateTexture(renderer, "Hansokumake", ZED::Color(255, 0, 0));
-			m_Graphics["effect_hansokumake_blue" ].UpdateTexture(renderer, "Hansokumake", ZED::Color(255, 0, 0));
+			m_Graphics["effect_hansokumake_white"].UpdateTexture(renderer, "Hansokumake", ZED::Color(0, 0, 0));
+			m_Graphics["effect_hansokumake_blue" ].UpdateTexture(renderer, "Hansokumake", ZED::Color(255, 255, 255));
 
 			m_Graphics["effect_ippon_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row1);
 			m_Graphics["effect_ippon_white"].SetPosition(width - (int)(550.0 * m_ScalingFactor), effect_row1);
@@ -1330,19 +1324,19 @@ void Mat::NextState(State NextState) const
 
 				
 				m_Graphics["next_matches_blue2_" + std::to_string(i)].StopAllAnimations()
-																	 .SetPosition(40 - 1320, (int)shift_y + (int)(160.0*m_ScalingFactor), 0)
+																	 .SetPosition(40 - 1320, (int)shift_y + (int)(158.0*m_ScalingFactor), 0)
 																	 .AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
 				
 				m_Graphics["next_matches_white2_"  + std::to_string(i)].StopAllAnimations().Right()
-																	 .SetPosition(width - 40 + 1320, (int)shift_y + (int)(160.0*m_ScalingFactor), 0)
+																	 .SetPosition(width - 40 + 1320, (int)shift_y + (int)(158.0*m_ScalingFactor), 0)
 																	 .AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
 
 				m_Graphics["next_matches_blue_club_" + std::to_string(i)].StopAllAnimations()
-					.SetPosition(40 - 1320, (int)shift_y + (int)(320.0*m_ScalingFactor), 0)
+					.SetPosition(40 - 1320, (int)shift_y + (int)(325.0*m_ScalingFactor), 0)
 					.AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
 
 				m_Graphics["next_matches_white_club_"  + std::to_string(i)].StopAllAnimations().Right()
-					.SetPosition(width - 40 + 1320, (int)shift_y + (int)(320.0*m_ScalingFactor), 0)
+					.SetPosition(width - 40 + 1320, (int)shift_y + (int)(325.0*m_ScalingFactor), 0)
 					.AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
 			}
 
