@@ -56,14 +56,14 @@ bool Mat::Open()
 		if (display_width <= 0.0)//No display?
 			display_width = 1920.0;//Simulate 1080p
 
-		double tiny = 20.0, middle = 50.0, large = 70.0, huge = 100.0, gigantic = 170.0, gigantic2 = 250.0;
+		double tiny = 20.0, middle = 50.0, large = 70.0, huge = 100.0, gigantic = 170.0, gigantic2 = 230.0;
 		m_ScalingFactor = display_width / 1920.0;
 
-		tiny *= m_ScalingFactor;
+		tiny   *= m_ScalingFactor;
 		middle *= m_ScalingFactor;
 		large  *= m_ScalingFactor;
 		huge   *= m_ScalingFactor;
-		gigantic *= m_ScalingFactor;
+		gigantic  *= m_ScalingFactor;
 		gigantic2 *= m_ScalingFactor;
 
 		if (!renderer.InitFonts("assets/fonts/arial.ttf", (int)tiny, (int)middle, (int)large, (int)huge, (int)gigantic, (int)gigantic2))
@@ -1189,12 +1189,14 @@ void Mat::NextState(State NextState) const
 
 		case State::TransitionToMatch:
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				m_Graphics["next_matches_white_" + std::to_string(i)].AddAnimation(Animation(+100.0, 0.0, -83.0));
 				m_Graphics["next_matches_blue_"  + std::to_string(i)].AddAnimation(Animation(-100.0, 0.0, -83.0));
 				m_Graphics["next_matches_white2_" + std::to_string(i)].AddAnimation(Animation(+100.0, 0.0, -83.0));
-				m_Graphics["next_matches_blue2_" + std::to_string(i)].AddAnimation(Animation(-100.0, 0.0, -83.0));
+				m_Graphics["next_matches_blue2_"  + std::to_string(i)].AddAnimation(Animation(-100.0, 0.0, -83.0));
+				m_Graphics["next_matches_white_club_" + std::to_string(i)].AddAnimation(Animation(+100.0, 0.0, -83.0));
+				m_Graphics["next_matches_blue_club_"  + std::to_string(i)].AddAnimation(Animation(-100.0, 0.0, -83.0));
 			}
 
 			m_Graphics["blue_name"].SetPosition(50, name_height-620, 80)
@@ -1311,35 +1313,37 @@ void Mat::NextState(State NextState) const
 		case State::TransitionToWaiting:
 			for (int i = 0; i < 2; i++)
 			{
-				//double shift = 180.0;
-				double shift = 140.0;
+				double shift_y = 125.0;
 				if (i > 0)
-				{
-					//shift += 330.0;
-					//shift += i*120.0;
-					shift += 395.0;
-					shift += i*100.0;
-				}
+					shift_y += 495.0;
 
-				shift *= m_ScalingFactor;
+				shift_y *= m_ScalingFactor;
 
 				
 				m_Graphics["next_matches_blue_" + std::to_string(i)].StopAllAnimations()
-																	 .SetPosition(40 - 1320, (int)shift, 0)
+																	 .SetPosition(40 - 1320, (int)shift_y, 0)
 																	 .AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
 				
 				m_Graphics["next_matches_white_"  + std::to_string(i)].StopAllAnimations().Right()
-																	 .SetPosition(width - 40 + 1320, (int)shift, 0)
+																	 .SetPosition(width - 40 + 1320, (int)shift_y, 0)
 																	 .AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
 
 				
 				m_Graphics["next_matches_blue2_" + std::to_string(i)].StopAllAnimations()
-																	 .SetPosition(40 - 1320, (int)shift + (int)(165.0*m_ScalingFactor), 0)
+																	 .SetPosition(40 - 1320, (int)shift_y + (int)(160.0*m_ScalingFactor), 0)
 																	 .AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
 				
 				m_Graphics["next_matches_white2_"  + std::to_string(i)].StopAllAnimations().Right()
-																	 .SetPosition(width - 40 + 1320, (int)shift + (int)(165.0*m_ScalingFactor), 0)
+																	 .SetPosition(width - 40 + 1320, (int)shift_y + (int)(160.0*m_ScalingFactor), 0)
 																	 .AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
+
+				m_Graphics["next_matches_blue_club_" + std::to_string(i)].StopAllAnimations()
+					.SetPosition(40 - 1320, (int)shift_y + (int)(320.0*m_ScalingFactor), 0)
+					.AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
+
+				m_Graphics["next_matches_white_club_"  + std::to_string(i)].StopAllAnimations().Right()
+					.SetPosition(width - 40 + 1320, (int)shift_y + (int)(320.0*m_ScalingFactor), 0)
+					.AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
 			}
 
 			m_Graphics["next_match"].StopAllAnimations().Center()
@@ -1347,7 +1351,6 @@ void Mat::NextState(State NextState) const
 				.AddAnimation(Animation(0.0, 0.0, 35.0, [](auto& g) { return g.m_a < 255.0; }));
 
 			m_Graphics["following_match"].StopAllAnimations().Center()
-				//.SetPosition(width/2, (int)(450 * m_ScalingFactor), -120)
 				.SetPosition(width/2, (int)(565 * m_ScalingFactor), -120)
 				.AddAnimation(Animation(0.0, 0.0, 32.0, [](auto& g) { return g.m_a < 255.0; }));
 
@@ -1374,8 +1377,6 @@ void Mat::NextState(State NextState) const
 
 			m_Graphics["timer"].AddAnimation(Animation(0.0, 0.0, -33.0));
 
-			m_Graphics["matchtable"].SetPosition(20, height - (int)(120.0 * m_ScalingFactor))
-									.AddAnimation(Animation(0.0, 0.0, -40.0, [=](auto& g) { return g.m_a > 0.0; }));
 			m_Graphics["mat_name"].SetPosition(20, height - (int)(60.0 * m_ScalingFactor))
 								  .AddAnimation(Animation(0.0, 0.0, 10.0, [=](auto& g) { return g.m_a < 255.0; }));
 			break;
@@ -1426,7 +1427,7 @@ void Mat::UpdateGraphics() const
 			m_Graphics["next_matches_white_" + std::to_string(i)].Clear();
 			m_Graphics["next_matches_blue_"  + std::to_string(i)].Clear();
 			m_Graphics["next_matches_white2_" + std::to_string(i)].Clear();
-			m_Graphics["next_matches_blue2_" + std::to_string(i)].Clear();
+			m_Graphics["next_matches_blue2_"  + std::to_string(i)].Clear();
 		}
 
 		int i = 0;
@@ -1434,18 +1435,25 @@ void Mat::UpdateGraphics() const
 		{
 			if (!match.HasValidFighters())
 				continue;
-			
-			//auto white_name = match->GetFighter(Fighter::White)->GetName();
-			//auto blue_name  = match->GetFighter(Fighter::Blue )->GetName();
 
-			//m_Graphics["next_matches_white_" + std::to_string(i)].UpdateTexture(renderer, white_name, ZED::Color(0, 0, 0), FontSize);
-			//m_Graphics["next_matches_blue_"  + std::to_string(i)].UpdateTexture(renderer, blue_name,  ZED::Color(255, 255, 255), FontSize);
-
+			//Update judoka name
 			m_Graphics["next_matches_white_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetFirstname(), ZED::Color(0, 0, 0), FontSize);
 			m_Graphics["next_matches_blue_"   + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue)->GetFirstname(), ZED::Color(255, 255, 255), FontSize);
 			m_Graphics["next_matches_white2_" + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetLastname(), ZED::Color(0, 0, 0), FontSize);
 			m_Graphics["next_matches_blue2_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue)->GetLastname(), ZED::Color(255, 255, 255), FontSize);
 
+			//Update clubs of judokas
+			if (match.GetFighter(Fighter::White)->GetClub())
+				m_Graphics["next_matches_white_club_" + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetClub()->GetName(), ZED::Color(0, 0, 0), ZED::FontSize::Middle);
+			else
+				m_Graphics["next_matches_white_club_" + std::to_string(i)].Clear();
+
+			if (match.GetFighter(Fighter::Blue)->GetClub())
+				m_Graphics["next_matches_blue_club_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue)->GetClub()->GetName(), ZED::Color(255, 255, 255), ZED::FontSize::Middle);
+			else
+				m_Graphics["next_matches_blue_club_"  + std::to_string(i)].Clear();
+
+			//Shorten names if necessary
 			while (m_Graphics["next_matches_white_" + std::to_string(i)] && m_Graphics["next_matches_white_" + std::to_string(i)]->GetWidth() > std::max((width - 25.0 * m_ScalingFactor)/2, 100.0))
 				m_Graphics["next_matches_white_" + std::to_string(i)].Shorten(renderer);
 			while (m_Graphics["next_matches_blue_"  + std::to_string(i)] && m_Graphics["next_matches_blue_"  + std::to_string(i)]->GetWidth() > std::max((width - 25.0 * m_ScalingFactor)/2, 100.0))
@@ -1453,6 +1461,9 @@ void Mat::UpdateGraphics() const
 
 			//FontSize = ZED::FontSize::Large;
 			i++;
+
+			if (i == 2)
+				break;
 		}
 
 		break;
@@ -1855,23 +1866,6 @@ bool Mat::Render(double dt) const
 	}
 
 	case State::Waiting:
-		/*renderer.FillRect(ZED::Rect(0, 0, width / 2 - 50, height), 255, 255, 255);
-		renderer.FillRect(ZED::Rect(width / 2 + 50, 0, width, height), 0, 0, 255);
-
-		if (m_Background->GetType() == ZED::Type::OpenGL)
-		{
-			m_Background->SetSizeX(1.0f);
-			m_Background->SetSizeY(20.0f);
-			m_Background->SetAngle(0.0f);
-			renderer.RenderTransformedRotated(*m_Background, width/2 - 50, 0);
-		}
-		else
-		{
-			m_Background->SetAngle(0.0f);
-			for (int y = 0; y < height + 100; y += 100)
-				renderer.RenderTransformed(*m_Background, width/2 - 50, y);
-		}*/
-
 
 		if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetType() == MatchTable::Type::Pause)
 		{
@@ -1886,7 +1880,10 @@ bool Mat::Render(double dt) const
 				m_Graphics["next_matches_blue_"  + std::to_string(i)].Render(renderer, dt);
 
 				m_Graphics["next_matches_white2_" + std::to_string(i)].Render(renderer, dt);
-				m_Graphics["next_matches_blue2_" + std::to_string(i)].Render(renderer, dt);
+				m_Graphics["next_matches_blue2_"  + std::to_string(i)].Render(renderer, dt);
+
+				m_Graphics["next_matches_white_club_" + std::to_string(i)].Render(renderer, dt);
+				m_Graphics["next_matches_blue_club_"  + std::to_string(i)].Render(renderer, dt);
 			}
 		}
 
@@ -1900,16 +1897,14 @@ bool Mat::Render(double dt) const
 
 
 	case State::TransitionToMatch:
-		//float alpha = 360.0f - ((float)elapsed - 1000.0f) / 75.0f;
-		//RenderBackgroundEffect(alpha);
-
-
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			m_Graphics["next_matches_white_" + std::to_string(i)].Render(renderer, dt);
 			m_Graphics["next_matches_blue_"  + std::to_string(i)].Render(renderer, dt);
 			m_Graphics["next_matches_white2_" + std::to_string(i)].Render(renderer, dt);
-			m_Graphics["next_matches_blue2_" + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_blue2_"  + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_white_club_" + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_blue_club_"  + std::to_string(i)].Render(renderer, dt);
 		}
 
 		m_Graphics["next_match"].Render(renderer, dt);
@@ -1921,30 +1916,9 @@ bool Mat::Render(double dt) const
 	//fall through
 
 	case State::Running:
-		//Render middle bar
-		//renderer.FillRect(ZED::Rect(width/2 - 2, box_bottom+1, 4, height/2), 0, 0, 0);
-
-		/*renderer.FillRect(ZED::Rect(0, 0, width, height / 2 - 50), 255, 255, 255);
-		renderer.FillRect(ZED::Rect(0, height / 2 + 50, width, height), 0, 0, 255);
-
-		if (m_Background->GetType() == ZED::Type::OpenGL)
-		{
-			m_Background->SetSizeX(20.0f);
-			m_Background->SetSizeY(1.0f);
-			m_Background->SetAngle(270.0f);
-			renderer.RenderTransformedRotated(*m_Background, 0, height / 2 - 50);
-		}
-		else
-		{
-			m_Background->SetAngle(270.0f);
-			for (int x = 0; x < width + 100; x += 100)
-				renderer.RenderTransformedRotated(*m_Background, x, height / 2 - 50);
-		}*/
-
-
 		//Render osaekomi
 		m_Graphics["osaekomi_bar_border"].Render(renderer, dt);
-		m_Graphics["osaekomi_bar"].Render(renderer, dt);
+		m_Graphics["osaekomi_bar" ].Render(renderer, dt);
 		m_Graphics["osaekomi_text"].Render(renderer, dt);
 
 		//Render golden score
@@ -2034,12 +2008,14 @@ bool Mat::Render(double dt) const
 		m_Graphics["matchtable"].Render(renderer, dt);
 		m_Graphics["mat_name"  ].Render(renderer, dt);
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			m_Graphics["next_matches_white_" + std::to_string(i)].Render(renderer, dt);
 			m_Graphics["next_matches_blue_"  + std::to_string(i)].Render(renderer, dt);
 			m_Graphics["next_matches_white2_" + std::to_string(i)].Render(renderer, dt);
-			m_Graphics["next_matches_blue2_" + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_blue2_"  + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_white_club_" + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_blue_club_"  + std::to_string(i)].Render(renderer, dt);
 		}
 
 		m_Graphics["next_match"].Render(renderer, dt);
@@ -2095,20 +2071,6 @@ bool Mat::Render(double dt) const
 	if (m_RequestScreenshot)
 	{
 		ZED::Log::Debug("Taking screenshot");
-		//renderer.TakeScreenshotPNG("screenshot.png");
-
-		/*ZED::PNG img = ZED::PNG(renderer.TakeScreenshot());
-		if (img)
-		{
-			auto lambda = [&](ZED::PNG&& Img) {
-				Img.ConvertTo(ZED::ColorType::R8G8B8);
-				Img.Flip();
-				Img.Save("screenshot.png");
-				//m_RequestScreenshot = false;
-			};
-
-			std::thread(lambda, std::move(img)).detach();
-		}*/
 
 		ZED::PNG image = renderer.TakeScreenshot();
 		
