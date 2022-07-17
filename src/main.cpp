@@ -316,7 +316,7 @@ int main(int argc, char** argv)
 
 		ZED::Log::Debug("Adding debug judoka");
 
-		for (int i = 0; i < 35; i++)
+		for (int i = 0; i < 50; i++)
 			app.GetDatabase().AddJudoka(CreateRandomJudoka(&app.GetDatabase()));
 	}
 #endif

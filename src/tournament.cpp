@@ -915,10 +915,12 @@ bool Tournament::RemoveAgeGroup(const UUID& UUID)
 	Lock();
 
 	//Remove all assignments from this age group
-	for (auto [judoka, age_group] : m_JudokaToAgeGroup)
+	for (auto it = m_JudokaToAgeGroup.begin(); it != m_JudokaToAgeGroup.end();)
 	{
-		if (age_group == UUID)
-			m_JudokaToAgeGroup.erase(judoka);//Remove the assignment
+		if (it->second == UUID)
+			it = m_JudokaToAgeGroup.erase(it);//Remove the assignment
+		else
+			++it;
 	}
 
 	//Assign not-assigned judoka to a age group if possible
