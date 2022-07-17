@@ -193,9 +193,9 @@ int main(int argc, char** argv)
 		auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set, app.GetDatabase());
 
 		auto m1 = new Judoboard::Weightclass(tourney, 0, 120);
-		tourney->AddMatchTable(m1);
 		m1->SetMatID(1);
 		m1->SetAgeGroup(&age_group);
+		tourney->AddMatchTable(m1);
 
 		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
 		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));

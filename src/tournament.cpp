@@ -668,6 +668,7 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 
 	Lock();
 	m_StandingData.AddJudoka(Judoka);
+	FindAgeGroupForJudoka(*Judoka);
 
 	for (auto table : m_MatchTables)
 	{
@@ -678,7 +679,6 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		}
 	}
 
-	FindAgeGroupForJudoka(*Judoka);
 	Unlock();
 
 	GenerateSchedule();
@@ -782,6 +782,12 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	if (!NewMatchTable)
 		return;
 
+	if (NewMatchTable->GetAgeGroup())
+		AddAgeGroup(const_cast<AgeGroup*>(NewMatchTable->GetAgeGroup()));
+
+	if (NewMatchTable->GetOwnRuleSet())
+		AddRuleSet(const_cast<RuleSet*>(NewMatchTable->GetOwnRuleSet()));
+
 	//Add all eligable participants to the match table
 	for (auto [id, judoka] : m_StandingData.GetAllJudokas())//TODO This is bad if NewMatchTable is already stored on disk
 	{
@@ -881,6 +887,9 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 
 	if (!m_StandingData.AddAgeGroup(NewAgeGroup))
 		return false;
+
+	if (NewAgeGroup->GetRuleSet())
+		m_StandingData.AddRuleSet(const_cast<RuleSet*>(NewAgeGroup->GetRuleSet()));
 
 	Lock();
 	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
