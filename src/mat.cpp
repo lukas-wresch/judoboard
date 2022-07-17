@@ -1332,11 +1332,11 @@ void Mat::NextState(State NextState) const
 																	 .AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
 
 				m_Graphics["next_matches_blue_club_" + std::to_string(i)].StopAllAnimations()
-					.SetPosition(40 - 1320, (int)shift_y + (int)(325.0*m_ScalingFactor), 0)
+					.SetPosition(40 - 1320, (int)shift_y + (int)(330.0*m_ScalingFactor), 0)
 					.AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
 
 				m_Graphics["next_matches_white_club_"  + std::to_string(i)].StopAllAnimations().Right()
-					.SetPosition(width - 40 + 1320, (int)shift_y + (int)(325.0*m_ScalingFactor), 0)
+					.SetPosition(width - 40 + 1320, (int)shift_y + (int)(330.0*m_ScalingFactor), 0)
 					.AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
 			}
 
@@ -1422,6 +1422,8 @@ void Mat::UpdateGraphics() const
 			m_Graphics["next_matches_blue_"  + std::to_string(i)].Clear();
 			m_Graphics["next_matches_white2_" + std::to_string(i)].Clear();
 			m_Graphics["next_matches_blue2_"  + std::to_string(i)].Clear();
+			m_Graphics["next_matches_white_club_" + std::to_string(i)].Clear();
+			m_Graphics["next_matches_blue_club_"  + std::to_string(i)].Clear();
 		}
 
 		int i = 0;
