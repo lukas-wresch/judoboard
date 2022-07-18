@@ -65,7 +65,19 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	for (auto weightclass : File.GetWeightclasses())
 	{
 		auto new_weightclass = new Weightclass(*weightclass, this);
+
+		//Connect to age group
+		if (weightclass->AgeGroup)
+			new_weightclass->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
+
+		//Freeze the name
+		auto temp = new_weightclass->GetGender();
+		new_weightclass->SetGender(Gender::Unknown);
+		new_weightclass->SetName(new_weightclass->GetDescription());
+		new_weightclass->SetGender(temp);
+
 		weightclass->pUserData = new_weightclass;
+
 		m_MatchTables.emplace_back(new_weightclass);
 	}
 
@@ -782,8 +794,12 @@ const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
 {
 	for (auto table : m_MatchTables)
+	{
+		printf(table->GetName().c_str());
+		printf("\n");
 		if (table && table->GetName() == Name)
 			return table;
+	}
 	return nullptr;
 }
 

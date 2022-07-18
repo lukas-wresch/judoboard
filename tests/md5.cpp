@@ -325,6 +325,8 @@ TEST(MD5, ImportIntoTournament)
 {
 	initialize();
 
+	Localizer::SetLanguage(Language::German);
+
 	MD5 file("test-data/Test.md5");
 
 	ASSERT_TRUE(file);

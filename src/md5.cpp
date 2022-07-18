@@ -32,12 +32,20 @@ MD5::MD5(const Tournament& Tournament)
 
 	std::unordered_map<UUID, int> UUID2ID;
 	int id = 1;
+	std::unordered_map<int, void*> ID2PTR;
 
 	auto uuid2id = [&](const UUID& UUID) {
 		auto it = UUID2ID.find(UUID);
 		if (it != UUID2ID.end())
 			return it->second;
 		return -1;
+	};
+
+	auto id2ptr = [&](int id) -> void* {
+		auto it = ID2PTR.find(id);
+		if (it != ID2PTR.end())
+			return it->second;
+		return nullptr;
 	};
 
 
@@ -53,6 +61,7 @@ MD5::MD5(const Tournament& Tournament)
 
 		m_Participants.emplace_back(new_judoka);
 		UUID2ID.insert({ uuid, id - 1 });
+		ID2PTR.insert({ id - 1, new_judoka });
 	}
 
 	for (auto age_group : Tournament.GetAgeGroups())
@@ -66,6 +75,7 @@ MD5::MD5(const Tournament& Tournament)
 
 		m_AgeGroups.emplace_back(new_age_group);
 		UUID2ID.insert({ age_group->GetUUID(), id - 1 });
+		ID2PTR.insert({ id - 1, new_age_group });
 	}
 
 	for (auto match_table : Tournament.GetMatchTables())
@@ -80,12 +90,19 @@ MD5::MD5(const Tournament& Tournament)
 		new_weightclass->ID = id++;
 		new_weightclass->Description               = weightclass->GetName();
 		new_weightclass->WeightLargerThan          = weightclass->GetMinWeight() / 1000;
-		new_weightclass->WeightInGrammsLargerThan  = weightclass->GetMinWeight();
+		new_weightclass->WeightInGrammsLargerThan  = weightclass->GetMinWeight() % 1000;
 		new_weightclass->WeightSmallerThan         = weightclass->GetMaxWeight() / 1000;
-		new_weightclass->WeightInGrammsSmallerThan = weightclass->GetMaxWeight();
+		new_weightclass->WeightInGrammsSmallerThan = weightclass->GetMaxWeight() % 1000;
+
+		if (match_table->GetAgeGroup())
+		{
+			new_weightclass->AgeGroupID = uuid2id(match_table->GetAgeGroup()->GetUUID());
+			new_weightclass->AgeGroup   = (AgeGroup*)id2ptr(new_weightclass->AgeGroupID);
+		}
 
 		m_Weightclasses.emplace_back(new_weightclass);
 		UUID2ID.insert({ weightclass->GetUUID(), id - 1 });
+		ID2PTR.insert({ id - 1, new_weightclass });
 	}
 
 	for (auto match : Tournament.GetSchedule())
