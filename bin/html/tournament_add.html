@@ -96,14 +96,14 @@ function DeleteTournament()
 
 function DownloadTournament()
 {
-  Ajax('ajax/tournament/download?id='+id);
+  window.location.href ='ajax/tournament/download?id='+id;
   return false;
 }
 
 
 function ExportTournament()
 {
-  Ajax('ajax/tournament/export-md5?id='+id);
+  window.location.href ='ajax/tournament/export-md5?id='+id;
   return false;
 }
 

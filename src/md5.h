@@ -8,6 +8,7 @@
 namespace Judoboard
 {
 	class ITournament;
+	class Tournament;
 
 
 	//A *.md5 is a proprietary file format for storing tournament information
@@ -94,6 +95,8 @@ namespace Judoboard
 			int Tolerance = -1;
 
 			bool Team;//TODO set default
+
+			mutable void* pUserData = nullptr;
 		};
 
 		struct Participant
@@ -287,7 +290,7 @@ namespace Judoboard
 
 		MD5(const std::string& Filename);
 		MD5(ZED::Blob&& Data) { Parse(std::move(Data)); }
-		MD5(const ITournament* Tournament);
+		MD5(const Tournament& Tournament);
 		~MD5();
 
 		bool Save(const std::string& Filename) const;
@@ -305,6 +308,7 @@ namespace Judoboard
 
 		const std::vector<Association*>& GetAssociations()  const { return m_Associations; }
 		const std::vector<Club*>&        GetClubs()		    const { return m_Clubs; }
+		const std::vector<AgeGroup*>&    GetAgeGroups()     const { return m_AgeGroups; }
 		const std::vector<Weightclass*>& GetWeightclasses() const { return m_Weightclasses; }
 		const std::vector<Participant*>& GetParticipants()  const { return m_Participants; }
 		const std::vector<Match>&		 GetMatches()	    const { return m_Matches; }
@@ -315,6 +319,8 @@ namespace Judoboard
 		int GetNumParticipants()  const { return m_NumParticipants; }//Returns the number of participants that should be in the file according to the header, not the actual number of participants read
 
 		std::string GetFileDate()    const { return m_FileDate; }
+		std::string GetDateStart()   const { return m_DateStart; }
+		std::string GetDateEnd()     const { return m_DateEnd; }
 		std::string GetDescription() const { return m_Description; }
 
 		operator bool() const { return m_IsValid; }

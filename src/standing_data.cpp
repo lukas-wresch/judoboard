@@ -144,7 +144,7 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 	if (!NewJudoka)
 		return false;
 
-	m_Judokas.insert({ (std::string)NewJudoka->GetUUID(), NewJudoka });
+	m_Judokas.insert({ NewJudoka->GetUUID(), NewJudoka });
 	return true;
 }
 
@@ -244,7 +244,7 @@ Club* StandingData::AddClub(const MD5::Club& NewClub)
 		new_club = nullptr;
 	}
 
-	return nullptr;
+	return new_club;
 }
 
 

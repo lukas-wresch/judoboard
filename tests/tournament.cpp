@@ -474,6 +474,7 @@ TEST(Tournament, SaveAndLoad)
 		Tournament t("deleteMe");
 		t.EnableAutoSave(false);
 
+		EXPECT_EQ(t.GetName(), "deleteMe");
 		EXPECT_EQ(t.GetParticipants().size(), 4);
 		EXPECT_EQ(t.GetMatchTables().size(), 2);
 		EXPECT_EQ(t.GetSchedule().size(), 4);

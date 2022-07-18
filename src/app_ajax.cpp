@@ -2098,6 +2098,9 @@ void Application::SetupHttpServer()
 			return std::string("Could not find tournament");
 
 		std::string filename = "tournaments/" + tournament->GetName() + ".yml";
+
+		Request.m_ResponseHeader = std::string("Content-Disposition: attachment; filename=") + tournament->GetName() + ".yml";
+
 		return HttpServer::LoadFile(filename);
 	}, HttpServer::ResourceType::Binary);
 
@@ -2108,15 +2111,19 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
+
 		auto tournament = FindTournament(id);
 		if (!tournament)
 			return std::string("Could not find tournament");
 
 		//Convert to MD5 and save
-		MD5 md5_tournament(GetTournament());
+		MD5 md5_tournament(*tournament);
 
 		std::string filename = tournament->GetName() + ".md5";
 		md5_tournament.Save(filename);
+		
+		Request.m_ResponseHeader = std::string("Content-Disposition: attachment; filename=") + filename;
 
 		return HttpServer::LoadFile(filename);
 	}, HttpServer::ResourceType::Binary);

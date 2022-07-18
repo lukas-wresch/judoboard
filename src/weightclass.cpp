@@ -41,25 +41,15 @@ Weightclass::Weightclass(const YAML::Node& Yaml, ITournament* Tournament) : Matc
 
 Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament) : MatchTable(Tournament)
 {
-	if (Weightclass.AgeGroup)
-		SetName(Weightclass.AgeGroup->Name + " " + Weightclass.Description);
-	else
-		SetName(Weightclass.Description);
+	SetName(Weightclass.Description);
 
 	if (Weightclass.WeightLargerThan > 0)
-		m_MinWeight = Weightclass.WeightLargerThan;
+		m_MinWeight = Weightclass.WeightLargerThan  * 1000 + Weightclass.WeightInGrammsLargerThan;
 	if (Weightclass.WeightSmallerThan > 0)
-		m_MaxWeight = Weightclass.WeightSmallerThan;
+		m_MaxWeight = Weightclass.WeightSmallerThan * 1000 + Weightclass.WeightInGrammsSmallerThan;
 
 	if (Weightclass.AgeGroup)
-	{
 		m_Gender = Weightclass.AgeGroup->Gender;
-
-		//TODO convert birthyear to actual age limit
-		//m_MinAge = Weightclass.AgeGroup->MinBirthyear;
-		//m_MaxAge = Weightclass.AgeGroup->MaxBirthyear;
-		//m_AgeEnforced = true;
-	}
 }
 
 
@@ -99,12 +89,21 @@ std::string Weightclass::GetDescription() const
 	std::string desc = GetName();
 
 	if (desc.length() > 0)
+	{
+		if (GetAgeGroup() && GetAgeGroup()->GetGender() != Gender::Unknown)
+			return GetAgeGroup()->GetName() + " " + desc;
+		else if (GetAgeGroup())
+			return GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender) + " " + desc;
 		return desc;
+	}
 
 	if (GetAgeGroup())
 	{
-		desc = GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender) + " - ";
-		desc += std::to_string(m_MinWeight) + " - " + std::to_string(m_MaxWeight) + " kg";
+		desc = GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender);
+		if (m_MaxWeight%1000 == 0)
+			desc += " -" + std::to_string(m_MaxWeight/1000) + " kg";
+		else
+			desc += " -" + std::to_string(m_MaxWeight/1000) + "," + std::to_string((m_MaxWeight/100)%10) + " kg";
 	}
 
 	else

@@ -3,6 +3,7 @@
 #include "../ZED/include/core.h"
 #include "age_group.h"
 #include "standing_data.h"
+#include "localizer.h"
 
 
 
@@ -30,6 +31,8 @@ AgeGroup::AgeGroup(const YAML::Node& Yaml, const StandingData& StandingData)
 		m_MinAge = Yaml["min_age"].as<uint32_t>();
 	if (Yaml["max_age"])
 		m_MaxAge = Yaml["max_age"].as<uint32_t>();
+	if (Yaml["gender"])
+		m_Gender = (Gender)Yaml["gender"].as<uint32_t>();
 
 	if (Yaml["rules"])
 		m_pRules = StandingData.FindRuleSet(Yaml["rules"].as<std::string>());
@@ -37,8 +40,25 @@ AgeGroup::AgeGroup(const YAML::Node& Yaml, const StandingData& StandingData)
 
 
 
+AgeGroup::AgeGroup(const MD5::AgeGroup& AgeGroup, const StandingData& StandingData)
+	: m_StandingData(StandingData)
+{
+	m_Name   = AgeGroup.Name;
+	m_Gender = AgeGroup.Gender;
+
+	auto year = StandingData.GetYear();
+	m_MinAge = year - AgeGroup.MaxBirthyear + 1;
+	m_MaxAge = year - AgeGroup.MinBirthyear + 1;
+}
+
+
+
 bool AgeGroup::IsElgiable(const Judoka& Fighter) const
 {
+	if (m_Gender != Gender::Unknown)
+		if (m_Gender != Fighter.GetGender())
+			return false;
+
 	uint32_t age = m_StandingData.GetYear() - Fighter.GetBirthyear();
 
 	if (m_MinAge == 0)//No min age
@@ -59,6 +79,9 @@ void AgeGroup::operator >> (YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "min_age" << YAML::Value << m_MinAge;
 	Yaml << YAML::Key << "max_age" << YAML::Value << m_MaxAge;
 
+	if (m_Gender != Gender::Unknown)
+		Yaml << YAML::Key << "gender" << YAML::Value << (int)m_Gender;
+
 	if (m_pRules)
 		Yaml << YAML::Key << "rules" << YAML::Value << (std::string)m_pRules->GetUUID();
 
@@ -74,6 +97,9 @@ void AgeGroup::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "min_age" << YAML::Value << m_MinAge;
 	Yaml << YAML::Key << "max_age" << YAML::Value << m_MaxAge;
 
+	if (m_Gender != Gender::Unknown)
+		Yaml << YAML::Key << "gender" << YAML::Value << (int)m_Gender;
+
 	std::string desc;
 	if (m_MinAge == 0)
 		desc = "-" + std::to_string(m_MaxAge);
@@ -81,6 +107,9 @@ void AgeGroup::ToString(YAML::Emitter& Yaml) const
 		desc = std::to_string(m_MinAge) + "+";
 	else
 		desc = std::to_string(m_MinAge) + " - " + std::to_string(m_MaxAge);
+
+	if (m_Gender != Gender::Unknown)
+		desc += " " + Localizer::Gender2ShortForm(m_Gender);
 
 	Yaml << YAML::Key << "desc" << YAML::Value << desc;
 

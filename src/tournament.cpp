@@ -36,6 +36,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 {
 	m_Name = File.GetDescription();
 
+	int day, month, year;
+	if (sscanf_s(File.GetDateStart().c_str(), "D%d-%d-%d", &year, &month, &day) == 3)
+		m_StandingData.SetYear(year);
+
 	//Add clubs
 	for (auto club : File.GetClubs())
 	{
@@ -49,11 +53,34 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			m_StandingData.AddClub(new Club(*club));
 	}
 
+	//Add age groups
+	for (auto age_group : File.GetAgeGroups())
+	{
+		auto new_age_group = new AgeGroup(*age_group, m_StandingData);
+		age_group->pUserData = new_age_group;
+		m_StandingData.AddAgeGroup(new_age_group);
+	}
+
 	//Add weightclasses
 	for (auto weightclass : File.GetWeightclasses())
 	{
 		auto new_weightclass = new Weightclass(*weightclass, this);
+
+		//Connect to age group
+		if (weightclass->AgeGroup)
+			new_weightclass->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
+
+		//Freeze the name
+		auto temp  = new_weightclass->GetGender();
+		auto temp2 = new_weightclass->GetAgeGroup();
+		new_weightclass->SetGender(Gender::Unknown);
+		new_weightclass->SetAgeGroup(nullptr);
+		new_weightclass->SetName(new_weightclass->GetDescription());
+		new_weightclass->SetGender(temp);
+		new_weightclass->SetAgeGroup(temp2);
+
 		weightclass->pUserData = new_weightclass;
+
 		m_MatchTables.emplace_back(new_weightclass);
 	}
 
@@ -770,8 +797,26 @@ const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
 {
 	for (auto table : m_MatchTables)
+	{
+		printf(table->GetName().c_str());
+		printf("\n");
 		if (table && table->GetName() == Name)
 			return table;
+	}
+	return nullptr;
+}
+
+
+
+MatchTable* Tournament::FindMatchTableByDescription(const std::string& Description)
+{
+	for (auto table : m_MatchTables)
+	{
+		printf(table->GetDescription().c_str());
+		printf("\n");
+		if (table && table->GetDescription() == Description)
+			return table;
+	}
 	return nullptr;
 }
 

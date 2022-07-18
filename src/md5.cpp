@@ -1,6 +1,9 @@
 #include <cassert>
 #include <array>
 #include "md5.h"
+#include "tournament.h"
+#include "weightclass.h"
+#include "age_group.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/file.h"
 
@@ -22,15 +25,176 @@ MD5::MD5(const std::string& Filename)
 
 
 
-MD5::MD5(const ITournament* Tournament)
+MD5::MD5(const Tournament& Tournament)
 {
-	if (!Tournament)
+	m_Description = Tournament.GetName();
+	m_FileDate = "01.01." + std::to_string(Tournament.GetDatabase().GetYear());
+
+	std::unordered_map<UUID, int> UUID2ID;
+	int id = 1;
+	std::unordered_map<int, void*> ID2PTR;
+
+	auto uuid2id = [&](const UUID& UUID) {
+		auto it = UUID2ID.find(UUID);
+		if (it != UUID2ID.end())
+			return it->second;
+		return -1;
+	};
+
+	auto id2ptr = [&](int id) -> void* {
+		auto it = ID2PTR.find(id);
+		if (it != ID2PTR.end())
+			return it->second;
+		return nullptr;
+	};
+
+
+	for (auto club : Tournament.GetDatabase().GetAllClubs())
 	{
-		ZED::Log::Error("Internal error");
-		return;
+		Club* new_club = new Club;
+
+		new_club->ID = id++;
+		new_club->Name            = club->GetName();
+		new_club->Name_ForSorting = club->GetName();
+
+		m_Clubs.emplace_back(new_club);
+		UUID2ID.insert({ club->GetUUID(), id - 1 });
+		ID2PTR.insert({ id - 1, new_club });
 	}
 
-	ZED::Log::Error("NOT IMPLEMENTED");
+	for (auto [uuid, judoka] : Tournament.GetParticipants())
+	{
+		Participant* new_judoka = new Participant;
+
+		new_judoka->ID = id++;
+		new_judoka->Firstname = judoka->GetFirstname();
+		new_judoka->Lastname  = judoka->GetLastname();
+		new_judoka->WeightInGramm = judoka->GetWeight();
+		new_judoka->Birthyear     = judoka->GetBirthyear();
+
+		m_Participants.emplace_back(new_judoka);
+		UUID2ID.insert({ uuid, id - 1 });
+		ID2PTR.insert({ id - 1, new_judoka });
+	}
+
+	for (auto age_group : Tournament.GetAgeGroups())
+	{
+		AgeGroup* new_age_group = new AgeGroup;
+
+		new_age_group->ID = id++;
+		new_age_group->Name         = age_group->GetName();
+		new_age_group->Gender       = age_group->GetGender();
+		new_age_group->MinBirthyear = age_group->GetMinAge();
+		new_age_group->MaxBirthyear = age_group->GetMaxAge();
+
+		m_AgeGroups.emplace_back(new_age_group);
+		UUID2ID.insert({ age_group->GetUUID(), id - 1 });
+		ID2PTR.insert({ id - 1, new_age_group });
+	}
+
+	for (auto match_table : Tournament.GetMatchTables())
+	{
+		if (match_table->GetType() != MatchTable::Type::Weightclass)
+			continue;
+
+		auto weightclass = (Judoboard::Weightclass*)match_table;
+
+		Weightclass* new_weightclass = new Weightclass;
+
+		new_weightclass->ID = id++;
+		new_weightclass->Description               = weightclass->GetName();
+		new_weightclass->WeightLargerThan          = weightclass->GetMinWeight() / 1000;
+		new_weightclass->WeightInGrammsLargerThan  = weightclass->GetMinWeight() % 1000;
+		new_weightclass->WeightSmallerThan         = weightclass->GetMaxWeight() / 1000;
+		new_weightclass->WeightInGrammsSmallerThan = weightclass->GetMaxWeight() % 1000;
+
+		if (match_table->GetAgeGroup())
+		{
+			new_weightclass->AgeGroupID = uuid2id(match_table->GetAgeGroup()->GetUUID());
+			new_weightclass->AgeGroup   = (AgeGroup*)id2ptr(new_weightclass->AgeGroupID);
+		}
+
+		m_Weightclasses.emplace_back(new_weightclass);
+		UUID2ID.insert({ weightclass->GetUUID(), id - 1 });
+		ID2PTR.insert({ id - 1, new_weightclass });
+
+		//Convert participants
+		for (auto judoka : match_table->GetParticipants())
+		{
+			Participant* md5_judoka = (Participant*)id2ptr(uuid2id(judoka->GetUUID()));
+			if (md5_judoka)
+			{
+				md5_judoka->WeightclassID = uuid2id(match_table->GetUUID());
+				md5_judoka->Weightclass   = (Weightclass*)id2ptr(md5_judoka->WeightclassID);
+			}
+		}
+
+		//Convert results
+
+		auto results = match_table->CalculateResults();
+		int rank = 1;
+		for (auto result : results)
+		{
+			Result new_result;
+			new_result.Weightclass   = new_weightclass;
+			new_result.WeightclassID = id - 1;
+			new_result.AgeGroup   = new_weightclass->AgeGroup;
+			new_result.AgeGroupID = new_weightclass->AgeGroupID;
+
+			new_result.ParticipantID = uuid2id(result.Judoka->GetUUID());
+			new_result.Participant   = (Participant*)id2ptr(new_result.ParticipantID);
+			new_result.PointsPlus    = result.Wins;
+			new_result.ScorePlus     = result.Score;
+
+			new_result.RankNo = rank++;
+
+			m_Results.emplace_back(new_result);
+		}
+	}
+
+	for (auto match : Tournament.GetSchedule())
+	{
+		if (!match->HasValidFighters())//TODO
+			continue;
+
+		Match new_match;
+		new_match.WhiteID = uuid2id(match->GetFighter(Fighter::White)->GetUUID());
+		new_match.RedID   = uuid2id(match->GetFighter(Fighter::Blue )->GetUUID());
+
+		new_match.White = (Participant*)id2ptr(new_match.WhiteID);
+		new_match.Red   = (Participant*)id2ptr(new_match.RedID);
+
+		if (match->GetMatchTable() && match->GetMatchTable()->GetAgeGroup())
+		{
+			new_match.Weightclass = FindWeightclass(uuid2id(match->GetMatchTable()->GetAgeGroup()->GetUUID()),
+													uuid2id(match->GetMatchTable()->GetUUID()));
+			if (new_match.Weightclass)
+				new_match.WeightclassID = new_match.Weightclass->ID;
+		}
+
+		if (match->HasConcluded())
+		{//Convert result
+			if (match->GetMatchResult().m_Winner == Winner::White)
+			{
+				new_match.WinnerID = new_match.WhiteID;
+				new_match.LoserID  = new_match.RedID;
+			}
+			else if (match->GetMatchResult().m_Winner == Winner::Blue)
+			{
+				new_match.WinnerID = new_match.RedID;
+				new_match.LoserID  = new_match.WhiteID;
+			}
+			else
+			{
+				//TODO draw can not be converted
+			}
+
+			new_match.ScoreWinner = (int)match->GetMatchResult().m_Score;
+			new_match.Time        = match->GetMatchResult().m_Time / 1000;
+		}
+
+		m_Matches.emplace_back(new_match);
+	}
 }
 
 

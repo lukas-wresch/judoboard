@@ -36,7 +36,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 Application::~Application()
 {
-	if (!m_Database.Save("database.yaml"))
+	if (!m_Database.Save("database.yml"))
 		ZED::Log::Error("Could not save database!");
 
 	for (auto mat : m_Mats)
@@ -55,7 +55,7 @@ Application::~Application()
 
 bool Application::LoadDataFromDisk()
 {
-	if (!m_Database.Load("database.yaml"))
+	if (!m_Database.Load("database.yml"))
 	{
 		ZED::Log::Warn("Could not load database!");
 		//return false;
