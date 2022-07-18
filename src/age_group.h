@@ -31,6 +31,8 @@ namespace Judoboard
 		int GetMaxAge() const { return m_MaxAge; }
 		void SetMinAge(uint32_t Age) { m_MinAge = Age; }
 		void SetMaxAge(uint32_t Age) { m_MaxAge = Age; }
+		auto GetGender() const { return m_Gender; }
+		void SetGender(Gender NewGender) { m_Gender = NewGender; }
 
 		bool IsElgiable(const Judoka& Fighter) const;
 
@@ -42,6 +44,8 @@ namespace Judoboard
 
 		uint32_t m_MinAge = 0;//Age by birthyear
 		uint32_t m_MaxAge = 100;
+
+		Gender m_Gender = Gender::Unknown;
 
 		const RuleSet* m_pRules = nullptr;
 

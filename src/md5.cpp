@@ -70,6 +70,7 @@ MD5::MD5(const Tournament& Tournament)
 
 		new_age_group->ID = id++;
 		new_age_group->Name         = age_group->GetName();
+		new_age_group->Gender       = age_group->GetGender();
 		new_age_group->MinBirthyear = age_group->GetMinAge();
 		new_age_group->MaxBirthyear = age_group->GetMaxAge();
 
@@ -103,6 +104,28 @@ MD5::MD5(const Tournament& Tournament)
 		m_Weightclasses.emplace_back(new_weightclass);
 		UUID2ID.insert({ weightclass->GetUUID(), id - 1 });
 		ID2PTR.insert({ id - 1, new_weightclass });
+
+		//Convert results
+
+		auto results = match_table->CalculateResults();
+		int rank = 1;
+		for (auto result : results)
+		{
+			Result new_result;
+			new_result.Weightclass   = new_weightclass;
+			new_result.WeightclassID = id - 1;
+			new_result.AgeGroup   = new_weightclass->AgeGroup;
+			new_result.AgeGroupID = new_weightclass->AgeGroupID;
+
+			new_result.ParticipantID = uuid2id(result.Judoka->GetUUID());
+			new_result.Participant   = (Participant*)id2ptr(new_result.ParticipantID);
+			new_result.PointsPlus    = result.Wins;
+			new_result.ScorePlus     = result.Score;
+
+			new_result.RankNo = rank++;
+
+			m_Results.emplace_back(new_result);
+		}
 	}
 
 	for (auto match : Tournament.GetSchedule())

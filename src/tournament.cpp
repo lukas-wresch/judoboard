@@ -71,10 +71,13 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			new_weightclass->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
 
 		//Freeze the name
-		auto temp = new_weightclass->GetGender();
+		auto temp  = new_weightclass->GetGender();
+		auto temp2 = new_weightclass->GetAgeGroup();
 		new_weightclass->SetGender(Gender::Unknown);
+		new_weightclass->SetAgeGroup(nullptr);
 		new_weightclass->SetName(new_weightclass->GetDescription());
 		new_weightclass->SetGender(temp);
+		new_weightclass->SetAgeGroup(temp2);
 
 		weightclass->pUserData = new_weightclass;
 
@@ -798,6 +801,20 @@ MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
 		printf(table->GetName().c_str());
 		printf("\n");
 		if (table && table->GetName() == Name)
+			return table;
+	}
+	return nullptr;
+}
+
+
+
+MatchTable* Tournament::FindMatchTableByDescription(const std::string& Description)
+{
+	for (auto table : m_MatchTables)
+	{
+		printf(table->GetDescription().c_str());
+		printf("\n");
+		if (table && table->GetDescription() == Description)
 			return table;
 	}
 	return nullptr;

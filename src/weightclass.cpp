@@ -90,7 +90,9 @@ std::string Weightclass::GetDescription() const
 
 	if (desc.length() > 0)
 	{
-		if (GetAgeGroup())
+		if (GetAgeGroup() && GetAgeGroup()->GetGender() != Gender::Unknown)
+			return GetAgeGroup()->GetName() + " " + desc;
+		else if (GetAgeGroup())
 			return GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender) + " " + desc;
 		return desc;
 	}
