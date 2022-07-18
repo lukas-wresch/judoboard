@@ -49,6 +49,19 @@ MD5::MD5(const Tournament& Tournament)
 	};
 
 
+	for (auto club : Tournament.GetDatabase().GetAllClubs())
+	{
+		Club* new_club = new Club;
+
+		new_club->ID = id++;
+		new_club->Name            = club->GetName();
+		new_club->Name_ForSorting = club->GetName();
+
+		m_Clubs.emplace_back(new_club);
+		UUID2ID.insert({ club->GetUUID(), id - 1 });
+		ID2PTR.insert({ id - 1, new_club });
+	}
+
 	for (auto [uuid, judoka] : Tournament.GetParticipants())
 	{
 		Participant* new_judoka = new Participant;

@@ -244,7 +244,7 @@ Club* StandingData::AddClub(const MD5::Club& NewClub)
 		new_club = nullptr;
 	}
 
-	return nullptr;
+	return new_club;
 }
 
 
