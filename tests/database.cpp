@@ -165,8 +165,8 @@ TEST(Database, AccountTest)
 		EXPECT_EQ(d.FindAccount(j1.GetUsername())->GetUsername(), j1.GetUsername());
 		EXPECT_EQ(d.FindAccount(j2.GetUsername())->GetUsername(), j2.GetUsername());
 
-		EXPECT_TRUE(d.Save("temp.yaml"));
-		EXPECT_TRUE(d.Save("temp2.yaml"));
+		EXPECT_TRUE(d.Save("temp.yml"));
+		EXPECT_TRUE(d.Save("temp2.yml"));
 
 		EXPECT_TRUE(d.DeleteAccount(j1.GetUsername()));
 		EXPECT_FALSE(d.DeleteAccount(j1.GetUsername()));
@@ -180,7 +180,7 @@ TEST(Database, AccountTest)
 		ASSERT_FALSE(d.FindAccount(j1.GetUsername()));
 		ASSERT_FALSE(d.FindAccount(j2.GetUsername()));
 
-		EXPECT_TRUE(d.Load("temp.yaml"));
+		EXPECT_TRUE(d.Load("temp.yml"));
 
 		ASSERT_FALSE(d.FindAccount(j1.GetUsername()));
 		ASSERT_FALSE(d.FindAccount(j2.GetUsername()));
@@ -189,8 +189,8 @@ TEST(Database, AccountTest)
 		//EXPECT_EQ(d.FindAccount(j2.GetUsername())->GetUsername(), j2.GetUsername());
 	}
 
-	ZED::Core::RemoveFile("temp.yaml");
-	ZED::Core::RemoveFile("temp2.yaml");
+	ZED::Core::RemoveFile("temp.yml");
+	ZED::Core::RemoveFile("temp2.yml");
 }
 
 
