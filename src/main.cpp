@@ -307,7 +307,7 @@ int main(int argc, char** argv)
 #endif
 #endif
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	if (app.GetDatabase().GetNumJudoka() < 5)
 	{
 		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
@@ -319,7 +319,7 @@ int main(int argc, char** argv)
 		for (int i = 0; i < 50; i++)
 			app.GetDatabase().AddJudoka(CreateRandomJudoka(&app.GetDatabase()));
 	}
-#endif
+//#endif
 
 	ZED::Log::Info("Application has started");
 	app.Run();

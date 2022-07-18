@@ -4,6 +4,8 @@
 #include "../ZED/include/sha512.h"
 #include "database.h"
 #include "localizer.h"
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 
 
 
@@ -47,9 +49,16 @@ void Database::Reset()
 bool Database::Load(const std::string& Filename)
 {
 	m_Filename = Filename;
-	std::ifstream File(Filename, std::ios::binary);
+	std::ifstream file(Filename);
+	if (!file)
+	{
+		ZED::Log::Warn("Could not open file " + Filename);
+		return false;
+	}
 
-	if (!File)
+	YAML::Node yaml = YAML::LoadFile(Filename);
+
+	if (!yaml)
 	{
 		ZED::Log::Warn("Could not open file " + Filename);
 		return false;
@@ -57,32 +66,19 @@ bool Database::Load(const std::string& Filename)
 
 	Reset();
 
-	ZED::CSV csv(File);
-
-	uint32_t version = 0;
-	csv >> version;
-
-	if (version != 1)
+	if (!yaml["version"] || yaml["version"].as<int>() != 1)
 	{
 		ZED::Log::Error("File format is too new for this application to read. Please update this application");
 		return false;
 	}
 
-	StandingData::operator<<(csv);
+	//Read standing data
+	StandingData::operator <<(yaml);
 
-	uint32_t accountCount = 0;
-	csv >> accountCount;
-
-	for (uint32_t i = 0; i < accountCount; i++)
+	if (yaml["accounts"] && yaml["accounts"].IsSequence())
 	{
-		std::string username, password;
-
-		csv >> username >> password;
-
-		Account::AccessLevel accessLevel = Account::AccessLevel::None;
-		csv >> accessLevel;
-
-		AddAccount(Account(username, password, accessLevel));
+		for (const auto& account : yaml["accounts"])
+			AddAccount(Account(account));
 	}
 
 	return true;
@@ -95,34 +91,34 @@ bool Database::Save(const std::string& Filename) const
 	if (Filename[0] == '\0')
 		return false;
 
-	m_Filename = Filename;
-	std::ofstream File(Filename, std::ios::binary);
+	std::ofstream file(Filename);
 
-	if (!File)
+	if (!file)
 	{
 		ZED::Log::Error("Could not save file " + Filename);
 		return false;
 	}
 
-	ZED::CSV csv;
+	YAML::Emitter yaml;
 
-	csv << 1;//Version
+	yaml << YAML::BeginMap;
+	yaml << YAML::Key << "version" << YAML::Value << "1";
 	
-	StandingData::operator>>(csv);
+	StandingData::operator >>(yaml);
 
-	csv << m_Accounts.size();
+	yaml << YAML::Key << "accounts";
+	yaml << YAML::Value;
+	yaml << YAML::BeginSeq;
 
 	for (auto account : m_Accounts)
 	{
 		if (account)
-		{
-			csv << account->GetUsername();
-			csv << account->GetPassword();
-			csv << account->GetAccessLevel();
-		}
+			*account >> yaml;
 	}
 
-	csv >> File;
+	yaml << YAML::EndSeq;
+	yaml << YAML::EndMap;
+	file << yaml.c_str();
 	return true;
 }
 

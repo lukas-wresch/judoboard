@@ -370,7 +370,7 @@ TEST(Ajax, ListClubs)
 	initialize();
 
 	{
-		ZED::Core::RemoveFile("database.csv");
+		ZED::Core::RemoveFile("database.yaml");
 		Application app;
 
 		app.GetDatabase().AddClub(new Club("Club 1"));
@@ -642,7 +642,7 @@ TEST(Ajax, ListAgeGroups)
 {
 	initialize();
 
-	ZED::Core::RemoveFile("database.csv");
+	ZED::Core::RemoveFile("database.yaml");
 	Application app;
 
 	YAML::Node result = YAML::Load(app.Ajax_ListAllAgeGroups());

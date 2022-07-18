@@ -1,7 +1,7 @@
+#include <signal.h>
 #include "app.h"
 #include "database.h"
 #include "weightclass.h"
-//#include "virtual_mat.h"
 #include "remote_mat.h"
 #include "tournament.h"
 #include "remote_tournament.h"
@@ -36,7 +36,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 Application::~Application()
 {
-	if (!m_Database.Save("database.csv"))
+	if (!m_Database.Save("database.yaml"))
 		ZED::Log::Error("Could not save database!");
 
 	for (auto mat : m_Mats)
@@ -55,7 +55,7 @@ Application::~Application()
 
 bool Application::LoadDataFromDisk()
 {
-	if (!m_Database.Load("database.csv"))
+	if (!m_Database.Load("database.yaml"))
 	{
 		ZED::Log::Warn("Could not load database!");
 		//return false;

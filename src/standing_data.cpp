@@ -32,31 +32,6 @@ void StandingData::Reset()
 
 
 
-void StandingData::operator << (ZED::CSV& Stream)
-{
-	uint32_t judokaCount = 0;
-	Stream >> judokaCount;
-
-	for (uint32_t i = 0; i < judokaCount; i++)
-	{
-		Judoka* newJudoka = new Judoka(Stream);
-		m_Judokas.insert({ (std::string)newJudoka->GetUUID(), newJudoka });
-	}
-
-	uint32_t ruleSetsCount = 0;
-	Stream >> ruleSetsCount;
-
-	m_RuleSets.clear();
-
-	for (uint32_t i = 0; i < ruleSetsCount; i++)
-	{
-		auto new_rule_set = new RuleSet(Stream);
-		m_RuleSets.emplace_back(new_rule_set);
-	}
-}
-
-
-
 void StandingData::operator << (YAML::Node& Yaml)
 {
 	if (Yaml["year"])
@@ -96,25 +71,6 @@ void StandingData::operator << (YAML::Node& Yaml)
 			m_AgeGroups.emplace_back(new_age_group);
 		}
 	}
-}
-
-
-
-void StandingData::operator >> (ZED::CSV& Stream) const
-{
-	Stream << m_Judokas.size();
-
-	for (auto [id, judoka] : m_Judokas)
-	{
-		if (judoka)
-			*judoka >> Stream;
-	}
-
-	Stream << m_RuleSets.size();
-
-	for (auto rule : m_RuleSets)
-		if (rule)
-			*rule >> Stream;
 }
 
 

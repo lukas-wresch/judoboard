@@ -23,18 +23,6 @@ Judoka::Judoka(const std::string& Firstname, const std::string& Lastname, uint32
 
 
 
-Judoka::Judoka(ZED::CSV& Stream, const StandingData* pStandingData)
-{
-	std::string uuid, club_uuid;
-	Stream >> m_Firstname >> m_Lastname >> m_Weight >> m_Gender >> m_Birthyear >> uuid >> club_uuid;
-	SetUUID(std::move(uuid));
-
-	if (pStandingData && club_uuid.length() > 1)
-		m_pClub = pStandingData->FindClub(UUID(std::move(club_uuid)));
-}
-
-
-
 Judoka::Judoka(const YAML::Node& Yaml, const StandingData* pStandingData)
 {
 	if (Yaml["uuid"])
@@ -86,23 +74,6 @@ Judoka::Judoka(const MD5::Participant& Participant, const StandingData* pStandin
 
 	if (pStandingData && Participant.Club)
 		m_pClub = pStandingData->FindClubByName(Participant.Club->Name);
-}
-
-
-
-void Judoka::operator >> (ZED::CSV& Stream) const
-{
-	Stream << m_Firstname;
-	Stream << m_Lastname;
-	Stream << m_Weight << m_Gender << m_Birthyear;
-	Stream << (std::string)GetUUID();
-
-	if (m_pClub)
-		Stream << (std::string)m_pClub->GetUUID();
-	else
-		Stream << "?";
-
-	Stream.AddNewline();//Also needed to flush the stream
 }
 
 
