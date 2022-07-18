@@ -118,6 +118,17 @@ MD5::MD5(const Tournament& Tournament)
 		UUID2ID.insert({ weightclass->GetUUID(), id - 1 });
 		ID2PTR.insert({ id - 1, new_weightclass });
 
+		//Convert participants
+		for (auto judoka : match_table->GetParticipants())
+		{
+			Participant* md5_judoka = (Participant*)id2ptr(uuid2id(judoka->GetUUID()));
+			if (md5_judoka)
+			{
+				md5_judoka->WeightclassID = uuid2id(match_table->GetUUID());
+				md5_judoka->Weightclass   = (Weightclass*)id2ptr(md5_judoka->WeightclassID);
+			}
+		}
+
 		//Convert results
 
 		auto results = match_table->CalculateResults();
@@ -150,9 +161,16 @@ MD5::MD5(const Tournament& Tournament)
 		new_match.WhiteID = uuid2id(match->GetFighter(Fighter::White)->GetUUID());
 		new_match.RedID   = uuid2id(match->GetFighter(Fighter::Blue )->GetUUID());
 
+		new_match.White = (Participant*)id2ptr(new_match.WhiteID);
+		new_match.Red   = (Participant*)id2ptr(new_match.RedID);
+
 		if (match->GetMatchTable() && match->GetMatchTable()->GetAgeGroup())
+		{
 			new_match.Weightclass = FindWeightclass(uuid2id(match->GetMatchTable()->GetAgeGroup()->GetUUID()),
 													uuid2id(match->GetMatchTable()->GetUUID()));
+			if (new_match.Weightclass)
+				new_match.WeightclassID = new_match.Weightclass->ID;
+		}
 
 		if (match->HasConcluded())
 		{//Convert result

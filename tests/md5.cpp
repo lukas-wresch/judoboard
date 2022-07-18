@@ -1782,14 +1782,14 @@ TEST(MD5, ConvertToMD5AndBack)
 
 	ASSERT_EQ(results.size(), 0);
 
-	table = tour.FindMatchTableByDescription("Frauen u18 -43&#44;1 kg");
+	table = tour.FindMatchTableByDescription("Frauen u18 -43,1 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
 	ASSERT_EQ(results.size(), 1);
 	EXPECT_EQ(results[0].Judoka->GetFirstname(), "Gina");
 
-	table = tour.FindMatchTableByDescription("Frauen u18 -57&#44;7 kg");
+	table = tour.FindMatchTableByDescription("Frauen u18 -57,7 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1845,7 +1845,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[1].Judoka->GetFirstname(), "Viktoria");
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Diana");
 
-	table = tour.FindMatchTableByDescription(u8"Jugend u13w -33&#44;9 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13w -33,9 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1854,7 +1854,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[1].Judoka->GetFirstname(), "Luisa");
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Mariebelle");
 
-	table = tour.FindMatchTableByDescription(u8"Jugend u13w -36&#44;1 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13w -36,1 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1864,7 +1864,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Lentje");
 	EXPECT_EQ(results[3].Judoka->GetFirstname(), "Leane");
 
-	table = tour.FindMatchTableByDescription(u8"Jugend u13w -39&#44;2 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13w -39,2 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1874,7 +1874,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Vienna");
 	EXPECT_EQ(results[3].Judoka->GetFirstname(), "Mia");
 
-	table = tour.FindMatchTableByDescription(u8"Jugend u13w -42&#44;9 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13w -42,9 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1884,7 +1884,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Sirpa");
 	EXPECT_EQ(results[3].Judoka->GetFirstname(), "Lia");
 
-	table = tour.FindMatchTableByDescription(u8"Jugend u13w -52&#44;9 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13w -52,9 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1892,14 +1892,14 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[0].Judoka->GetFirstname(), "Josephine");
 	EXPECT_EQ(results[1].Judoka->GetFirstname(), "Marijana");
 
-	table = tour.FindMatchTableByDescription(u8"Jugend u13m -23&#44;3 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13m -23,3 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
 	ASSERT_EQ(results.size(), 1);
 	EXPECT_EQ(results[0].Judoka->GetFirstname(), "Selim");
 
-	table = tour.FindMatchTableByDescription(u8"Jugend u13m -28&#44;1 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13m -28,1 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1908,7 +1908,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[1].Judoka->GetFirstname(), "Arne");
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Fabian");
 
-	table = tour.FindMatchTableByDescription(u8"Jugend u13m -28&#44;7 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13m -28,7 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1918,7 +1918,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Maximilain");
 	EXPECT_EQ(results[3].Judoka->GetFirstname(), "Moritz");
 
-	table = tour.FindMatchTableByDescription(u8"Jugend u13m -30&#44;4 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13m -30,4 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1928,7 +1928,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Kerwin");
 	EXPECT_EQ(results[3].Judoka->GetFirstname(), "Matthies");
 
-	table = tour.FindMatchTableByName(u8"Jugend u13m -34&#44;4 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13m -34,4 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1938,7 +1938,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Florian");
 	EXPECT_EQ(results[3].Judoka->GetFirstname(), "Philip");
 
-	table = tour.FindMatchTableByName(u8"Jugend u13m -35&#44;1 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13m -35,1 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1948,7 +1948,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Amon");
 	EXPECT_EQ(results[3].Judoka->GetFirstname(), "Leonard");
 
-	table = tour.FindMatchTableByName(u8"Jugend u13m -37&#44;9 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13m -37,9 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1958,7 +1958,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Kai");
 	EXPECT_EQ(results[3].Judoka->GetFirstname(), "Tim");
 
-	table = tour.FindMatchTableByName(u8"Jugend u13m -39&#44;9 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13m -39,9 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1968,7 +1968,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Felix");
 	EXPECT_EQ(results[3].Judoka->GetFirstname(), "Paul");
 
-	table = tour.FindMatchTableByName(u8"Jugend u13m -43&#44;7 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13m -43,7 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
@@ -1977,7 +1977,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	EXPECT_EQ(results[1].Judoka->GetFirstname(), "Jan");
 	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Jonas");
 
-	table = tour.FindMatchTableByName(u8"Jugend u13m -47&#44;7 kg");
+	table = tour.FindMatchTableByDescription(u8"Jugend u13m -47,7 kg");
 	ASSERT_TRUE(table);
 	results = table->CalculateResults();
 
