@@ -85,7 +85,7 @@ std::vector<MatchTable::Result> CustomTable::CalculateResults() const
 			if (!enemy)
 				continue;
 
-			if (fighter->GetID() == enemy->GetID())
+			if (fighter->GetUUID() == enemy->GetUUID())
 				continue;
 
 			auto matches = FindMatches(*fighter, *enemy);//Find all matches of these two
@@ -97,7 +97,7 @@ std::vector<MatchTable::Result> CustomTable::CalculateResults() const
 
 				const auto& result = matches[0]->GetMatchResult();
 
-				if (matches[0]->GetWinningJudoka()->GetID() == fighter->GetID())
+				if (matches[0]->GetWinningJudoka()->GetUUID() == fighter->GetUUID())
 				{
 					ret[i].Wins++;
 					ret[i].Score += (uint32_t)result.m_Score;
@@ -119,7 +119,7 @@ const std::string CustomTable::ToHTML() const
 {
 	std::string ret;
 
-	ret += "<a href=\"#matchtable_add.html?id=" + std::to_string(GetID()) + "\">" + GetName() + "</a><br/>";
+	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetName() + "</a><br/>";
 
 	ret += Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 
@@ -140,13 +140,13 @@ const std::string CustomTable::ToHTML() const
 
 		
 		if (match->IsRunning())
-			ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(match->GetID()) + "\">In Progress</a></td>";
+			ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">In Progress</a></td>";
 		else if (!match->HasConcluded())
-			ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(match->GetID()) + "\">- - -</a></td>";
+			ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">- - -</a></td>";
 		else
 		{
 			const auto& result = match->GetMatchResult();
-			ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(match->GetID()) + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
+			ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
 		}
 
 		ret += "</tr>";

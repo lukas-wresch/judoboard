@@ -35,7 +35,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>..\Judoboard\$(Configuration)\;..\..\bin\$(Configuration);$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
     <TargetName>$(ProjectName)_Debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -44,16 +44,16 @@
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>..\Judoboard\$(Configuration)\;..\..\bin\$(Configuration)\;..\..\external;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\Judoboard\$(Configuration);..\..\bin;..\..\external;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
-    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
+    <TargetName>$(ProjectName)_Debug</TargetName>
     <IntDir>$(Configuration)\</IntDir>
     <IncludePath>..\..\external;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
-    <LibraryPath>..\Judoboard\$(Configuration)\;..\..\bin\$(Configuration)\;..\..\external;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
+    <LibraryPath>..\Judoboard\$(Configuration);..\..\bin;..\..\external;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
     <IntDir>$(Configuration)\</IntDir>
     <IncludePath>..\..\external;$(IncludePath)</IncludePath>
@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tests\account.cpp" />
+    <ClCompile Include="..\..\tests\age_group.cpp" />
     <ClCompile Include="..\..\tests\ajax.cpp" />
     <ClCompile Include="..\..\tests\app.cpp" />
     <ClCompile Include="..\..\tests\club.cpp" />
@@ -79,6 +80,7 @@
     <ClCompile Include="..\..\tests\remote_mat.cpp" />
     <ClCompile Include="..\..\tests\timer.cpp" />
     <ClCompile Include="..\..\tests\tournament.cpp" />
+    <ClCompile Include="..\..\tests\weightclass_generator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Judoboard\Judoboard.vcxproj">
@@ -109,7 +111,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;customtable.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;age_group.obj;app.obj;app_ajax.obj;club.obj;customtable.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -127,7 +129,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;customtable.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;yaml-cpp\yaml-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;age_group.obj;app.obj;app_ajax.obj;club.obj;customtable.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;weightclass_generator.obj;window_win.obj;yaml-cpp\yaml-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -168,7 +170,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;club.obj;customtable.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;window_win.obj;yaml-cpp\yaml-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;age_group.obj;club.obj;customtable.obj;database.obj;dm4.obj;error.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mongoose.obj;remote_mat.obj;rule_set.obj;standing_data.obj;timer.obj;tournament.obj;weightclass.obj;weightclass_generator.obj;window_win.obj;yaml-cpp\yaml-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

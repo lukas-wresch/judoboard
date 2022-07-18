@@ -1,7 +1,7 @@
+#include <signal.h>
 #include "app.h"
 #include "database.h"
 #include "weightclass.h"
-//#include "virtual_mat.h"
 #include "remote_mat.h"
 #include "tournament.h"
 #include "remote_tournament.h"
@@ -36,7 +36,7 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 Application::~Application()
 {
-	if (!m_Database.Save("database.csv"))
+	if (!m_Database.Save("database.yaml"))
 		ZED::Log::Error("Could not save database!");
 
 	for (auto mat : m_Mats)
@@ -55,7 +55,7 @@ Application::~Application()
 
 bool Application::LoadDataFromDisk()
 {
-	if (!m_Database.Load("database.csv"))
+	if (!m_Database.Load("database.yaml"))
 	{
 		ZED::Log::Warn("Could not load database!");
 		//return false;
@@ -63,6 +63,7 @@ bool Application::LoadDataFromDisk()
 
 	ZED::Core::Indexer([this](auto Filename) {
 		Filename = Filename.substr(Filename.find_last_of(ZED::Core::Separator) + 1);
+		Filename = Filename.substr(0, Filename.length() - 4);//Remove .yml
 		AddTournament(new Tournament(Filename));
 		return true;
 		}, "tournaments");
@@ -136,12 +137,12 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 
 
 
-bool Application::OpenTournament(uint32_t ID)
+bool Application::OpenTournament(const UUID& UUID)
 {
 	if (!CloseTournament())
 		return false;
 
-	m_CurrentTournament = FindTournament(ID);
+	m_CurrentTournament = FindTournament(UUID);
 	return true;
 }
 
@@ -315,11 +316,11 @@ bool Application::StartLocalMat(uint32_t ID)
 
 
 
-std::vector<const Match*> Application::GetNextMatches(uint32_t MatID) const
+std::vector<Match> Application::GetNextMatches(uint32_t MatID) const
 {
 	if (!GetTournament())
 	{
-		std::vector<const Match*> empty;
+		std::vector<Match> empty;
 		return empty;
 	}
 	return GetTournament()->GetNextMatches(MatID);
@@ -335,7 +336,7 @@ bool Application::AddTournament(Tournament* NewTournament)
 		return false;
 	}
 
-	if (FindTournament(NewTournament->GetName()))
+	if (FindTournamentByName(NewTournament->GetName()))
 	{
 		ZED::Log::Warn("Tournament with this name already exists");
 		return false;
@@ -355,16 +356,16 @@ bool Application::AddTournament(Tournament* NewTournament)
 
 
 
-bool Application::DeleteTournament(uint32_t ID)
+bool Application::DeleteTournament(const UUID& UUID)
 {
 	for (auto it = m_Tournaments.begin(); it != m_Tournaments.end(); ++it)
 	{
-		if (*it && (*it)->GetID() == ID)
+		if (*it && (*it)->GetUUID() == UUID)
 		{
 			bool ret = ZED::Core::RemoveFile("tournaments/" + (*it)->GetName() + ".yml");
 
 			delete *it;
-			it = m_Tournaments.erase(it);
+			m_Tournaments.erase(it);
 
 			return ret;
 		}
@@ -375,29 +376,29 @@ bool Application::DeleteTournament(uint32_t ID)
 
 
 
-Tournament* Application::FindTournament(uint32_t ID)
+Tournament* Application::FindTournament(const UUID& UUID)
 {
 	for (auto tournament : m_Tournaments)
-		if (tournament && tournament->GetID() == ID)
+		if (tournament && tournament->GetUUID() == UUID)
 			return tournament;
 	return nullptr;
 }
 
 
 
-const Tournament* Application::FindTournament(uint32_t ID) const
+const Tournament* Application::FindTournament(const UUID& UUID) const
 {
 	for (auto tournament : m_Tournaments)
-		if (tournament && tournament->GetID() == ID)
+		if (tournament && tournament->GetUUID() == UUID)
 			return tournament;
 	return nullptr;
 }
 
 
 
-const Tournament* Application::FindTournament(const std::string& Name) const
+const Tournament* Application::FindTournamentByName(const std::string& Name) const
 {
-	for (auto* tournament : m_Tournaments)
+	for (auto tournament : m_Tournaments)
 		if (tournament && tournament->GetName() == Name)
 			return tournament;
 	return nullptr;

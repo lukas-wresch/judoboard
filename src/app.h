@@ -7,7 +7,6 @@
 #include "imat.h"
 #include "error.h"
 #include "HttpServer/HttpServer.h"
-#include "../ZED/include/csv.h"
 
 
 
@@ -58,13 +57,13 @@ namespace Judoboard
 		const auto& GetTournamentList() const { return m_Tournaments; }
 		[[nodiscard]]
 		auto& SetTournamentList() { return m_Tournaments; }
-		bool OpenTournament(uint32_t ID);
+		bool OpenTournament(const UUID& UUID);
 		bool CloseTournament();
 		bool AddTournament(Tournament* NewTournament);
-		bool DeleteTournament(uint32_t ID);
-		Tournament* FindTournament(uint32_t ID);
-		const Tournament* FindTournament(uint32_t ID) const;
-		const Tournament* FindTournament(const std::string& Name) const;
+		bool DeleteTournament(const UUID& UUID);
+		Tournament* FindTournament(const UUID& UUID);
+		const Tournament* FindTournament(const UUID& UUID) const;
+		const Tournament* FindTournamentByName(const std::string& Name) const;
 
 		//Mats
 		const std::vector<IMat*>& GetMats() const { return m_Mats; }
@@ -79,7 +78,7 @@ namespace Judoboard
 		bool StartLocalMat(uint32_t ID = 1);
 		bool CloseMat(uint32_t ID);
 
-		std::vector<const Match*> GetNextMatches(uint32_t MatID) const;
+		std::vector<Match> GetNextMatches(uint32_t MatID) const;
 
 		bool ConnectToMaster(const std::string& Hostname, uint16_t Port = 8080);
 
@@ -92,7 +91,7 @@ namespace Judoboard
 		Error Ajax_UpdatePassword(Account* Account, const HttpServer::Request& Request);
 
 		//Mat
-		ZED::CSV Ajax_GetMats() const;
+		std::string Ajax_GetMats() const;
 		Error Ajax_OpenMat(  const HttpServer::Request& Request);
 		Error Ajax_CloseMat( const HttpServer::Request& Request);
 		Error Ajax_UpdateMat(const HttpServer::Request& Request);
@@ -109,10 +108,15 @@ namespace Judoboard
 
 		//Clubs
 		Error Ajax_AddClub(const HttpServer::Request& Request);
-		ZED::CSV Ajax_ListClubs();
+		std::string Ajax_ListClubs();
+
+		//Rule sets
+
+		//Age groups
+		std::string Ajax_ListAllAgeGroups() const;
 
 		//Match tables
-		ZED::CSV Ajax_ListMatchTables(const HttpServer::Request& Request);
+		std::string Ajax_ListAllMatchTables(const HttpServer::Request& Request);
 		std::string Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_GetMatchesFromMatchTable(const HttpServer::Request& Request);
 

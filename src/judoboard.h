@@ -65,10 +65,6 @@ namespace Judoboard
 		for (auto it = Input.begin(); it != Input.end(); ++it)
 		{
 			unsigned char value = UTF8_GetValue(it);
-#ifdef _DEBUG
-			if (value > 0xff)//Can not encode character into latin1
-				assert(false);
-#endif
 			ret += (char)value;
 		}
 

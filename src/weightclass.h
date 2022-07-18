@@ -13,7 +13,6 @@ namespace Judoboard
 	public:
 		Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight);
 		Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight, Gender Gender);
-		Weightclass(ZED::CSV& Stream, ITournament* Tournament);
 		Weightclass(const YAML::Node& Yaml, ITournament* Tournament);
 		Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament);
 
@@ -21,7 +20,7 @@ namespace Judoboard
 
 		virtual Type GetType() const override { return Type::Weightclass; }
 
-		const std::string GetDescription() const;
+		virtual std::string GetDescription() const override;
 		virtual Status GetStatus() const override;
 
 		virtual std::vector<Result> CalculateResults() const override;
@@ -35,19 +34,14 @@ namespace Judoboard
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
-		virtual const std::string ToString() const override;
 
-		virtual void operator >> (ZED::CSV& Stream) const override;
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
+		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 
 	private:
 		uint16_t m_MinWeight = 10;
 		uint16_t m_MaxWeight = 100;
-
-		uint16_t m_MinAge = 0;
-		uint16_t m_MaxAge = 100;
-		bool m_AgeEnforced = false;
 
 		Gender m_Gender = Gender::Unknown;
 	};

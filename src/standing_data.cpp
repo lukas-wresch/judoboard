@@ -5,6 +5,7 @@
 #include "../ZED/include/log.h"
 #include "../ZED/include/sha512.h"
 #include "standing_data.h"
+#include "itournament.h"
 
 
 
@@ -21,78 +22,64 @@ void StandingData::Reset()
 	for (auto rule : m_RuleSets)
 		delete rule;
 	m_RuleSets.clear();
-}
 
+	for (auto age_group : m_AgeGroups)
+		delete age_group;
+	m_AgeGroups.clear();
 
-
-void StandingData::operator << (ZED::CSV& Stream)
-{
-	uint32_t judokaCount = 0;
-	Stream >> judokaCount;
-
-	for (uint32_t i = 0; i < judokaCount; i++)
-	{
-		Judoka* newJudoka = new Judoka(Stream);
-		m_Judokas.insert({ newJudoka->GetID(), newJudoka });
-	}
-
-	uint32_t ruleSetsCount = 0;
-	Stream >> ruleSetsCount;
-
-	for (uint32_t i = 0; i < ruleSetsCount; i++)
-	{
-		auto new_rule_set = new RuleSet(Stream);
-		m_RuleSets.emplace_back(new_rule_set);
-	}
+	m_Year = 0;
 }
 
 
 
 void StandingData::operator << (YAML::Node& Yaml)
 {
+	if (Yaml["year"])
+		m_Year = Yaml["year"].as<uint32_t>();
+
 	if (Yaml["judoka"] && Yaml["judoka"].IsSequence())
 	{
+		m_Judokas.clear();
+
 		for (const auto& node : Yaml["judoka"])
 		{
 			Judoka* newJudoka = new Judoka(node);
-			m_Judokas.insert({ newJudoka->GetID(), newJudoka });
+			m_Judokas.insert({ (std::string)newJudoka->GetUUID(), newJudoka });
 		}
 	}
 
 
 	if (Yaml["rule_sets"] && Yaml["rule_sets"].IsSequence())
 	{
+		m_RuleSets.clear();
+
 		for (const auto& node : Yaml["rule_sets"])
 		{
 			auto new_rule_set = new RuleSet(node);
 			m_RuleSets.emplace_back(new_rule_set);
 		}
 	}
-}
 
 
-
-void StandingData::operator >> (ZED::CSV& Stream) const
-{
-	Stream << m_Judokas.size();
-
-	for (auto [id, judoka] : m_Judokas)
+	if (Yaml["age_groups"] && Yaml["age_groups"].IsSequence())
 	{
-		if (judoka)
-			*judoka >> Stream;
+		m_AgeGroups.clear();
+
+		for (const auto& node : Yaml["age_groups"])
+		{
+			auto new_age_group = new AgeGroup(node, *this);
+			m_AgeGroups.emplace_back(new_age_group);
+		}
 	}
-
-	Stream << m_RuleSets.size();
-
-	for (auto rule : m_RuleSets)
-		if (rule)
-			*rule >> Stream;
 }
 
 
 
 void StandingData::operator >> (YAML::Emitter& Yaml) const
 {
+	if (m_Year > 0)//No the default (current) year?
+		Yaml << YAML::Key << "year" << YAML::Value << m_Year;
+
 	Yaml << YAML::Key << "judoka";
 	Yaml << YAML::Value;
 	Yaml << YAML::BeginSeq;
@@ -105,6 +92,7 @@ void StandingData::operator >> (YAML::Emitter& Yaml) const
 
 	Yaml << YAML::EndSeq;
 	
+	//Export rule sets
 	Yaml << YAML::Key << "rule_sets";
 	Yaml << YAML::Value;
 	Yaml << YAML::BeginSeq;
@@ -112,6 +100,17 @@ void StandingData::operator >> (YAML::Emitter& Yaml) const
 	for (auto rule : m_RuleSets)
 		if (rule)
 			*rule >> Yaml;
+
+	Yaml << YAML::EndSeq;
+
+	//Export age groups
+	Yaml << YAML::Key << "age_groups";
+	Yaml << YAML::Value;
+	Yaml << YAML::BeginSeq;
+
+	for (auto age_group : m_AgeGroups)
+		if (age_group)
+			*age_group >> Yaml;
 
 	Yaml << YAML::EndSeq;
 }
@@ -129,22 +128,33 @@ void StandingData::AddMD5File(const MD5& File)
 
 
 
+uint32_t StandingData::GetYear() const
+{
+	if (m_Year != 0)
+		return m_Year;
+
+	auto date = ZED::Core::GetDate();
+	return date.year;
+}
+
+
+
 bool StandingData::AddJudoka(Judoka* NewJudoka)
 {
 	if (!NewJudoka)
 		return false;
 
-	m_Judokas.insert({ NewJudoka->GetID(), NewJudoka });
+	m_Judokas.insert({ (std::string)NewJudoka->GetUUID(), NewJudoka });
 	return true;
 }
 
 
 
-bool StandingData::DeleteJudoka(uint32_t ID)
+bool StandingData::DeleteJudoka(const UUID& UUID)
 {
 	for (auto it = m_Judokas.begin(); it != m_Judokas.end(); ++it)
 	{
-		if (it->first == ID)
+		if (it->second && it->second->GetUUID() == UUID)
 		{
 			m_Judokas.erase(it);
 			return true;
@@ -156,19 +166,62 @@ bool StandingData::DeleteJudoka(uint32_t ID)
 
 
 
-const std::string StandingData::JudokaToJSON() const
+const std::string StandingData::Judoka2String(std::string SearchString, const ITournament* Tournament) const
 {
-	std::string ret = "[";
+	if (!Tournament)
+		return "";
+	
+	std::transform(SearchString.begin(), SearchString.end(), SearchString.begin(),
+		[](unsigned char c){ return std::tolower(c); });
+
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
 
 	for (auto [id, judoka] : m_Judokas)
 	{
-		if (ret.length() > 1)
-			ret += ",";
-		ret += "{\"label\":\"" + judoka->GetName() + " (" + std::to_string(judoka->GetWeight()) +" kg)\", \"value\":\"" + std::to_string(id) + "\"}";
+		auto name = judoka->GetName();
+		std::transform(name.begin(), name.end(), name.begin(),
+			[](unsigned char c){ return std::tolower(c); });
+
+		if (name.find(SearchString) == std::string::npos)
+			continue;
+
+		ret << YAML::BeginMap;
+
+		ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
+		ret << YAML::Key << "name" << YAML::Value << judoka->GetName();
+		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight();
+		ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
+
+		if (judoka->GetClub())
+			ret << YAML::Key << "club" << YAML::Value << judoka->GetClub()->GetName();
+
+		ret << YAML::Key << "is_participant" << YAML::Value << Tournament->IsParticipant(*judoka);
+
+		auto judoka_age_group = Tournament->GetAgeGroupOfJudoka(judoka);
+		if (judoka_age_group)
+			ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
+
+		//Calculate eligable age groups
+		ret << YAML::Key << "age_groups" << YAML::Value;
+		ret << YAML::BeginSeq;
+
+		auto age_groups = Tournament->GetEligableAgeGroupsOfJudoka(judoka);
+		for (auto age_group : age_groups)
+		{
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
+			ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
+			ret << YAML::EndMap;
+		}
+
+		ret << YAML::EndSeq;
+
+		ret << YAML::EndMap;
 	}
 
-	ret += "]";
-	return ret;
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 
@@ -206,28 +259,6 @@ bool StandingData::AddClub(Club* NewClub)
 
 	m_Clubs.emplace_back(NewClub);
 	return true;
-}
-
-
-
-Club* StandingData::FindClub(uint32_t ID)
-{
-	for (auto club : m_Clubs)
-		if (club && club->GetID() == ID)
-			return club;
-
-	return nullptr;
-}
-
-
-
-const Club* StandingData::FindClub(uint32_t ID) const
-{
-	for (auto club : m_Clubs)
-		if (club && club->GetID() == ID)
-			return club;
-
-	return nullptr;
 }
 
 
@@ -320,28 +351,6 @@ const RuleSet* StandingData::FindRuleSet(const UUID& UUID) const
 
 
 
-RuleSet* StandingData::FindRuleSet(uint32_t ID)
-{
-	for (auto rule : m_RuleSets)
-		if (rule && rule->GetID() == ID)
-			return rule;
-
-	return nullptr;
-}
-
-
-
-const RuleSet* StandingData::FindRuleSet(uint32_t ID) const
-{
-	for (auto rule : m_RuleSets)
-		if (rule && rule->GetID() == ID)
-			return rule;
-
-	return nullptr;
-}
-
-
-
 bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
 {
 	if (!NewRuleSet || FindRuleSet(NewRuleSet->GetUUID()))
@@ -353,24 +362,73 @@ bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
 
 
 
-Judoka* StandingData::FindJudoka(uint32_t ID)
+AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName)
 {
-	auto item = m_Judokas.find(ID);
-	if (item == m_Judokas.end())
-		return nullptr;
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetName() == AgeGroupName)
+			return age_group;
 
-	return item->second;
+	return nullptr;
 }
 
 
 
-const Judoka* StandingData::FindJudoka(uint32_t ID) const
+const AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName) const
 {
-	auto item = m_Judokas.find(ID);
-	if (item == m_Judokas.end())
-		return nullptr;
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetName() == AgeGroupName)
+			return age_group;
 
-	return item->second;
+	return nullptr;
+}
+
+
+
+AgeGroup* StandingData::FindAgeGroup(const UUID& UUID)
+{
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetUUID() == UUID)
+			return age_group;
+
+	return nullptr;
+}
+
+
+
+const AgeGroup* StandingData::FindAgeGroup(const UUID& UUID) const
+{
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetUUID() == UUID)
+			return age_group;
+
+	return nullptr;
+}
+
+
+
+bool StandingData::AddAgeGroup(AgeGroup* NewAgeGroup)
+{
+	if (!NewAgeGroup || FindAgeGroup(NewAgeGroup->GetUUID()))
+		return false;
+
+	m_AgeGroups.emplace_back(NewAgeGroup);
+	return true;
+}
+
+
+
+bool StandingData::RemoveAgeGroup(const UUID& UUID)
+{
+	for (auto it = m_AgeGroups.begin(); it != m_AgeGroups.end(); ++it)
+	{
+		if ((*it)->GetUUID() == UUID)
+		{
+			m_AgeGroups.erase(it);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 

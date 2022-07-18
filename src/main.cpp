@@ -3,29 +3,45 @@
 #include "database.h"
 #include "tournament.h"
 #include "weightclass.h"
+#include "standing_data.h"
 #include "../ZED/include/log.h"
 
 
 
-Judoboard::Judoka CreateRandomJudoka()
+Judoboard::Judoka CreateRandomJudoka(const Judoboard::StandingData* db)
 {
 	const std::string firstname_male[] =
-	{ "Ben", "Friedrich", "Phillipp", "Tim", "Lukas", "Marco", "Peter", "Martin", "Detlef", "Andreas", "Dominik", "Mathias", "Stephan", u8"Sören", "Eric", "Finn", "Felix", "Julian", "Maximilian" };
+	{ "Ben", "Friedrich", "Phillipp", "Tim", "Lukas", "Marco", "Peter", "Martin", "Detlef", "Andreas", "Dominik", "Mathias", "Stephan", u8"Sören", "Eric", "Finn", "Felix", "Julian", "Maximilian", "Jannik"};
 	const std::string firstname_female[] =
-	{ "Emma", "Stephanie", "Julia", "Jana", "Uta", "Petra", "Sophie", "Kerstin", "Lena", "Jennifer", "Kathrin", "Katherina", "Anna", "Carla", "Paulina" };
+	{ "Emma", "Stephanie", "Julia", "Jana", "Uta", "Petra", "Sophie", "Kerstin", "Lena", "Jennifer", "Kathrin", "Katherina", "Anna", "Carla", "Paulina", "Clara", "Hanna" };
 	const std::string lastname[] =
 	{ "Ehrlichmann", "Dresdner", "Biermann", "Fisher", "Vogler", "Pfaff", "Eberhart", "Frankfurter", u8"König", "Pabst", "Ziegler", "Hartmann", "Pabst", "Kortig", "Schweitzer", "Luft", "Wexler", "Kaufmann", u8"Frühauf", "Bieber", "Schumacher", u8"Müncher", "Schmidt", "Meier", "Fischer", "Weber", "Meyer", "Wagner", "Becker", "Schulz", "Hoffmann" };
+
+	Judoboard::Judoka ret("", "");
 
 	if (rand() & 1)
 	{
 		auto fname = firstname_male[rand() % (sizeof(firstname_male) / sizeof(firstname_male[0]) - 1)];
 		auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
-		return Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Male);
+		ret = Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Male);
+	}
+	else
+	{
+		auto fname = firstname_female[rand() % (sizeof(firstname_female) / sizeof(firstname_female[0]) - 1)];
+		auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
+		ret = Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Female);
 	}
 
-	auto fname = firstname_female[rand() % (sizeof(firstname_female) / sizeof(firstname_female[0]) - 1)];
-	auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
-	return Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Female);
+	ret.SetBirthyear(1990 + rand()%25);
+
+	if (db && db->GetAllClubs().size() >= 1)
+	{
+		int club_index = rand() % db->GetAllClubs().size();
+		auto club = db->GetAllClubs()[club_index];
+		ret.SetClub(club);
+	}
+
+	return ret;
 }
 
 
@@ -99,8 +115,8 @@ int main(int argc, char** argv)
 		ZED::Core::Pause(5000);
 
 		srand(ZED::Core::CurrentTimestamp());
-		auto j1 = CreateRandomJudoka();
-		auto j2 = CreateRandomJudoka();
+		auto j1 = CreateRandomJudoka(&app.GetDatabase());
+		auto j2 = CreateRandomJudoka(&app.GetDatabase());
 		Judoboard::Match match(nullptr, &j1, &j2, mat->GetMatID());
 		//Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, true, true);
 		Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, false, false);
@@ -177,7 +193,7 @@ int main(int argc, char** argv)
 		for (int i = 0; i < 5; i++)
 		{
 			//app.GetDatabase().AddJudoka(CreateRandomJudoka());
-			tourney->AddParticipant(new Judoboard::Judoka(CreateRandomJudoka()));
+			tourney->AddParticipant(new Judoboard::Judoka(CreateRandomJudoka(&app.GetDatabase())));
 		}
 
 		app.AddTournament(tourney);
@@ -291,15 +307,19 @@ int main(int argc, char** argv)
 #endif
 #endif
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	if (app.GetDatabase().GetNumJudoka() < 5)
 	{
+		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
+		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
+		app.GetDatabase().AddClub(new Judoboard::Club("Senne"));
+
 		ZED::Log::Debug("Adding debug judoka");
 
-		for (int i = 0; i < 30; i++)
-			app.GetDatabase().AddJudoka(CreateRandomJudoka());
+		for (int i = 0; i < 50; i++)
+			app.GetDatabase().AddJudoka(CreateRandomJudoka(&app.GetDatabase()));
 	}
-#endif
+//#endif
 
 	ZED::Log::Info("Application has started");
 	app.Run();

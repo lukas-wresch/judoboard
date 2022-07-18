@@ -36,7 +36,11 @@ bool Mat::Open()
 		//m_Window = Window(Application::Name);//Recreate
 
 		if (!m_Window.OpenWindow())
+		{
 			ZED::Log::Warn("Could not open window");
+			if (Window::IsDisplayConnected())//Should be able to create a window
+				return;//Couldn't create a renderer (possibly)
+		}
 
 		for (int i = 0; i < 10; i++)
 		{
@@ -984,7 +988,7 @@ void Mat::Tokeda()
 
 
 
-const std::vector<const Match*> Mat::GetNextMatches() const
+const std::vector<Match> Mat::GetNextMatches() const
 {
 	m_mutex.lock();
 	auto ret = m_NextMatches;
@@ -1385,7 +1389,7 @@ void Mat::UpdateGraphics() const
 		int i = 0;
 		for (auto match : m_NextMatches)
 		{
-			if (!match->HasValidFighters())
+			if (!match.HasValidFighters())
 				continue;
 			
 			//auto white_name = match->GetFighter(Fighter::White)->GetName();
@@ -1394,10 +1398,10 @@ void Mat::UpdateGraphics() const
 			//m_Graphics["next_matches_white_" + std::to_string(i)].UpdateTexture(renderer, white_name, ZED::Color(0, 0, 0), FontSize);
 			//m_Graphics["next_matches_blue_"  + std::to_string(i)].UpdateTexture(renderer, blue_name,  ZED::Color(255, 255, 255), FontSize);
 
-			m_Graphics["next_matches_white_"  + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::White)->GetFirstname(), ZED::Color(0, 0, 0), FontSize);
-			m_Graphics["next_matches_blue_"   + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::Blue)->GetFirstname(), ZED::Color(255, 255, 255), FontSize);
-			m_Graphics["next_matches_white2_" + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::White)->GetLastname(), ZED::Color(0, 0, 0), FontSize);
-			m_Graphics["next_matches_blue2_"  + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::Blue)->GetLastname(), ZED::Color(255, 255, 255), FontSize);
+			m_Graphics["next_matches_white_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetFirstname(), ZED::Color(0, 0, 0), FontSize);
+			m_Graphics["next_matches_blue_"   + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue)->GetFirstname(), ZED::Color(255, 255, 255), FontSize);
+			m_Graphics["next_matches_white2_" + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetLastname(), ZED::Color(0, 0, 0), FontSize);
+			m_Graphics["next_matches_blue2_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue)->GetLastname(), ZED::Color(255, 255, 255), FontSize);
 
 			while (m_Graphics["next_matches_white_" + std::to_string(i)] && m_Graphics["next_matches_white_" + std::to_string(i)]->GetWidth() > std::max((width - 25.0 * m_ScalingFactor)/2, 100.0))
 				m_Graphics["next_matches_white_" + std::to_string(i)].Shorten(renderer);

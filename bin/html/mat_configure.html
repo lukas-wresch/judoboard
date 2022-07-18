@@ -49,64 +49,52 @@ function Update()
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
     console.log(response);
-    var res = response.split(",");
-
-    if (res.length < 2)
-      return;
+    var res = YAML.parse(response);
 
     var table = document.getElementById("mats");
-
+    
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
-
-    for (var i=1; i < res.length;)
+    
+    for (const mat of res.mats)
     {
-      var matID   = res[i++];
-      var type    = res[i++];
-      var is_open = res[i++];
-      var name    = res[i++];
-      var showIpponAsTwoWazaari = res[i++];
-      var timerStyle = res[i++];
-      var fullscreen = res[i++];
-
-
       var row = table.insertRow(-1);
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
       var cell3 = row.insertCell(2);
       var cell4 = row.insertCell(3);
 
-      cell1.innerHTML = matID;
+      cell1.innerHTML = mat.id;
       cell2.innerHTML = "???";
 
       cell4.innerHTML = "";
 
-      if (type == 0)
+      if (typeof mat.type === 'undefined' || mat.type == 0)
         cell3.innerHTML = "Not available";
-      else if (type == 1)
+      else if (mat.type == 1)
       {
         cell3.innerHTML = "Local mat";
-        if (is_open == 1)
-          cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseMat(" + matID + ");\">Close</button>";
+        if (mat.is_open == 1)
+          cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseMat(" + mat.id + ");\">Close</button>";
         else
-          cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenMat(" + matID + ");\">Start</button>";
+          cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenMat(" + mat.id + ");\">Start</button>";
 
-        if (fullscreen == 0)
-          cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('fullscreen'," + matID + ");\">Fullscreen</button>";
+        if (!mat.is_fullscreen)
+          cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('fullscreen'," + mat.id + ");\">Fullscreen</button>";
         else
-          cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('windowed'," + matID + ");\">Window Mode</button>";
+          cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('windowed'," + mat.id + ");\">Window Mode</button>";
 
-        cell4.innerHTML += "<button class=\"neutral\" onclick=\"navigate('mat_edit.html?id=" + matID + "');\">Edit</button>";
+        cell4.innerHTML += "<button class=\"neutral\" onclick=\"navigate('mat_edit.html?id=" + mat.id + "');\">Edit</button>";
       }
-      else if (type == 2)
+      else if (mat.type == 2)
       {
         cell3.innerHTML = "Virtual mat";
         //if (res[i+2] == 1)
-          cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseMat(" + matID + ");\">Destroy</button>";
+          cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseMat(" + mat.id + ");\">Destroy</button>";
         //else
           //cell4.innerHTML = "<button class=\"neutral\" onclick=\"return OpenMat(" + matID + ");\">Start</button>";
       }
-      else if (type == 3)
+      else if (mat.type == 3)
         cell3.innerHTML = "Remote mat";
     }
   });

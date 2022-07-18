@@ -1,4 +1,7 @@
 var lang_en = {
+    age_group: "Age group",
+    age_groups: "Age groups",
+    club: "Club",
     name: "Name",
     username: "Username",
     password: "Password",
@@ -8,14 +11,18 @@ var lang_en = {
     admin: "Admin",
     schedule: "Schedule",
     match_tables: "Match Tables",
+    add: "Add",
     add_match: "Add Match",
     add_matchtable: "Add Match Table",
+    generate_matchtables: "Generate Match Tables",
     update_matchtable: "Update Match Table",
     delete_matchtable: "Delete Match Table",
     matchtable: "Match Table",
     matchtables: "Match Tables",
     new_club: "New Club",
     new_match: "New Match",
+    num_matches: "#Matches",
+    num_participants: "#Participants",
     participants: "Participants",
     database: "Database",
     new_judoka: "New Judoka",
@@ -107,6 +114,9 @@ var lang_en = {
 
 
 var lang_de = {
+    age_group: "Altersklasse",
+    age_groups: "Altersklassen",
+    club: "Verein",
     name: "Name",
     username: "Benutzername",
     password: "Passwort",
@@ -116,14 +126,18 @@ var lang_de = {
     admin: "Administrator",
     schedule: "Zeitplan",
     match_tables: "Kampflisten",
+    add: "Hinzuf&uuml;gen",
     add_match: "Kampf hinzuf&uuml;gen",
     add_matchtable: "Kampfliste hinzuf&uuml;gen",
+    generate_matchtables: "Kampflisten generieren",
     update_matchtable: "Kampfliste &auml;ndern",
     delete_matchtable: "Kampfliste l&ouml;schen",
     matchtable: "Kampfliste",
     matchtables: "Kampflisten",
     new_club: "Neuer Verein",
     new_match: "Neuer Kampf",
+    num_matches: "#K&auml;mpfe",
+    num_participants: "#Teilnehmer",
     new_participant: "Neuer Teilnehmer",
     add_participant: "Teilnehmer  hinzuf&uuml;gen",
     participants: "Teilnehmer",
@@ -346,6 +360,23 @@ function AjaxPost(url, params, callback)
 
 
 
+function AjaxPostToYaml(url, params, callback)
+{
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", url);
+  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+  xhttp.onreadystatechange = function()
+  {
+    if (this.readyState == 4 && this.status == 200 && typeof callback !== 'undefined')
+      callback(this.responseText);
+  };
+
+  xhttp.send(params);
+}
+
+
+
 function Color(index)
 {
   if (index == 1)
@@ -384,17 +415,9 @@ function navigate(url)
   if (window.innerWidth <= 900)//Mobile
     slideout.close();
 
-  //$( "#main" ).load(url);
   return false;
 }
 
-
-
-/*$(window).on('hashchange', function(e)
-{
-  console.log(location.hash.slice(1));
-  navigate(location.hash.slice(1));
-});*/
 
 window.onhashchange = function(e)
 {
@@ -419,37 +442,91 @@ function GetRuleSets(callback)
 {
   AjaxCallback("ajax/rule/list", function(response) {
     console.log(response);
-    var res = response.split(",");
-
-    if (res.length < 1)
-      return;
+    var res = YAML.parse(response);
 
     var rules = document.getElementById("rule");
 
     while (rules.length >= 1)
       rules.remove(rules.length-1);
 
-    var default_rule_set = res[0];
+    var option = document.createElement("option");
+    option.value = 0;
+    option.text = "None";
+    rules.add(option);
 
-    for (var i=1; i < res.length; i)
+    for (const rule of res.rules)
     {
       var option = document.createElement("option");
 
-      var id   = res[i++];
-      var name = res[i++];
-      var desc = res[i++];
+      option.value = rule.uuid;
 
-      option.value = id;
-
-      if (option.value == default_rule_set)
-        option.text = name + " (" + lang.tournament_default + ")";
+      if (typeof res.default !== 'undefined' && rule.uuid == res.default)
+        option.text = rule.name + " (" + lang.tournament_default + ")";
       else
-        option.text = name;
+        option.text = rule.name;
 
       rules.add(option);
     }
 
-    rules.value = default_rule_set;
+    if (typeof res.default !== 'undefined' && rule.uuid == res.default)
+        rules.value = res.default;
+
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+}
+
+
+
+function GetAgeGroups(callback)
+{
+  AjaxCallback("ajax/age_groups/list", function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    var ages = document.getElementById("age_group");
+
+    while (ages.length >= 1)
+      ages.remove(ages.length-1);
+
+    for (const age of res)
+    {
+      var option = document.createElement("option");
+      option.value = age.uuid;
+      option.text  = age.name;
+      ages.add(option);
+    }
+
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+}
+
+
+
+function GetClubs(callback)
+{
+  AjaxCallback("ajax/club/list", function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    var clubs = document.getElementById("clubs");
+
+    while (clubs.length >= 1)
+      clubs.remove(clubs.length-1);
+
+    var option = document.createElement("option");
+    option.value = 0;
+    option.text  = "(None)";
+    clubs.add(option);
+
+    for (const club of res)
+    {
+      var option = document.createElement("option");
+      option.value = club.uuid;
+      option.text  = club.name;
+      clubs.add(option);
+    }
 
     if (typeof callback !== 'undefined')
       callback();
@@ -501,28 +578,20 @@ function GetColors(callback)
 function GetMats(callback)
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
-    var res = response.split(",");
+    var res = YAML.parse(response);
 
     if (res.length < 2)
       return;
 
-    var mat = document.getElementById("mat");
-    var maxID = res[0];
+    var ui_mats = document.getElementById("mat");
 
-    for (var i=1; i < res.length;)
+    for (const mat of res.mats)
     {
-      var matID   = res[i++];
-      var type    = res[i++];
-      var is_open = res[i++];
-      var name    = res[i++];
-      var showIpponAsTwoWazaari = res[i++];
-      var timerStyle = res[i++];
-      var fullscreen = res[i++];
-
       var option = document.createElement("option");
-      option.text  = name;
-      option.value = matID;
-      mat.add(option);
+      option.text  = mat.name;
+      option.value = mat.id;
+
+      ui_mats.add(option);
     }
 
     if (typeof callback !== 'undefined')

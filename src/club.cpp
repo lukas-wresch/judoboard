@@ -1,3 +1,5 @@
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include "../ZED/include/core.h"
 #include "club.h"
 
@@ -35,4 +37,16 @@ void Club::operator >> (ZED::CSV& Stream) const
 	Stream << (std::string)GetUUID();
 
 	Stream.AddNewline();//Also needed to flush the stream
+}
+
+
+
+void Club::operator >> (YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+
+	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
+
+	Yaml << YAML::EndMap;
 }

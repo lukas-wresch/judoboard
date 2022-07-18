@@ -310,17 +310,18 @@ TEST(Tournament, ParticipantHasSameIDAsInDatabase)
 	tourney.Reset();
 
 	EXPECT_TRUE(tourney.AddParticipant(&j1));
+	ASSERT_TRUE(tourney.FindParticipant(j1.GetUUID()));
+	EXPECT_EQ(j1.GetUUID(), tourney.FindParticipant(j1.GetUUID())->GetUUID());
 	//tourney gets saved now
 
 	tourney.EnableAutoSave(false);
 
 
 	Tournament t("deleteMe");
-	//t.ConnectToDatabase(d);
 	t.EnableAutoSave(false);
-	EXPECT_TRUE(t.GetParticipants().size() == 1);
-	EXPECT_TRUE(t.FindParticipant(j1.GetUUID()));
-	//EXPECT_TRUE(t.FindParticipant(j1.GetID()));
+	EXPECT_EQ(t.GetParticipants().size(), 1);
+	ASSERT_TRUE(t.FindParticipant(j1.GetUUID()));
+	EXPECT_EQ(j1.GetUUID(), t.FindParticipant(j1.GetUUID())->GetUUID());
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
@@ -376,8 +377,7 @@ TEST(Tournament, HasDefaultRuleSet2)
 
 	ASSERT_TRUE(t.GetDefaultRuleSet());
 	ASSERT_TRUE(d.FindRuleSetByName("Default"));
-	EXPECT_NE(t.GetDefaultRuleSet()->GetID(),   d.FindRuleSetByName("Default")->GetID());
-	EXPECT_NE(t.GetDefaultRuleSet()->GetUUID(), d.FindRuleSetByName("Default")->GetUUID());
+	EXPECT_EQ(t.GetDefaultRuleSet()->GetUUID(), d.FindRuleSetByName("Default")->GetUUID());
 
 	EXPECT_EQ(t.GetDefaultRuleSet()->GetMatchTime(),         60);
 	EXPECT_EQ(t.GetDefaultRuleSet()->GetGoldenScoreTime(),   30);
@@ -446,7 +446,6 @@ TEST(Tournament, SaveAndLoad)
 		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
 		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
 
-		EXPECT_NE(j1.GetID(),   j2.GetID());
 		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
 
 		d.AddJudoka(&j1);
@@ -508,7 +507,6 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
 		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
 
-		EXPECT_NE(j1.GetID(), j2.GetID());
 		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
 
 		d.AddJudoka(&j1);

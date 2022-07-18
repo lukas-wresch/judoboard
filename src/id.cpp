@@ -22,7 +22,6 @@ ID::ID()
 		s_NextID++;
 	}
 
-	m_ID   = s_NextID++;
 	m_UUID = GenerateUUID();
 }
 
@@ -30,7 +29,6 @@ ID::ID()
 
 ID::ID(ZED::Blob& Stream)
 {
-	Stream >> m_ID;
 	ZED::SHA256 hash;
 	Stream >> hash;
 	m_UUID = hash;

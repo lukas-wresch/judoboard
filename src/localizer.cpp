@@ -46,6 +46,11 @@ void Localizer::Initialize(Language NewLanguage)
 			s_de["Following Matches"] = u8"Nachfolgende K\u00e4mpfe";
 			s_de["Following Match"] = "Nachfolgender Kampf";
 			s_de["Default"] = "Standard";
+
+			s_de["Children"] = "Kinder";
+			s_de["Youth"]    = "Jugendliche";
+			s_de["Adults"]   = "Erwachsene";
+			s_de["Seniors"]  = "Senioren";
 			
 			break;
 		}
@@ -71,4 +76,29 @@ std::string Localizer::Translate(const std::string& English)
 	}
 
 	return English;
+}
+
+
+
+std::string Localizer::Gender2ShortForm(Gender Gender)
+{
+	switch (s_CurrentLanguage)
+	{
+	case Language::German:
+	{
+		if (Gender == Gender::Male)
+			return  "m";
+		else if (Gender == Gender::Female)
+			return "w";
+		return "";
+	}
+
+	case Language::English:
+	default:
+		if (Gender == Gender::Male)
+			return  "m";
+		else if (Gender == Gender::Female)
+			return "f";
+		return "";
+	}
 }

@@ -82,9 +82,17 @@ public:
 
 	[[nodiscard]]
 	static std::string DecodeURLEncoded(const ZED::Blob& Input, const char* VariableName);
+	[[nodiscard]]
+	static std::string DecodeURLEncoded(const ZED::Blob& Input, const std::string& VariableName) {
+		return DecodeURLEncoded(Input, VariableName.c_str());
+	}
 
 	[[nodiscard]]
 	static std::string DecodeURLEncoded(const std::string& Input, const char* VariableName);
+	[[nodiscard]]
+	static std::string DecodeURLEncoded(const std::string& Input, const std::string& VariableName) {
+		return DecodeURLEncoded(Input, VariableName.c_str());
+	}
 
 	[[nodiscard]]
 	static const std::string CookieHeader(const std::string& Name, const std::string& Value, const std::string& Location = "/");

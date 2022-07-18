@@ -61,6 +61,8 @@ bool ZED::RendererOpenGL::Init(HWND Hwnd)
 bool ZED::RendererOpenGL::Init(GtkWindow* DrawingArea)
 #endif
 {
+	Log::Info("Starting OpenGL renderer");
+
 #ifdef _WIN32
 	if (!RendererSDL2::Init(Hwnd))
 #else
@@ -73,7 +75,10 @@ bool ZED::RendererOpenGL::Init(GtkWindow* DrawingArea)
 	m_glcontext = SDL_GL_CreateContext(m_SDL_window);
 
 	if (!m_glcontext)
+	{
+		Log::Error("Could not create OpenGL context");
 		return false;
+	}
 
 	//SDL_GL_SetSwapInterval(0);//Disable Vsync
 

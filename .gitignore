@@ -385,9 +385,10 @@ FodyWeavers.xsd
 *.testdurations
 
 
+/bin/GoogleTest.exe
 /bin/GoogleTest_Debug.exe
 /bin/Judoboard.exe
 /bin/Judoboard_Debug.exe
 *.wav
-
-/bin/tournaments/*
+*.yml
+*.md5

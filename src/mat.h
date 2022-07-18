@@ -54,7 +54,7 @@ namespace Judoboard
 		bool IsDoingAnimation() const { return m_State == State::TransitionToMatch || m_State == State::TransitionToWaiting; }
 		bool AreFightersOnMat() const override { return m_State == State::TransitionToMatch || m_State == State::Running; }
 		const Match* GetMatch() const override { return m_pMatch; }
-		const std::vector<const Match*> GetNextMatches() const override;
+		const std::vector<Match> GetNextMatches() const override;
 
 		uint32_t EndTimeOfOsaekomi() const;//Returns the number of seconds the osaekomi end the match
 

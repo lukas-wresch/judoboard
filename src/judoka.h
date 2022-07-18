@@ -30,7 +30,7 @@ namespace Judoboard
 		friend class Match;
 
 	public:
-		Judoka(const std::string& Firstname, const std::string& Lastname, uint32_t Weight = 0, Gender Gender = Gender::Male);
+		Judoka(const std::string& Firstname, const std::string& Lastname, uint32_t Weight = 0, Gender Gender = Gender::Male, uint32_t Birthyear = 0);
 		Judoka(ZED::CSV& Stream, const StandingData* pStandingData = nullptr);//Load judoka from file
 		Judoka(const YAML::Node& Yaml, const StandingData* pStandingData = nullptr);//Load judoka from file
 		Judoka(const DM4::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from DM4 data
@@ -60,12 +60,10 @@ namespace Judoboard
 		void StartBreak() const { m_LastMatch_Timestamp = Timer::GetTimestamp(); }
 		uint32_t GetLengthOfBreak()  const { return (Timer::GetTimestamp() - m_LastMatch_Timestamp) / 1000; }//Returns the number of seconds this judoka had a break
 
-		const std::string ToString() const;
-
-		void operator >> (ZED::CSV& Stream) const;
 		void operator >> (YAML::Emitter& Yaml) const;
+		void ToString(YAML::Emitter& Yaml) const;
 
-		bool operator ==(const Judoka& cmp) const { return GetID() == cmp.GetID(); }
+		bool operator ==(const Judoka& cmp) const { return GetUUID() == cmp.GetUUID(); }
 
 	private:
 		Judoka() = default;//Create empty judoka (for class Mat)

@@ -33,7 +33,7 @@ void MatchTable::SetMatID(int32_t MatID)
 bool MatchTable::IsIncluded(const Judoka& Fighter) const
 {
 	for (auto& participant : m_Participants)
-		if (participant && participant->GetID() == Fighter.GetID())
+		if (participant && participant->GetUUID() == Fighter.GetUUID())
 			return true;
 	return false;
 }
@@ -115,79 +115,6 @@ const RuleSet& MatchTable::GetRuleSet() const
 
 
 
-/*int MatchTable::CompareFighterScore(const void* A, const void* B)
-{
-	const Result* a = (Result*)A;
-	const Result* b = (Result*)B;
-
-	if (a->Wins < b->Wins)
-		return 1;
-	if (a->Wins > b->Wins)
-		return -1;
-
-	if (a->Score < b->Score)
-		return 1;
-	if (a->Score > b->Score)
-		return -1;
-
-	//Direct comparision
-	auto matches = a->MatchTable->FindMatches(*a->Judoka, *b->Judoka);
-
-	int a_wins = 0,  b_wins = 0;
-	int a_score = 0, b_score = 0;
-
-	for (auto match : matches)
-	{
-		if (!match->HasConcluded())
-			continue;
-
-		auto result = match->GetMatchResult();
-
-		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetID() == a->Judoka->GetID())
-		{
-			a_wins++;
-			a_score += (int)match->GetMatchResult().m_Score;
-		}
-
-		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetID() == b->Judoka->GetID())
-		{
-			b_wins++;
-			b_score += (int)match->GetMatchResult().m_Score;
-		}
-	}
-
-	if (a_wins < b_wins)
-		return 1;
-	if (a_wins > b_wins)
-		return -1;
-
-	if (a_score < b_score)
-		return 1;
-	if (a_score > b_score)
-		return -1;
-
-	if (a->Time < b->Time)
-		return -1;
-	if (a->Time > b->Time)
-		return 1;
-
-	//This ensures that everything is well-ordered, however if this is necessary a flag is raised!
-	if (a->Judoka->GetID() < b->Judoka->GetID())
-	{
-		a->NotSortable = b->NotSortable = true;
-		return -1;
-	}
-	if (a->Judoka->GetID() > b->Judoka->GetID())
-	{
-		a->NotSortable = b->NotSortable = true;
-		return 1;
-	}
-
-	return 0;
-}*/
-
-
-
 bool MatchTable::Result::operator < (const Result& rhs) const
 {
 	if (Wins < rhs.Wins)
@@ -213,13 +140,13 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 
 		auto result = match->GetMatchResult();
 
-		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetID() == Judoka->GetID())
+		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetUUID() == Judoka->GetUUID())
 		{
 			a_wins++;
 			a_score += (int)match->GetMatchResult().m_Score;
 		}
 
-		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetID() == rhs.Judoka->GetID())
+		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetUUID() == rhs.Judoka->GetUUID())
 		{
 			b_wins++;
 			b_score += (int)match->GetMatchResult().m_Score;
@@ -242,12 +169,12 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 		return false;
 
 	//This ensures that everything is well-ordered, however if this is necessary a flag is raised!
-	if (Judoka->GetID() < rhs.Judoka->GetID())
+	if ((std::string)Judoka->GetUUID() < (std::string)rhs.Judoka->GetUUID())
 	{
 		NotSortable = rhs.NotSortable = true;
 		return true;
 	}
-	if (Judoka->GetID() > rhs.Judoka->GetID())
+	if ((std::string)Judoka->GetUUID() > (std::string)rhs.Judoka->GetUUID())
 	{
 		NotSortable = rhs.NotSortable = true;
 		return false;
@@ -261,7 +188,7 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 const std::string MatchTable::ToString() const
 {
 	ZED::CSV ret;
-	ret << GetID() << GetType() << GetScheduleIndex() << GetMatID() << GetColor() << GetRuleSet().GetID() << m_Name;
+	ret << (std::string)GetUUID() << GetType() << GetScheduleIndex() << GetMatID() << GetColor() << (std::string)GetRuleSet().GetUUID() << m_Name;
 	return ret;
 }
 
@@ -309,6 +236,9 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : Schedu
 	if (Yaml["rule_set"])
 		m_Rules = Tournament->FindRuleSet(Yaml["rule_set"].as<std::string>());
 
+	if (Yaml["age_group"])
+		m_pAgeGroup = Tournament->FindAgeGroup(Yaml["age_group"].as<std::string>());
+
 	if (Yaml["participants"] && Yaml["participants"].IsSequence())
 	{
 		for (const auto& node : Yaml["participants"])
@@ -349,16 +279,43 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 	Schedulable::operator >>(Yaml);
 
 	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
-	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
+	if (m_Name.length() > 0)
+		Yaml << YAML::Key << "name" << YAML::Value << m_Name;
 
 	if (m_Rules)
 		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
+	if (m_pAgeGroup)
+		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)m_pAgeGroup->GetUUID();
 
 	Yaml << YAML::Key << "participants";
 	Yaml << YAML::BeginSeq;
 
 	for (auto judoka : m_Participants)
 		Yaml << (std::string)judoka->GetUUID();
+
+	Yaml << YAML::EndSeq;
+}
+
+
+
+void MatchTable::ToString(YAML::Emitter& Yaml) const
+{
+	Schedulable::operator >>(Yaml);
+
+	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
+	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
+	Yaml << YAML::Key << "description" << YAML::Value << GetDescription();
+
+	if (m_Rules)
+		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
+	if (m_pAgeGroup)
+		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)m_pAgeGroup->GetUUID();
+
+	Yaml << YAML::Key << "participants";
+	Yaml << YAML::BeginSeq;
+
+	for (auto judoka : m_Participants)
+		judoka->ToString(Yaml);
 
 	Yaml << YAML::EndSeq;
 }

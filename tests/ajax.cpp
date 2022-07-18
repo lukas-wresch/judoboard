@@ -8,30 +8,18 @@ TEST(Ajax, GetMats)
 
 	Application app;
 
-	auto csv = app.Ajax_GetMats();
+	auto yaml = YAML::Load(app.Ajax_GetMats());
 
-	//csv
-	int highestID, id, type;
-	std::string name;
-	bool isOpen;
-	int style;
-
-	csv >> highestID;
-
-	EXPECT_TRUE(highestID == 1);
+	EXPECT_TRUE(yaml["highest_mat_id"].as<int>() == 1);
 
 	app.StartLocalMat(1);
 
-	auto csv2 = app.Ajax_GetMats();
+	yaml = YAML::Load(app.Ajax_GetMats());
 
-	//csv
-	csv2 >> highestID >> id >> type >> isOpen >> name >> style;
-
-	EXPECT_TRUE(highestID == 2);
-	EXPECT_TRUE(id == 1);
-	EXPECT_TRUE(type == (int)Mat::Type::LocalMat);
-	EXPECT_TRUE(name == "Mat 1");
-	EXPECT_TRUE(style == (int)IMat::IpponStyle::DoubleDigit);
+	EXPECT_EQ(yaml["highest_mat_id"].as<int>(), 2);
+	EXPECT_EQ(yaml["mats"][0]["type"].as<int>(), (int)Mat::Type::LocalMat);
+	EXPECT_EQ(yaml["mats"][0]["name"].as<std::string>(), "Mat 1");
+	EXPECT_EQ(yaml["mats"][0]["ippon_style"].as<int>(), (int)IMat::IpponStyle::DoubleDigit);
 }
 
 
@@ -49,8 +37,8 @@ TEST(Ajax, OpenMat)
 
 		app.Ajax_OpenMat(HttpServer::Request("id=1"));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+		ASSERT_TRUE(app.GetDefaultMat());
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 	}
 
@@ -67,8 +55,8 @@ TEST(Ajax, OpenMat)
 
 		app.Ajax_OpenMat(HttpServer::Request("id=5"));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 5);
+		ASSERT_TRUE(app.GetDefaultMat());
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 5);
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 	}
 }
@@ -251,12 +239,13 @@ TEST(Ajax, Ajax_GetHansokumake)
 		
 		ZED::CSV ret2 = app.Ajax_GetHansokumake();
 
-		int id, mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
+		std::string id;
+		int mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
 		std::string white_name, blue_name, color, matchtable_name;
 		ret2 >> id >> white_name >> blue_name >> mat_id >> state >> color >> matchtable >> matchtable_name;
 		ret2 >> hansokumake_fighter >> hansokumake_state;
 
-		EXPECT_EQ(id, match.GetID());
+		EXPECT_EQ(id, (std::string)match.GetUUID());
 		EXPECT_EQ(white_name, match.GetFighter(Fighter::White)->GetName());
 		EXPECT_EQ(blue_name,  match.GetFighter(Fighter::Blue )->GetName());
 		EXPECT_EQ(hansokumake_fighter, (int)f);
@@ -282,14 +271,15 @@ TEST(Ajax, Ajax_GetHansokumake)
 
 		ZED::CSV ret2 = app.Ajax_GetHansokumake();
 
-		int id, mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
+		std::string id;
+		int mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
 		std::string white_name, blue_name, color, matchtable_name;
 		ret2 >> id >> white_name >> blue_name >> mat_id >> state >> color >> matchtable >> matchtable_name;
 		ret2 >> hansokumake_fighter >> hansokumake_state;
 
-		EXPECT_EQ(id, match.GetID());
+		EXPECT_EQ(id, (std::string)match.GetUUID());
 		EXPECT_EQ(white_name, match.GetFighter(Fighter::White)->GetName());
-		EXPECT_EQ(blue_name, match.GetFighter(Fighter::Blue)->GetName());
+		EXPECT_EQ(blue_name,  match.GetFighter(Fighter::Blue)->GetName());
 		EXPECT_EQ(hansokumake_fighter, (int)f);
 		EXPECT_EQ(hansokumake_state, (int)IMat::Scoreboard::DisqualificationState::Disqualified);
 	}
@@ -313,14 +303,15 @@ TEST(Ajax, Ajax_GetHansokumake)
 
 		ZED::CSV ret2 = app.Ajax_GetHansokumake();
 
-		int id, mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
+		std::string id;
+		int mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
 		std::string white_name, blue_name, color, matchtable_name;
 		ret2 >> id >> white_name >> blue_name >> mat_id >> state >> color >> matchtable >> matchtable_name;
 		ret2 >> hansokumake_fighter >> hansokumake_state;
 
-		EXPECT_EQ(id, match.GetID());
+		EXPECT_EQ(id, (std::string)match.GetUUID());
 		EXPECT_EQ(white_name, match.GetFighter(Fighter::White)->GetName());
-		EXPECT_EQ(blue_name, match.GetFighter(Fighter::Blue)->GetName());
+		EXPECT_EQ(blue_name,  match.GetFighter(Fighter::Blue)->GetName());
 		EXPECT_EQ(hansokumake_fighter, (int)f);
 		EXPECT_EQ(hansokumake_state, (int)IMat::Scoreboard::DisqualificationState::NotDisqualified);
 	}
@@ -379,30 +370,24 @@ TEST(Ajax, ListClubs)
 	initialize();
 
 	{
+		ZED::Core::RemoveFile("database.yaml");
 		Application app;
 
 		app.GetDatabase().AddClub(new Club("Club 1"));
 
-		auto csv = app.Ajax_ListClubs();
+		YAML::Node yaml = YAML::Load(app.Ajax_ListClubs());
 
-		int id1, id2;
-		std::string name1, name2;
-		csv >> id1 >> name1;
-
-		EXPECT_EQ(id1, 3);
-		EXPECT_EQ(name1, "Club 1");
+		ASSERT_EQ(yaml.size(), 1);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
 
 
 		app.GetDatabase().AddClub(new Club("Club 2"));
 
-		auto csv2 = app.Ajax_ListClubs();
+		yaml = YAML::Load(app.Ajax_ListClubs());
 
-		csv2 >> id1 >> name1 >> id2 >> name2;
-
-		EXPECT_EQ(id1, 3);
-		EXPECT_EQ(name1, "Club 1");
-		EXPECT_EQ(id2, 4);
-		EXPECT_EQ(name2, "Club 2");
+		ASSERT_EQ(yaml.size(), 2);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
+		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "Club 2");
 	}
 }
 
@@ -599,16 +584,14 @@ TEST(Ajax, GetParticipantsFromMatchTable)
 	auto table = new Weightclass(app.GetTournament(), 10, 100);
 	app.GetTournament()->AddMatchTable(table);
 
-	ZED::CSV result = app.Ajax_GetParticipantsFromMatchTable(HttpServer::Request("id=" + std::to_string(table->GetID())));
+	YAML::Node yaml = YAML::Load(app.Ajax_GetParticipantsFromMatchTable(HttpServer::Request("id=" + (std::string)table->GetUUID())));
 
-	int id;
-	std::string name;
+	ASSERT_EQ(yaml.size(), 1);
+	EXPECT_EQ(j1->GetUUID(), yaml[0]["uuid"].as<std::string>());
+	EXPECT_EQ(j1->GetFirstname(), yaml[0]["firstname"].as<std::string>());
+	EXPECT_EQ(j1->GetLastname(),  yaml[0]["lastname" ].as<std::string>());
 
-	result >> id >> name;
-	EXPECT_EQ(j1->GetID(), id);
-	EXPECT_EQ(j1->GetName(), name);
-
-	//Changed to only 1 judoka since there is now guarantee that the judoka will come out in the same order
+	//Changed to only 1 judoka since there is no guarantee that the judoka will come out in the same order
 
 	/*result >> id >> name;
 	EXPECT_EQ(j2->GetID(), id);
@@ -638,17 +621,40 @@ TEST(Ajax, GetMatchesFromMatchTable)
 	auto table = new Weightclass(app.GetTournament(), 10, 100);
 	app.GetTournament()->AddMatchTable(table);
 
-	ZED::CSV result = app.Ajax_GetMatchesFromMatchTable(HttpServer::Request("id=" + std::to_string(table->GetID())));
+	YAML::Node yaml = YAML::Load(app.Ajax_GetMatchesFromMatchTable(HttpServer::Request("id=" + (std::string)table->GetUUID())));
 
-	int id, matID, state, tableID;
-	std::string name1, name2, tableName, color;
+	ASSERT_EQ(yaml.size(), 3);
 
-	for (int i = 0; i < 3; i++)
+	int i = 0;
+	for (const auto& node : yaml)
 	{
-		result >> id >> name1 >> name2 >> matID >> state >> color >> tableID >> tableName;
-		EXPECT_EQ(table->GetSchedule()[i]->GetID(), id);
-		EXPECT_EQ(table->GetSchedule()[i]->GetFighter(Fighter::White)->GetName(), name1);
-		EXPECT_EQ(table->GetSchedule()[i]->GetFighter(Fighter::Blue )->GetName(), name2);
-		EXPECT_EQ(table->GetSchedule()[i]->GetMatID(), matID);
+		EXPECT_EQ(node["uuid"].as<std::string>(),       (std::string)table->GetSchedule()[i]->GetUUID());
+		EXPECT_EQ(node["white_name"].as<std::string>(), table->GetSchedule()[i]->GetFighter(Fighter::White)->GetName());
+		EXPECT_EQ(node["blue_name"].as<std::string>(),  table->GetSchedule()[i]->GetFighter(Fighter::Blue )->GetName());
+		EXPECT_EQ(node["mat_id"].as<int>(),             table->GetSchedule()[i]->GetMatID());
+		i++;
 	}
+}
+
+
+
+TEST(Ajax, ListAgeGroups)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("database.yaml");
+	Application app;
+
+	YAML::Node result = YAML::Load(app.Ajax_ListAllAgeGroups());
+
+	ASSERT_TRUE(result);
+	ASSERT_TRUE(result.IsSequence());
+	ASSERT_EQ(result.size(), 6);
+
+	EXPECT_EQ(result[0]["name"].as<std::string>(), "U11");
+	EXPECT_EQ(result[1]["name"].as<std::string>(), "U13");
+	EXPECT_EQ(result[2]["name"].as<std::string>(), "U15");
+	EXPECT_EQ(result[3]["name"].as<std::string>(), "U18");
+	EXPECT_EQ(result[4]["name"].as<std::string>(), "U21");
+	EXPECT_EQ(result[5]["name"].as<std::string>(), "Seniors");
 }

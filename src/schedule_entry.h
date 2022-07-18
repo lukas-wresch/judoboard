@@ -174,7 +174,7 @@ namespace Judoboard
 
 		virtual const std::vector<Match*> GetSchedule() const = 0;
 		virtual uint32_t GetRecommendedNumMatchesBeforeBreak() const { return 1; }
-		virtual const std::string GetName() const = 0;
+		virtual std::string GetDescription() const = 0;
 
 		virtual uint32_t GetMatID() const { return m_MatID; }
 		virtual void SetMatID(int32_t MatID) { m_MatID = MatID; }

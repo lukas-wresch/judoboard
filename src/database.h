@@ -14,7 +14,6 @@ namespace Judoboard
 	public:
 		Database() {
 			Reset();
-			AddRuleSet(new RuleSet);//Add default rule set
 		}
 
 		void Reset();

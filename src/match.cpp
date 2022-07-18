@@ -186,10 +186,10 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 
 bool Match::Contains(const Judoka& Judoka) const
 {
-	if (m_White.m_Judoka && m_White.m_Judoka->GetID() == Judoka.GetID())
+	if (m_White.m_Judoka && m_White.m_Judoka->GetUUID() == Judoka.GetUUID())
 		return true;
 
-	if (m_Blue.m_Judoka  && m_Blue.m_Judoka->GetID()  == Judoka.GetID())
+	if (m_Blue.m_Judoka  && m_Blue.m_Judoka->GetUUID()  == Judoka.GetUUID())
 		return true;
 
 	return false;
@@ -199,7 +199,7 @@ bool Match::Contains(const Judoka& Judoka) const
 
 Fighter Match::GetColorOfFighter(const Judoka& Judoka) const
 {
-	if (m_White.m_Judoka && m_White.m_Judoka->GetID() == Judoka.GetID())
+	if (m_White.m_Judoka && m_White.m_Judoka->GetUUID() == Judoka.GetUUID())
 		return Fighter::White;
 	return Fighter::Blue;
 }
@@ -208,10 +208,10 @@ Fighter Match::GetColorOfFighter(const Judoka& Judoka) const
 
 const Judoka* Match::GetEnemyOf(const Judoka& Judoka) const
 {
-	if (m_White.m_Judoka && m_White.m_Judoka->GetID() == Judoka.GetID())
+	if (m_White.m_Judoka && m_White.m_Judoka->GetUUID() == Judoka.GetUUID())
 		return m_Blue.m_Judoka;
 
-	if (m_Blue.m_Judoka  && m_Blue.m_Judoka->GetID()  == Judoka.GetID())
+	if (m_Blue.m_Judoka  && m_Blue.m_Judoka->GetUUID()  == Judoka.GetUUID())
 		return m_White.m_Judoka;
 
 	return nullptr;
@@ -285,7 +285,7 @@ ZED::CSV Match::ToString() const
 {
 	ZED::CSV ret;
 
-	ret << GetID();
+	ret << (std::string)GetUUID();
 
 	if (!GetFighter(Fighter::White) || !GetFighter(Fighter::Blue))
 		ret << "???,???";
@@ -295,7 +295,7 @@ ZED::CSV Match::ToString() const
 	ret << GetMatID() << m_State << GetColor().ToHexString();
 
 	if (GetMatchTable())
-		ret << GetMatchTable()->GetID() << GetMatchTable()->GetName();
+		ret << (std::string)GetMatchTable()->GetUUID() << GetMatchTable()->GetDescription();
 	else
 		ret << "0,- - -";
 
@@ -304,9 +304,42 @@ ZED::CSV Match::ToString() const
 
 
 
+void Match::ToString(YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+
+	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+
+	if (GetFighter(Fighter::White))
+		Yaml << YAML::Key << "white_name" << YAML::Value << GetFighter(Fighter::White)->GetName();
+	if (GetFighter(Fighter::Blue))
+		Yaml << YAML::Key << "blue_name"  << YAML::Value << GetFighter(Fighter::Blue)->GetName();
+
+	Yaml << YAML::Key << "mat_id" << YAML::Value << GetMatID();
+	Yaml << YAML::Key << "state"  << YAML::Value << (int)m_State;
+	Yaml << YAML::Key << "color"  << YAML::Value << GetColor().ToHexString();
+
+	if (m_Rules)
+		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
+
+	if (GetMatchTable())
+	{
+		Yaml << YAML::Key << "match_table" << YAML::Value << (std::string)GetMatchTable()->GetUUID();
+		Yaml << YAML::Key << "match_table_name" << YAML::Value << GetMatchTable()->GetName();
+	}
+
+	Yaml << YAML::Key << "winner" << YAML::Value << (int)m_Result.m_Winner;
+	Yaml << YAML::Key << "score"  << YAML::Value << (int)m_Result.m_Score;
+	Yaml << YAML::Key << "time"   << YAML::Value << m_Result.m_Time;
+
+	Yaml << YAML::EndMap;
+}
+
+
+
 ZED::CSV Match::AllToString() const
 {
-	return ToString() << m_Result.m_Winner << m_Result.m_Score << m_Result.m_Time << GetRuleSet().GetID();
+	return ToString() << m_Result.m_Winner << m_Result.m_Score << m_Result.m_Time << (std::string)GetRuleSet().GetUUID();
 }
 
 

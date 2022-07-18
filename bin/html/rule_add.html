@@ -162,17 +162,17 @@ function GetRuleSet(id)
 {
   AjaxCallback("ajax/rule/get?id="+id, function(response) {
     var res = response.split(",");
-    console.log(response);
+    var res = YAML.parse(response);
 
-    document.getElementById("name").value = res[0];
-    document.getElementById("match_time").value  = res[1];
-    document.getElementById("goldenscore_time").value    = res[2];
-    document.getElementById("osaekomi_ippon").value    = res[3];
-    document.getElementById("osaekomi_wazaari").value    = res[4];
-    document.getElementById("yuko").checked = res[5] == 1 ? true : false;
-    document.getElementById("koka").checked = res[6] == 1 ? true : false;
-    document.getElementById("draw").checked = res[7] == 1 ? true : false;
-    document.getElementById("break_time").value = res[8];
+    document.getElementById("name").value        = res.name;
+    document.getElementById("match_time").value  = res.match_time;
+    document.getElementById("goldenscore_time").value    = res.golden_score_time;
+    document.getElementById("osaekomi_ippon").value      = res.osaekomi_time;
+    document.getElementById("osaekomi_wazaari").value    = res.osaekomi_with_wazaari_time;
+    document.getElementById("yuko").checked = res.yuko;
+    document.getElementById("koka").checked = res.koka;
+    document.getElementById("draw").checked = res.draw;
+    document.getElementById("break_time").value = res.break_time;
   });
 }
 

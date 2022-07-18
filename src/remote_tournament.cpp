@@ -14,10 +14,10 @@ RemoteTournament::RemoteTournament(const std::string& Host, uint16_t Port) : m_H
 
 
 
-std::vector<const Match*> RemoteTournament::GetNextMatches(uint32_t MatID) const
+std::vector<Match> RemoteTournament::GetNextMatches(uint32_t MatID) const
 {
 	ZED::Log::Error("NOT IMPLEMENTED");
-	std::vector<const Match*> ret;
+	std::vector<Match> ret;
 	return ret;
 }
 
@@ -38,8 +38,12 @@ Judoka* RemoteTournament::FindParticipant(const UUID& UUID)
 	if (response.length() == 0)
 		return nullptr;
 
-	ZED::CSV csv(response);
-	Judoka* judoka = new Judoka(csv);
+	YAML::Node yaml = YAML::Load(response);
+
+	if (!yaml)
+		return nullptr;
+
+	Judoka* judoka = new Judoka(yaml);
 	m_StandingData.AddJudoka(judoka);
 
 	return judoka;
@@ -54,8 +58,12 @@ const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 	if (response.length() == 0)
 		return nullptr;
 
-	ZED::CSV csv(response);
-	Judoka* judoka = new Judoka(csv);
+	YAML::Node yaml = YAML::Load(response);
+
+	if (!yaml)
+		return nullptr;
+
+	Judoka* judoka = new Judoka(yaml);
 	m_StandingData.AddJudoka(judoka);
 
 	return judoka;
@@ -85,7 +93,7 @@ std::string RemoteTournament::Request2Master(const std::string& URL) const
 		ZED::Log::Info("Could not connect to master server: " + m_Hostname + ":" + std::to_string(m_Port));
 		return "";
 	}
-	else if (std::count(response.begin(), response.end(), ',') < 3)
+	else if (std::count(response.begin(), response.end(), ':') < 2)
 	{
 		ZED::Log::Warn("Invalid response: " + response);
 		return "";

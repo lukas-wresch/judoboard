@@ -6,7 +6,6 @@
 #include "remote_mat.h"
 #include "tournament.h"
 #include "../ZED/include/log.h"
-#include "../ZED/include/csv.h"
 #include "../ZED/include/http_client.h"
 
 
@@ -31,13 +30,15 @@ void Application::SetupHttpServer()
 	m_Server.RegisterResource("/sha512.min.js", [](auto& Request) { return HttpServer::LoadFile("html/sha512.min.js"); }, HttpServer::ResourceType::JavaScript);
 	m_Server.RegisterResource("/jquery-ui.css", [](auto& Request) { return HttpServer::LoadFile("html/jquery-ui.css"); }, HttpServer::ResourceType::CSS);
 
+	m_Server.RegisterResource("/yaml.min.js", [](auto& Request) { return HttpServer::LoadFile("html/yaml.min.js"); }, HttpServer::ResourceType::JavaScript);
+
 	m_Server.RegisterResource("/slideout.min.js", [](auto& Request) { return HttpServer::LoadFile("html/slideout.min.js"); }, HttpServer::ResourceType::JavaScript);
 	m_Server.RegisterResource("/menu.png", [](auto& Request) { return HttpServer::LoadFile("html/menu.png"); }, HttpServer::ResourceType::Image_PNG);
 
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit",
 		"club_list", "club_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
-		"matchtable_list", "matchtable_add", "rule_add", "rule_list", "tournament_list", "tournament_add",
+		"matchtable_list", "matchtable_add", "matchtable_creator", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add",
 		"server_config"
 	};
 
@@ -91,7 +92,7 @@ void Application::SetupHttpServer()
 		}
 
 		return Error(Error::Type::InvalidFormat);
-		});
+	});
 
 	m_Server.RegisterResource("/upload/md5", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -243,6 +244,7 @@ void Application::SetupHttpServer()
 	m_Server.RegisterResource("/ajax/get_schedule", [this](auto& Request) -> std::string {
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
+		LockTillScopeEnd();
 		return GetTournament()->Schedule2String();
 	});
 
@@ -253,7 +255,21 @@ void Application::SetupHttpServer()
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
+
+		LockTillScopeEnd();
 		return GetTournament()->Participants2String();
+	});
+
+
+	m_Server.RegisterResource("/ajax/judoka/search", [this](auto& Request) -> std::string {
+		if (!IsLoggedIn(Request))
+			return Error(Error::Type::NotLoggedIn);
+
+		auto search_string = HttpServer::DecodeURLEncoded(Request.m_Query, "name");
+
+		LockTillScopeEnd();
+
+		return m_Database.Judoka2String(search_string, GetTournament());
 	});
 
 
@@ -270,6 +286,8 @@ void Application::SetupHttpServer()
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
+
+		LockTillScopeEnd();
 		return GetTournament()->MasterSchedule2String();
 	});
 
@@ -282,10 +300,9 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
 		GetTournament()->MoveScheduleEntryUp(id);
 		return Error();//OK
 	});
@@ -299,10 +316,9 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
 		GetTournament()->MoveScheduleEntryDown(id);
 		return Error();//OK
 	});
@@ -316,9 +332,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
 		auto match = GetTournament()->FindMatch(id);
@@ -338,18 +352,18 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "index"));
-		int mat   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
+		UUID id  = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+		int  mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
 
-		if (index < 0)
-			return Error(Error::Type::InvalidID);
 		if (mat <= 0)
 			return std::string("Invalid mat id");
+
+		LockTillScopeEnd();
 
 		if (GetTournament()->GetStatus() == Status::Concluded)
 			return std::string("Tournament is already finalized");
 
-		auto entry = GetTournament()->GetScheduleEntry(index);
+		auto entry = GetTournament()->GetScheduleEntry(id);
 
 		if (!entry)
 			return Error(Error::Type::ItemNotFound);
@@ -367,11 +381,10 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		auto rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		LockTillScopeEnd();
 
 		auto match = GetTournament()->FindMatch(id);
 		auto ruleSet = m_Database.FindRuleSetByName(rule);
@@ -383,7 +396,7 @@ void Application::SetupHttpServer()
 
 		match->SetRuleSet(ruleSet);
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/match/move_up", [this](auto& Request) -> std::string {
@@ -394,10 +407,9 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return std::string();
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
 		GetTournament()->MoveMatchUp(id);
 
 		return std::string();
@@ -411,10 +423,9 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return std::string();
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
 		GetTournament()->MoveMatchDown(id);
 
 		return std::string();
@@ -428,14 +439,13 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return std::string();
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		bool success = GetTournament()->DeleteMatch(id);
+		LockTillScopeEnd();
+		bool success = GetTournament()->RemoveMatch(id);
 
 		return std::string();
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/match/get_log", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
@@ -445,10 +455,9 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return std::string();
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
 		auto match = GetTournament()->FindMatch(id);
 
 		if (!match)
@@ -528,13 +537,13 @@ void Application::SetupHttpServer()
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		if (id <= 0)
+		if (matID <= 0)
 			return Error(Error::Type::InvalidID);
 
 		LockTillScopeEnd();
-		auto mat = FindMat(id);
+		auto mat = FindMat(matID);
 
 		if (!mat)
 			return Error(Error::Type::MatNotFound);
@@ -551,15 +560,16 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return "No Tournament is currently open";
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		if (id <= 0)
+		if (matID <= 0)
 			return Error(Error::Type::InvalidID);
 
-		auto mat = FindMat(id);
+		LockTillScopeEnd();
+		auto mat = FindMat(matID);
 
 		if (!mat)
-			return "Mat not found";
+			return Error(Error::Type::MatNotFound);
 
 		auto nextMatch = GetTournament()->GetNextMatch(mat->GetMatID());
 		if (nextMatch)
@@ -573,12 +583,13 @@ void Application::SetupHttpServer()
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		if (id <= 0)
+		if (matID <= 0)
 			return Error(Error::Type::InvalidID);
 
-		auto mat = FindMat(id);
+		LockTillScopeEnd();
+		auto mat = FindMat(matID);
 
 		if (!mat)
 			return Error(Error::Type::MatNotFound);
@@ -597,15 +608,15 @@ void Application::SetupHttpServer()
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
-			return std::string();
+			return Error(Error::Type::InvalidID);
 
 		auto mat = FindMat(id);
 
 		if (!mat)
-			return std::string();
+			return Error(Error::Type::MatNotFound);
 
 		return std::to_string(mat->GetTimeElapsed()) + "," + (mat->IsHajime() ? "1" : "0");
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/mat/get_score", [this](auto& Request) -> std::string {
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -1061,8 +1072,8 @@ void Application::SetupHttpServer()
 		auto nextMatches = mat->GetNextMatches();
 		for (auto match : nextMatches)
 		{
-			if (match && match->GetFighter(Fighter::White) && match->GetFighter(Fighter::Blue))
-				ret << match->GetFighter(Fighter::White)->GetName() << match->GetFighter(Fighter::Blue)->GetName();
+			if (match.GetFighter(Fighter::White) && match.GetFighter(Fighter::Blue))
+				ret << match.GetFighter(Fighter::White)->GetName() << match.GetFighter(Fighter::Blue)->GetName();
 		}
 
 		return ret;
@@ -1070,7 +1081,7 @@ void Application::SetupHttpServer()
 
 
 
-	m_Server.RegisterResource("/ajax/judoka/autocomplete", [this](auto& Request) -> std::string {
+	/*m_Server.RegisterResource("/ajax/judoka/autocomplete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1078,10 +1089,10 @@ void Application::SetupHttpServer()
 		bool filter = HttpServer::DecodeURLEncoded(Request.m_Query, "filter") == "true";
 
 		if (filter && GetTournament())
-			return GetTournament()->GetDatabase().JudokaToJSON();
+			return GetTournament()->JudokaToJSON();
 
 		return m_Database.JudokaToJSON();
-	});
+	});*/
 
 
 	m_Server.RegisterResource("/ajax/judoka/add", [this](auto& Request) -> std::string {
@@ -1093,7 +1104,8 @@ void Application::SetupHttpServer()
 		auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
 		int  weight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "weight"));
 		Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
-		int  clubID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "club"));
+		int  birthyear = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "birthyear"));
+		UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");
 
 		if (weight < 0)
 			weight = 0;
@@ -1102,8 +1114,9 @@ void Application::SetupHttpServer()
 			return (std::string)(Error)Error::Type::InvalidInput;
 
 		Judoka new_judoka(firstname, lastname, weight, gender);
-		if (clubID >= 0)
-			new_judoka.SetClub(GetDatabase().FindClub(clubID));
+		if (birthyear > 1900 && birthyear < 2100)
+			new_judoka.SetBirthyear(birthyear);
+		new_judoka.SetClub(GetDatabase().FindClub(clubID));
 
 		m_Database.AddJudoka(std::move(new_judoka));
 		m_Database.Save();
@@ -1116,14 +1129,16 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto judoka = m_Database.FindJudoka(id);
 
 		if (judoka)
-			return judoka->ToString();
+		{
+			YAML::Emitter ret;
+			*judoka >> ret;
+			return ret.c_str();
+		}
 
 		return std::string();
 	});
@@ -1134,13 +1149,15 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		ZED::CSV ret;
+		YAML::Emitter ret;
+		ret << YAML::BeginSeq;
 		for (auto [id, judoka] : m_Database.GetAllJudokas())
 		{
 			if (judoka)
-				ret << judoka->ToString();
+				judoka->ToString(ret);
 		}
-		return ret;
+		ret << YAML::EndSeq;
+		return ret.c_str();
 	});
 
 
@@ -1149,15 +1166,12 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
-
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
 		auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
 		int  weight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "weight"));
 		Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
-		int  clubID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "club"));
+		UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");
 
 		if (weight < 0)
 			weight = 0;
@@ -1174,7 +1188,7 @@ void Application::SetupHttpServer()
 		judoka->SetLastname(lastname);
 		judoka->SetWeight(weight);
 		judoka->SetGender(gender);
-		if (clubID >= 0)
+		if (GetDatabase().FindClub(clubID))
 			judoka->SetClub(GetDatabase().FindClub(clubID));
 		else
 			judoka->SetClub(nullptr);
@@ -1188,16 +1202,14 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto judoka = m_Database.FindJudoka(id);
 
 		if (!judoka)
 			return std::string("Judoka not found");
 
-		if (!m_Database.DeleteJudoka(judoka->GetID()))
+		if (!m_Database.DeleteJudoka(judoka->GetUUID()))
 			return std::string("Failed to delete");
 
 		return Error();//OK
@@ -1227,10 +1239,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "id"));
-
-		if (id < 0)
-			return std::string("Invalid input");
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto judoka = m_Database.FindJudoka(id);
 
@@ -1258,10 +1267,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		if (GetTournament() && GetTournament()->RemoveParticipant(id))
 			return Error();//OK
@@ -1364,7 +1370,7 @@ void Application::SetupHttpServer()
 
 		m_Database.Save();
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/account/list", [this](auto& Request) -> std::string {
@@ -1435,6 +1441,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
+		GetTournament()->Lock();
 		std::string ret;
 		for (auto table : GetTournament()->GetMatchTables())
 		{
@@ -1444,6 +1451,7 @@ void Application::SetupHttpServer()
 			ret += table->ToHTML();
 			ret += "<br/><br/><br/>";
 		}
+		GetTournament()->Unlock();
 
 		return ret;
 	});
@@ -1474,12 +1482,12 @@ void Application::SetupHttpServer()
 	});
 
 
-	m_Server.RegisterResource("/ajax/matchtable/get_participants", [this](auto& Request) -> std::string {
+	/*m_Server.RegisterResource("/ajax/matchtable/get_participants", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
 		return Ajax_GetParticipantsFromMatchTable(Request);
-	});
+	});*/
 
 
 	m_Server.RegisterResource("/ajax/matchtable/get_matches", [this](auto& Request) -> std::string {
@@ -1499,6 +1507,10 @@ void Application::SetupHttpServer()
 			return std::string("No tournament is open");
 
 		MatchTable::Type type = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "type"));
+		int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
+		UUID rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
+		UUID age_group = HttpServer::DecodeURLEncoded(Request.m_Body, "age_group");
+
 		MatchTable* new_table = nullptr;
 
 		switch (type)
@@ -1512,10 +1524,11 @@ void Application::SetupHttpServer()
 
 			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 
-			if (gender < 0 || gender >= 2)
-				new_table = new Weightclass(GetTournament(), minWeight, maxWeight);
-			else
+			if (gender == 0 || gender == 1)
 				new_table = new Weightclass(GetTournament(), minWeight, maxWeight, (Gender)gender);
+			else
+				new_table = new Weightclass(GetTournament(), minWeight, maxWeight);
+				
 			break;
 		}
 
@@ -1531,19 +1544,17 @@ void Application::SetupHttpServer()
 			return std::string("Unknown type");
 		}
 
-		int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
-		auto ruleName = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");//TODO Use ID instead
-
-		new_table->SetMatID(FindDefaultMatID());
 		if (mat >= 0)
 			new_table->SetMatID(mat);
-		if (m_Database.FindRuleSetByName(ruleName))
-			new_table->SetRuleSet(m_Database.FindRuleSetByName(ruleName));
+		else
+			new_table->SetMatID(FindDefaultMatID());
 
+		new_table->SetRuleSet(m_Database.FindRuleSet(rule));
+		new_table->SetAgeGroup(m_Database.FindAgeGroup(age_group));
 
+		LockTillScopeEnd();
 		GetTournament()->Lock();
 		GetTournament()->AddMatchTable(new_table);
-		GetTournament()->GenerateSchedule();
 		GetTournament()->Unlock();
 		return Error();//OK
 	});
@@ -1558,55 +1569,58 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament is open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 		int color = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "color"));
 		int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
-		int rule = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "rule"));
+		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Body, "age_group");
+		UUID rule_set_id  = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		auto table = GetTournament()->FindMatchTable(id);
 
-		auto& tables = GetTournament()->SetMatchTables();
-		auto  table_index = GetTournament()->FindMatchTableIndex(id);
-
-		if (table_index < 0 || !tables[table_index])
+		if (!table)
 			return std::string("Could not find class");
 
+		auto age_group = m_Database.FindAgeGroup(age_group_id);
+		auto rule_set  = m_Database.FindRuleSet(rule_set_id);
 
 		GetTournament()->Lock();
 
 		if (color >= 0)
-			tables[table_index]->SetColor(color);
+			table->SetColor(color);
 
-		tables[table_index]->SetName(name);
+		table->SetName(name);
 
 		if (mat >= 0)
-			tables[table_index]->SetMatID(mat);
-		if (m_Database.FindRuleSet(rule))
-			tables[table_index]->SetRuleSet(m_Database.FindRuleSet(rule));
+			table->SetMatID(mat);
+		
+		table->SetAgeGroup(age_group);
+		GetTournament()->AddAgeGroup(age_group);
+		
+		table->SetRuleSet(rule_set);
+		GetTournament()->AddRuleSet(rule_set);
 
 		GetTournament()->Unlock();
 
 
-		switch (tables[table_index]->GetType())
+		switch (table->GetType())
 		{
 		case MatchTable::Type::Weightclass:
 		{
 			int minWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight"));
 			int maxWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight"));
-			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+			int gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 
 			if (minWeight < 0 || maxWeight < 0)
 				return std::string("Invalid value");
 
-			Weightclass* table = (Weightclass*)tables[table_index];
+			Weightclass* weight_table = (Weightclass*)table;
 
 			GetTournament()->Lock();
 
-			table->SetMinWeight(minWeight);
-			table->SetMaxWeight(maxWeight);
-			table->SetGender((Gender)gender);
+			weight_table->SetMinWeight(minWeight);
+			weight_table->SetMaxWeight(maxWeight);
+			weight_table->SetGender((Gender)gender);
 
 			GetTournament()->Unlock();
 			break;
@@ -1621,6 +1635,36 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/matchtable/generate", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		if (!GetTournament())
+			return std::string("No tournament is open");
+
+		auto min  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "min"));
+		auto max  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "max"));
+		auto diff = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "diff"));
+
+		if (min <= 0 || max <= 0 || diff <= 0)
+			return Error(Error::Type::InvalidInput);
+
+		auto age_groups = GetTournament()->GetAgeGroups();
+		for (auto it = age_groups.begin(); it != age_groups.end();)
+		{
+			if (ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, (std::string)(*it)->GetUUID())) != 1)
+				it = age_groups.erase(it);
+			else
+				++it;
+		}
+
+		return GetTournament()->GenerateWeightclasses(min, max, diff, age_groups);
+
+		//return Error();//OK
+	});
+
+
 	m_Server.RegisterResource("/ajax/matchtable/delete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -1629,14 +1673,10 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament is open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
-
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		GetTournament()->Lock();
-		bool ret = GetTournament()->DeleteMatchTable(id);
+		bool ret = GetTournament()->RemoveMatchTable(id);
 		GetTournament()->Unlock();
 
 		if (!ret)
@@ -1654,15 +1694,18 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament is open");
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		if (id < 0)
-			return std::string("Invalid id");
+		LockTillScopeEnd();
 
-		if (!GetTournament()->FindMatchTable(id))
+		auto match_table = GetTournament()->FindMatchTable(id);
+
+		if (!match_table)
 			return std::string("Could not find class");
 
-		return GetTournament()->FindMatchTable(id)->ToString();
+		YAML::Emitter ret;
+		match_table->ToString(ret);
+		return ret.c_str();
 	});
 
 
@@ -1675,14 +1718,11 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		int whiteID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "white"));
-		int blueID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "blue"));
-
-		if (whiteID < 0 || blueID < 0)
-			return Error(Error::Type::InvalidID);
+		UUID whiteID = HttpServer::DecodeURLEncoded(Request.m_Body, "white");
+		UUID blueID  = HttpServer::DecodeURLEncoded(Request.m_Body, "blue");
 
 		auto white = m_Database.FindJudoka(whiteID);
-		auto blue = m_Database.FindJudoka(blueID);
+		auto blue  = m_Database.FindJudoka(blueID);
 
 		if (!white || !blue)//Judokas exist?
 			return std::string("Judoka not found in database");
@@ -1690,7 +1730,7 @@ void Application::SetupHttpServer()
 		GetTournament()->AddMatch(Match(GetTournament(), white, blue, FindDefaultMatID()));
 
 		return Error();//OK
-		});
+	});
 
 
 	m_Server.RegisterResource("/ajax/match/set_mat", [this](auto& Request) -> std::string {
@@ -1701,11 +1741,13 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		int matchID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID matchID = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
 
-		if (matchID < 0 || matID < 0)
+		if (matID < 0)
 			return Error(Error::Type::InvalidID);
+
+		LockTillScopeEnd();
 
 		auto match = GetTournament()->FindMatch(matchID);
 
@@ -1714,7 +1756,7 @@ void Application::SetupHttpServer()
 
 		match->SetMatID(matID);
 		return Error();//OK
-		});
+	});
 
 
 	//Rule Sets
@@ -1746,7 +1788,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		std::string name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 		int match_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "match_time"));
@@ -1766,24 +1808,22 @@ void Application::SetupHttpServer()
 		*rule = RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time);
 		m_Database.Save();
 		return Error();//OK
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/rule/get", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto rule = m_Database.FindRuleSet(id);
 		if (!rule)
 			return std::string("Could not find rule set in database");
 
-		ZED::CSV ret;
-		ret << rule->GetName() << rule->GetMatchTime() << rule->GetGoldenScoreTime();
-		ret << rule->GetOsaeKomiTime(false) << rule->GetOsaeKomiTime(true);
-		ret << rule->IsYukoEnabled() << rule->IsKokaEnabled() << rule->IsDrawAllowed() << rule->GetBreakTime();
-		return ret;
+		YAML::Emitter ret;
+		*rule >> ret;
+		return ret.c_str();
 	});
 
 	m_Server.RegisterResource("/ajax/rule/list", [this](auto& Request) -> std::string {
@@ -1792,23 +1832,90 @@ void Application::SetupHttpServer()
 			return error;
 
 		auto& rules = m_Database.GetRuleSets();
-		ZED::CSV ret;
+		YAML::Emitter ret;
+
+		ret << YAML::BeginMap;
 
 		if (GetTournament() && GetTournament()->GetDefaultRuleSet())
-			ret << GetTournament()->GetDefaultRuleSet()->GetID();
-		else if (!rules.empty())
-			ret << rules[0]->GetID();
-		else
-			ret << 0;
+			ret << YAML::Key << "default" << YAML::Value << (std::string)GetTournament()->GetDefaultRuleSet()->GetUUID();
+
+		ret << YAML::Key << "rules" << YAML::Value;
+		ret << YAML::BeginSeq;
 
 		for (auto rule : rules)
 		{
 			if (rule)
-				ret << rule->GetID() << rule->GetName() << rule->GetDescription();
+			{
+				ret << YAML::BeginMap;
+				ret << YAML::Key << "uuid" << YAML::Value << (std::string)rule->GetUUID();
+				ret << YAML::Key << "name" << YAML::Value << (std::string)rule->GetName();
+				ret << YAML::Key << "desc" << YAML::Value << (std::string)rule->GetDescription();
+				ret << YAML::EndMap;
+			}
 		}
 
-		return (std::string)ret;
-		});
+		ret << YAML::EndSeq;
+		ret << YAML::EndMap;
+
+		return ret.c_str();
+	});
+
+
+	//Age groups
+
+	m_Server.RegisterResource("/ajax/age_groups/list", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_ListAllAgeGroups();
+	});
+
+	m_Server.RegisterResource("/ajax/age_groups/get", [this](auto& Request) -> std::string {
+		if (!IsLoggedIn(Request))
+			return (std::string)Error(Error::Type::NotLoggedIn);
+
+		LockTillScopeEnd();//In case the tournament gets closed at the same time
+
+		YAML::Emitter yaml;
+		GetTournament()->ListAgeGroups(yaml);
+		return yaml.c_str();
+	});
+
+	m_Server.RegisterResource("/ajax/age_groups/select", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+		auto age_group = m_Database.FindAgeGroup(age_group_id);
+
+		if (!age_group)
+			return Error(Error::Type::ItemNotFound);
+
+		LockTillScopeEnd();//In case the tournament gets closed at the same time
+
+		if (!GetTournament()->AddAgeGroup(age_group))
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/age_groups/remove", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+		LockTillScopeEnd();//In case the tournament gets closed at the same time
+
+		if (!GetTournament()->RemoveAgeGroup(age_group_id))
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
+	});
 
 
 	//Tournaments
@@ -1819,9 +1926,9 @@ void Application::SetupHttpServer()
 			return error;
 
 		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-		auto rule_id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "rules"));
+		UUID rule_id = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
 
-		if (FindTournament(name))
+		if (FindTournamentByName(name))
 			return std::string("There is already a tournament with that name");
 
 		auto rules = m_Database.FindRuleSet(rule_id);
@@ -1831,10 +1938,45 @@ void Application::SetupHttpServer()
 		Tournament* new_tournament = new Tournament(name);
 		new_tournament->SetDefaultRuleSet(rules);
 
+		LockTillScopeEnd();//In case the tournament gets closed at the same time
+
 		if (!AddTournament(new_tournament))
 			return std::string("Could not add tournament");
 
 		new_tournament->Save();
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/tournament/update", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+		UUID rule_id = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
+
+		LockTillScopeEnd();
+
+		auto tournament = FindTournament(id);
+		if (!tournament)
+			return Error(Error::Type::ItemNotFound);
+
+		//Check if the tournament is closed
+		if (tournament->GetName() == GetTournament()->GetName())
+			return Error(Error::Type::OperationFailed);
+
+		auto rules = m_Database.FindRuleSet(rule_id);
+		if (!rules)
+			ZED::Log::Warn("Adding tournament: Could not find rule set in database");
+
+		tournament->SetName(name);
+		tournament->SetDefaultRuleSet(rules);
+		if (!tournament->Save())
+			return Error(Error::Type::OperationFailed);
+
+		//TODO delete the old tournament file
+
 		return Error();//OK
 	});
 
@@ -1843,10 +1985,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return std::string("Invalid tournament id");
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto tournament = FindTournament(id);
 		if (!tournament)
@@ -1856,10 +1995,32 @@ void Application::SetupHttpServer()
 		ret << tournament->GetName() << tournament->GetParticipants().size();
 		ret << tournament->GetSchedule().size() << tournament->GetStatus();
 		if (tournament->GetDefaultRuleSet())
-			ret << tournament->GetDefaultRuleSet()->GetID();
+			ret << (std::string)tournament->GetDefaultRuleSet()->GetUUID();
 		else
 			ret << -1;
 		return ret;
+	});
+
+	m_Server.RegisterResource("/ajax/tournament/assign_age_group", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		UUID id           = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "age");
+
+		auto judoka    = GetTournament()->FindParticipant(id);
+		auto age_group = GetTournament()->FindAgeGroup(age_group_id);
+
+		if (!judoka || !age_group)
+			return Error(Error::Type::ItemNotFound);
+
+		LockTillScopeEnd();//In case the tournament gets closed at the same time
+
+		if (!GetTournament()->AssignJudokaToAgeGroup(judoka, age_group))
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/open", [this](auto& Request) -> std::string {
@@ -1867,10 +2028,9 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		if (id < 0)
-			return std::string("Invalid tournament id");
+		LockTillScopeEnd();
 
 		if (!OpenTournament(id))
 			return std::string("Could not open tournament");
@@ -1882,6 +2042,8 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
+
+		LockTillScopeEnd();
 
 		if (GetTournament())
 			GetTournament()->Save();
@@ -1897,10 +2059,9 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		LockTillScopeEnd();
 
 		auto tournament = FindTournament(id);
 		if (!tournament)
@@ -1915,10 +2076,9 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		LockTillScopeEnd();
 
 		if (!DeleteTournament(id))
 			return Error(Error::Type::OperationFailed);
@@ -1931,10 +2091,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto tournament = FindTournament(id);
 		if (!tournament)
@@ -1952,10 +2109,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id < 0)
-			return Error(Error::Type::InvalidID);
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		auto tournament = FindTournament(id);
 		if (!tournament)
@@ -1982,9 +2136,9 @@ void Application::SetupHttpServer()
 		{
 			if (tournament)//Filter out temporary tournament
 			{
-				ret << tournament->GetID() << tournament->GetName() << tournament->GetParticipants().size() << tournament->GetSchedule().size() << tournament->GetStatus();
+				ret << (std::string)tournament->GetUUID() << tournament->GetName() << tournament->GetParticipants().size() << tournament->GetSchedule().size() << tournament->GetStatus();
 				//Is the tournament open?
-				ret << (m_CurrentTournament && tournament->GetID() == m_CurrentTournament->GetID());
+				ret << (m_CurrentTournament && tournament->GetUUID() == m_CurrentTournament->GetUUID());
 			}
 		}
 
@@ -2288,18 +2442,18 @@ void Application::SetupHttpServer()
 		if (!IsMaster())
 			return "You are not allowed to connect";
 
-		auto uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "uuid");
+		UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "uuid");
 
 		ZED::Log::Info("Slave requested participant info");
 
-		auto judoka = GetTournament()->FindParticipant(UUID(std::move(uuid)));
+		auto judoka = GetTournament()->FindParticipant(uuid);
 
 		if (!judoka)
 			return "Not found";
 
-		ZED::CSV csv;
-		*judoka >> csv;
-		return csv;
+		YAML::Emitter yaml;
+		*judoka >> yaml;
+		return yaml.c_str();
 	});
 
 	m_Server.RegisterResource("/ajax/master/post_match_result", [this](auto& Request) -> std::string {
@@ -2342,14 +2496,19 @@ Error Application::Ajax_UpdatePassword(Account* Account, const HttpServer::Reque
 
 
 
-ZED::CSV Application::Ajax_GetMats() const
+std::string Application::Ajax_GetMats() const
 {
-	ZED::CSV ret;
+	YAML::Emitter ret;
 
 	if (GetTournament())
 	{//Show all mats that are available/used and an additional one
 		auto max = std::max(GetHighestMatID(), GetTournament()->GetHighestMatIDUsed()) + 1;
-		ret << max;
+
+		ret << YAML::BeginMap;
+		ret << YAML::Key << "highest_mat_id" << YAML::Value << max;
+
+		ret << YAML::Key << "mats" << YAML::Value;
+		ret << YAML::BeginSeq;
 
 		for (uint32_t id = 1; id <= max; id++)
 		{
@@ -2358,15 +2517,33 @@ ZED::CSV Application::Ajax_GetMats() const
 			if (!mat)
 			{
 				std::string mat_name = Localizer::Translate("Mat") + " " + std::to_string(id);
-				ret << id << IMat::Type::Unknown << false << mat_name << 0 << 0 << false;
+				//ret << id << IMat::Type::Unknown << false << mat_name << 0 << 0 << false;
+
+				ret << YAML::BeginMap;
+				ret << YAML::Key << "id"   << YAML::Value << id;
+				ret << YAML::Key << "name" << YAML::Value << mat_name;
+				ret << YAML::EndMap;
 			}
 			else
-				ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponStyle() << mat->GetTimerStyle() << mat->IsFullscreen();
+			{
+				//ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponStyle() << mat->GetTimerStyle() << mat->IsFullscreen();
+				ret << YAML::BeginMap;
+				ret << YAML::Key << "id"      << YAML::Value << id;
+				ret << YAML::Key << "name"    << YAML::Value << mat->GetName();
+				ret << YAML::Key << "type"    << YAML::Value << (int)mat->GetType();
+				ret << YAML::Key << "is_open" << YAML::Value << mat->IsOpen();
+				ret << YAML::Key << "ippon_style"   << YAML::Value << (int)mat->GetIpponStyle();
+				ret << YAML::Key << "timer_style"   << YAML::Value << (int)mat->GetTimerStyle();
+				ret << YAML::Key << "is_fullscreen" << YAML::Value << mat->IsFullscreen();
+				ret << YAML::EndMap;
+			}
 		}
+
+		ret << YAML::EndSeq;
+		ret << YAML::EndMap;
 	}
 
-	ret.AddNewline();
-	return ret;
+	return ret.c_str();
 }
 
 
@@ -2482,16 +2659,44 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 
 
 
-ZED::CSV Application::Ajax_ListClubs()
+std::string Application::Ajax_ListClubs()
 {
-	ZED::CSV ret;
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
 	for (auto club : m_Database.GetAllClubs())
 	{
 		if (club)
-			ret << club->GetID() << club->GetName();
+			*club >> ret;
 	}
-	ret.AddNewline();
-	return ret;
+
+	ret << YAML::EndSeq;
+	return ret.c_str();
+}
+
+
+
+std::string Application::Ajax_ListAllAgeGroups() const
+{
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
+	for (const auto age_group : GetDatabase().GetAgeGroups())
+	{
+		if (age_group)
+		{
+			ret << YAML::BeginMap;
+
+			age_group->ToString(ret);
+			bool is_used = GetTournament()->FindAgeGroup(age_group->GetUUID());
+			ret << YAML::Key << "is_used" << YAML::Value << is_used;
+
+			ret << YAML::EndMap;
+		}
+	}
+
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 
@@ -2501,10 +2706,9 @@ std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Re
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
 
-	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-	if (id < 0)
-		return Error(Error::Type::InvalidID);
+	LockTillScopeEnd();
 
 	auto table = GetTournament()->FindMatchTable(id);
 
@@ -2514,14 +2718,16 @@ std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Re
 
 	GetTournament()->Lock();
 
-	ZED::CSV ret;
-	for (auto judoka : table->GetParticipants())
-		ret << judoka->GetID() << judoka->GetName();
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
 
+	for (auto judoka : table->GetParticipants())
+		judoka->ToString(ret);
+
+	ret << YAML::EndSeq;
 	GetTournament()->Unlock();
 	
-	ret.AddNewline();
-	return ret;
+	return ret.c_str();
 }
 
 
@@ -2531,10 +2737,7 @@ std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
 
-	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-	if (id < 0)
-		return Error(Error::Type::InvalidID);
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 	auto table = GetTournament()->FindMatchTable(id);
 
@@ -2544,14 +2747,15 @@ std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request
 
 	GetTournament()->Lock();
 
-	ZED::CSV ret;
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
 	for (auto match : table->GetSchedule())
-		ret << match->ToString();
+		match->ToString(ret);
+	ret << YAML::EndSeq;
 
 	GetTournament()->Unlock();
 
-	ret.AddNewline();
-	return ret;
+	return ret.c_str();
 }
 
 

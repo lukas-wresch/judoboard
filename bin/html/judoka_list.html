@@ -6,9 +6,10 @@
   <tr>
     <th style="width: 4cm;" id="firstname">Firstname</th>
     <th style="width: 4cm;" id="lastname">Lastname</th>
+    <th style="width: 3.5cm;" id="club">Club</th>
     <th style="width: 2cm;" id="weight">Weight</th>
     <th style="width: 2cm;" id="gender">Gender</th>
-    <th style="width: 2cm;"></th>
+    <th style="width: 2cm;" id="options">Options</th>
   </tr>
 </table>
 
@@ -19,42 +20,45 @@ function GetJudokaList()
 {
   AjaxCallback("ajax/judoka/list", function(response) {
     console.log(response);
-    var res = response.split(",");
-
-    if (res.length < 4)
-      return;
+    var res = YAML.parse(response);
 
     var table = document.getElementById("list");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    for (var i=0; i < res.length;)
+    for (const judoka of res)
     {
       var row = table.insertRow(-1);
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
-      var cell3 = row.insertCell(2);
-      var cell4 = row.insertCell(3);
-      var cell5 = row.insertCell(4);
+      var cell6 = row.insertCell(2);
+      var cell3 = row.insertCell(3);
+      var cell4 = row.insertCell(4);
+      var cell5 = row.insertCell(5);
 
-      var id = res[i++];
-      cell1.innerHTML = res[i++];
-      cell2.innerHTML = res[i++];
-      cell3.innerHTML = res[i++] + " kg";
-      var gender    = res[i++];
-      var birthyear = res[i++];
-      var clubID    = res[i++];
+      cell1.style.fontSize  = "16pt";
+      cell1.innerHTML = judoka.firstname;
+      cell2.style.fontSize  = "16pt";
+      cell2.innerHTML = judoka.lastname;
+
+      cell6.style.fontSize  = "14pt";
+      if (typeof judoka.club_name !== 'undefined')
+        cell6.innerHTML = judoka.club_name;
+      else
+        cell6.innerHTML = "- - -";
+
+      cell3.style.fontSize  = "16pt";
+      cell3.innerHTML = judoka.weight + " kg";
 
 
-      if (gender == 0)
+      if (judoka.gender == 0)
         cell4.innerHTML = lang.male;
       else
         cell4.innerHTML = lang.female;
       
 
-      //cell5.innerHTML = "<a href=\"#judoka_edit.html?id="+id+"\">Edit Judoka</a>";
-      cell5.innerHTML = "<button class=\"white\" style=\"width: 3.3cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"judoka_add.html?id="+id+"\");>Edit Judoka</button>";
+      cell5.innerHTML = "<button class=\"white\" style=\"width: 3.3cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"judoka_add.html?id="+judoka.uuid+"\");>Edit Judoka</button>";
     }
   });
 }
@@ -68,5 +72,6 @@ document.getElementById("firstname").innerHTML = lang.firstname;
 document.getElementById("lastname").innerHTML  = lang.lastname;
 document.getElementById("weight").innerHTML    = lang.weight;
 document.getElementById("gender").innerHTML    = lang.gender;
+document.getElementById("club").innerHTML      = lang.club;
 
 </script>

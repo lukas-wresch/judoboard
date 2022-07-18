@@ -22,6 +22,8 @@ namespace Judoboard
 		bool operator == (const UUID& rhs) const noexcept { return m_UUID == rhs.m_UUID; }
 		bool operator != (const UUID& rhs) const noexcept { return m_UUID != rhs.m_UUID; }
 
+		bool operator == (const std::string& rhs) const noexcept { return m_UUID == rhs; }
+
 		void operator = (UUID&& NewUUID) noexcept { m_UUID = std::move(NewUUID.m_UUID); }
 
 	protected:
@@ -47,7 +49,6 @@ namespace Judoboard
 		static const UUID GenerateUUID();
 		static void Reset();
 
-		uint32_t GetID() const { return m_ID; }
 		const UUID& GetUUID() const { return m_UUID; }
 
 		operator const UUID& () const { return m_UUID; }
@@ -57,9 +58,6 @@ namespace Judoboard
 		//void SetUUID(const std::string& UUID) { m_UUID = UUID; }
 
 	private:
-		void SetID(uint32_t ID) { m_ID = ID; }
-
-		uint32_t m_ID = 0;
 		UUID m_UUID;
 
 		static uint32_t s_NextID;

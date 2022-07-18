@@ -13,6 +13,7 @@ namespace Judoboard
 	class Tournament;
 	class Match;
 	class RuleSet;
+	class AgeGroup;
 
 
 
@@ -103,12 +104,13 @@ namespace Judoboard
 		const RuleSet& GetRuleSet() const;
 		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
 
-		const std::string GetName() const override { return m_Name; }
-		void SetName(const std::string& Name)
-		{
-			m_Name = Name;
-			ReplaceAll(m_Name, ",", "&#44;");//Escape all ','
-		}
+		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
+		void SetAgeGroup(const AgeGroup* NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
+
+		std::string GetName() const { return m_Name; }
+		void SetName(const std::string& Name) { m_Name = Name; }
+
+		virtual std::string GetDescription() const = 0;
 
 		//Serialization
 		virtual const std::string ToString() const;
@@ -123,6 +125,7 @@ namespace Judoboard
 
 		virtual void operator >> (ZED::CSV& Stream) const;
 		virtual void operator >> (YAML::Emitter& Yaml) const;
+		virtual void ToString(YAML::Emitter& Yaml) const;
 
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
@@ -132,7 +135,9 @@ namespace Judoboard
 		std::vector<Match*>& SetSchedule() { return m_Schedule; }
 
 		std::vector<Judoka*> m_Participants;
-		const RuleSet* m_Rules = nullptr;//Custom rule set for the match (if available)
+		const RuleSet* m_Rules = nullptr;//Custom rule set for the matches (if available)
+
+		const AgeGroup* m_pAgeGroup = nullptr;//Age group for the matches (if available)
 
 		std::string m_Name;
 	};

@@ -65,9 +65,9 @@ function GetTournaments()
       }
 
       if (is_open == 0)
-        cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenTournament(" + id + ");\">Open</button>" + "<button class=\"neutral\" onclick=\"navigate('tournament_add.html?id=" + id + "');\">Edit</button>";
+        cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenTournament('" + id + "');\">Open</button>" + "<button class=\"neutral\" onclick=\"navigate('tournament_add.html?id=" + id + "');\">Edit</button>";
       else
-        cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseTournament(" + id + ");\">Close</button>";
+        cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseTournament('" + id + "');\">Close</button>";
     }
   });
 }
