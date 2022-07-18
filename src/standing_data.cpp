@@ -144,7 +144,7 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 	if (!NewJudoka)
 		return false;
 
-	m_Judokas.insert({ (std::string)NewJudoka->GetUUID(), NewJudoka });
+	m_Judokas.insert({ NewJudoka->GetUUID(), NewJudoka });
 	return true;
 }
 

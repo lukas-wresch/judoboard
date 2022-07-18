@@ -2,6 +2,7 @@
 #include "id.h"
 #include "rule_set.h"
 #include "judoka.h"
+#include "md5.h"
 
 
 namespace YAML
@@ -21,6 +22,7 @@ namespace Judoboard
 	public:
 		AgeGroup(const std::string& Name, uint32_t MinAge, uint32_t MaxAge, const RuleSet* Rules, const StandingData& StandingData);
 		AgeGroup(const YAML::Node& Yaml, const StandingData& StandingData);
+		AgeGroup(const MD5::AgeGroup& AgeGroup, const StandingData& StandingData);
 
 		std::string GetName() const { return m_Name; }
 		const RuleSet* GetRuleSet() const { return m_pRules; }

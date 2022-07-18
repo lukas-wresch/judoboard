@@ -25,6 +25,9 @@ namespace Judoboard
 
 		virtual std::vector<Result> CalculateResults() const override;
 
+		auto GetMinWeight() const { return m_MinWeight; }
+		auto GetMaxWeight() const { return m_MaxWeight; }
+		auto GetGender()    const { return m_Gender; }
 		void SetMinWeight(uint16_t MinWeight) { m_MinWeight = MinWeight; }
 		void SetMaxWeight(uint16_t MaxWeight) { m_MaxWeight = MaxWeight; }
 		void SetGender(Gender Gender) { m_Gender = Gender; }
@@ -40,8 +43,8 @@ namespace Judoboard
 
 
 	private:
-		uint16_t m_MinWeight = 10;
-		uint16_t m_MaxWeight = 100;
+		uint32_t m_MinWeight = 10*1000;//In gramms
+		uint32_t m_MaxWeight = 100*1000;//In gramms
 
 		Gender m_Gender = Gender::Unknown;
 	};

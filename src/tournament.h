@@ -65,7 +65,7 @@ namespace Judoboard
 
 		//Participant / Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const override { return m_StandingData.FindJudoka(Judoka.GetUUID()); }
-		const std::unordered_map<std::string, Judoka*>& GetParticipants() const { return m_StandingData.GetAllJudokas(); }
+		const std::unordered_map<UUID, Judoka*>& GetParticipants() const { return m_StandingData.GetAllJudokas(); }
 		virtual bool AddParticipant(Judoka* Judoka) override;
 		virtual bool RemoveParticipant(const UUID& UUID) override;
 

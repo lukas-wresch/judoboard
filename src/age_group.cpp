@@ -37,6 +37,17 @@ AgeGroup::AgeGroup(const YAML::Node& Yaml, const StandingData& StandingData)
 
 
 
+AgeGroup::AgeGroup(const MD5::AgeGroup& AgeGroup, const StandingData& StandingData)
+	: m_StandingData(StandingData)
+{
+	m_Name = AgeGroup.Name;
+	auto year = StandingData.GetYear();
+	m_MinAge = year - AgeGroup.MaxBirthyear + 1;
+	m_MaxAge = year - AgeGroup.MinBirthyear + 1;
+}
+
+
+
 bool AgeGroup::IsElgiable(const Judoka& Fighter) const
 {
 	uint32_t age = m_StandingData.GetYear() - Fighter.GetBirthyear();

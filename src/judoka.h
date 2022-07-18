@@ -31,7 +31,6 @@ namespace Judoboard
 
 	public:
 		Judoka(const std::string& Firstname, const std::string& Lastname, uint32_t Weight = 0, Gender Gender = Gender::Male, uint32_t Birthyear = 0);
-		Judoka(ZED::CSV& Stream, const StandingData* pStandingData = nullptr);//Load judoka from file
 		Judoka(const YAML::Node& Yaml, const StandingData* pStandingData = nullptr);//Load judoka from file
 		Judoka(const DM4::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from DM4 data
 		Judoka(const MD5::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from MD5 data
@@ -40,10 +39,6 @@ namespace Judoboard
 		uint32_t GetWeight() const { return m_Weight; }
 		uint16_t GetAge() const;
 		const std::string GetName() const { return m_Firstname + " " + m_Lastname; }
-
-		//[[deprecated]]
-		//const std::string GetShortName() const;
-		//const std::string ToHexString() const;
 
 		const std::string GetFirstname() const { return m_Firstname; }
 		const std::string GetLastname()  const { return m_Lastname;  }

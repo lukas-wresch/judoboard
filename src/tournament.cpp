@@ -36,6 +36,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 {
 	m_Name = File.GetDescription();
 
+	int day, month, year;
+	if (sscanf_s(File.GetDateStart().c_str(), "D%d-%d-%d", &year, &month, &day) == 3)
+		m_StandingData.SetYear(year);
+
 	//Add clubs
 	for (auto club : File.GetClubs())
 	{
@@ -47,6 +51,14 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		else
 			m_StandingData.AddClub(new Club(*club));
+	}
+
+	//Add age groups
+	for (auto age_group : File.GetAgeGroups())
+	{
+		auto new_age_group = new AgeGroup(*age_group, m_StandingData);
+		age_group->pUserData = new_age_group;
+		m_StandingData.AddAgeGroup(new_age_group);
 	}
 
 	//Add weightclasses

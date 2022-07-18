@@ -1,6 +1,9 @@
 #include <cassert>
 #include <array>
 #include "md5.h"
+#include "tournament.h"
+#include "weightclass.h"
+#include "age_group.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/file.h"
 
@@ -22,15 +25,105 @@ MD5::MD5(const std::string& Filename)
 
 
 
-MD5::MD5(const ITournament* Tournament)
+MD5::MD5(const Tournament& Tournament)
 {
-	if (!Tournament)
+	m_Description = Tournament.GetName();
+	m_FileDate = "01.01." + std::to_string(Tournament.GetDatabase().GetYear());
+
+	std::unordered_map<UUID, int> UUID2ID;
+	int id = 1;
+
+	auto uuid2id = [&](const UUID& UUID) {
+		auto it = UUID2ID.find(UUID);
+		if (it != UUID2ID.end())
+			return it->second;
+		return -1;
+	};
+
+
+	for (auto [uuid, judoka] : Tournament.GetParticipants())
 	{
-		ZED::Log::Error("Internal error");
-		return;
+		Participant* new_judoka = new Participant;
+
+		new_judoka->ID = id++;
+		new_judoka->Firstname = judoka->GetFirstname();
+		new_judoka->Lastname  = judoka->GetLastname();
+		new_judoka->WeightInGramm = judoka->GetWeight();
+		new_judoka->Birthyear     = judoka->GetBirthyear();
+
+		m_Participants.emplace_back(new_judoka);
+		UUID2ID.insert({ uuid, id - 1 });
 	}
 
-	ZED::Log::Error("NOT IMPLEMENTED");
+	for (auto age_group : Tournament.GetAgeGroups())
+	{
+		AgeGroup* new_age_group = new AgeGroup;
+
+		new_age_group->ID = id++;
+		new_age_group->Name         = age_group->GetName();
+		new_age_group->MinBirthyear = age_group->GetMinAge();
+		new_age_group->MaxBirthyear = age_group->GetMaxAge();
+
+		m_AgeGroups.emplace_back(new_age_group);
+		UUID2ID.insert({ age_group->GetUUID(), id - 1 });
+	}
+
+	for (auto match_table : Tournament.GetMatchTables())
+	{
+		if (match_table->GetType() != MatchTable::Type::Weightclass)
+			continue;
+
+		auto weightclass = (Judoboard::Weightclass*)match_table;
+
+		Weightclass* new_weightclass = new Weightclass;
+
+		new_weightclass->ID = id++;
+		new_weightclass->Description               = weightclass->GetName();
+		new_weightclass->WeightLargerThan          = weightclass->GetMinWeight() / 1000;
+		new_weightclass->WeightInGrammsLargerThan  = weightclass->GetMinWeight();
+		new_weightclass->WeightSmallerThan         = weightclass->GetMaxWeight() / 1000;
+		new_weightclass->WeightInGrammsSmallerThan = weightclass->GetMaxWeight();
+
+		m_Weightclasses.emplace_back(new_weightclass);
+		UUID2ID.insert({ weightclass->GetUUID(), id - 1 });
+	}
+
+	for (auto match : Tournament.GetSchedule())
+	{
+		if (!match->HasValidFighters())//TODO
+			continue;
+
+		Match new_match;
+		new_match.WhiteID = uuid2id(match->GetFighter(Fighter::White)->GetUUID());
+		new_match.RedID   = uuid2id(match->GetFighter(Fighter::Blue )->GetUUID());
+
+		if (match->GetMatchTable() && match->GetMatchTable()->GetAgeGroup())
+			new_match.Weightclass = FindWeightclass(uuid2id(match->GetMatchTable()->GetAgeGroup()->GetUUID()),
+													uuid2id(match->GetMatchTable()->GetUUID()));
+
+		if (match->HasConcluded())
+		{//Convert result
+			if (match->GetMatchResult().m_Winner == Winner::White)
+			{
+				new_match.WinnerID = new_match.WhiteID;
+				new_match.LoserID  = new_match.RedID;
+			}
+			else if (match->GetMatchResult().m_Winner == Winner::Blue)
+			{
+				new_match.WinnerID = new_match.RedID;
+				new_match.LoserID  = new_match.WhiteID;
+			}
+			else
+			{
+				//TODO draw can not be converted
+			}
+
+			new_match.ScoreWinner = (int)match->GetMatchResult().m_Score;
+			new_match.Time        = match->GetMatchResult().m_Time / 1000;
+		}
+
+		m_Matches.emplace_back(new_match);
+	}
 }
 
 

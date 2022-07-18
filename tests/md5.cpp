@@ -1261,7 +1261,7 @@ TEST(MD5, ConvertToMD5)
 	Database db;
 	Tournament tour_temp(file, &db);//Convert to native
 
-	MD5 md5_tournament(&tour_temp);//Convert back to MD5
+	MD5 md5_tournament(tour_temp);//Convert back to MD5
 
 	Tournament tour(md5_tournament, &db);//Convert back to native
 

@@ -46,19 +46,16 @@ Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament*
 	else
 		SetName(Weightclass.Description);
 
-	if (Weightclass.WeightLargerThan > 0)
-		m_MinWeight = Weightclass.WeightLargerThan;
-	if (Weightclass.WeightSmallerThan > 0)
-		m_MaxWeight = Weightclass.WeightSmallerThan;
+	if (Weightclass.WeightInGrammsLargerThan > 0)
+		m_MinWeight = Weightclass.WeightInGrammsLargerThan;
+	if (Weightclass.WeightInGrammsSmallerThan > 0)
+		m_MaxWeight = Weightclass.WeightInGrammsSmallerThan;
 
 	if (Weightclass.AgeGroup)
 	{
 		m_Gender = Weightclass.AgeGroup->Gender;
 
-		//TODO convert birthyear to actual age limit
-		//m_MinAge = Weightclass.AgeGroup->MinBirthyear;
-		//m_MaxAge = Weightclass.AgeGroup->MaxBirthyear;
-		//m_AgeEnforced = true;
+		//TODO connect to age group
 	}
 }
 

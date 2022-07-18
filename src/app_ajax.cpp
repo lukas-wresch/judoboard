@@ -2111,12 +2111,14 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();
+
 		auto tournament = FindTournament(id);
 		if (!tournament)
 			return std::string("Could not find tournament");
 
 		//Convert to MD5 and save
-		MD5 md5_tournament(GetTournament());
+		MD5 md5_tournament(*tournament);
 
 		std::string filename = tournament->GetName() + ".md5";
 		md5_tournament.Save(filename);
