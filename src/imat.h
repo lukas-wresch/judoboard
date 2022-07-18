@@ -198,7 +198,7 @@ namespace Judoboard
 		uint32_t m_ID = 1;
 
 		//Configuration
-		TimerStyle m_TimerStyle = TimerStyle::HundredsMS;
+		TimerStyle m_TimerStyle = TimerStyle::OnlySeconds;
 		IpponStyle m_IpponStyle = IpponStyle::DoubleDigit;
 		//IpponStyle m_IpponStyle = IpponStyle::SpelledOut;
 		bool m_IsFullscreen = true;
