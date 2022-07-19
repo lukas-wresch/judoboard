@@ -69,7 +69,7 @@ MD5::MD5(const Tournament& Tournament)
 		new_judoka->ID = id++;
 		new_judoka->Firstname = judoka->GetFirstname();
 		new_judoka->Lastname  = judoka->GetLastname();
-		new_judoka->WeightInGramm = judoka->GetWeight();
+		new_judoka->WeightInGrams = judoka->GetWeight();
 		new_judoka->Birthyear     = judoka->GetBirthyear();
 
 		m_Participants.emplace_back(new_judoka);
@@ -662,10 +662,10 @@ bool MD5::Save(const std::string& Filename) const
 			Write_Int(judoka->GKParticipantID);
 			Write_Line(judoka->MoneyIncreased ? "T" : "F");
 
-			if (judoka->WeightInGramm < 0)
+			if (judoka->WeightInGrams < 0)
 				Write_Line("");
 			else
-				Write_Int(judoka->WeightInGramm);
+				Write_Int(judoka->WeightInGrams);
 		}
 
 		file.Seek(-1);//Delete last \0

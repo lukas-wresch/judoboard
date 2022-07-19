@@ -159,7 +159,7 @@ Judoka* Database::UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly,
 				if (NewJudoka.Birthyear > 0)
 					old_judoka->SetBirthyear(NewJudoka.Birthyear);
 				if (NewJudoka.WeightInGrams > 0)
-					old_judoka->SetWeightInGrams(NewJudoka.WeightInGrams);
+					old_judoka->SetWeight(NewJudoka.WeightInGrams);
 			}
 
 			return old_judoka;
@@ -205,8 +205,8 @@ Judoka* Database::UpdateOrAdd(const Judoka& NewJudoka, bool ParseOnly, std::stri
 					old_judoka->SetClub(FindClubByName(NewJudoka.GetClub()->GetName()));
 				if (NewJudoka.GetBirthyear() > 0)
 					old_judoka->SetBirthyear(NewJudoka.GetBirthyear());
-				if (NewJudoka.GetWeightInGrams() > 0)
-					old_judoka->SetWeightInGrams(NewJudoka.GetWeightInGrams());
+				if (NewJudoka.GetWeight() > 0)
+					old_judoka->SetWeight(NewJudoka.GetWeight());
 			}
 
 			return old_judoka;

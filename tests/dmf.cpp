@@ -39,11 +39,7 @@ TEST(DMF, Read_second_age_group1_m)
 {
 	initialize();
 
-#ifdef _WIN32
-	DMF file("../test-data/secondage group1 (m).dmf");
-#else
 	DMF file("test-data/secondage group1 (m).dmf");
-#endif
 
 	ASSERT_TRUE(file);
 
