@@ -154,12 +154,12 @@ Judoka* Database::UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly,
 
 			if (!ParseOnly)
 			{
-				if (NewJudoka.Club)
+				if (NewJudoka.Club && FindClubByName(NewJudoka.Club->Name))
 					old_judoka->SetClub(FindClubByName(NewJudoka.Club->Name));
 				if (NewJudoka.Birthyear > 0)
 					old_judoka->SetBirthyear(NewJudoka.Birthyear);
-				if (NewJudoka.Weight > 0)
-					old_judoka->SetWeight(NewJudoka.Weight);
+				if (NewJudoka.WeightInGrams > 0)
+					old_judoka->SetWeightInGrams(NewJudoka.WeightInGrams);
 			}
 
 			return old_judoka;
@@ -169,6 +169,53 @@ Judoka* Database::UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly,
 		{
 			//Add to database
 			Output += "Adding judoka: " + NewJudoka.Firstname + " " + NewJudoka.Lastname + "<br/>";
+
+			if (!ParseOnly)
+			{
+				auto new_judoka = new Judoka(NewJudoka);
+				AddJudoka(new_judoka);
+				return new_judoka;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+
+
+Judoka* Database::UpdateOrAdd(const Judoka& NewJudoka, bool ParseOnly, std::string& Output)
+{
+	auto old_judoka = FindJudoka_ExactMatch(NewJudoka);
+
+	if (old_judoka)//Exact match
+		return old_judoka;
+
+	else//No exact match
+	{
+		old_judoka = FindJudoka_SameName(NewJudoka);
+
+		if (old_judoka)//Found someone with the right name but incorrect club/birthyear
+		{
+			Output += "Updating information of judoka: " + old_judoka->GetName() + "<br/>";
+
+			if (!ParseOnly)
+			{
+				if (NewJudoka.GetClub() && FindClubByName(NewJudoka.GetClub()->GetName()))
+					old_judoka->SetClub(FindClubByName(NewJudoka.GetClub()->GetName()));
+				if (NewJudoka.GetBirthyear() > 0)
+					old_judoka->SetBirthyear(NewJudoka.GetBirthyear());
+				if (NewJudoka.GetWeightInGrams() > 0)
+					old_judoka->SetWeightInGrams(NewJudoka.GetWeightInGrams());
+			}
+
+			return old_judoka;
+		}
+
+		else//We don't have a judoka with this name
+		{
+			//Add to database
+			Output += "Adding judoka: " + NewJudoka.GetFirstname() + " " + NewJudoka.GetLastname() + "<br/>";
 
 			if (!ParseOnly)
 			{

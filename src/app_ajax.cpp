@@ -96,6 +96,41 @@ void Application::SetupHttpServer()
 		return Error(Error::Type::InvalidFormat);
 	});
 
+	m_Server.RegisterResource("/upload/dmf", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		//ZED::Log::Debug(Request.m_Body);
+
+		auto pos = Request.m_Body.Find("\r\n\r\n");
+		if (pos != 0)
+		{
+			//std::string body_after_boundary = Request.m_Body.substr(pos + 4)
+			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
+
+			if (boundary_end == 0)
+				return Error(Error::Type::InvalidFormat);
+
+			DMF dmf_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
+
+			if (!dmf_file)
+				return Error(Error::Type::InvalidFormat);
+
+			bool success;
+			auto output = AddDMFFile(dmf_file, true, &success);
+
+			if (!success)
+				return "Parsing FAILED<br/><br/>" + output;
+
+			AddDMFFile(dmf_file);//apply DM4 file
+
+			return "Parsing OK<br/><br/>" + output;
+		}
+
+		return Error(Error::Type::InvalidFormat);
+	});
+
 	m_Server.RegisterResource("/upload/md5", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)

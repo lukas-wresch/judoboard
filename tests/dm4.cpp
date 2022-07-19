@@ -34,7 +34,7 @@ TEST(DM4, Read_Verein1_U13_m)
 	EXPECT_EQ(file.GetParticipants()[0].Firstname, "VornameTN");
 	EXPECT_EQ(file.GetParticipants()[0].Lastname,  "NachnameTN");
 	EXPECT_EQ(file.GetParticipants()[0].Gender, Gender::Male);
-	EXPECT_EQ(file.GetParticipants()[0].Weight, 50);
+	EXPECT_EQ(file.GetParticipants()[0].WeightInGrams, 50 * 1000);
 	EXPECT_EQ(file.GetParticipants()[0].Birthyear, 2007);
 }
 
@@ -73,7 +73,7 @@ TEST(DM4, Read_Verein1_U15_m)
 	//EXPECT_EQ(file.GetParticipants()[0].Lastname,   "Kд");
 	EXPECT_EQ(file.GetParticipants()[0].Lastname, u8"K\u00e4");
 	EXPECT_EQ(file.GetParticipants()[0].Gender, Gender::Male);
-	EXPECT_EQ(file.GetParticipants()[0].Weight, -1);
+	EXPECT_EQ(file.GetParticipants()[0].WeightInGrams, -1);
 	EXPECT_EQ(file.GetParticipants()[0].Birthyear, 2006);
 
 	EXPECT_EQ(file.GetParticipants()[1].ID, 2);
@@ -83,7 +83,7 @@ TEST(DM4, Read_Verein1_U15_m)
 	EXPECT_EQ(file.GetParticipants()[1].Firstname, "Jan");
 	EXPECT_EQ(file.GetParticipants()[1].Lastname, "Kr");
 	EXPECT_EQ(file.GetParticipants()[1].Gender, Gender::Male);
-	EXPECT_EQ(file.GetParticipants()[1].Weight, 66);
+	EXPECT_EQ(file.GetParticipants()[1].WeightInGrams, 66 * 1000);
 	EXPECT_EQ(file.GetParticipants()[1].Birthyear, 2005);
 }
 
@@ -121,7 +121,7 @@ TEST(DM4, Read_Verein1_U15_w)
 	EXPECT_EQ(file.GetParticipants()[0].Firstname, "Joyce");
 	EXPECT_EQ(file.GetParticipants()[0].Lastname, "F");
 	EXPECT_EQ(file.GetParticipants()[0].Gender, Gender::Female);
-	EXPECT_EQ(file.GetParticipants()[0].Weight, -1);
+	EXPECT_EQ(file.GetParticipants()[0].WeightInGrams, -1);
 	EXPECT_EQ(file.GetParticipants()[0].Birthyear, 2005);
 
 	EXPECT_EQ(file.GetParticipants()[1].ID, 2);
@@ -131,7 +131,7 @@ TEST(DM4, Read_Verein1_U15_w)
 	EXPECT_EQ(file.GetParticipants()[1].Firstname, "Clara");
 	EXPECT_EQ(file.GetParticipants()[1].Lastname, "H");
 	EXPECT_EQ(file.GetParticipants()[1].Gender, Gender::Female);
-	EXPECT_EQ(file.GetParticipants()[1].Weight, 63);
+	EXPECT_EQ(file.GetParticipants()[1].WeightInGrams, 63 * 1000);
 	EXPECT_EQ(file.GetParticipants()[1].Birthyear, 2006);
 }
 
@@ -169,7 +169,7 @@ TEST(DM4, Read_Verein1_U18_w)
 	EXPECT_EQ(file.GetParticipants()[0].Firstname, "Lena");
 	EXPECT_EQ(file.GetParticipants()[0].Lastname, "F");
 	EXPECT_EQ(file.GetParticipants()[0].Gender, Gender::Female);
-	EXPECT_EQ(file.GetParticipants()[0].Weight, -1);
+	EXPECT_EQ(file.GetParticipants()[0].WeightInGrams, -1);
 	EXPECT_EQ(file.GetParticipants()[0].Birthyear, 2002);
 
 	EXPECT_EQ(file.GetParticipants()[1].ID, 2);
@@ -180,7 +180,7 @@ TEST(DM4, Read_Verein1_U18_w)
 	//EXPECT_EQ(file.GetParticipants()[1].Lastname, "ья");
 	EXPECT_EQ(file.GetParticipants()[1].Lastname, u8"\u00fc\u00df");
 	EXPECT_EQ(file.GetParticipants()[1].Gender, Gender::Female);
-	EXPECT_EQ(file.GetParticipants()[1].Weight, -1);
+	EXPECT_EQ(file.GetParticipants()[1].WeightInGrams, -1);
 	EXPECT_EQ(file.GetParticipants()[1].Birthyear, 2003);
 
 	EXPECT_EQ(file.GetParticipants()[2].ID, 3);
@@ -190,7 +190,7 @@ TEST(DM4, Read_Verein1_U18_w)
 	EXPECT_EQ(file.GetParticipants()[2].Firstname, "Catherina");
 	EXPECT_EQ(file.GetParticipants()[2].Lastname, "S");
 	EXPECT_EQ(file.GetParticipants()[2].Gender, Gender::Female);
-	EXPECT_EQ(file.GetParticipants()[2].Weight, -1);
+	EXPECT_EQ(file.GetParticipants()[2].WeightInGrams, -1);
 	EXPECT_EQ(file.GetParticipants()[2].Birthyear, 2002);
 
 	EXPECT_EQ(file.GetParticipants()[3].ID, 4);
@@ -200,7 +200,7 @@ TEST(DM4, Read_Verein1_U18_w)
 	EXPECT_EQ(file.GetParticipants()[3].Firstname, "Alissa");
 	EXPECT_EQ(file.GetParticipants()[3].Lastname, "W");
 	EXPECT_EQ(file.GetParticipants()[3].Gender, Gender::Female);
-	EXPECT_EQ(file.GetParticipants()[3].Weight, -1);
+	EXPECT_EQ(file.GetParticipants()[3].WeightInGrams, -1);
 	EXPECT_EQ(file.GetParticipants()[3].Birthyear, 2004);
 }
 
@@ -237,6 +237,6 @@ TEST(DM4, Read_Verein1_U21_n)
 	EXPECT_EQ(file.GetParticipants()[0].Club->Name, "Verein1");
 	EXPECT_EQ(file.GetParticipants()[0].Firstname, "Dustin");
 	EXPECT_EQ(file.GetParticipants()[0].Lastname, "L");
-	EXPECT_EQ(file.GetParticipants()[0].Weight, -1);
+	EXPECT_EQ(file.GetParticipants()[0].WeightInGrams, -1);
 	EXPECT_EQ(file.GetParticipants()[0].Birthyear, 2001);
 }

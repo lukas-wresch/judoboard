@@ -180,6 +180,7 @@
     <ClCompile Include="..\..\src\customtable.cpp" />
     <ClCompile Include="..\..\src\database.cpp" />
     <ClCompile Include="..\..\src\dm4.cpp" />
+    <ClCompile Include="..\..\src\dmf.cpp" />
     <ClCompile Include="..\..\src\error.cpp" />
     <ClCompile Include="..\..\src\HttpServer\HttpServer.cpp" />
     <ClCompile Include="..\..\src\id.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="..\..\src\customtable.h" />
     <ClInclude Include="..\..\src\database.h" />
     <ClInclude Include="..\..\src\dm4.h" />
+    <ClInclude Include="..\..\src\dmf.h" />
     <ClInclude Include="..\..\src\error.h" />
     <ClInclude Include="..\..\src\HttpServer\HttpServer.h" />
     <ClInclude Include="..\..\src\id.h" />

@@ -24,6 +24,7 @@
 #include "../src/window.h"
 #include "../src/dm4.h"
 #include "../src/md5.h"
+#include "../src/dmf.h"
 #include "../ZED/include/http_client.h"
 #include "../ZED/include/sha256.h"
 #include "../ZED/include/sha512.h"

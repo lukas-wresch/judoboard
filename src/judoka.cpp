@@ -51,8 +51,8 @@ Judoka::Judoka(const DM4::Participant& Participant, const StandingData* pStandin
 
 	if (Participant.Birthyear > 0)
 		m_Birthyear = Participant.Birthyear;
-	if (Participant.Weight > 0)
-		m_Weight = Participant.Weight;
+	if (Participant.WeightInGrams > 0)
+		m_WeightInGrams = Participant.WeightInGrams;
 
 	if (pStandingData && Participant.Club)
 		m_pClub = pStandingData->FindClubByName(Participant.Club->Name);
@@ -69,8 +69,8 @@ Judoka::Judoka(const MD5::Participant& Participant, const StandingData* pStandin
 
 	if (Participant.Birthyear > 0)
 		m_Birthyear = Participant.Birthyear;
-	if (Participant.WeightInGramm > 0)
-		m_Weight = Participant.WeightInGramm/1000;//TODO Loss of information!!
+	if (Participant.WeightInGrams > 0)
+		m_WeightInGrams = Participant.WeightInGrams;
 
 	if (pStandingData && Participant.Club)
 		m_pClub = pStandingData->FindClubByName(Participant.Club->Name);
@@ -92,6 +92,20 @@ void Judoka::operator >> (YAML::Emitter& Yaml) const
 	Yaml << YAML::EndMap;
 }
 
+Judoka::Judoka(const DMF::Participant& Participant)
+{
+	m_Firstname = Participant.Firstname;
+	m_Lastname  = Participant.Lastname;
+
+	if (Participant.Birthyear > 0)
+		m_Birthyear = Participant.Birthyear;
+	if (Participant.WeightInGrams > 0)
+		m_WeightInGrams = Participant.WeightInGrams;
+}
+
+
+
+void Judoka::operator >> (ZED::CSV& Stream) const
 
 
 void Judoka::ToString(YAML::Emitter& Yaml) const

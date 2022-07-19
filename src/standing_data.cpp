@@ -459,6 +459,50 @@ const Judoka* StandingData::FindJudoka(const UUID& UUID) const
 
 
 
+Judoka* StandingData::FindJudoka_ExactMatch(const Judoka& NewJudoka)
+{
+	Judoka* ret = nullptr;
+
+	for (auto [id, judoka] : m_Judokas)
+	{
+		if (judoka && judoka->GetFirstname()  == NewJudoka.GetFirstname()
+			&& judoka->GetLastname()   == NewJudoka.GetLastname()
+			&& judoka->GetGender()     == NewJudoka.GetGender()
+			&& (judoka->GetBirthyear() == NewJudoka.GetBirthyear() || judoka->GetBirthyear() == 0 || NewJudoka.GetBirthyear() < 0)
+			&& (!judoka->GetClub() || !NewJudoka.GetClub() || judoka->GetClub()->GetName() == NewJudoka.GetClub()->GetName()) )
+		{
+			if (ret)//Have we found one?
+				return nullptr;//Then this is not an exact match
+
+			ret = judoka;
+		}
+	}
+
+	return ret;
+}
+
+
+
+Judoka* StandingData::FindJudoka_SameName(const Judoka& NewJudoka)
+{
+	Judoka* ret = nullptr;
+
+	for (auto [id, judoka] : m_Judokas)
+	{
+		if (judoka && judoka->GetFirstname() == NewJudoka.GetFirstname() && judoka->GetLastname() == NewJudoka.GetLastname() && judoka->GetGender() == NewJudoka.GetGender())
+		{
+			if (ret)//Have we found one?
+				return nullptr;//Then this is not an exact match
+
+			ret = judoka;
+		}
+	}
+
+	return ret;
+}
+
+
+
 Judoka* StandingData::FindJudoka_DM4_ExactMatch(const DM4::Participant& NewJudoka)
 {
 	Judoka* ret = nullptr;

@@ -133,7 +133,7 @@ namespace Judoboard
 			int GKParticipantID = -1;//GK = ???
 
 			bool MoneyIncreased = false;
-			int  WeightInGramm = -1;
+			int  WeightInGrams  = -1;
 
 			mutable void* pUserData = nullptr;
 		};
@@ -328,7 +328,7 @@ namespace Judoboard
 	private:
 		bool Parse(ZED::Blob&& Data);
 		std::string ReadLine(ZED::Blob& Data, bool* pStartOfHeading = nullptr, bool* pNewLine = nullptr, bool* pDoubleZero = nullptr);
-		std::string RemoveControlCharacters(std::string& Str);
+		std::string RemoveControlCharacters(std::string& Str);//Removes all ASCII and Latin1 control characters
 
 		bool ReadTournamentData(ZED::Blob& Data);
 		bool ReadRankScore(ZED::Blob& Data);
