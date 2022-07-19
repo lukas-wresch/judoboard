@@ -15,7 +15,7 @@ using namespace Judoboard;
 
 
 const std::string Application::Name = "Judoboard";
-const std::string Application::Version = "0.3.1";
+const std::string Application::Version = "0.3.2";
 bool Application::NoWindow = false;
 
 
