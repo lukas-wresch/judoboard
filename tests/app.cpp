@@ -38,6 +38,41 @@ TEST(App, ServerConnection)
 
 
 
+TEST(App, AddDM4File)
+{
+	initialize();
+	Application app;
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	app.AddTournament(t);
+
+	DM4 dm4_file("test-data/Verein1_U13 (m).dm4");
+
+	ASSERT_TRUE(dm4_file);
+
+	bool success;
+	auto output = app.AddDM4File(dm4_file, false, &success);
+
+	ASSERT_TRUE(success);
+
+	auto judokas = app.GetTournament()->GetParticipants();
+
+	ASSERT_EQ(judokas.size(), 1);
+
+	for (auto [uuid, j] : judokas)
+	{
+		EXPECT_EQ(j->GetFirstname(), "VornameTN");
+		EXPECT_EQ(j->GetLastname(), "NachnameTN");
+		EXPECT_EQ(j->GetBirthyear(), 2007);
+		ASSERT_TRUE(j->GetClub());
+		EXPECT_EQ(j->GetClub()->GetName(), "Verein1");
+	}
+}
+
+
+
 TEST(App, Tournaments)
 {
 	initialize();

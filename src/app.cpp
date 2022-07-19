@@ -101,7 +101,9 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 
 	ret += "Tournament name: " + File.GetTournamentName() + "<br/>";
 	ret += "Tournament date: " + File.GetTournamentDate() + "<br/>";
+	ret += "<br/>";
 
+	LockTillScopeEnd();
 
 	for (auto club : File.GetClubs())
 	{
@@ -128,6 +130,9 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 
 		if (!ParseOnly && new_judoka)
 		{//Add to the current tournament
+			if (File.GetClubs().size() == 1)//If there is only one
+				new_judoka->SetClub(GetDatabase().FindClubByName(File.GetClubs()[0]->Name));
+
 			GetTournament()->AddParticipant(new_judoka);
 		}
 	}
