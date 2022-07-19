@@ -190,11 +190,11 @@ TEST(Database, AccountTest)
 
 		EXPECT_TRUE(d.Load("temp.yml"));
 
-		ASSERT_FALSE(d.FindAccount(j1.GetUsername()));
-		ASSERT_FALSE(d.FindAccount(j2.GetUsername()));
+		ASSERT_TRUE(d.FindAccount(j1.GetUsername()));
+		ASSERT_TRUE(d.FindAccount(j2.GetUsername()));
 
-		//EXPECT_EQ(d.FindAccount(j1.GetUsername())->GetUsername(), j1.GetUsername());
-		//EXPECT_EQ(d.FindAccount(j2.GetUsername())->GetUsername(), j2.GetUsername());
+		EXPECT_EQ(d.FindAccount(j1.GetUsername())->GetUsername(), j1.GetUsername());
+		EXPECT_EQ(d.FindAccount(j2.GetUsername())->GetUsername(), j2.GetUsername());
 	}
 
 	ZED::Core::RemoveFile("temp.yml");
