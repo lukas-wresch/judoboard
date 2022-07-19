@@ -6,11 +6,7 @@ TEST(DMF, Read_first_age_group1_m)
 {
 	initialize();
 
-#ifdef _WIN32
-	DMF file("../test-data/firstage group1 (m).dmf");
-#else
 	DMF file("test-data/firstage group1 (m).dmf");
-#endif
 
 	ASSERT_TRUE(file);
 
@@ -85,11 +81,7 @@ TEST(DMF, Read_third_age_group_w)
 {
 	initialize();
 
-#ifdef _WIN32
-	DMF file("../test-data/third_name of age group (w).dmf");
-#else
 	DMF file("test-data/third_name of age group (w).dmf");
-#endif
 
 	ASSERT_TRUE(file);
 
