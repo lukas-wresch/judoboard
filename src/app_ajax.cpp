@@ -64,17 +64,11 @@ void Application::SetupHttpServer()
 		auto pos = Request.m_Body.Find("\r\n\r\n");
 		if (pos != 0)
 		{
-			//std::string body_after_boundary = Request.m_Body.substr(pos + 4)
 			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
 
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
 
-			//auto upload_content = ZED::Blob(Request.m_Body.substr(pos + 4, boundary_end - pos - 4));
-
-			//ZED::Log::Debug(Request.m_Body.substr(pos + 4, boundary_end - pos - 4));
-
-			//upload_content.Trim(content_length);
 			DM4 dm4_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
 
 			if (!dm4_file)
@@ -87,6 +81,14 @@ void Application::SetupHttpServer()
 				return "Parsing FAILED<br/><br/>" + output;
 
 			AddDM4File(dm4_file);//apply DM4 file
+
+			output += R"(
+<html>
+	<head>
+		<meta http-equiv = "refresh" content = "5; url=/#schedule.html"/>
+	</head>
+</html>
+)";
 
 			return "Parsing OK<br/><br/>" + output;
 		}

@@ -124,6 +124,8 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 
 	for (auto dm4_judoka : File.GetParticipants())
 	{
+		ret += "Judoka: " + dm4_judoka.Firstname + " " + dm4_judoka.Lastname + "<br/>";
+
 		auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);		
 
 		//Judoka is now added/updated
