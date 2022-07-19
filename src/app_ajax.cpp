@@ -1083,20 +1083,6 @@ void Application::SetupHttpServer()
 
 
 
-	/*m_Server.RegisterResource("/ajax/judoka/autocomplete", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-
-		bool filter = HttpServer::DecodeURLEncoded(Request.m_Query, "filter") == "true";
-
-		if (filter && GetTournament())
-			return GetTournament()->JudokaToJSON();
-
-		return m_Database.JudokaToJSON();
-	});*/
-
-
 	m_Server.RegisterResource("/ajax/judoka/add", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
