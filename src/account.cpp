@@ -70,8 +70,8 @@ Account::Account(const YAML::Node& Yaml)
 {
 	if (Yaml["uuid"])
 		SetUUID(Yaml["uuid"].as<std::string>());
-	if (Yaml["usename"])
-		m_Username = Yaml["usename"].as<std::string>();
+	if (Yaml["username"])
+		m_Username = Yaml["username"].as<std::string>();
 	if (Yaml["password"])
 		m_Password = Yaml["password"].as<std::string>();
 	if (Yaml["access_level"])

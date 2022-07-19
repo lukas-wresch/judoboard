@@ -67,6 +67,8 @@ TEST(Database, SaveAndLoad)
 		d.AddJudoka(&j1);
 		d.AddJudoka(&j2);
 
+		d.AddAccount(Account("UserTest", "UserPass", Account::AccessLevel::Moderator));
+
 		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
 
 		d.AddRuleSet(new RuleSet("Test", 60, 30, 20, 10, true, true, true, 1));
@@ -74,11 +76,11 @@ TEST(Database, SaveAndLoad)
 		EXPECT_EQ(d.FindJudoka(j1.GetUUID())->GetWeight(), 50);
 		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), 60);
 
-		EXPECT_TRUE(d.Save("temp.csv"));
+		EXPECT_TRUE(d.Save("temp.yml"));
 
 
 		Database d2;
-		EXPECT_TRUE(d2.Load("temp.csv"));
+		EXPECT_TRUE(d2.Load("temp.yml"));
 
 		EXPECT_TRUE(d2.GetNumJudoka() == 2);
 
@@ -94,18 +96,24 @@ TEST(Database, SaveAndLoad)
 
 		auto rule_set = d2.FindRuleSetByName("Test");
 		ASSERT_TRUE(rule_set);
-		EXPECT_TRUE(rule_set->GetMatchTime() == 60);
-		EXPECT_TRUE(rule_set->GetGoldenScoreTime() == 30);
-		EXPECT_TRUE(rule_set->GetOsaeKomiTime(false) == 20);
-		EXPECT_TRUE(rule_set->GetOsaeKomiTime(true) == 10);
+		EXPECT_EQ(rule_set->GetMatchTime(), 60);
+		EXPECT_EQ(rule_set->GetGoldenScoreTime(), 30);
+		EXPECT_EQ(rule_set->GetOsaeKomiTime(false), 20);
+		EXPECT_EQ(rule_set->GetOsaeKomiTime(true), 10);
 		EXPECT_TRUE(rule_set->IsYukoEnabled());
 		EXPECT_TRUE(rule_set->IsKokaEnabled());
 		EXPECT_TRUE(rule_set->IsDrawAllowed());
-		EXPECT_TRUE(rule_set->GetBreakTime() == 1);
+		EXPECT_EQ(rule_set->GetBreakTime(), 1);
+
+		auto acc = d2.FindAccount("UserTest");
+		ASSERT_TRUE(acc);
+		EXPECT_EQ(acc->GetUsername(), "UserTest");
+		EXPECT_EQ(acc->GetPassword(), "UserPass");
+		EXPECT_EQ(acc->GetAccessLevel(), Account::AccessLevel::Moderator);
 	}
 
-	ZED::Core::RemoveFile("temp.csv");
-	ZED::Core::RemoveFile("temp2.csv");
+	ZED::Core::RemoveFile("temp.yml");
+	ZED::Core::RemoveFile("temp2.yml");
 }
 
 
