@@ -70,3 +70,39 @@ TEST(Judoka, ImportExport_RuleSet)
 		EXPECT_TRUE(r.GetDescription() == r2.GetDescription());
 	}
 }
+
+
+
+TEST(Judoka, Weight)
+{
+	initialize();
+
+	Weight w(123);
+	EXPECT_EQ(w, 123 * 1000);
+
+	Weight w2("12,3");
+	EXPECT_EQ(w2, 12 * 1000 + 300);
+	std::string ret;
+	w2 >> ret;
+	EXPECT_EQ(ret, "12,3");
+
+	Weight w3("12.3");
+	EXPECT_EQ(w3, 12 * 1000 + 300);
+	ret = "";
+	w3 >> ret;
+	EXPECT_EQ(ret, "12,3");
+
+	Weight w4("12");
+	EXPECT_EQ(w4, 12 * 1000);
+	ret = "";
+	w4 >> ret;
+	EXPECT_EQ(ret, "12");
+
+	YAML::Emitter yaml;
+	w2 >> yaml;
+	w2 = Weight(YAML::Load(yaml.c_str()));
+	EXPECT_EQ(w2, 12 * 1000 + 300);
+	ret = "";
+	w2 >> ret;
+	EXPECT_EQ(ret, "12,3");
+}

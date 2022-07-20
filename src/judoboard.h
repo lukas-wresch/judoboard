@@ -1,4 +1,6 @@
 #pragma once
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include <string>
 #include <cassert>
 #include "id.h"
@@ -13,6 +15,43 @@ namespace Judoboard
 		Male, Female
 	};
 
+
+	class Weight
+	{
+	public:
+		Weight(uint32_t InKg) {
+			m_InGrams = InKg * 1000;
+		}
+		Weight(const std::string& Input) {
+			int kg = 0, gram = 0;
+			if (Input.find(",") != std::string::npos)
+				sscanf_s(Input.c_str(), "%d,%d", &kg, &gram);
+			else
+				sscanf_s(Input.c_str(), "%d.%d", &kg, &gram);
+			m_InGrams = kg*1000 + gram*100;
+		}
+		Weight(const YAML::Node& Yaml) {
+			m_InGrams = Yaml.as<uint32_t>();
+		}
+
+		void operator >> (YAML::Emitter& Yaml) const {
+			Yaml << m_InGrams;
+		}
+		void operator >> (std::string& Output) const {
+			if (m_InGrams % 1000 == 0)
+				Output += std::to_string(m_InGrams/1000);
+			else
+				Output += std::to_string(m_InGrams/1000) + "," + std::to_string((m_InGrams % 1000) / 100);
+		}
+
+		operator uint32_t () const {
+			return m_InGrams;
+		}
+		
+
+	private:
+		uint32_t m_InGrams = 0;
+	};
 
 
 	inline std::string Latin1ToUTF8(const std::string& Input)
