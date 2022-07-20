@@ -2298,13 +2298,13 @@ void Application::SetupHttpServer()
 			return "You are not allowed to connect";
 
 		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		ZED::CSV matchCSV(Request.m_Body);
+		YAML::Node match_data = YAML::Load((const char*)Request.m_Body);
 
 		for (auto mat : m_Mats)
 		{
 			if (mat && mat->GetMatID() == matID)
 			{
-				Match* match = new Match(matchCSV, GetTournament());
+				Match* match = new Match(match_data, GetTournament());
 				GetTournament()->AddMatch(match);
 
 				if (mat->StartMatch(match))
@@ -2451,7 +2451,7 @@ void Application::SetupHttpServer()
 		if (!IsMaster())
 			return "You are not allowed to connect";
 
-		auto ip = ZED::Core::IP2String(Request.m_RequestInfo.RemoteIP);
+		auto ip  = ZED::Core::IP2String(Request.m_RequestInfo.RemoteIP);
 		int port = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "port"));
 
 		ZED::Log::Info("Slave informed us about a new mat");
@@ -2497,7 +2497,7 @@ void Application::SetupHttpServer()
 
 		ZED::Log::Info("Slave posted match results to us");
 
-		ZED::CSV match_data = Request.m_Body;
+		YAML::Node match_data = YAML::Load((const char*)Request.m_Body);
 		Match posted_match(match_data, GetTournament());
 
 		auto match = GetTournament()->FindMatch(posted_match);

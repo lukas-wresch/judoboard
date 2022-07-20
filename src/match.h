@@ -27,6 +27,14 @@ namespace Judoboard
 			Ippon = 10, Wazaari = 7, Yuko = 5, Koka = 3, Hantei = 1, Draw = 0
 		};
 
+		enum class DependencyType
+		{
+			None = 0,
+			BestOfThree,//Match is the last in the series of a best of three series
+			TakeWinner,//Take the winner of the match this match depends upon
+			TakeLoser//Take the loser of the match this match depends upon
+		};
+
 		struct Result
 		{
 			Result() = default;
@@ -50,7 +58,6 @@ namespace Judoboard
 
 
 		Match(const ITournament* Tournament, Judoka* White, Judoka* Blue, uint32_t MatID = 0);
-		Match(ZED::CSV& Stream, ITournament* Tournament);
 		Match(const YAML::Node& Yaml, ITournament* Tournament);
 
 		//Virtuals
@@ -62,7 +69,7 @@ namespace Judoboard
 		};
 
 		virtual void SetMatID(int32_t MatID) override { if (m_State == Status::Scheduled) Schedulable::SetMatID(MatID); }
-		virtual Status GetStatus() const override { return m_State; }
+		virtual Status GetStatus() const override;
 
 		virtual Color GetColor() const override {
 			if (GetMatchTable())
@@ -98,9 +105,15 @@ namespace Judoboard
 		const Judoka* GetEnemyOf(const Judoka& Judoka) const;//Returns the enemy of the given fighter. Judoka must be on of the two fighters of this match
 
 		const Judoka* GetWinningJudoka() const;
-		bool HasDependentMatches() const { return m_White.m_PreviousMatch || m_Blue.m_PreviousMatch; }//Returns true if and only if this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
+
+		//Match depencies
+		void SetDependency(Fighter Fighter, DependencyType Type, const Match* Reference);
+		void SetBestOfThree(const Match* Reference1, const Match* Reference2);
+		bool HasUnresolvedDependency() const;
+		bool HasDependentMatches() const {//Returns true if and only if this match depends upon (as in the depend matches needs to conclude in order for this match to start)
+			return m_White.m_Dependency != DependencyType::None || m_Blue.m_Dependency != DependencyType::None;
+		}
 		bool HasValidFighters() const { return m_White.m_Judoka && m_Blue.m_Judoka; }//Returns true if and only if GetFighter() returns not a null pointer
-		const std::vector<Match*> GetDependentMatches();//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
 		const std::vector<const Match*> GetDependentMatches() const;//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
 
 		const RuleSet& GetRuleSet() const;
@@ -124,8 +137,8 @@ namespace Judoboard
 
 		struct {
 			Judoka* m_Judoka = nullptr;
-			Match* m_PreviousMatch = nullptr;
-			bool m_PreviousWinner = true;
+			const Match* m_DependentMatch = nullptr;
+			DependencyType m_Dependency = DependencyType::None;
 		} m_White, m_Blue;
 
 		Status m_State = Status::Scheduled;

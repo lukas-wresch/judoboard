@@ -468,7 +468,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 	auto dependencies = NewMatch->GetDependentMatches();//Does this match depend on any other match?
 
 	for (auto prevMatch : dependencies)//For all dependencies
-		if (prevMatch) AddMatch(prevMatch);//Include them as well recursively
+		if (prevMatch) AddMatch(const_cast<Match*>(prevMatch));//Include them as well recursively
 
 	//If the match has judoka attached, include them as participants
 	if (NewMatch->GetFighter(Fighter::White) && !IsParticipant(*NewMatch->GetFighter(Fighter::White)))
