@@ -37,11 +37,10 @@ namespace Judoboard
 		void operator >> (YAML::Emitter& Yaml) const {
 			Yaml << m_InGrams;
 		}
-		void operator >> (std::string& Output) const {
+		std::string ToString() const {
 			if (m_InGrams % 1000 == 0)
-				Output += std::to_string(m_InGrams/1000);
-			else
-				Output += std::to_string(m_InGrams/1000) + "," + std::to_string((m_InGrams % 1000) / 100);
+				return std::to_string(m_InGrams/1000);
+			return std::to_string(m_InGrams/1000) + "," + std::to_string((m_InGrams % 1000) / 100);
 		}
 
 		operator uint32_t () const {

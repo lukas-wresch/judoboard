@@ -43,8 +43,8 @@ namespace Judoboard
 
 
 	private:
-		uint32_t m_MinWeight = 10*1000;//In gramms
-		uint32_t m_MaxWeight = 100*1000;//In gramms
+		Weight m_MinWeight = 10*1000;//In gramms
+		Weight m_MaxWeight = 100*1000;//In gramms
 
 		Gender m_Gender = Gender::Unknown;
 	};
