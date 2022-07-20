@@ -28,8 +28,8 @@ namespace Judoboard
 		auto GetMinWeight() const { return m_MinWeight; }
 		auto GetMaxWeight() const { return m_MaxWeight; }
 		auto GetGender()    const { return m_Gender; }
-		void SetMinWeight(uint16_t MinWeight) { m_MinWeight = MinWeight; }
-		void SetMaxWeight(uint16_t MaxWeight) { m_MaxWeight = MaxWeight; }
+		void SetMinWeight(Weight MinWeight) { m_MinWeight = MinWeight; }
+		void SetMaxWeight(Weight MaxWeight) { m_MaxWeight = MaxWeight; }
 		void SetGender(Gender Gender) { m_Gender = Gender; }
 
 		virtual bool IsElgiable(const Judoka& Fighter) const override;

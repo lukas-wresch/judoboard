@@ -60,8 +60,11 @@ void Weightclass::operator >> (YAML::Emitter& Yaml) const
 
 	MatchTable::operator >>(Yaml);
 
-	Yaml << YAML::Key << "min_weight" << YAML::Value << m_MinWeight;
-	Yaml << YAML::Key << "max_weight" << YAML::Value << m_MaxWeight;
+	Yaml << YAML::Key << "min_weight" << YAML::Value;
+	m_MinWeight >> Yaml;
+	Yaml << YAML::Key << "max_weight" << YAML::Value;
+	m_MaxWeight >> Yaml;
+
 	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;
 
 	Yaml << YAML::EndMap;
@@ -75,8 +78,8 @@ void Weightclass::ToString(YAML::Emitter& Yaml) const
 
 	MatchTable::ToString(Yaml);
 
-	Yaml << YAML::Key << "min_weight" << YAML::Value << m_MinWeight;
-	Yaml << YAML::Key << "max_weight" << YAML::Value << m_MaxWeight;
+	Yaml << YAML::Key << "min_weight" << YAML::Value << m_MinWeight.ToString();
+	Yaml << YAML::Key << "max_weight" << YAML::Value << m_MaxWeight.ToString();
 	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;
 
 	Yaml << YAML::EndMap;
@@ -149,12 +152,12 @@ std::string Weightclass::GetHTMLForm()
 	std::string ret = R"(
 <div>
     <label style="width:150px;float:left;margin-top:5px;" id="label_min_weight">Min Weight</label>
-    <input style="margin-bottom:20px;" type="number" id="minWeight" value="" min="10" max="500" />
+    <input style="margin-bottom:20px;" type="text" id="minWeight" value="" size="1" />
 </div>
 
 <div>
     <label style="width:150px;float:left;margin-top:5px;" id="label_max_weight">Max Weight</label>
-    <input style="margin-bottom:20px;" type="number" id="maxWeight" value="" min="10" max="500" />
+    <input style="margin-bottom:20px;" type="text" id="maxWeight" value="" size="1" />
 </div>
 
 <div>
