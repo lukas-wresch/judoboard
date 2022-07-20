@@ -185,6 +185,8 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 		judoka.SetGender(File.GetGender());
 		judoka.SetClub(club);
 
+		ret += "Judoka: " + dmf_judoka.Firstname + " " + dmf_judoka.Lastname + "<br/>";
+
 		auto new_judoka = GetDatabase().UpdateOrAdd(judoka, ParseOnly, ret);		
 
 		//Judoka is now added/updated

@@ -123,7 +123,15 @@ void Application::SetupHttpServer()
 			if (!success)
 				return "Parsing FAILED<br/><br/>" + output;
 
-			AddDMFFile(dmf_file);//apply DM4 file
+			AddDMFFile(dmf_file);//apply DMF file
+
+			output += R"(
+<html>
+	<head>
+		<meta http-equiv = "refresh" content = "5; url=/#schedule.html"/>
+	</head>
+</html>
+)";
 
 			return "Parsing OK<br/><br/>" + output;
 		}
