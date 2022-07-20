@@ -6,7 +6,7 @@ TEST(Match, ExportImport)
 {
 	initialize();
 	
-	for (int i = 0; i < 1000 * 5; i++)
+	for (int i = 0; i < 3000; i++)
 	{
 		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
@@ -27,7 +27,7 @@ TEST(Match, ExportImport)
 		ASSERT_EQ(match.GetFighter(Fighter::Blue )->GetUUID(), match2.GetFighter(Fighter::Blue )->GetUUID());
 
 		ASSERT_EQ(match.GetRuleSet().GetUUID(), match2.GetRuleSet().GetUUID());
-		//ASSERT_EQ((std::string)match.AllToString(), (std::string)match2.AllToString());//Will fail due to ID mismatch
+		ASSERT_EQ((std::string)match.AllToString(), (std::string)match2.AllToString());//Will fail due to ID mismatch
 		ASSERT_EQ(match.GetColor(), match2.GetColor());
 		ASSERT_EQ(match.GetUUID(), match2.GetUUID());
 		ASSERT_EQ(match.HasConcluded(), match2.HasConcluded());
@@ -41,36 +41,123 @@ TEST(Match, BestOf3)
 {
 	initialize();
 
-	Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
-	Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 
-	Tournament tourney;
+		Tournament tourney;
 
-	Mat mat(1);
+		Mat mat(1);
 
-	Match m1(&tourney, &j1, &j2, 1);
-	Match m2(&tourney, &j2, &j1, 1);
-	Match m3(&tourney, &j1, &j2, 1);
+		Match m1(&tourney, &j1, &j2, 1);
+		Match m2(&tourney, &j2, &j1, 1);
+		Match m3(&tourney, &j1, &j2, 1);
 
-	m3.SetBestOfThree(&m1, &m2);
+		m3.SetBestOfThree(&m1, &m2);
 
-	EXPECT_FALSE(m1.HasDependentMatches());
-	EXPECT_FALSE(m2.HasDependentMatches());
-	EXPECT_TRUE(m3.HasDependentMatches());
+		EXPECT_FALSE(m1.HasDependentMatches());
+		EXPECT_FALSE(m2.HasDependentMatches());
+		EXPECT_TRUE(m3.HasDependentMatches());
 
-	EXPECT_TRUE(m3.HasUnresolvedDependency());
-	EXPECT_EQ(m3.GetStatus(), Status::Optional);
+		EXPECT_TRUE(m3.HasUnresolvedDependency());
+		EXPECT_EQ(m3.GetStatus(), Status::Optional);
 
-	mat.StartMatch(&m1);
-	mat.AddIppon(Fighter::White);
-	mat.EndMatch();
+		mat.StartMatch(&m1);
+		mat.AddIppon(f);
+		mat.EndMatch();
 
-	mat.StartMatch(&m2);
-	mat.AddIppon(Fighter::White);
-	mat.EndMatch();
+		mat.StartMatch(&m2);
+		mat.AddIppon(f);
+		mat.EndMatch();
 
-	EXPECT_FALSE(m3.HasUnresolvedDependency());
-	EXPECT_EQ(m3.GetStatus(), Status::Scheduled);
+		EXPECT_FALSE(m3.HasUnresolvedDependency());
+		EXPECT_EQ(m3.GetStatus(), Status::Scheduled);
+	}
+}
+
+
+
+TEST(Match, BestOf3_2)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+
+		Tournament tourney;
+		tourney.EnableAutoSave(false);
+
+		Mat mat(1);
+
+		Match m1(&tourney, &j1, &j2, 1);
+		Match m2(&tourney, &j2, &j1, 1);
+		Match m3(&tourney, &j1, &j2, 1);
+
+		m3.SetBestOfThree(&m1, &m2);
+
+		EXPECT_FALSE(m1.HasDependentMatches());
+		EXPECT_FALSE(m2.HasDependentMatches());
+		EXPECT_TRUE(m3.HasDependentMatches());
+
+		EXPECT_TRUE(m3.HasUnresolvedDependency());
+		EXPECT_EQ(m3.GetStatus(), Status::Optional);
+
+		mat.StartMatch(&m1);
+		mat.AddIppon(f);
+		mat.EndMatch();
+
+		mat.StartMatch(&m2);
+		mat.AddIppon(!f);
+		mat.EndMatch();
+
+		EXPECT_FALSE(m3.HasUnresolvedDependency());
+		EXPECT_EQ(m3.GetStatus(), Status::Skipped);
+	}
+}
+
+
+
+TEST(Match, BestOf3_3)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+
+		Tournament tourney;
+		tourney.EnableAutoSave(false);
+
+		Mat mat(1);
+
+		Match m1(&tourney, &j1, &j2, 1);
+		Match m2(&tourney, &j1, &j2, 1);
+		Match m3(&tourney, &j1, &j2, 1);
+
+		m3.SetBestOfThree(&m1, &m2);
+
+		EXPECT_FALSE(m1.HasDependentMatches());
+		EXPECT_FALSE(m2.HasDependentMatches());
+		EXPECT_TRUE(m3.HasDependentMatches());
+
+		EXPECT_TRUE(m3.HasUnresolvedDependency());
+		EXPECT_EQ(m3.GetStatus(), Status::Optional);
+
+		mat.StartMatch(&m1);
+		mat.AddIppon(f);
+		mat.EndMatch();
+
+		mat.StartMatch(&m2);
+		mat.AddIppon(f);
+		mat.EndMatch();
+
+		EXPECT_FALSE(m3.HasUnresolvedDependency());
+		EXPECT_EQ(m3.GetStatus(), Status::Skipped);
+	}
 }
 
 

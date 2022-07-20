@@ -146,8 +146,22 @@ void Match::operator >>(YAML::Emitter& Yaml) const
 
 Status Match::GetStatus() const
 {
-	if (m_White.m_Dependency == DependencyType::BestOfThree && HasUnresolvedDependency())
-		return Status::Optional;
+	if (m_White.m_Dependency == DependencyType::BestOfThree)
+	{
+		if (HasUnresolvedDependency())
+			return Status::Optional;
+
+		//Check if won by the same person
+		if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
+		{
+			if (m_White.m_DependentMatch->GetWinningJudoka() &&
+				m_Blue.m_DependentMatch->GetWinningJudoka()  &&
+				m_White.m_DependentMatch->GetWinningJudoka()->GetUUID() == m_Blue.m_DependentMatch->GetWinningJudoka()->GetUUID())
+				return Status::Skipped;//Skip match
+		}
+
+		return m_State;
+	}
 	return m_State;
 }
 

@@ -20,6 +20,7 @@ namespace Judoboard
 		Running,//Match is currently underway
 		Concluded,//Match has concluded, results are available
 		Optional,//It is not clear yet whetever the match will take place
+		Skipped,//The match will take place
 	};
 
 
