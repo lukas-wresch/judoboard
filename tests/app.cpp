@@ -73,6 +73,41 @@ TEST(App, AddDM4File)
 
 
 
+TEST(App, AddDMFFile)
+{
+	initialize();
+	Application app;
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	app.AddTournament(t);
+
+	DMF dmf_file("test-data/firstage group1 (m).dmf");
+
+	ASSERT_TRUE(dmf_file);
+
+	bool success;
+	auto output = app.AddDMFFile(dmf_file, false, &success);
+
+	ASSERT_TRUE(success);
+
+	auto judokas = app.GetTournament()->GetParticipants();
+
+	ASSERT_EQ(judokas.size(), 1);
+
+	for (auto [uuid, j] : judokas)
+	{
+		EXPECT_EQ(j->GetFirstname(), "firstname");
+		EXPECT_EQ(j->GetLastname(), "lastname");
+		EXPECT_EQ(j->GetBirthyear(), 1990);
+		ASSERT_TRUE(j->GetClub());
+		EXPECT_EQ(j->GetClub()->GetName(), "club name");
+	}
+}
+
+
+
 TEST(App, Tournaments)
 {
 	initialize();

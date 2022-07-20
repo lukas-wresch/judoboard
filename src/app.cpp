@@ -164,14 +164,18 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 	ret += "Tournament date: " + File.GetTournamentDate() + "<br/>";
 
 
-	const auto club = GetDatabase().FindClubByName(File.GetClub().Name);
+	auto club = GetDatabase().FindClubByName(File.GetClub().Name);
 
 	if (!club)
 	{
 		ZED::Log::Warn("Could not find club");
-		if (pSuccess)
-			*pSuccess = false;
-		return ret;
+
+		ret += "Adding new club: " + File.GetClub().Name + "<br/>";
+
+		if (!ParseOnly)
+			GetDatabase().AddClub(new Club(File.GetClub().Name));
+
+		club = GetDatabase().FindClubByName(File.GetClub().Name);
 	}
 
 	for (auto dmf_judoka : File.GetParticipants())
@@ -190,6 +194,9 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 			GetTournament()->AddParticipant(new_judoka);
 		}
 	}
+
+	if (pSuccess)
+		*pSuccess = true;
 
 	return ret;
 }
