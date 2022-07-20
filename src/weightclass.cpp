@@ -100,15 +100,12 @@ std::string Weightclass::GetDescription() const
 	if (GetAgeGroup())
 	{
 		desc = GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender);
-		if (m_MaxWeight%1000 == 0)
-			desc += " -" + std::to_string(m_MaxWeight/1000) + " kg";
-		else
-			desc += " -" + std::to_string(m_MaxWeight/1000) + "," + std::to_string((m_MaxWeight/100)%10) + " kg";
+		desc += " -" + m_MaxWeight.ToString() + " kg";
 	}
 
 	else
 	{
-		desc = std::to_string(m_MinWeight) + " - " + std::to_string(m_MaxWeight) + " kg";
+		desc = m_MinWeight.ToString() + " - " + m_MaxWeight.ToString() + " kg";
 
 		if (m_Gender == Gender::Male)
 			desc += " (m)";
