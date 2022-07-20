@@ -1132,19 +1132,16 @@ void Application::SetupHttpServer()
 			return error;
 
 		auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
-		auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
-		int  weight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "weight"));
+		auto lastname  = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
+		auto weight    = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
 		Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 		int  birthyear = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "birthyear"));
 		UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");
 
-		if (weight < 0)
-			weight = 0;
-
 		if (!firstname.size() || !lastname.size() || (gender != Gender::Male && gender != Gender::Female))
 			return (std::string)(Error)Error::Type::InvalidInput;
 
-		Judoka new_judoka(firstname, lastname, weight, gender);
+		Judoka new_judoka(firstname, lastname, Weight(weight), gender);
 		if (birthyear > 1900 && birthyear < 2100)
 			new_judoka.SetBirthyear(birthyear);
 		new_judoka.SetClub(GetDatabase().FindClub(clubID));
@@ -1200,12 +1197,9 @@ void Application::SetupHttpServer()
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
 		auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
-		int  weight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "weight"));
+		auto weight = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
 		Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 		UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");
-
-		if (weight < 0)
-			weight = 0;
 
 		if (!firstname.size() || !lastname.size() || (gender != Gender::Male && gender != Gender::Female))
 			return (std::string)(Error)Error::Type::InvalidInput;
@@ -1217,7 +1211,7 @@ void Application::SetupHttpServer()
 
 		judoka->SetFirstname(firstname);
 		judoka->SetLastname(lastname);
-		judoka->SetWeight(weight);
+		judoka->SetWeight(Weight(weight));
 		judoka->SetGender(gender);
 		if (GetDatabase().FindClub(clubID))
 			judoka->SetClub(GetDatabase().FindClub(clubID));
@@ -1548,17 +1542,15 @@ void Application::SetupHttpServer()
 		{
 		case MatchTable::Type::Weightclass:
 		{
-			int minWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight"));
-			int maxWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight"));
-			if (minWeight < 0 || maxWeight < 0)
-				return std::string("Invalid value");
+			auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
+			auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
 
 			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 
 			if (gender == 0 || gender == 1)
-				new_table = new Weightclass(GetTournament(), minWeight, maxWeight, (Gender)gender);
+				new_table = new Weightclass(GetTournament(), Weight(minWeight), Weight(maxWeight), (Gender)gender);
 			else
-				new_table = new Weightclass(GetTournament(), minWeight, maxWeight);
+				new_table = new Weightclass(GetTournament(), Weight(minWeight), Weight(maxWeight));
 				
 			break;
 		}
@@ -1638,19 +1630,16 @@ void Application::SetupHttpServer()
 		{
 		case MatchTable::Type::Weightclass:
 		{
-			int minWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight"));
-			int maxWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight"));
-			int gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
-
-			if (minWeight < 0 || maxWeight < 0)
-				return std::string("Invalid value");
+			auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
+			auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
+			int gender     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 
 			Weightclass* weight_table = (Weightclass*)table;
 
 			GetTournament()->Lock();
 
-			weight_table->SetMinWeight(minWeight);
-			weight_table->SetMaxWeight(maxWeight);
+			weight_table->SetMinWeight(Weight(minWeight));
+			weight_table->SetMaxWeight(Weight(maxWeight));
 			weight_table->SetGender((Gender)gender);
 
 			GetTournament()->Unlock();
