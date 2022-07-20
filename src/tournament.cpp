@@ -461,6 +461,16 @@ bool Tournament::AddMatch(Match* NewMatch)
 
 	Lock();
 
+	//Do we have the match already?
+	for (auto match : m_Schedule)
+	{
+		if (match->GetUUID() == NewMatch->GetUUID())
+		{
+			Unlock();
+			return false;
+		}
+	}
+
 	//Do we have the rule set already?
 	if (!m_StandingData.FindRuleSet(NewMatch->GetRuleSet().GetUUID()))
 		m_StandingData.AddRuleSet(new RuleSet(NewMatch->GetRuleSet()));//Copy rule set
@@ -475,8 +485,6 @@ bool Tournament::AddMatch(Match* NewMatch)
 		m_StandingData.AddJudoka(NewMatch->GetFighter(Fighter::White));
 	if (NewMatch->GetFighter(Fighter::Blue) && !IsParticipant(*NewMatch->GetFighter(Fighter::Blue)))
 		m_StandingData.AddJudoka(NewMatch->GetFighter(Fighter::Blue));
-
-	Unlock();
 
 	if (NewMatch->GetFighter(Fighter::White) && IsDisqualified(*NewMatch->GetFighter(Fighter::White)))
 	{
@@ -505,8 +513,6 @@ bool Tournament::AddMatch(Match* NewMatch)
 	}
 
 	NewMatch->SetScheduleIndex(GetMaxScheduleIndex() + 1);
-
-	Lock();
 
 	m_Schedule.emplace_back(NewMatch);
 	m_SchedulePlanner.emplace_back(NewMatch);

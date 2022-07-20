@@ -59,6 +59,8 @@ namespace Judoboard
 
 		Match(const ITournament* Tournament, Judoka* White, Judoka* Blue, uint32_t MatID = 0);
 		Match(const YAML::Node& Yaml, ITournament* Tournament);
+		//Match(Match&) = delete;//TODO
+		//Match(const Match&) = delete;//TODO
 
 		//Virtuals
 		virtual const std::vector<Match*> GetSchedule() const override { std::vector<Match*> schedule{ (Match*)this }; return schedule; }
