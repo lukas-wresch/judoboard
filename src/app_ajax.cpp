@@ -1554,12 +1554,16 @@ void Application::SetupHttpServer()
 				return std::string("Invalid value");
 
 			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+			bool bo3   = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
 
-			if (gender == 0 || gender == 1)
-				new_table = new Weightclass(GetTournament(), minWeight, maxWeight, (Gender)gender);
-			else
-				new_table = new Weightclass(GetTournament(), minWeight, maxWeight);
-				
+			auto new_weightclass = new Weightclass(GetTournament(), minWeight, maxWeight);
+
+			if (gender == (int)Gender::Male || gender == (int)Gender::Female)
+				new_weightclass->SetGender((Gender)gender);
+
+			new_weightclass->IsBestOfThree(bo3);
+
+			new_table = new_weightclass;				
 			break;
 		}
 
@@ -1607,6 +1611,8 @@ void Application::SetupHttpServer()
 		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Body, "age_group");
 		UUID rule_set_id  = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 
+		LockTillScopeEnd();
+
 		auto table = GetTournament()->FindMatchTable(id);
 
 		if (!table)
@@ -1641,6 +1647,7 @@ void Application::SetupHttpServer()
 			int minWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight"));
 			int maxWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight"));
 			int gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+			bool bo3      = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
 
 			if (minWeight < 0 || maxWeight < 0)
 				return std::string("Invalid value");
@@ -1652,6 +1659,7 @@ void Application::SetupHttpServer()
 			weight_table->SetMinWeight(minWeight);
 			weight_table->SetMaxWeight(maxWeight);
 			weight_table->SetGender((Gender)gender);
+			weight_table->IsBestOfThree(bo3);
 
 			GetTournament()->Unlock();
 			break;

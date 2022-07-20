@@ -109,7 +109,7 @@ function GetForm(callback)
     if (g_yaml && typeof g_yaml.gender !== 'undefined')
       document.getElementById("gender").value = g_yaml.gender;
       if (g_yaml && typeof g_yaml.best_of_three !== 'undefined')
-      document.getElementById("bo3").value = g_yaml.best_of_three;
+      document.getElementById("bo3").checked = g_yaml.best_of_three;
       
     if (typeof callback !== 'undefined')
       callback();
@@ -126,6 +126,9 @@ function AddMatchtable()
 
   for (var i = 0, element; element = elements[i++];)
   {
+    if (element.type == 'checkbox')
+      data[element.id] = element.checked;
+    else
       data[element.id] = element.value;
   }
 
@@ -153,7 +156,12 @@ function UpdateMatchtable()
   var data = [];
 
   for (var i = 0, element; element = elements[i++];)
+  {
+    if (element.type == 'checkbox')
+      data[element.id] = element.checked;
+    else
       data[element.id] = element.value;
+  }
 
   data["name"]  = document.getElementById("name").value;
   data["color"] = document.getElementById("color").value;

@@ -320,7 +320,7 @@ ZED::CSV Match::ToString() const
 	else
 		ret << GetFighter(Fighter::White)->GetName() << GetFighter(Fighter::Blue)->GetName();
 
-	ret << GetMatID() << m_State << GetColor().ToHexString();
+	ret << GetMatID() << (int)GetStatus() << GetColor().ToHexString();
 
 	if (GetMatchTable())
 		ret << (std::string)GetMatchTable()->GetUUID() << GetMatchTable()->GetDescription();
@@ -344,7 +344,7 @@ void Match::ToString(YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "blue_name"  << YAML::Value << GetFighter(Fighter::Blue)->GetName();
 
 	Yaml << YAML::Key << "mat_id" << YAML::Value << GetMatID();
-	Yaml << YAML::Key << "state"  << YAML::Value << (int)m_State;
+	Yaml << YAML::Key << "state"  << YAML::Value << (int)GetStatus();
 	Yaml << YAML::Key << "color"  << YAML::Value << GetColor().ToHexString();
 
 	if (m_Rules)

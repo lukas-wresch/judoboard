@@ -363,6 +363,16 @@ function Update()
         cell5.style.color = "green";
         cell5.innerHTML = lang.concluded;
       }
+      else if (state == 3)
+      {
+        cell5.style.color = "blue";
+        cell5.innerHTML = lang.optional;
+      }
+      else if (state == 4)
+      {
+        cell5.style.color = "blue";
+        cell5.innerHTML = lang.skipped;
+      }
       else
         cell5.innerHTML = "Unknown";
 
@@ -491,7 +501,7 @@ function Update()
       {
         var select = document.createElement("select");
         select.style.width = "1.7cm";
-        select.style.fontSize  = "14pt";
+        select.style.fontSize = "14pt";
 
         for (const age_group of judoka.age_groups)
         {
