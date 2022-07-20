@@ -6,7 +6,7 @@ TEST(Tournament, DontDuplicateParticipants)
 {
 	initialize();
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
 		Database d;
@@ -35,7 +35,7 @@ TEST(Tournament, DontDuplicateParticipants)
 		EXPECT_TRUE(tourney.GetParticipants().size() == 2);
 	}
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
 
 
@@ -156,7 +156,7 @@ TEST(Tournament, DoubleDisqualification2)
 {
 	initialize();
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
 		Judoka j1("Firstname", "Lastname", 50, Gender::Male);
@@ -195,7 +195,7 @@ TEST(Tournament, DoubleDisqualification2)
 		EXPECT_EQ(match2.GetLog().GetEvents().size(), 0u);
 	}
 
-	ZED::Core::RemoveFile("tournaments/deleteMe");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
 
 
@@ -288,7 +288,7 @@ TEST(Tournament, ColorsForMatchTables)
 		EXPECT_TRUE(tourney.GetMatchTables()[1]->GetColor() == Color::Name::Red);
 	}
 
-	ZED::Core::RemoveFile("deleteMe.csv");
+	ZED::Core::RemoveFile("deleteMe.yml");
 }
 
 
@@ -400,7 +400,7 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 		d.EnableAutoSave(false);
 		d.AddRuleSet(new RuleSet("Test", 10, 20, 30, 40));
 
-		ZED::Core::RemoveFile("tournaments/deleteMe");
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 		Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 		tourney.Reset();
 
