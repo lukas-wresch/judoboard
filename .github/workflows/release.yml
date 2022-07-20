@@ -30,9 +30,9 @@ jobs:
       - name: package
         run: dir; .\package.bat
       - name: zip
-        run: cd bin\Release; 7z a package.zip *
+        run: cd bin; 7z a package.zip *
       - name: version
-        run: echo "::set-output name=version::$(./bin/Release/Judoboard.exe --version)"
+        run: echo "::set-output name=version::$(./bin/Judoboard.exe --version)"
         id: version
       - name: Create Release
         uses: actions/create-release@latest
@@ -50,6 +50,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: .\bin\Release\package.zip
+          asset_path: .\bin\package.zip
           asset_name: Judoboard.zip
           asset_content_type: application/zip
