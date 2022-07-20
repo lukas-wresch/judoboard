@@ -140,6 +140,9 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 		}
 	}
 
+	if (pSuccess)
+		*pSuccess = true;
+
 	return ret;
 }
 
