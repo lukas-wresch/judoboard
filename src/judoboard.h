@@ -23,12 +23,27 @@ namespace Judoboard
 			m_InGrams = InKg * 1000;
 		}
 		Weight(const std::string& Input) {
-			int kg = 0, gram = 0;
-			if (Input.find(",") != std::string::npos)
-				sscanf_s(Input.c_str(), "%d,%d", &kg, &gram);
-			else
-				sscanf_s(Input.c_str(), "%d.%d", &kg, &gram);
-			m_InGrams = kg*1000 + gram*100;
+			bool commaFound = false;
+			int digitsAfterComma = 0;
+			for (char c : Input)
+			{
+				if (c == ',' || c == '.')
+					commaFound = true;
+				else
+				{
+					m_InGrams *= 10;
+					m_InGrams += (int)c - '0';
+					if (commaFound)
+						digitsAfterComma++;
+				}
+			}
+
+			if (digitsAfterComma == 0)
+				m_InGrams *= 1000;
+			else if (digitsAfterComma == 1)
+				m_InGrams *= 100;
+			else if (digitsAfterComma == 2)
+				m_InGrams *= 10;
 		}
 		Weight(const YAML::Node& Yaml) {
 			m_InGrams = Yaml.as<uint32_t>();
