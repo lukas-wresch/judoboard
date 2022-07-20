@@ -138,8 +138,8 @@ uint16_t Judoka::GetAge() const
 
 
 
-void Judoka::SetWeight(uint32_t NewWeight)
+void Judoka::SetWeight(Weight NewWeight)
 {
-	if (NewWeight < 1000 * 1000)
+	if (NewWeight < Weight(1000))
 		m_Weight = NewWeight;
 }

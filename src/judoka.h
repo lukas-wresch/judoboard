@@ -50,7 +50,7 @@ namespace Judoboard
 		void SetFirstname(const std::string& Firstname) { m_Firstname = Firstname; }
 		void SetLastname( const std::string& Lastname)  { m_Lastname  = Lastname; }
 		void SetGender(Gender NewGender) { m_Gender = NewGender; }
-		void SetWeight(uint32_t NewWight);
+		void SetWeight(Weight NewWeight);
 		void SetBirthyear(uint16_t NewBirthyear) { m_Birthyear = NewBirthyear; }
 		void SetClub(const Club* NewClub) { m_pClub = NewClub; }
 

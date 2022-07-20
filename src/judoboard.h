@@ -39,8 +39,9 @@ namespace Judoboard
 		}
 		std::string ToString() const {
 			if (m_InGrams % 1000 == 0)
-				return std::to_string(m_InGrams/1000);
-			return std::to_string(m_InGrams/1000) + "," + std::to_string((m_InGrams % 1000) / 100);
+				return std::to_string(m_InGrams / 1000);
+			//Add space at the end to that yaml doesn't think that this is a number
+			return std::to_string(m_InGrams/1000) + "," + std::to_string((m_InGrams%1000) / 100) + " ";
 		}
 
 		operator uint32_t () const {

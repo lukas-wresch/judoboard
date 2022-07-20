@@ -1164,7 +1164,7 @@ void Application::SetupHttpServer()
 		if (judoka)
 		{
 			YAML::Emitter ret;
-			*judoka >> ret;
+			judoka->ToString(ret);
 			return ret.c_str();
 		}
 
@@ -1207,7 +1207,7 @@ void Application::SetupHttpServer()
 		auto judoka = m_Database.FindJudoka(id);
 
 		if (!judoka)
-			return std::string("Judoka not found");
+			return Error(Error::Type::ItemNotFound);
 
 		judoka->SetFirstname(firstname);
 		judoka->SetLastname(lastname);
