@@ -47,5 +47,6 @@ namespace Judoboard
 		uint32_t m_MaxWeight = 100*1000;//In gramms
 
 		Gender m_Gender = Gender::Unknown;
+		bool m_BestOfThree = false;
 	};
 }

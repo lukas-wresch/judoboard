@@ -1909,7 +1909,8 @@ void Application::SetupHttpServer()
 		LockTillScopeEnd();//In case the tournament gets closed at the same time
 
 		YAML::Emitter yaml;
-		GetTournament()->ListAgeGroups(yaml);
+		if (GetTournament())
+			GetTournament()->ListAgeGroups(yaml);
 		return yaml.c_str();
 	});
 

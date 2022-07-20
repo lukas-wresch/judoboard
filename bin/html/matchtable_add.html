@@ -103,11 +103,13 @@ function GetForm(callback)
     document.getElementById("female").innerHTML = lang.female;
 
     if (g_yaml && typeof g_yaml.min_weight !== 'undefined')
-      document.getElementById("minWeight").value = g_yaml["min_weight"];
+      document.getElementById("minWeight").value = g_yaml.min_weight;
     if (g_yaml && typeof g_yaml.max_weight !== 'undefined')
-      document.getElementById("maxWeight").value = g_yaml["max_weight"];
+      document.getElementById("maxWeight").value = g_yaml.max_weight;
     if (g_yaml && typeof g_yaml.gender !== 'undefined')
-      document.getElementById("gender").value = g_yaml["gender"];
+      document.getElementById("gender").value = g_yaml.gender;
+      if (g_yaml && typeof g_yaml.best_of_three !== 'undefined')
+      document.getElementById("bo3").value = g_yaml.best_of_three;
       
     if (typeof callback !== 'undefined')
       callback();
