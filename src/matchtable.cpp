@@ -336,3 +336,26 @@ Match* MatchTable::AddAutoMatch(size_t WhiteIndex, size_t BlueIndex)
 	m_Schedule.emplace_back(new_match);
 	return new_match;
 }
+
+
+
+std::pair<size_t, size_t> MatchTable::GetIndicesOfMatch(const Match* Match) const
+{
+	std::pair ret(0, 0);
+
+	if (!Match || !Match->HasValidFighters())
+	{
+		ZED::Log::Error("Illegal match");
+		return ret;
+	}
+
+	for (int i = 0; i < m_Participants.size(); ++i)
+	{
+		if (m_Participants[i]->GetUUID() == Match->GetFighter(Fighter::White)->GetUUID())
+			ret.first = i;
+		if (m_Participants[i]->GetUUID() == Match->GetFighter(Fighter::Blue)->GetUUID())
+			ret.second = i;
+	}	
+
+	return ret;
+}

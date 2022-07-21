@@ -6,7 +6,7 @@ TEST(Match, ExportImport)
 {
 	initialize();
 	
-	for (int i = 0; i < 3000; i++)
+	for (int i = 0; i < 2000; i++)
 	{
 		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
@@ -27,7 +27,7 @@ TEST(Match, ExportImport)
 		ASSERT_EQ(match.GetFighter(Fighter::Blue )->GetUUID(), match2.GetFighter(Fighter::Blue )->GetUUID());
 
 		ASSERT_EQ(match.GetRuleSet().GetUUID(), match2.GetRuleSet().GetUUID());
-		ASSERT_EQ((std::string)match.AllToString(), (std::string)match2.AllToString());//Will fail due to ID mismatch
+		ASSERT_EQ((std::string)match.AllToString(), (std::string)match2.AllToString());
 		ASSERT_EQ(match.GetColor(), match2.GetColor());
 		ASSERT_EQ(match.GetUUID(), match2.GetUUID());
 		ASSERT_EQ(match.HasConcluded(), match2.HasConcluded());

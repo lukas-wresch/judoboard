@@ -119,6 +119,7 @@ namespace Judoboard
 
 	protected:
 		Match* AddAutoMatch(size_t WhiteIndex, size_t BlueIndex);
+		std::pair<size_t, size_t> GetIndicesOfMatch(const Match* Match) const;
 
 		Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }

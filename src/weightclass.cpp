@@ -234,16 +234,7 @@ void Weightclass::GenerateSchedule()
 		m_RecommendedNumMatches_Before_Break = 2;
 
 	if (GetParticipants().size() == 2)
-	{
-		auto match1 = AddAutoMatch(0, 1);
-		if (m_BestOfThree)
-		{
-			auto match2 = AddAutoMatch(1, 0);
-			auto match3 = AddAutoMatch(0, 1);
-
-			match3->SetBestOfThree(match1, match2);
-		}
-	}
+		AddAutoMatch(0, 1);
 
 	else if (GetParticipants().size() == 3)
 	{
@@ -293,6 +284,23 @@ void Weightclass::GenerateSchedule()
 		auto rng = std::default_random_engine{};
 		std::shuffle(std::begin(m_Schedule), std::end(m_Schedule), rng);
 	}
+
+	
+	//Add additional matches for best of three
+	if (m_BestOfThree)
+	{
+		auto length = m_Schedule.size();
+		for (size_t i = 0; i < length; ++i)
+		{
+			auto match1 = m_Schedule[i];
+			auto indices = GetIndicesOfMatch(match1);
+
+			auto match2 = AddAutoMatch(indices.second, indices.first);
+			auto match3 = AddAutoMatch(indices.first,  indices.second);
+			match3->SetBestOfThree(match1, match2);
+		}
+	}
+
 
 	for (auto match : m_Schedule)
 		match->SetMatchTable(this);
