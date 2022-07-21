@@ -108,7 +108,7 @@ std::string Weightclass::GetDescription() const
 
 	else
 	{
-		desc = std::to_string(m_MinWeight) + " - " + std::to_string(m_MaxWeight) + " kg";
+		desc = "-" + std::to_string(m_MaxWeight) + " kg";
 
 		if (m_Gender == Gender::Male)
 			desc += " (m)";

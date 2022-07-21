@@ -126,6 +126,44 @@ TEST(Tournament, AddMatchAfterDisqualification)
 
 
 
+TEST(Tournament, AddAgeGroup)
+{
+	initialize();
+
+	Judoboard::Application app;
+
+	app.StartLocalMat(1);
+
+	Judoboard::Mat* mat = (Judoboard::Mat*)app.GetDefaultMat();
+
+	srand(ZED::Core::CurrentTimestamp());
+
+	auto tourney = new Judoboard::Tournament("Demo Tournament");
+	tourney->EnableAutoSave(false);
+
+	auto rule_set  = Judoboard::RuleSet("Demo", 180, 60, 20, 10);
+	auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set, app.GetDatabase());
+
+	auto m1 = new Judoboard::Weightclass(tourney, 0, 120);
+	m1->SetMatID(1);
+	m1->SetAgeGroup(&age_group);
+	tourney->AddMatchTable(m1);
+
+	EXPECT_TRUE(tourney->FindAgeGroup(age_group.GetUUID()));
+	EXPECT_TRUE(tourney->FindRuleSet(rule_set.GetUUID()));
+
+	app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
+	app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
+	app.GetDatabase().AddClub(new Judoboard::Club("Senne"));
+
+	for (int i = 0; i < 5; i++)
+		tourney->AddParticipant(new Judoboard::Judoka(Test_CreateRandomJudoka(&app.GetDatabase())));
+
+	EXPECT_EQ(tourney->GetSchedule().size(), 5*4/2);
+}
+
+
+
 TEST(Tournament, DoubleDisqualification)
 {
 	initialize();

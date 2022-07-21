@@ -103,6 +103,7 @@ namespace Judoboard
 
 		const RuleSet& GetRuleSet() const;
 		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
+		const RuleSet* GetOwnRuleSet() const { return m_Rules; }
 
 		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
 		void SetAgeGroup(const AgeGroup* NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
