@@ -1171,7 +1171,7 @@ std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const 
 	for (auto age_group : AgeGroups)
 	{
 		std::vector<std::pair<int, int>> weightsSlots;
-		int min = 1000;
+		int min = 1000 * 1000;
 		int max = 0;
 		for (const auto [id, judoka] : m_StandingData.GetAllJudokas())
 		{
@@ -1355,7 +1355,7 @@ const std::string Tournament::Participants2String() const
 
 		ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
 		ret << YAML::Key << "name" << YAML::Value << judoka->GetName();
-		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight();
+		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
 		ret << YAML::Key << "num_matches" << YAML::Value << num_matches;
 
 		if (judoka->GetClub())

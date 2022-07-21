@@ -1,4 +1,6 @@
 #pragma once
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include <string>
 #include <cassert>
 #include "id.h"
@@ -13,6 +15,58 @@ namespace Judoboard
 		Male, Female
 	};
 
+
+	class Weight
+	{
+	public:
+		Weight(uint32_t InKg) {
+			m_InGrams = InKg * 1000;
+		}
+		Weight(const std::string& Input) {
+			bool commaFound = false;
+			int digitsAfterComma = 0;
+			for (char c : Input)
+			{
+				if (c == ',' || c == '.')
+					commaFound = true;
+				else
+				{
+					m_InGrams *= 10;
+					m_InGrams += (int)c - '0';
+					if (commaFound)
+						digitsAfterComma++;
+				}
+			}
+
+			if (digitsAfterComma == 0)
+				m_InGrams *= 1000;
+			else if (digitsAfterComma == 1)
+				m_InGrams *= 100;
+			else if (digitsAfterComma == 2)
+				m_InGrams *= 10;
+		}
+		Weight(const YAML::Node& Yaml) {
+			m_InGrams = Yaml.as<uint32_t>();
+		}
+
+		void operator >> (YAML::Emitter& Yaml) const {
+			Yaml << m_InGrams;
+		}
+		std::string ToString() const {
+			if (m_InGrams % 1000 == 0)
+				return std::to_string(m_InGrams / 1000);
+			//Add space at the end to that yaml doesn't think that this is a number
+			return std::to_string(m_InGrams/1000) + "," + std::to_string((m_InGrams%1000) / 100) + " ";
+		}
+
+		operator uint32_t () const {
+			return m_InGrams;
+		}
+		
+
+	private:
+		uint32_t m_InGrams = 0;
+	};
 
 
 	inline std::string Latin1ToUTF8(const std::string& Input)

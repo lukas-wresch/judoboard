@@ -190,7 +190,7 @@ const std::string StandingData::Judoka2String(std::string SearchString, const IT
 
 		ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
 		ret << YAML::Key << "name" << YAML::Value << judoka->GetName();
-		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight();
+		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
 		ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
 
 		if (judoka->GetClub())

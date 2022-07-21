@@ -10,11 +10,11 @@ using namespace Judoboard;
 
 
 
-Judoka::Judoka(const std::string& Firstname, const std::string& Lastname, uint32_t Weight, Gender Gender, uint32_t Birthyear)
+Judoka::Judoka(const std::string& Firstname, const std::string& Lastname, Weight Weight, Gender Gender, uint32_t Birthyear)
 	: m_Firstname(Firstname), m_Lastname(Lastname)
 {
-	if (Weight < 1000 * 1000)
-		m_Weight = Weight;
+	m_Weight = Weight;
+
 	if (Gender == Gender::Male || Gender == Gender::Female)
 		m_Gender = Gender;
 
@@ -32,7 +32,7 @@ Judoka::Judoka(const YAML::Node& Yaml, const StandingData* pStandingData)
 	if (Yaml["lastname"])
 		m_Lastname = Yaml["lastname"].as<std::string>();
 	if (Yaml["weight"])
-		m_Weight = Yaml["weight"].as<int>();
+		m_Weight = Weight(Yaml["weight"]);
 	if (Yaml["gender"])
 		m_Gender = (Gender)Yaml["gender"].as<int>();
 	if (Yaml["birthyear"])
@@ -97,7 +97,10 @@ void Judoka::operator >> (YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "uuid"      << YAML::Value << (std::string)GetUUID();
 	Yaml << YAML::Key << "firstname" << YAML::Value << m_Firstname;
 	Yaml << YAML::Key << "lastname"  << YAML::Value << m_Lastname;
-	Yaml << YAML::Key << "weight"    << YAML::Value << m_Weight;
+
+	Yaml << YAML::Key << "weight"    << YAML::Value;
+	m_Weight >> Yaml;
+
 	Yaml << YAML::Key << "gender"    << YAML::Value << (int)m_Gender;
 	Yaml << YAML::Key << "birthyear" << YAML::Value << m_Birthyear;
 	if (m_pClub)
@@ -113,7 +116,7 @@ void Judoka::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "uuid"      << YAML::Value << (std::string)GetUUID();
 	Yaml << YAML::Key << "firstname" << YAML::Value << m_Firstname;
 	Yaml << YAML::Key << "lastname"  << YAML::Value << m_Lastname;
-	Yaml << YAML::Key << "weight"    << YAML::Value << m_Weight;
+	Yaml << YAML::Key << "weight"    << YAML::Value << m_Weight.ToString();
 	Yaml << YAML::Key << "gender"    << YAML::Value << (int)m_Gender;
 	Yaml << YAML::Key << "birthyear" << YAML::Value << m_Birthyear;
 
@@ -135,8 +138,8 @@ uint16_t Judoka::GetAge() const
 
 
 
-void Judoka::SetWeight(uint32_t NewWeight)
+void Judoka::SetWeight(Weight NewWeight)
 {
-	if (NewWeight < 1000 * 1000)
+	if (NewWeight < Weight(1000))
 		m_Weight = NewWeight;
 }

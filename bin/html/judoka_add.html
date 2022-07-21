@@ -14,7 +14,7 @@
 
 <div>
     <label style="width:150px;float:left;margin-top:4px;" id="label_weight">Weight</label>
-    <input style="margin-bottom:20px;" type="number" id="weight" value="" min="10" max="500" />
+    <input style="margin-bottom:20px;" type="text" id="weight" value="" min="10" max="500" />
 </div>
 
 <div>
@@ -81,7 +81,7 @@ function GetJudoka(id)
 
     document.getElementById("firstname").value = res.firstname;
     document.getElementById("lastname").value  = res.lastname;
-    document.getElementById("weight").value    = res.weight;
+    document.getElementById("weight").value    = String(res.weight).trim();
     document.getElementById("gender").value    = res.gender;
     document.getElementById("birthyear").value = res.birthyear;
 

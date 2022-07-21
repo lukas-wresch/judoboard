@@ -8,12 +8,12 @@ TEST(Judoka, Basic)
 	Judoka j("Firstname", "Lastname", 50, Gender::Male);
 
 	EXPECT_EQ(j.GetGender(), Gender::Male);
-	EXPECT_EQ(j.GetWeight(), 50);
+	EXPECT_EQ(j.GetWeight(), Weight(50));
 
 	EXPECT_EQ(j.GetName(), std::string("Firstname Lastname"));
 
 	j.SetWeight(80);
-	EXPECT_EQ(j.GetWeight(), 80);
+	EXPECT_EQ(j.GetWeight(), Weight(80));
 
 	j.SetGender(Gender::Female);
 	EXPECT_TRUE(j.GetGender() == Gender::Female);
@@ -69,4 +69,66 @@ TEST(Judoka, ImportExport_RuleSet)
 		EXPECT_TRUE(r.GetBreakTime() ==   r2.GetBreakTime());
 		EXPECT_TRUE(r.GetDescription() == r2.GetDescription());
 	}
+}
+
+
+
+TEST(Judoka, Weight)
+{
+	initialize();
+
+	Weight w(123);
+	EXPECT_EQ(w, 123 * 1000);
+
+	Weight w2("12,3");
+	EXPECT_EQ(w2, 12 * 1000 + 300);
+	EXPECT_EQ(w2.ToString(), "12,3 ");
+
+	Weight w3("12.3");
+	EXPECT_EQ(w3, 12 * 1000 + 300);
+	EXPECT_EQ(w3.ToString(), "12,3 ");
+
+	Weight w4("12");
+	EXPECT_EQ(w4, 12 * 1000);
+	EXPECT_EQ(w4.ToString(), "12");
+
+	YAML::Emitter yaml;
+	w2 >> yaml;
+	w2 = Weight(YAML::Load(yaml.c_str()));
+	EXPECT_EQ(w2, 12 * 1000 + 300);
+	EXPECT_EQ(w2.ToString(), "12,3 ");
+}
+
+
+
+TEST(Judoka, WeightWithGrams)
+{
+	initialize();
+
+	Weight w(123);
+	EXPECT_EQ(w, 123 * 1000);
+
+	Weight w2("12,03");
+	EXPECT_EQ(w2, 12 * 1000 + 30);
+	EXPECT_EQ(w2.ToString(), "12,0 ");
+
+	Weight w3("12.003");
+	EXPECT_EQ(w3, 12 * 1000 + 3);
+	EXPECT_EQ(w3.ToString(), "12,0 ");
+
+	Weight w4("12");
+	EXPECT_EQ(w4, 12 * 1000);
+	EXPECT_EQ(w4.ToString(), "12");
+
+	YAML::Emitter yaml;
+	w2 >> yaml;
+	w2 = Weight(YAML::Load(yaml.c_str()));
+	EXPECT_EQ(w2, 12 * 1000 + 30);
+	EXPECT_EQ(w2.ToString(), "12,0 ");
+
+	YAML::Emitter yaml2;
+	w3 >> yaml2;
+	w3 = Weight(YAML::Load(yaml2.c_str()));
+	EXPECT_EQ(w3, 12 * 1000 + 3);
+	EXPECT_EQ(w3.ToString(), "12,0 ");
 }

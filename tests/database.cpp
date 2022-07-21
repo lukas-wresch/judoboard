@@ -5,8 +5,8 @@
 TEST(Database, JudokaTest)
 {
 	initialize();
-	ZED::Core::RemoveFile("temp.csv");
-	ZED::Core::RemoveFile("temp2.csv");
+	ZED::Core::RemoveFile("temp.yml");
+	ZED::Core::RemoveFile("temp2.yml");
 
 	{
 		Database d;
@@ -19,17 +19,17 @@ TEST(Database, JudokaTest)
 		d.AddJudoka(&j1);
 		d.AddJudoka(&j2);
 
-		EXPECT_TRUE(d.FindJudoka(j1.GetUUID())->GetWeight() == 50);
-		EXPECT_TRUE(d.FindJudoka(j2.GetUUID())->GetWeight() == 60);
+		EXPECT_TRUE(d.FindJudoka(j1.GetUUID())->GetWeight() == Weight(50));
+		EXPECT_TRUE(d.FindJudoka(j2.GetUUID())->GetWeight() == Weight(60));
 
-		EXPECT_TRUE(d.Save("temp.csv"));
-		EXPECT_TRUE(d.Save("temp2.csv"));
+		EXPECT_TRUE(d.Save("temp.yml"));
+		EXPECT_TRUE(d.Save("temp2.yml"));
 
 		ASSERT_TRUE(d.DeleteJudoka(j1.GetUUID()));
 		EXPECT_FALSE(d.DeleteJudoka(j1.GetUUID()));
 
 		ASSERT_TRUE(d.FindJudoka(j1.GetUUID()) == nullptr);
-		EXPECT_TRUE(d.FindJudoka(j2.GetUUID())->GetWeight() == 60);
+		EXPECT_TRUE(d.FindJudoka(j2.GetUUID())->GetWeight() == Weight(60));
 
 		EXPECT_TRUE(d.DeleteJudoka(j2.GetUUID()));
 		EXPECT_FALSE(d.DeleteJudoka(j2.GetUUID()));
@@ -37,16 +37,16 @@ TEST(Database, JudokaTest)
 		EXPECT_TRUE(d.FindJudoka(j1.GetUUID()) == nullptr);
 		EXPECT_TRUE(d.FindJudoka(j2.GetUUID()) == nullptr);
 
-		EXPECT_TRUE(d.Load("temp.csv"));
+		EXPECT_TRUE(d.Load("temp.yml"));
 
 		ASSERT_TRUE(d.FindJudoka(j1.GetUUID()));
-		EXPECT_EQ(d.FindJudoka(j1.GetUUID())->GetWeight(), 50);
+		EXPECT_EQ(d.FindJudoka(j1.GetUUID())->GetWeight(), Weight(50));
 		ASSERT_TRUE(d.FindJudoka(j2.GetUUID()));
-		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), 60);
+		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), Weight(60));
 	}
 
-	ZED::Core::RemoveFile("temp.csv");
-	ZED::Core::RemoveFile("temp2.csv");
+	ZED::Core::RemoveFile("temp.yml");
+	ZED::Core::RemoveFile("temp2.yml");
 }
 
 
@@ -73,8 +73,8 @@ TEST(Database, SaveAndLoad)
 
 		d.AddRuleSet(new RuleSet("Test", 60, 30, 20, 10, true, true, true, 1));
 
-		EXPECT_EQ(d.FindJudoka(j1.GetUUID())->GetWeight(), 50);
-		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), 60);
+		EXPECT_EQ(d.FindJudoka(j1.GetUUID())->GetWeight(), Weight(50));
+		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), Weight(60));
 
 		EXPECT_TRUE(d.Save("temp.yml"));
 
@@ -86,12 +86,12 @@ TEST(Database, SaveAndLoad)
 
 		ASSERT_TRUE(d2.FindJudoka(j1.GetUUID()));
 		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetUUID(), j1.GetUUID());
-		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetWeight(), 50);
+		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetWeight(), Weight(50));
 		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetGender(), j1.GetGender());
 
 		ASSERT_TRUE(d2.FindJudoka(j2.GetUUID()));
 		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetUUID(), j2.GetUUID());
-		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetWeight(), 60);
+		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetWeight(), Weight(60));
 		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetGender(), j2.GetGender());
 
 		auto rule_set = d2.FindRuleSetByName("Test");
