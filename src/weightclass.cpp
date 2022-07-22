@@ -12,7 +12,7 @@ using namespace Judoboard;
 
 
 
-Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight) : MatchTable(Tournament)
+Weightclass::Weightclass(const ITournament* Tournament, Weight MinWeight, Weight MaxWeight) : MatchTable(Tournament)
 {
 	m_MinWeight = MinWeight;
 	m_MaxWeight = MaxWeight;
@@ -20,7 +20,7 @@ Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint
 
 
 
-Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight, Gender Gender) : Weightclass(Tournament, MinWeight, MaxWeight)
+Weightclass::Weightclass(const ITournament* Tournament, Weight MinWeight, Weight MaxWeight, Gender Gender) : Weightclass(Tournament, MinWeight, MaxWeight)
 {
 	m_Gender = Gender;
 }
