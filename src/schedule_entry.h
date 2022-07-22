@@ -159,6 +159,9 @@ namespace Judoboard
 		}
 		Schedulable(const YAML::Node& Yaml, const ITournament* Tournament) : m_Tournament(Tournament)
 		{
+			if (!Yaml.IsMap())
+				return;
+
 			if (Yaml["uuid"])
 				SetUUID(Yaml["uuid"].as<std::string>());
 			if (Yaml["schedule_index"])

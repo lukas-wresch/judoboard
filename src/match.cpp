@@ -26,6 +26,9 @@ Match::Match(const ITournament* Tournament, Judoka* White, Judoka* Blue, uint32_
 
 Match::Match(const YAML::Node& Yaml, ITournament* Tournament) : Schedulable(Yaml, Tournament)
 {
+	if (!Yaml.IsMap())
+		return;
+
 	if (Yaml["white"] && Tournament)
 		m_White.m_Judoka = Tournament->FindParticipant(Yaml["white"].as<std::string>());
 	if (Yaml["blue"] && Tournament)
