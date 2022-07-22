@@ -97,7 +97,7 @@ namespace Judoboard
 	private:
 		bool SendCommand(const std::string& URL) const;
 		ZED::HttpClient::Packet SendRequest(const std::string& URL) const;
-		bool PostData(const std::string& URL, const ZED::CSV& Data) const;
+		bool PostData(const std::string& URL, const YAML::Emitter& Data) const;
 
 		struct InternalState
 		{

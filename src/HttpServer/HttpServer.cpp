@@ -64,10 +64,10 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
 
         if (Connection->content_len > 0)
         {
-            ZED::Blob body((size_t)Connection->content_len);
+            ZED::Blob body((size_t)Connection->content_len + 1);
             //char* body = new char[(size_t)Connection->content_len + 1];
             mg_read(Connection, body, (size_t)Connection->content_len);
-            //body[Connection->content_len] = '\0';
+            body[Connection->content_len] = '\0';
             request_body = std::move(body);
             //delete[] body;
         }

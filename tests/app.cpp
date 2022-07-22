@@ -359,13 +359,17 @@ TEST(App, MatchOnSlave)
 	ASSERT_TRUE(mat != nullptr);
 	ASSERT_TRUE(mat->StartMatch(&match));
 
-	ZED::Core::Pause(5000);
+	ZED::Core::Pause(2000);
 
 	mat->Hajime();
 
 	mat->AddIppon(Fighter::White);
 
+	ZED::Core::Pause(100);
+
 	EXPECT_TRUE(mat->EndMatch());
+
+	ZED::Core::Pause(100);
 
 	EXPECT_EQ(match.GetMatchResult().m_Winner, Fighter::White);
 	EXPECT_EQ(match.GetMatchResult().m_Score, Match::Score::Ippon);

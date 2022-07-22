@@ -24,7 +24,7 @@ namespace Judoboard
 
 	private:
 		std::string Request2Master(const std::string& URL) const;
-		bool Post2Master(const std::string& URL, const ZED::CSV& Data) const;
+		bool Post2Master(const std::string& URL, const YAML::Emitter& Data) const;
 
 		std::string m_Hostname;
 		uint16_t m_Port;

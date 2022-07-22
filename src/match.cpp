@@ -127,7 +127,7 @@ void Match::operator >>(YAML::Emitter& Yaml) const
 	if (m_White.m_Dependency != DependencyType::None)
 		Yaml << YAML::Key << "dependency_white" << YAML::Value << (int)m_White.m_Dependency;
 	if (m_Blue.m_Dependency != DependencyType::None)
-		Yaml << YAML::Key << "dependency_blue" << YAML::Value << (int)m_Blue.m_Dependency;
+		Yaml << YAML::Key << "dependency_blue"  << YAML::Value << (int)m_Blue.m_Dependency;
 
 	if (m_White.m_DependentMatch)
 		Yaml << YAML::Key << "dependent_match_white" << YAML::Value << (std::string)m_White.m_DependentMatch->GetUUID();
