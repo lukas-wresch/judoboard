@@ -24,6 +24,8 @@ namespace Judoboard
 		virtual Status GetStatus() const override;
 
 		virtual std::vector<Result> CalculateResults() const override;
+		virtual bool IsElgiable(const Judoka& Fighter) const override;
+		virtual void GenerateSchedule() override;
 
 		auto GetMinWeight() const { return m_MinWeight; }
 		auto GetMaxWeight() const { return m_MaxWeight; }
@@ -31,9 +33,8 @@ namespace Judoboard
 		void SetMinWeight(Weight MinWeight) { m_MinWeight = MinWeight; }
 		void SetMaxWeight(Weight MaxWeight) { m_MaxWeight = MaxWeight; }
 		void SetGender(Gender Gender) { m_Gender = Gender; }
-
-		virtual bool IsElgiable(const Judoka& Fighter) const override;
-		void GenerateSchedule() override;
+		auto IsBestOfThree() const { return m_BestOfThree; }
+		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; }
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
@@ -47,5 +48,6 @@ namespace Judoboard
 		Weight m_MaxWeight = 100*1000;//In gramms
 
 		Gender m_Gender = Gender::Unknown;
+		bool m_BestOfThree = false;
 	};
 }

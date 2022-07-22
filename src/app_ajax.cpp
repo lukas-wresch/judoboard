@@ -1546,12 +1546,16 @@ void Application::SetupHttpServer()
 			auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
 
 			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+			bool bo3   = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
 
-			if (gender == 0 || gender == 1)
-				new_table = new Weightclass(GetTournament(), Weight(minWeight), Weight(maxWeight), (Gender)gender);
-			else
-				new_table = new Weightclass(GetTournament(), Weight(minWeight), Weight(maxWeight));
-				
+			auto new_weightclass = new Weightclass(GetTournament(), minWeight, maxWeight);
+
+			if (gender == (int)Gender::Male || gender == (int)Gender::Female)
+				new_weightclass->SetGender((Gender)gender);
+
+			new_weightclass->IsBestOfThree(bo3);
+
+			new_table = new_weightclass;				
 			break;
 		}
 
@@ -1599,6 +1603,8 @@ void Application::SetupHttpServer()
 		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Body, "age_group");
 		UUID rule_set_id  = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 
+		LockTillScopeEnd();
+
 		auto table = GetTournament()->FindMatchTable(id);
 
 		if (!table)
@@ -1630,9 +1636,13 @@ void Application::SetupHttpServer()
 		{
 		case MatchTable::Type::Weightclass:
 		{
-			auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
-			auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
-			int gender     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+			int minWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight"));
+			int maxWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight"));
+			int gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+			bool bo3      = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
+
+			if (minWeight < 0 || maxWeight < 0)
+				return std::string("Invalid value");
 
 			Weightclass* weight_table = (Weightclass*)table;
 
@@ -1641,6 +1651,7 @@ void Application::SetupHttpServer()
 			weight_table->SetMinWeight(Weight(minWeight));
 			weight_table->SetMaxWeight(Weight(maxWeight));
 			weight_table->SetGender((Gender)gender);
+			weight_table->IsBestOfThree(bo3);
 
 			GetTournament()->Unlock();
 			break;
@@ -1898,7 +1909,8 @@ void Application::SetupHttpServer()
 		LockTillScopeEnd();//In case the tournament gets closed at the same time
 
 		YAML::Emitter yaml;
-		GetTournament()->ListAgeGroups(yaml);
+		if (GetTournament())
+			GetTournament()->ListAgeGroups(yaml);
 		return yaml.c_str();
 	});
 
@@ -2287,13 +2299,13 @@ void Application::SetupHttpServer()
 			return "You are not allowed to connect";
 
 		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-		ZED::CSV matchCSV(Request.m_Body);
+		YAML::Node match_data = YAML::Load((const char*)Request.m_Body);
 
 		for (auto mat : m_Mats)
 		{
 			if (mat && mat->GetMatID() == matID)
 			{
-				Match* match = new Match(matchCSV, GetTournament());
+				Match* match = new Match(match_data, GetTournament());
 				GetTournament()->AddMatch(match);
 
 				if (mat->StartMatch(match))
@@ -2440,7 +2452,7 @@ void Application::SetupHttpServer()
 		if (!IsMaster())
 			return "You are not allowed to connect";
 
-		auto ip = ZED::Core::IP2String(Request.m_RequestInfo.RemoteIP);
+		auto ip  = ZED::Core::IP2String(Request.m_RequestInfo.RemoteIP);
 		int port = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "port"));
 
 		ZED::Log::Info("Slave informed us about a new mat");
@@ -2486,7 +2498,7 @@ void Application::SetupHttpServer()
 
 		ZED::Log::Info("Slave posted match results to us");
 
-		ZED::CSV match_data = Request.m_Body;
+		YAML::Node match_data = YAML::Load((const char*)Request.m_Body);
 		Match posted_match(match_data, GetTournament());
 
 		auto match = GetTournament()->FindMatch(posted_match);

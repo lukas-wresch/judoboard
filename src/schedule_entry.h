@@ -18,7 +18,9 @@ namespace Judoboard
 	{
 		Scheduled,//Match is scheduled
 		Running,//Match is currently underway
-		Concluded//Match has concluded, results are available
+		Concluded,//Match has concluded, results are available
+		Optional,//It is not clear yet whetever the match will take place
+		Skipped,//The match will take place
 	};
 
 

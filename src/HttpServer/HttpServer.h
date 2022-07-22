@@ -61,7 +61,6 @@ public:
 		Request(const std::string& Query, std::string& Body, const RequestInfo& RequestInfo) : Request(Query, ZED::Blob(Body), RequestInfo) {}
 
 		std::string m_Query;
-		//std::string m_Body;
 		ZED::Blob m_Body;
 		const RequestInfo m_RequestInfo;
 

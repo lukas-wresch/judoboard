@@ -287,13 +287,48 @@ TEST(Tournament, RevokeDoubleDisqualification)
 
 
 
+TEST(Tournament, BestOf3_Matchtable)
+{
+	{
+		initialize();
+
+		Judoka j1("Firstname1", "Lastname1", 50, Gender::Male);
+		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka j3("Firstname3", "Lastname3", 52, Gender::Male);
+		Judoka j4("Firstname4", "Lastname4", 53, Gender::Male);
+
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+		Tournament tourney("deleteMe");
+		tourney.Reset();
+		tourney.EnableAutoSave(false);
+
+		EXPECT_TRUE(tourney.AddParticipant(&j1));
+		EXPECT_TRUE(tourney.AddParticipant(&j2));
+		EXPECT_TRUE(tourney.AddParticipant(&j3));
+		EXPECT_TRUE(tourney.AddParticipant(&j4));
+
+		auto matchtable = new Weightclass(&tourney, 50, 60);
+		matchtable->IsBestOfThree(true);
+		tourney.AddMatchTable(matchtable);
+
+		EXPECT_EQ(tourney.GetMatchTables().size(), 1);
+
+		EXPECT_EQ(matchtable->GetSchedule().size(), 6 * 3);
+	}
+
+	ZED::Core::RemoveFile("deleteMe.yml");
+}
+
+
+
 TEST(Tournament, ColorsForMatchTables)
 {
 	{
 		initialize();
 		Database d;
-		d.Save("deleteMe.csv");
-		d.Load("deleteMe.csv");
+		d.Save("deleteMe.yml");
+		d.Load("deleteMe.yml");
 
 		EXPECT_TRUE(d.GetNumJudoka() == 0);
 

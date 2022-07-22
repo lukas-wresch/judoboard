@@ -35,6 +35,8 @@ Weightclass::Weightclass(const YAML::Node& Yaml, ITournament* Tournament) : Matc
 		m_MaxWeight = Yaml["max_weight"].as<int>();
 	if (Yaml["gender"])
 		m_Gender = (Gender)Yaml["gender"].as<int>();
+	if (Yaml["best_of_three"])
+		m_BestOfThree = Yaml["best_of_three"].as<bool>();
 }
 
 
@@ -67,6 +69,9 @@ void Weightclass::operator >> (YAML::Emitter& Yaml) const
 
 	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;
 
+	if (m_BestOfThree)
+		Yaml << YAML::Key << "best_of_three" << YAML::Value << m_BestOfThree;
+
 	Yaml << YAML::EndMap;
 }
 
@@ -81,6 +86,7 @@ void Weightclass::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "min_weight" << YAML::Value << m_MinWeight.ToString();
 	Yaml << YAML::Key << "max_weight" << YAML::Value << m_MaxWeight.ToString();
 	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;
+	Yaml << YAML::Key << "best_of_three" << YAML::Value << m_BestOfThree;
 
 	Yaml << YAML::EndMap;
 }
@@ -162,11 +168,19 @@ std::string Weightclass::GetHTMLForm()
 
 <div>
   <label style="width:150px;float:left;margin-top:5px;" id="label_gender">Gender</label>
-  <select style="margin-bottom:10px;" id="gender">
+  <select style="margin-bottom:20px;" id="gender">
     <option selected value="-1" id="all">All</option>
     <option value="0" id="male">Male</option>
     <option value="1" id="female">Female</option>
   </select>
+</div>
+
+<div>
+  <label style="width:150px;float:left;margin-top:5px;" id="label_bo3">Best of 3</label>
+  <input type="checkbox" id="bo3" class="switch-input">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="bo3">
+    <span class="toggle-on" id="bo3_enabled"></span><span class="toggle-off" id="bo3_disabled"></span>
+  </label>
 </div>
 )";
 
@@ -219,7 +233,10 @@ void Weightclass::GenerateSchedule()
 	else
 		m_RecommendedNumMatches_Before_Break = 2;
 
-	if (GetParticipants().size() == 3)
+	if (GetParticipants().size() == 2)
+		AddAutoMatch(0, 1);
+
+	else if (GetParticipants().size() == 3)
 	{
 		AddAutoMatch(0, 1);
 		AddAutoMatch(0, 2);
@@ -267,6 +284,23 @@ void Weightclass::GenerateSchedule()
 		auto rng = std::default_random_engine{};
 		std::shuffle(std::begin(m_Schedule), std::end(m_Schedule), rng);
 	}
+
+	
+	//Add additional matches for best of three
+	if (m_BestOfThree)
+	{
+		auto length = m_Schedule.size();
+		for (size_t i = 0; i < length; ++i)
+		{
+			auto match1 = m_Schedule[i];
+			auto indices = GetIndicesOfMatch(match1);
+
+			auto match2 = AddAutoMatch(indices.second, indices.first);
+			auto match3 = AddAutoMatch(indices.first,  indices.second);
+			match3->SetBestOfThree(match1, match2);
+		}
+	}
+
 
 	for (auto match : m_Schedule)
 		match->SetMatchTable(this);
