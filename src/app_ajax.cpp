@@ -1636,13 +1636,10 @@ void Application::SetupHttpServer()
 		{
 		case MatchTable::Type::Weightclass:
 		{
-			int minWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight"));
-			int maxWeight = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight"));
-			int gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
-			bool bo3      = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
-
-			if (minWeight < 0 || maxWeight < 0)
-				return std::string("Invalid value");
+			auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
+			auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
+			int  gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+			bool bo3       = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
 
 			Weightclass* weight_table = (Weightclass*)table;
 
