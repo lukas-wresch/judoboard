@@ -804,8 +804,6 @@ MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
 {
 	for (auto table : m_MatchTables)
 	{
-		printf(table->GetName().c_str());
-		printf("\n");
 		if (table && table->GetName() == Name)
 			return table;
 	}
@@ -818,8 +816,6 @@ MatchTable* Tournament::FindMatchTableByDescription(const std::string& Descripti
 {
 	for (auto table : m_MatchTables)
 	{
-		printf(table->GetDescription().c_str());
-		printf("\n");
 		if (table && table->GetDescription() == Description)
 			return table;
 	}

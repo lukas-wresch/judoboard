@@ -468,7 +468,7 @@ Judoka* StandingData::FindJudoka_ExactMatch(const Judoka& NewJudoka)
 		if (judoka && judoka->GetFirstname()  == NewJudoka.GetFirstname()
 			&& judoka->GetLastname()   == NewJudoka.GetLastname()
 			&& judoka->GetGender()     == NewJudoka.GetGender()
-			&& (judoka->GetBirthyear() == NewJudoka.GetBirthyear() || judoka->GetBirthyear() == 0 || NewJudoka.GetBirthyear() < 0)
+			&& (judoka->GetBirthyear() == NewJudoka.GetBirthyear() || judoka->GetBirthyear() == 0 || NewJudoka.GetBirthyear() == 0)
 			&& (!judoka->GetClub() || !NewJudoka.GetClub() || judoka->GetClub()->GetName() == NewJudoka.GetClub()->GetName()) )
 		{
 			if (ret)//Have we found one?

@@ -54,9 +54,9 @@ Match::Match(const YAML::Node& Yaml, ITournament* Tournament) : Schedulable(Yaml
 	if (Yaml["dependency_blue"])
 		m_Blue.m_Dependency = (DependencyType)Yaml["dependency_blue"].as<int>();
 
-	if (Yaml["dependent_match_white"])
+	if (Yaml["dependent_match_white"] && Tournament)
 		m_White.m_DependentMatch = Tournament->FindMatch(Yaml["dependent_match_white"].as<std::string>());
-	if (Yaml["dependent_match_white"])
+	if (Yaml["dependent_match_blue"] && Tournament)
 		m_Blue.m_DependentMatch  = Tournament->FindMatch(Yaml["dependent_match_blue"].as<std::string>());
 
 	if (Yaml["is_auto_generated"])
