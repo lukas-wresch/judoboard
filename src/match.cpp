@@ -157,9 +157,9 @@ Status Match::GetStatus() const
 		//Check if won by the same person
 		if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
 		{
-			if (m_White.m_DependentMatch->GetWinningJudoka() &&
-				m_Blue.m_DependentMatch->GetWinningJudoka()  &&
-				m_White.m_DependentMatch->GetWinningJudoka()->GetUUID() == m_Blue.m_DependentMatch->GetWinningJudoka()->GetUUID())
+			if (m_White.m_DependentMatch->GetWinner() &&
+				m_Blue.m_DependentMatch->GetWinner()  &&
+				m_White.m_DependentMatch->GetWinner()->GetUUID() == m_Blue.m_DependentMatch->GetWinner()->GetUUID())
 				return Status::Skipped;//Skip match
 		}
 
@@ -225,7 +225,7 @@ const Judoka* Match::GetEnemyOf(const Judoka& Judoka) const
 
 
 
-const Judoka* Match::GetWinningJudoka() const
+const Judoka* Match::GetWinner() const
 {
 	if (!HasConcluded())
 		return nullptr;
@@ -239,6 +239,24 @@ const Judoka* Match::GetWinningJudoka() const
 		return m_White.m_Judoka;
 	else
 		return m_Blue.m_Judoka;
+}
+
+
+
+const Judoka* Match::GetLoser() const
+{
+	if (!HasConcluded())
+		return nullptr;
+
+	auto result = GetMatchResult();
+
+	if (result.m_Winner == Winner::Draw)
+		return nullptr;
+
+	if (result.m_Winner == Winner::White)
+		return m_Blue.m_Judoka;
+	else
+		return m_White.m_Judoka;
 }
 
 

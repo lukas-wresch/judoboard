@@ -106,7 +106,8 @@ namespace Judoboard
 		Fighter GetColorOfFighter(const Judoka& Judoka) const;//Returns the color (white or blue) of the judoka. 'Judoka' must be on of the two fighters of the match
 		const Judoka* GetEnemyOf(const Judoka& Judoka) const;//Returns the enemy of the given fighter. Judoka must be on of the two fighters of this match
 
-		const Judoka* GetWinningJudoka() const;
+		const Judoka* GetWinner() const;
+		const Judoka* GetLoser() const;
 
 		//Match depencies
 		void SetDependency(Fighter Fighter, DependencyType Type, const Match* Reference);

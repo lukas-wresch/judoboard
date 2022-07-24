@@ -140,13 +140,13 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 
 		auto result = match->GetMatchResult();
 
-		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetUUID() == Judoka->GetUUID())
+		if (result.m_Winner != Winner::Draw && match->GetWinner()->GetUUID() == Judoka->GetUUID())
 		{
 			a_wins++;
 			a_score += (int)match->GetMatchResult().m_Score;
 		}
 
-		if (result.m_Winner != Winner::Draw && match->GetWinningJudoka()->GetUUID() == rhs.Judoka->GetUUID())
+		if (result.m_Winner != Winner::Draw && match->GetWinner()->GetUUID() == rhs.Judoka->GetUUID())
 		{
 			b_wins++;
 			b_score += (int)match->GetMatchResult().m_Score;
@@ -358,4 +358,20 @@ std::pair<size_t, size_t> MatchTable::GetIndicesOfMatch(const Match* Match) cons
 	}	
 
 	return ret;
+}
+
+
+
+size_t MatchTable::GetIndexOfParticipant(const Judoka* Participant) const
+{
+	if (!Participant)
+		return 0;
+
+	for (size_t i = 0; i < m_Participants.size(); ++i)
+	{
+		if (Participant && Participant->GetUUID() == m_Participants[i]->GetUUID())
+			return i;
+	}
+
+	return 0;
 }

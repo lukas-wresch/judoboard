@@ -1276,7 +1276,7 @@ void Tournament::Disqualify(const Judoka& Judoka)
 		//Concluded match via disqualification
 		else if (match->HasConcluded() && match->GetLog().GetNumEvent() == 0 && match->Contains(Judoka))
 		{
-			if (match->GetWinningJudoka() && *match->GetWinningJudoka() == Judoka)
+			if (match->GetWinner() && *match->GetWinner() == Judoka)
 			{
 				match->SetResult(Match::Result(Winner::Draw, Match::Score::Draw));
 			}

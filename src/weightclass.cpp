@@ -297,7 +297,8 @@ void Weightclass::GenerateSchedule()
 
 			auto match2 = AddAutoMatch(indices.second, indices.first);
 			auto match3 = AddAutoMatch(indices.first,  indices.second);
-			match3->SetBestOfThree(match1, match2);
+			if (match3)
+				match3->SetBestOfThree(match1, match2);
 		}
 	}
 
@@ -315,39 +316,24 @@ std::vector<MatchTable::Result> Weightclass::CalculateResults() const
 	for (size_t i = 0; i < GetParticipants().size(); i++)
 	{
 		auto fighter = GetParticipant(i);
+		ret[i].Set(fighter, this);		
+	}
 
-		if (!fighter)
+	for (auto match : m_Schedule)
+	{
+		if (!match->HasConcluded())
 			continue;
 
-		ret[i].Set(fighter, this);
+		const auto& result = match->GetMatchResult();
 
-		for (size_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
-		{
-			auto enemy = GetParticipant(j);
-			if (!enemy)
-				continue;
+		auto i = GetIndexOfParticipant(match->GetWinner());
+		auto j = GetIndexOfParticipant(match->GetLoser());
 
-			if (fighter->GetUUID() == enemy->GetUUID())
-				continue;
+		ret[i].Wins++;
+		ret[i].Score += (uint32_t)result.m_Score;
 
-			auto matches = FindMatches(*fighter, *enemy);//Find all matches of these two
-
-			if (!matches.empty())
-			{
-				if (!matches[0]->HasConcluded())
-					continue;
-
-				const auto& result = matches[0]->GetMatchResult();
-
-				if (matches[0]->GetWinningJudoka()->GetUUID() == fighter->GetUUID())
-				{
-					ret[i].Wins++;
-					ret[i].Score += (uint32_t)result.m_Score;
-				}
-
-				ret[i].Time += result.m_Time;
-			}
-		}
+		ret[i].Time += result.m_Time;
+		ret[j].Time += result.m_Time;
 	}
 
 	std::sort(ret.begin(), ret.end());
@@ -403,7 +389,7 @@ const std::string Weightclass::ToHTML() const
 					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">In Progress</a></td>";
 				else if (!matches[0]->HasConcluded())
 					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">- - -</a></td>";
-				else if (matches[0]->GetWinningJudoka()->GetUUID() == fighter->GetUUID())
+				else if (matches[0]->GetWinner()->GetUUID() == fighter->GetUUID())
 				{
 					const auto& result = matches[0]->GetMatchResult();
 					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";

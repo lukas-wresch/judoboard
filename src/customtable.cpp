@@ -97,7 +97,7 @@ std::vector<MatchTable::Result> CustomTable::CalculateResults() const
 
 				const auto& result = matches[0]->GetMatchResult();
 
-				if (matches[0]->GetWinningJudoka()->GetUUID() == fighter->GetUUID())
+				if (matches[0]->GetWinner()->GetUUID() == fighter->GetUUID())
 				{
 					ret[i].Wins++;
 					ret[i].Score += (uint32_t)result.m_Score;
