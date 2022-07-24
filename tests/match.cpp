@@ -171,6 +171,7 @@ TEST(Match, BestOf3ExportImport)
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 	Tournament tourney("deleteMe");
+	tourney.EnableAutoSave(false);
 
 	Mat mat(1);
 
@@ -189,6 +190,7 @@ TEST(Match, BestOf3ExportImport)
 	}
 
 	Tournament tourney2("deleteMe");
+	tourney2.EnableAutoSave(false);
 
 	ASSERT_EQ(tourney2.GetSchedule().size(), 3);
 
