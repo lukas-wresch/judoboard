@@ -17,10 +17,10 @@ jobs:
       run: chmod u+x *.sh && ./dependencies.sh && XDG_RUNTIME_DIR=. && sudo apt-get install gdb
     - name: make
       run: ./compile.sh
-    - name: debug tests
-      run: cd bin && gdb ./judoboard_test_debug --eval-command=r bt && cd ..
     - name: run tests
       run: ./run_tests.sh
+    - name: debug tests
+      run: cd bin && gdb ./judoboard_test_debug --eval-command=r bt && cd ..
       
   test2:
     name: Unit Tests on Raspberry Pi 4
@@ -32,10 +32,10 @@ jobs:
       run: chmod u+x *.sh
     - name: make
       run: ./compile.sh
-    - name: debug tests
-      run: cd bin && gdb ./judoboard_test_debug --eval-command=r bt && cd ..
     - name: run tests
       run: ./run_tests.sh
+    - name: debug tests
+      run: cd bin && gdb ./judoboard_test_debug --eval-command=r bt && cd ..
       
   test3:
     name: Unit Tests on Windows
