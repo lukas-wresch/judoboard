@@ -279,6 +279,9 @@ bool Tournament::LoadYAML(const std::string& Filename)
 
 bool Tournament::SaveYAML(const std::string& Filename) const
 {
+	if (m_Name.empty())
+		return false;
+
 	std::ofstream file(Filename);
 
 	if (!file)
