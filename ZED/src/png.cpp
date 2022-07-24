@@ -12,18 +12,18 @@ using namespace ZED;
 //#pragma comment(lib, "../external/libpng-1.6.37/projects/vstudio/Release Library/zlib.lib")
 
 #ifdef _WIN64
-#ifdef _DEBUG
-#pragma comment(lib, "../packages/libpng.1.6.28.1/build/native/lib/x64/v140/dynamic/Debug/libpng16.lib")
-#else
+//#ifdef _DEBUG
+//#pragma comment(lib, "../packages/libpng.1.6.28.1/build/native/lib/x64/v140/dynamic/Debug/libpng16.lib")
+//#else
 #pragma comment(lib, "../packages/libpng.1.6.28.1/build/native/lib/x64/v140/dynamic/Release/libpng16.lib")
-#endif
+//#endif
 
 #else//32 bit
-#ifdef _DEBUG
-#pragma comment(lib, "../packages/libpng.1.6.28.1/build/native/lib/Win32/v140/dynamic/Debug/libpng16.lib")
-#else
+//#ifdef _DEBUG
+//#pragma comment(lib, "../packages/libpng.1.6.28.1/build/native/lib/Win32/v140/dynamic/Debug/libpng16.lib")
+//#else
 #pragma comment(lib, "../packages/libpng.1.6.28.1/build/native/lib/Win32/v140/dynamic/Release/libpng16.lib")
-#endif
+//#endif
 #endif
 
 

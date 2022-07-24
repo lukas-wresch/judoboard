@@ -41,14 +41,14 @@ TEST(Match, BestOf3)
 {
 	initialize();
 
+	Mat mat(1);
+
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 
 		Tournament tourney;
-
-		Mat mat(1);
 
 		Match m1(&tourney, &j1, &j2, 1);
 		Match m2(&tourney, &j2, &j1, 1);
@@ -82,6 +82,8 @@ TEST(Match, BestOf3_2)
 {
 	initialize();
 
+	Mat mat(1);
+
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
@@ -89,8 +91,6 @@ TEST(Match, BestOf3_2)
 
 		Tournament tourney;
 		tourney.EnableAutoSave(false);
-
-		Mat mat(1);
 
 		Match m1(&tourney, &j1, &j2, 1);
 		Match m2(&tourney, &j2, &j1, 1);
@@ -124,6 +124,8 @@ TEST(Match, BestOf3_3)
 {
 	initialize();
 
+	Mat mat(1);
+
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
@@ -131,8 +133,6 @@ TEST(Match, BestOf3_3)
 
 		Tournament tourney;
 		tourney.EnableAutoSave(false);
-
-		Mat mat(1);
 
 		Match m1(&tourney, &j1, &j2, 1);
 		Match m2(&tourney, &j1, &j2, 1);
