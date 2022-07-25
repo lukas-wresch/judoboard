@@ -4,12 +4,21 @@
 [![Tests](https://github.com/lukas-wresch/judoboard/actions/workflows/tests.yml/badge.svg)](https://github.com/lukas-wresch/judoboard/actions/workflows/tests.yml)
 
 Judoboard is a easy to use digital scoreboard and tournament management system for the sport of Judo.
+Current feature set:
+
+- Support for weightclasses
+- Age groups with different rule sets
+- Best of three matches
+- Yuko and Koka (optional)
+- Import & export of md5 files
+- Import of dm4 files
+- Import of dmf files
 
 Currently working on the following features:
 
-[![DM4 Support](https://github.com/lukas-wresch/judoboard/actions/workflows/dm4.yml/badge.svg?branch=dm4-support)](https://github.com/lukas-wresch/judoboard/actions/workflows/dm4.yml)
-
-[![MD5 Support](https://github.com/lukas-wresch/judoboard/actions/workflows/md5.yml/badge.svg?branch=md5-support)](https://github.com/lukas-wresch/judoboard/actions/workflows/md5.yml)
+- Support for multiple mats
+- Single-elimination tournament
+- Double-elimination tournament
 
 ## Demonstration
 
