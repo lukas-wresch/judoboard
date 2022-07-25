@@ -170,12 +170,12 @@ TEST(Match, BestOf3ExportImport)
 	Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
-	Tournament tourney("deleteMe");
-	tourney.EnableAutoSave(false);
 
 	Mat mat(1);
 
 	{
+		Tournament tourney("deleteMe");
+
 		Match m1(&tourney, &j1, &j2, 1);
 		Match m2(&tourney, &j2, &j1, 1);
 		Match m3(&tourney, &j1, &j2, 1);
@@ -187,37 +187,44 @@ TEST(Match, BestOf3ExportImport)
 		tourney.AddMatch(&m3);
 
 		tourney.Save();
+		tourney.EnableAutoSave(false);
 	}
 
-	Tournament tourney2("deleteMe");
-	tourney2.EnableAutoSave(false);
+	{
+		Tournament tourney2("deleteMe");
+		tourney2.EnableAutoSave(false);
 
-	ASSERT_EQ(tourney2.GetSchedule().size(), 3);
+		ASSERT_EQ(tourney2.GetSchedule().size(), 3);
 
-	auto m1 = tourney2.GetSchedule()[0];
-	auto m2 = tourney2.GetSchedule()[1];
-	auto m3 = tourney2.GetSchedule()[2];
+		auto m1 = tourney2.GetSchedule()[0];
+		auto m2 = tourney2.GetSchedule()[1];
+		auto m3 = tourney2.GetSchedule()[2];
 
-	EXPECT_FALSE(m1->HasDependentMatches());
-	EXPECT_FALSE(m2->HasDependentMatches());
-	EXPECT_TRUE(m3->HasDependentMatches());
+		EXPECT_FALSE(m1->HasDependentMatches());
+		EXPECT_FALSE(m2->HasDependentMatches());
+		EXPECT_TRUE(m3->HasDependentMatches());
 
-	auto dep = m3->GetDependentMatches();
-	ASSERT_EQ(dep.size(), 2);
-	EXPECT_EQ(dep[0], m1);
-	EXPECT_EQ(dep[1], m2);
+		auto dep = m3->GetDependentMatches();
+		ASSERT_EQ(dep.size(), 2);
+		EXPECT_EQ(dep[0], m1);
+		EXPECT_EQ(dep[1], m2);
 
-	EXPECT_TRUE(m3->HasUnresolvedDependency());
-	EXPECT_EQ(m3->GetStatus(), Status::Optional);
+		EXPECT_TRUE(m3->HasUnresolvedDependency());
+		EXPECT_EQ(m3->GetStatus(), Status::Optional);
 
-	mat.StartMatch(m1);
-	mat.AddIppon(Fighter::White);
-	mat.EndMatch();
+		mat.StartMatch(m1);
+		mat.AddIppon(Fighter::White);
+		mat.EndMatch();
 
-	mat.StartMatch(m2);
-	mat.AddIppon(Fighter::White);
-	mat.EndMatch();
+		mat.StartMatch(m2);
+		mat.AddIppon(Fighter::White);
+		mat.EndMatch();
 
-	EXPECT_FALSE(m3->HasUnresolvedDependency());
-	EXPECT_EQ(m3->GetStatus(), Status::Scheduled);
+		EXPECT_FALSE(m3->HasUnresolvedDependency());
+		EXPECT_EQ(m3->GetStatus(), Status::Scheduled);
+
+		tourney2.EnableAutoSave(false);
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
