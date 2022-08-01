@@ -37,6 +37,19 @@ void StandingData::operator << (YAML::Node& Yaml)
 	if (Yaml["year"])
 		m_Year = Yaml["year"].as<uint32_t>();
 
+
+	if (Yaml["clubs"] && Yaml["clubs"].IsSequence())
+	{
+		m_Clubs.clear();
+
+		for (const auto& node : Yaml["clubs"])
+		{
+			Club* newClub = new Club(node);
+			m_Clubs.emplace_back(newClub);
+		}
+	}
+
+
 	if (Yaml["judoka"] && Yaml["judoka"].IsSequence())
 	{
 		m_Judokas.clear();
@@ -79,6 +92,18 @@ void StandingData::operator >> (YAML::Emitter& Yaml) const
 {
 	if (m_Year > 0)//No the default (current) year?
 		Yaml << YAML::Key << "year" << YAML::Value << m_Year;
+
+	Yaml << YAML::Key << "clubs";
+	Yaml << YAML::Value;
+	Yaml << YAML::BeginSeq;
+
+	for (auto club : m_Clubs)
+	{
+		if (club)
+			*club >> Yaml;
+	}
+
+	Yaml << YAML::EndSeq;
 
 	Yaml << YAML::Key << "judoka";
 	Yaml << YAML::Value;

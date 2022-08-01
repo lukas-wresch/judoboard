@@ -15,6 +15,16 @@ Club::Club(const std::string& Name) : m_Name(Name)
 
 
 
+Club::Club(const YAML::Node& Yaml)
+{
+	if (Yaml["uuid"])
+		SetUUID(Yaml["uuid"].as<std::string>());
+	if (Yaml["name"])
+		m_Name = Yaml["name"].as<std::string>();
+}
+
+
+
 Club::Club(ZED::CSV& Stream)
 {
 	std::string uuid;
