@@ -402,7 +402,11 @@ const std::string Weightclass::ToHTML() const
 			}
 		}
 
-		ret += "<td style=\"text-align: center;\">" + std::to_string(results[i].Wins) + " : " + std::to_string(results[i].Score) + "<br/>(" + Timer::TimestampToString(results[i].Time) + ")</td>";
+		for (auto result : results)
+		{
+			if (result.Judoka && result.Judoka->GetUUID() == fighter->GetUUID())
+				ret += "<td style=\"text-align: center;\">" + std::to_string(result.Wins) + " : " + std::to_string(result.Score) + "<br/>(" + Timer::TimestampToString(result.Time) + ")</td>";
+		}
 
 		ret += "</tr>";
 	}
