@@ -2717,7 +2717,11 @@ std::string Application::Ajax_ListAllAgeGroups() const
 			ret << YAML::BeginMap;
 
 			age_group->ToString(ret);
-			bool is_used = GetTournament()->FindAgeGroup(age_group->GetUUID());
+
+			bool is_used = false;
+			if (GetTournament())
+				is_used = GetTournament()->FindAgeGroup(age_group->GetUUID());
+
 			ret << YAML::Key << "is_used" << YAML::Value << is_used;
 
 			ret << YAML::EndMap;
