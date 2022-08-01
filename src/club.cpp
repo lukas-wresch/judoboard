@@ -32,16 +32,6 @@ Club::Club(const MD5::Club& Club)
 
 
 
-void Club::operator >> (ZED::CSV& Stream) const
-{
-	Stream << m_Name;
-	Stream << (std::string)GetUUID();
-
-	Stream.AddNewline();//Also needed to flush the stream
-}
-
-
-
 void Club::operator >> (YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginMap;

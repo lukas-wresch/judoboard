@@ -1,7 +1,6 @@
 #pragma once
 #include "id.h"
 #include "md5.h"
-#include "../ZED/include/csv.h"
 
 
 namespace YAML
@@ -25,7 +24,6 @@ namespace Judoboard
 
 		std::string GetName() const { return m_Name; }
 
-		void operator >> (ZED::CSV& Stream) const;
 		void operator >> (YAML::Emitter& Yaml) const;
 
 	private:

@@ -7,7 +7,7 @@ TEST(Club, Basic)
 	initialize();
 	Club c("name");
 
-	EXPECT_TRUE(c.GetName() == "name");
+	EXPECT_EQ(c.GetName(), "name");
 }
 
 
@@ -18,11 +18,12 @@ TEST(Club, ImportExport)
 	{
 		Club c1(GetRandomName());
 
-		ZED::CSV csv;
-		c1 >> csv;
+		YAML::Emitter yaml;
+		c1 >> yaml;
 
-		Club c2(csv);
+		Club c2(YAML::Load(yaml.c_str()));
 
-		EXPECT_TRUE(c1.GetName() == c2.GetName());
+		EXPECT_EQ(c1.GetUUID(), c2.GetUUID());
+		EXPECT_EQ(c1.GetName(), c2.GetName());
 	}
 }
