@@ -153,7 +153,7 @@ namespace Judoboard
 			int MaxPooled = -1;
 
 			std::string Description;
-			int Status = -1;
+			int Status = 0;
 
 			int FightSystemID = -1;
 			int FightSystemTypeID = -1;
@@ -163,11 +163,11 @@ namespace Judoboard
 
 			std::string Date;
 
-			int Relay = -1;
+			int Relay  = -1;
 			int MaxJGJ = -1;
 
 			std::string Identifier;
-			std::string ForReference;
+			std::string ForReference = "T";
 
 			mutable void* pUserData = nullptr;
 		};

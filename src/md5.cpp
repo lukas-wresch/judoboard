@@ -110,11 +110,18 @@ MD5::MD5(const Tournament& Tournament)
 		Weightclass* new_weightclass = new Weightclass;
 
 		new_weightclass->ID = id++;
-		new_weightclass->Description               = weightclass->GetName();
+
+		if (weightclass->GetName().length() > 0)
+			new_weightclass->Description = weightclass->GetName();
+		else
+			new_weightclass->Description = weightclass->GetDescription();
+
 		new_weightclass->WeightLargerThan          = weightclass->GetMinWeight() / 1000;
 		new_weightclass->WeightInGrammsLargerThan  = weightclass->GetMinWeight() % 1000;
 		new_weightclass->WeightSmallerThan         = weightclass->GetMaxWeight() / 1000;
 		new_weightclass->WeightInGrammsSmallerThan = weightclass->GetMaxWeight() % 1000;
+
+		new_weightclass->Date = m_DateStart;
 
 		if (match_table->GetAgeGroup())
 		{
