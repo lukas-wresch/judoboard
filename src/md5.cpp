@@ -28,7 +28,10 @@ MD5::MD5(const std::string& Filename)
 MD5::MD5(const Tournament& Tournament)
 {
 	m_Description = Tournament.GetName();
-	m_FileDate = "01.01." + std::to_string(Tournament.GetDatabase().GetYear());
+	m_FileDate = "Datum: 01.01." + std::to_string(Tournament.GetDatabase().GetYear());
+
+	m_DateStart = "D" + std::to_string(Tournament.GetDatabase().GetYear()) + "-01-01-00:00:00:0000";
+	m_DateEnd   = m_DateStart;
 
 	std::unordered_map<UUID, int> UUID2ID;
 	int id = 1;
