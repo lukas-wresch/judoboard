@@ -364,19 +364,19 @@ const std::string Weightclass::ToHTML() const
 
 	for (size_t i = 0; i < GetParticipants().size();i++)
 	{
-		auto enemy = GetParticipant(i);
+		auto fighter = GetParticipant(i);
 
-		if (!enemy)
+		if (!fighter)
 			continue;
 
 		ret += "<tr>";
 		ret += "<td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
-		ret += "<td>" + enemy->GetName() + "<br/>(" + std::to_string(enemy->GetWeight()) + " kg)</td>";
+		ret += "<td>" + fighter->GetName() + "<br/>(" + fighter->GetWeight().ToString() + " kg)</td>";
 
 		for (size_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
 		{
-			auto fighter = GetParticipant(j);
-			if (!fighter)
+			auto enemy = GetParticipant(j);
+			if (!enemy)
 				continue;
 
 			auto matches = FindMatches(*fighter, *enemy);
