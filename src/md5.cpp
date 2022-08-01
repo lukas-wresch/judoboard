@@ -87,8 +87,13 @@ MD5::MD5(const Tournament& Tournament)
 		new_age_group->ID = id++;
 		new_age_group->Name         = age_group->GetName();
 		new_age_group->Gender       = age_group->GetGender();
-		new_age_group->MinBirthyear = age_group->GetMinAge();
-		new_age_group->MaxBirthyear = age_group->GetMaxAge();
+
+		if (age_group->GetMaxAge() == 0)
+			new_age_group->MinBirthyear = Tournament.GetDatabase().GetYear() - 100;
+		else
+			new_age_group->MinBirthyear = Tournament.GetDatabase().GetYear() - age_group->GetMaxAge();
+
+		new_age_group->MaxBirthyear = Tournament.GetDatabase().GetYear() - age_group->GetMinAge();
 
 		m_AgeGroups.emplace_back(new_age_group);
 		UUID2ID.insert({ age_group->GetUUID(), id - 1 });
@@ -385,7 +390,10 @@ bool MD5::Save(const std::string& Filename) const
 
 			Write_Line(age_group->PoolSystem ? "T" : "F");
 			Write_Line(age_group->AllParticipantsInResultTable ? "T" : "F");
-			Write_Line(age_group->Team ? "T" : "");//Format unclear (TODO)
+			if (age_group->Team != -1)
+				Write_Int(age_group->Team);
+			else
+				Write_Line("");
 		}
 
 		file.Seek(-1);//Delete last \0

@@ -92,9 +92,9 @@ namespace Judoboard
 			int MoneyKataIncreased = -1;
 			int MoneyAllCategoriesIncreased = -1;
 
-			int Tolerance = -1;
+			int Tolerance = 0;
 
-			bool Team;//TODO set default
+			int Team = -1;
 
 			mutable void* pUserData = nullptr;
 		};
