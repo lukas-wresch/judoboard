@@ -141,6 +141,9 @@ MD5::MD5(const Tournament& Tournament)
 			{
 				md5_judoka->WeightclassID = uuid2id(match_table->GetUUID());
 				md5_judoka->Weightclass   = (Weightclass*)id2ptr(md5_judoka->WeightclassID);
+
+				md5_judoka->AgeGroupID = new_weightclass->AgeGroupID;
+				md5_judoka->AgeGroup   = new_weightclass->AgeGroup;
 			}
 		}
 
@@ -148,11 +151,11 @@ MD5::MD5(const Tournament& Tournament)
 
 		auto results = match_table->CalculateResults();
 		int rank = 1;
-		for (auto result : results)
+		for (const auto& result : results)
 		{
 			Result new_result;
 			new_result.Weightclass   = new_weightclass;
-			new_result.WeightclassID = id - 1;
+			new_result.WeightclassID = new_weightclass->ID;
 			new_result.AgeGroup   = new_weightclass->AgeGroup;
 			new_result.AgeGroupID = new_weightclass->AgeGroupID;
 
@@ -162,10 +165,39 @@ MD5::MD5(const Tournament& Tournament)
 			new_result.ScorePlus     = result.Score;
 
 			new_result.RankNo = rank++;
+			new_result.RankID = id++;
+
+			new_result.Participant->RankID = new_result.RankID;
 
 			m_Results.emplace_back(new_result);
 		}
 	}
+
+	//Create relations table
+	int startNo = 1;
+	for (auto age_group : m_AgeGroups)
+	{
+		for (auto weightclass : m_Weightclasses)
+		{
+			for (auto judoka : m_Participants)
+			{
+				if (judoka->AgeGroupID != age_group->ID)
+					continue;
+				if (judoka->WeightclassID != weightclass->ID)
+					continue;
+
+				RelationParticipantMatchTable new_relation;
+				new_relation.AgeGroupID    = age_group->ID;
+				new_relation.WeightclassID = weightclass->ID;
+				new_relation.ParticipantID = judoka->ID;
+				new_relation.StartNo       = startNo++;
+
+				m_Relations.emplace_back(new_relation);
+			}
+		}
+	}
+
+	int match_no = 1;
 
 	for (auto match : Tournament.GetSchedule())
 	{
@@ -173,6 +205,7 @@ MD5::MD5(const Tournament& Tournament)
 			continue;
 
 		Match new_match;
+		new_match.MatchNo = match_no++;
 		new_match.WhiteID = uuid2id(match->GetFighter(Fighter::White)->GetUUID());
 		new_match.RedID   = uuid2id(match->GetFighter(Fighter::Blue )->GetUUID());
 
@@ -187,6 +220,10 @@ MD5::MD5(const Tournament& Tournament)
 				new_match.WeightclassID = new_match.Weightclass->ID;
 
 			new_match.AgeGroupID = uuid2id(match->GetMatchTable()->GetAgeGroup()->GetUUID());
+
+			//Find start numbers
+			new_match.StartNoWhite = FindStartNo(new_match.AgeGroupID, new_match.WeightclassID, new_match.WhiteID);
+			new_match.StartNoRed   = FindStartNo(new_match.AgeGroupID, new_match.WeightclassID, new_match.RedID);
 		}
 
 		if (match->HasConcluded())
@@ -352,7 +389,7 @@ bool MD5::Save(const std::string& Filename) const
 
 		for (auto& rank2points : m_RankToPoints)
 		{
-			Write_Int(rank2points.Rank);
+			Write_Int(rank2points.RankID);
 			Write_Int(rank2points.Points);
 		}
 
@@ -1026,6 +1063,20 @@ std::vector<const MD5::Result*> MD5::FindResults(int AgeGroupID, int Weightclass
 
 
 
+int MD5::FindStartNo(int AgeGroupID, int WeightclassID, int ParticipantID) const
+{
+	for (auto relation : m_Relations)
+	{
+		if (relation.AgeGroupID == AgeGroupID && relation.WeightclassID == WeightclassID &&
+			relation.ParticipantID == ParticipantID)
+			return relation.StartNo;
+	}
+
+	return -1;
+}
+
+
+
 void MD5::Dump() const
 {
 	for (auto age_group : m_AgeGroups)
@@ -1356,7 +1407,7 @@ bool MD5::ReadRankScore(ZED::Blob& Data)
 				{
 					if (header[i] == "PlatzPK")
 					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_ranktopoints.Rank) != 1)
+						if (sscanf_s(data[i].c_str(), "%d", &new_ranktopoints.RankID) != 1)
 							ZED::Log::Warn("Could not read rank of relation table rank -> points");
 					}
 					else if (header[i] == "Punkte")

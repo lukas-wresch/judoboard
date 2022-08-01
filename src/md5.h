@@ -283,7 +283,7 @@ namespace Judoboard
 
 		struct RankToPoints
 		{
-			int Rank = -1;
+			int RankID = -1;
 			int Points = -1;
 		};
 
@@ -303,6 +303,7 @@ namespace Judoboard
 		const Result* FindResult(int AgeGroupID, int WeightclassID, int Rank) const;
 		const Result* FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const;
 		std::vector<const Result*> FindResults(int AgeGroupID, int WeightclassID) const;
+		int FindStartNo(int AgeGroupID, int WeightclassID, int ParticipantID) const;
 
 		void Dump() const;
 
