@@ -185,6 +185,8 @@ MD5::MD5(const Tournament& Tournament)
 													uuid2id(match->GetMatchTable()->GetUUID()));
 			if (new_match.Weightclass)
 				new_match.WeightclassID = new_match.Weightclass->ID;
+
+			new_match.AgeGroupID = uuid2id(match->GetMatchTable()->GetAgeGroup()->GetUUID());
 		}
 
 		if (match->HasConcluded())
