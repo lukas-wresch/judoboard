@@ -1,0 +1,48 @@
+<h1 id="headline"></h1>
+
+<button class="add" id="add" style="margin-bottom: 1cm;" onclick="navigate('association_add.html')"></button> 
+
+<table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
+  <tr>
+    <th style="width: 4cm;" id="name"></th>
+    <th style="width: 4cm;" id="parent">Parent</th>
+    <th style="width: 2cm;">Options</th>
+  </tr>
+</table>
+
+
+<script>
+
+function GetAssociationList()
+{
+  AjaxCallback("ajax/association/list", function(response) {
+    var res = YAML.parse(response);
+
+    var table = document.getElementById("list");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    for (const assoc of res)
+    {
+      var row = table.insertRow(-1);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+
+      cell1.innerHTML = assoc.name;
+      cell2.innerHTML = assoc.parent;
+
+      cell3.innerHTML = "<button class=\"white\" style=\"width: 3.3cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"association_add.html?id="+assoc.uuid+"\");>Edit Association</button>";
+    }
+  });
+}
+
+
+GetClubList();
+
+document.getElementById("headline").innerHTML = lang.list_of_all_clubs;
+document.getElementById("add").innerHTML      = lang.new_club;
+document.getElementById("name").innerHTML     = lang.name;
+
+</script>
