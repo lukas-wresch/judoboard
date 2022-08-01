@@ -1,6 +1,5 @@
 #define YAML_CPP_STATIC_DEFINE
 #include "yaml-cpp/yaml.h"
-#include "../ZED/include/core.h"
 #include "club.h"
 
 
@@ -9,35 +8,18 @@ using namespace Judoboard;
 
 
 
-Club::Club(const std::string& Name) : m_Name(Name)
+Club::Club(const std::string& Name) : Association(Name)
 {	
 }
 
 
 
-Club::Club(const YAML::Node& Yaml)
+Club::Club(const YAML::Node& Yaml) : Association(Yaml)
 {
-	if (Yaml["uuid"])
-		SetUUID(Yaml["uuid"].as<std::string>());
-	if (Yaml["name"])
-		m_Name = Yaml["name"].as<std::string>();
 }
 
 
 
-Club::Club(const MD5::Club& Club)
+Club::Club(const MD5::Club& Club) : Association(Club.Name)
 {
-	m_Name = Club.Name;
-}
-
-
-
-void Club::operator >> (YAML::Emitter& Yaml) const
-{
-	Yaml << YAML::BeginMap;
-
-	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
-	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
-
-	Yaml << YAML::EndMap;
 }

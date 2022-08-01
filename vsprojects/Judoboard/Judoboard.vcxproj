@@ -176,6 +176,7 @@
     <ClCompile Include="..\..\src\age_group.cpp" />
     <ClCompile Include="..\..\src\app.cpp" />
     <ClCompile Include="..\..\src\app_ajax.cpp" />
+    <ClCompile Include="..\..\src\association.cpp" />
     <ClCompile Include="..\..\src\club.cpp" />
     <ClCompile Include="..\..\src\customtable.cpp" />
     <ClCompile Include="..\..\src\database.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="..\..\src\account.h" />
     <ClInclude Include="..\..\src\age_group.h" />
     <ClInclude Include="..\..\src\app.h" />
+    <ClInclude Include="..\..\src\association.h" />
     <ClInclude Include="..\..\src\club.h" />
     <ClInclude Include="..\..\src\customtable.h" />
     <ClInclude Include="..\..\src\database.h" />
