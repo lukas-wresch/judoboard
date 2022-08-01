@@ -25,15 +25,6 @@ Club::Club(const YAML::Node& Yaml)
 
 
 
-Club::Club(ZED::CSV& Stream)
-{
-	std::string uuid;
-	Stream >> m_Name >> uuid;
-	SetUUID(std::move(uuid));
-}
-
-
-
 Club::Club(const MD5::Club& Club)
 {
 	m_Name = Club.Name;

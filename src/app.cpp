@@ -537,7 +537,7 @@ void Application::Run()
 		ZED::Core::Pause(10 * 1000);
 		runtime += 10;
 
-		if (runtime % (10 * 60) == 0)//Every 10 minutes
+		if (runtime % (5 * 60) == 0)//Every 5 minutes
 		{
 			if (!m_Database.Save())
 				ZED::Log::Warn("Auto saving of database failed!");

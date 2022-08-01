@@ -326,6 +326,8 @@ int main(int argc, char** argv)
 
 		for (int i = 0; i < 50; i++)
 			app.GetDatabase().AddJudoka(CreateRandomJudoka(&app.GetDatabase()));
+
+		app.GetDatabase().Save();
 	}
 //#endif
 
