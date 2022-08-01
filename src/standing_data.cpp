@@ -38,13 +38,25 @@ void StandingData::operator << (YAML::Node& Yaml)
 		m_Year = Yaml["year"].as<uint32_t>();
 
 
+	if (Yaml["associations"] && Yaml["associations"].IsSequence())
+	{
+		m_Associations.clear();
+
+		for (const auto& node : Yaml["associations"])
+		{
+			Association* newAssoc = new Association(node, this);
+			m_Associations.emplace_back(newAssoc);
+		}
+	}
+
+
 	if (Yaml["clubs"] && Yaml["clubs"].IsSequence())
 	{
 		m_Clubs.clear();
 
 		for (const auto& node : Yaml["clubs"])
 		{
-			Club* newClub = new Club(node);
+			Club* newClub = new Club(node, this);
 			m_Clubs.emplace_back(newClub);
 		}
 	}
@@ -92,6 +104,20 @@ void StandingData::operator >> (YAML::Emitter& Yaml) const
 {
 	if (m_Year > 0)//No the default (current) year?
 		Yaml << YAML::Key << "year" << YAML::Value << m_Year;
+
+	Yaml << YAML::Key << "associations";
+	Yaml << YAML::Value;
+	Yaml << YAML::BeginSeq;
+
+	//TODO order associations by level
+
+	for (auto assoc : m_Associations)
+	{
+		if (assoc)
+			*assoc >> Yaml;
+	}
+
+	Yaml << YAML::EndSeq;
 
 	Yaml << YAML::Key << "clubs";
 	Yaml << YAML::Value;
@@ -326,6 +352,28 @@ const Club* StandingData::FindClubByName(const std::string& Name) const
 	for (auto club : m_Clubs)
 		if (club && club->GetName() == Name)
 			return club;
+
+	return nullptr;
+}
+
+
+
+Association* StandingData::FindAssociation(const UUID& UUID)
+{
+	for (auto assoc : m_Associations)
+		if (assoc && assoc->GetUUID() == UUID)
+			return assoc;
+
+	return nullptr;
+}
+
+
+
+const Association* StandingData::FindAssociation(const UUID& UUID) const
+{
+	for (auto assoc : m_Associations)
+		if (assoc && assoc->GetUUID() == UUID)
+			return assoc;
 
 	return nullptr;
 }

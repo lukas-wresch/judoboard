@@ -18,7 +18,9 @@ namespace Judoboard
 	{
 	public:
 		Association(const std::string& Name);
-		Association(const YAML::Node& Yaml);
+		Association(const YAML::Node& Yaml, const StandingData* StandingData);
+
+		virtual int GetLevel() const { return m_Level; }
 
 		std::string GetName()   const { return m_Name; }
 		auto        GetParent() const { return m_pParent; }
@@ -30,6 +32,7 @@ namespace Judoboard
 	private:
 		std::string m_Name;
 
+		int m_Level = 0;//0 for the highest level, +1 for every level below
 		const Association* m_pParent = nullptr;
 	};
 }

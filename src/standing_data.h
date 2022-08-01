@@ -61,13 +61,15 @@ namespace Judoboard
 		Club* FindClubByName(const std::string& Name);
 		const Club* FindClubByName(const std::string& Name) const;
 
+		//Associations
+		Association* FindAssociation(const UUID& UUID);
+		const Association* FindAssociation(const UUID& UUID) const;
+
 		//Rule sets
 		RuleSet* FindRuleSetByName(const std::string& RuleSetName);
 		const RuleSet* FindRuleSetByName(const std::string& RuleSetName) const;
 		RuleSet* FindRuleSet(const UUID& UUID);
 		const RuleSet* FindRuleSet(const UUID& UUID) const;
-		RuleSet* FindRuleSet(uint32_t ID);
-		const RuleSet* FindRuleSet(uint32_t ID) const;
 
 		bool AddRuleSet(RuleSet* NewRuleSet);
 		std::vector<RuleSet*>& GetRuleSets() { return m_RuleSets; }
@@ -78,8 +80,6 @@ namespace Judoboard
 		const AgeGroup* FindAgeGroupByName(const std::string& AgeGroupName) const;
 		AgeGroup* FindAgeGroup(const UUID& UUID);
 		const AgeGroup* FindAgeGroup(const UUID& UUID) const;
-		AgeGroup* FindAgeGroup(uint32_t ID);
-		const AgeGroup* FindAgeGroup(uint32_t ID) const;
 
 		bool AddAgeGroup(AgeGroup* NewAgeGroup);
 		bool RemoveAgeGroup(const UUID& UUID);
@@ -93,6 +93,7 @@ namespace Judoboard
 		std::unordered_map<UUID, Judoka*> m_Judokas;
 
 		std::vector<Club*> m_Clubs;
+		std::vector<Association*> m_Associations;
 
 		std::vector<RuleSet*> m_RuleSets;
 		std::vector<AgeGroup*> m_AgeGroups;

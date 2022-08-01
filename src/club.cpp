@@ -14,7 +14,7 @@ Club::Club(const std::string& Name) : Association(Name)
 
 
 
-Club::Club(const YAML::Node& Yaml) : Association(Yaml)
+Club::Club(const YAML::Node& Yaml, const StandingData* StandingData) : Association(Yaml, StandingData)
 {
 }
 

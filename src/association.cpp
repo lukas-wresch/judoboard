@@ -1,6 +1,7 @@
 #define YAML_CPP_STATIC_DEFINE
 #include "yaml-cpp/yaml.h"
 #include "association.h"
+#include "standing_data.h"
 
 
 
@@ -14,12 +15,19 @@ Association::Association(const std::string& Name) : m_Name(Name)
 
 
 
-Association::Association(const YAML::Node& Yaml)
+Association::Association(const YAML::Node& Yaml, const StandingData* StandingData)
 {
 	if (Yaml["uuid"])
 		SetUUID(Yaml["uuid"].as<std::string>());
 	if (Yaml["name"])
 		m_Name = Yaml["name"].as<std::string>();
+
+	if (Yaml["parent"] && StandingData)
+	{
+		m_pParent = StandingData->FindAssociation(Yaml["parent"].as<std::string>());
+		if (m_pParent)
+			m_Level = m_pParent->GetLevel() + 1;
+	}
 }
 
 
