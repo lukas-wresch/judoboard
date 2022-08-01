@@ -38,7 +38,7 @@ namespace Judoboard
 			std::string Representative_Fax;
 
 			int OfficialClubNo = 0;//Official no. of the club
-			bool StatusChanged;//Could also be a boolean
+			int StatusChanged;
 		};
 
 		struct Association

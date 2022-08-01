@@ -52,6 +52,8 @@ MD5::MD5(const Tournament& Tournament)
 	};
 
 
+	//Convert clubs
+
 	for (auto club : Tournament.GetDatabase().GetAllClubs())
 	{
 		Club* new_club = new Club;
@@ -65,6 +67,8 @@ MD5::MD5(const Tournament& Tournament)
 		ID2PTR.insert({ id - 1, new_club });
 	}
 
+	//Convert judoka
+
 	for (auto [uuid, judoka] : Tournament.GetParticipants())
 	{
 		Participant* new_judoka = new Participant;
@@ -74,6 +78,12 @@ MD5::MD5(const Tournament& Tournament)
 		new_judoka->Lastname  = judoka->GetLastname();
 		new_judoka->WeightInGrams = judoka->GetWeight();
 		new_judoka->Birthyear     = judoka->GetBirthyear();
+
+		if (judoka->GetClub())
+		{
+			new_judoka->ClubID = uuid2id(judoka->GetClub()->GetUUID());
+			new_judoka->Club   = (Club*)id2ptr(new_judoka->ClubID);
+		}
 
 		m_Participants.emplace_back(new_judoka);
 		UUID2ID.insert({ uuid, id - 1 });
@@ -583,7 +593,10 @@ bool MD5::Save(const std::string& Filename) const
 			else
 				Write_Int(club->OfficialClubNo);
 
-			Write_Line(club->StatusChanged ? "T" : "");//Format unclear (TODO)
+			if (club->StatusChanged < 0)
+				Write_Int(club->StatusChanged);
+			else
+				Write_Line("");
 		}
 
 		file.Seek(-1);//Delete last \0
@@ -2539,7 +2552,10 @@ bool MD5::ReadClubs(ZED::Blob& Data)
 							ZED::Log::Warn("Could not read club number");
 					}
 					else if (header[i] == "StatusAenderung")
-						new_club.StatusChanged = data[i] == "T";
+					{
+						if (sscanf_s(data[i].c_str(), "%d", &new_club.StatusChanged) != 1)
+							ZED::Log::Info("Could not read club StatusChanged");
+					}
 				}
 
 				m_Clubs.emplace_back(new Club(new_club));

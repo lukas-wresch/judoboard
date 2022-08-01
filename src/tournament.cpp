@@ -703,7 +703,10 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		return false;
 
 	Lock();
+
 	m_StandingData.AddJudoka(Judoka);
+	m_StandingData.AddClub(const_cast<Club*>(Judoka->GetClub()));
+
 	FindAgeGroupForJudoka(*Judoka);
 
 	for (auto table : m_MatchTables)
