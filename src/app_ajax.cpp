@@ -1703,9 +1703,7 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		GetTournament()->Lock();
 		bool ret = GetTournament()->RemoveMatchTable(id);
-		GetTournament()->Unlock();
 
 		if (!ret)
 			return std::string("Failed to delete match table");

@@ -894,6 +894,8 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 
 bool Tournament::RemoveMatchTable(const UUID& UUID)
 {
+	Lock();
+
 	auto matchTable = FindMatchTable(UUID);
 
 	if (!matchTable)
@@ -921,6 +923,9 @@ bool Tournament::RemoveMatchTable(const UUID& UUID)
 			break;
 		}
 	}
+
+	GenerateSchedule();
+	Unlock();
 
 	return true;
 }
@@ -1054,6 +1059,8 @@ std::vector<const AgeGroup*> Tournament::GetAgeGroups() const
 
 void Tournament::ListAgeGroups(YAML::Emitter& Yaml) const
 {
+	Lock();
+
 	Yaml << YAML::BeginSeq;
 
 	for (auto age_group : m_StandingData.GetAgeGroups())
@@ -1067,7 +1074,7 @@ void Tournament::ListAgeGroups(YAML::Emitter& Yaml) const
 		size_t num_matches = 0;
 		for (auto match_table : m_MatchTables)
 		{
-			if (match_table->GetAgeGroup()->GetUUID() == age_group->GetUUID())
+			if (match_table->GetAgeGroup() && match_table->GetAgeGroup()->GetUUID() == age_group->GetUUID())
 			{
 				num_match_tables++;
 				num_matches += match_table->GetSchedule().size();
@@ -1089,6 +1096,7 @@ void Tournament::ListAgeGroups(YAML::Emitter& Yaml) const
 	}
 
 	Yaml << YAML::EndSeq;
+	Unlock();
 }
 
 
