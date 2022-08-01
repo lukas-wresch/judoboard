@@ -30,9 +30,9 @@ Weightclass::Weightclass(const ITournament* Tournament, Weight MinWeight, Weight
 Weightclass::Weightclass(const YAML::Node& Yaml, ITournament* Tournament) : MatchTable(Yaml, Tournament)
 {
 	if (Yaml["min_weight"])
-		m_MinWeight = Yaml["min_weight"].as<int>();
+		m_MinWeight = Weight(Yaml["min_weight"]);
 	if (Yaml["max_weight"])
-		m_MaxWeight = Yaml["max_weight"].as<int>();
+		m_MaxWeight = Weight(Yaml["max_weight"]);
 	if (Yaml["gender"])
 		m_Gender = (Gender)Yaml["gender"].as<int>();
 	if (Yaml["best_of_three"])
