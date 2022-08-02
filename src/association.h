@@ -17,7 +17,7 @@ namespace Judoboard
 	class Association : public ID
 	{
 	public:
-		Association(const std::string& Name);
+		Association(const std::string& Name, const Association* Parent = nullptr);
 		Association(const YAML::Node& Yaml, const StandingData* StandingData);
 
 		virtual int GetLevel() const { return m_Level; }
@@ -28,6 +28,9 @@ namespace Judoboard
 		void SetName(std::string NewName) { m_Name = NewName; }
 
 		void operator >> (YAML::Emitter& Yaml) const;
+
+	protected:
+		void SetParent(const Association* NewParent) { m_pParent = NewParent; }
 
 	private:
 		std::string m_Name;

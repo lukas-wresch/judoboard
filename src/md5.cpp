@@ -1092,6 +1092,15 @@ int MD5::FindStartNo(int AgeGroupID, int WeightclassID, int ParticipantID) const
 
 void MD5::Dump() const
 {
+	for (auto assoc : m_Associations)
+	{
+		std::string line = std::to_string(assoc->ID) + "   " + assoc->Description + "   " + std::to_string(assoc->NextAsscociationID);
+
+		ZED::Log::Info(line);
+	}
+
+
+
 	for (auto age_group : m_AgeGroups)
 	{
 		std::string separator(age_group->Name.length(), '-');

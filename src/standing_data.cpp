@@ -308,6 +308,8 @@ bool StandingData::AddClub(Club* NewClub)
 	if (FindClub(NewClub->GetUUID()))
 		return false;
 
+	AddAssociation(const_cast<Association*>(NewClub->GetParent()));
+
 	m_Clubs.emplace_back(NewClub);
 	return true;
 }
@@ -354,6 +356,23 @@ const Club* StandingData::FindClubByName(const std::string& Name) const
 			return club;
 
 	return nullptr;
+}
+
+
+
+bool StandingData::AddAssociation(Association* NewAssociation)
+{
+	if (!NewAssociation)
+		return false;
+
+	if (FindAssociation(NewAssociation->GetUUID()))
+		return false;
+
+	//Add recursively
+	AddAssociation(const_cast<Association*>(NewAssociation->GetParent()));
+
+	m_Associations.emplace_back(NewAssociation);
+	return true;
 }
 
 

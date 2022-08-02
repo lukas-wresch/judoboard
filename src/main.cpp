@@ -318,9 +318,32 @@ int main(int argc, char** argv)
 //#ifdef _DEBUG
 	if (app.GetDatabase().GetNumJudoka() < 5)
 	{
-		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
-		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
-		app.GetDatabase().AddClub(new Judoboard::Club("Senne"));
+		auto inter = new Judoboard::Association("International");
+
+		auto de = new Judoboard::Association("Deutschland", inter);
+
+		auto dn = new Judoboard::Association("Deuschland-Nord", de);
+		auto ds = new Judoboard::Association(u8"Deuschland-S\u00fcd", de);
+
+		auto nord  = new Judoboard::Association("Nord", dn);
+		auto west  = new Judoboard::Association("West", dn);
+		auto nost  = new Judoboard::Association("Nordost", dn);
+		auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
+		auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+
+		auto nieder   = new Judoboard::Association("Niedersachsen", nord);
+		auto hamnburg = new Judoboard::Association("Hamburg", nord);
+		auto berlin   = new Judoboard::Association("Berlin", nost);
+		auto nrw      = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+		auto detmold = new Judoboard::Association("Detmold", nrw);
+
+		auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+
+
+		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen", biegue));
+		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede", biegue));
+		app.GetDatabase().AddClub(new Judoboard::Club("Senne", biegue));
 
 		ZED::Log::Debug("Adding debug judoka");
 

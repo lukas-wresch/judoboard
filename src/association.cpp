@@ -9,8 +9,10 @@ using namespace Judoboard;
 
 
 
-Association::Association(const std::string& Name) : m_Name(Name)
-{	
+Association::Association(const std::string& Name, const Association* Parent) : m_Name(Name), m_pParent(Parent)
+{
+	if (Parent)
+		m_Level = m_pParent->GetLevel() + 1;
 }
 
 
