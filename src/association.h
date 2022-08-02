@@ -30,6 +30,8 @@ namespace Judoboard
 		void operator >> (YAML::Emitter& Yaml) const;
 		void ToString(YAML::Emitter& Yaml) const;
 
+		bool operator < (const Association& rhs) const;
+
 	protected:
 		void SetParent(const Association* NewParent) { m_pParent = NewParent; }
 

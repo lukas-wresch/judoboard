@@ -20,6 +20,6 @@ Club::Club(const YAML::Node& Yaml, const StandingData* StandingData) : Associati
 
 
 
-Club::Club(const MD5::Club& Club) : Association(Club.Name)
+Club::Club(const MD5::Club& Club) : Association(Club.Name, nullptr)
 {
 }

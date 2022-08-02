@@ -109,8 +109,6 @@ void StandingData::operator >> (YAML::Emitter& Yaml) const
 	Yaml << YAML::Value;
 	Yaml << YAML::BeginSeq;
 
-	//TODO order associations by level
-
 	for (auto assoc : m_Associations)
 	{
 		if (assoc)
@@ -372,6 +370,10 @@ bool StandingData::AddAssociation(Association* NewAssociation)
 	AddAssociation(const_cast<Association*>(NewAssociation->GetParent()));
 
 	m_Associations.emplace_back(NewAssociation);
+
+	//std::sort would normally order the vector by memory address :-(
+	std::sort(m_Associations.begin(), m_Associations.end(), [](auto a, auto b) { return *a < *b; });
+
 	return true;
 }
 

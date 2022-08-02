@@ -65,3 +65,15 @@ void Association::ToString(YAML::Emitter& Yaml) const
 
 	Yaml << YAML::EndMap;
 }
+
+
+
+bool Association::operator < (const Association& rhs) const
+{
+	if (this->GetLevel() < rhs.GetLevel())
+		return true;
+	if (this->GetLevel() > rhs.GetLevel())
+		return false;
+
+	return (this->GetName() < rhs.GetName());
+}
