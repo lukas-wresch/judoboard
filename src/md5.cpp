@@ -112,11 +112,15 @@ MD5::MD5(const Tournament& Tournament)
 		new_judoka->Lastname  = judoka->GetLastname();
 		new_judoka->WeightInGrams = judoka->GetWeight();
 		new_judoka->Birthyear     = judoka->GetBirthyear();
+		//new_judoka->Rank = 1;//DEBUG
+		new_judoka->GKParticipantID = new_judoka->ID;
 
 		if (judoka->GetClub())
 		{
 			new_judoka->ClubID = uuid2id(judoka->GetClub()->GetUUID());
 			new_judoka->Club   = (Club*)id2ptr(new_judoka->ClubID);
+			new_judoka->ClubFullname  = new_judoka->Club->Name;
+			new_judoka->AssociationShortname = new_judoka->Club->Name_ForSorting;//TODO
 		}
 
 		m_Participants.emplace_back(new_judoka);
@@ -211,7 +215,7 @@ MD5::MD5(const Tournament& Tournament)
 			new_result.RankNo = rank++;
 			new_result.RankID = id++;
 
-			new_result.Participant->RankID = new_result.RankID;
+			//new_result.Participant->Rank = new_result.RankID;
 
 			m_Results.emplace_back(new_result);
 		}
@@ -757,10 +761,10 @@ bool MD5::Save(const std::string& Filename) const
 			else
 				Write_Int(judoka->StartNo);
 
-			Write_Int(judoka->RankID);
+			Write_Int(judoka->Rank);
 			Write_Line(judoka->StatusChanged ? "1" : "");
 			Write_Line(UTF8ToLatin1(judoka->ClubFullname));
-			Write_Line(UTF8ToLatin1(judoka->ClubShortname));
+			Write_Line(UTF8ToLatin1(judoka->AssociationShortname));
 			Write_Int(judoka->AllCategoriesParticipantID);
 			Write_Int(judoka->KataParticipantID);
 			Write_Int(judoka->GKParticipantID);
@@ -2426,15 +2430,15 @@ bool MD5::ReadParticipants(ZED::Blob& Data)
 					}
 					else if (header[i] == "PlatzPK")
 					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.RankID) != 1)
-							ZED::Log::Warn("Could not read rank id of participant");
+						if (sscanf_s(data[i].c_str(), "%d", &new_participant.Rank) != 1)
+							ZED::Log::Warn("Could not read rank of participant");
 					}
 					else if (header[i] == "StatusAenderung")
 						new_participant.StatusChanged = data[i] == "1";
 					else if (header[i] == "REDAusgeschrieben")
 						new_participant.ClubFullname = Latin1ToUTF8(data[i]);
 					else if (header[i] == "REDKuerzel")
-						new_participant.ClubShortname = Latin1ToUTF8(data[i]);
+						new_participant.AssociationShortname = Latin1ToUTF8(data[i]);
 					else if (header[i] == "AllkategorieTNPK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_participant.AllCategoriesParticipantID) != 1)

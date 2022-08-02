@@ -112,25 +112,25 @@ namespace Judoboard
 			std::string Firstname;
 			std::string Lastname;
 
-			int Graduation = -1;
+			int Graduation = 0;//Kyu/Dan, 0 for unknown
 
-			int  WeightclassID = -1;//Remeber these IDs are NOT unique!
+			int  WeightclassID = -1;//Remember these IDs are NOT unique!
 			const Weightclass* Weightclass = nullptr;
 			bool HasBeenWeighted = false;
 
 			int Birthyear = -1;//< 0 if no value is known
 
 			int StartNo = -1;
-			int RankID  = -1;
+			int Rank    = -1;//Rank for qualification (place), 9 for placed on 1
 
 			bool StatusChanged = false;
 
 			std::string ClubFullname;
-			std::string ClubShortname;
+			std::string AssociationShortname;
 
 			int AllCategoriesParticipantID = -1;
 			int KataParticipantID = -1;
-			int GKParticipantID = -1;//GK = ???
+			int GKParticipantID = -1;//Weightclass participant id???
 
 			bool MoneyIncreased = false;
 			int  WeightInGrams  = -1;
