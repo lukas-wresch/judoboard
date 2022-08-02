@@ -44,13 +44,13 @@ namespace Judoboard
 		struct Association
 		{
 			int ID = -1;
-			int TierID = -1;
+			int Tier = -1;//International starts at 2, everything below increases the tier level
 
 			std::string Description;
 			std::string ShortName;
 
 			std::string Number;//"Number" of the association, can also include characters like '.'
-			int NextAsscociationID = -1;
+			int NextAsscociationID = -1;//Association of the parent
 			const Association* NextAsscociation = nullptr;
 
 			bool Active = false;
@@ -59,7 +59,7 @@ namespace Judoboard
 		struct RelationClubAssociation//Relational table to connect clubs to associations
 		{
 			int ClubID = -1;
-			int TierID = -1;
+			int Tier   = -1;//International starts at 2, everything below increases the tier level
 			int AssociationID = -1;
 		};
 
@@ -370,9 +370,9 @@ namespace Judoboard
 
 		int m_SchemaID = -1;
 		int m_LotteryLevelID = -1;
-		int m_AssociationID  = -1;
-		int m_AssociationLevelID = -1;
-		int m_LevelShortID = -1;
+		int m_AssociationID  = -1;//Association that is conducting the tournament
+		int m_AssociationLevelID = -1;//Tier of m_AssociationID + 1
+		int m_LevelShortID = -1;//Tier of m_AssociationID
 		int m_MAXJGJ = -1;
 		int m_LotteryProcess = -1;
 

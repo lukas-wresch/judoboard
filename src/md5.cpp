@@ -52,6 +52,28 @@ MD5::MD5(const Tournament& Tournament)
 	};
 
 
+	//Convert associations
+
+	for (auto assoc : Tournament.GetDatabase().GetAllAssociations())
+	{
+		Association* new_assoc = new Association;
+
+		new_assoc->ID = id++;
+		new_assoc->Description = assoc->GetName();
+		new_assoc->ShortName   = assoc->GetName();
+		new_assoc->Tier        = assoc->GetLevel() + 2;//International starts a 2 in MD5 files
+
+		if (assoc->GetParent())
+		{
+			new_assoc->NextAsscociationID = uuid2id(assoc->GetParent()->GetUUID());
+			new_assoc->NextAsscociation   = (Association*)id2ptr(new_assoc->NextAsscociationID);
+		}
+
+		m_Associations.emplace_back(new_assoc);
+		UUID2ID.insert({ assoc->GetUUID(), id - 1 });
+		ID2PTR.insert({ id - 1, new_assoc });
+	}
+
 	//Convert clubs
 
 	for (auto club : Tournament.GetDatabase().GetAllClubs())
@@ -65,6 +87,18 @@ MD5::MD5(const Tournament& Tournament)
 		m_Clubs.emplace_back(new_club);
 		UUID2ID.insert({ club->GetUUID(), id - 1 });
 		ID2PTR.insert({ id - 1, new_club });
+
+		//Create relation table entries
+		for (auto parent = club->GetParent(); parent ; parent = parent->GetParent())
+		{
+			RelationClubAssociation new_rel;
+
+			new_rel.ClubID = new_club->ID;
+			new_rel.AssociationID = uuid2id(parent->GetUUID());
+			new_rel.Tier          = parent->GetLevel() + 2;
+
+			m_ClubRelations.emplace_back(new_rel);
+		}
 	}
 
 	//Convert judoka
@@ -543,7 +577,7 @@ bool MD5::Save(const std::string& Filename) const
 		for (auto& association : m_Associations)
 		{
 			Write_Int(association->ID);
-			Write_Int(association->TierID);
+			Write_Int(association->Tier);
 			Write_Line(UTF8ToLatin1(association->Description));
 			Write_Line(UTF8ToLatin1(association->ShortName));
 			Write_Line(association->Number);
@@ -622,7 +656,7 @@ bool MD5::Save(const std::string& Filename) const
 		for (auto& rel : m_ClubRelations)
 		{
 			Write_Int(rel.ClubID);
-			Write_Int(rel.TierID);
+			Write_Int(rel.Tier);
 			Write_Int(rel.AssociationID);			
 		}
 
@@ -1092,15 +1126,28 @@ int MD5::FindStartNo(int AgeGroupID, int WeightclassID, int ParticipantID) const
 
 void MD5::Dump() const
 {
+	//Dump associations
+	ZED::Log::Info("--- Associations ---");
 	for (auto assoc : m_Associations)
 	{
-		std::string line = std::to_string(assoc->ID) + "   " + assoc->Description + "   " + std::to_string(assoc->NextAsscociationID);
+		std::string line = std::to_string(assoc->ID) + "   " + assoc->Description + "  ->  " + std::to_string(assoc->NextAsscociationID) + " Tier: " + std::to_string(assoc->Tier);
 
 		ZED::Log::Info(line);
 	}
 
 
+	//Dump relation
+	ZED::Log::Info("\n\n--- Club -> Association ---");
+	for (auto rel : m_ClubRelations)
+	{
+		std::string line = std::to_string(rel.ClubID) + "  ->  " + std::to_string(rel.AssociationID) + "  Tier:  " + std::to_string(rel.Tier);
 
+		ZED::Log::Info(line);
+	}
+
+
+	//Dump results
+	ZED::Log::Info("\n\n--- Results ---");
 	for (auto age_group : m_AgeGroups)
 	{
 		std::string separator(age_group->Name.length(), '-');
@@ -1729,13 +1776,13 @@ bool MD5::ReadRelationClubAssociation(ZED::Blob& Data)
 					}
 					else if (header[i] == "EbenePK")
 					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_relation.TierID) != 1)
-							ZED::Log::Warn("Could not read club id of club relations table");
+						if (sscanf_s(data[i].c_str(), "%d", &new_relation.Tier) != 1)
+							ZED::Log::Warn("Could not read tier of club relations table");
 					}
 					else if (header[i] == "VerbandPK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_relation.AssociationID) != 1)
-							ZED::Log::Warn("Could not read club id of club relations table");
+							ZED::Log::Warn("Could not read association id of club relations table");
 					}
 				}
 
@@ -2468,8 +2515,8 @@ bool MD5::ReadAssociation(ZED::Blob& Data)
 					}
 					else if (header[i] == "EbenePK")
 					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_association.TierID) != 1)
-							ZED::Log::Warn("Could not read tier id of association");
+						if (sscanf_s(data[i].c_str(), "%d", &new_association.Tier) != 1)
+							ZED::Log::Warn("Could not read tier of association");
 					}
 					else if (header[i] == "Bezeichnung")
 						new_association.Description = Latin1ToUTF8(data[i]);
@@ -2480,7 +2527,7 @@ bool MD5::ReadAssociation(ZED::Blob& Data)
 					else if (header[i] == "NaechsteEbenePK")
 					{
 						if (sscanf_s(data[i].c_str(), "%d", &new_association.NextAsscociationID) != 1)
-							ZED::Log::Warn("Could not read NextTierID of association");
+							ZED::Log::Warn("Could not read NextAsscociationID of association");
 					}
 					else if (header[i] == "Aktiv")
 						new_association.Active = data[i] == "1";
