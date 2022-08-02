@@ -53,8 +53,9 @@ void Association::ToString(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginMap;
 
-	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
-	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
+	Yaml << YAML::Key << "uuid"  << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "name"  << YAML::Value << m_Name;
+	Yaml << YAML::Key << "level" << YAML::Value << GetLevel();
 
 	if (m_pParent)
 	{

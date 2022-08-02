@@ -322,8 +322,8 @@ int main(int argc, char** argv)
 
 		auto de = new Judoboard::Association("Deutschland", inter);
 
-		auto dn = new Judoboard::Association("Deuschland-Nord", de);
-		auto ds = new Judoboard::Association(u8"Deuschland-S\u00fcd", de);
+		auto dn = new Judoboard::Association("Deutschland-Nord", de);
+		auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
 
 		auto nord  = new Judoboard::Association("Nord", dn);
 		auto west  = new Judoboard::Association("West", dn);
@@ -331,10 +331,15 @@ int main(int argc, char** argv)
 		auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
 		auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
 
-		auto nieder   = new Judoboard::Association("Niedersachsen", nord);
-		auto hamnburg = new Judoboard::Association("Hamburg", nord);
-		auto berlin   = new Judoboard::Association("Berlin", nost);
-		auto nrw      = new Judoboard::Association("Nordrhein-Westfalen", west);
+		auto nieder  = new Judoboard::Association("Niedersachsen", nord);
+		auto hamburg = new Judoboard::Association("Hamburg", nord);
+		auto berlin  = new Judoboard::Association("Berlin", nost);
+		auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+		app.GetDatabase().AddAssociation(nieder);
+		app.GetDatabase().AddAssociation(hamburg);
+		app.GetDatabase().AddAssociation(berlin);
+		app.GetDatabase().AddAssociation(nrw);
 
 		auto detmold = new Judoboard::Association("Detmold", nrw);
 

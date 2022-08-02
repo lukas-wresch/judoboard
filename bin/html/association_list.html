@@ -5,6 +5,7 @@
 <table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
     <th style="width: 4cm;" id="name"></th>
+    <th style="width: 1.5cm;" id="level">Level</th>
     <th style="width: 4cm;" id="parent">Parent</th>
     <th style="width: 2cm;">Options</th>
   </tr>
@@ -29,17 +30,23 @@ function GetAssociationList()
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
       var cell3 = row.insertCell(2);
+      var cell4 = row.insertCell(3);
 
       cell1.innerHTML = assoc.name;
-      cell2.innerHTML = assoc.parent;
+      cell2.innerHTML = assoc.level;
 
-      cell3.innerHTML = "<button class=\"white\" style=\"width: 3.3cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"association_add.html?id="+assoc.uuid+"\");>Edit Association</button>";
+      if (typeof assoc.parent_name !== 'undefined')
+        cell3.innerHTML = assoc.parent_name;
+      else
+        cell3.innerHTML = "- - -";
+
+      cell4.innerHTML = "<button class=\"white\" style=\"width: 3.3cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"association_add.html?id="+assoc.uuid+"\");>Edit</button>";
     }
   });
 }
 
 
-GetClubList();
+GetAssociationList();
 
 document.getElementById("headline").innerHTML = lang.list_of_all_clubs;
 document.getElementById("add").innerHTML      = lang.new_club;
