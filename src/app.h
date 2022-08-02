@@ -114,6 +114,9 @@ namespace Judoboard
 		Error Ajax_AddClub(const HttpServer::Request& Request);
 		std::string Ajax_ListClubs();
 
+		//Associations
+		std::string Ajax_ListAssociations();
+
 		//Rule sets
 
 		//Age groups

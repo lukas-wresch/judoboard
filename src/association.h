@@ -28,6 +28,7 @@ namespace Judoboard
 		void SetName(std::string NewName) { m_Name = NewName; }
 
 		void operator >> (YAML::Emitter& Yaml) const;
+		void ToString(YAML::Emitter& Yaml) const;
 
 	protected:
 		void SetParent(const Association* NewParent) { m_pParent = NewParent; }

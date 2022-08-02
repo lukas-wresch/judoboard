@@ -46,3 +46,21 @@ void Association::operator >> (YAML::Emitter& Yaml) const
 
 	Yaml << YAML::EndMap;
 }
+
+
+
+void Association::ToString(YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+
+	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
+
+	if (m_pParent)
+	{
+		Yaml << YAML::Key << "parent_uuid" << YAML::Value << (std::string)m_pParent->GetUUID();
+		Yaml << YAML::Key << "parent_name" << YAML::Value << m_pParent->GetName();
+	}
+
+	Yaml << YAML::EndMap;
+}

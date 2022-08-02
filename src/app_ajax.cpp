@@ -1258,6 +1258,14 @@ void Application::SetupHttpServer()
 		return Ajax_ListClubs();
 	});
 
+	m_Server.RegisterResource("/ajax/association/list", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_ListAssociations();
+	});
+
 
 	m_Server.RegisterResource("/ajax/participant/add", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -2697,6 +2705,23 @@ std::string Application::Ajax_ListClubs()
 	{
 		if (club)
 			*club >> ret;
+	}
+
+	ret << YAML::EndSeq;
+	return ret.c_str();
+}
+
+
+
+std::string Application::Ajax_ListAssociations()
+{
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
+	for (auto club : m_Database.GetAllAssociations())
+	{
+		if (club)
+			club->ToString(ret);
 	}
 
 	ret << YAML::EndSeq;

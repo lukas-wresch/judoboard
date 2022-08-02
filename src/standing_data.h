@@ -62,6 +62,7 @@ namespace Judoboard
 		const Club* FindClubByName(const std::string& Name) const;
 
 		//Associations
+		auto& GetAllAssociations() const { return m_Associations; }
 		bool AddAssociation(Association* NewAssociation);
 		Association* FindAssociation(const UUID& UUID);
 		const Association* FindAssociation(const UUID& UUID) const;
