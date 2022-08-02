@@ -8,9 +8,8 @@ using namespace Judoboard;
 
 
 
-Club::Club(const std::string& Name, const Association* Association) : Association(Name)
+Club::Club(const std::string& Name, const Association* Association) : Association(Name, Association)
 {
-	SetParent(Association);
 }
 
 
