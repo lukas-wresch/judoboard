@@ -16,7 +16,7 @@ using namespace Judoboard;
 
 
 const std::string Application::Name = "Judoboard";
-const std::string Application::Version = "0.3.2";
+const std::string Application::Version = "0.3.3";
 bool Application::NoWindow = false;
 
 
@@ -42,8 +42,6 @@ Application::~Application()
 
 	for (auto mat : m_Mats)
 		delete mat;
-
-	m_Mats.clear();
 
 	m_Running = false;
 	m_CurrentTournament = nullptr;
