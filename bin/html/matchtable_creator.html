@@ -5,6 +5,14 @@
   <label id="label_age_group" style="width:100px;margin-top:5px;">Age Groups</label><br/>
 </div>
 
+<div id="div_gender" style="margin-bottom: 0cm; font-size: 14pt;">
+  <label style="width:240px;float:left;margin-top:4px;" id="label_split_genders">Split genders</label>
+  <input type="checkbox" checked id="split_genders" class="switch-input" onclick="Update();">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="split_genders">
+    <span class="toggle-on" id="split_genders_enabled"></span><span class="toggle-off" id="split_genders_disabled"></span>
+  </label>
+</div>
+
 <div style="margin-bottom: 5mm; font-size: 14pt; width: 100%;">
   <div style="width: 240px; float: left;">
     <label id="label_max_participants_" style="width:80cm;margin-top:5px;">Max Participants</label>:
@@ -34,7 +42,7 @@
   <table id="matchtables" border="1" rules="all" style="margin-bottom: 1cm;">
     <tr>
       <th style="width: 0.5cm;" id="no">No.</th>
-      <th style="width: 4cm;" id="name">Name</th>
+      <th style="width: 5cm;" id="name">Name</th>
       <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
       <th style="width: 3.0cm; text-align: center;">#Participants</th>
     </tr>
@@ -70,6 +78,7 @@ function Update()
   data["min"]  = document.getElementById("min_participants").value;
   data["max"]  = document.getElementById("max_participants").value;
   data["diff"] = document.getElementById("weight_diff").value;
+  data["split_genders"] = document.getElementById("split_genders").checked;
 
   for (var no = 0; no < 1000; no++)
   {

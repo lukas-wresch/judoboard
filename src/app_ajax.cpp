@@ -1671,9 +1671,10 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament is open");
 
-		auto min  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "min"));
-		auto max  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "max"));
-		auto diff = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "diff"));
+		auto min   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "min"));
+		auto max   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "max"));
+		auto diff  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "diff"));
+		auto split = HttpServer::DecodeURLEncoded(Request.m_Body, "split_genders") == "true";
 
 		if (min <= 0 || max <= 0 || diff <= 0)
 			return Error(Error::Type::InvalidInput);
@@ -1687,7 +1688,7 @@ void Application::SetupHttpServer()
 				++it;
 		}
 
-		return GetTournament()->GenerateWeightclasses(min, max, diff, age_groups);
+		return GetTournament()->GenerateWeightclasses(min, max, diff, age_groups, split);
 
 		//return Error();//OK
 	});

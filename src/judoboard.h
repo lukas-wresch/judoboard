@@ -15,6 +15,17 @@ namespace Judoboard
 		Male, Female
 	};
 
+	inline void operator++ (Gender& g)
+	{
+		g = (Gender)(((int)g) + 1);
+	}
+
+	inline void operator++ (Gender& g, int)
+	{
+		g = (Gender)(((int)g) + 1);
+	}
+
+
 
 	class Weight
 	{

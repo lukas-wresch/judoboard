@@ -100,7 +100,7 @@ namespace Judoboard
 		virtual bool MoveScheduleEntryUp(const UUID& UUID) { return false; }
 		virtual bool MoveScheduleEntryDown(const UUID& UUID) { return false; }
 
-		virtual std::string GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups) { return ""; }
+		virtual std::string GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) { return ""; }
 
 		//Disqualifications
 		virtual void Disqualify(const Judoka& Judoka) {}
