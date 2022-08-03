@@ -7,6 +7,11 @@
     <input style="margin-bottom:20px;" type="text" id="name" value="" size="30" maxlength="64"/>
 </div>
 
+<div>
+    <label style="width:200px;float:left; margin-top:4px;" id="label_year"></label>
+    <input style="margin-bottom:20px;" type="number" id="year" />
+</div>
+
 <div id="div_status">
     <label style="width:200px; float:left; margin-top:4px;" id="label_status">Status</label>
     <p style="padding-top:5px; margin-bottom:20px;" id="status">- - -</p>
@@ -36,6 +41,7 @@ function AddTournament()
 {
   var params = URLEncode({
     name:        document.getElementById("name").value,
+    year:        document.getElementById("year").value,
     rules:       document.getElementById("rule").value
   });
 
@@ -51,6 +57,7 @@ function UpdateTournament()
 {
   var params = URLEncode({
     name:        document.getElementById("name").value,
+    year:        document.getElementById("year").value,
     rules:       document.getElementById("rule").value
   });
 
@@ -137,7 +144,9 @@ function GetTournament(id)
 
 document.getElementById("add").innerHTML    = lang.new_tournament;
 document.getElementById("label_name").innerHTML = lang.name;
+document.getElementById("label_year").innerHTML = lang.year;
 
+document.getElementById("year").value = new Date().getFullYear();
 
 var id = URLDecode(URL, "id");
 

@@ -110,7 +110,8 @@ var lang_en = {
     empty_tournament_confirm: "Are you sure you want to delete all match results of this tournament?",
     delete_tournament_confirm: "Are you sure you want to completely delete this tournament?",
     delete_rules_confirm: "Are you sure you want to delete this rule set?",
-    shutdown_confirm: "Are you sure you want to shutdown Judoboard?"
+    shutdown_confirm: "Are you sure you want to shutdown Judoboard?",
+    year: "Year",
 }
 
 
@@ -228,7 +229,8 @@ var lang_de = {
     empty_tournament_confirm: unescape("Willst du wirklich alle Ergebnisse dieses Turnieres l%F6schen?"),
     delete_tournament_confirm: unescape("Willst du wirklich dieses Turnier vollst%E4ndig l%F6schen?"),
     delete_rules_confirm: unescape("Willst du wirklich dieses Regelwerk l%F6schen?"),
-    shutdown_confirm: "Soll Judoboard wirklich heruntergefahren werden?"
+    shutdown_confirm: "Soll Judoboard wirklich heruntergefahren werden?",
+    year: "Jahr",
 }
 
 
