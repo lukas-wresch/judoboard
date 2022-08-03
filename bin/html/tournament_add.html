@@ -118,24 +118,22 @@ function ExportTournament()
 function GetTournament(id)
 {
   AjaxCallback("ajax/tournament/get?id="+id, function(response) {
-    var res = response.split(",");
+    var res = YAML.parse(response);
     console.log(response);
 
-    var status = res[3];
-    var rules  = res[4];
-
-    if (status == 0)
+    if (res.status == 0)
       document.getElementById("status").innerHTML = lang.scheduled;
-    else if (status == 1)
+    else if (res.status == 1)
       document.getElementById("status").innerHTML = lang.running;
-    else if (status == 2)
+    else if (res.status == 2)
       document.getElementById("status").innerHTML = lang.concluded;
 
-    document.getElementById("name").value  = res[0];
+    document.getElementById("name").value = res.name;
+    document.getElementById("year").value = res.year;
 
     GetRuleSets(function() {
-      console.log(rules);
-      document.getElementById("rule").value = rules;
+      if (typeof res.rule_set_uuid !== 'undefined')
+        document.getElementById("rule").value = res.rule_set_uuid;
     });
   });
 }

@@ -1953,6 +1953,7 @@ void Application::SetupHttpServer()
 			return error;
 
 		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+		auto year = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "year"));
 		UUID rule_id = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
 
 		if (FindTournamentByName(name))
@@ -1963,6 +1964,8 @@ void Application::SetupHttpServer()
 			ZED::Log::Warn("Adding tournament: Could not find rule set in database");
 
 		Tournament* new_tournament = new Tournament(name);
+		if (year > 0)
+			new_tournament->SetYear(year);
 		new_tournament->SetDefaultRuleSet(rules);
 
 		LockTillScopeEnd();//In case the tournament gets closed at the same time
@@ -1981,6 +1984,7 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+		auto year = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "year"));
 		UUID rule_id = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
 
 		LockTillScopeEnd();
@@ -1990,7 +1994,7 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::ItemNotFound);
 
 		//Check if the tournament is closed
-		if (tournament->GetName() == GetTournament()->GetName())
+		if (GetTournament() && tournament->GetName() == GetTournament()->GetName())
 			return Error(Error::Type::OperationFailed);
 
 		auto rules = m_Database.FindRuleSet(rule_id);
@@ -1998,11 +2002,14 @@ void Application::SetupHttpServer()
 			ZED::Log::Warn("Adding tournament: Could not find rule set in database");
 
 		tournament->SetName(name);
+		if (year >= 0)
+			tournament->SetYear(year);
 		tournament->SetDefaultRuleSet(rules);
+
 		if (!tournament->Save())
 			return Error(Error::Type::OperationFailed);
 
-		//TODO delete the old tournament file
+		//TODO delete the old tournament file in case the name changed
 
 		return Error();//OK
 	});
@@ -2018,14 +2025,21 @@ void Application::SetupHttpServer()
 		if (!tournament)
 			return std::string("Could not find tournament");
 
-		ZED::CSV ret;
-		ret << tournament->GetName() << tournament->GetParticipants().size();
-		ret << tournament->GetSchedule().size() << tournament->GetStatus();
+		YAML::Emitter yaml;
+		yaml << YAML::BeginMap;
+
+		yaml << YAML::Key << "name" << YAML::Value << tournament->GetName();
+		yaml << YAML::Key << "year" << YAML::Value << tournament->GetDatabase().GetYear();
+		yaml << YAML::Key << "num_participants" << YAML::Value << tournament->GetParticipants().size();
+		yaml << YAML::Key << "schedule_size" << YAML::Value << tournament->GetSchedule().size();
+		yaml << YAML::Key << "status" << YAML::Value << (int)tournament->GetStatus();
+
 		if (tournament->GetDefaultRuleSet())
-			ret << (std::string)tournament->GetDefaultRuleSet()->GetUUID();
-		else
-			ret << -1;
-		return ret;
+			yaml << YAML::Key << "rule_set_uuid" << YAML::Value << (std::string)tournament->GetDefaultRuleSet()->GetUUID();
+
+		yaml << YAML::EndMap;
+		
+		return yaml.c_str();
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/assign_age_group", [this](auto& Request) -> std::string {

@@ -39,11 +39,10 @@ namespace Judoboard
 		[[nodiscard]]
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
 		const auto& GetSchedule() const { return m_Schedule; }
-		Match* FindMatch(uint32_t ID) const;
 		Match* FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
 		const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
-		//virtual const std::string JudokaToJSON() const override { return m_StandingData.JudokaToJSON(); }
+		void SetYear(uint32_t NewYear) { m_StandingData.SetYear(NewYear); }
 
 		void SetName(const std::string& NewName) { m_Name = NewName; }
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
