@@ -55,16 +55,34 @@ namespace Judoboard
 		std::string ToString() const {
 			if (m_InGrams % 1000 == 0)
 				return std::to_string(m_InGrams / 1000);
-			//Add space at the end to that yaml doesn't think that this is a number
+			//Add space at the end so that yaml doesn't think that this is a number
 			return std::to_string(m_InGrams/1000) + "," + std::to_string((m_InGrams%1000) / 100) + " ";
 		}
 
-		operator uint32_t () const {
+		operator uint32_t () const {//TODO make explicit
 			return m_InGrams;
+		}
+
+		Weight operator + (const Weight& rhs) {
+			Weight ret;
+			ret.m_InGrams = this->m_InGrams + rhs.m_InGrams;
+			return ret;
+		}
+
+		Weight operator / (int Divisor) {
+			Weight ret;
+			ret.m_InGrams = this->m_InGrams / Divisor;
+			return ret;
+		}
+
+		void operator /= (int Divisor) {
+			this->m_InGrams /= Divisor;
 		}
 		
 
 	private:
+		Weight() = default;
+
 		uint32_t m_InGrams = 0;
 	};
 

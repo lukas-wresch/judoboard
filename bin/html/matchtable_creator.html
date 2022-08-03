@@ -129,7 +129,7 @@ function Update()
 
 function GetAgeGroups_Multiple()
 {
-  AjaxCallback("ajax/age_groups/list", function(response) {
+  AjaxCallback("ajax/age_groups/get", function(response) {
     console.log(response);
     var res = YAML.parse(response);
 
@@ -138,9 +138,11 @@ function GetAgeGroups_Multiple()
     var no = 0;
     for (const age of res)
     {
-      ages.innerHTML += "<label><input type=\"checkbox\" id=\"age_group_"+no+"\" value=\"" + age.uuid + "\" />" + age.name + "</label><br/>";
+      ages.innerHTML += "<label><input type=\"checkbox\" checked id=\"age_group_"+no+"\" value=\"" + age.uuid + "\" />" + age.name + "</label><br/>";
       no++;
     }
+
+    Update();
   });
 }
 
@@ -148,7 +150,6 @@ function GetAgeGroups_Multiple()
 
 
 GetAgeGroups_Multiple();
-Update();
 
 
 document.getElementById("add").innerHTML = lang.add_matchtable;

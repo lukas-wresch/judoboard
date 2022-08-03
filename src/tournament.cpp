@@ -1186,21 +1186,17 @@ std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const 
 
 	for (auto age_group : AgeGroups)
 	{
-		std::vector<std::pair<int, int>> weightsSlots;
-		int min = 1000 * 1000;
-		int max = 0;
+		std::vector<std::pair<Weight, int>> weightsSlots;
+		
 		for (const auto [id, judoka] : m_StandingData.GetAllJudokas())
 		{
 			auto age_group_of_judoka = GetAgeGroupOfJudoka(judoka);
 			if (age_group_of_judoka && age_group_of_judoka->GetUUID() == age_group->GetUUID())
-			{
-				const int weight = judoka->GetWeight();
-				weightsSlots.emplace_back(weight, 0);
-			}
+				weightsSlots.emplace_back(judoka->GetWeight(), 0);
 		}
 
 		std::sort(weightsSlots.begin(), weightsSlots.end(),
-			[](const std::pair<int, int>& a, const std::pair<int, int>& b) {
+			[](const std::pair<Weight, int>& a, const std::pair<Weight, int>& b) {
 			return a.first < b.first;
 		});
 
@@ -1212,8 +1208,8 @@ std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const 
 
 		//Generate yaml output
 		int currentClass = -1;
-		int weight_min = 0;
-		int weight_max = 0;
+		Weight weight_min = 0;
+		Weight weight_max = 0;
 		int judoka_count = 0;
 		for (auto [weight, weightclass] : weightsSlots)
 		{
@@ -1224,9 +1220,9 @@ std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const 
 
 				//Close weightclass
 				ret << YAML::BeginMap;
-				ret << YAML::Key << "min" << YAML::Value << weight_min;
-				ret << YAML::Key << "max" << YAML::Value << weight_max;
-				std::string name = age_group->GetName() + " " + std::to_string(weight_min) + " - " + std::to_string(weight_max);
+				ret << YAML::Key << "min" << YAML::Value << weight_min.ToString();
+				ret << YAML::Key << "max" << YAML::Value << weight_max.ToString();
+				std::string name = age_group->GetName() + " " + weight_min.ToString() + " - " + weight_max.ToString();
 				ret << YAML::Key << "name" << YAML::Value << name;
 				ret << YAML::Key << "num_participants" << YAML::Value << judoka_count;
 				ret << YAML::EndMap;
@@ -1242,7 +1238,7 @@ std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const 
 		//Close weightclass
 		ret << YAML::BeginMap;
 		ret << YAML::Key << "min" << YAML::Value << weight_min;
-		std::string name = age_group->GetName() + " " + std::to_string(weight_min) + "+";
+		std::string name = age_group->GetName() + " " + weight_min.ToString() + "+";
 		ret << YAML::Key << "name" << YAML::Value << name;
 		ret << YAML::Key << "num_participants" << YAML::Value << judoka_count;
 		ret << YAML::EndMap;

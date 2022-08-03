@@ -9,7 +9,7 @@ using namespace Judoboard;
 
 
 
-int Generator::calculateMedian(std::vector<std::pair<int, int>>& v, int Start, int End)
+Weight Generator::calculateMedian(std::vector<std::pair<Weight, int>>& v, int Start, int End)
 {
 	if (End <= Start)
 		return 0;
@@ -28,15 +28,18 @@ int Generator::calculateMedian(std::vector<std::pair<int, int>>& v, int Start, i
 
 
 
-bool Generator::split(std::vector<std::pair<int, int>>& WeightsSlots, int Start, int End)
+bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Start, int End)
 {
 	static int next_weight_id = 1;
 
-	int median = calculateMedian(WeightsSlots, Start, End);
-	int count  = End-Start;
+	if (Start > End)
+		return false;
 
-	int min = 1000;
-	int max = 0;
+	Weight median = calculateMedian(WeightsSlots, Start, End);
+	unsigned int count  = End-Start;
+
+	Weight min = 1000 * 1000;
+	Weight max = 0;
 	for (int i = Start; i < End; ++i)
 	{
 		if (WeightsSlots[i].first < min)
@@ -46,7 +49,7 @@ bool Generator::split(std::vector<std::pair<int, int>>& WeightsSlots, int Start,
 	}
 
 	bool need_split = count > m_Max;//Must split
-	need_split |= (count >= 2 * m_Min) && (max - min > m_Diff);
+	need_split |= (count >= 2 * m_Min) && (max - min > m_Diff * 1000);
 
 	if (need_split)
 	{
