@@ -1693,8 +1693,12 @@ void Application::SetupHttpServer()
 		if (!apply)
 		{
 			YAML::Emitter yaml;
+			yaml << YAML::BeginSeq;
+
 			for (const auto& desc : descriptors)
 				desc.ToString(yaml);
+
+			yaml << YAML::EndSeq;
 			return yaml.c_str();
 		}
 

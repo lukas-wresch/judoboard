@@ -70,16 +70,13 @@ WeightclassDescCollection::WeightclassDescCollection(std::vector<std::pair<Weigh
 
 void WeightclassDescCollection::ToString(YAML::Emitter& Yaml) const
 {
-	YAML::Emitter ret;
-	ret << YAML::BeginSeq;
-
 	for (const auto& desc : m_Collection)
 	{
 		//Generate yaml output
 
-		ret << YAML::BeginMap;
-		ret << YAML::Key << "min" << YAML::Value << desc.m_Min.ToString();
-		ret << YAML::Key << "max" << YAML::Value << desc.m_Max.ToString();
+		Yaml << YAML::BeginMap;
+		Yaml << YAML::Key << "min" << YAML::Value << desc.m_Min.ToString();
+		Yaml << YAML::Key << "max" << YAML::Value << desc.m_Max.ToString();
 
 		std::string name;
 		if (m_AgeGroup)
@@ -91,13 +88,11 @@ void WeightclassDescCollection::ToString(YAML::Emitter& Yaml) const
 			name += desc.m_Min.ToString() + " - " + desc.m_Max.ToString();
 		else
 			name += desc.m_Min.ToString() + "+";
-		ret << YAML::Key << "name" << YAML::Value << name;
+		Yaml << YAML::Key << "name" << YAML::Value << name;
 
-		ret << YAML::Key << "num_participants" << YAML::Value << desc.m_NumParticipants;
-		ret << YAML::EndMap;
+		Yaml << YAML::Key << "num_participants" << YAML::Value << desc.m_NumParticipants;
+		Yaml << YAML::EndMap;
 	}
-
-	ret << YAML::EndSeq;
 }
 
 

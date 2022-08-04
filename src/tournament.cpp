@@ -1229,7 +1229,36 @@ std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min
 
 bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>& Descriptors)
 {
-	return false;
+	Lock();
+
+	for (const auto& desc : Descriptors)
+	{
+		if (desc.m_AgeGroup)
+		{
+			//Remove all weightclasses with this age group			
+			for (auto match_table : m_MatchTables)
+			{
+				if (match_table->GetType() == MatchTable::Type::Weightclass &&
+					match_table->GetAgeGroup() &&
+					match_table->GetAgeGroup()->GetUUID() == desc.m_AgeGroup->GetUUID())
+					RemoveMatchTable(match_table->GetUUID());
+			}
+		}
+
+		for (auto weight_desc : desc.m_Collection)
+		{
+			auto new_weightclass = new Weightclass(this, weight_desc.m_Min, weight_desc.m_Max, desc.m_Gender);
+
+			new_weightclass->SetAgeGroup(desc.m_AgeGroup);
+			new_weightclass->SetMatID(1);
+
+			AddMatchTable(new_weightclass);
+		}
+	}
+
+	Unlock();
+
+	return true;
 }
 
 
