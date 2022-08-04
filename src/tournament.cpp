@@ -1213,6 +1213,20 @@ std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min
 			//Perform splitting algorithm
 			auto result = gen.split(weights);
 
+#ifdef _DEBUG
+			std::string line;
+			for (auto w : weights)
+				line += w.ToString() + " ";
+			ZED::Log::Debug(line);
+
+			ZED::Log::Debug("Min:  " + std::to_string(Min));
+			ZED::Log::Debug("Max:  " + std::to_string(Max));
+			ZED::Log::Debug("Diff: " + std::to_string(Diff));
+
+			for (auto r : result.m_Collection)
+				ZED::Log::Info(r.m_Min.ToString() + " - " + r.m_Max.ToString() + "   #" + std::to_string(r.m_NumParticipants));
+#endif
+
 			//Add additional metadata
 			result.m_AgeGroup = age_group;
 			if (SplitGenders)
