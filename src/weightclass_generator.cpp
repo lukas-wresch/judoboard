@@ -1,7 +1,9 @@
 #include <algorithm>
 #include "../ZED/include/log.h"
-#include "weightclass.h"
 #include "weightclass_generator.h"
+#include "weightclass.h"
+#include "age_group.h"
+#include "localizer.h"
 
 
 
@@ -24,6 +26,78 @@ Weight Generator::calculateMedian(std::vector<std::pair<Weight, int>>& v, int St
 		size_t n = Start + (End-Start) / 2;
 		return v[n].first;
 	}
+}
+
+
+
+WeightclassDescCollection::WeightclassDescCollection(std::vector<std::pair<Weight, int>>& WeightSlots)
+{
+	int currentClass = -1;
+	Weight weight_min = 0;
+	Weight weight_max = 0;
+	int judoka_count = 0;
+	for (auto [weight, weightclass] : WeightSlots)
+	{
+		//New weightclass
+		if (currentClass != weightclass && currentClass != -1)
+		{
+			weight_max = weight;
+
+			//Close weightclass
+			WeightclassDesc new_desc;
+			new_desc.m_Min = weight_min;
+			new_desc.m_Max = weight_max;
+			new_desc.m_NumParticipants = judoka_count;
+			m_Collection.emplace_back(new_desc);
+
+			weight_min = weight;
+			judoka_count = 0;
+		}
+
+		judoka_count++;
+		currentClass = weightclass;
+	}
+
+	//Close weightclass
+	WeightclassDesc new_desc;
+	new_desc.m_Min = weight_min;
+	new_desc.m_Max = 0;
+	new_desc.m_NumParticipants = judoka_count;
+	m_Collection.emplace_back(new_desc);
+}
+
+
+
+void WeightclassDescCollection::ToString(YAML::Emitter& Yaml) const
+{
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
+	for (const auto& desc : m_Collection)
+	{
+		//Generate yaml output
+
+		ret << YAML::BeginMap;
+		ret << YAML::Key << "min" << YAML::Value << desc.m_Min.ToString();
+		ret << YAML::Key << "max" << YAML::Value << desc.m_Max.ToString();
+
+		std::string name;
+		if (m_AgeGroup)
+			name += m_AgeGroup->GetName() + " ";
+		if (m_Gender != Gender::Unknown)
+			name += "(" + Localizer::Gender2ShortForm(m_Gender) + ") ";
+
+		if (desc.m_Max != 0)
+			name += desc.m_Min.ToString() + " - " + desc.m_Max.ToString();
+		else
+			name += desc.m_Min.ToString() + "+";
+		ret << YAML::Key << "name" << YAML::Value << name;
+
+		ret << YAML::Key << "num_participants" << YAML::Value << desc.m_NumParticipants;
+		ret << YAML::EndMap;
+	}
+
+	ret << YAML::EndSeq;
 }
 
 

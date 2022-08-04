@@ -72,6 +72,35 @@ document.getElementById("weight_diff").oninput = function() {
 
 
 
+function Add()
+{
+  var data = [];
+  data["min"]  = document.getElementById("min_participants").value;
+  data["max"]  = document.getElementById("max_participants").value;
+  data["diff"] = document.getElementById("weight_diff").value;
+  data["split_genders"] = document.getElementById("split_genders").checked;
+  data["apply"] = true;
+
+  for (var no = 0; no < 1000; no++)
+  {
+    if (document.getElementById("age_group_"+no) == null)
+      break;
+
+    if (document.getElementById("age_group_"+no).checked)
+      data[document.getElementById("age_group_"+no).value] = 1;
+  }
+
+  console.log(data);
+
+  var params = URLEncode(data);
+
+  AjaxPost("ajax/matchtable/generate", params, function(response) {
+    navigate("matchtable_list.html");
+  });
+}
+
+
+
 function Update()
 {
   var data = [];

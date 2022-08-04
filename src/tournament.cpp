@@ -1179,10 +1179,9 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 
 
 
-std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders)
+std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) const
 {
-	YAML::Emitter ret;
-	ret << YAML::BeginSeq;
+	std::vector<WeightclassDescCollection> ret;
 
 	for (auto age_group : AgeGroups)
 	{
@@ -1191,7 +1190,7 @@ std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const 
 			if (gender == Gender::Female && !SplitGenders)
 				continue;//Only do one loop for both genders
 
-			std::vector<std::pair<Weight, int>> weightsSlots;
+			std::vector<Weight> weights;
 
 			for (const auto [id, judoka] : m_StandingData.GetAllJudokas())
 			{
@@ -1201,67 +1200,36 @@ std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const 
 
 				auto age_group_of_judoka = GetAgeGroupOfJudoka(judoka);
 				if (age_group_of_judoka && age_group_of_judoka->GetUUID() == age_group->GetUUID())
-					weightsSlots.emplace_back(judoka->GetWeight(), 0);
+					weights.emplace_back(judoka->GetWeight());
 			}
 
-			std::sort(weightsSlots.begin(), weightsSlots.end(),
-				[](const std::pair<Weight, int>& a, const std::pair<Weight, int>& b) {
-					return a.first < b.first;
-			});
+			std::sort(weights.begin(), weights.end());
 
 			Generator gen;
 			gen.m_Min = Min;
 			gen.m_Max = Max;
 			gen.m_Diff = Diff;
-			gen.split(weightsSlots, 0, (int)weightsSlots.size());
 
-			//Generate yaml output
-			int currentClass = -1;
-			Weight weight_min = 0;
-			Weight weight_max = 0;
-			int judoka_count = 0;
-			for (auto [weight, weightclass] : weightsSlots)
-			{
-				//New weightclass
-				if (currentClass != weightclass && currentClass != -1)
-				{
-					weight_max = weight;
+			//Perform splitting algorithm
+			auto result = gen.split(weights);
 
-					//Close weightclass
-					ret << YAML::BeginMap;
-					ret << YAML::Key << "min" << YAML::Value << weight_min.ToString();
-					ret << YAML::Key << "max" << YAML::Value << weight_max.ToString();
-					std::string name = age_group->GetName() + " ";
-					if (SplitGenders)
-						name += "(" + Localizer::Gender2ShortForm(gender) + ") ";
-					name += weight_min.ToString() + " - " + weight_max.ToString();
-					ret << YAML::Key << "name" << YAML::Value << name;
-					ret << YAML::Key << "num_participants" << YAML::Value << judoka_count;
-					ret << YAML::EndMap;
-
-					weight_min = weight;
-					judoka_count = 0;
-				}
-
-				judoka_count++;
-				currentClass = weightclass;
-			}
-
-			//Close weightclass
-			ret << YAML::BeginMap;
-			ret << YAML::Key << "min" << YAML::Value << weight_min;
-			std::string name = age_group->GetName() + " ";
+			//Add additional metadata
+			result.m_AgeGroup = age_group;
 			if (SplitGenders)
-				name += "(" + Localizer::Gender2ShortForm(gender) + ") ";
-			name +=  weight_min.ToString() + "+";
-			ret << YAML::Key << "name" << YAML::Value << name;
-			ret << YAML::Key << "num_participants" << YAML::Value << judoka_count;
-			ret << YAML::EndMap;
+				result.m_Gender = gender;
+
+			ret.emplace_back(result);
 		}
 	}
 
-	ret << YAML::EndSeq;
-	return ret.c_str();
+	return ret;
+}
+
+
+
+bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>& Descriptors)
+{
+	return false;
 }
 
 

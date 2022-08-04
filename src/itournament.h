@@ -5,6 +5,7 @@
 #include "mat.h"
 #include "schedule_entry.h"
 #include "database.h"
+#include "weightclass_generator.h"
 
 
 
@@ -100,7 +101,11 @@ namespace Judoboard
 		virtual bool MoveScheduleEntryUp(const UUID& UUID) { return false; }
 		virtual bool MoveScheduleEntryDown(const UUID& UUID) { return false; }
 
-		virtual std::string GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) { return ""; }
+		virtual std::vector<WeightclassDescCollection> GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) const {
+			std::vector<WeightclassDescCollection> ret;
+			return ret;
+		}
+		virtual bool ApplyWeightclasses(const std::vector<WeightclassDescCollection>& Descriptors) { return false; }
 
 		//Disqualifications
 		virtual void Disqualify(const Judoka& Judoka) {}

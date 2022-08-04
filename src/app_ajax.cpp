@@ -1675,6 +1675,7 @@ void Application::SetupHttpServer()
 		auto max   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "max"));
 		auto diff  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "diff"));
 		auto split = HttpServer::DecodeURLEncoded(Request.m_Body, "split_genders") == "true";
+		auto apply = HttpServer::DecodeURLEncoded(Request.m_Body, "apply") == "true";
 
 		if (min <= 0 || max <= 0 || diff <= 0)
 			return Error(Error::Type::InvalidInput);
@@ -1688,9 +1689,19 @@ void Application::SetupHttpServer()
 				++it;
 		}
 
-		return GetTournament()->GenerateWeightclasses(min, max, diff, age_groups, split);
+		auto descriptors = GetTournament()->GenerateWeightclasses(min, max, diff, age_groups, split);
+		if (!apply)
+		{
+			YAML::Emitter yaml;
+			for (const auto& desc : descriptors)
+				desc.ToString(yaml);
+			return yaml.c_str();
+		}
 
-		//return Error();//OK
+		if (!GetTournament()->ApplyWeightclasses(descriptors))
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
 	});
 
 

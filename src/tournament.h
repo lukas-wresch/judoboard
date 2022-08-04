@@ -118,7 +118,8 @@ namespace Judoboard
 		bool MoveScheduleEntryUp(const UUID& UUID) override;
 		bool MoveScheduleEntryDown(const UUID& UUID) override;
 
-		virtual std::string GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) override;
+		virtual std::vector<WeightclassDescCollection> GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) const override;
+		virtual bool ApplyWeightclasses(const std::vector<WeightclassDescCollection>& Descriptors) override;
 
 		//Disqualifications
 		bool IsDisqualified(const Judoka& Judoka) const;

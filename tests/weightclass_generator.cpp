@@ -32,7 +32,7 @@ TEST(WeightclassGenerator, Test1)
 {
 	initialize();
 
-	std::vector<int> weightsSlots = {30, 35, 43, 46, 48, 53, 60, 63, 64, 65, 67, 69, 69, 69, 72, 77, 81};
+	std::vector<Weight> weightsSlots = {30, 35, 43, 46, 48, 53, 60, 63, 64, 65, 67, 69, 69, 69, 72, 77, 81};
 
 	Generator gen;
 	gen.m_Min  = 2;
