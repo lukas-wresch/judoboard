@@ -3,6 +3,7 @@
 #include "weightclass.h"
 #include "pause.h"
 #include "customtable.h"
+#include "single_elimination.h"
 #include "remote_mat.h"
 #include "tournament.h"
 #include "../ZED/include/log.h"
@@ -1555,7 +1556,26 @@ void Application::SetupHttpServer()
 
 			new_weightclass->IsBestOfThree(bo3);
 
-			new_table = new_weightclass;				
+			new_table = new_weightclass;
+			break;
+		}
+
+		case MatchTable::Type::SingleElimination:
+		{
+			auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
+			auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
+
+			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+			bool bo3   = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
+
+			auto new_single = new SingleElimination(GetTournament(), Weight(minWeight), Weight(maxWeight));
+
+			if (gender == (int)Gender::Male || gender == (int)Gender::Female)
+				new_single->SetGender((Gender)gender);
+
+			new_single->IsBestOfThree(bo3);
+
+			new_table = new_single;
 			break;
 		}
 

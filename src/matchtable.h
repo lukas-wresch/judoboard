@@ -25,7 +25,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Unknown, Weightclass, Pause, Custom
+			Unknown, Weightclass, Pause, Custom, SingleElimination
 		};
 
 		struct Result
