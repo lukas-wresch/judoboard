@@ -179,7 +179,7 @@ const std::string SingleElimination::ToHTML() const
 
 		std::string ret;
 
-		ret += "<td>";
+		ret += "<td><a href='#edit_match.html?id=" + (std::string)match->GetUUID() + "'>";
 
 		if (match->GetFighter(Fighter::White))
 			ret += match->GetFighter(Fighter::White)->GetName();
@@ -193,7 +193,7 @@ const std::string SingleElimination::ToHTML() const
 		else
 			ret += "???";
 
-		"</td>";
+		"</a></td>";
 
 		return ret;
 	};
@@ -201,7 +201,7 @@ const std::string SingleElimination::ToHTML() const
 
 	ret += "<tr height='5mm'>";
 	for (int round = 0; round < rounds; ++round)
-		ret += "<th>Round " + std::to_string(round+1) + "</th>";
+		ret += "<th>" + Localizer::Translate("Round") + " " + std::to_string(round + 1) + "</th>";
 	ret += "</tr>";
 
 	for (int y = 0; y < N; ++y)
