@@ -28,5 +28,11 @@ namespace Judoboard
 
 
 	private:
+		size_t GetNumberOfRounds() const {
+			return (size_t)std::floor(std::log2(GetParticipants().size()));
+		}
+
+		bool m_ThirdPlaceMatch = false;
+		bool m_FifthPlaceMatch = false;
 	};
 }

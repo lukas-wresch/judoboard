@@ -120,6 +120,8 @@ namespace Judoboard
 
 	protected:
 		Match* AddAutoMatch(size_t WhiteIndex, size_t BlueIndex);
+		Match* AddMatchForWinners(const Match* Match1, const Match* Match2);
+
 		std::pair<size_t, size_t> GetIndicesOfMatch(const Match* Match) const;
 
 		size_t GetIndexOfParticipant(const Judoka* Participant) const;

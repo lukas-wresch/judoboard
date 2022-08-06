@@ -1488,9 +1488,6 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		int type = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "type"));
 
 		switch ((MatchTable::Type)type)
@@ -1501,6 +1498,8 @@ void Application::SetupHttpServer()
 				return Pause::GetHTMLForm();
 			case MatchTable::Type::Custom:
 				return CustomTable::GetHTMLForm();
+			case MatchTable::Type::SingleElimination:
+				return SingleElimination::GetHTMLForm();
 
 			default:
 				return std::string("Unknown form");
@@ -1750,7 +1749,10 @@ void Application::SetupHttpServer()
 			return std::string("Could not find class");
 
 		YAML::Emitter ret;
+		ret << YAML::BeginMap;
 		match_table->ToString(ret);
+		ret << YAML::EndMap;
+
 		return ret.c_str();
 	});
 

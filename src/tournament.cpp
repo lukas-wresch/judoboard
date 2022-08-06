@@ -5,6 +5,7 @@
 #include "tournament.h"
 #include "database.h"
 #include "weightclass.h"
+#include "single_elimination.h"
 #include "weightclass_generator.h"
 #include "md5.h"
 #define YAML_CPP_STATIC_DEFINE
@@ -241,6 +242,9 @@ bool Tournament::LoadYAML(const std::string& Filename)
 			{
 			case MatchTable::Type::Weightclass:
 				new_table = new Weightclass(node, this);
+				break;
+			case MatchTable::Type::SingleElimination:
+				new_table = new SingleElimination(node, this);
 				break;
 			}
 

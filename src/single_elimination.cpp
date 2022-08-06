@@ -37,11 +37,7 @@ void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 
 void SingleElimination::ToString(YAML::Emitter& Yaml) const
 {
-	Yaml << YAML::BeginMap;
-
 	Weightclass::ToString(Yaml);
-
-	Yaml << YAML::EndMap;
 }
 
 
@@ -68,57 +64,37 @@ void SingleElimination::GenerateSchedule()
 	else
 		m_RecommendedNumMatches_Before_Break = 2;
 
-	if (GetParticipants().size() == 2)
-		AddAutoMatch(0, 1);
+	const auto rounds = GetNumberOfRounds();
+	
+	//Round 1
+	std::vector<Match*> lastRound;
+	std::vector<Match*> nextRound;
 
-	else if (GetParticipants().size() == 3)
+	for (int i = 0; i < GetParticipants().size(); i += 2)
 	{
-		AddAutoMatch(0, 1);
-		AddAutoMatch(0, 2);
-		AddAutoMatch(1, 2);
+		auto match = AddAutoMatch(i, i+1);
+		nextRound.emplace_back(match);
 	}
 
-	else if (GetParticipants().size() == 4)
+	//Additional rounds
+	for (int round = 1; round < rounds; ++round)
 	{
-		AddAutoMatch(0, 1);
-		AddAutoMatch(2, 3);
+		lastRound = std::move(nextRound);
+		nextRound.clear();
 
-		AddAutoMatch(0, 2);
-		AddAutoMatch(1, 3);
+		for (size_t i = 0; i < lastRound.size(); i += 2)
+		{
+			if (i+1 >= lastRound.size())
+				break;
 
-		AddAutoMatch(0, 3);
-		AddAutoMatch(1, 2);
+			auto match_winner1 = lastRound[i];
+			auto match_winner2 = lastRound[i+1];
+
+			auto new_match = AddMatchForWinners(match_winner1, match_winner2);
+			nextRound.emplace_back(new_match);
+		}
 	}
 
-	else if (GetParticipants().size() == 5)
-	{
-		AddAutoMatch(0, 1);
-		AddAutoMatch(2, 3);
-		AddAutoMatch(0, 4);
-
-		AddAutoMatch(1, 2);
-		AddAutoMatch(3, 4);
-		AddAutoMatch(0, 2);
-
-		AddAutoMatch(1, 3);
-		AddAutoMatch(2, 4);
-		AddAutoMatch(0, 3);
-
-		AddAutoMatch(1, 4);
-	}
-
-	else
-	{
-		for (size_t white = 0; white < GetParticipants().size(); ++white)
-			for (size_t blue = white + 1; blue < GetParticipants().size(); ++blue)
-			{
-				if (white != blue)
-					AddAutoMatch(white, blue);
-			}
-
-		auto rng = std::default_random_engine{};
-		std::shuffle(std::begin(m_Schedule), std::end(m_Schedule), rng);
-	}
 
 	
 	//Add additional matches for best of three
@@ -136,10 +112,6 @@ void SingleElimination::GenerateSchedule()
 				match3->SetBestOfThree(match1, match2);
 		}
 	}
-
-
-	for (auto match : m_Schedule)
-		match->SetMatchTable(this);
 }
 
 
@@ -186,12 +158,12 @@ const std::string SingleElimination::ToHTML() const
 
 	ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 
-	ret += R"(<table width="50%" border="1" rules="all">)";
+	ret += "<table width='50%' border='1' rules='all'>";
 
 	//auto results = CalculateResults();
 
 	const auto N = GetParticipants().size();
-	int rounds = (int)std::floor(std::log2(GetParticipants().size())) + 1;
+	const auto rounds = GetNumberOfRounds();
 
 	auto renderMatch = [this, N](int roundIndex, int matchOfRound) -> std::string {
 		int matchIndex = 0;
@@ -227,23 +199,25 @@ const std::string SingleElimination::ToHTML() const
 	};
 
 
+	ret += "<tr height='5mm'>";
+	for (int round = 0; round < rounds; ++round)
+		ret += "<th>Round " + std::to_string(round+1) + "</th>";
+	ret += "</tr>";
 
-
-	for (int y = 0; y < 2*N; ++y)
+	for (int y = 0; y < N; ++y)
 	{
-		ret += "<tr>";
+		ret += "<tr height='5mm'>";
 
-		int matchOfRound = 0;
 		for (int round = 0; round < rounds; ++round)
 		{
-			if (y%2 == 1)
+			if ( (y + (int)std::pow(2, round) + 1) % (int)std::pow(2, round+1) != 0)
 			{
-				ret += "<td> </td>";
+				ret += "<td></td>";
 				continue;
 			}
 
+			const int matchOfRound = y / (int)std::pow(2, round+1);
 			ret += renderMatch(round, matchOfRound);
-			matchOfRound++;
 		}
 
 		ret += "</tr>";
