@@ -23,20 +23,20 @@ TEST(Match, ExportImport)
 
 		Match match2(YAML::Load(yaml.c_str()), &tourney);
 
-		EXPECT_EQ(match.GetFighter(Fighter::White)->GetUUID(), match2.GetFighter(Fighter::White)->GetUUID());
-		EXPECT_EQ(match.GetFighter(Fighter::Blue )->GetUUID(), match2.GetFighter(Fighter::Blue )->GetUUID());
+		ASSERT_EQ(match.GetFighter(Fighter::White)->GetUUID(), match2.GetFighter(Fighter::White)->GetUUID());
+		ASSERT_EQ(match.GetFighter(Fighter::Blue )->GetUUID(), match2.GetFighter(Fighter::Blue )->GetUUID());
 
-		EXPECT_EQ(match.GetRuleSet().GetUUID(), match2.GetRuleSet().GetUUID());
+		ASSERT_EQ(match.GetRuleSet().GetUUID(), match2.GetRuleSet().GetUUID());
 
 		YAML::Emitter yaml1, yaml2;
 		match.ToString(yaml1);
 		match2.ToString(yaml2);
-		EXPECT_EQ(yaml1.c_str(), yaml2.c_str());
+		ASSERT_EQ((std::string)yaml1.c_str(), (std::string)yaml2.c_str());
 
-		EXPECT_EQ(match.GetColor(), match2.GetColor());
-		EXPECT_EQ(match.GetUUID(), match2.GetUUID());
-		EXPECT_EQ(match.HasConcluded(), match2.HasConcluded());
-		EXPECT_EQ(match.IsRunning(), match2.IsRunning());
+		ASSERT_EQ(match.GetColor(), match2.GetColor());
+		ASSERT_EQ(match.GetUUID(), match2.GetUUID());
+		ASSERT_EQ(match.HasConcluded(), match2.HasConcluded());
+		ASSERT_EQ(match.IsRunning(), match2.IsRunning());
 	}
 }
 
