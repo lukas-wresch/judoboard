@@ -221,7 +221,7 @@ const std::string SingleElimination::ToHTML() const
 			else
 				ret += "<br/>0:" + std::to_string((int)result.m_Score);
 
-			ret += " (" + Timer::TimestampToString(result.m_Time);
+			ret += " (" + Timer::TimestampToString(result.m_Time) + ")";
 		}
 
 		ret += "</a></td>";
@@ -237,7 +237,7 @@ const std::string SingleElimination::ToHTML() const
 
 	for (int y = 0; y < N; ++y)
 	{
-		ret += "<tr height='5mm'>";
+		ret += "<tr style='height: 5mm; text-align: center'>";
 
 		for (int round = 0; round < rounds; ++round)
 		{

@@ -375,18 +375,21 @@ void Application::SetupHttpServer()
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
 
-		if (!GetTournament())
-			return Error(Error::Type::TournamentNotOpen);
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return Error(Error::Type::TournamentNotOpen);
+
 		auto match = GetTournament()->FindMatch(id);
 
 		if (!match)
 			return Error(Error::Type::ItemNotFound);
 
-		return match->AllToString();
+		YAML::Emitter ret;
+		match->ToString(ret);
+		return ret.c_str();
 	});
 
 

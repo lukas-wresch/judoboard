@@ -387,7 +387,7 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	if (GetMatchTable())
 	{
 		Yaml << YAML::Key << "match_table" << YAML::Value << (std::string)GetMatchTable()->GetUUID();
-		Yaml << YAML::Key << "match_table_name" << YAML::Value << GetMatchTable()->GetName();
+		Yaml << YAML::Key << "match_table_name" << YAML::Value << GetMatchTable()->GetDescription();
 	}
 
 	Yaml << YAML::Key << "winner" << YAML::Value << (int)m_Result.m_Winner;
@@ -395,13 +395,6 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "time"   << YAML::Value << m_Result.m_Time;
 
 	Yaml << YAML::EndMap;
-}
-
-
-
-ZED::CSV Match::AllToString() const
-{
-	return ToString() << m_Result.m_Winner << m_Result.m_Score << m_Result.m_Time << (std::string)GetRuleSet().GetUUID();
 }
 
 

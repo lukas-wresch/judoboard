@@ -29,10 +29,10 @@ namespace Judoboard
 
 		enum class DependencyType
 		{
-			None = 0,
-			BestOfThree,//Match is the last in the series of a best of three series
-			TakeWinner,//Take the winner of the match this match depends upon
-			TakeLoser//Take the loser of the match this match depends upon
+			None        = 0x00,
+			BestOfThree = 0x01,//Match is the last in the series of a best of three series
+			TakeWinner  = 0x02,//Take the winner of the match this match depends upon
+			TakeLoser   = 0x04,//Take the loser of the match this match depends upon
 		};
 
 		struct Result
@@ -126,7 +126,6 @@ namespace Judoboard
 
 		//Serialize
 		ZED::CSV ToString() const;
-		ZED::CSV AllToString() const;
 		void ToString(YAML::Emitter& Yaml) const;
 
 		void operator >>(ZED::CSV& Stream) const;
