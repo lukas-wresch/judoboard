@@ -563,6 +563,103 @@ TEST(Tournament, SaveAndLoad)
 
 
 
+TEST(Tournament, SaveAndLoad_AgeGroups)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+
+		j1.SetBirthyear(2000);
+		j2.SetBirthyear(2000);
+		j3.SetBirthyear(2000);
+		j4.SetBirthyear(2000);
+
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+		Tournament tourney("deleteMe");
+
+		AgeGroup a("AgeGroup", 20, 1000, nullptr, tourney.GetDatabase());
+
+		tourney.AddAgeGroup(&a);
+		EXPECT_TRUE(tourney.AddParticipant(&j1));
+		EXPECT_TRUE(tourney.AddParticipant(&j2));
+		EXPECT_TRUE(tourney.AddParticipant(&j3));
+		EXPECT_TRUE(tourney.AddParticipant(&j4));
+
+
+		Tournament t("deleteMe");
+		t.EnableAutoSave(false);
+
+		EXPECT_EQ(t.GetName(), "deleteMe");
+		ASSERT_EQ(t.GetParticipants().size(), 4);
+
+		for (auto [id, j] : t.GetParticipants())
+		{
+			auto age_group = t.GetAgeGroupOfJudoka(j);
+
+			ASSERT_TRUE(age_group);
+			EXPECT_EQ(age_group->GetUUID(), a.GetUUID());
+			EXPECT_EQ(age_group->GetName(), a.GetName());
+		}
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Tournament, SaveAndLoad_Clubs)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Club c("Club name");
+
+		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+
+		j1.SetClub(&c);
+		j2.SetClub(&c);
+		j3.SetClub(&c);
+		j4.SetClub(&c);
+
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+		Tournament tourney("deleteMe");
+
+		EXPECT_TRUE(tourney.AddParticipant(&j1));
+		EXPECT_TRUE(tourney.AddParticipant(&j2));
+		EXPECT_TRUE(tourney.AddParticipant(&j3));
+		EXPECT_TRUE(tourney.AddParticipant(&j4));
+
+
+		Tournament t("deleteMe");
+		t.EnableAutoSave(false);
+
+		EXPECT_EQ(t.GetName(), "deleteMe");
+		ASSERT_EQ(t.GetParticipants().size(), 4);
+
+		for (auto [id, j] : t.GetParticipants())
+		{
+			ASSERT_TRUE(j->GetClub());
+			EXPECT_EQ(j->GetClub()->GetUUID(), c.GetUUID());
+			EXPECT_EQ(j->GetClub()->GetName(), c.GetName());
+		}
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, SaveAndLoad_AutoMatches)
 {
 	initialize();
