@@ -234,42 +234,67 @@ void Weightclass::GenerateSchedule()
 		m_RecommendedNumMatches_Before_Break = 2;
 
 	if (GetParticipants().size() == 2)
-		AddAutoMatch(0, 1);
+		AddAutoMatch(1, 0);
 
 	else if (GetParticipants().size() == 3)
 	{
-		AddAutoMatch(0, 1);
-		AddAutoMatch(0, 2);
-		AddAutoMatch(1, 2);
+		AddAutoMatch(2, 0);
+		AddAutoMatch(1, 0);
+		AddAutoMatch(2, 1);
 	}
 
 	else if (GetParticipants().size() == 4)
 	{
-		AddAutoMatch(0, 1);
-		AddAutoMatch(2, 3);
+		AddAutoMatch(2, 0);
+		AddAutoMatch(3, 1);
 
-		AddAutoMatch(0, 2);
-		AddAutoMatch(1, 3);
+		AddAutoMatch(3, 0);
+		AddAutoMatch(2, 1);
 
-		AddAutoMatch(0, 3);
-		AddAutoMatch(1, 2);
+		AddAutoMatch(1, 0);
+		AddAutoMatch(3, 2);
 	}
 
 	else if (GetParticipants().size() == 5)
 	{
-		AddAutoMatch(0, 1);
-		AddAutoMatch(2, 3);
-		AddAutoMatch(0, 4);
+		AddAutoMatch(3, 0);
+		AddAutoMatch(4, 1);
 
-		AddAutoMatch(1, 2);
-		AddAutoMatch(3, 4);
-		AddAutoMatch(0, 2);
+		AddAutoMatch(2, 0);
+		AddAutoMatch(3, 1);
 
-		AddAutoMatch(1, 3);
-		AddAutoMatch(2, 4);
-		AddAutoMatch(0, 3);
+		AddAutoMatch(4, 2);
+		AddAutoMatch(1, 0);
 
-		AddAutoMatch(1, 4);
+		AddAutoMatch(3, 2);
+		AddAutoMatch(4, 0);
+
+		AddAutoMatch(2, 1);
+		AddAutoMatch(4, 3);
+	}
+
+	else if (GetParticipants().size() == 6)
+	{
+		AddAutoMatch(3, 0);
+		AddAutoMatch(4, 1);
+		AddAutoMatch(5, 2);
+
+		AddAutoMatch(3, 1);
+		AddAutoMatch(4, 0);
+
+		AddAutoMatch(5, 1);
+		AddAutoMatch(2, 0);
+
+		AddAutoMatch(5, 3);
+		AddAutoMatch(4, 2);
+		AddAutoMatch(1, 0);
+
+		AddAutoMatch(4, 3);
+		AddAutoMatch(5, 0);
+		AddAutoMatch(2, 1);
+
+		AddAutoMatch(5, 4);
+		AddAutoMatch(3, 2);
 	}
 
 	else

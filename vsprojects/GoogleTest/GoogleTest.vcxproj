@@ -81,6 +81,7 @@
     <ClCompile Include="..\..\tests\remote_mat.cpp" />
     <ClCompile Include="..\..\tests\timer.cpp" />
     <ClCompile Include="..\..\tests\tournament.cpp" />
+    <ClCompile Include="..\..\tests\weightclass.cpp" />
     <ClCompile Include="..\..\tests\weightclass_generator.cpp" />
   </ItemGroup>
   <ItemGroup>
