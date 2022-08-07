@@ -321,7 +321,11 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 	yaml << YAML::BeginSeq;
 
 	for (auto table : m_MatchTables)
+	{
+		yaml << YAML::BeginMap;
 		*table >> yaml;
+		yaml << YAML::EndMap;
+	}
 
 	yaml << YAML::EndSeq;
 

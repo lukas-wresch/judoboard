@@ -58,8 +58,6 @@ Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament*
 
 void Weightclass::operator >> (YAML::Emitter& Yaml) const
 {
-	Yaml << YAML::BeginMap;
-
 	MatchTable::operator >>(Yaml);
 
 	Yaml << YAML::Key << "min_weight" << YAML::Value;
@@ -71,8 +69,6 @@ void Weightclass::operator >> (YAML::Emitter& Yaml) const
 
 	if (m_BestOfThree)
 		Yaml << YAML::Key << "best_of_three" << YAML::Value << m_BestOfThree;
-
-	Yaml << YAML::EndMap;
 }
 
 
