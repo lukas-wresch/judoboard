@@ -196,7 +196,8 @@ const std::string SingleElimination::ToHTML() const
 		std::string ret;
 
 		ret += "<td><a href='#edit_match.html?id=" + (std::string)match->GetUUID() + "'>";
-
+		
+		//Output name of fighters
 		if (match->GetFighter(Fighter::White))
 			ret += match->GetFighter(Fighter::White)->GetName();
 		else
@@ -209,7 +210,21 @@ const std::string SingleElimination::ToHTML() const
 		else
 			ret += "???";
 
-		"</a></td>";
+		//Output result
+		if (match->IsRunning())
+			ret += "<br/>" + Localizer::Translate("In Progress");
+		else if (match->HasConcluded())
+		{
+			const auto& result = match->GetMatchResult();
+			if (result.m_Winner == Winner::White)
+				ret += "<br/>"   + std::to_string((int)result.m_Score) + ":0";
+			else
+				ret += "<br/>0:" + std::to_string((int)result.m_Score);
+
+			ret += " (" + Timer::TimestampToString(result.m_Time);
+		}
+
+		ret += "</a></td>";
 
 		return ret;
 	};
