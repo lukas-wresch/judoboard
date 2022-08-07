@@ -299,11 +299,10 @@ void Weightclass::GenerateSchedule()
 
 	else
 	{
-		for (size_t white = 0; white < GetParticipants().size(); ++white)
-			for (size_t blue = white + 1; blue < GetParticipants().size(); ++blue)
+		for (size_t blue = 0; blue < GetParticipants().size(); ++blue)
+			for (size_t white = blue + 1; white < GetParticipants().size(); ++white)
 			{
-				if (white != blue)
-					AddAutoMatch(white, blue);
+				AddAutoMatch(white, blue);
 			}
 
 		auto rng = std::default_random_engine{};
@@ -427,7 +426,7 @@ const std::string Weightclass::ToHTML() const
 			}
 		}
 
-		for (auto result : results)
+		for (const auto& result : results)
 		{
 			if (result.Judoka && result.Judoka->GetUUID() == fighter->GetUUID())
 				ret += "<td style=\"text-align: center;\">" + std::to_string(result.Wins) + " : " + std::to_string(result.Score) + "<br/>(" + Timer::TimestampToString(result.Time) + ")</td>";

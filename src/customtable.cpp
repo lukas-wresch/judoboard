@@ -18,15 +18,8 @@ CustomTable::CustomTable(const ITournament* Tournament) : MatchTable(Tournament)
 }
 
 
-CustomTable::CustomTable(ZED::CSV& Stream, ITournament* Tournament) : MatchTable(Stream, Tournament)
+CustomTable::CustomTable(const YAML::Node& Yaml, ITournament* Tournament) : MatchTable(Yaml, Tournament)
 {
-}
-
-
-
-void CustomTable::operator >> (ZED::CSV& Stream) const
-{
-	MatchTable::operator >>(Stream);
 }
 
 
@@ -182,13 +175,5 @@ const std::string CustomTable::ToHTML() const
 
 	ret += "</table>";
 
-	return ret;
-}
-
-
-
-const std::string CustomTable::ToString() const
-{
-	ZED::CSV ret(MatchTable::ToString());
 	return ret;
 }

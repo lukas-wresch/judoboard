@@ -194,40 +194,6 @@ const std::string MatchTable::ToString() const
 
 
 
-MatchTable::MatchTable(ZED::CSV& Stream, ITournament* Tournament) : Schedulable(Stream, Tournament)
-{
-	Stream >> m_Name;
-
-	bool rulesAvailable;
-	Stream >> rulesAvailable;
-	if (rulesAvailable && Tournament)
-	{
-		std::string rulesUUID;
-		Stream >> rulesUUID;
-		m_Rules = Tournament->FindRuleSet(UUID(std::move(rulesUUID)));
-	}
-
-	size_t participants;
-	Stream >> participants;
-	for (size_t i = 0; i < participants; i++)
-	{
-		std::string uuid;
-		Stream >> uuid;
-
-		if (Tournament)
-		{
-			auto judoka = Tournament->FindParticipant(UUID(std::move(uuid)));
-
-			if (judoka)
-				m_Participants.emplace_back(judoka);
-			else
-				ZED::Log::Error("Participant could not be found");
-		}
-	}
-}
-
-
-
 MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : Schedulable(Yaml, Tournament)
 {
 	if (Yaml["name"])
@@ -248,28 +214,6 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : Schedu
 				m_Participants.emplace_back(participant);
 		}
 	}
-}
-
-
-
-void MatchTable::operator >> (ZED::CSV& Stream) const
-{
-	Stream << GetType();
-
-	Schedulable::operator >>(Stream);
-	Stream << m_Name;
-
-	if (m_Rules)
-	{
-		Stream << true << (std::string)m_Rules->GetUUID();
-		Stream.AddNewline();
-	}
-	else
-		Stream << false;//No rule set
-
-	Stream << m_Participants.size();
-	for (auto judoka : m_Participants)
-		Stream << (std::string)judoka->GetUUID();
 }
 
 
@@ -369,7 +313,7 @@ size_t MatchTable::GetIndexOfParticipant(const Judoka* Participant) const
 
 	for (size_t i = 0; i < m_Participants.size(); ++i)
 	{
-		if (Participant && Participant->GetUUID() == m_Participants[i]->GetUUID())
+		if (Participant->GetUUID() == m_Participants[i]->GetUUID())
 			return i;
 	}
 
