@@ -340,7 +340,7 @@ Match* MatchTable::AddAutoMatch(size_t WhiteIndex, size_t BlueIndex)
 
 
 
-Match* MatchTable::AddMatchForWinners(const Match* Match1, const Match* Match2)
+Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
 {
 	Match* new_match = new Match(GetTournament(), nullptr, nullptr, GetMatID());
 

@@ -311,7 +311,7 @@ std::vector<MatchTable::Result> Weightclass::CalculateResults() const
 		ret[i].Set(fighter, this);		
 	}
 
-	for (auto match : m_Schedule)
+	for (const Match* match : m_Schedule)
 	{
 		if (!match->HasConcluded())
 			continue;

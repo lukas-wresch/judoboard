@@ -142,7 +142,7 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 		ret[i].Set(fighter, this);		
 	}
 
-	for (auto match : m_Schedule)
+	for (const Match* match : m_Schedule)
 	{
 		if (!match->HasConcluded())
 			continue;
@@ -230,7 +230,7 @@ const std::string SingleElimination::ToHTML() const
 	};
 
 
-	ret += "<tr height='5mm'>";
+	ret += "<tr style='height: 5mm; text-align: center'>";
 	for (int round = 0; round < rounds; ++round)
 		ret += "<th>" + Localizer::Translate("Round") + " " + std::to_string(round + 1) + "</th>";
 	ret += "</tr>";
