@@ -2,6 +2,19 @@
 
 
 
+TEST(Weightclass, Eligable_NoMaxWeight)
+{
+	initialize();
+
+	Judoka j1(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
+
+	Weightclass w(nullptr, 10, 0);
+
+	EXPECT_TRUE(w.IsElgiable(j1));
+}
+
+
+
 TEST(Weightclass, CorrectOrder2)
 {
 	initialize();
