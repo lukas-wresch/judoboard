@@ -94,6 +94,14 @@ int main(int argc, char** argv)
 
 	if (version)
 	{
+#ifdef _WIN32
+		if (AttachConsole(ATTACH_PARENT_PROCESS) || AllocConsole())
+		{
+			FILE* temp;
+			freopen_s(&temp, "CONOUT$", "w", stdout);
+			freopen_s(&temp, "CONOUT$", "w", stderr);
+		}
+#endif
 		std::cout << Judoboard::Application::Version;
 		return 0;
 	}
