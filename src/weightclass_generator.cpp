@@ -109,27 +109,48 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 
 	Weight min = 1000 * 1000;
 	Weight max = 0;
+	int Middle = Start;
 	for (int i = Start; i < End; ++i)
 	{
 		if (WeightsSlots[i].first < min)
 			min = WeightsSlots[i].first;
 		if (WeightsSlots[i].first > max)
 			max = WeightsSlots[i].first;
+
+		if (WeightsSlots[i].first < median)
+			Middle = i;
 	}
+		
 
-	bool need_split = count > m_Max;//Must split
-	need_split |= (count >= 2 * m_Min) && (max - min > m_Diff * 1000);
+	bool must_split = count > m_Max;//Must split
+	bool should_split = must_split || (count >= 2 * m_Min) && (max - min > m_Diff * 1000);
+	//Don't split if the result is too tiny, unless we must
+	bool can_split = (Middle + 1 - Start >= (int)m_Min) && (End - Middle - 1 >= (int)m_Min);
 
-	if (need_split)
+	if (must_split || (should_split && can_split))
 	{
-		int Middle = Start;
+#ifdef _DEBUG
+		std::string line;
+		for (int i = Start; i < End; ++i)
+			line += std::to_string(WeightsSlots[i].first) + " ";
+		ZED::Log::Debug(line);
+		ZED::Log::Debug("Median: " + std::to_string(median));
+		ZED::Log::Debug("Spread: " + std::to_string(max - min));
+		ZED::Log::Debug(std::string("Must split: ")   + (must_split   ? "Yes" : "No"));
+		ZED::Log::Debug(std::string("Should split: ") + (should_split ? "Yes" : "No"));
+		ZED::Log::Debug(std::string("Can split: ")    + (can_split    ? "Yes" : "No"));
+		ZED::Log::Debug("Will split!");
+		ZED::Log::Debug("Middle: " + std::to_string(Middle));
+		ZED::Log::Debug("Left#:  " + std::to_string(Middle - Start + 1));
+		ZED::Log::Debug("Right#: " + std::to_string(End - Middle-1));
+		ZED::Log::Debug("- - -");
+#endif
+
+		//Perform splitting!
 		for (int i = Start; i < End; ++i)
 		{
 			if (WeightsSlots[i].first < median)
-			{
 				WeightsSlots[i].second = next_weight_id;
-				Middle = i;
-			}
 			else
 				WeightsSlots[i].second = next_weight_id + 1;
 		}
@@ -138,7 +159,28 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 
 		split(WeightsSlots, Start, Middle + 1);
 		split(WeightsSlots, Middle + 1, End);
+		return true;
 	}
 
-	return need_split;
+#ifdef _DEBUG
+	else
+	{
+		std::string line;
+		for (int i = Start; i < End; ++i)
+			line += std::to_string(WeightsSlots[i].first) + " ";
+		ZED::Log::Debug(line);
+		ZED::Log::Debug("Median: " + std::to_string(median));
+		ZED::Log::Debug("Spread: " + std::to_string(max - min));
+		ZED::Log::Debug(std::string("Must split: ")   + (must_split   ? "Yes" : "No"));
+		ZED::Log::Debug(std::string("Should split: ") + (should_split ? "Yes" : "No"));
+		ZED::Log::Debug(std::string("Can split: ")    + (can_split    ? "Yes" : "No"));
+		ZED::Log::Debug("Middle: " + std::to_string(Middle));
+		ZED::Log::Debug("Left#:  " + std::to_string(Middle - Start + 1));
+		ZED::Log::Debug("Right#: " + std::to_string(End - Middle-1));
+		ZED::Log::Debug("Group complete!");
+		ZED::Log::Debug("- - -");
+	}
+#endif
+
+	return false;
 }
