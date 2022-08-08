@@ -1346,15 +1346,19 @@ void Tournament::RevokeDisqualification(const Judoka& Judoka)
 
 const std::string Tournament::Schedule2String() const
 {
-	ZED::CSV ret;
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
 	Lock();
 	for (auto match : m_Schedule)
 	{
 		if (match)
-			ret << match->ToString();
+			match->ToString(ret);
 	}
 	Unlock();
-	return ret;
+
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 

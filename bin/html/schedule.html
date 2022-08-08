@@ -287,21 +287,17 @@ function Update()
 
 
   AjaxCallback("ajax/get_schedule", function(response) {
-    var res = response.split(",");
-
-    if (res.length < 4)
-      return;
+    console.log(response);
+    var res = YAML.parse(response);
 
     var table = document.getElementById("schedule");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    console.log(response);
     var no = 0;
-    for (var i=0; i < res.length;)
+    for (const match of res)
     {
-      no++;
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
       var cell1 = row.insertCell(1);
@@ -313,62 +309,59 @@ function Update()
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
-
-      var id    = res[i++];
-      var white = res[i++];
-      var blue  = res[i++];
-      var matID = res[i++];
-      var state = res[i++];
-      var color = res[i++];
-      var matchtableID   = res[i++];
-      var matchtableName = res[i++];
-
+      no++;
       cell0.innerHTML = no;
       cell0.style.textAlign = "center";
       cell0.style.fontSize  = "14pt";
       cell0.style.height    = "1.5cm";
 
-      cell1.innerHTML = white;
-      cell2.innerHTML = blue;
-
-      if (matchtableID > 0)
-        cell3.innerHTML = "<a href=\"#matchtable_add.html?id="+matchtableID+"\">" + matchtableName + "</a>";
+      if (typeof match.white_name !== 'undefined')
+        cell1.innerHTML = match.white_name;
       else
-        cell3.innerHTML = matchtableName;
+        cell1.innerHTML = "???";
+      if (typeof match.blue_name !== 'undefined')
+        cell2.innerHTML = match.blue_name;
+      else
+        cell2.innerHTML = "???";
 
-      cell3.style.backgroundColor = color;
+      if (typeof match.match_table !== 'undefined')
+        cell3.innerHTML = "<a href=\"#matchtable_add.html?id="+match.match_table+"\">" + match.match_table_name + "</a>";
+      else
+        cell3.innerHTML = "- - -";
+
+      cell3.style.backgroundColor = match.color;
       cell3.style.textAlign = "center";
 
-      if (matID <= 0)
+      if (match.mat_id <= 0)
       {
         cell4.style.fontWeight = "bold";
         cell4.innerHTML = "None";
       }
       else
-        cell4.innerHTML = matID;
+        cell4.innerHTML = match.mat_id;
 
-      cell4.style.backgroundColor = Color(matID);
+      cell4.style.backgroundColor = Color(match.mat_id);
       cell4.style.textAlign = "center";
       cell4.style.fontSize  = "16pt";
 
-      if (state == 0)
+      if (match.state == 0)
         cell5.innerHTML = lang.scheduled;
-      else if (state == 1)
+      else if (match.state == 1)
       {
         cell5.style.color = "red";
         cell5.innerHTML = lang.running;
       }
-      else if (state == 2)
+      else if (match.state == 2)
       {
         cell5.style.color = "green";
         cell5.innerHTML = lang.concluded;
       }
-      else if (state == 3)
+      else if (match.state == 3)
       {
         cell5.style.color = "blue";
         cell5.innerHTML = lang.optional;
       }
-      else if (state == 4)
+      else if (match.state == 4)
       {
         cell5.style.color = "blue";
         cell5.innerHTML = lang.skipped;
@@ -381,10 +374,10 @@ function Update()
       var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
 
 
-      var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 1.8cm; margin-right: 2mm;\" onclick=navigate(\"edit_match.html?id="+id+"\");>" + lang.details + "</button></td>";
+      var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 1.8cm; margin-right: 2mm;\" onclick=navigate(\"edit_match.html?id="+match.uuid+"\");>" + lang.details + "</button></td>";
 
-      if (state == 0)
-        options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveUp('"+id+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return MoveDown('"+id+"');\"></a></td></tr></table>";
+      if (match.state == 0)
+        options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveUp('"+match.uuid+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return MoveDown('"+match.uuid+"');\"></a></td></tr></table>";
       else
         options += "<td></td></tr><tr><td></td></tr></table>";
 
@@ -532,11 +525,12 @@ function Update()
 
   AjaxCallback("ajax/hansokumake/get", function(response) {
     console.log(response);
-    var res = response.split(",");
+    var res = YAML.parse(response);
 
-    if (res.length < 4)
+    if (res.length < 1)
     {
-       $("#div_hansokumake").animate({height: '0px', opacity: 0}, 1000);
+       if (showHansokumake)
+         $("#div_hansokumake").animate({height: '0px', opacity: 0}, 1000);
        showHansokumake = false;
        return;
     }
@@ -547,20 +541,8 @@ function Update()
       table.deleteRow(table.rows.length-1);
 
     var no = 0;
-    for (var i=0; i < res.length;)
+    for (const hansoku of res)
     {
-      no++;
-      var id = res[i++];
-      var white_name = res[i++];
-      var blue_name  = res[i++];
-      var mat_id  = res[i++];
-      var state   = res[i++];
-      var color   = res[i++];
-      var matchtable_id   = res[i++];
-      var matchtable_name = res[i++];
-      var hansokumake_fighter = res[i++];
-      var hansokumake_state   = res[i++];
-
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
       var cell1 = row.insertCell(1);
@@ -570,6 +552,7 @@ function Update()
       var cell5 = row.insertCell(5);
       var cell6 = row.insertCell(6);
 
+      no++;
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
 
@@ -577,42 +560,42 @@ function Update()
       cell0.style.textAlign = "center";
       cell0.style.fontSize  = "14pt";
 
-      cell1.innerHTML = white_name;
-      cell2.innerHTML = blue_name;
+      cell1.innerHTML = hansoku.match.white_name;
+      cell2.innerHTML = hansoku.match.blue_name;
 
-      cell3.innerHTML = matchtable_name;
+      cell3.innerHTML = hansoku.match.match_table_name;
       cell3.style.textAlign = "center";
 
-      cell4.innerHTML = mat_id;
+      cell4.innerHTML = hansoku.match.mat_id;
       cell4.style.textAlign = "center";
       cell4.style.fontSize  = "16pt";
 
-      if (hansokumake_state == 0)
+      if (hansoku.disqualification_state == 0)
         cell5.innerHTML = "Hansokumake " + lang.for + " ";
-      else if (hansokumake_state == 1)
+      else if (hansoku.disqualification_state == 1)
         cell5.innerHTML = lang.disqualification + " " + lang.for + " ";
-      else if (hansokumake_state == 2)
+      else if (hansoku.disqualification_state == 2)
         cell5.innerHTML = lang.no_disqualification + " " + lang.for + " ";
 
-      if (hansokumake_fighter == 0)
+      if (hansoku.fighter == 0)
         cell5.innerHTML += lang.white;
       else
         cell5.innerHTML += lang.blue;
 
       cell5.style.fontSize  = "16pt";
 
-      if (hansokumake_state == 0)
+      if (hansoku.disqualification_state == 0)
       {
-        cell6.innerHTML  = "<button class=\"remove\"  style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return Disqualify("   + hansokumake_fighter + ',' + mat_id+")\">" + "Disqualify" + "</button>";
-        cell6.innerHTML += "<button class=\"neutral\" style=\"width: 4.5cm; height: 0.9cm;\" onclick=\"return NoDisqualify(" + hansokumake_fighter + ',' + mat_id+")\">" + "No Disqualification" + "</button>";
+        cell6.innerHTML  = "<button class=\"remove\"  style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return Disqualify("   + hansoku.fighter + ',' + hansoku.match.mat_id+")\">" + "Disqualify" + "</button>";
+        cell6.innerHTML += "<button class=\"neutral\" style=\"width: 4.5cm; height: 0.9cm;\" onclick=\"return NoDisqualify(" + hansoku.fighter + ',' + hansoku.match.mat_id+")\">" + "No Disqualification" + "</button>";
       }
-      else if (hansokumake_state == 1)
+      else if (hansoku.disqualification_state == 1)
       {
-        cell6.innerHTML = "<button class=\"neutral\" style=\"width: 5.5cm; height: 0.9cm;\" onclick=\"return RemoveDisqualify(" + hansokumake_fighter + ',' + +mat_id+")\">" + "Revoke Disqualification" + "</button>";
+        cell6.innerHTML = "<button class=\"neutral\" style=\"width: 5.5cm; height: 0.9cm;\" onclick=\"return RemoveDisqualify(" + hansoku.fighter + ',' + hansoku.match.mat_id+")\">" + "Revoke Disqualification" + "</button>";
       }
-      else if (hansokumake_state == 2)
+      else if (hansoku.disqualification_state == 2)
       {
-        cell6.innerHTML = "<button class=\"neutral\" style=\"width: 6.5cm; height: 0.9cm;\" onclick=\"return RemoveNoDisqualify(" + hansokumake_fighter + ',' + +mat_id+")\">" + "Revoke No Disqualification" + "</button>";
+        cell6.innerHTML = "<button class=\"neutral\" style=\"width: 6.5cm; height: 0.9cm;\" onclick=\"return RemoveNoDisqualify(" + hansoku.fighter + ',' + hansoku.match.mat_id+")\">" + "Revoke No Disqualification" + "</button>";
       }
 
       cell6.style.textAlign = "center";
@@ -620,7 +603,7 @@ function Update()
 
     if (!showHansokumake)
     {
-        $("#div_hansokumake").show().animate({height: 'auto', opacity: 100}, 1000);
+        $("#div_hansokumake").show().animate({height: 200*res.length + 'px', opacity: 100}, 1000);
         showHansokumake = true;
     }
   });

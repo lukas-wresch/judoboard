@@ -288,9 +288,11 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/get_schedule", [this](auto& Request) -> std::string {
+		LockTillScopeEnd();
+
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
-		LockTillScopeEnd();
+
 		return GetTournament()->Schedule2String();
 	});
 
@@ -2921,7 +2923,8 @@ std::string Application::Ajax_GetHansokumake() const
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
 
-	ZED::CSV ret;
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
 
 	LockTillScopeEnd();
 	for (auto mat : GetMats())
@@ -2933,14 +2936,20 @@ std::string Application::Ajax_GetHansokumake() const
 		{
 			if (mat->GetScoreboard(fighter).m_HansokuMake && mat->GetScoreboard(fighter).m_HansokuMake_Direct)
 			{
-				ret << mat->GetMatch()->ToString();
-				ret << fighter;
-				ret << mat->GetScoreboard(fighter).m_Disqualification;//Disqualification state
+				ret << YAML::BeginMap;
+
+				ret << YAML::Key << "match" << YAML::Value;
+				mat->GetMatch()->ToString(ret);
+				ret << YAML::Key << "fighter" << YAML::Value << (int)fighter;
+				ret << YAML::Key << "disqualification_state" << YAML::Value << (int)mat->GetScoreboard(fighter).m_Disqualification;
+
+				ret << YAML::EndMap;
 			}
 		}
 	}
 
-	return ret;
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 
