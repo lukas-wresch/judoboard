@@ -42,8 +42,7 @@
   <table id="matchtables" border="1" rules="all" style="margin-bottom: 1cm;">
     <tr>
       <th style="width: 0.5cm;" id="no">No.</th>
-      <th style="width: 5cm;" id="name">Name</th>
-      <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
+      <th style="width: 7cm;" id="name">Name</th>
       <th style="width: 3.0cm; text-align: center;">#Participants</th>
     </tr>
   </table>
@@ -137,8 +136,8 @@ function Update()
       var row = table.insertRow(-1);
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
-      var cell3 = row.insertCell(2);
-      var cell4 = row.insertCell(3);
+      //var cell3 = row.insertCell(2);
+      var cell4 = row.insertCell(2);
 
       console.log(weightclass);
 
@@ -153,8 +152,8 @@ function Update()
       cell2.style.fontSize  = "16pt";
 
       //cell3.innerHTML = weightclass.min + " - " + weightclass.max;
-      cell3.style.textAlign = "center";
-      cell3.style.fontSize  = "16pt";
+      //cell3.style.textAlign = "center";
+      //cell3.style.fontSize  = "16pt";
 
       cell4.innerHTML = weightclass.num_participants;
       cell4.style.textAlign = "center";
@@ -176,7 +175,7 @@ function GetAgeGroups_Multiple()
     var no = 0;
     for (const age of res)
     {
-      ages.innerHTML += "<label><input type=\"checkbox\" checked id=\"age_group_"+no+"\" value=\"" + age.uuid + "\" />" + age.name + "</label><br/>";
+      ages.innerHTML += "<label><input type=\"checkbox\" checked id=\"age_group_"+no+"\" value=\"" + age.uuid + "\" onclick='Update();'/>" + age.name + "</label><br/>";
       no++;
     }
 

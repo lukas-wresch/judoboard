@@ -85,9 +85,9 @@ void WeightclassDescCollection::ToString(YAML::Emitter& Yaml) const
 			name += "(" + Localizer::Gender2ShortForm(m_Gender) + ") ";
 
 		if (desc.m_Max != 0)
-			name += desc.m_Min.ToString() + " - " + desc.m_Max.ToString();
+			name += desc.m_Min.ToString() + " - " + desc.m_Max.ToString() + " kg";
 		else
-			name += desc.m_Min.ToString() + "+";
+			name += desc.m_Min.ToString() + "+ kg";
 		Yaml << YAML::Key << "name" << YAML::Value << name;
 
 		Yaml << YAML::Key << "num_participants" << YAML::Value << desc.m_NumParticipants;
