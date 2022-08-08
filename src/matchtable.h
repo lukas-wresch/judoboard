@@ -68,7 +68,6 @@ namespace Judoboard
 
 
 		MatchTable(const ITournament* Tournament) : Schedulable(Tournament) {}
-		MatchTable(ZED::CSV& Stream, ITournament* Tournament);
 		MatchTable(const YAML::Node& Yaml, ITournament* Tournament);
 		MatchTable(MatchTable&) = delete;
 		MatchTable(const MatchTable&) = delete;
@@ -129,7 +128,6 @@ namespace Judoboard
 		Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 
-		virtual void operator >> (ZED::CSV& Stream) const;
 		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual void ToString(YAML::Emitter& Yaml) const;
 

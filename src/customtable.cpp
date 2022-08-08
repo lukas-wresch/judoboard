@@ -18,18 +18,6 @@ CustomTable::CustomTable(const ITournament* Tournament) : MatchTable(Tournament)
 }
 
 
-CustomTable::CustomTable(ZED::CSV& Stream, ITournament* Tournament) : MatchTable(Stream, Tournament)
-{
-}
-
-
-
-void CustomTable::operator >> (ZED::CSV& Stream) const
-{
-	MatchTable::operator >>(Stream);
-}
-
-
 
 Status CustomTable::GetStatus() const
 {

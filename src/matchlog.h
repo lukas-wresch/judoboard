@@ -129,9 +129,7 @@ namespace Judoboard
 
 		const std::string ToString() const;
 
-		void operator << (ZED::CSV& Stream);
 		void operator << (const YAML::Node& Yaml);
-		void operator >> (ZED::CSV& Stream) const;
 		void operator >> (YAML::Emitter& Yaml) const;
 
 	private:

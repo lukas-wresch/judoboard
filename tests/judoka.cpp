@@ -45,29 +45,30 @@ TEST(Judoka, ImportExport)
 }
 
 
+
 TEST(Judoka, ImportExport_RuleSet)
 {
 	for (int i = 0; i < 1000 * 10; i++)
 	{
 		RuleSet r(GetRandomName(), rand() % 200, rand() % 200, rand() % 200, rand() % 200, rand() % 2, rand() % 2, rand() % 2, rand() % 200);
 
-		ZED::CSV csv;
-		r >> csv;
+		YAML::Emitter yaml;
+		r >> yaml;
 
-		RuleSet r2(csv);
+		RuleSet r2(YAML::Load(yaml.c_str()));
 
-		EXPECT_TRUE(r.GetName() == r2.GetName());
-		EXPECT_TRUE(r.IsYukoEnabled() == r2.IsYukoEnabled());
-		EXPECT_TRUE(r.IsKokaEnabled() == r2.IsKokaEnabled());
-		EXPECT_TRUE(r.IsGoldenScoreEnabled() == r2.IsGoldenScoreEnabled());
-		EXPECT_TRUE(r.GetUUID() == r2.GetUUID());
-		EXPECT_TRUE(r.IsDrawAllowed() == r2.IsDrawAllowed());
-		EXPECT_TRUE(r.GetOsaeKomiTime(true)  == r2.GetOsaeKomiTime(true));
-		EXPECT_TRUE(r.GetOsaeKomiTime(false) == r2.GetOsaeKomiTime(false));
-		EXPECT_TRUE(r.GetMatchTime() == r2.GetMatchTime());
-		EXPECT_TRUE(r.GetGoldenScoreTime() == r2.GetGoldenScoreTime());
-		EXPECT_TRUE(r.GetBreakTime() ==   r2.GetBreakTime());
-		EXPECT_TRUE(r.GetDescription() == r2.GetDescription());
+		EXPECT_EQ(r.GetName(), r2.GetName());
+		EXPECT_EQ(r.IsYukoEnabled(), r2.IsYukoEnabled());
+		EXPECT_EQ(r.IsKokaEnabled(), r2.IsKokaEnabled());
+		EXPECT_EQ(r.IsGoldenScoreEnabled(), r2.IsGoldenScoreEnabled());
+		EXPECT_EQ(r.GetUUID(), r2.GetUUID());
+		EXPECT_EQ(r.IsDrawAllowed(), r2.IsDrawAllowed());
+		EXPECT_EQ(r.GetOsaeKomiTime(true),  r2.GetOsaeKomiTime(true));
+		EXPECT_EQ(r.GetOsaeKomiTime(false), r2.GetOsaeKomiTime(false));
+		EXPECT_EQ(r.GetMatchTime(), r2.GetMatchTime());
+		EXPECT_EQ(r.GetGoldenScoreTime(), r2.GetGoldenScoreTime());
+		EXPECT_EQ(r.GetBreakTime(),  r2.GetBreakTime());
+		EXPECT_EQ(r.GetDescription(), r2.GetDescription());
 	}
 }
 

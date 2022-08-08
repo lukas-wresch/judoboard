@@ -62,9 +62,6 @@ namespace Judoboard
 			m_Name = (Name)temp;
 		}
 
-		void operator << (ZED::CSV& Stream) const { Stream >> m_Name; }
-		void operator >> (ZED::CSV& Stream) const { Stream << m_Name; }
-
 		bool operator >  (const Color& rhs) const { return (int)m_Name >  (int)rhs.m_Name; }
 		bool operator >= (const Color& rhs) const { return (int)m_Name >= (int)rhs.m_Name; }
 		bool operator == (const Color& rhs) const { return (int)m_Name == (int)rhs.m_Name; }
@@ -149,14 +146,6 @@ namespace Judoboard
 
 	public:
 		Schedulable(const ITournament* Tournament) : m_Tournament(Tournament) {}
-		Schedulable(ZED::CSV& Stream, const ITournament* Tournament) : m_Tournament(Tournament)
-		{
-			std::string uuid;
-			Stream >> uuid;
-			SetUUID(std::move(uuid));
-			Stream >> m_ScheduleIndex >> m_MatID;
-			m_Color << Stream;
-		}
 		Schedulable(const YAML::Node& Yaml, const ITournament* Tournament) : m_Tournament(Tournament)
 		{
 			if (!Yaml.IsMap())
@@ -194,11 +183,6 @@ namespace Judoboard
 		int32_t GetScheduleIndex() const { return m_ScheduleIndex; }
 		const ITournament* GetTournament() const { return m_Tournament; }
 
-		void operator >> (ZED::CSV& Stream) const {
-			Stream << (std::string)GetUUID();
-			Stream << m_ScheduleIndex << m_MatID;
-			m_Color >> Stream;
-		}
 		void operator >> (YAML::Emitter& Yaml) const {
 			Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
 			Yaml << YAML::Key << "schedule_index" << YAML::Value << m_ScheduleIndex;
