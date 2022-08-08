@@ -97,6 +97,37 @@ void WeightclassDescCollection::ToString(YAML::Emitter& Yaml) const
 
 
 
+unsigned int Generator::getSpread(std::vector<std::pair<Weight, int>>& WeightsSlots, int Start, int End)
+{
+	Weight min = 1000 * 1000;
+	Weight max = 0;
+	
+	for (int i = Start; i < End; ++i)
+	{
+		if (WeightsSlots[i].first < min)
+			min = WeightsSlots[i].first;
+		if (WeightsSlots[i].first > max)
+			max = WeightsSlots[i].first;
+	}
+
+	return max - min;
+}
+
+
+
+bool Generator::isGroupOK(std::vector<std::pair<Weight, int>>& WeightsSlots, int Start, int End)
+{
+	const auto spread = getSpread(WeightsSlots, Start, End);
+	const unsigned int count  = End-Start;
+
+	const bool must_split = count > m_Max;//Must split
+	const bool should_split = must_split || (count >= 2 * m_Min) && (spread > m_Diff * 1000);
+
+	return !should_split;
+}
+
+
+
 bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Start, int End)
 {
 	static int next_weight_id = 1;
@@ -105,7 +136,7 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 		return false;
 
 	Weight median = calculateMedian(WeightsSlots, Start, End);
-	unsigned int count  = End-Start;
+	unsigned int count = End-Start;
 
 	Weight min = 1000 * 1000;
 	Weight max = 0;
@@ -146,10 +177,67 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 		ZED::Log::Debug("- - -");
 #endif
 
+		bool moved_for_complete_group   = false;
+		bool moved_for_spread_reduction = false;
+
+		//Can we move 'Middle' to the left, if we can split of a complete group?
+
+		if (Middle - 1 > Start && !isGroupOK(WeightsSlots, Start, Middle + 1)
+			                   &&  isGroupOK(WeightsSlots, Start, Middle))
+		{
+			Middle--;
+			moved_for_complete_group = true;
+
+			ZED::Log::Debug("Moved 'Middle' to the left to split a group of!");
+			ZED::Log::Debug("Middle: " + std::to_string(Middle));
+		}
+		//TODO for right
+
+		if (!moved_for_complete_group && count >= 5)
+		{
+			//Can we move the 'Middle' to reduce the spread?
+			auto spread_left  = getSpread(WeightsSlots, Start, Middle + 1);
+			auto spread_right = getSpread(WeightsSlots, Middle, End);
+			auto spread_now   = std::max(spread_left, spread_right);
+
+			
+			if (Middle > Start + 1)
+			{
+				auto spread_left_new  = getSpread(WeightsSlots, Start, Middle);
+				auto spread_right_new = getSpread(WeightsSlots, Middle - 1, End);
+				auto spread_new       = std::max(spread_left_new, spread_right_new);
+
+				if (spread_new < spread_now)//Spread got reduced
+				{
+					Middle--;
+					moved_for_spread_reduction = true;
+
+					ZED::Log::Debug("Moved 'Middle' to the left to reduce spread!");
+					ZED::Log::Debug("Middle: " + std::to_string(Middle));
+				}
+			}
+
+			if (!moved_for_spread_reduction && End - 1 > Middle)
+			{
+				auto spread_left_new  = getSpread(WeightsSlots, Start, Middle + 2);
+				auto spread_right_new = getSpread(WeightsSlots, Middle + 1, End);
+				auto spread_new       = std::max(spread_left_new, spread_right_new);
+
+				if (spread_new < spread_now)//Spread got reduced
+				{
+					Middle++;
+					moved_for_spread_reduction = true;
+
+					ZED::Log::Debug("Moved 'Middle' to the right to reduce spread!");
+					ZED::Log::Debug("Middle: " + std::to_string(Middle));
+				}
+			}
+		}
+
 		//Perform splitting!
 		for (int i = Start; i < End; ++i)
 		{
-			if (WeightsSlots[i].first < median)
+			if (i <= Middle)
 				WeightsSlots[i].second = next_weight_id;
 			else
 				WeightsSlots[i].second = next_weight_id + 1;
