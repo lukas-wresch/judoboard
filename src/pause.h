@@ -11,7 +11,7 @@ namespace Judoboard
 
 	public:
 		Pause(const ITournament* Tournament) : MatchTable(Tournament) {}
-		Pause(ZED::CSV& Stream, ITournament* Tournament) : MatchTable(Stream, Tournament) {}
+		Pause(const YAML::Node& Yaml, ITournament* Tournament) : MatchTable(Yaml, Tournament) {}
 
 		static std::string GetHTMLForm() { return ""; }
 

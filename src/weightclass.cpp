@@ -239,51 +239,75 @@ void Weightclass::GenerateSchedule()
 		m_RecommendedNumMatches_Before_Break = 2;
 
 	if (GetParticipants().size() == 2)
-		AddAutoMatch(0, 1);
+		AddAutoMatch(1, 0);
 
 	else if (GetParticipants().size() == 3)
 	{
-		AddAutoMatch(0, 1);
-		AddAutoMatch(0, 2);
-		AddAutoMatch(1, 2);
+		AddAutoMatch(2, 0);
+		AddAutoMatch(1, 0);
+		AddAutoMatch(2, 1);
 	}
 
 	else if (GetParticipants().size() == 4)
 	{
-		AddAutoMatch(0, 1);
-		AddAutoMatch(2, 3);
+		AddAutoMatch(2, 0);
+		AddAutoMatch(3, 1);
 
-		AddAutoMatch(0, 2);
-		AddAutoMatch(1, 3);
+		AddAutoMatch(3, 0);
+		AddAutoMatch(2, 1);
 
-		AddAutoMatch(0, 3);
-		AddAutoMatch(1, 2);
+		AddAutoMatch(1, 0);
+		AddAutoMatch(3, 2);
 	}
 
 	else if (GetParticipants().size() == 5)
 	{
-		AddAutoMatch(0, 1);
-		AddAutoMatch(2, 3);
-		AddAutoMatch(0, 4);
+		AddAutoMatch(3, 0);
+		AddAutoMatch(4, 1);
 
-		AddAutoMatch(1, 2);
-		AddAutoMatch(3, 4);
-		AddAutoMatch(0, 2);
+		AddAutoMatch(2, 0);
+		AddAutoMatch(3, 1);
 
-		AddAutoMatch(1, 3);
-		AddAutoMatch(2, 4);
-		AddAutoMatch(0, 3);
+		AddAutoMatch(4, 2);
+		AddAutoMatch(1, 0);
 
-		AddAutoMatch(1, 4);
+		AddAutoMatch(3, 2);
+		AddAutoMatch(4, 0);
+
+		AddAutoMatch(2, 1);
+		AddAutoMatch(4, 3);
+	}
+
+	else if (GetParticipants().size() == 6)
+	{
+		AddAutoMatch(3, 0);
+		AddAutoMatch(4, 1);
+		AddAutoMatch(5, 2);
+
+		AddAutoMatch(3, 1);
+		AddAutoMatch(4, 0);
+
+		AddAutoMatch(5, 1);
+		AddAutoMatch(2, 0);
+
+		AddAutoMatch(5, 3);
+		AddAutoMatch(4, 2);
+		AddAutoMatch(1, 0);
+
+		AddAutoMatch(4, 3);
+		AddAutoMatch(5, 0);
+		AddAutoMatch(2, 1);
+
+		AddAutoMatch(5, 4);
+		AddAutoMatch(3, 2);
 	}
 
 	else
 	{
-		for (size_t white = 0; white < GetParticipants().size(); ++white)
-			for (size_t blue = white + 1; blue < GetParticipants().size(); ++blue)
+		for (size_t blue = 0; blue < GetParticipants().size(); ++blue)
+			for (size_t white = blue + 1; white < GetParticipants().size(); ++white)
 			{
-				if (white != blue)
-					AddAutoMatch(white, blue);
+				AddAutoMatch(white, blue);
 			}
 
 		auto rng = std::default_random_engine{};
@@ -407,7 +431,7 @@ const std::string Weightclass::ToHTML() const
 			}
 		}
 
-		for (auto result : results)
+		for (const auto& result : results)
 		{
 			if (result.Judoka && result.Judoka->GetUUID() == fighter->GetUUID())
 				ret += "<td style=\"text-align: center;\">" + std::to_string(result.Wins) + " : " + std::to_string(result.Score) + "<br/>(" + Timer::TimestampToString(result.Time) + ")</td>";

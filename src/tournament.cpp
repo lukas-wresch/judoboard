@@ -214,6 +214,12 @@ bool Tournament::LoadYAML(const std::string& Filename)
 	//Read standing data
 	m_StandingData << yaml;
 
+	if (yaml["judoka_to_age_group"] && yaml["judoka_to_age_group"].IsMap())
+	{
+		for (const auto& node : yaml["judoka_to_age_group"])
+			m_JudokaToAgeGroup.insert({ node.first.as<std::string>(), node.second.as<std::string>() });
+	}
+
 	if (yaml["disqualified_judoka"] && yaml["disqualified_judoka"].IsSequence())
 	{
 		for (const auto& node : yaml["disqualified_judoka"])
@@ -296,6 +302,15 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 	yaml << YAML::Value << "1";
 
 	m_StandingData >> yaml;
+
+	yaml << YAML::Key << "judoka_to_age_group";
+	yaml << YAML::Value;
+	yaml << YAML::BeginMap;
+
+	for (const auto& [judoka_uuid, age_group_uuid] : m_JudokaToAgeGroup)
+		yaml << YAML::Key << (std::string)judoka_uuid << YAML::Value << (std::string)age_group_uuid;
+
+	yaml << YAML::EndMap;
 
 	yaml << YAML::Key << "disqualified_judoka";
 	yaml << YAML::Value;

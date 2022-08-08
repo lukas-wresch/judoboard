@@ -11,7 +11,7 @@ namespace Judoboard
 
 	public:
 		CustomTable(const ITournament* Tournament);
-		CustomTable(ZED::CSV& Stream, ITournament* Tournament);
+		CustomTable(const YAML::Node& Yaml, ITournament* Tournament);
 
 		static std::string GetHTMLForm();
 
@@ -27,9 +27,6 @@ namespace Judoboard
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
-		virtual const std::string ToString() const override;
-
-		virtual void operator >> (ZED::CSV& Stream) const override;
 
 
 	private:

@@ -220,7 +220,8 @@ bool Application::CloseTournament()
 		if (!m_CurrentTournament->CanCloseTournament())
 			return false;
 
-	m_CurrentTournament = nullptr;
+	//Re-open temporary tournament
+	m_CurrentTournament = &m_TempTournament;
 	return true;
 }
 
