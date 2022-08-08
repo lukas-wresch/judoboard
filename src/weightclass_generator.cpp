@@ -191,7 +191,16 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 			ZED::Log::Debug("Moved 'Middle' to the left to split a group of!");
 			ZED::Log::Debug("Middle: " + std::to_string(Middle));
 		}
-		//TODO for right
+		else if (Middle + 1 < End && !isGroupOK(WeightsSlots, Middle + 1, End)
+			                      &&  isGroupOK(WeightsSlots, Middle + 2, End))
+		{
+			Middle++;
+			moved_for_complete_group = true;
+
+			ZED::Log::Debug("Moved 'Middle' to the right to split a group of!");
+			ZED::Log::Debug("Middle: " + std::to_string(Middle));
+		}
+
 
 		if (!moved_for_complete_group && count >= 5)
 		{
@@ -234,6 +243,7 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 			}
 		}
 
+
 		//Perform splitting!
 		for (int i = Start; i < End; ++i)
 		{
@@ -244,6 +254,7 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 		}
 
 		next_weight_id += 2;
+
 
 		split(WeightsSlots, Start, Middle + 1);
 		split(WeightsSlots, Middle + 1, End);
