@@ -912,8 +912,6 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 
 bool Tournament::RemoveMatchTable(const UUID& UUID)
 {
-	Lock();
-
 	auto matchTable = FindMatchTable(UUID);
 
 	if (!matchTable)
@@ -921,6 +919,8 @@ bool Tournament::RemoveMatchTable(const UUID& UUID)
 
 	if (matchTable->GetStatus() != Status::Scheduled)//Can safely delete the match table
 		return false;
+
+	Lock();
 
 	//Remove match table
 	for (auto table = m_MatchTables.begin(); table != m_MatchTables.end(); ++table)
