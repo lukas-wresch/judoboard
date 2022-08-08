@@ -109,12 +109,19 @@ std::string Weightclass::GetDescription() const
 	if (GetAgeGroup())
 	{
 		desc = GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender);
-		desc += " -" + m_MaxWeight.ToString() + " kg";
+
+		if (m_MaxWeight == 0)
+			desc += " +" + m_MinWeight.ToString() + " kg";
+		else
+			desc += " -" + m_MaxWeight.ToString() + " kg";
 	}
 
 	else
 	{
-		desc = m_MinWeight.ToString() + " - " + m_MaxWeight.ToString() + " kg";
+		if (m_MaxWeight == 0)
+			desc = "+" + m_MinWeight.ToString() + " kg";
+		else
+			desc = m_MinWeight.ToString() + " - " + m_MaxWeight.ToString() + " kg";
 
 		if (m_Gender != Gender::Unknown)
 			desc += " (" + Localizer::Gender2ShortForm(m_Gender) + ")";
