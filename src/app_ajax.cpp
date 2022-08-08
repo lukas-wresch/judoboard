@@ -1463,6 +1463,8 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
+		LockTillScopeEnd();
+
 		if (!GetTournament())
 			return std::string("No tournament open");
 
