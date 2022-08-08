@@ -46,6 +46,7 @@ namespace Judoboard
 
 		void SetName(const std::string& NewName) { m_Name = NewName; }
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
+		bool IsAutoSave() const { return m_AutoSave; }
 
 		Status GetStatus() const;
 		bool CanCloseTournament() const;
@@ -147,6 +148,7 @@ namespace Judoboard
 
 		void FindAgeGroupForJudoka(const Judoka& Judoka);
 
+		int32_t  GetFreeScheduleIndex(uint32_t Mat = 0) const;
 		int32_t  GetMaxScheduleIndex(uint32_t Mat = 0) const;
 		uint32_t GetMaxEntriesAtScheduleIndex(uint32_t MatID, int32_t ScheduleIndex) const;
 

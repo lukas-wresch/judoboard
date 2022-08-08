@@ -864,7 +864,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	}
 
 	if (NewMatchTable->GetScheduleIndex() < 0)//No schedule index?
-		NewMatchTable->SetScheduleIndex(GetMaxScheduleIndex() + 1);//Put at the bottom of list
+		NewMatchTable->SetScheduleIndex(GetFreeScheduleIndex());//Take the first empty slot
 	NewMatchTable->GenerateSchedule();
 
 	//Find a new color for this match table
@@ -1260,6 +1260,9 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 {
 	Lock();
 
+	bool temp_auto_save = IsAutoSave();
+	EnableAutoSave(false);//Disable temporarily for performance reasons
+
 	for (const auto& desc : Descriptors)
 	{
 		if (desc.m_AgeGroup)
@@ -1284,6 +1287,9 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 			AddMatchTable(new_weightclass);
 		}
 	}
+
+	EnableAutoSave(temp_auto_save);
+	Save();
 
 	Unlock();
 
@@ -1516,6 +1522,32 @@ void Tournament::FindAgeGroupForJudoka(const Judoka& Judoka)
 	//Only one choice?
 	if (EligableAgeGroups.size() == 1)//Add judoka to age group
 		m_JudokaToAgeGroup.insert({ Judoka.GetUUID(), EligableAgeGroups[0]->GetUUID() });
+}
+
+
+
+int32_t Tournament::GetFreeScheduleIndex(uint32_t Mat) const
+{
+	int32_t ret = 0;
+
+	for (; true; ++ret)
+	{
+		bool is_free = true;
+
+		for (auto entry : m_SchedulePlanner)
+		{
+			if (entry && entry->GetScheduleIndex() == ret)
+			{
+				is_free = false;
+				break;
+			}
+		}
+
+		if (is_free)
+			return ret;
+	}
+
+	return -1;
 }
 
 
