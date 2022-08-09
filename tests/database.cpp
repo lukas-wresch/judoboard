@@ -128,7 +128,7 @@ TEST(Database, SaveAndLoad_Umlaut)
 		EXPECT_EQ(d.GetNumJudoka(), 0);
 		EXPECT_EQ(d.GetRuleSets().size(), 3);
 
-		Judoka j1(u8"Sören", u8"König",  50, Gender::Male);
+		Judoka j1(u8"S\u00f6ren", u8"K\u00f6nig",  50, Gender::Male);
 
 		d.AddJudoka(&j1);
 
@@ -142,8 +142,8 @@ TEST(Database, SaveAndLoad_Umlaut)
 
 		ASSERT_TRUE(d2.FindJudoka(j1.GetUUID()));
 		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetUUID(), j1.GetUUID());
-		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetFirstname(), u8"Sören");
-		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetLastname(),  u8"König");
+		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetFirstname(), u8"S\u00f6ren");
+		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetLastname(),  u8"K\u00f6nig");
 	}
 
 	ZED::Core::RemoveFile("temp.yml");
