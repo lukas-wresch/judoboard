@@ -103,6 +103,10 @@ int main(int argc, char** argv)
 		}
 #endif
 		std::cout << Judoboard::Application::Version;
+
+#ifdef _WIN32
+		FreeConsole();
+#endif
 		return 0;
 	}
 
