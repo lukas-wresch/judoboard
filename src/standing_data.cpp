@@ -332,6 +332,22 @@ const Club* StandingData::FindClubByName(const std::string& Name) const
 
 
 
+bool StandingData::DeleteClub(const UUID& UUID)
+{
+	for (auto it = m_Clubs.begin(); it != m_Clubs.end(); ++it)
+	{
+		if (*it && (*it)->GetUUID() == UUID)
+		{
+			m_Clubs.erase(it);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
 RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName)
 {
 	for (auto rule : m_RuleSets)

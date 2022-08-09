@@ -1250,6 +1250,22 @@ void Application::SetupHttpServer()
 		return Ajax_AddClub(Request);
 	});
 
+	m_Server.RegisterResource("/ajax/club/edit", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_EditClub(Request);
+	});
+
+	m_Server.RegisterResource("/ajax/club/delete", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_DeleteClub(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/club/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -2710,10 +2726,49 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 {
 	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 
-	if (name.size() == 0)
+	if (name.length() == 0)
 		return Error::Type::InvalidInput;
 
+	LockTillScopeEnd();
+
 	m_Database.AddClub(new Club(name));
+	m_Database.Save();
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_EditClub(const HttpServer::Request& Request)
+{
+	UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+
+	if (name.length() == 0)
+		return Error::Type::InvalidInput;
+
+	LockTillScopeEnd();
+
+	auto club = m_Database.FindClub(uuid);
+
+	if (!club)
+		return Error::Type::ItemNotFound;
+
+	club->SetName(name);
+	m_Database.Save();
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_DeleteClub(const HttpServer::Request& Request)
+{
+	UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	LockTillScopeEnd();
+
+	if (!m_Database.DeleteClub(uuid))
+		return Error::Type::OperationFailed;
+
 	m_Database.Save();
 	return Error();//OK
 }
@@ -2724,6 +2779,8 @@ std::string Application::Ajax_ListClubs()
 {
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
+
+	LockTillScopeEnd();
 
 	for (auto club : m_Database.GetAllClubs())
 	{
@@ -2741,6 +2798,8 @@ std::string Application::Ajax_ListAllAgeGroups() const
 {
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
+
+	LockTillScopeEnd();
 
 	for (const auto age_group : GetDatabase().GetAgeGroups())
 	{
@@ -2768,12 +2827,12 @@ std::string Application::Ajax_ListAllAgeGroups() const
 
 std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request)
 {
-	if (!GetTournament())
-		return Error(Error::Type::TournamentNotOpen);
-
 	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
 
 	auto table = GetTournament()->FindMatchTable(id);
 
@@ -2799,10 +2858,12 @@ std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Re
 
 std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request& Request)
 {
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	LockTillScopeEnd();
+
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
-
-	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 	auto table = GetTournament()->FindMatchTable(id);
 

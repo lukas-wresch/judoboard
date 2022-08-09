@@ -112,6 +112,8 @@ namespace Judoboard
 
 		//Clubs
 		Error Ajax_AddClub(const HttpServer::Request& Request);
+		Error Ajax_EditClub(const HttpServer::Request& Request);
+		Error Ajax_DeleteClub(const HttpServer::Request& Request);
 		std::string Ajax_ListClubs();
 
 		//Rule sets

@@ -11,6 +11,10 @@
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddClub()" id="add">New Club</button>
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateClub()" id="update">Update Club</button>
 
+<div id="div_delete" style="margin-top: 5mm;">
+  <button id="delete" class="remove" onclick="return DeleteClub();">Delete Club</button>
+</div>
+
 </form>
 
 
@@ -36,7 +40,17 @@ function UpdateClub()
     name:             document.getElementById("name").value
   });
 
-  AjaxPost('ajax/club/update?id='+id, params, function() {
+  AjaxPost('ajax/club/edit?id='+id, params, function() {
+    navigate("club_list.html");
+  });
+
+  return false;
+}
+
+
+function DeleteClub()
+{
+  AjaxCallback('ajax/club/delete?id='+id, function() {
     navigate("club_list.html");
   });
 
@@ -56,9 +70,9 @@ function GetClub(id)
 
 
 
-document.getElementById("add").innerHTML    = lang.new_club;
-document.getElementById("update").innerHTML = lang.update_club;
-document.getElementById("label_name").innerHTML             = lang.name;
+document.getElementById("add").innerHTML        = lang.new_club;
+document.getElementById("update").innerHTML     = lang.update_club;
+document.getElementById("label_name").innerHTML = lang.name;
 
 var id = URLDecode(URL, "id");
 
@@ -72,6 +86,7 @@ else
 {
   document.getElementById("headline").innerHTML = lang.new_club;
   document.getElementById("update").style.display = "none";
+  document.getElementById("delete").style.display = "none";
 }
 
 </script>

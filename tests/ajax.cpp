@@ -121,30 +121,30 @@ TEST(Ajax, UpdateMat)
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 5);
-		EXPECT_TRUE(app.GetDefaultMat()->GetName()  == "Test");
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 0);
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 5);
+		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test");
+		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 0);
+		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 1);
 
 
 		app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&timerStyle=2"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
-		EXPECT_TRUE(app.GetDefaultMat()->GetName() == "Test2");
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 1);
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 2);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test2");
+		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 1);
+		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 2);
 
 
 		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test2&ipponStyle=2&timerStyle=0"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
-		EXPECT_TRUE(app.GetDefaultMat()->GetName() == "Test2");
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 2);
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 0);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test2");
+		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 2);
+		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 0);
 	}
 }
 
@@ -196,7 +196,7 @@ TEST(Ajax, SetFullscreen)
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsFullscreen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
 
 
 		app.Ajax_SetFullscreen(false, HttpServer::Request("id=1"));
@@ -204,7 +204,7 @@ TEST(Ajax, SetFullscreen)
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 		EXPECT_FALSE(app.GetDefaultMat()->IsFullscreen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
 
 
 		app.Ajax_SetFullscreen(true, HttpServer::Request("id=1"));
@@ -212,13 +212,13 @@ TEST(Ajax, SetFullscreen)
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 		EXPECT_TRUE(app.GetDefaultMat()->IsFullscreen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
 	}
 }
 
 
 
-TEST(Ajax, Ajax_GetHansokumake)
+TEST(Ajax, GetHansokumake)
 {
 	initialize();
 
@@ -319,7 +319,7 @@ TEST(Ajax, Ajax_GetHansokumake)
 
 
 
-TEST(Ajax, Ajax_GetHansokumake2)
+TEST(Ajax, GetHansokumake2)
 {
 	initialize();
 
@@ -365,7 +365,7 @@ TEST(Ajax, AddClub)
 
 
 
-TEST(Ajax, ListClubs)
+TEST(Ajax, Clubs_List)
 {
 	initialize();
 
@@ -388,6 +388,51 @@ TEST(Ajax, ListClubs)
 		ASSERT_EQ(yaml.size(), 2);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
 		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "Club 2");
+	}
+}
+
+
+
+TEST(Ajax, Clubs_Edit)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("database.yml");
+		Application app;
+
+		auto c = new Club("Club 1");
+		app.GetDatabase().AddClub(c);
+
+		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)c->GetUUID(), "name=NewName")), "ok");
+
+
+		auto yaml = YAML::Load(app.Ajax_ListClubs());
+
+		ASSERT_EQ(yaml.size(), 1);
+		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), c->GetUUID());
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "NewName");
+	}
+}
+
+
+
+TEST(Ajax, Clubs_Delete)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("database.yml");
+		Application app;
+
+		auto c = new Club("Club 1");
+		app.GetDatabase().AddClub(c);
+
+		EXPECT_EQ((std::string)app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)c->GetUUID())), "ok");
+
+		auto yaml = YAML::Load(app.Ajax_ListClubs());
+
+		ASSERT_EQ(yaml.size(), 0);
 	}
 }
 
