@@ -91,6 +91,8 @@ bool Database::Save(const std::string& Filename) const
 	if (Filename[0] == '\0')
 		return false;
 
+	//std::setlocale(LC_ALL, "en_US.UTF-8");
+
 	std::ofstream file(Filename);
 
 	if (!file)
