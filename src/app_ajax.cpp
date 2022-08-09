@@ -1266,6 +1266,14 @@ void Application::SetupHttpServer()
 		return Ajax_DeleteClub(Request);
 	});
 
+	m_Server.RegisterResource("/ajax/club/get", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_GetClub(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/club/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -2789,6 +2797,26 @@ std::string Application::Ajax_ListClubs()
 	}
 
 	ret << YAML::EndSeq;
+	return ret.c_str();
+}
+
+
+
+std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
+{
+	UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	YAML::Emitter ret;
+
+	LockTillScopeEnd();
+
+	auto club = m_Database.FindClub(uuid);
+
+	if (!club)
+		return Error(Error::Type::ItemNotFound);
+
+	*club >> ret;
+
 	return ret.c_str();
 }
 

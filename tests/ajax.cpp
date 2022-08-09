@@ -361,6 +361,8 @@ TEST(Ajax, AddClub)
 		ASSERT_EQ(clubs.size(), 1);
 		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
 	}
+
+	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -389,6 +391,30 @@ TEST(Ajax, Clubs_List)
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
 		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "Club 2");
 	}
+
+	ZED::Core::RemoveFile("database.yml");
+}
+
+
+
+TEST(Ajax, Clubs_Get)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("database.yml");
+		Application app;
+
+		auto c = new Club("Club 1");
+		app.GetDatabase().AddClub(c);
+
+		YAML::Node yaml = YAML::Load(app.Ajax_GetClub(HttpServer::Request("id=" + (std::string)c->GetUUID())));
+
+		EXPECT_EQ(yaml["uuid"].as<std::string>(), c->GetUUID());
+		EXPECT_EQ(yaml["name"].as<std::string>(), c->GetName());
+	}
+
+	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -413,6 +439,8 @@ TEST(Ajax, Clubs_Edit)
 		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), c->GetUUID());
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "NewName");
 	}
+
+	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -434,6 +462,8 @@ TEST(Ajax, Clubs_Delete)
 
 		ASSERT_EQ(yaml.size(), 0);
 	}
+
+	ZED::Core::RemoveFile("database.yml");
 }
 
 

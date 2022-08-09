@@ -61,10 +61,10 @@ function DeleteClub()
 function GetClub(id)
 {
   AjaxCallback("ajax/club/get?id="+id, function(response) {
-    var res = response.split(",");
     console.log(response);
+    var res = YAML.parse(response);
 
-    document.getElementById("name").value = res[0];
+    document.getElementById("name").value = res.name;
   });
 }
 
@@ -79,12 +79,12 @@ var id = URLDecode(URL, "id");
 if (id)
 {
   document.getElementById("headline").innerHTML = lang.update_club;
-  document.getElementById("add").style.display = "none";
+  document.getElementById("add").style.display  = "none";
   GetClub(id);
 }
 else
 {
-  document.getElementById("headline").innerHTML = lang.new_club;
+  document.getElementById("headline").innerHTML   = lang.new_club;
   document.getElementById("update").style.display = "none";
   document.getElementById("delete").style.display = "none";
 }
