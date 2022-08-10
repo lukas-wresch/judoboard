@@ -132,6 +132,34 @@ TEST(App, Tournaments)
 
 
 
+TEST(App, DeleteTournament)
+{
+	initialize();
+	Application app;
+
+	{
+		Tournament* t = new Tournament("deleteMe");
+
+		Judoka j(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
+		t->AddParticipant(&j);
+
+		EXPECT_TRUE(app.AddTournament(t));
+		ASSERT_TRUE(app.GetTournament());
+
+		EXPECT_EQ(app.GetTournamentList().size(), 1);
+		EXPECT_EQ((*app.GetTournamentList().begin())->GetName(), t->GetName());
+
+		EXPECT_TRUE(app.CloseTournament());
+		EXPECT_TRUE(app.DeleteTournament(t->GetUUID()));
+	}
+	
+
+	std::ifstream file("tournaments/deleteMe.yaml");
+	EXPECT_FALSE(file);
+}
+
+
+
 TEST(App, Mats)
 {
 	initialize();

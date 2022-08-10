@@ -1607,9 +1607,7 @@ void Application::SetupHttpServer()
 		new_table->SetRuleSet(m_Database.FindRuleSet(rule));
 		new_table->SetAgeGroup(m_Database.FindAgeGroup(age_group));
 
-		GetTournament()->Lock();
 		GetTournament()->AddMatchTable(new_table);
-		GetTournament()->Unlock();
 		return Error();//OK
 	});
 

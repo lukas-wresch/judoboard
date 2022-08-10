@@ -431,12 +431,12 @@ bool Application::DeleteTournament(const UUID& UUID)
 	{
 		if (*it && (*it)->GetUUID() == UUID)
 		{
-			bool ret = ZED::Core::RemoveFile("tournaments/" + (*it)->GetName() + ".yml");
+			const auto filename = "tournaments/" + (*it)->GetName() + ".yml";
 
 			delete *it;
 			m_Tournaments.erase(it);
 
-			return ret;
+			return ZED::Core::RemoveFile(filename);
 		}
 	}
 
