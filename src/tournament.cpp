@@ -850,6 +850,8 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	if (!NewMatchTable)
 		return;
 
+	Lock();
+
 	if (NewMatchTable->GetAgeGroup())
 		AddAgeGroup(const_cast<AgeGroup*>(NewMatchTable->GetAgeGroup()));
 
@@ -880,6 +882,8 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	m_SchedulePlanner.push_back(NewMatchTable);
 
 	GenerateSchedule();
+
+	Unlock();
 }
 
 
@@ -1052,11 +1056,15 @@ std::vector<const AgeGroup*> Tournament::GetEligableAgeGroupsOfJudoka(const Judo
 {
 	std::vector<const AgeGroup*> ret;
 
+	Lock();
+
 	for (auto age_group : m_StandingData.GetAgeGroups())
 	{
 		if (Judoka && age_group->IsElgiable(*Judoka))
 			ret.emplace_back(age_group);
 	}
+
+	Unlock();
 
 	return ret;
 }
@@ -1067,8 +1075,12 @@ std::vector<const AgeGroup*> Tournament::GetAgeGroups() const
 {
 	std::vector<const AgeGroup*> ret;
 
+	Lock();
+
 	for (auto age_group : m_StandingData.GetAgeGroups())
 		ret.emplace_back(age_group);
+
+	Unlock();
 
 	return ret;
 }

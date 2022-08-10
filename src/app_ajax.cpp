@@ -1554,6 +1554,8 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
+		LockTillScopeEnd();
+
 		if (!GetTournament())
 			return std::string("No tournament is open");
 
@@ -1605,7 +1607,6 @@ void Application::SetupHttpServer()
 		new_table->SetRuleSet(m_Database.FindRuleSet(rule));
 		new_table->SetAgeGroup(m_Database.FindAgeGroup(age_group));
 
-		LockTillScopeEnd();
 		GetTournament()->Lock();
 		GetTournament()->AddMatchTable(new_table);
 		GetTournament()->Unlock();
@@ -1694,6 +1695,8 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
+		LockTillScopeEnd();
+
 		if (!GetTournament())
 			return std::string("No tournament is open");
 
@@ -1739,6 +1742,8 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
+
+		LockTillScopeEnd();
 
 		if (!GetTournament())
 			return std::string("No tournament is open");

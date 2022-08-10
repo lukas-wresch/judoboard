@@ -385,6 +385,8 @@ bool Application::StartLocalMat(uint32_t ID)
 
 std::vector<Match> Application::GetNextMatches(uint32_t MatID) const
 {
+	LockTillScopeEnd();
+
 	if (!GetTournament())
 	{
 		std::vector<Match> empty;
