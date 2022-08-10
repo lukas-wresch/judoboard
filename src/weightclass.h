@@ -11,10 +11,10 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		Weightclass(const ITournament* Tournament, Weight MinWeight, Weight MaxWeight);
-		Weightclass(const ITournament* Tournament, Weight MinWeight, Weight MaxWeight, Gender Gender);
-		Weightclass(const YAML::Node& Yaml, ITournament* Tournament);
-		Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament);
+		Weightclass(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
+		Weightclass(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament = nullptr);
+		Weightclass(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
+		Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament = nullptr);
 
 		static std::string GetHTMLForm();
 

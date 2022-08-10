@@ -12,7 +12,8 @@ using namespace Judoboard;
 
 
 
-Weightclass::Weightclass(const ITournament* Tournament, Weight MinWeight, Weight MaxWeight) : MatchTable(Tournament)
+Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
+	: MatchTable(Tournament)
 {
 	m_MinWeight = MinWeight;
 	m_MaxWeight = MaxWeight;
@@ -20,14 +21,16 @@ Weightclass::Weightclass(const ITournament* Tournament, Weight MinWeight, Weight
 
 
 
-Weightclass::Weightclass(const ITournament* Tournament, Weight MinWeight, Weight MaxWeight, Gender Gender) : Weightclass(Tournament, MinWeight, MaxWeight)
+Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
+	: Weightclass(MinWeight, MaxWeight, Tournament)
 {
 	m_Gender = Gender;
 }
 
 
 
-Weightclass::Weightclass(const YAML::Node& Yaml, ITournament* Tournament) : MatchTable(Yaml, Tournament)
+Weightclass::Weightclass(const YAML::Node& Yaml, ITournament* Tournament)
+	: MatchTable(Yaml, Tournament)
 {
 	if (Yaml["min_weight"])
 		m_MinWeight = Weight(Yaml["min_weight"]);
@@ -41,7 +44,8 @@ Weightclass::Weightclass(const YAML::Node& Yaml, ITournament* Tournament) : Matc
 
 
 
-Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament) : MatchTable(Tournament)
+Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament)
+	: MatchTable(Tournament)
 {
 	SetName(Weightclass.Description);
 

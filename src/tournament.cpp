@@ -843,6 +843,8 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	if (!NewMatchTable)
 		return;
 
+	NewMatchTable->SetTournament(this);
+
 	if (NewMatchTable->GetAgeGroup())
 		AddAgeGroup(const_cast<AgeGroup*>(NewMatchTable->GetAgeGroup()));
 

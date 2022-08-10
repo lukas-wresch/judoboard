@@ -86,8 +86,8 @@ TEST(Mat, ForcedCloseDuringMatch)
 	tourney->AddParticipant(&j5);
 	tourney->AddParticipant(&j6);
 
-	MatchTable* m1 = new Weightclass(tourney, 0, 49);
-	MatchTable* m2 = new Weightclass(tourney, 50, 100);
+	MatchTable* m1 = new Weightclass(0, 49);
+	MatchTable* m2 = new Weightclass(50, 100);
 	m1->SetMatID(1);
 	m2->SetMatID(1);
 	tourney->AddMatchTable(m1);

@@ -144,7 +144,7 @@ TEST(Tournament, AddAgeGroup)
 	auto rule_set  = Judoboard::RuleSet("Demo", 180, 60, 20, 10);
 	auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set, app.GetDatabase());
 
-	auto m1 = new Judoboard::Weightclass(tourney, 0, 120);
+	auto m1 = new Judoboard::Weightclass(0, 120);
 	m1->SetMatID(1);
 	m1->SetAgeGroup(&age_group);
 	tourney->AddMatchTable(m1);
@@ -308,7 +308,7 @@ TEST(Tournament, BestOf3_Matchtable)
 		EXPECT_TRUE(tourney.AddParticipant(&j3));
 		EXPECT_TRUE(tourney.AddParticipant(&j4));
 
-		auto matchtable = new Weightclass(&tourney, 50, 60);
+		auto matchtable = new Weightclass(50, 60);
 		matchtable->IsBestOfThree(true);
 		tourney.AddMatchTable(matchtable);
 
@@ -353,8 +353,8 @@ TEST(Tournament, ColorsForMatchTables)
 		EXPECT_TRUE(tourney.AddParticipant(&j3));
 		EXPECT_TRUE(tourney.AddParticipant(&j4));
 
-		tourney.AddMatchTable(new Weightclass(&tourney, 50, 55));
-		tourney.AddMatchTable(new Weightclass(&tourney, 60, 65));
+		tourney.AddMatchTable(new Weightclass(50, 55));
+		tourney.AddMatchTable(new Weightclass(60, 65));
 
 		EXPECT_TRUE(tourney.GetMatchTables().size() == 2);
 		EXPECT_TRUE(tourney.GetMatchTables()[0]->GetColor() == Color::Name::Blue);
@@ -534,8 +534,8 @@ TEST(Tournament, SaveAndLoad)
 		EXPECT_TRUE(tourney->AddParticipant(&j3));
 		EXPECT_TRUE(tourney->AddParticipant(&j4));
 
-		tourney->AddMatchTable(new Weightclass(tourney, 50, 55));
-		tourney->AddMatchTable(new Weightclass(tourney, 60, 65));
+		tourney->AddMatchTable(new Weightclass(50, 55));
+		tourney->AddMatchTable(new Weightclass(60, 65));
 		tourney->AddMatch(Match(tourney, &j1, &j3, 1));
 		tourney->AddMatch(Match(tourney, &j1, &j4, 2));
 
@@ -595,8 +595,8 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 		EXPECT_TRUE(tourney->AddParticipant(&j3));
 		EXPECT_TRUE(tourney->AddParticipant(&j4));
 
-		tourney->AddMatchTable(new Weightclass(tourney, 50, 55));
-		tourney->AddMatchTable(new Weightclass(tourney, 60, 65));
+		tourney->AddMatchTable(new Weightclass(50, 55));
+		tourney->AddMatchTable(new Weightclass(60, 65));
 		tourney->AddMatch(Match(tourney, &j1, &j3, 2));
 		tourney->AddMatch(Match(tourney, &j1, &j4, 2));
 

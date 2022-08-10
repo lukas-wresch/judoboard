@@ -1551,7 +1551,7 @@ void Application::SetupHttpServer()
 			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 			bool bo3   = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
 
-			auto new_weightclass = new Weightclass(GetTournament(), Weight(minWeight), Weight(maxWeight));
+			auto new_weightclass = new Weightclass(Weight(minWeight), Weight(maxWeight));
 
 			if (gender == (int)Gender::Male || gender == (int)Gender::Female)
 				new_weightclass->SetGender((Gender)gender);
@@ -1570,7 +1570,7 @@ void Application::SetupHttpServer()
 			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 			bool bo3   = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
 
-			auto new_single = new SingleElimination(GetTournament(), Weight(minWeight), Weight(maxWeight));
+			auto new_single = new SingleElimination(Weight(minWeight), Weight(maxWeight));
 
 			if (gender == (int)Gender::Male || gender == (int)Gender::Female)
 				new_single->SetGender((Gender)gender);

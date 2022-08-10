@@ -10,7 +10,7 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		SingleElimination(const ITournament* Tournament, Weight MinWeight, Weight MaxWeight);
+		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
 		SingleElimination(const YAML::Node& Yaml, ITournament* Tournament);
 
 		static std::string GetHTMLForm();
@@ -29,6 +29,9 @@ namespace Judoboard
 
 	private:
 		size_t GetNumberOfRounds() const {
+			if (GetParticipants().size() == 0)
+				return 0;
+
 			return (size_t)std::floor(std::log2(GetParticipants().size()));
 		}
 

@@ -581,7 +581,7 @@ TEST(Ajax, GetParticipantsFromMatchTable)
 	//app.GetTournament()->AddParticipant(j2);
 	//app.GetTournament()->AddParticipant(j3);
 
-	auto table = new Weightclass(app.GetTournament(), 10, 100);
+	auto table = new Weightclass(10, 100);
 	app.GetTournament()->AddMatchTable(table);
 
 	YAML::Node yaml = YAML::Load(app.Ajax_GetParticipantsFromMatchTable(HttpServer::Request("id=" + (std::string)table->GetUUID())));
@@ -618,7 +618,7 @@ TEST(Ajax, GetMatchesFromMatchTable)
 	app.GetTournament()->AddParticipant(j2);
 	app.GetTournament()->AddParticipant(j3);
 
-	auto table = new Weightclass(app.GetTournament(), 10, 100);
+	auto table = new Weightclass(10, 100);
 	app.GetTournament()->AddMatchTable(table);
 
 	YAML::Node yaml = YAML::Load(app.Ajax_GetMatchesFromMatchTable(HttpServer::Request("id=" + (std::string)table->GetUUID())));

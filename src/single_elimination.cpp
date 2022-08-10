@@ -11,14 +11,15 @@ using namespace Judoboard;
 
 
 
-SingleElimination::SingleElimination(const ITournament* Tournament, Weight MinWeight, Weight MaxWeight)
-	: Weightclass(Tournament, MinWeight, MaxWeight)
+SingleElimination::SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
+	: Weightclass(MinWeight, MaxWeight, Tournament)
 {
 }
 
 
 
-SingleElimination::SingleElimination(const YAML::Node& Yaml, ITournament* Tournament) : Weightclass(Yaml, Tournament)
+SingleElimination::SingleElimination(const YAML::Node& Yaml, ITournament* Tournament)
+	: Weightclass(Yaml, Tournament)
 {
 }
 

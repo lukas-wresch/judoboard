@@ -208,6 +208,7 @@ namespace Judoboard
 
 	private:
 		void SetScheduleIndex(int32_t ScheduleIndex) { m_ScheduleIndex = ScheduleIndex; }
+		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
 
 		const ITournament* m_Tournament = nullptr;
 
