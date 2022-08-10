@@ -52,10 +52,12 @@ namespace Judoboard
 			if (GetParticipants().size() == 0)
 				return 0;
 
-			return (size_t)std::floor(std::log2(GetParticipants().size()));
+			return (size_t)std::ceil(std::log2(GetParticipants().size()));
 		}
 
 		std::unordered_map<size_t, Judoka*> m_StartingPositions;
+
+		std::vector<Match*> m_ScheduleWithEmptyMatches;
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;

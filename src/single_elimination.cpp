@@ -135,6 +135,17 @@ void SingleElimination::GenerateSchedule()
 		}
 	}
 
+	//Copy complete schedule with 'empty' matches
+	m_ScheduleWithEmptyMatches = GetSchedule();
+
+	//Remove empty matches of schedule
+	for (auto it = m_Schedule.begin(); it != m_Schedule.end();)
+	{
+		if ((*it)->IsEmptyMatch())
+			it = m_Schedule.erase(it);
+		else
+			++it;
+	}
 
 	
 	//Add additional matches for best of three
