@@ -100,6 +100,13 @@ namespace Judoboard
 
 		Judoka* GetFighter(Fighter Fighter);
 		const Judoka* GetFighter(Fighter Fighter) const { return (const_cast<Match*>(this))->GetFighter(Fighter); }
+		void SetFighter(Fighter Fighter, Judoka* NewFighter) {
+			if (Fighter == Fighter::White)
+				m_White.m_Judoka = NewFighter;
+			else
+				m_Blue.m_Judoka  = NewFighter;
+		}
+
 		Result GetMatchResult() const { return m_Result; }//Returns the result of the match (if it has concluded)
 
 		bool Contains(const Judoka& Judoka) const;//Returns true if and only if Judoka is one of the two fighters
@@ -117,6 +124,13 @@ namespace Judoboard
 			return m_White.m_Dependency != DependencyType::None || m_Blue.m_Dependency != DependencyType::None;
 		}
 		bool HasValidFighters() const { return GetFighter(Fighter::White) && GetFighter(Fighter::Blue); }//Returns true if and only if GetFighter() returns not a null pointer
+		Judoka* GetSingleValidFighters() {
+			if (GetFighter(Fighter::White) && !GetFighter(Fighter::Blue))
+				return GetFighter(Fighter::White);
+			else if (!GetFighter(Fighter::White) && GetFighter(Fighter::Blue))
+				return GetFighter(Fighter::Blue);
+			return nullptr;
+		}
 		const std::vector<const Match*> GetDependentMatches() const;//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
 
 		const RuleSet& GetRuleSet() const;

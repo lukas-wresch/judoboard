@@ -100,16 +100,20 @@ void SingleElimination::GenerateSchedule()
 	else
 		m_RecommendedNumMatches_Before_Break = 2;
 
+	if (GetParticipants().size() <= 1)
+		return;
+
 	const auto rounds = GetNumberOfRounds();
+	const auto max_start_pos = pow(2, rounds);
 	
 	//Round 1
 	std::vector<Match*> lastRound;
 	std::vector<Match*> nextRound;
 
-	for (int i = 0; i < GetParticipants().size(); i += 2)
+	for (size_t i = 0; i < max_start_pos; i += 2)
 	{
-		auto match = AddAutoMatch(i, i+1);
-		nextRound.emplace_back(match);
+		auto new_match = CreateAutoMatch(GetJudokaByStartPosition(i), GetJudokaByStartPosition(i+1));
+		nextRound.emplace_back(new_match);
 	}
 
 	//Additional rounds
@@ -123,10 +127,10 @@ void SingleElimination::GenerateSchedule()
 			if (i+1 >= lastRound.size())
 				break;
 
-			auto match_winner1 = lastRound[i];
-			auto match_winner2 = lastRound[i+1];
+			auto match1 = lastRound[i];
+			auto match2 = lastRound[i+1];
 
-			auto new_match = AddMatchForWinners(match_winner1, match_winner2);
+			auto new_match = AddMatchForWinners(match1, match2);
 			nextRound.emplace_back(new_match);
 		}
 	}

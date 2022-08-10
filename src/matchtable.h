@@ -127,6 +127,7 @@ namespace Judoboard
 
 	protected:
 		Match* AddAutoMatch(size_t WhiteIndex, size_t BlueIndex);
+		Match* CreateAutoMatch(Judoka* White, Judoka* Blue);
 		Match* AddMatchForWinners(Match* Match1, Match* Match2);
 
 		std::pair<size_t, size_t> GetIndicesOfMatch(const Match* Match) const;
