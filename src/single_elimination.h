@@ -17,6 +17,12 @@ namespace Judoboard
 
 		virtual Type GetType() const override { return Type::SingleElimination; }
 
+		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false) override;
+		virtual void RemoveAllParticipants() override {
+			MatchTable::RemoveAllParticipants();
+			m_StartingPositions.clear();
+		}
+
 		virtual std::vector<Result> CalculateResults() const override;
 		virtual void GenerateSchedule() override;
 
@@ -34,6 +40,8 @@ namespace Judoboard
 
 			return (size_t)std::floor(std::log2(GetParticipants().size()));
 		}
+
+		std::unordered_map<UUID, size_t> m_StartingPositions;
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;

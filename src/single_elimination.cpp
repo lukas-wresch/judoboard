@@ -66,6 +66,18 @@ std::string SingleElimination::GetHTMLForm()
 
 
 
+bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
+{
+	if (!MatchTable::AddParticipant(NewParticipant, Force))
+		return false;
+
+	m_StartingPositions.insert({ NewParticipant->GetUUID(), GetParticipants().size() - 1 });
+
+	return true;
+}
+
+
+
 void SingleElimination::GenerateSchedule()
 {
 	for (auto it = m_Schedule.begin(); it != m_Schedule.end();)

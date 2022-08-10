@@ -265,11 +265,7 @@ bool Tournament::LoadYAML(const std::string& Filename)
 			Match* new_match = new Match(node, this);
 
 			if (new_match->GetMatchTable())
-			{
-				//TODO find a workaround
-				auto id = new_match->GetMatchTable()->GetUUID();
-				FindMatchTable(id)->SetSchedule().emplace_back(new_match);
-			}
+				(const_cast<MatchTable*>(new_match->GetMatchTable()))->AddMatch(new_match);
 
 			m_Schedule.emplace_back(new_match);
 		}
@@ -749,7 +745,7 @@ bool Tournament::RemoveParticipant(const UUID& UUID)
 		if (!table->Contains(deleted_judoka))
 			continue;
 
-		table->SetParticipants().clear();
+		table->RemoveAllParticipants();
 
 		for (auto& [id, judoka] : m_StandingData.GetAllJudokas())
 		{
@@ -888,7 +884,7 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 
 	if (matchTable->GetStatus() == Status::Scheduled)//Can safely recalculate the match table
 	{
-		matchTable->SetParticipants().clear();
+		matchTable->RemoveAllParticipants();
 
 		for (auto& [id, judoka] : m_StandingData.GetAllJudokas())
 		{

@@ -19,7 +19,6 @@ namespace Judoboard
 
 	class MatchTable : public Schedulable
 	{
-		friend class Tournament;
 		friend class Application;
 
 	public:
@@ -92,31 +91,41 @@ namespace Judoboard
 
 		virtual void SetMatID(int32_t MatID) override;
 
+		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false);
+		virtual void RemoveAllParticipants() {
+			m_Participants.clear();
+			m_Schedule.clear();
+		}
+
+		virtual std::string GetDescription() const = 0;
+		virtual std::vector<Result> CalculateResults() const = 0;
+
+		//Basics
 		const Match* GetMatch(size_t Index) const { if (Index >= m_Schedule.size()) return nullptr; return m_Schedule[Index]; }
 
-		bool AddParticipant(Judoka* NewParticipant, bool Force = false);
 		const std::vector<const Match*> FindMatches(const Judoka& Fighter1, const Judoka& Fighter2) const;//Returns all matches where Fighter1 and Fighter2 fight against each other
 
 		bool Contains(const Judoka* Judoka) const;
 
-		virtual std::vector<Result> CalculateResults() const = 0;
+		std::string GetName() const { return m_Name; }
+		void SetName(const std::string& Name) { m_Name = Name; }
 
+		//Rule sets
 		const RuleSet& GetRuleSet() const;
 		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
 		const RuleSet* GetOwnRuleSet() const { return m_Rules; }
 
+		//Age groups
 		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
 		void SetAgeGroup(const AgeGroup* NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
 
-		std::string GetName() const { return m_Name; }
-		void SetName(const std::string& Name) { m_Name = Name; }
-
-		virtual std::string GetDescription() const = 0;
+		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
 
 		//Serialization
 		virtual const std::string ToString() const;
 
-		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
+		virtual void operator >> (YAML::Emitter& Yaml) const;
+		virtual void ToString(YAML::Emitter& Yaml) const;
 
 	protected:
 		Match* AddAutoMatch(size_t WhiteIndex, size_t BlueIndex);
@@ -130,17 +139,15 @@ namespace Judoboard
 		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 
 		virtual void operator >> (ZED::CSV& Stream) const;
-		virtual void operator >> (YAML::Emitter& Yaml) const;
-		virtual void ToString(YAML::Emitter& Yaml) const;
 
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
 
 	private:
 		std::vector<Judoka*>& SetParticipants() { return m_Participants; }
-		std::vector<Match*>& SetSchedule() { return m_Schedule; }
+		std::vector<Match*>&  SetSchedule()     { return m_Schedule; }
 
-		std::vector<Judoka*> m_Participants;
+		std::vector<Judoka*> m_Participants;//List of all participants that are in the match table
 		const RuleSet* m_Rules = nullptr;//Custom rule set for the matches (if available)
 
 		const AgeGroup* m_pAgeGroup = nullptr;//Age group for the matches (if available)
