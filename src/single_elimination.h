@@ -32,6 +32,20 @@ namespace Judoboard
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
+	protected:
+		Judoka* GetJudokaByStartPosition(size_t StartPosition) const
+		{
+			auto result = m_StartingPositions.find(StartPosition);
+			if (result == m_StartingPositions.end())
+				return nullptr;
+			return result->second;
+		}
+
+		bool IsStartPositionTaken(size_t StartPosition) const
+		{
+			return m_StartingPositions.find(StartPosition) != m_StartingPositions.end();
+		}
+
 
 	private:
 		size_t GetNumberOfRounds() const {
@@ -41,7 +55,7 @@ namespace Judoboard
 			return (size_t)std::floor(std::log2(GetParticipants().size()));
 		}
 
-		std::unordered_map<UUID, size_t> m_StartingPositions;
+		std::unordered_map<size_t, Judoka*> m_StartingPositions;
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;

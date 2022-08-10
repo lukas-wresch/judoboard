@@ -71,7 +71,14 @@ bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
 	if (!MatchTable::AddParticipant(NewParticipant, Force))
 		return false;
 
-	m_StartingPositions.insert({ NewParticipant->GetUUID(), GetParticipants().size() - 1 });
+	for (size_t startPos = 0; true; startPos++)
+	{
+		if (!IsStartPositionTaken(startPos))
+		{
+			m_StartingPositions.insert({ startPos, NewParticipant });
+			break;
+		}
+	}
 
 	return true;
 }

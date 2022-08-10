@@ -19,8 +19,6 @@ namespace Judoboard
 
 	class MatchTable : public Schedulable
 	{
-		friend class Application;
-
 	public:
 		enum class Type
 		{
