@@ -112,7 +112,8 @@ void SingleElimination::GenerateSchedule()
 
 	for (size_t i = 0; i < max_start_pos; i += 2)
 	{
-		auto new_match = CreateAutoMatch(GetJudokaByStartPosition(i), GetJudokaByStartPosition(i+1));
+		auto new_match = CreateAutoMatch(GetJudokaByStartPosition(i),
+			                             GetJudokaByStartPosition(i+1));
 		nextRound.emplace_back(new_match);
 	}
 
@@ -169,32 +170,22 @@ void SingleElimination::GenerateSchedule()
 
 std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 {
-	std::vector<Result> ret(GetParticipants().size());
+	std::vector<Result> ret;
 
-	for (size_t i = 0; i < GetParticipants().size(); i++)
+	if (GetParticipants().size() == 1)
 	{
-		auto fighter = GetParticipant(i);
-		ret[i].Set(fighter, this);		
+		ret.emplace_back(GetParticipants()[0], this);
+		return ret;
 	}
 
-	for (const Match* match : m_Schedule)
+	//Get final match
+	const Match* lastMatch = m_Schedule[m_Schedule.size() - 1];
+
+	if (lastMatch->HasConcluded())
 	{
-		if (!match->HasConcluded())
-			continue;
-
-		const auto& result = match->GetMatchResult();
-
-		auto i = GetIndexOfParticipant(match->GetWinner());
-		auto j = GetIndexOfParticipant(match->GetLoser());
-
-		ret[i].Wins++;
-		ret[i].Score += (uint32_t)result.m_Score;
-
-		ret[i].Time += result.m_Time;
-		ret[j].Time += result.m_Time;
+		ret.emplace_back(lastMatch->GetWinner(), this);
+		ret.emplace_back(lastMatch->GetLoser(),  this);
 	}
-
-	std::sort(ret.begin(), ret.end());
 
 	return ret;
 }
@@ -213,8 +204,8 @@ const std::string SingleElimination::ToHTML() const
 
 	//auto results = CalculateResults();
 
-	const auto N = GetParticipants().size();
 	const auto rounds = GetNumberOfRounds();
+	const auto N = pow(2, rounds);
 
 	auto renderMatch = [this, N](int roundIndex, int matchOfRound) -> std::string {
 		int matchIndex = 0;
@@ -223,10 +214,10 @@ const std::string SingleElimination::ToHTML() const
 
 		matchIndex += matchOfRound;
 
-		if (matchIndex >= GetSchedule().size())
+		if (matchIndex >= m_ScheduleWithEmptyMatches.size())
 			return "";
 
-		auto match = GetSchedule()[matchIndex];
+		auto match = m_ScheduleWithEmptyMatches[matchIndex];
 
 		std::string ret;
 
@@ -235,15 +226,19 @@ const std::string SingleElimination::ToHTML() const
 		//Output name of fighters
 		if (match->GetFighter(Fighter::White))
 			ret += match->GetFighter(Fighter::White)->GetName();
-		else
+		else if (match->HasDependentMatches())
 			ret += "???";
+		else
+			ret += "- - -";
 
 		ret += " vs. ";
 
 		if (match->GetFighter(Fighter::Blue))
 			ret += match->GetFighter(Fighter::Blue)->GetName();
-		else
+		else if (match->HasDependentMatches())
 			ret += "???";
+		else
+			ret += "- - -";
 
 		//Output result
 		if (match->IsRunning())

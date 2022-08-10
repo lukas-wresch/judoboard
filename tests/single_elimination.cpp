@@ -101,7 +101,7 @@ TEST(SingleElimination, Count3)
 
 	auto results = group.CalculateResults();
 
-	ASSERT_EQ(results.size(), 3);
+	ASSERT_EQ(results.size(), 2);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j3->GetUUID());
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
@@ -149,7 +149,7 @@ TEST(SingleElimination, Count4)
 
 	auto results = group.CalculateResults();
 
-	ASSERT_EQ(results.size(), 4);
+	ASSERT_EQ(results.size(), 2);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j4->GetUUID());
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
@@ -200,7 +200,7 @@ TEST(SingleElimination, Count5)
 
 	auto results = group.CalculateResults();
 
-	ASSERT_EQ(results.size(), 5);
+	ASSERT_EQ(results.size(), 2);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j5->GetUUID());
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());

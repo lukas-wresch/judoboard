@@ -353,12 +353,12 @@ Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
 	//Is this an 'empty' match?
 	if (!Match1->HasDependentMatches() && Match1->GetSingleValidFighters())
 		new_match->SetFighter(Fighter::White, Match1->GetSingleValidFighters());
-	else
+	else if (!Match1->IsCompletelyEmptyMatch())
 		new_match->SetDependency(Fighter::White, Match::DependencyType::TakeWinner, Match1);
 
 	if (!Match2->HasDependentMatches() && Match2->GetSingleValidFighters())
 		new_match->SetFighter(Fighter::Blue, Match2->GetSingleValidFighters());
-	else
+	else if (!Match2->IsCompletelyEmptyMatch())
 		new_match->SetDependency(Fighter::Blue,  Match::DependencyType::TakeWinner, Match2);
 
 	return new_match;

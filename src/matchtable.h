@@ -31,6 +31,16 @@ namespace Judoboard
 			//Result(Result&) = delete;
 			//Result(const Result&) = delete;
 
+			Result(const Judoka* Judoka_, const MatchTable* MatchTable_)
+			{
+				Judoka = Judoka_;
+				MatchTable = MatchTable_;
+				Wins  = 0;
+				Score = 0;
+				Time  = 0;
+				NotSortable = false;
+			}
+
 			void Set(const Judoka* Judoka_, const MatchTable* MatchTable_)
 			{
 				Judoka = Judoka_;

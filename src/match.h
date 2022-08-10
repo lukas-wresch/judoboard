@@ -135,6 +135,10 @@ namespace Judoboard
 			return ( (!GetFighter(Fighter::White) && m_White.m_Dependency == DependencyType::None) ||
 				     (!GetFighter(Fighter::Blue)  && m_Blue.m_Dependency  == DependencyType::None));
 		}
+		bool IsCompletelyEmptyMatch() const {
+			return ( (!GetFighter(Fighter::White) && m_White.m_Dependency == DependencyType::None) &&
+				     (!GetFighter(Fighter::Blue)  && m_Blue.m_Dependency  == DependencyType::None));
+		}
 		const std::vector<const Match*> GetDependentMatches() const;//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
 
 		const RuleSet& GetRuleSet() const;
