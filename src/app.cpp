@@ -16,7 +16,7 @@ using namespace Judoboard;
 
 
 const std::string Application::Name = "Judoboard";
-const std::string Application::Version = "0.3.3";
+const std::string Application::Version = "0.3.4";
 bool Application::NoWindow = false;
 
 
@@ -417,7 +417,6 @@ bool Application::AddTournament(Tournament* NewTournament)
 		return false;
 	}
 
-	//NewTournament->ConnectToDatabase(m_Database);
 	m_Tournaments.emplace_back(NewTournament);
 
 	if (NewTournament->GetStatus() == Status::Scheduled)//Fresh new tournament
