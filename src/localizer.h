@@ -23,6 +23,9 @@ namespace Judoboard
 			s_CurrentLanguage = NewLanguage;
 			Initialize(NewLanguage);
 		}
+		static Language GetLanguage() {
+			return s_CurrentLanguage;
+		}
 
 	private:
 		static void Initialize(Language NewLanguage);

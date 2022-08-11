@@ -67,6 +67,7 @@ namespace Judoboard
 		bool DeleteTournament(const UUID& UUID);
 		Tournament* FindTournament(const UUID& UUID);
 		const Tournament* FindTournament(const UUID& UUID) const;
+		Tournament* FindTournamentByName(const std::string& Name);
 		const Tournament* FindTournamentByName(const std::string& Name) const;
 
 		//Mats

@@ -17,6 +17,8 @@ void Database::Reset()
 {
 	StandingData::Reset();
 
+	m_CurrentTournament = "";
+
 	for (auto account : m_Accounts)
 		delete account;
 
@@ -72,6 +74,11 @@ bool Database::Load(const std::string& Filename)
 		return false;
 	}
 
+	if (yaml["last_tournament_name"])
+		m_CurrentTournament = yaml["last_tournament_name"].as<std::string>();
+	if (yaml["language"])
+		Localizer::SetLanguage((Language)yaml["language"].as<int>());
+
 	//Read standing data
 	StandingData::operator <<(yaml);
 
@@ -103,6 +110,9 @@ bool Database::Save(const std::string& Filename) const
 
 	yaml << YAML::BeginMap;
 	yaml << YAML::Key << "version" << YAML::Value << "1";
+
+	yaml << YAML::Key << "last_tournament_name" << YAML::Value << m_CurrentTournament;
+	yaml << YAML::Key << "language" << YAML::Value << (int)Localizer::GetLanguage();
 	
 	StandingData::operator >>(yaml);
 

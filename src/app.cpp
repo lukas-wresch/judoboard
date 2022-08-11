@@ -67,6 +67,9 @@ bool Application::LoadDataFromDisk()
 		return true;
 		}, "tournaments");
 
+	if (FindTournamentByName(m_Database.GetLastTournamentName()))
+		OpenTournament(FindTournamentByName(m_Database.GetLastTournamentName())->GetUUID());
+
 	return true;
 }
 
@@ -209,6 +212,8 @@ bool Application::OpenTournament(const UUID& UUID)
 		return false;
 
 	m_CurrentTournament = FindTournament(UUID);
+	if (m_CurrentTournament)
+		m_Database.SetLastTournamentName(m_CurrentTournament->GetName());
 	return true;
 }
 
@@ -222,6 +227,7 @@ bool Application::CloseTournament()
 
 	//Re-open temporary tournament
 	m_CurrentTournament = &m_TempTournament;
+	m_Database.SetLastTournamentName("");
 	return true;
 }
 
@@ -459,6 +465,16 @@ const Tournament* Application::FindTournament(const UUID& UUID) const
 {
 	for (auto tournament : m_Tournaments)
 		if (tournament && tournament->GetUUID() == UUID)
+			return tournament;
+	return nullptr;
+}
+
+
+
+Tournament* Application::FindTournamentByName(const std::string& Name)
+{
+	for (auto tournament : m_Tournaments)
+		if (tournament && tournament->GetName() == Name)
 			return tournament;
 	return nullptr;
 }
