@@ -128,7 +128,7 @@ namespace Judoboard
 		std::string Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_GetMatchesFromMatchTable(const HttpServer::Request& Request);
 
-		ZED::CSV Ajax_Uptime();
+		std::string Ajax_Status();
 
 		//Serialization
 		[[deprecated]]

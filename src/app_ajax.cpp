@@ -250,11 +250,11 @@ void Application::SetupHttpServer()
 	});
 
 
-	m_Server.RegisterResource("/ajax/config/uptime", [this](auto& Request) -> std::string {
+	m_Server.RegisterResource("/ajax/config/status", [this](auto& Request) -> std::string {
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
-		return Ajax_Uptime();
+		return Ajax_Status();
 	});
 
 
@@ -2917,14 +2917,17 @@ std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request
 
 
 
-ZED::CSV Application::Ajax_Uptime()
+std::string Application::Ajax_Status()
 {
-	ZED::CSV ret;
+	YAML::Emitter ret;
 
-	ret << (Timer::GetTimestamp() - m_StartupTimestamp);
+	ret << YAML::BeginMap;
 
-	ret.AddNewline();
-	return ret;
+	ret << YAML::Key << "version" << YAML::Value << Version;
+	ret << YAML::Key << "uptime"  << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
+
+	ret << YAML::EndMap;
+	return ret.c_str();
 }
 
 

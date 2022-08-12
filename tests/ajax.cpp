@@ -468,7 +468,7 @@ TEST(Ajax, Clubs_Delete)
 
 
 
-TEST(Ajax, Uptime)
+TEST(Ajax, Status)
 {
 	initialize();
 
@@ -476,27 +476,27 @@ TEST(Ajax, Uptime)
 		Application app;
 
 		{
-			auto csv = app.Ajax_Uptime();
-			uint32_t uptime;
-			csv >> uptime;
+			YAML::Node yaml = YAML::Load(app.Ajax_Status());
+			uint32_t uptime = yaml["uptime"].as<uint32_t>();
 			EXPECT_TRUE(uptime < 100);
+
+			auto version = yaml["version"].as<std::string>();
+			EXPECT_EQ(version, Application::Version);
 		}
 		
 		ZED::Core::Pause(1000);
 
 		{
-			auto csv = app.Ajax_Uptime();
-			uint32_t uptime;
-			csv >> uptime;
+			YAML::Node yaml = YAML::Load(app.Ajax_Status());
+			uint32_t uptime = yaml["uptime"].as<uint32_t>();
 			EXPECT_TRUE(uptime < 1100);
 		}
 
 		ZED::Core::Pause(1000);
 
 		{
-			auto csv = app.Ajax_Uptime();
-			uint32_t uptime;
-			csv >> uptime;
+			YAML::Node yaml = YAML::Load(app.Ajax_Status());
+			uint32_t uptime = yaml["uptime"].as<uint32_t>();
 			EXPECT_TRUE(uptime < 2100);
 		}
 	}
