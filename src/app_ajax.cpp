@@ -161,7 +161,15 @@ void Application::SetupHttpServer()
 
 			AddTournament(new Tournament(md5_file, &GetDatabase()));//apply MD5 file
 
-			return "Parsing OK";
+			std::string output = R"(
+<html>
+	<head>
+		<meta http-equiv = "refresh" content = "5; url=/#tournament_list.html"/>
+	</head>
+</html>
+)";
+
+			return "Parsing OK<br/><br/>" + output;
 		}
 
 		return Error(Error::Type::InvalidFormat);
