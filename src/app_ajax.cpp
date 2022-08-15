@@ -337,10 +337,11 @@ void Application::SetupHttpServer()
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
+		LockTillScopeEnd();
+
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		LockTillScopeEnd();
 		return GetTournament()->MasterSchedule2String();
 	});
 
@@ -350,12 +351,13 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return Error(Error::Type::TournamentNotOpen);
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return Error(Error::Type::TournamentNotOpen);
+
 		GetTournament()->MoveScheduleEntryUp(id);
 		return Error();//OK
 	});
@@ -366,12 +368,13 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return Error(Error::Type::TournamentNotOpen);
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return Error(Error::Type::TournamentNotOpen);
+
 		GetTournament()->MoveScheduleEntryDown(id);
 		return Error();//OK
 	});
@@ -382,12 +385,13 @@ void Application::SetupHttpServer()
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
 
-		if (!GetTournament())
-			return Error(Error::Type::TournamentNotOpen);
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return Error(Error::Type::TournamentNotOpen);
+
 		auto match = GetTournament()->FindMatch(id);
 
 		if (!match)
@@ -402,9 +406,6 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		UUID id  = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		int  mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
 
@@ -412,6 +413,9 @@ void Application::SetupHttpServer()
 			return std::string("Invalid mat id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return std::string("No tournament open");
 
 		if (GetTournament()->GetStatus() == Status::Concluded)
 			return std::string("Tournament is already finalized");
@@ -431,13 +435,13 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		auto rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return std::string("No tournament open");
 
 		auto match = GetTournament()->FindMatch(id);
 		auto ruleSet = m_Database.FindRuleSetByName(rule);
@@ -457,12 +461,13 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return std::string("No tournament open");
+
 		GetTournament()->MoveMatchUp(id);
 
 		return std::string();
@@ -473,12 +478,13 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return std::string("No tournament open");
+
 		GetTournament()->MoveMatchDown(id);
 
 		return std::string();
@@ -489,12 +495,13 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return std::string("No tournament open");
+
 		bool success = GetTournament()->RemoveMatch(id);
 
 		return std::string();
@@ -505,12 +512,13 @@ void Application::SetupHttpServer()
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return std::string("No tournament open");
+
 		auto match = GetTournament()->FindMatch(id);
 
 		if (!match)
@@ -663,6 +671,7 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		LockTillScopeEnd();
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -677,6 +686,7 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		LockTillScopeEnd();
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -702,6 +712,7 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		LockTillScopeEnd();
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -724,6 +735,7 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return (std::string)Error(Error::Type::InvalidID);
 
+		LockTillScopeEnd();
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -750,6 +762,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -767,6 +780,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -784,6 +798,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -801,6 +816,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -817,6 +833,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -833,6 +850,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -849,6 +867,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -865,6 +884,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -882,6 +902,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -897,8 +918,9 @@ void Application::SetupHttpServer()
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 			if (id <= 0)
-				return "Invalid id";
+				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -916,6 +938,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -931,8 +954,9 @@ void Application::SetupHttpServer()
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 			if (id <= 0)
-				return "Invalid id";
+				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -950,6 +974,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -2947,6 +2972,7 @@ Error Application::Ajax_AddDisqualification(Fighter Whom, const HttpServer::Requ
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	LockTillScopeEnd();
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -2965,6 +2991,7 @@ Error Application::Ajax_RemoveDisqualification(Fighter Whom, const HttpServer::R
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	LockTillScopeEnd();
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -2983,6 +3010,7 @@ Error Application::Ajax_NoDisqualification(Fighter Whom, const HttpServer::Reque
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	LockTillScopeEnd();
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -3001,6 +3029,7 @@ Error Application::Ajax_RemoveNoDisqualification(Fighter Whom, const HttpServer:
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	LockTillScopeEnd();
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -3014,12 +3043,13 @@ Error Application::Ajax_RemoveNoDisqualification(Fighter Whom, const HttpServer:
 
 std::string Application::Ajax_GetHansokumake() const
 {
-	if (!GetTournament())
-		return Error(Error::Type::TournamentNotOpen);
-
 	ZED::CSV ret;
 
 	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
 	for (auto mat : GetMats())
 	{
 		if (!mat) continue;
@@ -3048,6 +3078,7 @@ Error Application::Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	LockTillScopeEnd();
 	auto mat = FindMat(id);
 
 	if (!mat)
