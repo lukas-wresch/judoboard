@@ -2,6 +2,45 @@
 
 
 
+TEST(SingleElimination, ExportImport)
+{
+	initialize();
+
+	SingleElimination group(0, 200);
+
+	group.IsThirdPlaceMatch(true);
+	group.IsFifthPlaceMatch(true);
+
+	YAML::Emitter yaml;
+	yaml << YAML::BeginMap;
+	group >> yaml;
+	yaml << YAML::EndMap;
+
+	auto test = yaml.c_str();
+	SingleElimination group2(YAML::Load(yaml.c_str()));
+
+	EXPECT_EQ(group2.IsThirdPlaceMatch(), group.IsThirdPlaceMatch());
+	EXPECT_EQ(group2.IsFifthPlaceMatch(), group.IsFifthPlaceMatch());
+
+
+	{
+		group.IsThirdPlaceMatch(false);
+		group.IsFifthPlaceMatch(false);
+
+		YAML::Emitter yaml;
+		yaml << YAML::BeginMap;
+		group >> yaml;
+		yaml << YAML::EndMap;
+
+		SingleElimination group2(YAML::Load(yaml.c_str()));
+
+		EXPECT_EQ(group2.IsThirdPlaceMatch(), group.IsThirdPlaceMatch());
+		EXPECT_EQ(group2.IsFifthPlaceMatch(), group.IsFifthPlaceMatch());
+	}
+}
+
+
+
 TEST(SingleElimination, Count1)
 {
 	initialize();

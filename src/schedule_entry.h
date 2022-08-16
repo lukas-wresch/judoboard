@@ -171,11 +171,6 @@ namespace Judoboard
 			if (Yaml["color"])
 				m_Color = Yaml["color"].as<int>();
 		}
-		Schedulable(ZED::Blob& Stream, const ITournament* Tournament) : ID(Stream), m_Tournament(Tournament)
-		{
-			//Stream >> m_ScheduleIndex >> m_MatID;
-			//m_Color << Stream;
-		}
 
 		virtual const std::vector<Match*> GetSchedule() const = 0;
 		virtual uint32_t GetRecommendedNumMatchesBeforeBreak() const { return 1; }

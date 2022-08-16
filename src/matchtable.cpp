@@ -233,13 +233,13 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : Schedu
 	if (Yaml["name"])
 		m_Name = Yaml["name"].as<std::string>();
 
-	if (Yaml["rule_set"])
+	if (Yaml["rule_set"] && Tournament)
 		m_Rules = Tournament->FindRuleSet(Yaml["rule_set"].as<std::string>());
 
-	if (Yaml["age_group"])
+	if (Yaml["age_group"] && Tournament)
 		m_pAgeGroup = Tournament->FindAgeGroup(Yaml["age_group"].as<std::string>());
 
-	if (Yaml["participants"] && Yaml["participants"].IsSequence())
+	if (Yaml["participants"] && Yaml["participants"].IsSequence() && Tournament)
 	{
 		for (const auto& node : Yaml["participants"])
 		{

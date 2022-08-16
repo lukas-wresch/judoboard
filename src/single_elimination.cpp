@@ -21,6 +21,10 @@ SingleElimination::SingleElimination(Weight MinWeight, Weight MaxWeight, const I
 SingleElimination::SingleElimination(const YAML::Node& Yaml, ITournament* Tournament)
 	: Weightclass(Yaml, Tournament)
 {
+	if (Yaml["third_place_match"])
+		m_ThirdPlaceMatch = Yaml["third_place_match"].as<bool>();
+	if (Yaml["fifth_place_match"])
+		m_FifthPlaceMatch = Yaml["fifth_place_match"].as<bool>();
 }
 
 
@@ -28,6 +32,11 @@ SingleElimination::SingleElimination(const YAML::Node& Yaml, ITournament* Tourna
 void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 {
 	Weightclass::operator >>(Yaml);
+
+	if (m_ThirdPlaceMatch)
+		Yaml << YAML::Key << "third_place_match" << YAML::Value << m_ThirdPlaceMatch;
+	if (m_ThirdPlaceMatch)
+		Yaml << YAML::Key << "fifth_place_match" << YAML::Value << m_FifthPlaceMatch;
 }
 
 

@@ -11,7 +11,7 @@ namespace Judoboard
 
 	public:
 		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
-		SingleElimination(const YAML::Node& Yaml, ITournament* Tournament);
+		SingleElimination(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
 
 		static std::string GetHTMLForm();
 
@@ -25,6 +25,12 @@ namespace Judoboard
 
 		virtual std::vector<Result> CalculateResults() const override;
 		virtual void GenerateSchedule() override;
+
+		bool IsThirdPlaceMatch() const { return m_ThirdPlaceMatch; }
+		bool IsFifthPlaceMatch() const { return m_FifthPlaceMatch; }
+
+		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; }
+		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; }
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
