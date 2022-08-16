@@ -25,6 +25,12 @@ SingleElimination::SingleElimination(const YAML::Node& Yaml, ITournament* Tourna
 		m_ThirdPlaceMatch = Yaml["third_place_match"].as<bool>();
 	if (Yaml["fifth_place_match"])
 		m_FifthPlaceMatch = Yaml["fifth_place_match"].as<bool>();
+
+	if (Yaml["starting_positions"] && Yaml["starting_positions"].IsSequence() && Tournament)
+	{
+		for (const auto& node : Yaml["starting_positions"])
+			m_StartingPositions.insert({ node.first.as<int>(), Tournament->FindParticipant(node.as<std::string>())  });
+	}
 }
 
 
@@ -37,6 +43,15 @@ void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "third_place_match" << YAML::Value << m_ThirdPlaceMatch;
 	if (m_ThirdPlaceMatch)
 		Yaml << YAML::Key << "fifth_place_match" << YAML::Value << m_FifthPlaceMatch;
+
+	if (!m_StartingPositions.empty())
+	{
+		Yaml << YAML::Key << "starting_positions" << YAML::Value;
+		Yaml << YAML::BeginSeq;
+		for (const auto [starting_pos, judoka] : m_StartingPositions)
+			Yaml << YAML::Key << starting_pos << YAML::Value << (std::string)judoka->GetUUID();
+		Yaml << YAML::EndSeq;
+	}
 }
 
 
@@ -197,6 +212,42 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 	}
 
 	return ret;
+}
+
+
+
+size_t SingleElimination::GetStartingPosition(const Judoka* Judoka) const
+{
+	if (!Judoka)
+		return 0;
+
+	for (auto [pos, participant] : m_StartingPositions)
+	{
+		if (participant && participant->GetUUID() == Judoka->GetUUID())
+			return pos;
+	}
+
+	return 0;
+}
+
+
+
+void SingleElimination::SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition)
+{
+	if (!Judoka)
+		return;
+
+	if (IsStartPositionTaken(NewStartingPosition))
+	{
+		auto judoka_on_slot = GetJudokaByStartPosition(NewStartingPosition);
+		auto my_old_pos     = GetStartingPosition(Judoka);
+
+		m_StartingPositions.erase(my_old_pos);
+		m_StartingPositions.insert({ my_old_pos, judoka_on_slot });
+	}
+
+	m_StartingPositions.erase(GetStartingPosition(Judoka));
+	m_StartingPositions.insert({ NewStartingPosition, Judoka });
 }
 
 

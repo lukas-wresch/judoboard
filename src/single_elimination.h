@@ -32,6 +32,9 @@ namespace Judoboard
 		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; }
 		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; }
 
+		size_t GetStartingPosition(const Judoka* Judoka) const;
+		void SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition);
+
 		//Serialization
 		virtual const std::string ToHTML() const override;
 
@@ -39,7 +42,7 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	protected:
-		Judoka* GetJudokaByStartPosition(size_t StartPosition) const
+		const Judoka* GetJudokaByStartPosition(size_t StartPosition) const
 		{
 			auto result = m_StartingPositions.find(StartPosition);
 			if (result == m_StartingPositions.end())
@@ -61,7 +64,7 @@ namespace Judoboard
 			return (size_t)std::ceil(std::log2(GetParticipants().size()));
 		}
 
-		std::unordered_map<size_t, Judoka*> m_StartingPositions;
+		std::unordered_map<size_t, const Judoka*> m_StartingPositions;
 
 		std::vector<Match*> m_ScheduleWithEmptyMatches;
 

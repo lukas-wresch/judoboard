@@ -489,9 +489,9 @@ bool Tournament::AddMatch(Match* NewMatch)
 
 	//If the match has judoka attached, include them as participants
 	if (NewMatch->GetFighter(Fighter::White) && !IsParticipant(*NewMatch->GetFighter(Fighter::White)))
-		m_StandingData.AddJudoka(NewMatch->GetFighter(Fighter::White));
+		m_StandingData.AddJudoka(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)));
 	if (NewMatch->GetFighter(Fighter::Blue) && !IsParticipant(*NewMatch->GetFighter(Fighter::Blue)))
-		m_StandingData.AddJudoka(NewMatch->GetFighter(Fighter::Blue));
+		m_StandingData.AddJudoka(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)));
 
 	if (NewMatch->GetFighter(Fighter::White) && IsDisqualified(*NewMatch->GetFighter(Fighter::White)))
 	{

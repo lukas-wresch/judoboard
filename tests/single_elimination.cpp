@@ -16,7 +16,6 @@ TEST(SingleElimination, ExportImport)
 	group >> yaml;
 	yaml << YAML::EndMap;
 
-	auto test = yaml.c_str();
 	SingleElimination group2(YAML::Load(yaml.c_str()));
 
 	EXPECT_EQ(group2.IsThirdPlaceMatch(), group.IsThirdPlaceMatch());
@@ -36,6 +35,69 @@ TEST(SingleElimination, ExportImport)
 
 		EXPECT_EQ(group2.IsThirdPlaceMatch(), group.IsThirdPlaceMatch());
 		EXPECT_EQ(group2.IsFifthPlaceMatch(), group.IsFifthPlaceMatch());
+	}
+}
+
+
+
+TEST(SingleElimination, ExportImport_StartingPositions)
+{
+	initialize();
+
+	for (int i = 0; i < 10; i++)
+	{
+		Tournament* t = new Tournament("Tournament Name");
+		t->EnableAutoSave(false);
+
+		SingleElimination group(0, 200);
+		t->AddMatchTable(&group);
+
+		auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+		t->AddParticipant(j1);
+
+		auto j2 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+		t->AddParticipant(j2);
+
+		auto j3 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 70);
+		t->AddParticipant(j3);
+
+		auto j4 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 80);
+		t->AddParticipant(j4);
+
+		auto j5 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 90);
+		t->AddParticipant(j5);
+
+
+		group.SetStartingPosition(j1, rand() % 8);
+		group.SetStartingPosition(j2, rand() % 8);
+		group.SetStartingPosition(j3, rand() % 8);
+		group.SetStartingPosition(j4, rand() % 8);
+		group.SetStartingPosition(j5, rand() % 8);
+
+		ASSERT_EQ(group.GetParticipants().size(), 5);
+
+		YAML::Emitter yaml;
+		yaml << YAML::BeginMap;
+		group >> yaml;
+		yaml << YAML::EndMap;
+
+		SingleElimination group2(YAML::Load(yaml.c_str()));
+
+
+		{
+			YAML::Emitter yaml;
+			yaml << YAML::BeginMap;
+			group >> yaml;
+			yaml << YAML::EndMap;
+
+			SingleElimination group2(YAML::Load(yaml.c_str()));
+
+			EXPECT_EQ(group2.GetStartingPosition(j1), group.GetStartingPosition(j1));
+			EXPECT_EQ(group2.GetStartingPosition(j2), group.GetStartingPosition(j2));
+			EXPECT_EQ(group2.GetStartingPosition(j3), group.GetStartingPosition(j3));
+			EXPECT_EQ(group2.GetStartingPosition(j4), group.GetStartingPosition(j4));
+			EXPECT_EQ(group2.GetStartingPosition(j5), group.GetStartingPosition(j5));
+		}
 	}
 }
 

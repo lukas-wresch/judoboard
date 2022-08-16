@@ -15,7 +15,7 @@ RuleSet s_default_rules;
 
 
 
-Match::Match(const ITournament* Tournament, Judoka* White, Judoka* Blue, uint32_t MatID) : Schedulable(Tournament)
+Match::Match(const ITournament* Tournament, const Judoka* White, const Judoka* Blue, uint32_t MatID) : Schedulable(Tournament)
 {
 	m_White.m_Judoka = White;
 	m_Blue.m_Judoka  = Blue;
@@ -170,7 +170,7 @@ Status Match::GetStatus() const
 
 
 
-Judoka* Match::GetFighter(Fighter Fighter)
+const Judoka* Match::GetFighter(Fighter Fighter) const
 {
 	if (Fighter == Fighter::White)
 	{
@@ -236,24 +236,6 @@ const Judoka* Match::GetEnemyOf(const Judoka& Judoka) const
 
 
 
-Judoka* Match::GetWinner()
-{
-	if (!HasConcluded())
-		return nullptr;
-
-	auto result = GetMatchResult();
-
-	if (result.m_Winner == Winner::Draw)
-		return nullptr;
-
-	if (result.m_Winner == Winner::White)
-		return GetFighter(Fighter::White);
-	else
-		return GetFighter(Fighter::Blue);
-}
-
-
-
 const Judoka* Match::GetWinner() const
 {
 	if (!HasConcluded())
@@ -268,24 +250,6 @@ const Judoka* Match::GetWinner() const
 		return GetFighter(Fighter::White);
 	else
 		return GetFighter(Fighter::Blue);
-}
-
-
-
-Judoka* Match::GetLoser()
-{
-	if (!HasConcluded())
-		return nullptr;
-
-	auto result = GetMatchResult();
-
-	if (result.m_Winner == Winner::Draw)
-		return nullptr;
-
-	if (result.m_Winner == Winner::White)
-		return GetFighter(Fighter::Blue);
-	else
-		return GetFighter(Fighter::White);
 }
 
 
