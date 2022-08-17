@@ -44,7 +44,7 @@ TEST(SingleElimination, ExportImport_StartingPositions)
 {
 	initialize();
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		Tournament* t = new Tournament("Tournament Name");
 		t->EnableAutoSave(false);
@@ -76,13 +76,6 @@ TEST(SingleElimination, ExportImport_StartingPositions)
 
 		ASSERT_EQ(group.GetParticipants().size(), 5);
 
-		YAML::Emitter yaml;
-		yaml << YAML::BeginMap;
-		group >> yaml;
-		yaml << YAML::EndMap;
-
-		SingleElimination group2(YAML::Load(yaml.c_str()));
-
 
 		{
 			YAML::Emitter yaml;
@@ -90,7 +83,7 @@ TEST(SingleElimination, ExportImport_StartingPositions)
 			group >> yaml;
 			yaml << YAML::EndMap;
 
-			SingleElimination group2(YAML::Load(yaml.c_str()));
+			SingleElimination group2(YAML::Load(yaml.c_str()), t);
 
 			EXPECT_EQ(group2.GetStartingPosition(j1), group.GetStartingPosition(j1));
 			EXPECT_EQ(group2.GetStartingPosition(j2), group.GetStartingPosition(j2));

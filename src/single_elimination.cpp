@@ -26,10 +26,10 @@ SingleElimination::SingleElimination(const YAML::Node& Yaml, ITournament* Tourna
 	if (Yaml["fifth_place_match"])
 		m_FifthPlaceMatch = Yaml["fifth_place_match"].as<bool>();
 
-	if (Yaml["starting_positions"] && Yaml["starting_positions"].IsSequence() && Tournament)
+	if (Yaml["starting_positions"] && Yaml["starting_positions"].IsMap() && Tournament)
 	{
 		for (const auto& node : Yaml["starting_positions"])
-			m_StartingPositions.insert({ node.first.as<int>(), Tournament->FindParticipant(node.as<std::string>())  });
+			m_StartingPositions.insert({ node.first.as<int>(), Tournament->FindParticipant(node.second.as<std::string>())  });
 	}
 }
 
@@ -47,10 +47,10 @@ void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 	if (!m_StartingPositions.empty())
 	{
 		Yaml << YAML::Key << "starting_positions" << YAML::Value;
-		Yaml << YAML::BeginSeq;
+		Yaml << YAML::BeginMap;
 		for (const auto [starting_pos, judoka] : m_StartingPositions)
 			Yaml << YAML::Key << starting_pos << YAML::Value << (std::string)judoka->GetUUID();
-		Yaml << YAML::EndSeq;
+		Yaml << YAML::EndMap;
 	}
 }
 
