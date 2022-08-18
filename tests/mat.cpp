@@ -1239,7 +1239,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 5; time <= 25; time += 5 + rand() % 8)
+	for (int time = 5; time <= 25; time += 6 + rand() % 8)
 	{
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 		{

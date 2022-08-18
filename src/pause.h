@@ -23,7 +23,6 @@ namespace Judoboard
 
 		//Serialization
 		const std::string ToHTML() const override { return ""; }//DEBUG
-		const std::string ToString() const override { return ""; }//DEBUG
 
 	private:
 		Pause(uint32_t ID, std::stringstream Stream);

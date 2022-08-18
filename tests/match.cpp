@@ -27,7 +27,12 @@ TEST(Match, ExportImport)
 		ASSERT_EQ(match.GetFighter(Fighter::Blue )->GetUUID(), match2.GetFighter(Fighter::Blue )->GetUUID());
 
 		ASSERT_EQ(match.GetRuleSet().GetUUID(), match2.GetRuleSet().GetUUID());
-		ASSERT_EQ((std::string)match.AllToString(), (std::string)match2.AllToString());
+
+		YAML::Emitter yaml1, yaml2;
+		match.ToString(yaml1);
+		match2.ToString(yaml2);
+		ASSERT_EQ((std::string)yaml1.c_str(), (std::string)yaml2.c_str());
+
 		ASSERT_EQ(match.GetColor(), match2.GetColor());
 		ASSERT_EQ(match.GetUUID(), match2.GetUUID());
 		ASSERT_EQ(match.HasConcluded(), match2.HasConcluded());

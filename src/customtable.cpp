@@ -18,11 +18,6 @@ CustomTable::CustomTable(const ITournament* Tournament) : MatchTable(Tournament)
 }
 
 
-CustomTable::CustomTable(const YAML::Node& Yaml, ITournament* Tournament) : MatchTable(Yaml, Tournament)
-{
-}
-
-
 
 Status CustomTable::GetStatus() const
 {

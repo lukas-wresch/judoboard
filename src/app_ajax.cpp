@@ -3,6 +3,7 @@
 #include "weightclass.h"
 #include "pause.h"
 #include "customtable.h"
+#include "single_elimination.h"
 #include "remote_mat.h"
 #include "tournament.h"
 #include "../ZED/include/log.h"
@@ -295,9 +296,11 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/get_schedule", [this](auto& Request) -> std::string {
+		LockTillScopeEnd();
+
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
-		LockTillScopeEnd();
+
 		return GetTournament()->Schedule2String();
 	});
 
@@ -397,7 +400,9 @@ void Application::SetupHttpServer()
 		if (!match)
 			return Error(Error::Type::ItemNotFound);
 
-		return match->AllToString();
+		YAML::Emitter ret;
+		match->ToString(ret);
+		return ret.c_str();
 	});
 
 
@@ -1546,9 +1551,6 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		int type = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "type"));
 
 		switch ((MatchTable::Type)type)
@@ -1559,6 +1561,8 @@ void Application::SetupHttpServer()
 				return Pause::GetHTMLForm();
 			case MatchTable::Type::Custom:
 				return CustomTable::GetHTMLForm();
+			case MatchTable::Type::SingleElimination:
+				return SingleElimination::GetHTMLForm();
 
 			default:
 				return std::string("Unknown form");
@@ -1616,7 +1620,26 @@ void Application::SetupHttpServer()
 
 			new_weightclass->IsBestOfThree(bo3);
 
-			new_table = new_weightclass;				
+			new_table = new_weightclass;
+			break;
+		}
+
+		case MatchTable::Type::SingleElimination:
+		{
+			auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
+			auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
+
+			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+			bool bo3   = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
+
+			auto new_single = new SingleElimination(GetTournament(), Weight(minWeight), Weight(maxWeight));
+
+			if (gender == (int)Gender::Male || gender == (int)Gender::Female)
+				new_single->SetGender((Gender)gender);
+
+			new_single->IsBestOfThree(bo3);
+
+			new_table = new_single;
 			break;
 		}
 
@@ -1808,7 +1831,10 @@ void Application::SetupHttpServer()
 			return std::string("Could not find class");
 
 		YAML::Emitter ret;
+		ret << YAML::BeginMap;
 		match_table->ToString(ret);
+		ret << YAML::EndMap;
+
 		return ret.c_str();
 	});
 
@@ -3043,30 +3069,36 @@ Error Application::Ajax_RemoveNoDisqualification(Fighter Whom, const HttpServer:
 
 std::string Application::Ajax_GetHansokumake() const
 {
-	ZED::CSV ret;
-
 	LockTillScopeEnd();
 
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
 
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
 	for (auto mat : GetMats())
 	{
-		if (!mat) continue;
-		if (!mat->GetMatch()) continue;
+		if (!mat || !mat->GetMatch()) continue;
 
 		for (Fighter fighter = Fighter::White; fighter <= Fighter::Blue; ++fighter)
 		{
 			if (mat->GetScoreboard(fighter).m_HansokuMake && mat->GetScoreboard(fighter).m_HansokuMake_Direct)
 			{
-				ret << mat->GetMatch()->ToString();
-				ret << fighter;
-				ret << mat->GetScoreboard(fighter).m_Disqualification;//Disqualification state
+				ret << YAML::BeginMap;
+
+				ret << YAML::Key << "match" << YAML::Value;
+				mat->GetMatch()->ToString(ret);
+				ret << YAML::Key << "fighter" << YAML::Value << (int)fighter;
+				ret << YAML::Key << "disqualification_state" << YAML::Value << (int)mat->GetScoreboard(fighter).m_Disqualification;
+
+				ret << YAML::EndMap;
 			}
 		}
 	}
 
-	return ret;
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 

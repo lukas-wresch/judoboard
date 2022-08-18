@@ -27,21 +27,6 @@ const std::string MatchLog::ToString() const
 
 
 
-void MatchLog::operator << (ZED::CSV& Stream)
-{
-	uint32_t size;
-	Stream >> size;
-
-	for (uint32_t i = 0; i < size; i++)
-	{
-		Event event;
-		Stream >> event.m_Group >> event.m_Event >> event.m_Timestamp;
-		m_Events.emplace_back(event);
-	}
-}
-
-
-
 void MatchLog::operator << (const YAML::Node& Yaml)
 {
 	if (!Yaml.IsSequence())
@@ -63,16 +48,6 @@ void MatchLog::operator << (const YAML::Node& Yaml)
 											node["timestamp"].as<int>()));
 		}
 	}
-}
-
-
-
-void MatchLog::operator >> (ZED::CSV& Stream) const
-{
-	Stream << m_Events.size();
-
-	for (auto& event : m_Events)
-		Stream << event.m_Group << event.m_Event << event.m_Timestamp;
 }
 
 

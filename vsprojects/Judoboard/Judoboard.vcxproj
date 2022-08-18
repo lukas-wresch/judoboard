@@ -195,6 +195,7 @@
     <ClCompile Include="..\..\src\remote_mat.cpp" />
     <ClCompile Include="..\..\src\remote_tournament.cpp" />
     <ClCompile Include="..\..\src\rule_set.cpp" />
+    <ClCompile Include="..\..\src\single_elimination.cpp" />
     <ClCompile Include="..\..\src\standing_data.cpp" />
     <ClCompile Include="..\..\src\timer.cpp" />
     <ClCompile Include="..\..\src\tournament.cpp" />
@@ -234,6 +235,7 @@
     <ClInclude Include="..\..\src\remote_tournament.h" />
     <ClInclude Include="..\..\src\rule_set.h" />
     <ClInclude Include="..\..\src\schedule_entry.h" />
+    <ClInclude Include="..\..\src\single_elimination.h" />
     <ClInclude Include="..\..\src\standing_data.h" />
     <ClInclude Include="..\..\src\timer.h" />
     <ClInclude Include="..\..\src\tournament.h" />

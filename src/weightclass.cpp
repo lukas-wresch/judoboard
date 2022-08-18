@@ -58,8 +58,6 @@ Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament*
 
 void Weightclass::operator >> (YAML::Emitter& Yaml) const
 {
-	Yaml << YAML::BeginMap;
-
 	MatchTable::operator >>(Yaml);
 
 	Yaml << YAML::Key << "min_weight" << YAML::Value;
@@ -71,24 +69,18 @@ void Weightclass::operator >> (YAML::Emitter& Yaml) const
 
 	if (m_BestOfThree)
 		Yaml << YAML::Key << "best_of_three" << YAML::Value << m_BestOfThree;
-
-	Yaml << YAML::EndMap;
 }
 
 
 
 void Weightclass::ToString(YAML::Emitter& Yaml) const
 {
-	Yaml << YAML::BeginMap;
-
 	MatchTable::ToString(Yaml);
 
 	Yaml << YAML::Key << "min_weight" << YAML::Value << m_MinWeight.ToString();
 	Yaml << YAML::Key << "max_weight" << YAML::Value << m_MaxWeight.ToString();
 	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;
 	Yaml << YAML::Key << "best_of_three" << YAML::Value << m_BestOfThree;
-
-	Yaml << YAML::EndMap;
 }
 
 
@@ -355,7 +347,7 @@ std::vector<MatchTable::Result> Weightclass::CalculateResults() const
 		ret[i].Set(fighter, this);		
 	}
 
-	for (auto match : m_Schedule)
+	for (const Match* match : m_Schedule)
 	{
 		if (!match->HasConcluded())
 			continue;
