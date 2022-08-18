@@ -25,6 +25,10 @@
 </div>
 
 <h2 id="headline">Schedule</h2>
+<label style="width:150px;float:left;margin-top:0px;" id="label_mat_display">Show matches on</label>
+  <select style="margin-bottom:20px; width: 200px;" id="display_mat" onchange='Update();'>
+  </select>
+
 <table id="schedule" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
     <th style="width: 0.5cm;" class="no">No.</th>
@@ -204,12 +208,20 @@ function Update()
     if (res.length < 2)
       return;
 
-    console.log(res);
+    var mat_to_display = document.getElementById("display_mat");
+    var mat_to_display_selected = mat_to_display.value;
+    while (mat_to_display.length > 0)
+      mat_to_display.remove(0);
+
+    var option = document.createElement("option");
+    option.value = 0;
+    option.text = "All Mats";
+    mat_to_display.add(option);
 
     var table = document.getElementById("master-schedule");
 
     while (table.rows.length > 0)
-      table.deleteRow(table.rows.length-1);
+      table.deleteRow(0);
 
     var i = 0;
     var mat_count = res[i++];
@@ -217,6 +229,12 @@ function Update()
     var row = table.insertRow(-1);
     for (var j=0; j < mat_count; j++)
     {
+      var option = document.createElement("option");
+      option.value = j+1;
+      option.text = "Mat " + (j+1);
+      mat_to_display.add(option);
+      mat_to_display.selectedIndex = mat_to_display_selected;
+
       var cell = row.insertCell(j);
       var colspan = res[i++];
       var id = res[i++];
@@ -295,9 +313,14 @@ function Update()
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
+    var mat_to_display = document.getElementById("display_mat").value;
+
     var no = 0;
     for (const match of res)
     {
+      if (mat_to_display != 0 && match.mat_id != mat_to_display)
+        continue;
+
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
       var cell1 = row.insertCell(1);
