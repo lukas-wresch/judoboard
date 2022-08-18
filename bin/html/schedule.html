@@ -203,10 +203,7 @@ function Update()
   AjaxCallback("ajax/get_masterschedule", function(response) {
     console.log(response);
 
-    var res = response.split(",");
-
-    if (res.length < 2)
-      return;
+    var res = YAML.parse(response);
 
     var mat_to_display = document.getElementById("display_mat");
     var mat_to_display_selected = mat_to_display.value;
@@ -224,78 +221,73 @@ function Update()
       table.deleteRow(0);
 
     var i = 0;
-    var mat_count = res[i++];
+    var mat_count = res.highest_mat_id;
 
     var row = table.insertRow(-1);
     for (var j=0; j < mat_count; j++)
     {
       var option = document.createElement("option");
       option.value = j+1;
-      option.text = "Mat " + (j+1);
+      option.text = lang.mat + " " + (j+1);
       mat_to_display.add(option);
       mat_to_display.selectedIndex = mat_to_display_selected;
 
       var cell = row.insertCell(j);
-      var colspan = res[i++];
-      var id = res[i++];
+      var colspan = res.max_widths[j];
 
-      cell.innerHTML = lang.mat + " " + id;
-      cell.style.backgroundColor = Color(id);
+      cell.innerHTML = lang.mat + " " + (j+1);
+      cell.style.backgroundColor = Color(j+1);
       cell.colSpan = colspan;
       cell.style.textAlign = "center";
       cell.style.fontSize  = "16pt";
       cell.style.height = "1.3cm";
     }
-
-    while (i < res.length)
+    
+    //For each index
+    for (const per_index of res.master_schedule)
     {
       var row = table.insertRow(-1);
 
-      for (var mat=1; mat <= mat_count;mat++)
+      //For each mat
+      for (const per_mat of per_index)
       {
-        var max         = res[i++];
-        var entry_count = res[i++];
+        var max = per_mat.max;
+        var entries_rendered = 0;
 
-        for (var entry=0; entry < entry_count;entry++)
+        if (per_mat.entries.length > 0)
         {
-          var editable = res[i++];
-          var index    = res[i++];
-          var id    = res[i++];
-          var color = res[i++];
-          var matID = parseInt(res[i++]);
-          var name  = res[i++];
+          for (const entry of per_mat.entries)
+          {
+            var cell = row.insertCell(-1);
 
-          var cell = row.insertCell(-1);
+            var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px; margin-left: 4mm; margin-right: 3mm;";
+            var contents;
 
-          var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px; margin-left: 4mm; margin-right: 3mm;";
-          var contents;
+            if (entry.editable)
+              contents = "<a href=\"#matchtable_add.html?id=" + entry.uuid + "\">" + entry.description + "</a><br/><br/>";
+            else
+              contents = entry.description + "<br/>";
 
-          if (editable)
-            contents = "<a href=\"#matchtable_add.html?id=" + id + "\">" + name + "</a><br/><br/>";
-          else
-            contents = name + "<br/>";
-
-          contents += "<table><tr><td rowspan=\"2\"><a style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat('" + id + "'," + (matID-1) + ");\"></a></td>";
-          contents += "           <td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp('"   + id + "');\"></a></td>";
-          contents += "           <td rowspan=\"2\"><a style=\"" + style + "transform: rotate(-45deg); \" href=\"#\" onclick=\"SetEntryMat('" + id + "'," + (matID+1) + ");\"></a></td></tr>";
-          contents += "       <tr><td><a style=\"" + style + "transform: rotate(45deg);\"    href=\"#\" onclick=\"return MoveEntryDown('" + id + "');\"></a></td></tr></table>";
+            contents += "<table><tr><td rowspan=\"2\"><a style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id-1) + ");\"></a></td>";
+            contents += "           <td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp('"   + entry.uuid + "');\"></a></td>";
+            contents += "           <td rowspan=\"2\"><a style=\"" + style + "transform: rotate(-45deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id+1) + ");\"></a></td></tr>";
+            contents += "       <tr><td><a style=\"" + style + "transform: rotate(45deg);\"    href=\"#\" onclick=\"return MoveEntryDown('" + entry.uuid + "');\"></a></td></tr></table>";
 
 
-          cell.innerHTML = contents;
-          cell.style.backgroundColor = color;
-          cell.style.textAlign = "center";
+            cell.innerHTML = contents;
+            cell.style.backgroundColor = entry.color;
+            cell.style.textAlign = "center";
+            entries_rendered++;
+          }
         }
 
-        if (entry_count < max || max == 0)
+        if (per_mat.entries.length < max || max == 0)
         {
           var cell = row.insertCell(-1);
-          if (entry_count == 0)
-            cell.innerHTML = "";
-          else
-            cell.innerHTML = "";
+          cell.innerHTML = "";
 
           cell.style.textAlign = "center";
-          cell.colSpan = max - entry_count;
+          cell.colSpan = max - entries_rendered;
           cell.style.height = "1.3cm";
         }
       }
@@ -305,7 +297,7 @@ function Update()
 
 
   AjaxCallback("ajax/get_schedule", function(response) {
-    console.log(response);
+    //console.log(response);
     var res = YAML.parse(response);
 
     var table = document.getElementById("schedule");
@@ -411,7 +403,7 @@ function Update()
 
 
   AjaxCallback("ajax/age_groups/get", function(response) {
-    console.log(response);
+    //console.log(response);
     var res = YAML.parse(response);
 
     var table = document.getElementById("age_groups");
@@ -460,7 +452,7 @@ function Update()
 
 
   AjaxCallback("ajax/participants/get", function(response) {
-    console.log(response);
+    //console.log(response);
     var res = YAML.parse(response);
 
     var table = document.getElementById("participants");

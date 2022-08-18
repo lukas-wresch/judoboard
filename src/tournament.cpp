@@ -1422,15 +1422,18 @@ const std::string Tournament::Participants2String() const
 
 const std::string Tournament::MasterSchedule2String() const
 {
-	ZED::CSV ret;
+	YAML::Emitter ret;
+	ret << YAML::BeginMap;
 
 	Lock();
-	//ret << mats.size();
 
-	auto highest_matID = GetHighestMatIDUsed();
-	ret << highest_matID;
+	const auto highest_matID = GetHighestMatIDUsed();
+	ret << YAML::Key << "highest_mat_id" << YAML::Value << highest_matID;
+	ret << YAML::Key << "max_index"      << YAML::Value << GetMaxScheduleIndex();
 
-	//for (auto mat : mats)//For all mat IDs
+	ret << YAML::Key << "max_widths" << YAML::Value;
+	ret << YAML::BeginSeq;
+
 	for (uint32_t matID = 1; matID <= highest_matID; matID++)
 	{
 		int max = 0;
@@ -1441,12 +1444,18 @@ const std::string Tournament::MasterSchedule2String() const
 				max = width;
 		}
 
-		ret << max << matID;
+		ret << max;
 	}
+
+	ret << YAML::EndSeq;
+
+	ret << YAML::Key << "master_schedule" << YAML::Value;
+	ret << YAML::BeginSeq;
 
 	for (int32_t index = 0; index <= GetMaxScheduleIndex(); index++)//For all times
 	{
-		//for (auto mat : mats)//For all mat IDs
+		ret << YAML::BeginSeq;
+
 		for (uint32_t matID = 1; matID <= highest_matID; matID++)
 		{
 			uint32_t max = 0;
@@ -1465,14 +1474,35 @@ const std::string Tournament::MasterSchedule2String() const
 				entries.push_back({ it, entry });
 			}
 
-			ret << max << entries.size();
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "max" << YAML::Value << max;
+			ret << YAML::Key << "entries" << YAML::Value;
+			ret << YAML::BeginSeq;
+
 			for (auto [index, entry] : entries)
-				ret << entry->IsEditable() << index << (std::string)entry->GetUUID() << entry->GetColor().ToHexString() << entry->GetMatID() << entry->GetDescription();
+			{
+				ret << YAML::BeginMap;
+				ret << YAML::Key << "uuid"        << YAML::Value << (std::string)entry->GetUUID();
+				ret << YAML::Key << "color"       << YAML::Value << entry->GetColor().ToHexString();
+				ret << YAML::Key << "editable"    << YAML::Value << entry->IsEditable();
+				ret << YAML::Key << "mat_id"      << YAML::Value << entry->GetMatID();
+				ret << YAML::Key << "description" << YAML::Value << entry->GetDescription();
+				ret << YAML::EndMap;
+			}
+
+			ret << YAML::EndSeq;
+			ret << YAML::EndMap;
 		}
+
+		ret << YAML::EndSeq;
 	}
 
 	Unlock();
-	return ret;
+
+	ret << YAML::EndMap;//master schedule
+	ret << YAML::EndMap;
+
+	return ret.c_str();
 }
 
 
