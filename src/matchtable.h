@@ -3,7 +3,6 @@
 #include <vector>
 #include "judoka.h"
 #include "schedule_entry.h"
-#include "../ZED/include/csv.h"
 
 
 
@@ -99,6 +98,7 @@ namespace Judoboard
 		bool Contains(const Judoka* Judoka) const;
 
 		virtual std::vector<Result> CalculateResults() const = 0;
+		virtual std::string GetDescription() const = 0;
 
 		const RuleSet& GetRuleSet() const;
 		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
@@ -109,11 +109,6 @@ namespace Judoboard
 
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& Name) { m_Name = Name; }
-
-		virtual std::string GetDescription() const = 0;
-
-		//Serialization
-		virtual const std::string ToString() const;
 
 		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
 
@@ -128,6 +123,7 @@ namespace Judoboard
 		Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 
+		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual void ToString(YAML::Emitter& Yaml) const;
 

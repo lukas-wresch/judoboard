@@ -172,11 +172,3 @@ const std::string CustomTable::ToHTML() const
 
 	return ret;
 }
-
-
-
-const std::string CustomTable::ToString() const
-{
-	ZED::CSV ret(MatchTable::ToString());
-	return ret;
-}

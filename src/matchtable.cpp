@@ -185,15 +185,6 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 
 
 
-const std::string MatchTable::ToString() const
-{
-	ZED::CSV ret;
-	ret << (std::string)GetUUID() << GetType() << GetScheduleIndex() << GetMatID() << GetColor() << (std::string)GetRuleSet().GetUUID() << m_Name;
-	return ret;
-}
-
-
-
 MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : Schedulable(Yaml, Tournament)
 {
 	if (Yaml["name"])
