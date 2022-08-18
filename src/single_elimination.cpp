@@ -31,6 +31,8 @@ SingleElimination::SingleElimination(const YAML::Node& Yaml, ITournament* Tourna
 		for (const auto& node : Yaml["starting_positions"])
 			m_StartingPositions.insert({ node.first.as<int>(), Tournament->FindParticipant(node.second.as<std::string>())  });
 	}
+
+	GenerateSchedule();//To generate m_ScheduleWithEmptyMatches
 }
 
 
