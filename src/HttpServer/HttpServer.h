@@ -101,18 +101,20 @@ public:
 		
 	//void RegisterResource(const std::string& URI, std::string (*Callback)(const std::string Query), ResourceType Type = ResourceType::HTML);
 	//void RegisterResource(const std::string& URI, std::function<std::string(Request&)> Callback, ResourceType Type = ResourceType::HTML);
-	void RegisterResource(const std::string& URI, std::function<ZED::Blob(Request&)> Callback, ResourceType Type = ResourceType::HTML);
+	void RegisterResource(const std::string& URI, std::function<ZED::Blob(Request&)> Callback, ResourceType Type = ResourceType::HTML, uint32_t Cache = 0);
 
 private:
 
 	struct Resource
 	{
-		Resource(ResourceType Type, std::function<ZED::Blob(Request&)> Callback) : m_Callback(Callback)
+		Resource(ResourceType Type, std::function<ZED::Blob(Request&)> Callback, uint32_t Cache = 0) : m_Callback(Callback)
 		{
 			m_Type = Type;
+			m_CacheAgeInSeconds = Cache;
 		}
 
 		ResourceType m_Type;
+		uint32_t m_CacheAgeInSeconds = 0;
 		std::function<ZED::Blob(Request&)> m_Callback;
 	};
 

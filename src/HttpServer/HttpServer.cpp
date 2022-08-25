@@ -107,30 +107,23 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
             MIMEType = "application/octet-stream";
 
 
+        mg_printf(Connection,
+            "HTTP/1.1 200 OK\r\n"
+            "Connection: Keep-Alive\r\n"
+            "Keep-Alive: timeout=60, max=1000\r\n"
+            "Content-Type: %s;\r\n"
+            "Content-Length: %d\r\n",
+            MIMEType.c_str(), content.GetSize());//Always set Content-Length
+
         if (request.m_ResponseHeader.length() > 0)
         {
-            mg_printf(Connection,
-                "HTTP/1.1 200 OK\r\n"
-                "Connection: Keep-Alive\r\n"
-                "Keep-Alive: timeout=60, max=1000\r\n"
-                "Content-Type: %s;\r\n"
-                "Content-Length: %d\r\n"//Always set Content-Length
-                "%s\r\n"
-                "\r\n",
-                MIMEType.c_str(), content.GetSize(), request.m_ResponseHeader.c_str());
+            mg_printf(Connection, request.m_ResponseHeader.c_str());
+            mg_printf(Connection, "\r\n");
         }
-        else
-        {
-            mg_printf(Connection,
-                "HTTP/1.1 200 OK\r\n"
-                "Connection: Keep-Alive\r\n"
-                "Keep-Alive: timeout=60, max=1000\r\n"
-                "Content-Type: %s;\r\n"
-                "Content-Length: %d\r\n"//Always set Content-Length
-                "\r\n",
-                MIMEType.c_str(), content.GetSize());
-        }
-
+        if (item != m_Resources.end() && item->second.m_CacheAgeInSeconds > 0)
+            mg_printf(Connection, "Cache-Control: max-age=%d\r\n", item->second.m_CacheAgeInSeconds);
+        
+        mg_printf(Connection, "\r\n");
         mg_write(Connection, content, content.GetSize());
     }
 
@@ -174,7 +167,7 @@ HttpServer::~HttpServer()
 
 
 
-void HttpServer::RegisterResource(const std::string& URI, std::function<ZED::Blob(Request&)> Callback, ResourceType Type)
+void HttpServer::RegisterResource(const std::string& URI, std::function<ZED::Blob(Request&)> Callback, ResourceType Type, uint32_t Cache)
 {
-    m_Resources.insert({ URI, Resource(Type, Callback) });
+    m_Resources.insert({ URI, Resource(Type, Callback, Cache) });
 }
