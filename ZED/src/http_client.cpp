@@ -114,13 +114,13 @@ bool HttpClient::SendFile(const char* Path, const char* Filename)
 
 HttpClient::Packet HttpClient::RecvResponse()
 {
+	if (!m_Socket.IsConnected())//Not connected
+		return Packet("", "");//Return empty packet
+
 	std::string response;
 	int content_length = -1;
 	int header_length  = -1;
 	uint32_t downloaded = 0;
-
-	if (!m_Socket.IsConnected())//Not connected
-		return Packet("", "");//Return empty packet
 
 	while (m_Socket.Recv())
 	{
@@ -151,7 +151,8 @@ HttpClient::Packet HttpClient::RecvResponse()
 					header_length = pos + sizeof("\r\n\r\n") - 1;
 			}
 
-			if (downloaded >= (uint32_t)header_length + (uint32_t)content_length)
+			if (header_length != -1 && content_length != -1 &&
+				downloaded >= (uint32_t)header_length + (uint32_t)content_length)
 				break;
 		}
 	}

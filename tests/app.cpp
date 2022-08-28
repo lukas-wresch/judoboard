@@ -21,7 +21,7 @@ TEST(App, ServerConnection)
 	EXPECT_FALSE(app.IsSlave());
 
 	EXPECT_TRUE(app.GetTournament());
-	EXPECT_TRUE(app.GetTournamentList().size() == 0);
+	EXPECT_EQ(app.GetTournamentList().size(), 0);
 }
 
 
