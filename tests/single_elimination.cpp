@@ -299,3 +299,42 @@ TEST(SingleElimination, Count5)
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
 }
+
+
+
+TEST(SingleElimination, Count5_ExportImport)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	t->AddMatchTable(&group);
+
+	auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+	t->AddParticipant(j1);
+
+	auto j2 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+	t->AddParticipant(j2);
+
+	auto j3 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 70);
+	t->AddParticipant(j3);
+
+	auto j4 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 80);
+	t->AddParticipant(j4);
+
+	auto j5 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 90);
+	t->AddParticipant(j5);
+
+	YAML::Emitter yaml;
+	yaml << YAML::BeginMap;
+	group >> yaml;
+	yaml << YAML::EndMap;
+
+	SingleElimination group2(YAML::Load(yaml.c_str()));
+
+	EXPECT_EQ(group.ToHTML().length(), group2.ToHTML().length());
+	EXPECT_EQ(group.ToHTML(), group2.ToHTML());
+}
