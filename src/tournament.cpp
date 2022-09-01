@@ -519,10 +519,10 @@ bool Tournament::AddMatch(Match* NewMatch)
 		}
 	}
 
-	NewMatch->SetScheduleIndex(GetMaxScheduleIndex() + 1);
+	//NewMatch->SetScheduleIndex(GetMaxScheduleIndex() + 1);//TODO
 
 	m_Schedule.emplace_back(NewMatch);
-	m_SchedulePlanner.emplace_back(NewMatch);
+	//m_SchedulePlanner.emplace_back(NewMatch);//TODO
 
 	Save();
 	Unlock();
@@ -1110,7 +1110,7 @@ void Tournament::ListAgeGroups(YAML::Emitter& Yaml) const
 
 
 
-Schedulable* Tournament::GetScheduleEntry(const UUID& UUID)
+MatchTable* Tournament::GetScheduleEntry(const UUID& UUID)
 {
 	for (auto entry : m_SchedulePlanner)
 		if (entry->GetUUID() == UUID)
@@ -1448,7 +1448,7 @@ const std::string Tournament::MasterSchedule2String() const
 				if (GetMaxEntriesAtScheduleIndex(matID, i) > max)
 					max = GetMaxEntriesAtScheduleIndex(matID, i);
 
-			std::vector<std::pair<uint32_t, Schedulable*>> entries;
+			std::vector<std::pair<uint32_t, MatchTable*>> entries;
 			for (uint32_t it = 0; it < m_SchedulePlanner.size(); ++it)//For all schedule entries
 			{
 				auto entry = m_SchedulePlanner[it];

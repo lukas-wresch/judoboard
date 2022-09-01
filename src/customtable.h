@@ -29,8 +29,6 @@ namespace Judoboard
 		virtual const std::string ToHTML() const override;
 		virtual const std::string ToString() const override;
 
-		virtual void operator >> (ZED::CSV& Stream) const override;
-
 
 	private:
 	};

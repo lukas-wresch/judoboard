@@ -96,7 +96,7 @@ namespace Judoboard
 		virtual void ListAgeGroups(YAML::Emitter& Yaml) const {}
 
 		//Master schedule / schedule entries
-		virtual Schedulable* GetScheduleEntry(const UUID& UUID) { return nullptr; }
+		virtual MatchTable* GetScheduleEntry(const UUID& UUID) { return nullptr; }
 		virtual bool MoveScheduleEntryUp(const UUID& UUID) { return false; }
 		virtual bool MoveScheduleEntryDown(const UUID& UUID) { return false; }
 

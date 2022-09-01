@@ -33,10 +33,9 @@ TEST(Match, ExportImport)
 		match2.ToString(yaml2);
 		ASSERT_EQ((std::string)yaml1.c_str(), (std::string)yaml2.c_str());
 
-		ASSERT_EQ(match.GetColor(), match2.GetColor());
-		ASSERT_EQ(match.GetUUID(), match2.GetUUID());
+		ASSERT_EQ(match.GetUUID(),      match2.GetUUID());
 		ASSERT_EQ(match.HasConcluded(), match2.HasConcluded());
-		ASSERT_EQ(match.IsRunning(), match2.IsRunning());
+		ASSERT_EQ(match.IsRunning(),    match2.IsRunning());
 	}
 }
 

@@ -281,9 +281,10 @@ const std::string SingleElimination::ToHTML() const
 
 		auto match = m_ScheduleWithEmptyMatches[matchIndex];
 
-		std::string ret;
+		std::string ret = "<td>";
 
-		ret += "<td><a href='#edit_match.html?id=" + (std::string)match->GetUUID() + "'>";
+		if (!match->IsEmptyMatch())
+			ret += "<a href='#edit_match.html?id=" + (std::string)match->GetUUID() + "'>";
 		
 		//Output name of fighters
 		if (match->GetFighter(Fighter::White))
@@ -316,6 +317,8 @@ const std::string SingleElimination::ToHTML() const
 			ret += " (" + Timer::TimestampToString(result.m_Time) + ")";
 		}
 
+		if (!match->IsEmptyMatch())
+			ret += "</a>";
 		ret += "</a></td>";
 
 		return ret;

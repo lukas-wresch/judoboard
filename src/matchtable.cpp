@@ -21,7 +21,7 @@ MatchTable::~MatchTable()
 
 void MatchTable::SetMatID(int32_t MatID)
 {
-	Schedulable::SetMatID(MatID);
+	m_MatID = MatID;
 
 	for (auto match : m_Schedule)
 		if (match)
@@ -194,42 +194,20 @@ const std::string MatchTable::ToString() const
 
 
 
-MatchTable::MatchTable(ZED::CSV& Stream, ITournament* Tournament) : Schedulable(Stream, Tournament)
+MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tournament(Tournament)
 {
-	Stream >> m_Name;
+	if (!Yaml.IsMap())
+		return;
 
-	bool rulesAvailable;
-	Stream >> rulesAvailable;
-	if (rulesAvailable && Tournament)
-	{
-		std::string rulesUUID;
-		Stream >> rulesUUID;
-		m_Rules = Tournament->FindRuleSet(UUID(std::move(rulesUUID)));
-	}
+	if (Yaml["uuid"])
+		SetUUID(Yaml["uuid"].as<std::string>());
+	if (Yaml["schedule_index"])
+		m_ScheduleIndex = Yaml["schedule_index"].as<int>();
+	if (Yaml["mat_id"])
+		m_MatID = Yaml["mat_id"].as<int>();
+	if (Yaml["color"])
+		m_Color = Yaml["color"].as<int>();
 
-	size_t participants;
-	Stream >> participants;
-	for (size_t i = 0; i < participants; i++)
-	{
-		std::string uuid;
-		Stream >> uuid;
-
-		if (Tournament)
-		{
-			auto judoka = Tournament->FindParticipant(UUID(std::move(uuid)));
-
-			if (judoka)
-				m_Participants.emplace_back(judoka);
-			else
-				ZED::Log::Error("Participant could not be found");
-		}
-	}
-}
-
-
-
-MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : Schedulable(Yaml, Tournament)
-{
 	if (Yaml["name"])
 		m_Name = Yaml["name"].as<std::string>();
 
@@ -252,31 +230,12 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : Schedu
 
 
 
-void MatchTable::operator >> (ZED::CSV& Stream) const
-{
-	Stream << GetType();
-
-	Schedulable::operator >>(Stream);
-	Stream << m_Name;
-
-	if (m_Rules)
-	{
-		Stream << true << (std::string)m_Rules->GetUUID();
-		Stream.AddNewline();
-	}
-	else
-		Stream << false;//No rule set
-
-	Stream << m_Participants.size();
-	for (auto judoka : m_Participants)
-		Stream << (std::string)judoka->GetUUID();
-}
-
-
-
 void MatchTable::operator >> (YAML::Emitter& Yaml) const
 {
-	Schedulable::operator >>(Yaml);
+	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "schedule_index" << YAML::Value << m_ScheduleIndex;
+	Yaml << YAML::Key << "mat_id" << YAML::Value << m_MatID;
+	Yaml << YAML::Key << "color"  << YAML::Value << (int)m_Color;
 
 	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
 	if (m_Name.length() > 0)
@@ -300,7 +259,10 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 
 void MatchTable::ToString(YAML::Emitter& Yaml) const
 {
-	Schedulable::operator >>(Yaml);
+	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "schedule_index" << YAML::Value << m_ScheduleIndex;
+	Yaml << YAML::Key << "mat_id" << YAML::Value << m_MatID;
+	Yaml << YAML::Key << "color"  << YAML::Value << (int)m_Color;
 
 	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
 	Yaml << YAML::Key << "name" << YAML::Value << m_Name;

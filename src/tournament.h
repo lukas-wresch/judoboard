@@ -114,7 +114,7 @@ namespace Judoboard
 		virtual void ListAgeGroups(YAML::Emitter& Yaml) const override;
 
 		//Master schedule / schedule entries
-		Schedulable* GetScheduleEntry(const UUID& UUID) override;
+		MatchTable* GetScheduleEntry(const UUID& UUID) override;
 		bool MoveScheduleEntryUp(const UUID& UUID) override;
 		bool MoveScheduleEntryDown(const UUID& UUID) override;
 
@@ -157,7 +157,7 @@ namespace Judoboard
 		std::vector<MatchTable*> m_MatchTables;
 		std::vector<Match*> m_Schedule;
 
-		std::vector<Schedulable*> m_SchedulePlanner;
+		std::vector<MatchTable*> m_SchedulePlanner;
 
 		const RuleSet* m_pDefaultRules = nullptr;//Default rule set of the tournament
 
