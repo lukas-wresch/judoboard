@@ -53,7 +53,7 @@ namespace Judoboard
 		void DeleteAllMatchResults();
 
 		bool AddMatch(Match* NewMatch);
-		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
+		//bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
 		Match* GetNextMatch(int32_t MatID = -1) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 		const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 
@@ -159,8 +159,6 @@ namespace Judoboard
 
 		std::vector<MatchTable*> m_MatchTables;
 		std::vector<Match*> m_Schedule;
-
-		std::vector<MatchTable*> m_SchedulePlanner;
 
 		const RuleSet* m_pDefaultRules = nullptr;//Default rule set of the tournament
 

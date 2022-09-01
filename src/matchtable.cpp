@@ -45,6 +45,9 @@ bool MatchTable::AddMatch(Match* NewMatch)
 	if (!NewMatch)
 		return false;
 
+	AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)), true);
+	AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
+
 	NewMatch->SetMatchTable(this);
 	m_Schedule.emplace_back(NewMatch);
 	return true;
@@ -61,7 +64,13 @@ bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 		if (!IsElgiable(*NewParticipant))//Is the judoka allowed in this match table?
 			return false;
 
+	//Is the judoka alreay a participant?
+	for (auto judoka : m_Participants)
+		if (judoka && *judoka == *NewParticipant)
+			return false;
+
 	m_Participants.push_back(NewParticipant);
+	GenerateSchedule();
 	return true;
 }
 

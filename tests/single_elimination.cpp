@@ -179,12 +179,15 @@ TEST(SingleElimination, Count3)
 	t->AddParticipant(j3);
 
 	ASSERT_EQ(group.GetParticipants().size(), 3);
-	ASSERT_EQ(group.GetSchedule().size(), 2);
+	ASSERT_EQ(group.GetSchedule().size(), 3);
 
 	Mat m(1);
 
 	for (auto match : group.GetSchedule())
 	{
+		if (match->IsEmptyMatch())
+			continue;
+
 		EXPECT_TRUE(m.StartMatch(match));
 		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
 			m.AddIppon(Fighter::White);
@@ -278,12 +281,15 @@ TEST(SingleElimination, Count5)
 	t->AddParticipant(j5);
 
 	ASSERT_EQ(group.GetParticipants().size(), 5);
-	ASSERT_EQ(group.GetSchedule().size(),     4);
+	ASSERT_EQ(group.GetSchedule().size(),     7);
 
 	Mat m(1);
 
 	for (auto match : group.GetSchedule())
 	{
+		if (match->IsEmptyMatch())
+			continue;
+
 		EXPECT_TRUE(m.StartMatch(match));
 		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
 			m.AddIppon(Fighter::White);

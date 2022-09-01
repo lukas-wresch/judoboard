@@ -14,28 +14,28 @@ TEST(Match, ExportImport)
 		RuleSet rule_set("test", rand(), rand(), rand(), rand());
 		Tournament tourney;
 
-		Match match(&tourney, &j1, &j2, matid);
-		match.SetRuleSet(&rule_set);
-		tourney.AddMatch(&match);//Also copies the rule set inside the tournment's database
+		Match* match = new Match(&tourney, &j1, &j2, matid);
+		match->SetRuleSet(&rule_set);
+		tourney.AddMatch(match);//Also copies the rule set inside the tournment's database
 
 		YAML::Emitter yaml;
-		match >> yaml;
+		*match >> yaml;
 
 		Match match2(YAML::Load(yaml.c_str()), &tourney);
 
-		ASSERT_EQ(match.GetFighter(Fighter::White)->GetUUID(), match2.GetFighter(Fighter::White)->GetUUID());
-		ASSERT_EQ(match.GetFighter(Fighter::Blue )->GetUUID(), match2.GetFighter(Fighter::Blue )->GetUUID());
+		ASSERT_EQ(match->GetFighter(Fighter::White)->GetUUID(), match2.GetFighter(Fighter::White)->GetUUID());
+		ASSERT_EQ(match->GetFighter(Fighter::Blue )->GetUUID(), match2.GetFighter(Fighter::Blue )->GetUUID());
 
-		ASSERT_EQ(match.GetRuleSet().GetUUID(), match2.GetRuleSet().GetUUID());
+		ASSERT_EQ(match->GetRuleSet().GetUUID(), match2.GetRuleSet().GetUUID());
 
 		YAML::Emitter yaml1, yaml2;
-		match.ToString(yaml1);
+		match->ToString(yaml1);
 		match2.ToString(yaml2);
 		ASSERT_EQ((std::string)yaml1.c_str(), (std::string)yaml2.c_str());
 
-		ASSERT_EQ(match.GetUUID(),      match2.GetUUID());
-		ASSERT_EQ(match.HasConcluded(), match2.HasConcluded());
-		ASSERT_EQ(match.IsRunning(),    match2.IsRunning());
+		ASSERT_EQ(match->GetUUID(),      match2.GetUUID());
+		ASSERT_EQ(match->HasConcluded(), match2.HasConcluded());
+		ASSERT_EQ(match->IsRunning(),    match2.IsRunning());
 	}
 }
 
@@ -180,15 +180,15 @@ TEST(Match, BestOf3ExportImport)
 	{
 		Tournament tourney("deleteMe");
 
-		Match m1(&tourney, &j1, &j2, 1);
-		Match m2(&tourney, &j2, &j1, 1);
-		Match m3(&tourney, &j1, &j2, 1);
+		Match* m1 = new Match(&tourney, &j1, &j2, 1);
+		Match* m2 = new Match(&tourney, &j2, &j1, 1);
+		Match* m3 = new Match(&tourney, &j1, &j2, 1);
 
-		m3.SetBestOfThree(&m1, &m2);
+		m3->SetBestOfThree(m1, m2);
 
-		tourney.AddMatch(&m1);
-		tourney.AddMatch(&m2);
-		tourney.AddMatch(&m3);
+		tourney.AddMatch(m1);
+		tourney.AddMatch(m2);
+		tourney.AddMatch(m3);
 
 		tourney.Save();
 		tourney.EnableAutoSave(false);

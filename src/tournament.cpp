@@ -5,6 +5,7 @@
 #include "tournament.h"
 #include "database.h"
 #include "weightclass.h"
+#include "customtable.h"
 #include "single_elimination.h"
 #include "weightclass_generator.h"
 #include "md5.h"
@@ -143,15 +144,11 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 Tournament::~Tournament()
 {
-	if (m_Schedule.size() > 0 || GetParticipants().size() > 0 || m_MatchTables.size() > 0 || m_SchedulePlanner.size() > 0)
+	if (m_Schedule.size() > 0 || GetParticipants().size() > 0 || m_MatchTables.size() > 0)
 		Save();
 
 	for (auto table : m_MatchTables)
 		delete table;
-
-	//for (auto match : m_Schedule)
-		//if (!match->GetMatchTable())
-			//delete match;//Match might now be stored on the heap, then this will crash
 }
 
 
@@ -170,8 +167,6 @@ void Tournament::Reset()
 		if (!match->GetMatchTable())
 			delete match;
 	m_Schedule.clear();
-
-	m_SchedulePlanner.clear();
 
 	//Don't delete since this could be shared memory
 	//m_pDefaultRules = nullptr;
@@ -249,16 +244,16 @@ bool Tournament::LoadYAML(const std::string& Filename)
 			case MatchTable::Type::Weightclass:
 				new_table = new Weightclass(node, this);
 				break;
+			case MatchTable::Type::Custom:
+				new_table = new CustomTable(node, this);
+				break;
 			case MatchTable::Type::SingleElimination:
 				new_table = new SingleElimination(node, this);
 				break;
 			}
 
 			if (new_table)
-			{
 				m_MatchTables.push_back(new_table);
-				m_SchedulePlanner.push_back(new_table);
-			}
 		}
 	}
 
@@ -268,12 +263,11 @@ bool Tournament::LoadYAML(const std::string& Filename)
 	{
 		for (const auto& node : yaml["schedule"])
 		{
-			Match* new_match = new Match(node, this);
-
-			if (new_match->GetMatchTable())
-				(const_cast<MatchTable*>(new_match->GetMatchTable()))->AddMatch(new_match);
-
-			m_Schedule.emplace_back(new_match);
+			UUID id = node.as<std::string>();
+			for (auto table : m_MatchTables)
+				for (auto match : table->GetSchedule())
+					if (match->GetUUID() == id)
+						m_Schedule.emplace_back(match);
 		}
 	}
 
@@ -345,7 +339,7 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 	yaml << YAML::BeginSeq;
 
 	for (auto match : m_Schedule)
-		*match >> yaml;
+		yaml << (std::string)match->GetUUID();
 
 	yaml << YAML::EndSeq;
 
@@ -486,7 +480,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 	//Do we have the match already?
 	for (auto match : m_Schedule)
 	{
-		if (match->GetUUID() == NewMatch->GetUUID())
+		if (match && match->GetUUID() == NewMatch->GetUUID())
 		{
 			Unlock();
 			return false;
@@ -503,10 +497,10 @@ bool Tournament::AddMatch(Match* NewMatch)
 		if (prevMatch) AddMatch(const_cast<Match*>(prevMatch));//Include them as well recursively
 
 	//If the match has judoka attached, include them as participants
-	if (NewMatch->GetFighter(Fighter::White) && !IsParticipant(*NewMatch->GetFighter(Fighter::White)))
-		m_StandingData.AddJudoka(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)));
-	if (NewMatch->GetFighter(Fighter::Blue) && !IsParticipant(*NewMatch->GetFighter(Fighter::Blue)))
-		m_StandingData.AddJudoka(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)));
+	if (NewMatch->GetFighter(Fighter::White))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)));
+	if (NewMatch->GetFighter(Fighter::Blue))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)));
 
 	if (NewMatch->GetFighter(Fighter::White) && IsDisqualified(*NewMatch->GetFighter(Fighter::White)))
 	{
@@ -534,13 +528,13 @@ bool Tournament::AddMatch(Match* NewMatch)
 		}
 	}
 
-	//NewMatch->SetScheduleIndex(GetMaxScheduleIndex() + 1);//TODO
+	auto new_match_table = new CustomTable(this);
+	new_match_table->AddMatch(NewMatch);
+	AddMatchTable(new_match_table);
 
-	m_Schedule.emplace_back(NewMatch);
-	//m_SchedulePlanner.emplace_back(NewMatch);//TODO
-
-	Save();
 	Unlock();
+	Save();
+
 	return true;
 }
 
@@ -586,11 +580,14 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
 	if (GetStatus() == Status::Concluded)
 		return false;
 
-	for (auto it = m_SchedulePlanner.begin(); it != m_SchedulePlanner.end(); ++it)
+	for (auto it = m_MatchTables.begin(); it != m_MatchTables.end(); ++it)
 	{
+		if ((*it)->GetType() != MatchTable::Type::Custom)
+			continue;
+
 		if ((*it)->GetSchedule().size() == 1 && (*it)->GetSchedule()[0]->GetUUID() == MatchID)
 		{
-			it = m_SchedulePlanner.erase(it);
+			it = m_MatchTables.erase(it);
 			break;
 		}
 	}
@@ -728,18 +725,23 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 
 	FindAgeGroupForJudoka(*Judoka);
 
+	bool added = false;
 	for (auto table : m_MatchTables)
 	{
 		if (table && table->IsElgiable(*Judoka))
 		{
 			table->AddParticipant(Judoka);
 			table->GenerateSchedule();
+			added = true;
 		}
 	}
 
 	Unlock();
 
-	GenerateSchedule();
+	if (added)
+		GenerateSchedule();
+	else
+		Save();
 
 	return true;
 }
@@ -869,7 +871,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 		AddRuleSet(const_cast<RuleSet*>(NewMatchTable->GetOwnRuleSet()));
 
 	//Add all eligable participants to the match table
-	for (auto [id, judoka] : m_StandingData.GetAllJudokas())//TODO This is bad if NewMatchTable is already stored on disk
+	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
 	{
 		if (judoka && NewMatchTable->IsElgiable(*judoka))
 			NewMatchTable->AddParticipant(judoka);
@@ -888,7 +890,6 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	NewMatchTable->SetColor(match_table_color);
 
 	m_MatchTables.push_back(NewMatchTable);
-	m_SchedulePlanner.push_back(NewMatchTable);
 
 	//Copy over matches
 	for (auto match : NewMatchTable->GetSchedule())
@@ -946,16 +947,6 @@ bool Tournament::RemoveMatchTable(const UUID& UUID)
 		if (*table && (*table)->GetUUID() == UUID)
 		{
 			table = m_MatchTables.erase(table);
-			break;
-		}
-	}
-
-	//Remove the table for the schedule
-	for (auto schedule_entry = m_SchedulePlanner.begin(); schedule_entry != m_SchedulePlanner.end(); ++schedule_entry)
-	{
-		if (*schedule_entry && (*schedule_entry)->GetUUID() == UUID)
-		{
-			schedule_entry = m_SchedulePlanner.erase(schedule_entry);
 			break;
 		}
 	}
@@ -1147,7 +1138,7 @@ void Tournament::ListAgeGroups(YAML::Emitter& Yaml) const
 
 MatchTable* Tournament::GetScheduleEntry(const UUID& UUID)
 {
-	for (auto entry : m_SchedulePlanner)
+	for (auto entry : m_MatchTables)
 		if (entry->GetUUID() == UUID)
 			return entry;
 	return nullptr;
@@ -1162,22 +1153,22 @@ bool Tournament::MoveScheduleEntryUp(const UUID& UUID)
 
 	Lock();
 	uint32_t index = 0;
-	for (; index < m_SchedulePlanner.size(); ++index)
-		if (m_SchedulePlanner[index]->GetUUID() == UUID)
+	for (; index < m_MatchTables.size(); ++index)
+		if (m_MatchTables[index]->GetUUID() == UUID)
 			break;
 	Unlock();
 
-	if (index >= m_SchedulePlanner.size() || !m_SchedulePlanner[index])
+	if (index >= m_MatchTables.size() || !m_MatchTables[index])
 		return false;
 
-	if (m_SchedulePlanner[index]->GetScheduleIndex() <= 0)
+	if (m_MatchTables[index]->GetScheduleIndex() <= 0)
 		return false;
 
-	if (m_SchedulePlanner[index]->GetStatus() != Status::Scheduled)//Don't move if already started
+	if (m_MatchTables[index]->GetStatus() != Status::Scheduled)//Don't move if already started
 		return false;
 
 	Lock();
-	m_SchedulePlanner[index]->SetScheduleIndex(m_SchedulePlanner[index]->GetScheduleIndex() - 1);
+	m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() - 1);
 
 	GenerateSchedule();
 	Unlock();
@@ -1193,15 +1184,15 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 
 	Lock();
 	uint32_t index = 0;
-	for (; index < m_SchedulePlanner.size(); ++index)
-		if (m_SchedulePlanner[index]->GetUUID() == UUID)
+	for (; index < m_MatchTables.size(); ++index)
+		if (m_MatchTables[index]->GetUUID() == UUID)
 			break;
 	Unlock();
 
-	if (index >= m_SchedulePlanner.size() || !m_SchedulePlanner[index])
+	if (index >= m_MatchTables.size() || !m_MatchTables[index])
 		return false;
 
-	auto entry = m_SchedulePlanner[index];
+	auto entry = m_MatchTables[index];
 
 	//Is already at the last position and alone?
 	if (entry->GetScheduleIndex() == GetMaxScheduleIndex() && GetMaxEntriesAtScheduleIndex(0, entry->GetScheduleIndex()) == 1)
@@ -1211,7 +1202,7 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 		return false;
 
 	Lock();
-	m_SchedulePlanner[index]->SetScheduleIndex(m_SchedulePlanner[index]->GetScheduleIndex() + 1);
+	m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() + 1);
 
 	GenerateSchedule();
 	Unlock();
@@ -1526,9 +1517,9 @@ const std::string Tournament::MasterSchedule2String() const
 					max = GetMaxEntriesAtScheduleIndex(matID, i);
 
 			std::vector<std::pair<uint32_t, MatchTable*>> entries;
-			for (uint32_t it = 0; it < m_SchedulePlanner.size(); ++it)//For all schedule entries
+			for (uint32_t it = 0; it < m_MatchTables.size(); ++it)//For all schedule entries
 			{
-				auto entry = m_SchedulePlanner[it];
+				auto entry = m_MatchTables[it];
 
 				if (!entry || entry->GetScheduleIndex() != index || entry->GetMatID() != matID)
 					continue;
@@ -1594,7 +1585,7 @@ int32_t Tournament::GetFreeScheduleIndex(uint32_t Mat) const
 	{
 		bool is_free = true;
 
-		for (auto entry : m_SchedulePlanner)
+		for (auto entry : m_MatchTables)
 		{
 			if (entry && entry->GetScheduleIndex() == ret)
 			{
@@ -1616,7 +1607,7 @@ int32_t Tournament::GetMaxScheduleIndex(uint32_t Mat) const
 {
 	int32_t ret = -1;
 
-	for (auto entry : m_SchedulePlanner)
+	for (auto entry : m_MatchTables)
 	{
 		if (entry && entry->GetScheduleIndex() > ret)
 		{
@@ -1634,7 +1625,7 @@ uint32_t Tournament::GetMaxEntriesAtScheduleIndex(uint32_t MatID, int32_t Schedu
 {
 	uint32_t count = 0;
 
-	for (auto entry : m_SchedulePlanner)
+	for (auto entry : m_MatchTables)
 	{
 		if (entry && (ScheduleIndex < 0 || entry->GetScheduleIndex() == ScheduleIndex) )
 			if (MatID == 0 || entry->GetMatID() == MatID)
@@ -1653,8 +1644,6 @@ void Tournament::GenerateSchedule()
 
 	Lock();
 
-	for (auto match : m_Schedule)
-		delete match;
 	m_Schedule.clear();
 
 	for (auto table : m_MatchTables)
@@ -1667,7 +1656,7 @@ void Tournament::GenerateSchedule()
 	{
 		std::vector<std::pair<uint32_t, std::vector<Match*>>> Plan;
 
-		for (auto entry : m_SchedulePlanner)
+		for (auto entry : m_MatchTables)
 		{
 			if (!entry || entry->GetScheduleIndex() != index)
 				continue;
