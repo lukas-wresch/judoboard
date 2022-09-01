@@ -5,6 +5,10 @@
 <script type="text/javascript" src="slideout.min.js"></script>
 <script type="text/javascript" src="common.js"></script>
 <script type="text/javascript" src="sha512.min.js"></script>
+
+<script async type="text/javascript" src="jquery-latest.min.js"></script>
+<script async type="text/javascript" src="jquery-ui.min.js"></script>
+<script async type="text/javascript" src="yaml.min.js"></script>
 <meta http-equiv="refresh" content="280">
 </head>
 <body>
@@ -40,12 +44,12 @@
     <form>
 
       <div>
-        <label id="label_username" style="width:150px;float:left;margin-top:5px;">Username</label>
+        <label id="label_username" style="width:150px;float:left;margin-top:3px;">Username</label>
         <input style="margin-bottom:20px;" size="25" id="username" value="">
       </div>
 
       <div>
-        <label id="label_password" style="width:150px;float:left;margin-top:5px;">Password</label>
+        <label id="label_password" style="width:150px;float:left;margin-top:3px;">Password</label>
         <input type="password" style="margin-bottom:20px;" size="25" id="password" value="">
       </div>
 
@@ -114,6 +118,9 @@ var challenge;
 AjaxCallback('ajax/get_nonce', function(resp) {
   challenge = resp;
 });
+
+document.getElementById("label_username").innerHTML = lang.username;
+document.getElementById("label_password").innerHTML = lang.password;
 
 </script>
 

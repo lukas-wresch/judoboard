@@ -21,7 +21,7 @@ TEST(App, ServerConnection)
 	EXPECT_FALSE(app.IsSlave());
 
 	EXPECT_TRUE(app.GetTournament());
-	EXPECT_TRUE(app.GetTournamentList().size() == 0);
+	EXPECT_EQ(app.GetTournamentList().size(), 0);
 }
 
 
@@ -128,6 +128,34 @@ TEST(App, Tournaments)
 	EXPECT_TRUE(app.CloseTournament());
 
 	EXPECT_EQ(app.FindTournamentByName("Tournament Name")->GetName(), t->GetName());
+}
+
+
+
+TEST(App, DeleteTournament)
+{
+	initialize();
+	Application app;
+
+	{
+		Tournament* t = new Tournament("deleteMe");
+
+		Judoka j(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
+		t->AddParticipant(&j);
+
+		EXPECT_TRUE(app.AddTournament(t));
+		ASSERT_TRUE(app.GetTournament());
+
+		EXPECT_EQ(app.GetTournamentList().size(), 1);
+		EXPECT_EQ((*app.GetTournamentList().begin())->GetName(), t->GetName());
+
+		EXPECT_TRUE(app.CloseTournament());
+		EXPECT_TRUE(app.DeleteTournament(t->GetUUID()));
+	}
+	
+
+	std::ifstream file("tournaments/deleteMe.yaml");
+	EXPECT_FALSE(file);
 }
 
 

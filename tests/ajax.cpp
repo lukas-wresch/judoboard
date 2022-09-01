@@ -121,30 +121,30 @@ TEST(Ajax, UpdateMat)
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 5);
-		EXPECT_TRUE(app.GetDefaultMat()->GetName()  == "Test");
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 0);
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 5);
+		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test");
+		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 0);
+		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 1);
 
 
 		app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&timerStyle=2"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
-		EXPECT_TRUE(app.GetDefaultMat()->GetName() == "Test2");
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 1);
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 2);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test2");
+		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 1);
+		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 2);
 
 
 		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test2&ipponStyle=2&timerStyle=0"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
-		EXPECT_TRUE(app.GetDefaultMat()->GetName() == "Test2");
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetIpponStyle() == 2);
-		EXPECT_TRUE((int)app.GetDefaultMat()->GetTimerStyle() == 0);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test2");
+		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 2);
+		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 0);
 	}
 }
 
@@ -196,7 +196,7 @@ TEST(Ajax, SetFullscreen)
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsFullscreen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
 
 
 		app.Ajax_SetFullscreen(false, HttpServer::Request("id=1"));
@@ -204,7 +204,7 @@ TEST(Ajax, SetFullscreen)
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 		EXPECT_FALSE(app.GetDefaultMat()->IsFullscreen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
 
 
 		app.Ajax_SetFullscreen(true, HttpServer::Request("id=1"));
@@ -212,13 +212,13 @@ TEST(Ajax, SetFullscreen)
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 		EXPECT_TRUE(app.GetDefaultMat()->IsFullscreen());
-		EXPECT_TRUE(app.GetDefaultMat()->GetMatID() == 1);
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
 	}
 }
 
 
 
-TEST(Ajax, Ajax_GetHansokumake)
+TEST(Ajax, GetHansokumake)
 {
 	initialize();
 
@@ -232,24 +232,18 @@ TEST(Ajax, Ajax_GetHansokumake)
 		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
 
 		auto ret = app.Ajax_GetHansokumake();
-		EXPECT_EQ(ret.length(), 0);
+		EXPECT_EQ(ret, "[]");
 
 		mat->StartMatch(&match);
 		mat->AddHansokuMake(f);
 		
-		ZED::CSV ret2 = app.Ajax_GetHansokumake();
+		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
 
-		std::string id;
-		int mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
-		std::string white_name, blue_name, color, matchtable_name;
-		ret2 >> id >> white_name >> blue_name >> mat_id >> state >> color >> matchtable >> matchtable_name;
-		ret2 >> hansokumake_fighter >> hansokumake_state;
-
-		EXPECT_EQ(id, (std::string)match.GetUUID());
-		EXPECT_EQ(white_name, match.GetFighter(Fighter::White)->GetName());
-		EXPECT_EQ(blue_name,  match.GetFighter(Fighter::Blue )->GetName());
-		EXPECT_EQ(hansokumake_fighter, (int)f);
-		EXPECT_EQ(hansokumake_state, (int)IMat::Scoreboard::DisqualificationState::Unknown);
+		EXPECT_EQ(ret2[0]["match"]["uuid"].as<std::string>(), (std::string)match.GetUUID());
+		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName());
+		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName());
+		EXPECT_EQ(ret2[0]["fighter"].as<int>(), (int)f);
+		EXPECT_EQ(ret2[0]["disqualification_state"].as<int>(), (int)IMat::Scoreboard::DisqualificationState::Unknown);
 	}
 
 
@@ -263,25 +257,19 @@ TEST(Ajax, Ajax_GetHansokumake)
 		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
 
 		auto ret = app.Ajax_GetHansokumake();
-		EXPECT_EQ(ret.length(), 0);
+		EXPECT_EQ(ret, "[]");
 
 		mat->StartMatch(&match);
 		mat->AddHansokuMake(f);
 		mat->AddDisqualification(f);
 
-		ZED::CSV ret2 = app.Ajax_GetHansokumake();
+		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
 
-		std::string id;
-		int mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
-		std::string white_name, blue_name, color, matchtable_name;
-		ret2 >> id >> white_name >> blue_name >> mat_id >> state >> color >> matchtable >> matchtable_name;
-		ret2 >> hansokumake_fighter >> hansokumake_state;
-
-		EXPECT_EQ(id, (std::string)match.GetUUID());
-		EXPECT_EQ(white_name, match.GetFighter(Fighter::White)->GetName());
-		EXPECT_EQ(blue_name,  match.GetFighter(Fighter::Blue)->GetName());
-		EXPECT_EQ(hansokumake_fighter, (int)f);
-		EXPECT_EQ(hansokumake_state, (int)IMat::Scoreboard::DisqualificationState::Disqualified);
+		EXPECT_EQ(ret2[0]["match"]["uuid"].as<std::string>(), (std::string)match.GetUUID());
+		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName());
+		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName());
+		EXPECT_EQ(ret2[0]["fighter"].as<int>(), (int)f);
+		EXPECT_EQ(ret2[0]["disqualification_state"].as<int>(), (int)IMat::Scoreboard::DisqualificationState::Disqualified);
 	}
 
 
@@ -295,31 +283,25 @@ TEST(Ajax, Ajax_GetHansokumake)
 		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
 
 		auto ret = app.Ajax_GetHansokumake();
-		EXPECT_EQ(ret.length(), 0);
+		EXPECT_EQ(ret, "[]");
 
 		mat->StartMatch(&match);
 		mat->AddHansokuMake(f);
 		mat->AddNoDisqualification(f);
 
-		ZED::CSV ret2 = app.Ajax_GetHansokumake();
+		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
 
-		std::string id;
-		int mat_id, state, matchtable, hansokumake_fighter, hansokumake_state;
-		std::string white_name, blue_name, color, matchtable_name;
-		ret2 >> id >> white_name >> blue_name >> mat_id >> state >> color >> matchtable >> matchtable_name;
-		ret2 >> hansokumake_fighter >> hansokumake_state;
-
-		EXPECT_EQ(id, (std::string)match.GetUUID());
-		EXPECT_EQ(white_name, match.GetFighter(Fighter::White)->GetName());
-		EXPECT_EQ(blue_name,  match.GetFighter(Fighter::Blue)->GetName());
-		EXPECT_EQ(hansokumake_fighter, (int)f);
-		EXPECT_EQ(hansokumake_state, (int)IMat::Scoreboard::DisqualificationState::NotDisqualified);
+		EXPECT_EQ(ret2[0]["match"]["uuid"].as<std::string>(), (std::string)match.GetUUID());
+		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName());
+		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName());
+		EXPECT_EQ(ret2[0]["fighter"].as<int>(), (int)f);
+		EXPECT_EQ(ret2[0]["disqualification_state"].as<int>(), (int)IMat::Scoreboard::DisqualificationState::NotDisqualified);
 	}
 }
 
 
 
-TEST(Ajax, Ajax_GetHansokumake2)
+TEST(Ajax, GetHansokumake2)
 {
 	initialize();
 
@@ -333,7 +315,7 @@ TEST(Ajax, Ajax_GetHansokumake2)
 		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
 
 		auto ret = app.Ajax_GetHansokumake();
-		EXPECT_EQ(ret.length(), 0);
+		EXPECT_EQ(ret, "[]");
 
 		mat->StartMatch(&match);
 		for (int i = 0;i < 5; i++)
@@ -341,7 +323,7 @@ TEST(Ajax, Ajax_GetHansokumake2)
 
 		auto ret2 = app.Ajax_GetHansokumake();
 
-		EXPECT_EQ(ret2.length(), 0);
+		EXPECT_EQ(ret, "[]");
 	}
 }
 
@@ -361,11 +343,13 @@ TEST(Ajax, AddClub)
 		ASSERT_EQ(clubs.size(), 1);
 		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
 	}
+
+	ZED::Core::RemoveFile("database.yml");
 }
 
 
 
-TEST(Ajax, ListClubs)
+TEST(Ajax, Clubs_List)
 {
 	initialize();
 
@@ -389,11 +373,84 @@ TEST(Ajax, ListClubs)
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
 		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "Club 2");
 	}
+
+	ZED::Core::RemoveFile("database.yml");
 }
 
 
 
-TEST(Ajax, Uptime)
+TEST(Ajax, Clubs_Get)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("database.yml");
+		Application app;
+
+		auto c = new Club("Club 1");
+		app.GetDatabase().AddClub(c);
+
+		YAML::Node yaml = YAML::Load(app.Ajax_GetClub(HttpServer::Request("id=" + (std::string)c->GetUUID())));
+
+		EXPECT_EQ(yaml["uuid"].as<std::string>(), c->GetUUID());
+		EXPECT_EQ(yaml["name"].as<std::string>(), c->GetName());
+	}
+
+	ZED::Core::RemoveFile("database.yml");
+}
+
+
+
+TEST(Ajax, Clubs_Edit)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("database.yml");
+		Application app;
+
+		auto c = new Club("Club 1");
+		app.GetDatabase().AddClub(c);
+
+		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)c->GetUUID(), "name=NewName")), "ok");
+
+
+		auto yaml = YAML::Load(app.Ajax_ListClubs());
+
+		ASSERT_EQ(yaml.size(), 1);
+		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), c->GetUUID());
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "NewName");
+	}
+
+	ZED::Core::RemoveFile("database.yml");
+}
+
+
+
+TEST(Ajax, Clubs_Delete)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("database.yml");
+		Application app;
+
+		auto c = new Club("Club 1");
+		app.GetDatabase().AddClub(c);
+
+		EXPECT_EQ((std::string)app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)c->GetUUID())), "ok");
+
+		auto yaml = YAML::Load(app.Ajax_ListClubs());
+
+		ASSERT_EQ(yaml.size(), 0);
+	}
+
+	ZED::Core::RemoveFile("database.yml");
+}
+
+
+
+TEST(Ajax, Status)
 {
 	initialize();
 
@@ -401,27 +458,27 @@ TEST(Ajax, Uptime)
 		Application app;
 
 		{
-			auto csv = app.Ajax_Uptime();
-			uint32_t uptime;
-			csv >> uptime;
+			YAML::Node yaml = YAML::Load(app.Ajax_Status());
+			uint32_t uptime = yaml["uptime"].as<uint32_t>();
 			EXPECT_TRUE(uptime < 100);
+
+			auto version = yaml["version"].as<std::string>();
+			EXPECT_EQ(version, Application::Version);
 		}
 		
 		ZED::Core::Pause(1000);
 
 		{
-			auto csv = app.Ajax_Uptime();
-			uint32_t uptime;
-			csv >> uptime;
+			YAML::Node yaml = YAML::Load(app.Ajax_Status());
+			uint32_t uptime = yaml["uptime"].as<uint32_t>();
 			EXPECT_TRUE(uptime < 1100);
 		}
 
 		ZED::Core::Pause(1000);
 
 		{
-			auto csv = app.Ajax_Uptime();
-			uint32_t uptime;
-			csv >> uptime;
+			YAML::Node yaml = YAML::Load(app.Ajax_Status());
+			uint32_t uptime = yaml["uptime"].as<uint32_t>();
 			EXPECT_TRUE(uptime < 2100);
 		}
 	}

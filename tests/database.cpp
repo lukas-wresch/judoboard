@@ -118,6 +118,39 @@ TEST(Database, SaveAndLoad)
 
 
 
+TEST(Database, SaveAndLoad_Umlaut)
+{
+	initialize();
+
+	{
+		Database d;
+
+		EXPECT_EQ(d.GetNumJudoka(), 0);
+		EXPECT_EQ(d.GetRuleSets().size(), 3);
+
+		Judoka j1(u8"S\u00f6ren", u8"K\u00f6nig",  50, Gender::Male);
+
+		d.AddJudoka(&j1);
+
+		EXPECT_TRUE(d.Save("temp.yml"));
+
+
+		Database d2;
+		EXPECT_TRUE(d2.Load("temp.yml"));
+
+		ASSERT_EQ(d2.GetNumJudoka(), 1);
+
+		ASSERT_TRUE(d2.FindJudoka(j1.GetUUID()));
+		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetUUID(), j1.GetUUID());
+		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetFirstname(), u8"S\u00f6ren");
+		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetLastname(),  u8"K\u00f6nig");
+	}
+
+	ZED::Core::RemoveFile("temp.yml");
+}
+
+
+
 TEST(Database, OnlyOneDefaultRuleSet)
 {
 	initialize();

@@ -67,6 +67,7 @@ namespace Judoboard
 		bool DeleteTournament(const UUID& UUID);
 		Tournament* FindTournament(const UUID& UUID);
 		const Tournament* FindTournament(const UUID& UUID) const;
+		Tournament* FindTournamentByName(const std::string& Name);
 		const Tournament* FindTournamentByName(const std::string& Name) const;
 
 		//Mats
@@ -112,7 +113,10 @@ namespace Judoboard
 
 		//Clubs
 		Error Ajax_AddClub(const HttpServer::Request& Request);
+		Error Ajax_EditClub(const HttpServer::Request& Request);
+		Error Ajax_DeleteClub(const HttpServer::Request& Request);
 		std::string Ajax_ListClubs();
+		std::string Ajax_GetClub(const HttpServer::Request& Request);
 
 		//Rule sets
 
@@ -124,7 +128,7 @@ namespace Judoboard
 		std::string Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_GetMatchesFromMatchTable(const HttpServer::Request& Request);
 
-		ZED::CSV Ajax_Uptime();
+		std::string Ajax_Status();
 
 		//Serialization
 		[[deprecated]]

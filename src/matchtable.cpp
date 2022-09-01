@@ -185,29 +185,8 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 
 
 
-const std::string MatchTable::ToString() const
+MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : Schedulable(Yaml, Tournament)
 {
-	ZED::CSV ret;
-	ret << (std::string)GetUUID() << GetType() << GetScheduleIndex() << GetMatID() << GetColor() << (std::string)GetRuleSet().GetUUID() << m_Name;
-	return ret;
-}
-
-
-
-MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tournament(Tournament)
-{
-	if (!Yaml.IsMap())
-		return;
-
-	if (Yaml["uuid"])
-		SetUUID(Yaml["uuid"].as<std::string>());
-	if (Yaml["schedule_index"])
-		m_ScheduleIndex = Yaml["schedule_index"].as<int>();
-	if (Yaml["mat_id"])
-		m_MatID = Yaml["mat_id"].as<int>();
-	if (Yaml["color"])
-		m_Color = Yaml["color"].as<int>();
-
 	if (Yaml["name"])
 		m_Name = Yaml["name"].as<std::string>();
 
@@ -358,7 +337,7 @@ size_t MatchTable::GetIndexOfParticipant(const Judoka* Participant) const
 
 	for (size_t i = 0; i < m_Participants.size(); ++i)
 	{
-		if (Participant && Participant->GetUUID() == m_Participants[i]->GetUUID())
+		if (Participant->GetUUID() == m_Participants[i]->GetUUID())
 			return i;
 	}
 

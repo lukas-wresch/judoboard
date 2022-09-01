@@ -23,6 +23,7 @@ namespace Judoboard
 		Club(const MD5::Club& Club);
 
 		std::string GetName() const { return m_Name; }
+		void SetName(const std::string& NewName) { m_Name = NewName; }
 
 		void operator >> (YAML::Emitter& Yaml) const;
 

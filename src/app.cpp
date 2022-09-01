@@ -16,7 +16,7 @@ using namespace Judoboard;
 
 
 const std::string Application::Name = "Judoboard";
-const std::string Application::Version = "0.3.3";
+const std::string Application::Version = "0.3.4";
 bool Application::NoWindow = false;
 
 
@@ -66,6 +66,9 @@ bool Application::LoadDataFromDisk()
 		AddTournament(new Tournament(Filename));
 		return true;
 		}, "tournaments");
+
+	if (FindTournamentByName(m_Database.GetLastTournamentName()))
+		OpenTournament(FindTournamentByName(m_Database.GetLastTournamentName())->GetUUID());
 
 	return true;
 }
@@ -209,6 +212,8 @@ bool Application::OpenTournament(const UUID& UUID)
 		return false;
 
 	m_CurrentTournament = FindTournament(UUID);
+	if (m_CurrentTournament)
+		m_Database.SetLastTournamentName(m_CurrentTournament->GetName());
 	return true;
 }
 
@@ -220,7 +225,9 @@ bool Application::CloseTournament()
 		if (!m_CurrentTournament->CanCloseTournament())
 			return false;
 
-	m_CurrentTournament = nullptr;
+	//Re-open temporary tournament
+	m_CurrentTournament = &m_TempTournament;
+	m_Database.SetLastTournamentName("");
 	return true;
 }
 
@@ -384,6 +391,8 @@ bool Application::StartLocalMat(uint32_t ID)
 
 std::vector<Match> Application::GetNextMatches(uint32_t MatID) const
 {
+	LockTillScopeEnd();
+
 	if (!GetTournament())
 	{
 		std::vector<Match> empty;
@@ -408,7 +417,6 @@ bool Application::AddTournament(Tournament* NewTournament)
 		return false;
 	}
 
-	//NewTournament->ConnectToDatabase(m_Database);
 	m_Tournaments.emplace_back(NewTournament);
 
 	if (NewTournament->GetStatus() == Status::Scheduled)//Fresh new tournament
@@ -428,12 +436,12 @@ bool Application::DeleteTournament(const UUID& UUID)
 	{
 		if (*it && (*it)->GetUUID() == UUID)
 		{
-			bool ret = ZED::Core::RemoveFile("tournaments/" + (*it)->GetName() + ".yml");
+			const auto filename = "tournaments/" + (*it)->GetName() + ".yml";
 
 			delete *it;
 			m_Tournaments.erase(it);
 
-			return ret;
+			return ZED::Core::RemoveFile(filename);
 		}
 	}
 
@@ -456,6 +464,16 @@ const Tournament* Application::FindTournament(const UUID& UUID) const
 {
 	for (auto tournament : m_Tournaments)
 		if (tournament && tournament->GetUUID() == UUID)
+			return tournament;
+	return nullptr;
+}
+
+
+
+Tournament* Application::FindTournamentByName(const std::string& Name)
+{
+	for (auto tournament : m_Tournaments)
+		if (tournament && tournament->GetName() == Name)
 			return tournament;
 	return nullptr;
 }

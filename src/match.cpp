@@ -361,6 +361,52 @@ const RuleSet& Match::GetRuleSet() const
 
 
 
+void Match::ToString(YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+
+	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+
+	if (GetFighter(Fighter::White))
+		Yaml << YAML::Key << "white_name" << YAML::Value << GetFighter(Fighter::White)->GetName();
+	else
+	{
+		Yaml << YAML::Key << "white_dependency_type" << YAML::Value << (int)m_White.m_Dependency;
+		if (m_White.m_DependentMatch)
+			Yaml << YAML::Key << "white_dependency_uuid" << YAML::Value << (std::string)m_White.m_DependentMatch->GetUUID();
+	}
+
+	if (GetFighter(Fighter::Blue))
+		Yaml << YAML::Key << "blue_name"  << YAML::Value << GetFighter(Fighter::Blue)->GetName();
+	else
+	{
+		Yaml << YAML::Key << "blue_dependency_type" << YAML::Value << (int)m_Blue.m_Dependency;
+		if (m_Blue.m_DependentMatch)
+			Yaml << YAML::Key << "blue_dependency_uuid" << YAML::Value << (std::string)m_Blue.m_DependentMatch->GetUUID();
+	}
+
+	Yaml << YAML::Key << "mat_id" << YAML::Value << GetMatID();
+	Yaml << YAML::Key << "state"  << YAML::Value << (int)GetStatus();
+	Yaml << YAML::Key << "color"  << YAML::Value << GetColor().ToHexString();
+
+	if (m_Rules)
+		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
+
+	if (GetMatchTable())
+	{
+		Yaml << YAML::Key << "match_table" << YAML::Value << (std::string)GetMatchTable()->GetUUID();
+		Yaml << YAML::Key << "match_table_name" << YAML::Value << GetMatchTable()->GetDescription();
+	}
+
+	Yaml << YAML::Key << "winner" << YAML::Value << (int)m_Result.m_Winner;
+	Yaml << YAML::Key << "score"  << YAML::Value << (int)m_Result.m_Score;
+	Yaml << YAML::Key << "time"   << YAML::Value << m_Result.m_Time;
+
+	Yaml << YAML::EndMap;
+}
+
+
+
 void Match::EndMatch()
 {
 	m_State = Status::Concluded;

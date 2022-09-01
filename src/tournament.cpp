@@ -215,6 +215,12 @@ bool Tournament::LoadYAML(const std::string& Filename)
 	//Read standing data
 	m_StandingData << yaml;
 
+	if (yaml["judoka_to_age_group"] && yaml["judoka_to_age_group"].IsMap())
+	{
+		for (const auto& node : yaml["judoka_to_age_group"])
+			m_JudokaToAgeGroup.insert({ node.first.as<std::string>(), node.second.as<std::string>() });
+	}
+
 	if (yaml["disqualified_judoka"] && yaml["disqualified_judoka"].IsSequence())
 	{
 		for (const auto& node : yaml["disqualified_judoka"])
@@ -296,6 +302,15 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 	yaml << YAML::Value << "1";
 
 	m_StandingData >> yaml;
+
+	yaml << YAML::Key << "judoka_to_age_group";
+	yaml << YAML::Value;
+	yaml << YAML::BeginMap;
+
+	for (const auto& [judoka_uuid, age_group_uuid] : m_JudokaToAgeGroup)
+		yaml << YAML::Key << (std::string)judoka_uuid << YAML::Value << (std::string)age_group_uuid;
+
+	yaml << YAML::EndMap;
 
 	yaml << YAML::Key << "disqualified_judoka";
 	yaml << YAML::Value;
@@ -841,6 +856,8 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 	NewMatchTable->SetTournament(this);
 
+	Lock();
+
 	if (NewMatchTable->GetAgeGroup())
 		AddAgeGroup(const_cast<AgeGroup*>(NewMatchTable->GetAgeGroup()));
 
@@ -855,7 +872,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	}
 
 	if (NewMatchTable->GetScheduleIndex() < 0)//No schedule index?
-		NewMatchTable->SetScheduleIndex(GetMaxScheduleIndex() + 1);//Put at the bottom of list
+		NewMatchTable->SetScheduleIndex(GetFreeScheduleIndex());//Take the first empty slot
 	NewMatchTable->GenerateSchedule();
 
 	//Find a new color for this match table
@@ -871,6 +888,8 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	m_SchedulePlanner.push_back(NewMatchTable);
 
 	GenerateSchedule();
+
+	Unlock();
 }
 
 
@@ -903,8 +922,6 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 
 bool Tournament::RemoveMatchTable(const UUID& UUID)
 {
-	Lock();
-
 	auto matchTable = FindMatchTable(UUID);
 
 	if (!matchTable)
@@ -912,6 +929,8 @@ bool Tournament::RemoveMatchTable(const UUID& UUID)
 
 	if (matchTable->GetStatus() != Status::Scheduled)//Can safely delete the match table
 		return false;
+
+	Lock();
 
 	//Remove match table
 	for (auto table = m_MatchTables.begin(); table != m_MatchTables.end(); ++table)
@@ -1043,11 +1062,15 @@ std::vector<const AgeGroup*> Tournament::GetEligableAgeGroupsOfJudoka(const Judo
 {
 	std::vector<const AgeGroup*> ret;
 
+	Lock();
+
 	for (auto age_group : m_StandingData.GetAgeGroups())
 	{
 		if (Judoka && age_group->IsElgiable(*Judoka))
 			ret.emplace_back(age_group);
 	}
+
+	Unlock();
 
 	return ret;
 }
@@ -1058,8 +1081,12 @@ std::vector<const AgeGroup*> Tournament::GetAgeGroups() const
 {
 	std::vector<const AgeGroup*> ret;
 
+	Lock();
+
 	for (auto age_group : m_StandingData.GetAgeGroups())
 		ret.emplace_back(age_group);
+
+	Unlock();
 
 	return ret;
 }
@@ -1185,77 +1212,106 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 
 
 
-std::string Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups)
+std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) const
 {
-	YAML::Emitter ret;
-	ret << YAML::BeginSeq;
+	std::vector<WeightclassDescCollection> ret;
 
 	for (auto age_group : AgeGroups)
 	{
-		std::vector<std::pair<int, int>> weightsSlots;
-		int min = 1000 * 1000;
-		int max = 0;
-		for (const auto [id, judoka] : m_StandingData.GetAllJudokas())
+		for (Gender gender = Gender::Male; gender <= Gender::Female; ++gender)
 		{
-			auto age_group_of_judoka = GetAgeGroupOfJudoka(judoka);
-			if (age_group_of_judoka && age_group_of_judoka->GetUUID() == age_group->GetUUID())
+			if (gender == Gender::Female && !SplitGenders)
+				continue;//Only do one loop for both genders
+
+			std::vector<Weight> weights;
+
+			for (const auto [id, judoka] : m_StandingData.GetAllJudokas())
 			{
-				const int weight = judoka->GetWeight();
-				weightsSlots.emplace_back(weight, 0);
-			}
-		}
+				//Filter for correct gender
+				if (SplitGenders && judoka->GetGender() != gender)
+					continue;
 
-		std::sort(weightsSlots.begin(), weightsSlots.end(),
-			[](const std::pair<int, int>& a, const std::pair<int, int>& b) {
-			return a.first < b.first;
-		});
-
-		Generator gen;
-		gen.m_Min  = Min;
-		gen.m_Max  = Max;
-		gen.m_Diff = Diff;
-		gen.split(weightsSlots, 0, (int)weightsSlots.size());
-
-		//Generate yaml output
-		int currentClass = -1;
-		int weight_min = 0;
-		int weight_max = 0;
-		int judoka_count = 0;
-		for (auto [weight, weightclass] : weightsSlots)
-		{
-			//New weightclass
-			if (currentClass != weightclass && currentClass != -1)
-			{
-				weight_max = weight;
-
-				//Close weightclass
-				ret << YAML::BeginMap;
-				ret << YAML::Key << "min" << YAML::Value << weight_min;
-				ret << YAML::Key << "max" << YAML::Value << weight_max;
-				std::string name = age_group->GetName() + " " + std::to_string(weight_min) + " - " + std::to_string(weight_max);
-				ret << YAML::Key << "name" << YAML::Value << name;
-				ret << YAML::Key << "num_participants" << YAML::Value << judoka_count;
-				ret << YAML::EndMap;
-
-				weight_min = weight;
-				judoka_count = 0;
+				auto age_group_of_judoka = GetAgeGroupOfJudoka(judoka);
+				if (age_group_of_judoka && age_group_of_judoka->GetUUID() == age_group->GetUUID())
+					weights.emplace_back(judoka->GetWeight());
 			}
 
-			judoka_count++;
-			currentClass = weightclass;
-		}
+			std::sort(weights.begin(), weights.end());
 
-		//Close weightclass
-		ret << YAML::BeginMap;
-		ret << YAML::Key << "min" << YAML::Value << weight_min;
-		std::string name = age_group->GetName() + " " + std::to_string(weight_min) + "+";
-		ret << YAML::Key << "name" << YAML::Value << name;
-		ret << YAML::Key << "num_participants" << YAML::Value << judoka_count;
-		ret << YAML::EndMap;
+			Generator gen;
+			gen.m_Min = Min;
+			gen.m_Max = Max;
+			gen.m_Diff = Diff;
+
+			//Perform splitting algorithm
+			auto result = gen.split(weights);
+
+#ifdef _DEBUG
+			std::string line;
+			for (auto w : weights)
+				line += w.ToString() + " ";
+			ZED::Log::Debug(line);
+
+			ZED::Log::Debug("Min:  " + std::to_string(Min));
+			ZED::Log::Debug("Max:  " + std::to_string(Max));
+			ZED::Log::Debug("Diff: " + std::to_string(Diff));
+
+			for (auto r : result.m_Collection)
+				ZED::Log::Info(r.m_Min.ToString() + " - " + r.m_Max.ToString() + "   #" + std::to_string(r.m_NumParticipants));
+#endif
+
+			//Add additional metadata
+			result.m_AgeGroup = age_group;
+			if (SplitGenders)
+				result.m_Gender = gender;
+
+			ret.emplace_back(result);
+		}
 	}
 
-	ret << YAML::EndSeq;
-	return ret.c_str();
+	return ret;
+}
+
+
+
+bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>& Descriptors)
+{
+	Lock();
+
+	bool temp_auto_save = IsAutoSave();
+	EnableAutoSave(false);//Disable temporarily for performance reasons
+
+	for (const auto& desc : Descriptors)
+	{
+		if (desc.m_AgeGroup)
+		{
+			//Remove all weightclasses with this age group			
+			for (auto match_table : m_MatchTables)
+			{
+				if (match_table->GetType() == MatchTable::Type::Weightclass &&
+					match_table->GetAgeGroup() &&
+					match_table->GetAgeGroup()->GetUUID() == desc.m_AgeGroup->GetUUID())
+					RemoveMatchTable(match_table->GetUUID());
+			}
+		}
+
+		for (auto weight_desc : desc.m_Collection)
+		{
+			auto new_weightclass = new Weightclass(this, weight_desc.m_Min, weight_desc.m_Max, desc.m_Gender);
+
+			new_weightclass->SetAgeGroup(desc.m_AgeGroup);
+			new_weightclass->SetMatID(1);
+
+			AddMatchTable(new_weightclass);
+		}
+	}
+
+	EnableAutoSave(temp_auto_save);
+	Save();
+
+	Unlock();
+
+	return true;
 }
 
 
@@ -1344,15 +1400,19 @@ void Tournament::RevokeDisqualification(const Judoka& Judoka)
 
 const std::string Tournament::Schedule2String() const
 {
-	ZED::CSV ret;
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
 	Lock();
 	for (auto match : m_Schedule)
 	{
 		if (match)
-			ret << match->ToString();
+			match->ToString(ret);
 	}
 	Unlock();
-	return ret;
+
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 
@@ -1416,15 +1476,18 @@ const std::string Tournament::Participants2String() const
 
 const std::string Tournament::MasterSchedule2String() const
 {
-	ZED::CSV ret;
+	YAML::Emitter ret;
+	ret << YAML::BeginMap;
 
 	Lock();
-	//ret << mats.size();
 
-	auto highest_matID = GetHighestMatIDUsed();
-	ret << highest_matID;
+	const auto highest_matID = GetHighestMatIDUsed();
+	ret << YAML::Key << "highest_mat_id" << YAML::Value << highest_matID;
+	ret << YAML::Key << "max_index"      << YAML::Value << GetMaxScheduleIndex();
 
-	//for (auto mat : mats)//For all mat IDs
+	ret << YAML::Key << "max_widths" << YAML::Value;
+	ret << YAML::BeginSeq;
+
 	for (uint32_t matID = 1; matID <= highest_matID; matID++)
 	{
 		int max = 0;
@@ -1435,12 +1498,18 @@ const std::string Tournament::MasterSchedule2String() const
 				max = width;
 		}
 
-		ret << max << matID;
+		ret << max;
 	}
+
+	ret << YAML::EndSeq;
+
+	ret << YAML::Key << "master_schedule" << YAML::Value;
+	ret << YAML::BeginSeq;
 
 	for (int32_t index = 0; index <= GetMaxScheduleIndex(); index++)//For all times
 	{
-		//for (auto mat : mats)//For all mat IDs
+		ret << YAML::BeginSeq;
+
 		for (uint32_t matID = 1; matID <= highest_matID; matID++)
 		{
 			uint32_t max = 0;
@@ -1459,14 +1528,35 @@ const std::string Tournament::MasterSchedule2String() const
 				entries.push_back({ it, entry });
 			}
 
-			ret << max << entries.size();
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "max" << YAML::Value << max;
+			ret << YAML::Key << "entries" << YAML::Value;
+			ret << YAML::BeginSeq;
+
 			for (auto [index, entry] : entries)
-				ret << entry->IsEditable() << index << (std::string)entry->GetUUID() << entry->GetColor().ToHexString() << entry->GetMatID() << entry->GetDescription();
+			{
+				ret << YAML::BeginMap;
+				ret << YAML::Key << "uuid"        << YAML::Value << (std::string)entry->GetUUID();
+				ret << YAML::Key << "color"       << YAML::Value << entry->GetColor().ToHexString();
+				ret << YAML::Key << "editable"    << YAML::Value << entry->IsEditable();
+				ret << YAML::Key << "mat_id"      << YAML::Value << entry->GetMatID();
+				ret << YAML::Key << "description" << YAML::Value << entry->GetDescription();
+				ret << YAML::EndMap;
+			}
+
+			ret << YAML::EndSeq;
+			ret << YAML::EndMap;
 		}
+
+		ret << YAML::EndSeq;
 	}
 
 	Unlock();
-	return ret;
+
+	ret << YAML::EndMap;//master schedule
+	ret << YAML::EndMap;
+
+	return ret.c_str();
 }
 
 
@@ -1484,6 +1574,32 @@ void Tournament::FindAgeGroupForJudoka(const Judoka& Judoka)
 	//Only one choice?
 	if (EligableAgeGroups.size() == 1)//Add judoka to age group
 		m_JudokaToAgeGroup.insert({ Judoka.GetUUID(), EligableAgeGroups[0]->GetUUID() });
+}
+
+
+
+int32_t Tournament::GetFreeScheduleIndex(uint32_t Mat) const
+{
+	int32_t ret = 0;
+
+	for (; true; ++ret)
+	{
+		bool is_free = true;
+
+		for (auto entry : m_SchedulePlanner)
+		{
+			if (entry && entry->GetScheduleIndex() == ret)
+			{
+				is_free = false;
+				break;
+			}
+		}
+
+		if (is_free)
+			return ret;
+	}
+
+	return -1;
 }
 
 

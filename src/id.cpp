@@ -9,19 +9,12 @@
 using namespace Judoboard;
 
 
-uint32_t ID::s_NextID = 1;
 std::unordered_set<UUID> ID::s_UsedUUIDs;
 
 
 
 ID::ID()
 {
-	if (s_NextID == 0)
-	{
-		ZED::Log::Error("Out of IDs! Restart the application!");
-		s_NextID++;
-	}
-
 	m_UUID = GenerateUUID();
 }
 
@@ -45,7 +38,6 @@ ID::~ID()
 
 void ID::Reset()
 {
-	s_NextID = 1;
 	s_UsedUUIDs.clear();
 }
 

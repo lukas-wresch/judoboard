@@ -5,6 +5,14 @@
   <label id="label_age_group" style="width:100px;margin-top:5px;">Age Groups</label><br/>
 </div>
 
+<div id="div_gender" style="margin-bottom: 0cm; font-size: 14pt;">
+  <label style="width:240px;float:left;margin-top:4px;" id="label_split_genders">Split genders</label>
+  <input type="checkbox" checked id="split_genders" class="switch-input" onclick="Update();">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="split_genders">
+    <span class="toggle-on" id="split_genders_enabled"></span><span class="toggle-off" id="split_genders_disabled"></span>
+  </label>
+</div>
+
 <div style="margin-bottom: 5mm; font-size: 14pt; width: 100%;">
   <div style="width: 240px; float: left;">
     <label id="label_max_participants_" style="width:80cm;margin-top:5px;">Max Participants</label>:
@@ -34,8 +42,7 @@
   <table id="matchtables" border="1" rules="all" style="margin-bottom: 1cm;">
     <tr>
       <th style="width: 0.5cm;" id="no">No.</th>
-      <th style="width: 4cm;" id="name">Name</th>
-      <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
+      <th style="width: 7cm;" id="name">Name</th>
       <th style="width: 3.0cm; text-align: center;">#Participants</th>
     </tr>
   </table>
@@ -64,12 +71,42 @@ document.getElementById("weight_diff").oninput = function() {
 
 
 
+function Add()
+{
+  var data = [];
+  data["min"]  = document.getElementById("min_participants").value;
+  data["max"]  = document.getElementById("max_participants").value;
+  data["diff"] = document.getElementById("weight_diff").value;
+  data["split_genders"] = document.getElementById("split_genders").checked;
+  data["apply"] = true;
+
+  for (var no = 0; no < 1000; no++)
+  {
+    if (document.getElementById("age_group_"+no) == null)
+      break;
+
+    if (document.getElementById("age_group_"+no).checked)
+      data[document.getElementById("age_group_"+no).value] = 1;
+  }
+
+  console.log(data);
+
+  var params = URLEncode(data);
+
+  AjaxPost("ajax/matchtable/generate", params, function(response) {
+    navigate("matchtable_list.html");
+  });
+}
+
+
+
 function Update()
 {
   var data = [];
   data["min"]  = document.getElementById("min_participants").value;
   data["max"]  = document.getElementById("max_participants").value;
   data["diff"] = document.getElementById("weight_diff").value;
+  data["split_genders"] = document.getElementById("split_genders").checked;
 
   for (var no = 0; no < 1000; no++)
   {
@@ -99,8 +136,8 @@ function Update()
       var row = table.insertRow(-1);
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
-      var cell3 = row.insertCell(2);
-      var cell4 = row.insertCell(3);
+      //var cell3 = row.insertCell(2);
+      var cell4 = row.insertCell(2);
 
       console.log(weightclass);
 
@@ -115,8 +152,8 @@ function Update()
       cell2.style.fontSize  = "16pt";
 
       //cell3.innerHTML = weightclass.min + " - " + weightclass.max;
-      cell3.style.textAlign = "center";
-      cell3.style.fontSize  = "16pt";
+      //cell3.style.textAlign = "center";
+      //cell3.style.fontSize  = "16pt";
 
       cell4.innerHTML = weightclass.num_participants;
       cell4.style.textAlign = "center";
@@ -129,7 +166,7 @@ function Update()
 
 function GetAgeGroups_Multiple()
 {
-  AjaxCallback("ajax/age_groups/list", function(response) {
+  AjaxCallback("ajax/age_groups/get", function(response) {
     console.log(response);
     var res = YAML.parse(response);
 
@@ -138,9 +175,11 @@ function GetAgeGroups_Multiple()
     var no = 0;
     for (const age of res)
     {
-      ages.innerHTML += "<label><input type=\"checkbox\" id=\"age_group_"+no+"\" value=\"" + age.uuid + "\" />" + age.name + "</label><br/>";
+      ages.innerHTML += "<label><input type=\"checkbox\" checked id=\"age_group_"+no+"\" value=\"" + age.uuid + "\" onclick='Update();'/>" + age.name + "</label><br/>";
       no++;
     }
+
+    Update();
   });
 }
 
@@ -148,7 +187,6 @@ function GetAgeGroups_Multiple()
 
 
 GetAgeGroups_Multiple();
-Update();
 
 
 document.getElementById("add").innerHTML = lang.add_matchtable;

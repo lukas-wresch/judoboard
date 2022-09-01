@@ -26,6 +26,9 @@ namespace Judoboard
 
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 
+		auto GetLastTournamentName() const { return m_CurrentTournament; }
+		void SetLastTournamentName(const std::string& Name) { m_CurrentTournament = Name; }
+
 		//Judoka
 		Judoka* UpdateOrAdd(const MD5::Participant& NewJudoka);
 		Judoka* UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly, std::string& Output);
@@ -50,6 +53,8 @@ namespace Judoboard
 	private:
 		mutable std::string m_Filename;
 		bool m_AutoSave = true;
+
+		std::string m_CurrentTournament;//Name of tournament that is currently open
 
 		std::vector<Account*> m_Accounts;
 		std::vector<Account::Nonce> m_OpenNonces;

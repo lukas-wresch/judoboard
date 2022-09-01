@@ -23,18 +23,18 @@ void Application::SetupHttpServer()
 		return HttpServer::LoadFile("html/index.html");
 	});
 
-	m_Server.RegisterResource("/style.css", [](auto& Request) { return HttpServer::LoadFile("html/style.css"); }, HttpServer::ResourceType::CSS);
-	m_Server.RegisterResource("/common.js", [](auto& Request) { return HttpServer::LoadFile("html/common.js"); }, HttpServer::ResourceType::JavaScript);
+	m_Server.RegisterResource("/style.css", [](auto& Request) { return HttpServer::LoadFile("html/style.css"); }, HttpServer::ResourceType::CSS, 24*60*60);
+	m_Server.RegisterResource("/common.js", [](auto& Request) { return HttpServer::LoadFile("html/common.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
 
-	m_Server.RegisterResource("/jquery-latest.min.js", [](auto& Request) { return HttpServer::LoadFile("html/jquery-latest.min.js"); }, HttpServer::ResourceType::JavaScript);
-	m_Server.RegisterResource("/jquery-ui.min.js", [](auto& Request) { return HttpServer::LoadFile("html/jquery-ui.min.js"); }, HttpServer::ResourceType::JavaScript);
-	m_Server.RegisterResource("/sha512.min.js", [](auto& Request) { return HttpServer::LoadFile("html/sha512.min.js"); }, HttpServer::ResourceType::JavaScript);
-	m_Server.RegisterResource("/jquery-ui.css", [](auto& Request) { return HttpServer::LoadFile("html/jquery-ui.css"); }, HttpServer::ResourceType::CSS);
+	m_Server.RegisterResource("/jquery-latest.min.js", [](auto& Request) { return HttpServer::LoadFile("html/jquery-latest.min.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
+	m_Server.RegisterResource("/jquery-ui.min.js", [](auto& Request) { return HttpServer::LoadFile("html/jquery-ui.min.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
+	m_Server.RegisterResource("/sha512.min.js", [](auto& Request) { return HttpServer::LoadFile("html/sha512.min.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
+	m_Server.RegisterResource("/jquery-ui.css", [](auto& Request) { return HttpServer::LoadFile("html/jquery-ui.css"); }, HttpServer::ResourceType::CSS, 24*60*60);
 
-	m_Server.RegisterResource("/yaml.min.js", [](auto& Request) { return HttpServer::LoadFile("html/yaml.min.js"); }, HttpServer::ResourceType::JavaScript);
+	m_Server.RegisterResource("/yaml.min.js", [](auto& Request) { return HttpServer::LoadFile("html/yaml.min.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
 
-	m_Server.RegisterResource("/slideout.min.js", [](auto& Request) { return HttpServer::LoadFile("html/slideout.min.js"); }, HttpServer::ResourceType::JavaScript);
-	m_Server.RegisterResource("/menu.png", [](auto& Request) { return HttpServer::LoadFile("html/menu.png"); }, HttpServer::ResourceType::Image_PNG);
+	m_Server.RegisterResource("/slideout.min.js", [](auto& Request) { return HttpServer::LoadFile("html/slideout.min.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
+	m_Server.RegisterResource("/menu.png", [](auto& Request) { return HttpServer::LoadFile("html/menu.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
 
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit",
@@ -162,7 +162,15 @@ void Application::SetupHttpServer()
 
 			AddTournament(new Tournament(md5_file, &GetDatabase()));//apply MD5 file
 
-			return "Parsing OK";
+			std::string output = R"(
+<html>
+	<head>
+		<meta http-equiv = "refresh" content = "5; url=/#tournament_list.html"/>
+	</head>
+</html>
+)";
+
+			return "Parsing OK<br/><br/>" + output;
 		}
 
 		return Error(Error::Type::InvalidFormat);
@@ -251,11 +259,11 @@ void Application::SetupHttpServer()
 	});
 
 
-	m_Server.RegisterResource("/ajax/config/uptime", [this](auto& Request) -> std::string {
+	m_Server.RegisterResource("/ajax/config/status", [this](auto& Request) -> std::string {
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
-		return Ajax_Uptime();
+		return Ajax_Status();
 	});
 
 
@@ -288,9 +296,11 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/get_schedule", [this](auto& Request) -> std::string {
+		LockTillScopeEnd();
+
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
-		LockTillScopeEnd();
+
 		return GetTournament()->Schedule2String();
 	});
 
@@ -330,10 +340,11 @@ void Application::SetupHttpServer()
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
+		LockTillScopeEnd();
+
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		LockTillScopeEnd();
 		return GetTournament()->MasterSchedule2String();
 	});
 
@@ -343,12 +354,13 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return Error(Error::Type::TournamentNotOpen);
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return Error(Error::Type::TournamentNotOpen);
+
 		GetTournament()->MoveScheduleEntryUp(id);
 		return Error();//OK
 	});
@@ -359,12 +371,13 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return Error(Error::Type::TournamentNotOpen);
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return Error(Error::Type::TournamentNotOpen);
+
 		GetTournament()->MoveScheduleEntryDown(id);
 		return Error();//OK
 	});
@@ -398,9 +411,6 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		UUID id  = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		int  mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
 
@@ -408,6 +418,9 @@ void Application::SetupHttpServer()
 			return std::string("Invalid mat id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return std::string("No tournament open");
 
 		if (GetTournament()->GetStatus() == Status::Concluded)
 			return std::string("Tournament is already finalized");
@@ -427,13 +440,13 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 		auto rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return std::string("No tournament open");
 
 		auto match = GetTournament()->FindMatch(id);
 		auto ruleSet = m_Database.FindRuleSetByName(rule);
@@ -453,12 +466,13 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return std::string("No tournament open");
+
 		GetTournament()->MoveMatchUp(id);
 
 		return std::string();
@@ -469,12 +483,13 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return std::string("No tournament open");
+
 		GetTournament()->MoveMatchDown(id);
 
 		return std::string();
@@ -485,12 +500,13 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return std::string("No tournament open");
+
 		bool success = GetTournament()->RemoveMatch(id);
 
 		return std::string();
@@ -501,12 +517,13 @@ void Application::SetupHttpServer()
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
 
-		if (!GetTournament())
-			return std::string("No tournament open");
-
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 		LockTillScopeEnd();
+
+		if (!GetTournament())
+			return std::string("No tournament open");
+
 		auto match = GetTournament()->FindMatch(id);
 
 		if (!match)
@@ -659,6 +676,7 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		LockTillScopeEnd();
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -673,6 +691,7 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		LockTillScopeEnd();
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -698,6 +717,7 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		LockTillScopeEnd();
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -720,6 +740,7 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return (std::string)Error(Error::Type::InvalidID);
 
+		LockTillScopeEnd();
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -746,6 +767,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -763,6 +785,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -780,6 +803,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -797,6 +821,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -813,6 +838,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -829,6 +855,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -845,6 +872,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -861,6 +889,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -878,6 +907,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -893,8 +923,9 @@ void Application::SetupHttpServer()
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 			if (id <= 0)
-				return "Invalid id";
+				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -912,6 +943,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -927,8 +959,9 @@ void Application::SetupHttpServer()
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 			if (id <= 0)
-				return "Invalid id";
+				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -946,6 +979,7 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			LockTillScopeEnd();
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -1254,6 +1288,30 @@ void Application::SetupHttpServer()
 		return Ajax_AddClub(Request);
 	});
 
+	m_Server.RegisterResource("/ajax/club/edit", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_EditClub(Request);
+	});
+
+	m_Server.RegisterResource("/ajax/club/delete", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_DeleteClub(Request);
+	});
+
+	m_Server.RegisterResource("/ajax/club/get", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_GetClub(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/club/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -1467,6 +1525,8 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
+		LockTillScopeEnd();
+
 		if (!GetTournament())
 			return std::string("No tournament open");
 
@@ -1530,6 +1590,8 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
+
+		LockTillScopeEnd();
 
 		if (!GetTournament())
 			return std::string("No tournament is open");
@@ -1601,10 +1663,7 @@ void Application::SetupHttpServer()
 		new_table->SetRuleSet(m_Database.FindRuleSet(rule));
 		new_table->SetAgeGroup(m_Database.FindAgeGroup(age_group));
 
-		LockTillScopeEnd();
-		GetTournament()->Lock();
 		GetTournament()->AddMatchTable(new_table);
-		GetTournament()->Unlock();
 		return Error();//OK
 	});
 
@@ -1690,12 +1749,16 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
+		LockTillScopeEnd();
+
 		if (!GetTournament())
 			return std::string("No tournament is open");
 
-		auto min  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "min"));
-		auto max  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "max"));
-		auto diff = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "diff"));
+		auto min   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "min"));
+		auto max   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "max"));
+		auto diff  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "diff"));
+		auto split = HttpServer::DecodeURLEncoded(Request.m_Body, "split_genders") == "true";
+		auto apply = HttpServer::DecodeURLEncoded(Request.m_Body, "apply") == "true";
 
 		if (min <= 0 || max <= 0 || diff <= 0)
 			return Error(Error::Type::InvalidInput);
@@ -1709,9 +1772,23 @@ void Application::SetupHttpServer()
 				++it;
 		}
 
-		return GetTournament()->GenerateWeightclasses(min, max, diff, age_groups);
+		auto descriptors = GetTournament()->GenerateWeightclasses(min, max, diff, age_groups, split);
+		if (!apply)
+		{
+			YAML::Emitter yaml;
+			yaml << YAML::BeginSeq;
 
-		//return Error();//OK
+			for (const auto& desc : descriptors)
+				desc.ToString(yaml);
+
+			yaml << YAML::EndSeq;
+			return yaml.c_str();
+		}
+
+		if (!GetTournament()->ApplyWeightclasses(descriptors))
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
 	});
 
 
@@ -1719,6 +1796,8 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
+
+		LockTillScopeEnd();
 
 		if (!GetTournament())
 			return std::string("No tournament is open");
@@ -2717,10 +2796,49 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 {
 	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 
-	if (name.size() == 0)
+	if (name.length() == 0)
 		return Error::Type::InvalidInput;
 
+	LockTillScopeEnd();
+
 	m_Database.AddClub(new Club(name));
+	m_Database.Save();
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_EditClub(const HttpServer::Request& Request)
+{
+	UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+
+	if (name.length() == 0)
+		return Error::Type::InvalidInput;
+
+	LockTillScopeEnd();
+
+	auto club = m_Database.FindClub(uuid);
+
+	if (!club)
+		return Error::Type::ItemNotFound;
+
+	club->SetName(name);
+	m_Database.Save();
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_DeleteClub(const HttpServer::Request& Request)
+{
+	UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	LockTillScopeEnd();
+
+	if (!m_Database.DeleteClub(uuid))
+		return Error::Type::OperationFailed;
+
 	m_Database.Save();
 	return Error();//OK
 }
@@ -2731,6 +2849,8 @@ std::string Application::Ajax_ListClubs()
 {
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
+
+	LockTillScopeEnd();
 
 	for (auto club : m_Database.GetAllClubs())
 	{
@@ -2744,10 +2864,32 @@ std::string Application::Ajax_ListClubs()
 
 
 
+std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
+{
+	UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	YAML::Emitter ret;
+
+	LockTillScopeEnd();
+
+	auto club = m_Database.FindClub(uuid);
+
+	if (!club)
+		return Error(Error::Type::ItemNotFound);
+
+	*club >> ret;
+
+	return ret.c_str();
+}
+
+
+
 std::string Application::Ajax_ListAllAgeGroups() const
 {
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
+
+	LockTillScopeEnd();
 
 	for (const auto age_group : GetDatabase().GetAgeGroups())
 	{
@@ -2775,12 +2917,12 @@ std::string Application::Ajax_ListAllAgeGroups() const
 
 std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request)
 {
-	if (!GetTournament())
-		return Error(Error::Type::TournamentNotOpen);
-
 	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
 
 	auto table = GetTournament()->FindMatchTable(id);
 
@@ -2806,10 +2948,12 @@ std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Re
 
 std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request& Request)
 {
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	LockTillScopeEnd();
+
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
-
-	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 	auto table = GetTournament()->FindMatchTable(id);
 
@@ -2832,14 +2976,17 @@ std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request
 
 
 
-ZED::CSV Application::Ajax_Uptime()
+std::string Application::Ajax_Status()
 {
-	ZED::CSV ret;
+	YAML::Emitter ret;
 
-	ret << (Timer::GetTimestamp() - m_StartupTimestamp);
+	ret << YAML::BeginMap;
 
-	ret.AddNewline();
-	return ret;
+	ret << YAML::Key << "version" << YAML::Value << Version;
+	ret << YAML::Key << "uptime"  << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
+
+	ret << YAML::EndMap;
+	return ret.c_str();
 }
 
 
@@ -2851,6 +2998,7 @@ Error Application::Ajax_AddDisqualification(Fighter Whom, const HttpServer::Requ
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	LockTillScopeEnd();
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -2869,6 +3017,7 @@ Error Application::Ajax_RemoveDisqualification(Fighter Whom, const HttpServer::R
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	LockTillScopeEnd();
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -2887,6 +3036,7 @@ Error Application::Ajax_NoDisqualification(Fighter Whom, const HttpServer::Reque
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	LockTillScopeEnd();
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -2905,6 +3055,7 @@ Error Application::Ajax_RemoveNoDisqualification(Fighter Whom, const HttpServer:
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	LockTillScopeEnd();
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -2918,29 +3069,36 @@ Error Application::Ajax_RemoveNoDisqualification(Fighter Whom, const HttpServer:
 
 std::string Application::Ajax_GetHansokumake() const
 {
+	LockTillScopeEnd();
+
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
 
-	ZED::CSV ret;
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
 
-	LockTillScopeEnd();
 	for (auto mat : GetMats())
 	{
-		if (!mat) continue;
-		if (!mat->GetMatch()) continue;
+		if (!mat || !mat->GetMatch()) continue;
 
 		for (Fighter fighter = Fighter::White; fighter <= Fighter::Blue; ++fighter)
 		{
 			if (mat->GetScoreboard(fighter).m_HansokuMake && mat->GetScoreboard(fighter).m_HansokuMake_Direct)
 			{
-				ret << mat->GetMatch()->ToString();
-				ret << fighter;
-				ret << mat->GetScoreboard(fighter).m_Disqualification;//Disqualification state
+				ret << YAML::BeginMap;
+
+				ret << YAML::Key << "match" << YAML::Value;
+				mat->GetMatch()->ToString(ret);
+				ret << YAML::Key << "fighter" << YAML::Value << (int)fighter;
+				ret << YAML::Key << "disqualification_state" << YAML::Value << (int)mat->GetScoreboard(fighter).m_Disqualification;
+
+				ret << YAML::EndMap;
 			}
 		}
 	}
 
-	return ret;
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 
@@ -2952,6 +3110,7 @@ Error Application::Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	LockTillScopeEnd();
 	auto mat = FindMat(id);
 
 	if (!mat)

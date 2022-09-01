@@ -27,20 +27,6 @@ RuleSet::RuleSet(const std::string& Name, uint32_t MatchTime, int GoldenScoreTim
 
 
 
-RuleSet::RuleSet(ZED::CSV& Stream)
-{
-	Stream >> m_Name;
-
-	std::string uuid;
-	Stream >> uuid;
-	SetUUID(std::move(uuid));
-
-	Stream >> m_MatchTime >> m_GoldenScoreTime >> m_OsaeKomiTime >> m_OsaeKomiTime_With_WazaAri >> m_BreakTime;
-	Stream >> m_Yuko >> m_Koka >> m_Draw;
-}
-
-
-
 RuleSet::RuleSet(const YAML::Node& Yaml)
 {
 	if (Yaml["uuid"])
@@ -65,19 +51,6 @@ RuleSet::RuleSet(const YAML::Node& Yaml)
 		m_Koka = Yaml["koka"].as<bool>();
 	if (Yaml["draw"])
 		m_Draw = Yaml["draw"].as<bool>();
-}
-
-
-
-void RuleSet::operator >>(ZED::CSV& Stream) const
-{
-	Stream << m_Name;
-
-	Stream << (std::string)GetUUID();
-
-	Stream << m_MatchTime << m_GoldenScoreTime << m_OsaeKomiTime << m_OsaeKomiTime_With_WazaAri << m_BreakTime;
-	Stream << m_Yuko << m_Koka << m_Draw;
-	Stream.AddNewline();//Also needed to flush the stream
 }
 
 

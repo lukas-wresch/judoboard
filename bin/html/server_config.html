@@ -13,6 +13,11 @@
 <br/>
 
 <div style="margin-top: 2cm;">
+    <label style="width:150px;float:left;" id="label_version">Judoboard version</label>
+    <span  id="version">???</span>
+</div>
+
+<div style="margin-top: 5mm;">
     <label style="width:150px;float:left;" id="label_uptime">Uptime</label>
     <span  id="uptime">???</span>
 </div>
@@ -105,20 +110,17 @@ function Update()
 
 
 
-function GetUptime()
+function GetStatus()
 {
-  AjaxCallback("ajax/config/uptime", function(response) {
-    var res = response.split(",");
+  AjaxCallback("ajax/config/status", function(response) {
+    var res = YAML.parse(response);
 
-    if (res.length < 1)
-      return;
-
-    var uptime = res[0];
-
-    document.getElementById("uptime").innerHTML = NiceLargeTime(uptime);
+    document.getElementById("version").innerHTML = res.version;
+    document.getElementById("uptime").innerHTML  = NiceLargeTime(res.uptime);
   });
 }
 
 
 
-GetUptime();
+GetStatus();
+TimerID = window.setInterval(GetStatus, 1000);

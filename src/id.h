@@ -38,6 +38,12 @@ namespace Judoboard
 	};
 
 
+	inline bool operator == (const std::string& lhs, const UUID& rhs) noexcept
+	{
+		return lhs == (std::string)rhs;
+	}
+
+
 
 	class ID
 	{
@@ -60,7 +66,6 @@ namespace Judoboard
 	private:
 		UUID m_UUID;
 
-		static uint32_t s_NextID;
 		static std::unordered_set<UUID> s_UsedUUIDs;
 	};
 }

@@ -56,7 +56,7 @@ void StandingData::operator << (YAML::Node& Yaml)
 
 		for (const auto& node : Yaml["judoka"])
 		{
-			Judoka* newJudoka = new Judoka(node);
+			Judoka* newJudoka = new Judoka(node, this);
 			m_Judokas.insert({ (std::string)newJudoka->GetUUID(), newJudoka });
 		}
 	}
@@ -328,6 +328,22 @@ const Club* StandingData::FindClubByName(const std::string& Name) const
 			return club;
 
 	return nullptr;
+}
+
+
+
+bool StandingData::DeleteClub(const UUID& UUID)
+{
+	for (auto it = m_Clubs.begin(); it != m_Clubs.end(); ++it)
+	{
+		if (*it && (*it)->GetUUID() == UUID)
+		{
+			m_Clubs.erase(it);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 
