@@ -1297,7 +1297,7 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 
 		for (auto weight_desc : desc.m_Collection)
 		{
-			auto new_weightclass = new Weightclass(this, weight_desc.m_Min, weight_desc.m_Max, desc.m_Gender);
+			auto new_weightclass = new Weightclass(weight_desc.m_Min, weight_desc.m_Max, desc.m_Gender, this);
 
 			new_weightclass->SetAgeGroup(desc.m_AgeGroup);
 			new_weightclass->SetMatID(1);

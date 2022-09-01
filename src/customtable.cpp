@@ -172,3 +172,9 @@ const std::string CustomTable::ToHTML() const
 
 	return ret;
 }
+
+
+
+void CustomTable::ToString(YAML::Emitter& Yaml) const
+{
+}

@@ -27,7 +27,7 @@ namespace Judoboard
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
-		virtual const std::string ToString() const override;
+		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 
 	private:

@@ -269,8 +269,6 @@ namespace Judoboard
 		void SetScheduleIndex(int32_t ScheduleIndex) { m_ScheduleIndex = ScheduleIndex; }
 
 		//Serialization
-		virtual const std::string ToString() const;
-
 		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual void ToString(YAML::Emitter& Yaml) const;
 
@@ -285,10 +283,6 @@ namespace Judoboard
 
 		Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
-
-		//Serialization
-		virtual void operator >> (YAML::Emitter& Yaml) const;
-		virtual void ToString(YAML::Emitter& Yaml) const;
 
 		const ITournament* GetTournament() const { return m_Tournament; }
 

@@ -185,7 +185,7 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 
 
 
-MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : Schedulable(Yaml, Tournament)
+MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tournament(Tournament)
 {
 	if (Yaml["name"])
 		m_Name = Yaml["name"].as<std::string>();
