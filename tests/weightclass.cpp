@@ -255,3 +255,34 @@ TEST(Weightclass, CorrectOrder6)
 	EXPECT_EQ(w.GetSchedule()[14]->GetFighter(Fighter::White)->GetUUID(), j4.GetUUID());
 	EXPECT_EQ(w.GetSchedule()[14]->GetFighter(Fighter::Blue )->GetUUID(), j3.GetUUID());
 }
+
+
+
+TEST(Weightclass, ExportImport)
+{
+	initialize();
+
+	Judoka j1(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
+	Judoka j2(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
+
+	Weightclass w(10, 100);
+
+	EXPECT_TRUE(w.AddParticipant(&j1));
+	EXPECT_TRUE(w.AddParticipant(&j2));
+
+	w.GenerateSchedule();
+	ASSERT_EQ(w.GetSchedule().size(), 1);
+
+
+	{
+		YAML::Emitter yaml;
+		yaml << YAML::BeginMap;
+		w >> yaml;
+		yaml << YAML::EndMap;
+
+		Weightclass group2(YAML::Load(yaml.c_str()));
+
+		EXPECT_EQ(group2.GetSchedule().size(), w.GetSchedule().size());
+		EXPECT_EQ(group2.ToHTML(), w.ToHTML());
+	}
+}

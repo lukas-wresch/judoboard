@@ -29,6 +29,11 @@ Match::Match(const YAML::Node& Yaml, ITournament* Tournament) : m_Tournament(Tou
 	if (!Yaml.IsMap())
 		return;
 
+	if (Yaml["uuid"])
+		SetUUID(Yaml["uuid"].as<std::string>());
+	if (Yaml["mat_id"])
+		m_MatID = Yaml["mat_id"].as<int>();
+
 	if (Yaml["white"] && Tournament)
 		m_White.m_Judoka = Tournament->FindParticipant(Yaml["white"].as<std::string>());
 	if (Yaml["blue"] && Tournament)
