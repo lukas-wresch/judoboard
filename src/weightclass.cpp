@@ -192,6 +192,11 @@ std::string Weightclass::GetHTMLForm()
 
 bool Weightclass::IsElgiable(const Judoka& Fighter) const
 {
+	//Is already in this weight class?
+	for (auto judoka : GetParticipants())
+		if (*judoka == Fighter)
+			return false;
+
 	if (m_MaxWeight == 0)//No maximum weight
 	{
 		if (m_MinWeight > Fighter.GetWeight())

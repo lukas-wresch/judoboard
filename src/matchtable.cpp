@@ -205,6 +205,12 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tour
 				m_Participants.emplace_back(participant);
 		}
 	}
+
+	if (Yaml["matches"] && Yaml["matches"].IsSequence())
+	{
+		for (const auto& node : Yaml["matches"])
+			m_Schedule.emplace_back(new Match(node, Tournament));
+	}
 }
 
 
@@ -230,6 +236,14 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 
 	for (auto judoka : m_Participants)
 		Yaml << (std::string)judoka->GetUUID();
+
+	Yaml << YAML::EndSeq;
+
+	Yaml << YAML::Key << "matches";
+	Yaml << YAML::BeginSeq;
+
+	for (auto match : m_Schedule)
+		*match >> Yaml;
 
 	Yaml << YAML::EndSeq;
 }

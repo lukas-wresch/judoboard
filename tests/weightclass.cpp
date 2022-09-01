@@ -262,27 +262,34 @@ TEST(Weightclass, ExportImport)
 {
 	initialize();
 
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	Tournament t("deleteMe");
+	t.EnableAutoSave(false);
+
 	Judoka j1(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 	Judoka j2(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 
-	Weightclass w(10, 100);
+	auto w = new Weightclass(10, 100);
 
-	EXPECT_TRUE(w.AddParticipant(&j1));
-	EXPECT_TRUE(w.AddParticipant(&j2));
+	EXPECT_TRUE(w->AddParticipant(&j1));
+	EXPECT_TRUE(w->AddParticipant(&j2));
 
-	w.GenerateSchedule();
-	ASSERT_EQ(w.GetSchedule().size(), 1);
+	w->GenerateSchedule();
+	ASSERT_EQ(w->GetSchedule().size(), 1);
+
+	t.AddMatchTable(w);
 
 
 	{
 		YAML::Emitter yaml;
 		yaml << YAML::BeginMap;
-		w >> yaml;
+		*w >> yaml;
 		yaml << YAML::EndMap;
 
-		Weightclass group2(YAML::Load(yaml.c_str()));
+		Weightclass group2(YAML::Load(yaml.c_str()), &t);
 
-		EXPECT_EQ(group2.GetSchedule().size(), w.GetSchedule().size());
-		EXPECT_EQ(group2.ToHTML(), w.ToHTML());
+		EXPECT_EQ(group2.GetSchedule().size(), w->GetSchedule().size());
+		EXPECT_EQ(group2.ToHTML(), w->ToHTML());
 	}
 }

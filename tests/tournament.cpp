@@ -819,3 +819,31 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 	EXPECT_TRUE(tourney.AddMatch(&match2));
 	delete mat;
 }
+
+
+
+TEST(Tournament, AddParticpantsWhenAddingMatchTable)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	Tournament t("deleteMe");
+	t.EnableAutoSave(false);
+
+	Judoka j1(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
+	Judoka j2(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
+
+	auto w = new Weightclass(10, 100);
+
+	EXPECT_TRUE(w->AddParticipant(&j1));
+	EXPECT_TRUE(w->AddParticipant(&j2));
+
+	w->GenerateSchedule();
+	EXPECT_EQ(w->GetSchedule().size(), 1);
+
+	t.AddMatchTable(w);
+
+	EXPECT_EQ(t.GetParticipants().size(), 2);
+	EXPECT_EQ(t.GetSchedule().size(),     1);
+}
