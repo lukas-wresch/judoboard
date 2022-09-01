@@ -81,13 +81,10 @@ void Match::operator >>(YAML::Emitter& Yaml) const
 	if (m_MatID != 0)
 		Yaml << YAML::Key << "mat_id" << YAML::Value << m_MatID;
 
-	if (!GetFighter(Fighter::White) || !GetFighter(Fighter::Blue))
-		ZED::Log::Error("NOT IMPLEMENTED");//DEBUG NOT IMPLEMENTED
-	else
-	{
+	if (GetFighter(Fighter::White))
 		Yaml << YAML::Key << "white" << YAML::Value << (std::string)GetFighter(Fighter::White)->GetUUID();
+	if (GetFighter(Fighter::Blue))
 		Yaml << YAML::Key << "blue"  << YAML::Value << (std::string)GetFighter(Fighter::Blue )->GetUUID();
-	}
 
 	Yaml << YAML::Key << "state"  << YAML::Value << (int)m_State;
 

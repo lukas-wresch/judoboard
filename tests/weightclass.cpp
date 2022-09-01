@@ -290,6 +290,7 @@ TEST(Weightclass, ExportImport)
 		Weightclass group2(YAML::Load(yaml.c_str()), &t);
 
 		EXPECT_EQ(group2.GetSchedule().size(), w->GetSchedule().size());
-		EXPECT_EQ(group2.ToHTML(), w->ToHTML());
+		EXPECT_EQ(group2.ToHTML(),  w->ToHTML());
+		EXPECT_EQ(group2.GetUUID(), w->GetUUID());
 	}
 }

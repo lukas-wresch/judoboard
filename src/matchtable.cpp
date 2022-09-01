@@ -187,6 +187,11 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 
 MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tournament(Tournament)
 {
+	if (Yaml["uuid"])
+		SetUUID(Yaml["uuid"].as<std::string>());
+	if (Yaml["mat_id"])
+		m_MatID = Yaml["mat_id"].as<int>();
+
 	if (Yaml["name"])
 		m_Name = Yaml["name"].as<std::string>();
 

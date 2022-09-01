@@ -311,6 +311,7 @@ TEST(Tournament, BestOf3_Matchtable)
 		auto matchtable = new Weightclass(50, 60);
 		matchtable->IsBestOfThree(true);
 		tourney.AddMatchTable(matchtable);
+		tourney.GenerateSchedule();
 
 		EXPECT_EQ(tourney.GetMatchTables().size(), 1);
 
@@ -538,6 +539,7 @@ TEST(Tournament, SaveAndLoad)
 		tourney->AddMatchTable(new Weightclass(60, 65));
 		tourney->AddMatch(Match(tourney, &j1, &j3, 1));
 		tourney->AddMatch(Match(tourney, &j1, &j4, 2));
+		tourney->GenerateSchedule();
 
 		tourney->Disqualify(j1);
 
@@ -696,6 +698,7 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 		tourney->AddMatchTable(new Weightclass(60, 65));
 		tourney->AddMatch(Match(tourney, &j1, &j3, 2));
 		tourney->AddMatch(Match(tourney, &j1, &j4, 2));
+		tourney->GenerateSchedule();
 
 		tourney->EnableAutoSave(false);
 

@@ -333,7 +333,28 @@ TEST(SingleElimination, Count5_ExportImport)
 	group >> yaml;
 	yaml << YAML::EndMap;
 
-	SingleElimination group2(YAML::Load(yaml.c_str()));
+	SingleElimination group2(YAML::Load(yaml.c_str()), t);
+
+	EXPECT_EQ(group.GetMatID(), group2.GetMatID());
+	EXPECT_EQ(group.GetParticipants().size(), group2.GetParticipants().size());
+	ASSERT_EQ(group.GetSchedule().size(),     group2.GetSchedule().size());
+
+	for (int i = 0; i < group.GetSchedule().size(); ++i)
+	{
+		EXPECT_EQ(group.GetSchedule()[i]->GetUUID(), group2.GetSchedule()[i]->GetUUID());
+
+		if (group.GetSchedule()[i]->GetFighter(Fighter::White))
+		{
+			ASSERT_TRUE(group2.GetSchedule()[i]->GetFighter(Fighter::White));
+			EXPECT_EQ(group.GetSchedule()[i]->GetFighter(Fighter::White)->GetName(), group2.GetSchedule()[i]->GetFighter(Fighter::White)->GetName());
+		}
+
+		if (group.GetSchedule()[i]->GetFighter(Fighter::Blue))
+		{
+			ASSERT_TRUE(group2.GetSchedule()[i]->GetFighter(Fighter::Blue));
+			EXPECT_EQ(group.GetSchedule()[i]->GetFighter(Fighter::Blue)->GetName(), group2.GetSchedule()[i]->GetFighter(Fighter::Blue)->GetName());
+		}
+	}
 
 	EXPECT_EQ(group.ToHTML().length(), group2.ToHTML().length());
 	EXPECT_EQ(group.ToHTML(), group2.ToHTML());

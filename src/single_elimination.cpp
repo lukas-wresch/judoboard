@@ -31,8 +31,6 @@ SingleElimination::SingleElimination(const YAML::Node& Yaml, ITournament* Tourna
 		for (const auto& node : Yaml["starting_positions"])
 			m_StartingPositions.insert({ node.first.as<int>(), Tournament->FindParticipant(node.second.as<std::string>())  });
 	}
-
-	GenerateSchedule();//To generate m_ScheduleWithEmptyMatches
 }
 
 
@@ -43,7 +41,7 @@ void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 
 	if (m_ThirdPlaceMatch)
 		Yaml << YAML::Key << "third_place_match" << YAML::Value << m_ThirdPlaceMatch;
-	if (m_ThirdPlaceMatch)
+	if (m_FifthPlaceMatch)
 		Yaml << YAML::Key << "fifth_place_match" << YAML::Value << m_FifthPlaceMatch;
 
 	if (!m_StartingPositions.empty())
@@ -162,18 +160,6 @@ void SingleElimination::GenerateSchedule()
 		}
 	}
 
-	//Copy complete schedule with 'empty' matches
-	m_ScheduleWithEmptyMatches = GetSchedule();
-
-	//Remove empty matches of schedule
-	for (auto it = m_Schedule.begin(); it != m_Schedule.end();)
-	{
-		if ((*it)->IsEmptyMatch())
-			it = m_Schedule.erase(it);
-		else
-			++it;
-	}
-
 	
 	//Add additional matches for best of three
 	if (IsBestOfThree())
@@ -276,10 +262,10 @@ const std::string SingleElimination::ToHTML() const
 
 		matchIndex += matchOfRound;
 
-		if (matchIndex >= m_ScheduleWithEmptyMatches.size())
+		if (matchIndex >= GetSchedule().size())
 			return "";
 
-		auto match = m_ScheduleWithEmptyMatches[matchIndex];
+		auto match = GetSchedule()[matchIndex];
 
 		std::string ret = "<td>";
 

@@ -66,8 +66,6 @@ namespace Judoboard
 
 		std::unordered_map<size_t, const Judoka*> m_StartingPositions;
 
-		std::vector<Match*> m_ScheduleWithEmptyMatches;
-
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;
 	};

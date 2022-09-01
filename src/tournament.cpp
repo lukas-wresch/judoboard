@@ -877,7 +877,6 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 	if (NewMatchTable->GetScheduleIndex() < 0)//No schedule index?
 		NewMatchTable->SetScheduleIndex(GetFreeScheduleIndex());//Take the first empty slot
-	NewMatchTable->GenerateSchedule();
 
 	//Find a new color for this match table
 	Color match_table_color = Color::Name::Blue;
@@ -891,7 +890,12 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	m_MatchTables.push_back(NewMatchTable);
 	m_SchedulePlanner.push_back(NewMatchTable);
 
-	GenerateSchedule();
+	//Copy over matches
+	for (auto match : NewMatchTable->GetSchedule())
+	{
+		if (!match->IsEmptyMatch())
+			m_Schedule.emplace_back(match);
+	}
 
 	Unlock();
 }
