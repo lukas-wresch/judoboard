@@ -377,15 +377,15 @@ TEST(App, MatchOnSlave)
 
 	Judoka j1("White", "LastnameW");
 	Judoka j2("Blue",  "LastnameB");
-	Match match(nullptr, &j1, &j2);
-	match.SetMatID(2);
+	Match* match = new Match(nullptr, &j1, &j2);
+	match->SetMatID(2);
 
-	master.GetTournament()->AddMatch(&match);
+	master.GetTournament()->AddMatch(match);
 
 	auto mat = master.FindMat(2);
 
 	ASSERT_TRUE(mat != nullptr);
-	ASSERT_TRUE(mat->StartMatch(&match));
+	ASSERT_TRUE(mat->StartMatch(match));
 
 	ZED::Core::Pause(2000);
 
@@ -399,8 +399,8 @@ TEST(App, MatchOnSlave)
 
 	ZED::Core::Pause(100);
 
-	EXPECT_EQ(match.GetMatchResult().m_Winner, Fighter::White);
-	EXPECT_EQ(match.GetMatchResult().m_Score, Match::Score::Ippon);
+	EXPECT_EQ(match->GetMatchResult().m_Winner, Fighter::White);
+	EXPECT_EQ(match->GetMatchResult().m_Score, Match::Score::Ippon);
 }
 
 

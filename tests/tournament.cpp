@@ -553,7 +553,7 @@ TEST(Tournament, SaveAndLoad)
 
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		EXPECT_EQ(t.GetParticipants().size(), 4);
-		EXPECT_EQ(t.GetMatchTables().size(), 2);
+		EXPECT_EQ(t.GetMatchTables().size(), 4);
 		EXPECT_EQ(t.GetSchedule().size(), 4);
 
 		EXPECT_TRUE(t.IsDisqualified(j1));
