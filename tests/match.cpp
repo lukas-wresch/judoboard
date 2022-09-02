@@ -186,6 +186,11 @@ TEST(Match, BestOf3ExportImport)
 
 		m3->SetBestOfThree(m1, m2);
 
+		auto dep = m3->GetDependentMatches();
+		ASSERT_EQ(dep.size(), 2);
+		EXPECT_EQ(dep[0], m1);
+		EXPECT_EQ(dep[1], m2);
+
 		tourney.AddMatch(m1);
 		tourney.AddMatch(m2);
 		tourney.AddMatch(m3);

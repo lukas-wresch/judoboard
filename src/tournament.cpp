@@ -609,9 +609,13 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
 
 Match* Tournament::FindMatch(const UUID& UUID) const
 {
-	for (auto match : m_Schedule)
+	for (auto table : m_MatchTables)
+		for (auto match : table->GetSchedule())
+			if (match->GetUUID() == UUID)
+				return match;
+	/*for (auto match : m_Schedule)
 		if (match && match->GetUUID() == UUID)
-			return match;
+			return match;*/
 	return nullptr;
 }
 
