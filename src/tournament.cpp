@@ -263,6 +263,9 @@ bool Tournament::LoadYAML(const std::string& Filename)
 	{
 		for (const auto& node : yaml["schedule"])
 		{
+			if (!node.IsScalar())
+				continue;
+
 			UUID id = node.as<std::string>();
 			for (auto table : m_MatchTables)
 				for (auto match : table->GetSchedule())
