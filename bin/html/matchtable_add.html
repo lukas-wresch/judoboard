@@ -64,7 +64,7 @@
       <th style="width: 4cm;" id="name">Name</th>
       <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
       <th style="width: 2cm; text-align: center;" id="matches">#Matches</th>
-      <th style="width: 3.0cm; text-align: center;">Options</th>
+      <th style="width: 3.5cm; text-align: center;">Options</th>
     </tr>
   </table>
 </div>
@@ -195,6 +195,15 @@ function DeleteMatchtable()
 
 
 
+function SetStartPos(uuid, startpos)
+{
+  AjaxCallback('ajax/matchtable/set_start_pos?id=' + uuid + '&startpos=' + startpos, function() {
+      GetMatchTable(id);
+  });
+}
+
+
+
 function GetMatchTable(id)
 {
   AjaxCallback("ajax/matchtable/get?id="+id, function(response) {
@@ -248,7 +257,10 @@ function GetMatchTable(id)
          if (no%2 == 0)
            row.style.backgroundColor = "#eee";
 
-         cell0.innerHTML = no;
+         if (typeof judoka.starting_pos == 'undefined')
+           cell0.innerHTML = no;
+         else
+           cell0.innerHTML = judoka.starting_pos + 1;
          cell0.style.textAlign = "center";
          cell0.style.fontSize  = "14pt";
 
@@ -260,7 +272,15 @@ function GetMatchTable(id)
          cell3.style.textAlign = "center";
          cell3.style.fontSize  = "16pt";
 
-         cell4.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+judoka.uuid+")\">" + lang.remove + "</button>";
+         var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
+
+         var options = "<table><tr><td rowspan=\"2\"><button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+judoka.uuid+")\">" + lang.remove + "</button></td>";
+         if (typeof judoka.starting_pos !== 'undefined')
+           options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+","+(judoka.starting_pos-1)+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+","+(judoka.starting_pos+1)+"');\"></a></td></tr></table>";
+         else
+           options += "<td></td></tr><tr><td></td></tr></table>";
+
+         cell4.innerHTML = options;
          cell4.style.textAlign = "center";
        }
      }

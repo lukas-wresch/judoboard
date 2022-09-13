@@ -32,7 +32,7 @@ namespace Judoboard
 		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; }
 		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; }
 
-		size_t GetStartingPosition(const Judoka* Judoka) const;
+		virtual size_t GetStartingPosition(const Judoka* Judoka) const override;
 		void SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition);
 
 		//Serialization

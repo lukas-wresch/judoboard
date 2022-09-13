@@ -104,6 +104,8 @@ bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
 		}
 	}
 
+	SortParticipantsByStartingPosition();
+
 	return true;
 }
 

@@ -229,6 +229,8 @@ namespace Judoboard
 		virtual void GenerateSchedule() = 0;
 		virtual const std::string ToHTML() const = 0;
 
+		virtual size_t GetStartingPosition(const Judoka* Judoka) const { return -1; }
+
 		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false);
 		virtual void RemoveAllParticipants() {
 			m_Participants.clear();
@@ -285,6 +287,12 @@ namespace Judoboard
 		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 
 		const ITournament* GetTournament() const { return m_Tournament; }
+
+		void SortParticipantsByStartingPosition() {
+			std::sort(m_Participants.begin(), m_Participants.end(), [this](const Judoka* a, const Judoka* b) {
+				return GetStartingPosition(a) < GetStartingPosition(b);
+			});
+		}
 
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called

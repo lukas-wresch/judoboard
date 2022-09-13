@@ -284,7 +284,16 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::BeginSeq;
 
 	for (auto judoka : m_Participants)
-		judoka->ToString(Yaml);
+	{
+		Yaml << YAML::BeginMap;
+		Yaml << YAML::Key << "uuid"      << YAML::Value << (std::string)judoka->GetUUID();
+		Yaml << YAML::Key << "firstname" << YAML::Value << judoka->GetFirstname();
+		Yaml << YAML::Key << "lastname"  << YAML::Value << judoka->GetLastname();
+		Yaml << YAML::Key << "weight"    << YAML::Value << judoka->GetWeight().ToString();
+		if (GetStartingPosition(judoka) != -1)
+			Yaml << YAML::Key << "starting_pos" << YAML::Value << GetStartingPosition(judoka);
+		Yaml << YAML::EndMap;
+	}
 
 	Yaml << YAML::EndSeq;
 }
