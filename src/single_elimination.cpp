@@ -336,6 +336,8 @@ const std::string SingleElimination::ToHTML() const
 
 		ret += "</tr>";
 	}
+
+	ret += "</table>";
 	
 
 	return ret;

@@ -200,6 +200,8 @@ function SetStartPos(uuid, startpos)
   AjaxCallback('ajax/matchtable/set_start_pos?id=' + uuid + '&startpos=' + startpos, function() {
       GetMatchTable(id);
   });
+
+  return false;
 }
 
 
