@@ -450,6 +450,44 @@ TEST(Ajax, Clubs_Delete)
 
 
 
+TEST(Ajax, ListAssociations)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("database.yml");
+		Application app;
+
+		auto assoc1 = new Association("Assoc 1");
+		app.GetDatabase().AddAssociation(assoc1);
+
+		YAML::Node yaml = YAML::Load(app.Ajax_ListAssociations());
+
+		ASSERT_EQ(yaml.size(), 1);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Assoc 1");
+		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
+
+
+		auto assoc2 = new Association("Assoc 2", assoc1);
+		app.GetDatabase().AddAssociation(assoc2);
+
+		yaml = YAML::Load(app.Ajax_ListAssociations());
+
+		ASSERT_EQ(yaml.size(), 2);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Assoc 1");
+		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
+
+		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "Assoc 2");
+		EXPECT_EQ(yaml[1]["uuid"].as<std::string>(), (std::string)assoc2->GetUUID());
+		EXPECT_EQ(yaml[1]["parent_name"].as<std::string>(), "Assoc 1");
+		EXPECT_EQ(yaml[1]["parent_uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
+	}
+
+	ZED::Core::RemoveFile("database.yml");
+}
+
+
+
 TEST(Ajax, Status)
 {
 	initialize();

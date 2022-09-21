@@ -118,6 +118,9 @@ namespace Judoboard
 		std::string Ajax_ListClubs();
 		std::string Ajax_GetClub(const HttpServer::Request& Request);
 
+		//Associations
+		std::string Ajax_ListAssociations();
+
 		//Rule sets
 
 		//Age groups

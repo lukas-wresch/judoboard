@@ -38,7 +38,7 @@ void Application::SetupHttpServer()
 
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit",
-		"club_list", "club_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
+		"club_list", "club_add", "association_list", "association_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
 		"matchtable_list", "matchtable_add", "matchtable_creator", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add",
 		"server_config"
 	};
@@ -1318,6 +1318,14 @@ void Application::SetupHttpServer()
 			return error;
 
 		return Ajax_ListClubs();
+	});
+
+	m_Server.RegisterResource("/ajax/association/list", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_ListAssociations();
 	});
 
 
@@ -2877,6 +2885,7 @@ std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
 {
 	UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+
 	YAML::Emitter ret;
 
 	LockTillScopeEnd();
@@ -2888,6 +2897,23 @@ std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
 
 	*club >> ret;
 
+	return ret.c_str();
+}
+
+
+
+std::string Application::Ajax_ListAssociations()
+{
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
+	for (auto club : m_Database.GetAllAssociations())
+	{
+		if (club)
+			club->ToString(ret);
+	}
+
+	ret << YAML::EndSeq;
 	return ret.c_str();
 }
 
