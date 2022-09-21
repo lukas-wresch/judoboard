@@ -233,7 +233,11 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tour
 	if (Yaml["matches"] && Yaml["matches"].IsSequence())
 	{
 		for (const auto& node : Yaml["matches"])
-			m_Schedule.emplace_back(new Match(node, Tournament));
+		{
+			auto new_match = new Match(node, Tournament);
+			new_match->SetMatchTable(this);
+			m_Schedule.emplace_back(new_match);
+		}
 	}
 }
 
