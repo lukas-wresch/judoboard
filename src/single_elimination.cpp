@@ -227,16 +227,17 @@ void SingleElimination::SetStartingPosition(const Judoka* Judoka, size_t NewStar
 	if (!Judoka)
 		return;
 
+	auto my_old_pos = GetStartingPosition(Judoka);
+	m_StartingPositions.erase(my_old_pos);
+
 	if (IsStartPositionTaken(NewStartingPosition))
 	{
 		auto judoka_on_slot = GetJudokaByStartPosition(NewStartingPosition);
-		auto my_old_pos     = GetStartingPosition(Judoka);
 
-		m_StartingPositions.erase(my_old_pos);
+		m_StartingPositions.erase(GetStartingPosition(judoka_on_slot));
 		m_StartingPositions.insert({ my_old_pos, judoka_on_slot });
 	}
 
-	m_StartingPositions.erase(GetStartingPosition(Judoka));
 	m_StartingPositions.insert({ NewStartingPosition, Judoka });
 
 	SortParticipantsByStartingPosition();
