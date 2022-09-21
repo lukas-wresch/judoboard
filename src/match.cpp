@@ -158,6 +158,7 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	{
 		Yaml << YAML::Key << "match_table" << YAML::Value << (std::string)GetMatchTable()->GetUUID();
 		Yaml << YAML::Key << "match_table_name" << YAML::Value << GetMatchTable()->GetDescription();
+		Yaml << YAML::Key << "color" << YAML::Value << GetMatchTable()->GetColor().ToHexString();
 	}
 
 	Yaml << YAML::Key << "winner" << YAML::Value << (int)m_Result.m_Winner;
