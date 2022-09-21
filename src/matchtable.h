@@ -230,6 +230,7 @@ namespace Judoboard
 		virtual const std::string ToHTML() const = 0;
 
 		virtual size_t GetStartingPosition(const Judoka* Judoka) const { return -1; }
+		virtual void   SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition) {}
 
 		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false);
 		virtual void RemoveAllParticipants() {
@@ -254,6 +255,8 @@ namespace Judoboard
 
 		virtual Color GetColor() const { return m_Color; }
 		void  SetColor(Color NewColor) { m_Color = NewColor; }
+
+		Judoka* FindParticipant(const UUID& UUID) const;
 
 		//Rule sets
 		const RuleSet& GetRuleSet() const;

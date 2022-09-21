@@ -197,7 +197,7 @@ function DeleteMatchtable()
 
 function SetStartPos(uuid, startpos)
 {
-  AjaxCallback('ajax/matchtable/set_start_pos?id=' + uuid + '&startpos=' + startpos, function() {
+  AjaxCallback('ajax/matchtable/set_start_pos?id=' + id + '&judoka=' + uuid + '&startpos=' + startpos, function() {
       GetMatchTable(id);
   });
 

@@ -695,6 +695,42 @@ TEST(Ajax, GetMatchesFromMatchTable)
 
 
 
+TEST(Ajax, SetStartingPosition)
+{
+	initialize();
+
+	Application app;
+
+	auto j1 = new Judoka(GetRandomName(), GetRandomName(), 50);
+	auto j2 = new Judoka(GetRandomName(), GetRandomName(), 50);
+	auto j3 = new Judoka(GetRandomName(), GetRandomName(), 50);
+
+	app.GetTournament()->AddParticipant(j1);
+	app.GetTournament()->AddParticipant(j2);
+	app.GetTournament()->AddParticipant(j3);
+
+	auto table = new SingleElimination(10, 100);
+	app.GetTournament()->AddMatchTable(table);
+
+	for (int i = 0; i < 100; ++i)
+	{
+		int startpos = rand() % 4;
+		YAML::Node yaml = YAML::Load(app.Ajax_SetStartingPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j1->GetUUID() + "&startpos=" + std::to_string(startpos) )));
+
+		EXPECT_EQ(table->GetStartingPosition(j1), startpos);
+	}
+
+	for (int i = 0; i < 100; ++i)
+	{
+		int startpos = rand() % 4;
+		YAML::Node yaml = YAML::Load(app.Ajax_SetStartingPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j2->GetUUID() + "&startpos=" + std::to_string(startpos) )));
+
+		EXPECT_EQ(table->GetStartingPosition(j2), startpos);
+	}
+}
+
+
+
 TEST(Ajax, ListAgeGroups)
 {
 	initialize();

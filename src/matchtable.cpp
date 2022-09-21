@@ -30,9 +30,19 @@ void MatchTable::SetMatID(int32_t MatID)
 
 
 
+Judoka* MatchTable::FindParticipant(const UUID& UUID) const
+{
+	for (auto participant : m_Participants)
+		if (participant && participant->GetUUID() == UUID)
+			return participant;
+	return nullptr;
+}
+
+
+
 bool MatchTable::IsIncluded(const Judoka& Fighter) const
 {
-	for (auto& participant : m_Participants)
+	for (auto participant : m_Participants)
 		if (participant && participant->GetUUID() == Fighter.GetUUID())
 			return true;
 	return false;

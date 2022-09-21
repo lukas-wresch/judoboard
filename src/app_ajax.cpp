@@ -1744,6 +1744,15 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/matchtable/set_start_pos", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_SetStartingPosition(Request);
+	});
+
+
 	m_Server.RegisterResource("/ajax/matchtable/generate", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -2972,6 +2981,37 @@ std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request
 	GetTournament()->Unlock();
 
 	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_SetStartingPosition(const HttpServer::Request& Request)
+{
+	UUID id        = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	UUID judoka_id = HttpServer::DecodeURLEncoded(Request.m_Query, "judoka");
+	int  startpos  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "startpos"));
+
+	if (startpos < 0)
+		return Error::Type::InvalidInput;
+
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	auto table = GetTournament()->FindMatchTable(id);
+
+	if (!table)
+		return Error::Type::ItemNotFound;
+
+	auto judoka = table->FindParticipant(judoka_id);
+
+	if (!judoka)
+		return Error::Type::ItemNotFound;
+
+	table->SetStartingPosition(judoka, startpos);
+
+	return Error::Type::NoError;//OK
 }
 
 
