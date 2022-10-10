@@ -228,7 +228,7 @@ const std::string StandingData::Judoka2String(std::string SearchString, const IT
 
 	for (auto [id, judoka] : m_Judokas)
 	{
-		auto name = judoka->GetName();
+		auto name = judoka->GetName(NameStyle::GivenName);
 		std::transform(name.begin(), name.end(), name.begin(),
 			[](unsigned char c){ return std::tolower(c); });
 
@@ -238,7 +238,7 @@ const std::string StandingData::Judoka2String(std::string SearchString, const IT
 		ret << YAML::BeginMap;
 
 		ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
-		ret << YAML::Key << "name" << YAML::Value << judoka->GetName();
+		ret << YAML::Key << "name" << YAML::Value << judoka->GetName(NameStyle::GivenName);
 		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
 		ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
 

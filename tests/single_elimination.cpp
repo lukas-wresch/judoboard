@@ -352,13 +352,13 @@ TEST(SingleElimination, Count5_ExportImport)
 		if (group.GetSchedule()[i]->GetFighter(Fighter::White))
 		{
 			ASSERT_TRUE(group2.GetSchedule()[i]->GetFighter(Fighter::White));
-			EXPECT_EQ(group.GetSchedule()[i]->GetFighter(Fighter::White)->GetName(), group2.GetSchedule()[i]->GetFighter(Fighter::White)->GetName());
+			EXPECT_EQ(group.GetSchedule()[i]->GetFighter(Fighter::White)->GetName(NameStyle::GivenName), group2.GetSchedule()[i]->GetFighter(Fighter::White)->GetName(NameStyle::GivenName));
 		}
 
 		if (group.GetSchedule()[i]->GetFighter(Fighter::Blue))
 		{
 			ASSERT_TRUE(group2.GetSchedule()[i]->GetFighter(Fighter::Blue));
-			EXPECT_EQ(group.GetSchedule()[i]->GetFighter(Fighter::Blue)->GetName(), group2.GetSchedule()[i]->GetFighter(Fighter::Blue)->GetName());
+			EXPECT_EQ(group.GetSchedule()[i]->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName), group2.GetSchedule()[i]->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName));
 		}
 	}
 

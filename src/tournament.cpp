@@ -1442,7 +1442,7 @@ const std::string Tournament::Participants2String() const
 		ret << YAML::BeginMap;
 
 		ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
-		ret << YAML::Key << "name" << YAML::Value << judoka->GetName();
+		ret << YAML::Key << "name" << YAML::Value << judoka->GetName(NameStyle::GivenName);
 		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
 		ret << YAML::Key << "num_matches" << YAML::Value << num_matches;
 

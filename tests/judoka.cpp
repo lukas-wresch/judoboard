@@ -10,17 +10,17 @@ TEST(Judoka, Basic)
 	EXPECT_EQ(j.GetGender(), Gender::Male);
 	EXPECT_EQ(j.GetWeight(), Weight(50));
 
-	EXPECT_EQ(j.GetName(), std::string("Firstname Lastname"));
+	EXPECT_EQ(j.GetName(NameStyle::GivenName), std::string("Firstname Lastname"));
 
 	j.SetWeight(80);
 	EXPECT_EQ(j.GetWeight(), Weight(80));
 
 	j.SetGender(Gender::Female);
-	EXPECT_TRUE(j.GetGender() == Gender::Female);
+	EXPECT_EQ(j.GetGender(), Gender::Female);
 
 	j.SetFirstname("New");
 	j.SetLastname("Name");
-	EXPECT_EQ(j.GetName(), std::string("New Name"));
+	EXPECT_EQ(j.GetName(NameStyle::GivenName), std::string("New Name"));
 }
 
 
@@ -35,10 +35,10 @@ TEST(Judoka, ImportExport)
 
 		Judoka j2(YAML::Load(yaml.c_str()));
 
-		EXPECT_EQ(j.GetName(), j2.GetName());
+		EXPECT_EQ(j.GetName(NameStyle::GivenName), j2.GetName(NameStyle::GivenName));
 		EXPECT_EQ(j.GetGender(), j2.GetGender());
 		EXPECT_EQ(j.GetWeight(), j2.GetWeight());
-		EXPECT_EQ(j.GetAge(), j2.GetAge());
+		EXPECT_EQ(j.GetAge(),  j2.GetAge());
 		EXPECT_EQ(j.GetUUID(), j2.GetUUID());
 		EXPECT_EQ(j.GetLengthOfBreak(), j2.GetLengthOfBreak());
 	}

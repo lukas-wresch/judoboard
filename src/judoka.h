@@ -1,19 +1,11 @@
 #pragma once
 #include <string>
-#include "../ZED/include/csv.h"
 #include "timer.h"
 #include "club.h"
 #include "judoboard.h"
 #include "dm4.h"
 #include "md5.h"
 #include "dmf.h"
-
-
-namespace YAML
-{
-	class Emitter;
-	class Node;
-}
 
 
 
@@ -40,7 +32,16 @@ namespace Judoboard
 		auto GetGender() const { return m_Gender; }
 		auto GetWeight() const { return m_Weight; }
 		uint16_t GetAge() const;
-		const std::string GetName() const { return m_Firstname + " " + m_Lastname; }
+		const std::string GetName(NameStyle Style) const {
+			switch (Style)
+			{
+			case NameStyle::GivenName:
+				return m_Firstname + " " + m_Lastname;
+			case NameStyle::FamilyName:
+				return m_Lastname + ", " + m_Firstname;
+			}
+			return "";
+		}
 
 		const std::string GetFirstname() const { return m_Firstname; }
 		const std::string GetLastname()  const { return m_Lastname;  }

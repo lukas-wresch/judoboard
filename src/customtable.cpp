@@ -123,8 +123,8 @@ const std::string CustomTable::ToHTML() const
 	{
 		ret += "<tr>";
 		ret += "<td style=\"text-align: center;\">" + std::to_string(no++) + "</td>";
-		ret += "<td>" + match->GetFighter(Fighter::White)->GetName() + "</td>";
-		ret += "<td>" + match->GetFighter(Fighter::Blue )->GetName() + "</td>";
+		ret += "<td>" + match->GetFighter(Fighter::White)->GetName(NameStyle::GivenName) + "</td>";
+		ret += "<td>" + match->GetFighter(Fighter::Blue )->GetName(NameStyle::GivenName) + "</td>";
 
 		
 		if (match->IsRunning())
@@ -154,7 +154,7 @@ const std::string CustomTable::ToHTML() const
 		const auto& score = results[i];
 
 		ret += "<tr><td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
-		ret += "<td>" + score.Judoka->GetName() + "</td>";
+		ret += "<td>" + score.Judoka->GetName(NameStyle::GivenName) + "</td>";
 
 		ret += "<td>" + std::to_string(score.Wins)  + "</td>";
 		ret += "<td>" + std::to_string(score.Score) + "</td>";

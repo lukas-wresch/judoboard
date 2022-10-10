@@ -392,7 +392,7 @@ const std::string Weightclass::ToHTML() const
 		+ "</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name") + "</th>";
 
 	for (uint32_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
-		ret += "<th>vs " + GetParticipants()[j]->GetName() + "</th>";
+		ret += "<th>vs " + GetParticipants()[j]->GetName(NameStyle::GivenName) + "</th>";
 
 	ret += "<th style=\"text-align: center; width: 2.0cm;\">Total</th>";
 	ret += "</tr>";
@@ -408,7 +408,7 @@ const std::string Weightclass::ToHTML() const
 
 		ret += "<tr>";
 		ret += "<td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
-		ret += "<td>" + fighter->GetName() + "<br/>(" + fighter->GetWeight().ToString() + " kg)</td>";
+		ret += "<td>" + fighter->GetName(NameStyle::GivenName) + "<br/>(" + fighter->GetWeight().ToString() + " kg)</td>";
 
 		for (size_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
 		{
@@ -460,7 +460,7 @@ const std::string Weightclass::ToHTML() const
 		const auto& score = results[i];
 
 		ret += "<tr><td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
-		ret += "<td>" + score.Judoka->GetName() + "</td>";
+		ret += "<td>" + score.Judoka->GetName(NameStyle::GivenName) + "</td>";
 
 		ret += "<td>" + std::to_string(score.Wins)  + "</td>";
 		ret += "<td>" + std::to_string(score.Score) + "</td>";

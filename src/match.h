@@ -2,8 +2,6 @@
 #include "judoka.h"
 #include "matchlog.h"
 #include "matchtable.h"
-#include "schedule_entry.h"
-#include "../ZED/include/csv.h"
 
 
 
@@ -12,6 +10,7 @@ namespace Judoboard
 	class ITournament;
 	class Tournament;
 	class RuleSet;
+	class Judoka;
 
 
 

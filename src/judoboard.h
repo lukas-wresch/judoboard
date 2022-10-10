@@ -7,6 +7,13 @@
 
 
 
+namespace YAML
+{
+	class Emitter;
+	class Node;
+}
+
+
 namespace Judoboard
 {
 	enum class Gender
@@ -24,6 +31,14 @@ namespace Judoboard
 	{
 		g = (Gender)(((int)g) + 1);
 	}
+
+
+
+	enum class NameStyle
+	{
+		GivenName,//<Given name> <Family name>
+		FamilyName,//<Family name>, <Given name>
+	};
 
 
 
@@ -96,6 +111,18 @@ namespace Judoboard
 
 		uint32_t m_InGrams = 0;
 	};
+
+
+
+	enum class Status
+	{
+		Scheduled,//Match is scheduled
+		Running,//Match is currently underway
+		Concluded,//Match has concluded, results are available
+		Optional,//It is not clear yet whetever the match will take place
+		Skipped,//The match will take place
+	};
+
 
 
 	inline std::string Latin1ToUTF8(const std::string& Input)

@@ -131,7 +131,7 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
 
 	if (GetFighter(Fighter::White))
-		Yaml << YAML::Key << "white_name" << YAML::Value << GetFighter(Fighter::White)->GetName();
+		Yaml << YAML::Key << "white_name" << YAML::Value << GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
 	else
 	{
 		Yaml << YAML::Key << "white_dependency_type" << YAML::Value << (int)m_White.m_Dependency;
@@ -140,7 +140,7 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	}
 
 	if (GetFighter(Fighter::Blue))
-		Yaml << YAML::Key << "blue_name"  << YAML::Value << GetFighter(Fighter::Blue)->GetName();
+		Yaml << YAML::Key << "blue_name"  << YAML::Value << GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
 	else
 	{
 		Yaml << YAML::Key << "blue_dependency_type" << YAML::Value << (int)m_Blue.m_Dependency;

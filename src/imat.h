@@ -30,7 +30,7 @@ namespace Judoboard
 		{
 			DoubleDigit,//Show score like: 0 0, 0 1, 1 0
 			SingleDigit,//Show score like: 0, 1, 2
-			SpelledOut//  Show score like: *none*, 1 Wazaari, 2 Wazaari, Ippon
+			SpelledOut,//  Show score like: *none*, 1 Wazaari, 2 Wazaari, Ippon
 		};
 
 
@@ -181,6 +181,7 @@ namespace Judoboard
 		//Config
 		IpponStyle GetIpponStyle() const { return m_IpponStyle; }
 		TimerStyle GetTimerStyle() const { return m_TimerStyle; }
+		NameStyle  GetNameStyle()  const { return m_NameStyle; }
 		bool IsFullscreen() const { return m_IsFullscreen; }
 		virtual void SetFullscreen(bool Enabled = true) = 0;
 
@@ -188,6 +189,7 @@ namespace Judoboard
 		virtual void SetName(const std::string& NewName) { m_Name = NewName; }
 		virtual void SetIpponStyle(IpponStyle NewStyle) { m_IpponStyle = NewStyle; }
 		virtual void SetTimerStyle(TimerStyle NewStyle) { m_TimerStyle = NewStyle; }
+		virtual void SetNameStyle(NameStyle NewStyle) { m_NameStyle = NewStyle; }
 		virtual void SetIsFullscreen(bool Enabled) { m_IsFullscreen = Enabled; }
 
 		std::vector<Match> m_NextMatches;
@@ -200,7 +202,7 @@ namespace Judoboard
 		//Configuration
 		TimerStyle m_TimerStyle = TimerStyle::OnlySeconds;
 		IpponStyle m_IpponStyle = IpponStyle::DoubleDigit;
-		//IpponStyle m_IpponStyle = IpponStyle::SpelledOut;
+		NameStyle m_NameStyle   = NameStyle::FamilyName;
 		bool m_IsFullscreen = true;
 	};
 }

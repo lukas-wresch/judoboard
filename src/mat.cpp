@@ -1433,10 +1433,20 @@ void Mat::UpdateGraphics() const
 				continue;
 
 			//Update judoka name
-			m_Graphics["next_matches_white_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetFirstname(), ZED::Color(0, 0, 0), FontSize);
-			m_Graphics["next_matches_blue_"   + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue)->GetFirstname(), ZED::Color(255, 255, 255), FontSize);
-			m_Graphics["next_matches_white2_" + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetLastname(), ZED::Color(0, 0, 0), FontSize);
-			m_Graphics["next_matches_blue2_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue)->GetLastname(), ZED::Color(255, 255, 255), FontSize);
+			if (GetNameStyle() == NameStyle::GivenName)
+			{
+				m_Graphics["next_matches_white_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetFirstname(), ZED::Color(0, 0, 0), FontSize);
+				m_Graphics["next_matches_blue_"   + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue )->GetFirstname(), ZED::Color(255, 255, 255), FontSize);
+				m_Graphics["next_matches_white2_" + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetLastname(), ZED::Color(0, 0, 0), FontSize);
+				m_Graphics["next_matches_blue2_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue )->GetLastname(), ZED::Color(255, 255, 255), FontSize);
+			}
+			else
+			{
+				m_Graphics["next_matches_white_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetLastname() + ",", ZED::Color(0, 0, 0), FontSize);
+				m_Graphics["next_matches_blue_"   + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue )->GetLastname() + ",", ZED::Color(255, 255, 255), FontSize);
+				m_Graphics["next_matches_white2_" + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetFirstname(), ZED::Color(0, 0, 0), FontSize);
+				m_Graphics["next_matches_blue2_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue )->GetFirstname(), ZED::Color(255, 255, 255), FontSize);
+			}
 
 			//Update clubs of judokas
 			if (match.GetFighter(Fighter::White)->GetClub())
@@ -1469,8 +1479,8 @@ void Mat::UpdateGraphics() const
 
 	case State::TransitionToMatch:
 		//Update fighter's names
-		m_Graphics["white_name"].UpdateTexture(renderer, GetFighter(Fighter::White).GetName(), ZED::Color(0, 0, 0));
-		m_Graphics["blue_name" ].UpdateTexture(renderer, GetFighter(Fighter::Blue ).GetName(), ZED::Color(255, 255, 255));
+		m_Graphics["white_name"].UpdateTexture(renderer, GetFighter(Fighter::White).GetName(GetNameStyle()), ZED::Color(0, 0, 0));
+		m_Graphics["blue_name" ].UpdateTexture(renderer, GetFighter(Fighter::Blue ).GetName(GetNameStyle()), ZED::Color(255, 255, 255));
 
 		while (m_Graphics["white_name"] && m_Graphics["white_name"]->GetWidth() > std::max((width - 25.0*m_ScalingFactor)/2, 100.0))
 			m_Graphics["white_name"].Shorten(renderer);

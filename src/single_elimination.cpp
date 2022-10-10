@@ -279,7 +279,7 @@ const std::string SingleElimination::ToHTML() const
 		
 		//Output name of fighters
 		if (match->GetFighter(Fighter::White))
-			ret += match->GetFighter(Fighter::White)->GetName();
+			ret += match->GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
 		else if (match->HasDependentMatches())
 			ret += "???";
 		else
@@ -288,7 +288,7 @@ const std::string SingleElimination::ToHTML() const
 		ret += " vs. ";
 
 		if (match->GetFighter(Fighter::Blue))
-			ret += match->GetFighter(Fighter::Blue)->GetName();
+			ret += match->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
 		else if (match->HasDependentMatches())
 			ret += "???";
 		else

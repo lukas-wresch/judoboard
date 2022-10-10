@@ -117,7 +117,7 @@ TEST(Ajax, UpdateMat)
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 
-		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&timerStyle=1"));
+		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&timerStyle=1&nameStyle=0"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
@@ -125,9 +125,10 @@ TEST(Ajax, UpdateMat)
 		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test");
 		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 0);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 1);
+		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  0);
 
 
-		app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&timerStyle=2"));
+		app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&timerStyle=2&nameStyle=1"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
@@ -135,16 +136,18 @@ TEST(Ajax, UpdateMat)
 		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test2");
 		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 1);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 2);
+		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  1);
 
 
-		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test2&ipponStyle=2&timerStyle=0"));
+		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test3&ipponStyle=2&timerStyle=0&nameStyle=0"));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
-		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test2");
+		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test3");
 		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 2);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 0);
+		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  0);
 	}
 }
 
@@ -240,8 +243,8 @@ TEST(Ajax, GetHansokumake)
 		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
 
 		EXPECT_EQ(ret2[0]["match"]["uuid"].as<std::string>(), (std::string)match.GetUUID());
-		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName());
-		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName());
+		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName));
+		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName(NameStyle::GivenName));
 		EXPECT_EQ(ret2[0]["fighter"].as<int>(), (int)f);
 		EXPECT_EQ(ret2[0]["disqualification_state"].as<int>(), (int)IMat::Scoreboard::DisqualificationState::Unknown);
 	}
@@ -266,8 +269,8 @@ TEST(Ajax, GetHansokumake)
 		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
 
 		EXPECT_EQ(ret2[0]["match"]["uuid"].as<std::string>(), (std::string)match.GetUUID());
-		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName());
-		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName());
+		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName));
+		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName(NameStyle::GivenName));
 		EXPECT_EQ(ret2[0]["fighter"].as<int>(), (int)f);
 		EXPECT_EQ(ret2[0]["disqualification_state"].as<int>(), (int)IMat::Scoreboard::DisqualificationState::Disqualified);
 	}
@@ -292,8 +295,8 @@ TEST(Ajax, GetHansokumake)
 		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
 
 		EXPECT_EQ(ret2[0]["match"]["uuid"].as<std::string>(), (std::string)match.GetUUID());
-		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName());
-		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName());
+		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName));
+		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName(NameStyle::GivenName));
 		EXPECT_EQ(ret2[0]["fighter"].as<int>(), (int)f);
 		EXPECT_EQ(ret2[0]["disqualification_state"].as<int>(), (int)IMat::Scoreboard::DisqualificationState::NotDisqualified);
 	}
@@ -724,8 +727,8 @@ TEST(Ajax, GetMatchesFromMatchTable)
 	for (const auto& node : yaml)
 	{
 		EXPECT_EQ(node["uuid"].as<std::string>(),       (std::string)table->GetSchedule()[i]->GetUUID());
-		EXPECT_EQ(node["white_name"].as<std::string>(), table->GetSchedule()[i]->GetFighter(Fighter::White)->GetName());
-		EXPECT_EQ(node["blue_name"].as<std::string>(),  table->GetSchedule()[i]->GetFighter(Fighter::Blue )->GetName());
+		EXPECT_EQ(node["white_name"].as<std::string>(), table->GetSchedule()[i]->GetFighter(Fighter::White)->GetName(NameStyle::GivenName));
+		EXPECT_EQ(node["blue_name"].as<std::string>(),  table->GetSchedule()[i]->GetFighter(Fighter::Blue )->GetName(NameStyle::GivenName));
 		EXPECT_EQ(node["mat_id"].as<int>(),             table->GetSchedule()[i]->GetMatID());
 		i++;
 	}

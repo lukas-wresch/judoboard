@@ -160,7 +160,7 @@ Judoka* Database::UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly,
 
 		if (old_judoka)//Found someone with the right name but incorrect club/birthyear
 		{
-			Output += "Updating information of judoka: " + old_judoka->GetName() + "<br/>";
+			Output += "Updating information of judoka: " + old_judoka->GetName(NameStyle::GivenName) + "<br/>";
 
 			if (!ParseOnly)
 			{
@@ -207,7 +207,7 @@ Judoka* Database::UpdateOrAdd(const Judoka& NewJudoka, bool ParseOnly, std::stri
 
 		if (old_judoka)//Found someone with the right name but incorrect club/birthyear
 		{
-			Output += "Updating information of judoka: " + old_judoka->GetName() + "<br/>";
+			Output += "Updating information of judoka: " + old_judoka->GetName(NameStyle::GivenName) + "<br/>";
 
 			if (!ParseOnly)
 			{

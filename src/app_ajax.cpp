@@ -1148,7 +1148,7 @@ void Application::SetupHttpServer()
 		if (!mat->AreFightersOnMat())
 			ret << "- - -,- - -";
 		else if (mat->GetMatch())
-			ret << mat->GetMatch()->GetFighter(Fighter::White)->GetName() << mat->GetMatch()->GetFighter(Fighter::Blue)->GetName();
+			ret << mat->GetMatch()->GetFighter(Fighter::White)->GetName(NameStyle::GivenName) << mat->GetMatch()->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
 		else//Not supported by mat
 			ret << "???,???";
 
@@ -1156,7 +1156,7 @@ void Application::SetupHttpServer()
 		for (auto match : nextMatches)
 		{
 			if (match.GetFighter(Fighter::White) && match.GetFighter(Fighter::Blue))
-				ret << match.GetFighter(Fighter::White)->GetName() << match.GetFighter(Fighter::Blue)->GetName();
+				ret << match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName) << match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
 		}
 
 		return ret;
@@ -2770,6 +2770,7 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 	auto name  = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
+	int nameStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
 
 	if (id <= 0 || new_id <= 0)
 		return Error::Type::InvalidID;
@@ -2799,6 +2800,7 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 			mat->SetName(name);
 			mat->SetIpponStyle((Mat::IpponStyle)ipponStyle);
 			mat->SetTimerStyle((Mat::TimerStyle)timerStyle);
+			mat->SetNameStyle((NameStyle)nameStyle);
 
 			return Error();//OK
 		}

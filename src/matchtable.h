@@ -2,7 +2,6 @@
 #include <string>
 #include <vector>
 #include "judoka.h"
-#include "schedule_entry.h"
 
 
 
@@ -13,17 +12,7 @@ namespace Judoboard
 	class Match;
 	class RuleSet;
 	class AgeGroup;
-
-
-
-	enum class Status
-	{
-		Scheduled,//Match is scheduled
-		Running,//Match is currently underway
-		Concluded,//Match has concluded, results are available
-		Optional,//It is not clear yet whetever the match will take place
-		Skipped,//The match will take place
-	};
+	class Judoka;
 
 
 
@@ -63,9 +52,6 @@ namespace Judoboard
 			temp %= (int)Name::Max;
 			m_Name = (Name)temp;
 		}
-
-		void operator << (ZED::CSV& Stream) const { Stream >> m_Name; }
-		void operator >> (ZED::CSV& Stream) const { Stream << m_Name; }
 
 		bool operator >  (const Color& rhs) const { return (int)m_Name >  (int)rhs.m_Name; }
 		bool operator >= (const Color& rhs) const { return (int)m_Name >= (int)rhs.m_Name; }
