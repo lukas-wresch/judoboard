@@ -2698,6 +2698,7 @@ std::string Application::Ajax_GetMats() const
 				ret << YAML::Key << "is_open" << YAML::Value << mat->IsOpen();
 				ret << YAML::Key << "ippon_style"   << YAML::Value << (int)mat->GetIpponStyle();
 				ret << YAML::Key << "timer_style"   << YAML::Value << (int)mat->GetTimerStyle();
+				ret << YAML::Key << "name_style"    << YAML::Value << (int)mat->GetNameStyle();
 				ret << YAML::Key << "is_fullscreen" << YAML::Value << mat->IsFullscreen();
 				ret << YAML::EndMap;
 			}

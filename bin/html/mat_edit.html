@@ -31,6 +31,14 @@
   </select>
 </div>
 
+<div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_nameStyle">Name Style</label>
+  <select style="margin-bottom:20px;" id="nameStyle">
+    <option selected value="0" id="given_name_first">Give name first</option>
+    <option value="1" id="family_name_first">Family name first</option>
+  </select>
+</div>
+
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateMat()" id="update">Update Mat</button>
 
 </form>
@@ -65,6 +73,7 @@ function UpdateMat()
     name:        document.getElementById("name").value,
     ipponStyle:  document.getElementById("ipponStyle").value,
     timerStyle:  document.getElementById("timerStyle").value,
+    nameStyle:   document.getElementById("nameStyle").value,
   });
 
   AjaxPost('/ajax/config/set_mat?id=' + id, params, function() {
@@ -89,6 +98,7 @@ function GetMat(id)
         document.getElementById("name").value = mat.name;
         document.getElementById("ipponStyle").value = mat.ippon_style;
         document.getElementById("timerStyle").value = mat.timer_style;
+        document.getElementById("nameStyle").value  = mat.name_style;
       }
     }
 

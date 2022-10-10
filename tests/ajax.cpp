@@ -20,6 +20,7 @@ TEST(Ajax, GetMats)
 	EXPECT_EQ(yaml["mats"][0]["type"].as<int>(), (int)Mat::Type::LocalMat);
 	EXPECT_EQ(yaml["mats"][0]["name"].as<std::string>(), "Mat 1");
 	EXPECT_EQ(yaml["mats"][0]["ippon_style"].as<int>(), (int)IMat::IpponStyle::DoubleDigit);
+	EXPECT_EQ(yaml["mats"][0]["name_style"].as<int>(),  (int)NameStyle::GivenName);
 }
 
 
