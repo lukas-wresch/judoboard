@@ -1659,10 +1659,26 @@ void Tournament::GenerateSchedule()
 			table->GenerateSchedule();
 	}
 
+	//Check if there is a schedule index that is not used
+	//so that we can move match tables up
+
+	for (int32_t index = 0; index <= GetMaxScheduleIndex(); index++)
+	{
+		//Is the previous index empty?
+		if (index > 0 && GetMaxEntriesAtScheduleIndex(0, index-1) == 0)
+		{
+			for (auto table : m_MatchTables)
+				if (table && table->GetScheduleIndex() == index)
+					table->SetScheduleIndex(index-1);
+		}
+	}
+
+	//For all master schedule entries
 	for (int32_t index = 0; index <= GetMaxScheduleIndex(); index++)
 	{
 		std::vector<std::pair<uint32_t, std::vector<Match*>>> Plan;
 
+		//For each match table at this index
 		for (auto entry : m_MatchTables)
 		{
 			if (!entry || entry->GetScheduleIndex() != index)
