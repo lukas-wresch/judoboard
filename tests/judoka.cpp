@@ -85,24 +85,24 @@ TEST(Judoka, Weight)
 	initialize();
 
 	Weight w(123);
-	EXPECT_EQ(w, 123 * 1000);
+	EXPECT_EQ((uint32_t)w, 123 * 1000);
 
 	Weight w2("12,3");
-	EXPECT_EQ(w2, 12 * 1000 + 300);
+	EXPECT_EQ((uint32_t)w2, 12 * 1000 + 300);
 	EXPECT_EQ(w2.ToString(), "12,3 ");
 
 	Weight w3("12.3");
-	EXPECT_EQ(w3, 12 * 1000 + 300);
+	EXPECT_EQ((uint32_t)w3, 12 * 1000 + 300);
 	EXPECT_EQ(w3.ToString(), "12,3 ");
 
 	Weight w4("12");
-	EXPECT_EQ(w4, 12 * 1000);
+	EXPECT_EQ((uint32_t)w4, 12 * 1000);
 	EXPECT_EQ(w4.ToString(), "12");
 
 	YAML::Emitter yaml;
 	w2 >> yaml;
 	w2 = Weight(YAML::Load(yaml.c_str()));
-	EXPECT_EQ(w2, 12 * 1000 + 300);
+	EXPECT_EQ((uint32_t)w2, 12 * 1000 + 300);
 	EXPECT_EQ(w2.ToString(), "12,3 ");
 }
 
@@ -113,29 +113,29 @@ TEST(Judoka, WeightWithGrams)
 	initialize();
 
 	Weight w(123);
-	EXPECT_EQ(w, 123 * 1000);
+	EXPECT_EQ((uint32_t)w, 123 * 1000);
 
 	Weight w2("12,03");
-	EXPECT_EQ(w2, 12 * 1000 + 30);
+	EXPECT_EQ((uint32_t)w2, 12 * 1000 + 30);
 	EXPECT_EQ(w2.ToString(), "12,0 ");
 
 	Weight w3("12.003");
-	EXPECT_EQ(w3, 12 * 1000 + 3);
+	EXPECT_EQ((uint32_t)w3, 12 * 1000 + 3);
 	EXPECT_EQ(w3.ToString(), "12,0 ");
 
 	Weight w4("12");
-	EXPECT_EQ(w4, 12 * 1000);
+	EXPECT_EQ((uint32_t)w4, 12 * 1000);
 	EXPECT_EQ(w4.ToString(), "12");
 
 	YAML::Emitter yaml;
 	w2 >> yaml;
 	w2 = Weight(YAML::Load(yaml.c_str()));
-	EXPECT_EQ(w2, 12 * 1000 + 30);
+	EXPECT_EQ((uint32_t)w2, 12 * 1000 + 30);
 	EXPECT_EQ(w2.ToString(), "12,0 ");
 
 	YAML::Emitter yaml2;
 	w3 >> yaml2;
 	w3 = Weight(YAML::Load(yaml2.c_str()));
-	EXPECT_EQ(w3, 12 * 1000 + 3);
+	EXPECT_EQ((uint32_t)w3, 12 * 1000 + 3);
 	EXPECT_EQ(w3.ToString(), "12,0 ");
 }
