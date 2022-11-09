@@ -278,7 +278,7 @@ function GetMatchTable(id)
 
          var options = "<table><tr><td rowspan=\"2\"><button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+judoka.uuid+")\">" + lang.remove + "</button></td>";
          if (typeof judoka.starting_pos !== 'undefined')
-           options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+","+(judoka.starting_pos-1)+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+","+(judoka.starting_pos+1)+"');\"></a></td></tr></table>";
+           options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+"','"+(judoka.starting_pos-1)+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+"','"+(judoka.starting_pos+1)+"');\"></a></td></tr></table>";
          else
            options += "<td></td></tr><tr><td></td></tr></table>";
 
