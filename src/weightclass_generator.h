@@ -43,7 +43,7 @@ namespace Judoboard
 
 		static Weight calculateMedian(std::vector<std::pair<Weight, int>>& v, int Start, int End);
 
-		unsigned int getSpread(std::vector<std::pair<Weight, int>>& WeightsSlots, int Start, int End);
+		Weight getSpread(std::vector<std::pair<Weight, int>>& WeightsSlots, int Start, int End);
 		bool isGroupOK(std::vector<std::pair<Weight, int>>& WeightsSlots, int Start, int End);
 		bool split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Start, int End);
 

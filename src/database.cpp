@@ -215,7 +215,7 @@ Judoka* Database::UpdateOrAdd(const Judoka& NewJudoka, bool ParseOnly, std::stri
 					old_judoka->SetClub(FindClubByName(NewJudoka.GetClub()->GetName()));
 				if (NewJudoka.GetBirthyear() > 0)
 					old_judoka->SetBirthyear(NewJudoka.GetBirthyear());
-				if (NewJudoka.GetWeight() > 0)
+				if ((uint32_t)NewJudoka.GetWeight() > 0)
 					old_judoka->SetWeight(NewJudoka.GetWeight());
 			}
 

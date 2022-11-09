@@ -19,8 +19,8 @@ TEST(Database, JudokaTest)
 		d.AddJudoka(&j1);
 		d.AddJudoka(&j2);
 
-		EXPECT_TRUE(d.FindJudoka(j1.GetUUID())->GetWeight() == Weight(50));
-		EXPECT_TRUE(d.FindJudoka(j2.GetUUID())->GetWeight() == Weight(60));
+		EXPECT_EQ(d.FindJudoka(j1.GetUUID())->GetWeight(), Weight(50));
+		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), Weight(60));
 
 		EXPECT_TRUE(d.Save("temp.yml"));
 		EXPECT_TRUE(d.Save("temp2.yml"));
@@ -29,7 +29,7 @@ TEST(Database, JudokaTest)
 		EXPECT_FALSE(d.DeleteJudoka(j1.GetUUID()));
 
 		ASSERT_TRUE(d.FindJudoka(j1.GetUUID()) == nullptr);
-		EXPECT_TRUE(d.FindJudoka(j2.GetUUID())->GetWeight() == Weight(60));
+		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), Weight(60));
 
 		EXPECT_TRUE(d.DeleteJudoka(j2.GetUUID()));
 		EXPECT_FALSE(d.DeleteJudoka(j2.GetUUID()));

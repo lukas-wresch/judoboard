@@ -85,17 +85,43 @@ namespace Judoboard
 			return std::to_string(m_InGrams/1000) + "," + std::to_string((m_InGrams%1000) / 100) + " ";
 		}
 
-		operator uint32_t () const {//TODO make explicit
+		explicit operator uint32_t () const {
 			return m_InGrams;
 		}
 
-		Weight operator + (const Weight& rhs) {
+		bool operator == (const Weight& rhs) const {
+			return this->m_InGrams == rhs.m_InGrams;
+		}
+
+		bool operator < (const Weight& rhs) const {
+			return this->m_InGrams < rhs.m_InGrams;
+		}
+
+		bool operator <= (const Weight& rhs) const {
+			return this->m_InGrams <= rhs.m_InGrams;
+		}
+
+		bool operator > (const Weight& rhs) const {
+			return this->m_InGrams > rhs.m_InGrams;
+		}
+
+		bool operator >= (const Weight& rhs) const {
+			return this->m_InGrams >= rhs.m_InGrams;
+		}
+
+		Weight operator + (const Weight& rhs) const {
 			Weight ret;
 			ret.m_InGrams = this->m_InGrams + rhs.m_InGrams;
 			return ret;
 		}
 
-		Weight operator / (int Divisor) {
+		Weight operator - (const Weight& rhs) const {
+			Weight ret;
+			ret.m_InGrams = this->m_InGrams - rhs.m_InGrams;
+			return ret;
+		}
+
+		Weight operator / (int Divisor) const {
 			Weight ret;
 			ret.m_InGrams = this->m_InGrams / Divisor;
 			return ret;

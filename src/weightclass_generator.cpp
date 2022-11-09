@@ -46,7 +46,7 @@ WeightclassDescCollection::WeightclassDescCollection(std::vector<std::pair<Weigh
 			//Close weightclass
 			WeightclassDesc new_desc;
 			new_desc.m_Min = weight_min;
-			new_desc.m_Max = weight_max;
+			new_desc.m_Max = weight_max - Weight("0,001");
 			new_desc.m_NumParticipants = judoka_count;
 			m_Collection.emplace_back(new_desc);
 
@@ -84,7 +84,7 @@ void WeightclassDescCollection::ToString(YAML::Emitter& Yaml) const
 		if (m_Gender != Gender::Unknown)
 			name += "(" + Localizer::Gender2ShortForm(m_Gender) + ") ";
 
-		if (desc.m_Max != 0)
+		if ((uint32_t)desc.m_Max != 0)
 			name += desc.m_Min.ToString() + " - " + desc.m_Max.ToString() + " kg";
 		else
 			name += desc.m_Min.ToString() + "+ kg";
@@ -97,7 +97,7 @@ void WeightclassDescCollection::ToString(YAML::Emitter& Yaml) const
 
 
 
-unsigned int Generator::getSpread(std::vector<std::pair<Weight, int>>& WeightsSlots, int Start, int End)
+Weight Generator::getSpread(std::vector<std::pair<Weight, int>>& WeightsSlots, int Start, int End)
 {
 	Weight min = 1000 * 1000;
 	Weight max = 0;
@@ -121,7 +121,7 @@ bool Generator::isGroupOK(std::vector<std::pair<Weight, int>>& WeightsSlots, int
 	const unsigned int count  = End-Start;
 
 	const bool must_split = count > m_Max;//Must split
-	const bool should_split = must_split || (count >= 2 * m_Min) && (spread > m_Diff * 1000);
+	const bool should_split = must_split || (count >= 2 * m_Min) && (spread > Weight(m_Diff));
 
 	return !should_split;
 }
@@ -154,7 +154,7 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 		
 
 	bool must_split = count > m_Max;//Must split
-	bool should_split = must_split || (count >= 2 * m_Min) && (max - min > m_Diff * 1000);
+	bool should_split = must_split || (count >= 2 * m_Min) && (max - min > Weight(m_Diff));
 	//Don't split if the result is too tiny, unless we must
 	bool can_split = (Middle + 1 - Start >= (int)m_Min) && (End - Middle - 1 >= (int)m_Min);
 
@@ -163,10 +163,10 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 #ifdef _DEBUG
 		std::string line;
 		for (int i = Start; i < End; ++i)
-			line += std::to_string(WeightsSlots[i].first) + " ";
+			line += std::to_string((uint32_t)WeightsSlots[i].first) + " ";
 		ZED::Log::Debug(line);
-		ZED::Log::Debug("Median: " + std::to_string(median));
-		ZED::Log::Debug("Spread: " + std::to_string(max - min));
+		ZED::Log::Debug("Median: " + std::to_string((uint32_t)median));
+		ZED::Log::Debug("Spread: " + std::to_string((uint32_t)(max - min)));
 		ZED::Log::Debug(std::string("Must split: ")   + (must_split   ? "Yes" : "No"));
 		ZED::Log::Debug(std::string("Should split: ") + (should_split ? "Yes" : "No"));
 		ZED::Log::Debug(std::string("Can split: ")    + (can_split    ? "Yes" : "No"));
@@ -266,10 +266,10 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 	{
 		std::string line;
 		for (int i = Start; i < End; ++i)
-			line += std::to_string(WeightsSlots[i].first) + " ";
+			line += std::to_string((uint32_t)WeightsSlots[i].first) + " ";
 		ZED::Log::Debug(line);
-		ZED::Log::Debug("Median: " + std::to_string(median));
-		ZED::Log::Debug("Spread: " + std::to_string(max - min));
+		ZED::Log::Debug("Median: " + std::to_string((uint32_t)median));
+		ZED::Log::Debug("Spread: " + std::to_string((uint32_t)(max - min)));
 		ZED::Log::Debug(std::string("Must split: ")   + (must_split   ? "Yes" : "No"));
 		ZED::Log::Debug(std::string("Should split: ") + (should_split ? "Yes" : "No"));
 		ZED::Log::Debug(std::string("Can split: ")    + (can_split    ? "Yes" : "No"));

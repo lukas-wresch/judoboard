@@ -106,7 +106,7 @@ std::string Weightclass::GetDescription() const
 	{
 		desc = GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender);
 
-		if (m_MaxWeight == 0)
+		if ((uint32_t)m_MaxWeight == 0)
 			desc += " +" + m_MinWeight.ToString() + " kg";
 		else
 			desc += " -" + m_MaxWeight.ToString() + " kg";
@@ -114,7 +114,7 @@ std::string Weightclass::GetDescription() const
 
 	else
 	{
-		if (m_MaxWeight == 0)
+		if ((uint32_t)m_MaxWeight == 0)
 			desc = "+" + m_MinWeight.ToString() + " kg";
 		else
 			desc = m_MinWeight.ToString() + " - " + m_MaxWeight.ToString() + " kg";
@@ -197,7 +197,7 @@ bool Weightclass::IsElgiable(const Judoka& Fighter) const
 		if (*judoka == Fighter)
 			return false;
 
-	if (m_MaxWeight == 0)//No maximum weight
+	if ((uint32_t)m_MaxWeight == 0)//No maximum weight
 	{
 		if (m_MinWeight > Fighter.GetWeight())
 			return false;

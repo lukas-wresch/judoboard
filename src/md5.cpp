@@ -110,7 +110,7 @@ MD5::MD5(const Tournament& Tournament)
 		new_judoka->ID = id++;
 		new_judoka->Firstname = judoka->GetFirstname();
 		new_judoka->Lastname  = judoka->GetLastname();
-		new_judoka->WeightInGrams = judoka->GetWeight();
+		new_judoka->WeightInGrams = (uint32_t)judoka->GetWeight();
 		new_judoka->Birthyear     = judoka->GetBirthyear();
 		//new_judoka->Rank = 1;//DEBUG
 		new_judoka->GKParticipantID = new_judoka->ID;
@@ -164,10 +164,10 @@ MD5::MD5(const Tournament& Tournament)
 		else
 			new_weightclass->Description = weightclass->GetDescription();
 
-		new_weightclass->WeightLargerThan          = weightclass->GetMinWeight() / 1000;
-		new_weightclass->WeightInGrammsLargerThan  = weightclass->GetMinWeight() % 1000;
-		new_weightclass->WeightSmallerThan         = weightclass->GetMaxWeight() / 1000;
-		new_weightclass->WeightInGrammsSmallerThan = weightclass->GetMaxWeight() % 1000;
+		new_weightclass->WeightLargerThan          = (uint32_t)weightclass->GetMinWeight() / 1000;
+		new_weightclass->WeightInGrammsLargerThan  = (uint32_t)weightclass->GetMinWeight() % 1000;
+		new_weightclass->WeightSmallerThan         = (uint32_t)weightclass->GetMaxWeight() / 1000;
+		new_weightclass->WeightInGrammsSmallerThan = (uint32_t)weightclass->GetMaxWeight() % 1000;
 
 		new_weightclass->Date = m_DateStart;
 

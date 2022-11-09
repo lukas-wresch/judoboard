@@ -82,3 +82,57 @@ TEST(WeightclassGenerator, NoGroupWith1Participant_2)
 	for (auto res : result.m_Collection)
 		EXPECT_NE(res.m_NumParticipants, 1);
 }
+
+
+
+TEST(WeightclassGenerator, CorrectOutput)
+{
+	initialize();
+
+	std::vector<Weight> weights = { 25, 35, 42, 54, 63, 65, 66, 67, 67, 68, 72, 74, 76, 76, 81 };
+
+	Generator gen;
+	gen.m_Min  = 3;
+	gen.m_Max  = 5;
+	gen.m_Diff = 30;
+	
+	std::vector<std::pair<Weight, int>> weightsSlots;
+	for (auto weight : weights)
+		weightsSlots.emplace_back(weight, 0);
+
+	gen.split(weightsSlots, 0, (int)weightsSlots.size());
+
+	WeightclassDescCollection result(weightsSlots);
+
+
+
+	std::string line;
+	for (auto w : weights)
+		line += w.ToString() + " ";
+	ZED::Log::Debug(line);
+
+	std::string line2;
+	for (auto [weight, slot] : weightsSlots)
+		line2 += weight.ToString() + "(" + std::to_string(slot)  + ") ";
+	ZED::Log::Debug(line2);
+
+	for (auto r : result.m_Collection)
+		ZED::Log::Info(r.m_Min.ToString() + " - " + r.m_Max.ToString() + "   #" + std::to_string(r.m_NumParticipants));
+
+	ASSERT_EQ(result.m_Collection.size(), 4);
+	EXPECT_EQ(result.m_Collection[0].m_NumParticipants, 3);
+	EXPECT_EQ(result.m_Collection[1].m_NumParticipants, 3);
+	EXPECT_EQ(result.m_Collection[2].m_NumParticipants, 5);
+	EXPECT_EQ(result.m_Collection[3].m_NumParticipants, 4);
+
+	EXPECT_GE(result.m_Collection[0].m_Max, Weight(42));
+	EXPECT_LT(result.m_Collection[0].m_Max, Weight(54));
+
+	EXPECT_GE(result.m_Collection[1].m_Min, Weight(54));
+	EXPECT_GE(result.m_Collection[1].m_Max, Weight(65));
+	EXPECT_LT(result.m_Collection[1].m_Max, Weight(66));
+
+	EXPECT_GE(result.m_Collection[2].m_Min, Weight(66));
+	EXPECT_GE(result.m_Collection[2].m_Max, Weight(72));
+	EXPECT_LT(result.m_Collection[2].m_Max, Weight(74));
+}

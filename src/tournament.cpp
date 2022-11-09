@@ -1225,7 +1225,7 @@ std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min
 {
 	std::vector<WeightclassDescCollection> ret;
 
-	for (auto age_group : AgeGroups)
+	if (AgeGroups.empty())
 	{
 		for (Gender gender = Gender::Male; gender <= Gender::Female; ++gender)
 		{
@@ -1240,8 +1240,6 @@ std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min
 				if (SplitGenders && judoka->GetGender() != gender)
 					continue;
 
-				auto age_group_of_judoka = GetAgeGroupOfJudoka(judoka);
-				if (age_group_of_judoka && age_group_of_judoka->GetUUID() == age_group->GetUUID())
 					weights.emplace_back(judoka->GetWeight());
 			}
 
@@ -1270,11 +1268,67 @@ std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min
 #endif
 
 			//Add additional metadata
-			result.m_AgeGroup = age_group;
 			if (SplitGenders)
 				result.m_Gender = gender;
 
 			ret.emplace_back(result);
+		}
+	}
+
+
+	else
+	{
+		for (auto age_group : AgeGroups)
+		{
+			for (Gender gender = Gender::Male; gender <= Gender::Female; ++gender)
+			{
+				if (gender == Gender::Female && !SplitGenders)
+					continue;//Only do one loop for both genders
+
+				std::vector<Weight> weights;
+
+				for (const auto [id, judoka] : m_StandingData.GetAllJudokas())
+				{
+					//Filter for correct gender
+					if (SplitGenders && judoka->GetGender() != gender)
+						continue;
+
+					auto age_group_of_judoka = GetAgeGroupOfJudoka(judoka);
+					if (age_group_of_judoka && age_group_of_judoka->GetUUID() == age_group->GetUUID())
+						weights.emplace_back(judoka->GetWeight());
+				}
+
+				std::sort(weights.begin(), weights.end());
+
+				Generator gen;
+				gen.m_Min = Min;
+				gen.m_Max = Max;
+				gen.m_Diff = Diff;
+
+				//Perform splitting algorithm
+				auto result = gen.split(weights);
+
+#ifdef _DEBUG
+				std::string line;
+				for (auto w : weights)
+					line += w.ToString() + " ";
+				ZED::Log::Debug(line);
+
+				ZED::Log::Debug("Min:  " + std::to_string(Min));
+				ZED::Log::Debug("Max:  " + std::to_string(Max));
+				ZED::Log::Debug("Diff: " + std::to_string(Diff));
+
+				for (auto r : result.m_Collection)
+					ZED::Log::Info(r.m_Min.ToString() + " - " + r.m_Max.ToString() + "   #" + std::to_string(r.m_NumParticipants));
+#endif
+
+				//Add additional metadata
+				result.m_AgeGroup = age_group;
+				if (SplitGenders)
+					result.m_Gender = gender;
+
+				ret.emplace_back(result);
+			}
 		}
 	}
 
@@ -1294,12 +1348,21 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 	{
 		if (desc.m_AgeGroup)
 		{
-			//Remove all weightclasses with this age group			
+			//Remove all weight classes with this age group			
 			for (auto match_table : m_MatchTables)
 			{
 				if (match_table->GetType() == MatchTable::Type::Weightclass &&
 					match_table->GetAgeGroup() &&
 					match_table->GetAgeGroup()->GetUUID() == desc.m_AgeGroup->GetUUID())
+					RemoveMatchTable(match_table->GetUUID());
+			}
+		}
+
+		else//Not associated to an age group? Remove all weight classes
+		{
+			for (auto match_table : m_MatchTables)
+			{
+				if (match_table->GetType() == MatchTable::Type::Weightclass)
 					RemoveMatchTable(match_table->GetUUID());
 			}
 		}
