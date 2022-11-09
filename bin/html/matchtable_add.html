@@ -319,8 +319,14 @@ function GetMatchTable(id)
       cell0.style.fontSize  = "14pt";
       cell0.style.height    = "1.5cm";
 
-      cell1.innerHTML = match.white_name;
-      cell2.innerHTML = match.blue_name;
+      if (typeof match.white_name !== 'undefined')
+        cell1.innerHTML = match.white_name;
+      else
+        cell1.innerHTML = '???';
+      if (typeof match.blue_name !== 'undefined')
+        cell2.innerHTML = match.blue_name;
+      else
+        cell2.innerHTML = '???';
 
       if (match.mat_id <= 0)
       {
