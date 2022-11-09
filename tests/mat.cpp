@@ -195,9 +195,9 @@ TEST(Mat, CorrectWinner)
 			EXPECT_TRUE(m.EndMatch());
 
 			if (i == 4)
-				EXPECT_EQ(match.GetMatchResult().m_Winner, Winner::Draw);
+				EXPECT_EQ(match.GetResult().m_Winner, Winner::Draw);
 			else
-				EXPECT_EQ(match.GetMatchResult().m_Winner, Fighter2Winner(f));
+				EXPECT_EQ(match.GetResult().m_Winner, Fighter2Winner(f));
 		}
 	}
 }
@@ -446,7 +446,7 @@ TEST(Mat, ScoreEndsGoldenScore)
 
 			EXPECT_FALSE(m.IsHajime());
 			EXPECT_TRUE(m.EndMatch());
-			EXPECT_EQ(match.GetMatchResult().m_Winner, Fighter2Winner(f));
+			EXPECT_EQ(match.GetResult().m_Winner, Fighter2Winner(f));
 		}
 	}
 }
@@ -918,8 +918,8 @@ TEST(Mat, DoubleHansokumake)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetMatchResult().m_Winner == Judoboard::Winner::Draw);
-		EXPECT_TRUE((int)match.GetMatchResult().m_Score == 0);
+		EXPECT_EQ(match.GetResult().m_Winner, Judoboard::Winner::Draw);
+		EXPECT_EQ((int)match.GetResult().m_Score, 0);
 	}
 }
 
@@ -949,8 +949,8 @@ TEST(Mat, DoubleGachi)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetMatchResult().m_Winner == Judoboard::Winner::Draw);
-		EXPECT_TRUE((int)match.GetMatchResult().m_Score == 0);
+		EXPECT_TRUE(match.GetResult().m_Winner == Judoboard::Winner::Draw);
+		EXPECT_TRUE((int)match.GetResult().m_Score == 0);
 	}
 }
 
@@ -1196,8 +1196,8 @@ TEST(Mat, OsaekomiUkeGainsIppon)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetMatchResult().m_Winner == !f);
-		EXPECT_TRUE(match.GetMatchResult().m_Score  == Match::Score::Ippon);
+		EXPECT_TRUE(match.GetResult().m_Winner == !f);
+		EXPECT_TRUE(match.GetResult().m_Score  == Match::Score::Ippon);
 	}
 }
 
@@ -1228,8 +1228,8 @@ TEST(Mat, OsaekomiToriGivesUp)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_EQ(match.GetMatchResult().m_Winner, !f);
-		EXPECT_EQ(match.GetMatchResult().m_Score, Match::Score::Ippon);
+		EXPECT_EQ(match.GetResult().m_Winner, !f);
+		EXPECT_EQ(match.GetResult().m_Score, Match::Score::Ippon);
 	}
 }
 
@@ -1708,8 +1708,8 @@ TEST(Mat, HansokumakeDuringOsaekomi)
 
 
 			EXPECT_TRUE(m.EndMatch());
-			EXPECT_TRUE(match.GetMatchResult().m_Winner == !hansokumake_committer);
-			EXPECT_TRUE(match.GetMatchResult().m_Score  == Match::Score::Ippon);
+			EXPECT_TRUE(match.GetResult().m_Winner == !hansokumake_committer);
+			EXPECT_TRUE(match.GetResult().m_Score  == Match::Score::Ippon);
 		}
 	}
 }
@@ -2060,9 +2060,9 @@ TEST(Mat, Hantei)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetMatchResult().m_Winner == Fighter2Winner(f));
-		EXPECT_TRUE(match.GetMatchResult().m_Score  == Match::Score::Hantei);
-		EXPECT_TRUE(match.GetMatchResult().m_Score  == (Match::Score)1);
+		EXPECT_TRUE(match.GetResult().m_Winner == Fighter2Winner(f));
+		EXPECT_TRUE(match.GetResult().m_Score  == Match::Score::Hantei);
+		EXPECT_TRUE(match.GetResult().m_Score  == (Match::Score)1);
 	}
 }
 

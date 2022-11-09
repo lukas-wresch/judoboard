@@ -361,7 +361,7 @@ std::vector<MatchTable::Result> Weightclass::CalculateResults() const
 		if (!match->HasConcluded())
 			continue;
 
-		const auto& result = match->GetMatchResult();
+		const auto& result = match->GetResult();
 
 		auto i = GetIndexOfParticipant(match->GetWinner());
 		auto j = GetIndexOfParticipant(match->GetLoser());
@@ -428,12 +428,12 @@ const std::string Weightclass::ToHTML() const
 					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">- - -</a></td>";
 				else if (matches[0]->GetWinner()->GetUUID() == fighter->GetUUID())
 				{
-					const auto& result = matches[0]->GetMatchResult();
+					const auto& result = matches[0]->GetResult();
 					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
 				}
 				else
 				{
-					const auto& result = matches[0]->GetMatchResult();
+					const auto& result = matches[0]->GetResult();
 					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">0 (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
 				}
 			}

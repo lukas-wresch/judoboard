@@ -1656,7 +1656,7 @@ void Application::SetupHttpServer()
 		auto table = GetTournament()->FindMatchTable(id);
 
 		if (!table)
-			return std::string("Could not find class");
+			return Error(Error::Type::ItemNotFound);
 
 		auto age_group = m_Database.FindAgeGroup(age_group_id);
 		auto rule_set  = m_Database.FindRuleSet(rule_set_id);
@@ -1680,15 +1680,16 @@ void Application::SetupHttpServer()
 		GetTournament()->Unlock();
 
 
+		auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
+		auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
+		int  gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+		bool bo3       = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
+
+
 		switch (table->GetType())
 		{
 		case MatchTable::Type::Weightclass:
 		{
-			auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
-			auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
-			int  gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
-			bool bo3       = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
-
 			Weightclass* weight_table = (Weightclass*)table;
 
 			GetTournament()->Lock();
@@ -1702,8 +1703,23 @@ void Application::SetupHttpServer()
 			break;
 		}
 
+		case MatchTable::Type::SingleElimination:
+		{
+			SingleElimination* single_table = (SingleElimination*)table;
+
+			GetTournament()->Lock();
+
+			single_table->SetMinWeight(Weight(minWeight));
+			single_table->SetMaxWeight(Weight(maxWeight));
+			single_table->SetGender((Gender)gender);
+			single_table->IsBestOfThree(bo3);
+
+			GetTournament()->Unlock();
+			break;
+		}
+
 		default:
-			return std::string("Class is not a weightclass");
+			return Error(Error::Type::InternalError);
 		}
 
 		GetTournament()->UpdateMatchTable(id);
@@ -2394,7 +2410,7 @@ void Application::SetupHttpServer()
 		{
 			if (mat && mat->GetMatID() == matID)
 			{
-				Match* match = new Match(match_data, GetTournament());
+				Match* match = new Match(match_data, nullptr, GetTournament());
 				GetTournament()->AddMatch(match);
 
 				if (mat->StartMatch(match))
@@ -2587,15 +2603,16 @@ void Application::SetupHttpServer()
 
 		ZED::Log::Info("Slave posted match results to us");
 
+		//Extract UUID and result data
 		YAML::Node match_data = YAML::Load((const char*)Request.m_Body);
-		Match posted_match(match_data, GetTournament());
+		Match posted_match(match_data, nullptr, GetTournament());
 
-		auto match = GetTournament()->FindMatch(posted_match);
+		auto match = GetTournament()->FindMatch(posted_match.GetUUID());
 
 		if (!match)
 			return "Not found";
 
-		*match = posted_match;
+		match->SetResult(posted_match.GetResult());
 		return "ok";
 	});
 }
@@ -3062,6 +3079,9 @@ Error Application::Ajax_SetStartingPosition(const HttpServer::Request& Request)
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
 
+	if (GetTournament()->GetStatus() != Status::Scheduled)
+		return Error::Type::OperationFailed;
+
 	auto table = GetTournament()->FindMatchTable(id);
 
 	if (!table)
@@ -3073,6 +3093,7 @@ Error Application::Ajax_SetStartingPosition(const HttpServer::Request& Request)
 		return Error::Type::ItemNotFound;
 
 	table->SetStartingPosition(judoka, startpos);
+	GetTournament()->GenerateSchedule();
 
 	return Error::Type::NoError;//OK
 }

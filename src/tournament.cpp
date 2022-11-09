@@ -912,6 +912,9 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 bool Tournament::UpdateMatchTable(const UUID& UUID)
 {
+	if (GetStatus() != Status::Scheduled)
+		return false;
+
 	auto matchTable = FindMatchTable(UUID);
 
 	if (!matchTable)

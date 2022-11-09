@@ -278,7 +278,7 @@ function GetMatchTable(id)
 
          var options = "<table><tr><td rowspan=\"2\"><button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+judoka.uuid+")\">" + lang.remove + "</button></td>";
          if (typeof judoka.starting_pos !== 'undefined')
-           options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+","+(judoka.starting_pos-1)+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+","+(judoka.starting_pos+1)+"');\"></a></td></tr></table>";
+           options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+"','"+(judoka.starting_pos-1)+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+"','"+(judoka.starting_pos+1)+"');\"></a></td></tr></table>";
          else
            options += "<td></td></tr><tr><td></td></tr></table>";
 
@@ -319,8 +319,14 @@ function GetMatchTable(id)
       cell0.style.fontSize  = "14pt";
       cell0.style.height    = "1.5cm";
 
-      cell1.innerHTML = match.white_name;
-      cell2.innerHTML = match.blue_name;
+      if (typeof match.white_name !== 'undefined')
+        cell1.innerHTML = match.white_name;
+      else
+        cell1.innerHTML = '???';
+      if (typeof match.blue_name !== 'undefined')
+        cell2.innerHTML = match.blue_name;
+      else
+        cell2.innerHTML = '???';
 
       if (match.mat_id <= 0)
       {

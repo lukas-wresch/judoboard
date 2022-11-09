@@ -308,6 +308,50 @@ TEST(SingleElimination, Count5)
 
 
 
+TEST(SingleElimination, Count4_ExportImport)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	t->AddMatchTable(&group);
+
+	auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+	t->AddParticipant(j1);
+
+	auto j2 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+	t->AddParticipant(j2);
+
+	auto j3 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 70);
+	t->AddParticipant(j3);
+
+	auto j4 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 80);
+	t->AddParticipant(j4);
+
+	YAML::Emitter yaml;
+	yaml << YAML::BeginMap;
+	group >> yaml;
+	yaml << YAML::EndMap;
+
+	SingleElimination group2(YAML::Load(yaml.c_str()), t);
+
+	EXPECT_EQ(group.GetMatID(), group2.GetMatID());
+	EXPECT_EQ(group.GetParticipants().size(), group2.GetParticipants().size());
+	ASSERT_EQ(group.GetSchedule().size(),     group2.GetSchedule().size());
+
+	ASSERT_EQ(group2.GetSchedule()[2]->GetDependentMatches().size(), 2);
+	ASSERT_TRUE(group2.GetSchedule()[2]->GetDependentMatches()[0]);
+	ASSERT_TRUE(group2.GetSchedule()[2]->GetDependentMatches()[1]);
+
+	EXPECT_EQ(group2.GetSchedule()[2]->GetDependentMatches()[0]->GetUUID(), group2.GetSchedule()[0]->GetUUID());
+	EXPECT_EQ(group2.GetSchedule()[2]->GetDependentMatches()[1]->GetUUID(), group2.GetSchedule()[1]->GetUUID());
+}
+
+
+
 TEST(SingleElimination, Count5_ExportImport)
 {
 	initialize();

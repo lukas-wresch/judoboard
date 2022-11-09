@@ -83,7 +83,7 @@ std::vector<MatchTable::Result> CustomTable::CalculateResults() const
 				if (!matches[0]->HasConcluded())
 					continue;
 
-				const auto& result = matches[0]->GetMatchResult();
+				const auto& result = matches[0]->GetResult();
 
 				if (matches[0]->GetWinner()->GetUUID() == fighter->GetUUID())
 				{
@@ -133,7 +133,7 @@ const std::string CustomTable::ToHTML() const
 			ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">- - -</a></td>";
 		else
 		{
-			const auto& result = match->GetMatchResult();
+			const auto& result = match->GetResult();
 			ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
 		}
 

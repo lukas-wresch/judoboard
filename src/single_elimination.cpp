@@ -234,11 +234,17 @@ void SingleElimination::SetStartingPosition(const Judoka* Judoka, size_t NewStar
 	{
 		auto judoka_on_slot = GetJudokaByStartPosition(NewStartingPosition);
 
+		m_StartingPositions.erase(my_old_pos);
 		m_StartingPositions.erase(GetStartingPosition(judoka_on_slot));
 		m_StartingPositions.insert({ my_old_pos, judoka_on_slot });
+		m_StartingPositions.insert({ NewStartingPosition, Judoka });
 	}
 
-	m_StartingPositions.insert({ NewStartingPosition, Judoka });
+	else
+	{
+		m_StartingPositions.erase(GetStartingPosition(Judoka));
+		m_StartingPositions.insert({ NewStartingPosition, Judoka });
+	}
 
 	SortParticipantsByStartingPosition();
 }
@@ -299,7 +305,7 @@ const std::string SingleElimination::ToHTML() const
 			ret += "<br/>" + Localizer::Translate("In Progress");
 		else if (match->HasConcluded())
 		{
-			const auto& result = match->GetMatchResult();
+			const auto& result = match->GetResult();
 			if (result.m_Winner == Winner::White)
 				ret += "<br/>"   + std::to_string((int)result.m_Score) + ":0";
 			else

@@ -30,6 +30,16 @@ void MatchTable::SetMatID(int32_t MatID)
 
 
 
+Match* MatchTable::FindMatch(const UUID& UUID) const
+{
+	for (auto match : m_Schedule)
+		if (match && match->GetUUID() == UUID)
+			return match;
+	return nullptr;
+}
+
+
+
 Judoka* MatchTable::FindParticipant(const UUID& UUID) const
 {
 	for (auto participant : m_Participants)
@@ -157,18 +167,18 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 		if (!match->HasConcluded())
 			continue;
 
-		auto result = match->GetMatchResult();
+		auto result = match->GetResult();
 
 		if (result.m_Winner != Winner::Draw && match->GetWinner()->GetUUID() == Judoka->GetUUID())
 		{
 			a_wins++;
-			a_score += (int)match->GetMatchResult().m_Score;
+			a_score += (int)match->GetResult().m_Score;
 		}
 
 		if (result.m_Winner != Winner::Draw && match->GetWinner()->GetUUID() == rhs.Judoka->GetUUID())
 		{
 			b_wins++;
-			b_score += (int)match->GetMatchResult().m_Score;
+			b_score += (int)match->GetResult().m_Score;
 		}
 	}
 
@@ -233,11 +243,7 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tour
 	if (Yaml["matches"] && Yaml["matches"].IsSequence())
 	{
 		for (const auto& node : Yaml["matches"])
-		{
-			auto new_match = new Match(node, Tournament);
-			new_match->SetMatchTable(this);
-			m_Schedule.emplace_back(new_match);
-		}
+			m_Schedule.emplace_back(new Match(node, this, Tournament));
 	}
 }
 
