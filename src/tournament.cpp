@@ -1348,8 +1348,9 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 	{
 		if (desc.m_AgeGroup)
 		{
-			//Remove all weight classes with this age group			
-			for (auto match_table : m_MatchTables)
+			//Remove all weight classes with this age group
+			auto temp_copy = m_MatchTables;//We are iterating while removing
+			for (auto match_table : temp_copy)
 			{
 				if (match_table->GetType() == MatchTable::Type::Weightclass &&
 					match_table->GetAgeGroup() &&
@@ -1360,7 +1361,8 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 
 		else//Not associated to an age group? Remove all weight classes
 		{
-			for (auto match_table : m_MatchTables)
+			auto temp_copy = m_MatchTables;//We are iterating while removing
+			for (auto match_table : temp_copy)
 			{
 				if (match_table->GetType() == MatchTable::Type::Weightclass)
 					RemoveMatchTable(match_table->GetUUID());
