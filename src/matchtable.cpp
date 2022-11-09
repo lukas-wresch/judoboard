@@ -30,6 +30,16 @@ void MatchTable::SetMatID(int32_t MatID)
 
 
 
+Match* MatchTable::FindMatch(const UUID& UUID) const
+{
+	for (auto match : m_Schedule)
+		if (match && match->GetUUID() == UUID)
+			return match;
+	return nullptr;
+}
+
+
+
 Judoka* MatchTable::FindParticipant(const UUID& UUID) const
 {
 	for (auto participant : m_Participants)
