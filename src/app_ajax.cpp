@@ -1169,24 +1169,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
-		auto lastname  = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
-		auto weight    = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
-		Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
-		int  birthyear = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "birthyear"));
-		UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");
-
-		if (!firstname.size() || !lastname.size() || (gender != Gender::Male && gender != Gender::Female))
-			return (std::string)(Error)Error::Type::InvalidInput;
-
-		Judoka new_judoka(firstname, lastname, Weight(weight), gender);
-		if (birthyear > 1900 && birthyear < 2100)
-			new_judoka.SetBirthyear(birthyear);
-		new_judoka.SetClub(GetDatabase().FindClub(clubID));
-
-		m_Database.AddJudoka(std::move(new_judoka));
-		m_Database.Save();
-		return Error();//OK
+		return Ajax_AddJudoka(Request);
 	});
 
 
@@ -1232,31 +1215,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-		auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
-		auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
-		auto weight = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
-		Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
-		UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");
-
-		if (!firstname.size() || !lastname.size() || (gender != Gender::Male && gender != Gender::Female))
-			return (std::string)(Error)Error::Type::InvalidInput;
-
-		auto judoka = m_Database.FindJudoka(id);
-
-		if (!judoka)
-			return Error(Error::Type::ItemNotFound);
-
-		judoka->SetFirstname(firstname);
-		judoka->SetLastname(lastname);
-		judoka->SetWeight(Weight(weight));
-		judoka->SetGender(gender);
-		if (GetDatabase().FindClub(clubID))
-			judoka->SetClub(GetDatabase().FindClub(clubID));
-		else
-			judoka->SetClub(nullptr);
-
-		return Error();//OK
+		return Ajax_EditJudoka(Request);
 	});
 
 
@@ -2808,6 +2767,81 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 	}
 
 	return Error::Type::MatNotFound;
+}
+
+
+
+Error Application::Ajax_AddJudoka(const HttpServer::Request& Request)
+{
+	auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
+	auto lastname  = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
+	auto weight    = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
+	Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+	int  birthyear = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "birthyear"));
+	auto number = HttpServer::DecodeURLEncoded(Request.m_Body, "number");
+	UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");
+
+	if (!firstname.size() || !lastname.size() || (gender != Gender::Male && gender != Gender::Female))
+		return Error::Type::InvalidInput;
+
+	Judoka new_judoka(firstname, lastname, Weight(weight), gender);
+	if (birthyear > 1900 && birthyear < 2100)
+		new_judoka.SetBirthyear(birthyear);
+
+	if (!number.empty())
+		new_judoka.SetNumber(number);
+
+	new_judoka.SetClub(GetDatabase().FindClub(clubID));
+
+	LockTillScopeEnd();
+
+	m_Database.AddJudoka(std::move(new_judoka));
+	m_Database.Save();
+	
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
+	auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
+	auto weight = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
+	Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+	int  birthyear = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "birthyear"));
+	auto number = HttpServer::DecodeURLEncoded(Request.m_Body, "number");
+	UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");
+
+	if (!firstname.size() || !lastname.size() || (gender != Gender::Male && gender != Gender::Female))
+		return Error::Type::InvalidInput;
+
+	LockTillScopeEnd();
+
+	auto judoka = m_Database.FindJudoka(id);
+
+	if (!judoka)
+		return Error::Type::ItemNotFound;
+
+	judoka->SetFirstname(firstname);
+	judoka->SetLastname(lastname);
+	judoka->SetWeight(Weight(weight));
+	judoka->SetGender(gender);
+
+	if (birthyear > 1900 && birthyear < 2100)
+		judoka->SetBirthyear(birthyear);
+
+	if (!number.empty())
+		judoka->SetNumber(number);
+
+	if (GetDatabase().FindClub(clubID))
+		judoka->SetClub(GetDatabase().FindClub(clubID));
+	else
+		judoka->SetClub(nullptr);
+
+
+	return Error();//OK
 }
 
 

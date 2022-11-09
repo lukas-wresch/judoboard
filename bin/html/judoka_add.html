@@ -14,7 +14,7 @@
 
 <div>
     <label style="width:150px;float:left;margin-top:4px;" id="label_weight">Weight</label>
-    <input style="margin-bottom:20px;" type="text" id="weight" value="" min="10" max="500" />
+    <input style="margin-bottom:20px;" type="number" id="weight" value="" min="10" max="500" />
 </div>
 
 <div>
@@ -28,6 +28,11 @@
 <div>
     <label style="width:150px;float:left;margin-top:4px;" id="label_birthyear">Birthyear</label>
     <input style="margin-bottom:20px;" type="number" id="birthyear" value="1995" min="1900" max="2100" />
+</div>
+
+<div>
+    <label style="width:150px;float:left;margin-top:4px;" id="label_number">Judo passport number</label>
+    <input style="margin-bottom:20px;" type="text" id="number" value="" size="10" maxlength="64"/>
 </div>
 
 <div>
@@ -57,6 +62,7 @@ function AddJudoka()
     weight:    document.getElementById("weight").value,
     gender:    document.getElementById("gender").value,
     birthyear: document.getElementById("birthyear").value,
+    number:    document.getElementById("number").value,
     club:      document.getElementById("clubs").value,
   });
 
@@ -84,6 +90,7 @@ function GetJudoka(id)
     document.getElementById("weight").value    = String(res.weight).trim();
     document.getElementById("gender").value    = res.gender;
     document.getElementById("birthyear").value = res.birthyear;
+    document.getElementById("number").value    = res.number;
 
     GetClubs(function(response) {
       if (res.club != null)
@@ -101,6 +108,8 @@ function UpdateJudoka()
     lastname:  document.getElementById("lastname").value,
     weight:    document.getElementById("weight").value,
     gender:    document.getElementById("gender").value,
+    birthyear: document.getElementById("birthyear").value,
+    number:    document.getElementById("number").value,
     club:      document.getElementById("clubs").value,
   });
 

@@ -111,6 +111,10 @@ namespace Judoboard
 		//Schedule
 		std::string Ajax_GetHansokumake() const;//Returns matches that are in progress and have a direct hansokumake
 
+		//Judoka
+		Error Ajax_AddJudoka(const HttpServer::Request& Request);
+		Error Ajax_EditJudoka(const HttpServer::Request& Request);
+
 		//Clubs
 		Error Ajax_AddClub(const HttpServer::Request& Request);
 		Error Ajax_EditClub(const HttpServer::Request& Request);

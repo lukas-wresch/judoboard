@@ -333,7 +333,63 @@ TEST(Ajax, GetHansokumake2)
 
 
 
-TEST(Ajax, AddClub)
+TEST(Ajax, Judoka_Add)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddJudoka(HttpServer::Request("", "firstname=first&lastname=last&weight=10&gender=0&birthyear=2000&number=A123")), "ok");
+
+		auto judokas = app.GetDatabase().GetAllJudokas();
+
+		ASSERT_EQ(judokas.size(), 1);
+		auto judoka = judokas.begin()->second;
+
+		EXPECT_EQ(judoka->GetFirstname(), "first");
+		EXPECT_EQ(judoka->GetLastname(),  "last");
+		EXPECT_EQ(judoka->GetWeight(),  Weight(10));
+		EXPECT_EQ(judoka->GetGender(),  Gender::Male);
+		EXPECT_EQ(judoka->GetBirthyear(), 2000);
+		EXPECT_EQ(judoka->GetNumber(), "A123");
+	}
+
+	ZED::Core::RemoveFile("database.yml");
+}
+
+
+
+TEST(Ajax, Judoka_Edit)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddJudoka(HttpServer::Request("", "firstname=first&lastname=last&weight=10&gender=0&birthyear=2000&number=A123")), "ok");
+
+		auto judokas = app.GetDatabase().GetAllJudokas();
+
+		ASSERT_EQ(judokas.size(), 1);
+		auto judoka = judokas.begin()->second;
+
+		EXPECT_EQ((std::string)app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)judoka->GetUUID(), "firstname=first2&lastname=last2&weight=12,5&gender=1&birthyear=2001&number=A1234")), "ok");
+
+		EXPECT_EQ(judoka->GetFirstname(), "first2");
+		EXPECT_EQ(judoka->GetLastname(),  "last2");
+		EXPECT_EQ(judoka->GetWeight(),  Weight("12,5"));
+		EXPECT_EQ(judoka->GetGender(),  Gender::Female);
+		EXPECT_EQ(judoka->GetBirthyear(), 2001);
+		EXPECT_EQ(judoka->GetNumber(), "A1234");
+	}
+
+	ZED::Core::RemoveFile("database.yml");
+}
+
+
+
+TEST(Ajax, Clubs_Add)
 {
 	initialize();
 
