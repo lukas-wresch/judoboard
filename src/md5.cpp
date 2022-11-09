@@ -238,12 +238,12 @@ MD5::MD5(const Tournament& Tournament)
 
 		if (match->HasConcluded())
 		{//Convert result
-			if (match->GetMatchResult().m_Winner == Winner::White)
+			if (match->GetResult().m_Winner == Winner::White)
 			{
 				new_match.WinnerID = new_match.WhiteID;
 				new_match.LoserID  = new_match.RedID;
 			}
-			else if (match->GetMatchResult().m_Winner == Winner::Blue)
+			else if (match->GetResult().m_Winner == Winner::Blue)
 			{
 				new_match.WinnerID = new_match.RedID;
 				new_match.LoserID  = new_match.WhiteID;
@@ -253,8 +253,8 @@ MD5::MD5(const Tournament& Tournament)
 				//TODO draw can not be converted
 			}
 
-			new_match.ScoreWinner = (int)match->GetMatchResult().m_Score;
-			new_match.Time        = match->GetMatchResult().m_Time / 1000;
+			new_match.ScoreWinner = (int)match->GetResult().m_Score;
+			new_match.Time        = match->GetResult().m_Time / 1000;
 		}
 
 		m_Matches.emplace_back(new_match);

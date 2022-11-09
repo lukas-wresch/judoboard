@@ -24,7 +24,7 @@ Match::Match(const ITournament* Tournament, const Judoka* White, const Judoka* B
 
 
 
-Match::Match(const YAML::Node& Yaml, ITournament* Tournament) : m_Tournament(Tournament)
+Match::Match(const YAML::Node& Yaml, MatchTable* MatchTable, ITournament* Tournament) : m_Tournament(Tournament)
 {
 	if (!Yaml.IsMap())
 		return;
@@ -51,7 +51,9 @@ Match::Match(const YAML::Node& Yaml, ITournament* Tournament) : m_Tournament(Tou
 	if (Yaml["rule_set"] && Tournament)
 		m_Rules = Tournament->FindRuleSet(Yaml["rule_set"].as<std::string>());
 
-	if (Yaml["match_table"] && Tournament)
+	if (MatchTable)
+		m_Table = MatchTable;
+	else if (Yaml["match_table"] && Tournament)
 		m_Table = Tournament->FindMatchTable(Yaml["match_table"].as<std::string>());
 
 	if (Yaml["dependency_white"])
@@ -263,7 +265,7 @@ const Judoka* Match::GetWinner() const
 	if (!HasConcluded())
 		return nullptr;
 
-	auto result = GetMatchResult();
+	auto result = GetResult();
 
 	if (result.m_Winner == Winner::Draw)
 		return nullptr;
@@ -281,7 +283,7 @@ const Judoka* Match::GetLoser() const
 	if (!HasConcluded())
 		return nullptr;
 
-	auto result = GetMatchResult();
+	auto result = GetResult();
 
 	if (result.m_Winner == Winner::Draw)
 		return nullptr;

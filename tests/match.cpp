@@ -21,7 +21,7 @@ TEST(Match, ExportImport)
 		YAML::Emitter yaml;
 		*match >> yaml;
 
-		Match match2(YAML::Load(yaml.c_str()), &tourney);
+		Match match2(YAML::Load(yaml.c_str()), nullptr, &tourney);
 
 		ASSERT_EQ(match->GetFighter(Fighter::White)->GetUUID(), match2.GetFighter(Fighter::White)->GetUUID());
 		ASSERT_EQ(match->GetFighter(Fighter::Blue )->GetUUID(), match2.GetFighter(Fighter::Blue )->GetUUID());

@@ -157,18 +157,18 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 		if (!match->HasConcluded())
 			continue;
 
-		auto result = match->GetMatchResult();
+		auto result = match->GetResult();
 
 		if (result.m_Winner != Winner::Draw && match->GetWinner()->GetUUID() == Judoka->GetUUID())
 		{
 			a_wins++;
-			a_score += (int)match->GetMatchResult().m_Score;
+			a_score += (int)match->GetResult().m_Score;
 		}
 
 		if (result.m_Winner != Winner::Draw && match->GetWinner()->GetUUID() == rhs.Judoka->GetUUID())
 		{
 			b_wins++;
-			b_score += (int)match->GetMatchResult().m_Score;
+			b_score += (int)match->GetResult().m_Score;
 		}
 	}
 
@@ -233,7 +233,7 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tour
 	if (Yaml["matches"] && Yaml["matches"].IsSequence())
 	{
 		for (const auto& node : Yaml["matches"])
-			m_Schedule.emplace_back(new Match(node, Tournament));
+			m_Schedule.emplace_back(new Match(node, this, Tournament));
 	}
 }
 

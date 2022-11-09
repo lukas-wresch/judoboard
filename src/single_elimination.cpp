@@ -303,7 +303,7 @@ const std::string SingleElimination::ToHTML() const
 			ret += "<br/>" + Localizer::Translate("In Progress");
 		else if (match->HasConcluded())
 		{
-			const auto& result = match->GetMatchResult();
+			const auto& result = match->GetResult();
 			if (result.m_Winner == Winner::White)
 				ret += "<br/>"   + std::to_string((int)result.m_Score) + ":0";
 			else

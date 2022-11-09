@@ -399,8 +399,8 @@ TEST(App, MatchOnSlave)
 
 	ZED::Core::Pause(100);
 
-	EXPECT_EQ(match->GetMatchResult().m_Winner, Fighter::White);
-	EXPECT_EQ(match->GetMatchResult().m_Score, Match::Score::Ippon);
+	EXPECT_EQ(match->GetResult().m_Winner, Fighter::White);
+	EXPECT_EQ(match->GetResult().m_Score, Match::Score::Ippon);
 }
 
 

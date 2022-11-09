@@ -17,6 +17,7 @@ namespace Judoboard
 
 	class Match : public ID
 	{
+		friend class Application;
 		friend class Tournament;
 		friend class Mat;
 		friend class MatchTable;
@@ -58,7 +59,7 @@ namespace Judoboard
 
 
 		Match(const ITournament* Tournament, const Judoka* White, const Judoka* Blue, uint32_t MatID = 0);
-		Match(const YAML::Node& Yaml, ITournament* Tournament);
+		Match(const YAML::Node& Yaml, MatchTable* MatchTable, ITournament* Tournament);
 		//Match(Match&) = delete;//TODO
 		//Match(const Match&) = delete;//TODO
 
@@ -95,7 +96,7 @@ namespace Judoboard
 				m_Blue.m_Judoka  = NewFighter;
 		}
 
-		Result GetMatchResult() const { return m_Result; }//Returns the result of the match (if it has concluded)
+		Result GetResult() const { return m_Result; }//Returns the result of the match (if it has concluded)
 
 		bool Contains(const Judoka& Judoka) const;//Returns true if and only if Judoka is one of the two fighters
 		Fighter GetColorOfFighter(const Judoka& Judoka) const;//Returns the color (white or blue) of the judoka. 'Judoka' must be on of the two fighters of the match

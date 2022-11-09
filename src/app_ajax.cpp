@@ -2443,7 +2443,7 @@ void Application::SetupHttpServer()
 		{
 			if (mat && mat->GetMatID() == matID)
 			{
-				Match* match = new Match(match_data, GetTournament());
+				Match* match = new Match(match_data, nullptr, GetTournament());
 				GetTournament()->AddMatch(match);
 
 				if (mat->StartMatch(match))
@@ -2636,15 +2636,16 @@ void Application::SetupHttpServer()
 
 		ZED::Log::Info("Slave posted match results to us");
 
+		//Extract UUID and result data
 		YAML::Node match_data = YAML::Load((const char*)Request.m_Body);
-		Match posted_match(match_data, GetTournament());
+		Match posted_match(match_data, nullptr, GetTournament());
 
-		auto match = GetTournament()->FindMatch(posted_match);
+		auto match = GetTournament()->FindMatch(posted_match.GetUUID());
 
 		if (!match)
 			return "Not found";
 
-		*match = posted_match;
+		match->SetResult(posted_match.GetResult());
 		return "ok";
 	});
 }
