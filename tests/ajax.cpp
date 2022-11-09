@@ -715,7 +715,7 @@ TEST(Ajax, SetStartingPosition)
 	for (int i = 0; i < 100; ++i)
 	{
 		int startpos = rand() % 4;
-		YAML::Node yaml = YAML::Load(app.Ajax_SetStartingPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j1->GetUUID() + "&startpos=" + std::to_string(startpos) )));
+		EXPECT_EQ((std::string)app.Ajax_SetStartingPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j1->GetUUID() + "&startpos=" + std::to_string(startpos) )), "ok");
 
 		EXPECT_EQ(table->GetStartingPosition(j1), startpos);
 	}
@@ -723,7 +723,7 @@ TEST(Ajax, SetStartingPosition)
 	for (int i = 0; i < 100; ++i)
 	{
 		int startpos = rand() % 4;
-		YAML::Node yaml = YAML::Load(app.Ajax_SetStartingPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j2->GetUUID() + "&startpos=" + std::to_string(startpos) )));
+		EXPECT_EQ((std::string)app.Ajax_SetStartingPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j2->GetUUID() + "&startpos=" + std::to_string(startpos) )), "ok");
 
 		EXPECT_EQ(table->GetStartingPosition(j2), startpos);
 	}
