@@ -37,6 +37,8 @@ Judoka::Judoka(const YAML::Node& Yaml, const StandingData* pStandingData)
 		m_Gender = (Gender)Yaml["gender"].as<int>();
 	if (Yaml["birthyear"])
 		m_Birthyear = Yaml["birthyear"].as<int>();
+	if (Yaml["number"])
+		m_Number = Yaml["number"].as<std::string>();
 	if (Yaml["club"] && pStandingData)
 		m_pClub = pStandingData->FindClub(Yaml["club"].as<std::string>());
 }
@@ -103,6 +105,10 @@ void Judoka::operator >> (YAML::Emitter& Yaml) const
 
 	Yaml << YAML::Key << "gender"    << YAML::Value << (int)m_Gender;
 	Yaml << YAML::Key << "birthyear" << YAML::Value << m_Birthyear;
+
+	if (!m_Number.empty())
+		Yaml << YAML::Key << "number" << YAML::Value << m_Number;
+
 	if (m_pClub)
 		Yaml << YAML::Key << "club"  << YAML::Value << (std::string)m_pClub->GetUUID();
 	Yaml << YAML::EndMap;
@@ -119,6 +125,7 @@ void Judoka::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "weight"    << YAML::Value << m_Weight.ToString();
 	Yaml << YAML::Key << "gender"    << YAML::Value << (int)m_Gender;
 	Yaml << YAML::Key << "birthyear" << YAML::Value << m_Birthyear;
+	Yaml << YAML::Key << "number"    << YAML::Value << m_Number;
 
 	if (m_pClub)
 	{

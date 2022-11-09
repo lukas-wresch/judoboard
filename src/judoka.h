@@ -47,6 +47,7 @@ namespace Judoboard
 		const std::string GetLastname()  const { return m_Lastname;  }
 		auto GetBirthyear() const { return m_Birthyear; }
 		const Club* GetClub() const { return m_pClub; }
+		auto GetNumber() const { return m_Number; }
 
 		void SetFirstname(const std::string& Firstname) { m_Firstname = Firstname; }
 		void SetLastname( const std::string& Lastname)  { m_Lastname  = Lastname; }
@@ -54,6 +55,7 @@ namespace Judoboard
 		void SetWeight(Weight NewWeight);
 		void SetBirthyear(uint16_t NewBirthyear) { m_Birthyear = NewBirthyear; }
 		void SetClub(const Club* NewClub) { m_pClub = NewClub; }
+		void SetNumber(const std::string& NewNumber) { m_Number = NewNumber; }
 
 		void StartBreak() const { m_LastMatch_Timestamp = Timer::GetTimestamp(); }
 		uint32_t GetLengthOfBreak()  const { return (Timer::GetTimestamp() - m_LastMatch_Timestamp) / 1000; }//Returns the number of seconds this judoka had a break
@@ -70,9 +72,11 @@ namespace Judoboard
 		std::string m_Lastname;
 
 		Weight m_Weight = 0;//Weight in grams
-		Gender m_Gender = Gender::Male;
+		Gender m_Gender = Gender::Unknown;
 
 		uint16_t m_Birthyear = 0;
+
+		std::string m_Number;//Official number of this judoka according to his "judo passport"
 
 		const Club* m_pClub = nullptr;//Club the judoka belongs to
 

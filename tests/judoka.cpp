@@ -9,7 +9,7 @@ TEST(Judoka, Basic)
 
 	EXPECT_EQ(j.GetGender(), Gender::Male);
 	EXPECT_EQ(j.GetWeight(), Weight(50));
-
+	EXPECT_EQ(j.GetNumber(), "");
 	EXPECT_EQ(j.GetName(NameStyle::GivenName), std::string("Firstname Lastname"));
 
 	j.SetWeight(80);
@@ -21,14 +21,19 @@ TEST(Judoka, Basic)
 	j.SetFirstname("New");
 	j.SetLastname("Name");
 	EXPECT_EQ(j.GetName(NameStyle::GivenName), std::string("New Name"));
+
+	j.SetNumber("ABC123");
+	EXPECT_EQ(j.GetNumber(), "ABC123");
 }
+
 
 
 TEST(Judoka, ImportExport)
 {
-	for (int i = 0; i < 1000 * 10; i++)
+	for (int i = 0; i < 1000; i++)
 	{
 		Judoka j(GetRandomName(), GetRandomName(), rand()%200, (Gender)(rand()%2));
+		j.SetNumber("ABC123");
 
 		YAML::Emitter yaml;
 		j >> yaml;
@@ -41,6 +46,7 @@ TEST(Judoka, ImportExport)
 		EXPECT_EQ(j.GetAge(),  j2.GetAge());
 		EXPECT_EQ(j.GetUUID(), j2.GetUUID());
 		EXPECT_EQ(j.GetLengthOfBreak(), j2.GetLengthOfBreak());
+		EXPECT_EQ(j.GetNumber(), j2.GetNumber());
 	}
 }
 
@@ -48,7 +54,7 @@ TEST(Judoka, ImportExport)
 
 TEST(Judoka, ImportExport_RuleSet)
 {
-	for (int i = 0; i < 1000 * 10; i++)
+	for (int i = 0; i < 1000; i++)
 	{
 		RuleSet r(GetRandomName(), rand() % 200, rand() % 200, rand() % 200, rand() % 200, rand() % 2, rand() % 2, rand() % 2, rand() % 200);
 
