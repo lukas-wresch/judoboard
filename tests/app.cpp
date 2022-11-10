@@ -305,6 +305,8 @@ TEST(App, FullTournament_SingleElimination14)
 	Account acc("admin", "1234", Account::AccessLevel::Admin);
 	app.GetDatabase().AddAccount(acc);
 
+	ZED::Core::Pause(5000);
+
 	auto tournament_name = GetRandomName();
 	auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3*60, 3*60, 20, 10));
 	tourney->EnableAutoSave(false);
