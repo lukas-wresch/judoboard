@@ -367,6 +367,27 @@ const std::vector<const Match*> Match::GetDependentMatches() const
 
 
 
+bool Match::IsEmptyMatch() const
+{
+	if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
+		return m_White.m_DependentMatch->IsCompletelyEmptyMatch() || m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
+
+	return !GetFighter(Fighter::White) || !GetFighter(Fighter::Blue);
+}
+
+
+
+bool Match::IsCompletelyEmptyMatch() const
+{
+	if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
+		return m_White.m_DependentMatch->IsCompletelyEmptyMatch() && m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
+
+	return ( (!GetFighter(Fighter::White) && m_White.m_Dependency == DependencyType::None) &&
+		(!GetFighter(Fighter::Blue)  && m_Blue.m_Dependency  == DependencyType::None));
+}
+
+
+
 const RuleSet& Match::GetRuleSet() const
 {
 	if (m_Rules)
