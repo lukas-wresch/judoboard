@@ -181,6 +181,13 @@ TEST(SingleElimination, Count3)
 	ASSERT_EQ(group.GetParticipants().size(), 3);
 	ASSERT_EQ(group.GetSchedule().size(), 3);
 
+	EXPECT_EQ(group.GetSchedule()[0]->GetFighter(Fighter::White)->GetUUID(), j1->GetUUID());
+	EXPECT_EQ(group.GetSchedule()[0]->GetFighter(Fighter::Blue )->GetUUID(), j2->GetUUID());
+	EXPECT_EQ(group.GetSchedule()[1]->GetFighter(Fighter::White)->GetUUID(), j3->GetUUID());
+	EXPECT_FALSE(group.GetSchedule()[1]->GetFighter(Fighter::Blue));
+	EXPECT_FALSE(group.GetSchedule()[2]->GetFighter(Fighter::White));
+	EXPECT_TRUE( group.GetSchedule()[2]->GetFighter(Fighter::Blue));
+
 	Mat m(1);
 
 	for (auto match : group.GetSchedule())
@@ -202,6 +209,65 @@ TEST(SingleElimination, Count3)
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j3->GetUUID());
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
+}
+
+
+
+TEST(SingleElimination, Count3_BO3)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	group.IsBestOfThree(true);
+	t->AddMatchTable(&group);
+
+	auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+	t->AddParticipant(j1);
+
+	auto j2 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+	t->AddParticipant(j2);
+
+	auto j3 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 70);
+	t->AddParticipant(j3);
+
+	ASSERT_EQ(group.GetParticipants().size(), 3);
+	ASSERT_EQ(group.GetSchedule().size(), 3*3);
+
+	Mat m(1);
+
+	EXPECT_TRUE(m.StartMatch(group.GetSchedule()[0]));
+	m.AddIppon(Fighter::White);//j1
+	EXPECT_TRUE(m.EndMatch());
+
+	EXPECT_TRUE(m.StartMatch(group.GetSchedule()[1]));
+	m.AddIppon(Fighter::White);//j2
+	EXPECT_TRUE(m.EndMatch());
+
+	EXPECT_TRUE(m.StartMatch(group.GetSchedule()[2]));
+	m.AddIppon(Fighter::Blue);//j2
+	EXPECT_TRUE(m.EndMatch());
+
+	EXPECT_FALSE(m.StartMatch(group.GetSchedule()[3]));//Half empty
+	EXPECT_FALSE(m.StartMatch(group.GetSchedule()[4]));//Half empty
+	EXPECT_FALSE(m.StartMatch(group.GetSchedule()[5]));//Half empty
+
+	EXPECT_TRUE(m.StartMatch(group.GetSchedule()[6]));
+	m.AddIppon(Fighter::White);//j2
+	EXPECT_TRUE(m.EndMatch());
+
+	EXPECT_TRUE(m.StartMatch(group.GetSchedule()[7]));
+	m.AddIppon(Fighter::Blue);//j2
+	EXPECT_TRUE(m.EndMatch());
+
+	auto results = group.CalculateResults();
+
+	ASSERT_EQ(results.size(), 2);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j2->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j3->GetUUID());
 }
 
 

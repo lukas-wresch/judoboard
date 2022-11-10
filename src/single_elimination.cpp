@@ -166,16 +166,22 @@ void SingleElimination::GenerateSchedule()
 	//Add additional matches for best of three
 	if (IsBestOfThree())
 	{
-		auto length = m_Schedule.size();
+		auto schedule_copy = std::move(m_Schedule);
+
+		auto length = schedule_copy.size();
 		for (size_t i = 0; i < length; ++i)
 		{
-			auto match1 = m_Schedule[i];
-			auto indices = GetIndicesOfMatch(match1);
+			auto match1 = schedule_copy[i];
 
-			auto match2 = AddAutoMatch(indices.second, indices.first);
-			auto match3 = AddAutoMatch(indices.first,  indices.second);
-			if (match3)
-				match3->SetBestOfThree(match1, match2);
+			m_Schedule.push_back(match1);
+
+			auto match2 = new Match(*match1);
+			match2->SwapFighters();
+			auto match3 = new Match(*match1);
+			match3->SetBestOfThree(match1, match2);
+
+			m_Schedule.emplace_back(match2);
+			m_Schedule.emplace_back(match3);
 		}
 	}
 }
