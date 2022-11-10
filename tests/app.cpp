@@ -163,26 +163,31 @@ TEST(App, DeleteTournament)
 TEST(App, Mats)
 {
 	initialize();
-	Application app;
 
-	EXPECT_EQ(app.GetMats().size(), 0);
-	EXPECT_EQ(app.FindDefaultMatID(), 0);
-	EXPECT_TRUE(app.GetDefaultMat() == nullptr);
-	EXPECT_TRUE(app.FindMat(1) == nullptr);
+	{
+		Application app;
 
-	EXPECT_TRUE(app.StartLocalMat(1));
+		EXPECT_EQ(app.GetMats().size(), 0);
+		EXPECT_EQ(app.FindDefaultMatID(), 0);
+		EXPECT_TRUE(app.GetDefaultMat() == nullptr);
+		EXPECT_TRUE(app.FindMat(1) == nullptr);
 
-	EXPECT_TRUE(app.GetMats().size() == 1);
-	EXPECT_TRUE(app.FindDefaultMatID() == 1);
-	EXPECT_TRUE(app.GetDefaultMat() != nullptr);
-	EXPECT_TRUE(app.FindMat(1) != nullptr);
+		EXPECT_TRUE(app.StartLocalMat(1));
 
-	EXPECT_TRUE(app.CloseMat(1));
+		EXPECT_EQ(app.GetMats().size(), 1);
+		EXPECT_EQ(app.FindDefaultMatID(), 1);
+		EXPECT_TRUE(app.GetDefaultMat() != nullptr);
+		EXPECT_TRUE(app.FindMat(1) != nullptr);
 
-	EXPECT_TRUE(app.GetMats().size() == 1);
-	EXPECT_TRUE(app.FindDefaultMatID() == 1);
-	EXPECT_TRUE(app.GetDefaultMat() != nullptr);
-	EXPECT_TRUE(app.FindMat(1) != nullptr);
+		EXPECT_TRUE(app.CloseMat(1));
+
+		EXPECT_EQ(app.GetMats().size(), 1);
+		EXPECT_EQ(app.FindDefaultMatID(), 1);
+		EXPECT_TRUE(app.GetDefaultMat() != nullptr);
+		EXPECT_TRUE(app.FindMat(1) != nullptr);
+	}
+
+	ZED::Core::Pause(5000);
 }
 
 
