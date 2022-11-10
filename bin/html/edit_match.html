@@ -82,16 +82,16 @@ function GetMatch()
 
     if (typeof res.white_name !== 'undefined')
       document.getElementById("white").innerHTML = res.white_name;
-    else if (res.white_dependency_type == 1)
-      document.getElementById("white").innerHTML = "<a href='#edit_match.html?id=" + res.white_dependency_uuid + "'>Winner of this match</a>";
     else if (res.white_dependency_type == 2)
+      document.getElementById("white").innerHTML = "<a href='#edit_match.html?id=" + res.white_dependency_uuid + "'>Winner of this match</a>";
+    else if (res.white_dependency_type == 3)
       document.getElementById("white").innerHTML = "<a href='#edit_match.html?id=" + res.white_dependency_uuid + "'>Loser of this match</a>";
 
     if (typeof res.blue_name !== 'undefined')
       document.getElementById("blue" ).innerHTML = res.blue_name;
-    else if (res.blue_dependency_type == 1)
-      document.getElementById("blue").innerHTML = "<a href='#edit_match.html?id=" + res.blue_dependency_uuid + "'>Winner of this match</a>";
     else if (res.blue_dependency_type == 2)
+      document.getElementById("blue").innerHTML = "<a href='#edit_match.html?id=" + res.blue_dependency_uuid + "'>Winner of this match</a>";
+    else if (res.blue_dependency_type == 3)
       document.getElementById("blue").innerHTML = "<a href='#edit_match.html?id=" + res.blue_dependency_uuid + "'>Loser of this match</a>";
 
     if (res.state == 0)
