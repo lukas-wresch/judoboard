@@ -213,7 +213,10 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 		if (m_White.m_Judoka)
 			return m_White.m_Judoka;
 
-		else if (m_White.m_Dependency & DependencyType::TakeWinner)
+		else if (m_White.m_Dependency == DependencyType::BestOfThree && m_White.m_DependentMatch)
+			m_White.m_DependentMatch->GetFighter(Fighter::White);
+
+		else if (m_White.m_Dependency == DependencyType::TakeWinner)
 		{
 			if (m_White.m_DependentMatch && m_White.m_DependentMatch->HasConcluded())
 				return m_White.m_DependentMatch->GetWinner();
@@ -226,7 +229,10 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 	if (m_Blue.m_Judoka)
 		return m_Blue.m_Judoka;
 
-	else if (m_Blue.m_Dependency & DependencyType::TakeWinner)
+	else if (m_Blue.m_Dependency == DependencyType::BestOfThree && m_Blue.m_DependentMatch)
+		m_Blue.m_DependentMatch->GetFighter(Fighter::Blue);
+
+	else if (m_Blue.m_Dependency == DependencyType::TakeWinner)
 	{
 		if (m_Blue.m_DependentMatch && m_Blue.m_DependentMatch->HasConcluded())
 			return m_Blue.m_DependentMatch->GetWinner();
@@ -274,7 +280,10 @@ const Judoka* Match::GetEnemyOf(const Judoka& Judoka) const
 
 const Judoka* Match::GetWinner() const
 {
-	if (IsEmptyMatch() && !IsCompletelyEmptyMatch())
+	if (IsCompletelyEmptyMatch())
+		return nullptr;
+
+	if (IsEmptyMatch())
 	{
 		if (GetFighter(Fighter::White))
 			return GetFighter(Fighter::White);
@@ -397,8 +406,7 @@ bool Match::IsCompletelyEmptyMatch() const
 	if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
 		return m_White.m_DependentMatch->IsCompletelyEmptyMatch() && m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
 
-	return ( (!GetFighter(Fighter::White) && m_White.m_Dependency == DependencyType::None) &&
-		(!GetFighter(Fighter::Blue)  && m_Blue.m_Dependency  == DependencyType::None));
+	return !GetFighter(Fighter::White) && !GetFighter(Fighter::Blue);
 }
 
 

@@ -73,8 +73,14 @@ namespace Judoboard
 			if (IsBestOfThree() && m_White.m_DependentMatch && m_Blue.m_DependentMatch)
 			{
 				if (m_White.m_DependentMatch->HasConcluded() && m_Blue.m_DependentMatch->HasConcluded())
+				{
+					if (!m_White.m_DependentMatch->GetWinner())
+						return true;
+					if (!m_Blue.m_DependentMatch->GetWinner())
+						return true;
 					if (*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())
 						return true;
+				}
 			}
 			return m_State == Status::Concluded;
 		}
