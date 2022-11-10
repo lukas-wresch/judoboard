@@ -6,7 +6,7 @@ TEST(Match, ExportImport)
 {
 	initialize();
 	
-	for (int i = 0; i < 2000; i++)
+	for (int i = 0; i < 1000; i++)
 	{
 		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
@@ -16,12 +16,48 @@ TEST(Match, ExportImport)
 
 		Match* match = new Match(&tourney, &j1, &j2, matid);
 		match->SetRuleSet(&rule_set);
-		tourney.AddMatch(match);//Also copies the rule set inside the tournment's database
+		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
 
 		YAML::Emitter yaml;
 		*match >> yaml;
 
 		Match match2(YAML::Load(yaml.c_str()), nullptr, &tourney);
+
+		ASSERT_EQ(match->GetFighter(Fighter::White)->GetUUID(), match2.GetFighter(Fighter::White)->GetUUID());
+		ASSERT_EQ(match->GetFighter(Fighter::Blue )->GetUUID(), match2.GetFighter(Fighter::Blue )->GetUUID());
+
+		ASSERT_EQ(match->GetRuleSet().GetUUID(), match2.GetRuleSet().GetUUID());
+
+		YAML::Emitter yaml1, yaml2;
+		match->ToString(yaml1);
+		match2.ToString(yaml2);
+		ASSERT_EQ((std::string)yaml1.c_str(), (std::string)yaml2.c_str());
+
+		ASSERT_EQ(match->GetUUID(),      match2.GetUUID());
+		ASSERT_EQ(match->HasConcluded(), match2.HasConcluded());
+		ASSERT_EQ(match->IsRunning(),    match2.IsRunning());
+	}
+}
+
+
+
+TEST(Match, ExportImport_CopyConstructor)
+{
+	initialize();
+
+	for (int i = 0; i < 1000; i++)
+	{
+		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+		int matid = rand();
+		RuleSet rule_set("test", rand(), rand(), rand(), rand());
+		Tournament tourney;
+
+		Match* match = new Match(&tourney, &j1, &j2, matid);
+		match->SetRuleSet(&rule_set);
+		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
+
+		Match match2(*match);
 
 		ASSERT_EQ(match->GetFighter(Fighter::White)->GetUUID(), match2.GetFighter(Fighter::White)->GetUUID());
 		ASSERT_EQ(match->GetFighter(Fighter::Blue )->GetUUID(), match2.GetFighter(Fighter::Blue )->GetUUID());

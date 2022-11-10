@@ -166,16 +166,50 @@ void SingleElimination::GenerateSchedule()
 	//Add additional matches for best of three
 	if (IsBestOfThree())
 	{
-		auto length = m_Schedule.size();
+		auto schedule_copy = std::move(m_Schedule);
+
+		auto length = schedule_copy.size();
 		for (size_t i = 0; i < length; ++i)
 		{
-			auto match1 = m_Schedule[i];
-			auto indices = GetIndicesOfMatch(match1);
+			auto match1 = schedule_copy[i];
 
-			auto match2 = AddAutoMatch(indices.second, indices.first);
-			auto match3 = AddAutoMatch(indices.first,  indices.second);
-			if (match3)
-				match3->SetBestOfThree(match1, match2);
+			m_Schedule.push_back(match1);
+
+			auto match2 = new Match(*match1);
+			match2->SwapFighters();
+			auto match3 = new Match(*match1);
+			match3->SetBestOfThree(match1, match2);
+
+			m_Schedule.emplace_back(match2);
+			m_Schedule.emplace_back(match3);
+		}
+
+		//Fix references, matches should take the winner of the BO3 match not the first one
+		for (auto match : m_Schedule)
+		{
+			if (match->GetDependencyTypeOf(Fighter::White) != Match::DependencyType::TakeWinner)
+				continue;
+			if (match->GetDependencyTypeOf(Fighter::Blue ) != Match::DependencyType::TakeWinner)
+				continue;
+			if (match->IsBestOfThree())
+				continue;
+
+			auto dependent_match1 = match->GetDependentMatchOf(Fighter::White);
+			auto dependent_match2 = match->GetDependentMatchOf(Fighter::Blue);
+
+			if (dependent_match1 && dependent_match2)
+			{
+				auto index1 = FindMatchIndex(dependent_match1->GetUUID());
+				auto index2 = FindMatchIndex(dependent_match2->GetUUID());
+
+				if (index1 != SIZE_MAX && index2 != SIZE_MAX)
+				{
+					if (index1 + 2 < m_Schedule.size())
+						match->SetDependency(Fighter::White, Match::DependencyType::TakeWinner, m_Schedule[index1 + 2]);
+					if (index2 + 2 < m_Schedule.size())
+						match->SetDependency(Fighter::Blue,  Match::DependencyType::TakeWinner, m_Schedule[index2 + 2]);
+				}
+			}
 		}
 	}
 }

@@ -342,11 +342,11 @@ TEST(App, FullTournament_SingleElimination14)
 			ASSERT_TRUE(match);
 			ASSERT_TRUE(mat->StartMatch(match));
 
-			ZED::Core::Pause(3000);
+			ZED::Core::Pause(1000);
 
 			mat->Hajime();
 
-			ZED::Core::Pause(2000);
+			ZED::Core::Pause(1000);
 
 			while (!mat->HasConcluded())
 			{
@@ -369,15 +369,89 @@ TEST(App, FullTournament_SingleElimination14)
 				else
 				{
 					mat->Osaekomi(f);
-					ZED::Core::Pause(12 * 1000);
+					ZED::Core::Pause(11 * 1000);
 				}
 
 				ZED::Core::Pause(10 * 1000);
 			}
 
 			EXPECT_TRUE(mat->EndMatch());
-			ZED::Core::Pause(11 * 1000);
+			ZED::Core::Pause(9000);
 		}
+	}
+}
+
+
+
+TEST(App, FullTournament_SingleElimination7_BO3)
+{
+	initialize();
+	Application app;
+
+	app.CloseTournament();
+	app.SetTournamentList().clear();
+
+	app.StartLocalMat(1);
+
+	Account acc("admin", "1234", Account::AccessLevel::Admin);
+	app.GetDatabase().AddAccount(acc);
+
+	auto tournament_name = GetRandomName();
+	auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3*60, 3*60, 20, 10));
+	tourney->EnableAutoSave(false);
+	EXPECT_TRUE(app.AddTournament(tourney));
+
+	ASSERT_TRUE(app.FindTournamentByName(tournament_name));
+	EXPECT_TRUE(app.OpenTournament(app.FindTournamentByName(tournament_name)->GetUUID()));
+
+	for (int i = 0; i < 7; ++i)
+		tourney->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i));
+
+	auto group = new SingleElimination(10, 200, tourney);
+	group->SetMatID(1);
+	group->IsBestOfThree(true);
+	tourney->AddMatchTable(group);
+	tourney->GenerateSchedule();
+
+	auto mat = app.GetDefaultMat();
+	ASSERT_TRUE(mat);
+
+	for (auto match : tourney->GetSchedule())
+	{		
+		ASSERT_TRUE(match);
+		ASSERT_TRUE(mat->StartMatch(match));
+
+		ZED::Core::Pause(1000);
+
+		mat->Hajime();
+
+		ZED::Core::Pause(1000);
+
+		while (!mat->HasConcluded())
+		{
+			Fighter f = Fighter::White;
+			if (rand() % 2 == 0)
+				f = Fighter::Blue;
+
+			int rnd = rand() % 6;
+
+			if (rnd == 0)
+				mat->AddIppon(f);
+			else if (rnd == 1)
+				mat->AddWazaAri(f);
+			else if (rnd == 2)
+				mat->AddWazaAri(f);
+			else
+			{
+				mat->Osaekomi(f);
+				ZED::Core::Pause(11 * 1000);
+			}
+
+			ZED::Core::Pause(10 * 1000);
+		}
+
+		EXPECT_TRUE(mat->EndMatch());
+		ZED::Core::Pause(11 * 1000);
 	}
 
 	ZED::Core::Pause(5000);
