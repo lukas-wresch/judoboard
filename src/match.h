@@ -132,6 +132,16 @@ namespace Judoboard
 		bool IsEmptyMatch() const;
 		bool IsCompletelyEmptyMatch() const;
 		const std::vector<const Match*> GetDependentMatches() const;//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
+		auto GetDependencyTypeOf(Fighter Fighter) const {
+			if (Fighter == Fighter::White)
+				return m_White.m_Dependency;
+			return m_Blue.m_Dependency;
+		}
+		const Match* GetDependentMatchOf(Fighter Fighter) const {
+			if (Fighter == Fighter::White)
+				return m_White.m_DependentMatch;
+			return m_Blue.m_DependentMatch;
+		}
 
 		const RuleSet& GetRuleSet() const;
 		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
@@ -143,6 +153,10 @@ namespace Judoboard
 		void ToString(YAML::Emitter& Yaml) const;
 
 		void operator >>(YAML::Emitter& Yaml) const;
+
+		bool operator ==(const Match& rhs) const {
+			return GetUUID() == rhs.GetUUID();
+		}
 
 	private:
 		const ITournament* GetTournament() const { return m_Tournament; }

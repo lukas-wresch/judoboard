@@ -349,14 +349,14 @@ Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
 	Match* new_match = CreateAutoMatch(nullptr, nullptr);
 
 	//Is this an 'empty' match?
-	if (!Match1->HasDependentMatches() && Match1->GetSingleValidFighters())
-		new_match->SetFighter(Fighter::White, Match1->GetSingleValidFighters());
-	else if (!Match1->IsCompletelyEmptyMatch())
+	//if (!Match1->HasDependentMatches() && Match1->GetSingleValidFighters())
+		//new_match->SetFighter(Fighter::White, Match1->GetSingleValidFighters());
+	//else if (!Match1->IsCompletelyEmptyMatch())
 		new_match->SetDependency(Fighter::White, Match::DependencyType::TakeWinner, Match1);
 
-	if (!Match2->HasDependentMatches() && Match2->GetSingleValidFighters())
-		new_match->SetFighter(Fighter::Blue, Match2->GetSingleValidFighters());
-	else if (!Match2->IsCompletelyEmptyMatch())
+	//if (!Match2->HasDependentMatches() && Match2->GetSingleValidFighters())
+		//new_match->SetFighter(Fighter::Blue, Match2->GetSingleValidFighters());
+	//else if (!Match2->IsCompletelyEmptyMatch())
 		new_match->SetDependency(Fighter::Blue,  Match::DependencyType::TakeWinner, Match2);
 
 	return new_match;
@@ -364,7 +364,17 @@ Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
 
 
 
-std::pair<size_t, size_t> MatchTable::GetIndicesOfMatch(const Match* Match) const
+size_t MatchTable::FindMatchIndex(const UUID& UUID) const
+{
+	for (size_t i = 0; m_Schedule.size(); ++i)
+		if (m_Schedule[i] && m_Schedule[i]->GetUUID() == UUID)
+			return i;
+	return -1;
+}
+
+
+
+std::pair<size_t, size_t> MatchTable::GetParticipantIndicesOfMatch(const Match* Match) const
 {
 	std::pair ret(0, 0);
 

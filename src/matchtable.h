@@ -269,7 +269,8 @@ namespace Judoboard
 		Match* CreateAutoMatch(const Judoka* White, const Judoka* Blue);
 		Match* AddMatchForWinners(Match* Match1, Match* Match2);
 
-		std::pair<size_t, size_t> GetIndicesOfMatch(const Match* Match) const;
+		size_t FindMatchIndex(const UUID& UUID) const;
+		std::pair<size_t, size_t> GetParticipantIndicesOfMatch(const Match* Match) const;
 
 		size_t GetIndexOfParticipant(const Judoka* Participant) const;
 

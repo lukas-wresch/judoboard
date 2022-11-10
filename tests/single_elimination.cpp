@@ -188,6 +188,13 @@ TEST(SingleElimination, Count3)
 	EXPECT_FALSE(group.GetSchedule()[2]->GetFighter(Fighter::White));
 	EXPECT_TRUE( group.GetSchedule()[2]->GetFighter(Fighter::Blue));
 
+	//Check dependencies
+	ASSERT_TRUE(group.GetSchedule()[2]->GetDependentMatchOf(Fighter::White));
+	ASSERT_TRUE(group.GetSchedule()[2]->GetDependentMatchOf(Fighter::Blue));
+
+	EXPECT_EQ(*group.GetSchedule()[2]->GetDependentMatchOf(Fighter::White), *group.GetSchedule()[0]);
+	EXPECT_EQ(*group.GetSchedule()[2]->GetDependentMatchOf(Fighter::Blue),  *group.GetSchedule()[1]);
+
 	Mat m(1);
 
 	for (auto match : group.GetSchedule())
@@ -239,6 +246,24 @@ TEST(SingleElimination, Count3_BO3)
 
 	Mat m(1);
 
+	//Check dependency tree
+	EXPECT_EQ(*group.GetSchedule()[2]->GetDependentMatchOf(Fighter::White), *group.GetSchedule()[0]);
+	EXPECT_EQ(*group.GetSchedule()[2]->GetDependentMatchOf(Fighter::Blue),  *group.GetSchedule()[1]);
+
+	ASSERT_TRUE(group.GetSchedule()[6]->GetDependentMatchOf(Fighter::White));
+	ASSERT_TRUE(group.GetSchedule()[6]->GetDependentMatchOf(Fighter::Blue));
+	ASSERT_TRUE(group.GetSchedule()[7]->GetDependentMatchOf(Fighter::White));
+	ASSERT_TRUE(group.GetSchedule()[7]->GetDependentMatchOf(Fighter::Blue));
+	ASSERT_TRUE(group.GetSchedule()[8]->GetDependentMatchOf(Fighter::White));
+	ASSERT_TRUE(group.GetSchedule()[8]->GetDependentMatchOf(Fighter::Blue));
+
+	EXPECT_EQ(*group.GetSchedule()[6]->GetDependentMatchOf(Fighter::White), *group.GetSchedule()[2]);
+	EXPECT_EQ(*group.GetSchedule()[6]->GetDependentMatchOf(Fighter::Blue),  *group.GetSchedule()[5]);
+	EXPECT_EQ(*group.GetSchedule()[7]->GetDependentMatchOf(Fighter::White), *group.GetSchedule()[5]);
+	EXPECT_EQ(*group.GetSchedule()[7]->GetDependentMatchOf(Fighter::Blue),  *group.GetSchedule()[2]);
+	EXPECT_EQ(*group.GetSchedule()[8]->GetDependentMatchOf(Fighter::White), *group.GetSchedule()[6]);
+	EXPECT_EQ(*group.GetSchedule()[8]->GetDependentMatchOf(Fighter::Blue),  *group.GetSchedule()[7]);
+
 	EXPECT_TRUE(m.StartMatch(group.GetSchedule()[0]));
 	m.AddIppon(Fighter::White);//j1
 	EXPECT_TRUE(m.EndMatch());
@@ -266,6 +291,8 @@ TEST(SingleElimination, Count3_BO3)
 	auto results = group.CalculateResults();
 
 	ASSERT_EQ(results.size(), 2);
+	ASSERT_TRUE(results[0].Judoka);
+	ASSERT_TRUE(results[1].Judoka);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j2->GetUUID());
 	EXPECT_EQ(results[1].Judoka->GetUUID(), j3->GetUUID());
 }

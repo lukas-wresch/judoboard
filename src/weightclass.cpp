@@ -330,7 +330,7 @@ void Weightclass::GenerateSchedule()
 		for (size_t i = 0; i < length; ++i)
 		{
 			auto match1 = m_Schedule[i];
-			auto indices = GetIndicesOfMatch(match1);
+			auto indices = GetParticipantIndicesOfMatch(match1);
 
 			auto match2 = AddAutoMatch(indices.second, indices.first);
 			auto match3 = AddAutoMatch(indices.first,  indices.second);

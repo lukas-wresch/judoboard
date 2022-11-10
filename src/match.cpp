@@ -314,6 +314,13 @@ const Judoka* Match::GetLoser() const
 	if (!HasConcluded())
 		return nullptr;
 
+	if (IsBestOfThree() && m_White.m_DependentMatch && m_Blue.m_DependentMatch)
+	{
+		if (m_White.m_DependentMatch->HasConcluded() && m_Blue.m_DependentMatch->HasConcluded())
+			if (*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())
+				return m_White.m_DependentMatch->GetLoser();
+	}
+
 	auto result = GetResult();
 
 	if (result.m_Winner == Winner::Draw)
