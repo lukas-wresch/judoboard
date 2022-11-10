@@ -1771,7 +1771,7 @@ void Tournament::GenerateSchedule()
 					if (schedule.size() > 0)
 					{
 						auto match = schedule.front();
-						if (!match->IsCompletelyEmptyMatch())
+						if (!match->IsEmptyMatch())
 							m_Schedule.push_back(match);
 
 						schedule.erase(schedule.begin());

@@ -273,6 +273,13 @@ const Judoka* Match::GetEnemyOf(const Judoka& Judoka) const
 
 const Judoka* Match::GetWinner() const
 {
+	if (IsEmptyMatch() && !IsCompletelyEmptyMatch())
+	{
+		if (GetFighter(Fighter::White))
+			return GetFighter(Fighter::White);
+		return GetFighter(Fighter::Blue);
+	}
+
 	if (!HasConcluded())
 		return nullptr;
 

@@ -68,7 +68,11 @@ namespace Judoboard
 
 		bool IsScheduled()  const { return m_State == Status::Scheduled; }
 		bool IsRunning()    const { return m_State == Status::Running; }
-		bool HasConcluded() const { return m_State == Status::Concluded; }
+		bool HasConcluded() const {
+			if (IsEmptyMatch())
+				return true;
+			return m_State == Status::Concluded;
+		}
 		bool IsAssociatedWithMat() const { return GetMatID() > 0; }
 		MatchLog& GetLog() { return m_Log; }
 		const MatchLog& GetLog() const { return m_Log; }
