@@ -29,10 +29,10 @@ namespace Judoboard
 
 		enum class DependencyType
 		{
-			None        = 0x00,
+			None        = 0,
 			//BestOfThree = 0x01,//Match is the last in the series of a best of three series
-			TakeWinner  = 0x02,//Take the winner of the match this match depends upon
-			TakeLoser   = 0x04,//Take the loser of the match this match depends upon
+			TakeWinner  = 1,//Take the winner of the match this match depends upon
+			TakeLoser   = 2,//Take the loser of the match this match depends upon
 		};
 
 		struct Result
@@ -118,8 +118,8 @@ namespace Judoboard
 		void SetDependency(Fighter Fighter, DependencyType Type, Match* Reference);
 		void SetBestOfThree(Match* Reference1, Match* Reference2);
 		bool HasUnresolvedDependency() const;
-		bool HasDependentMatches() const {//Returns true if and only if this match depends upon (as in the depend matches needs to conclude in order for this match to start)
-			return m_White.m_Dependency != DependencyType::None || m_Blue.m_Dependency != DependencyType::None;
+		bool HasDependentMatches() const {//Returns true if and only if this match depends upon other matches (as in the depend matches needs to conclude in order for this match to start)
+			return m_White.m_DependentMatch || m_Blue.m_DependentMatch;
 		}
 		bool HasValidFighters() const { return GetFighter(Fighter::White) && GetFighter(Fighter::Blue); }//Returns true if and only if GetFighter() returns not a null pointer
 		const Judoka* GetSingleValidFighters() const {
