@@ -124,8 +124,7 @@ namespace Judoboard
 			return nullptr;
 		}
 		bool IsEmptyMatch() const {
-			return ( (!GetFighter(Fighter::White) && m_White.m_Dependency == DependencyType::None) ||
-				     (!GetFighter(Fighter::Blue)  && m_Blue.m_Dependency  == DependencyType::None));
+			return (!GetFighter(Fighter::White) || !GetFighter(Fighter::Blue));
 		}
 		bool IsCompletelyEmptyMatch() const {
 			return ( (!GetFighter(Fighter::White) && m_White.m_Dependency == DependencyType::None) &&
