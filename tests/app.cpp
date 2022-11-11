@@ -386,75 +386,80 @@ TEST(App, FullTournament_SingleElimination14)
 TEST(App, FullTournament_SingleElimination7_BO3)
 {
 	initialize();
-	Application app;
 
-	app.CloseTournament();
-	app.SetTournamentList().clear();
+	{
+		Application app;
 
-	app.StartLocalMat(1);
+		app.CloseTournament();
+		app.SetTournamentList().clear();
 
-	Account acc("admin", "1234", Account::AccessLevel::Admin);
-	app.GetDatabase().AddAccount(acc);
+		app.StartLocalMat(1);
 
-	auto tournament_name = GetRandomName();
-	auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3*60, 3*60, 20, 10));
-	tourney->EnableAutoSave(false);
-	EXPECT_TRUE(app.AddTournament(tourney));
+		Account acc("admin", "1234", Account::AccessLevel::Admin);
+		app.GetDatabase().AddAccount(acc);
 
-	ASSERT_TRUE(app.FindTournamentByName(tournament_name));
-	EXPECT_TRUE(app.OpenTournament(app.FindTournamentByName(tournament_name)->GetUUID()));
+		auto tournament_name = GetRandomName();
+		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
+		tourney->EnableAutoSave(false);
+		EXPECT_TRUE(app.AddTournament(tourney));
 
-	for (int i = 0; i < 7; ++i)
-		tourney->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i));
+		ASSERT_TRUE(app.FindTournamentByName(tournament_name));
+		EXPECT_TRUE(app.OpenTournament(app.FindTournamentByName(tournament_name)->GetUUID()));
 
-	auto group = new SingleElimination(10, 200, tourney);
-	group->SetMatID(1);
-	group->IsBestOfThree(true);
-	tourney->AddMatchTable(group);
-	tourney->GenerateSchedule();
+		for (int i = 0; i < 7; ++i)
+			tourney->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i));
 
-	auto mat = app.GetDefaultMat();
-	ASSERT_TRUE(mat);
+		auto group = new SingleElimination(10, 200, tourney);
+		group->SetMatID(1);
+		group->IsBestOfThree(true);
+		tourney->AddMatchTable(group);
+		tourney->GenerateSchedule();
 
-	for (auto match : tourney->GetSchedule())
-	{		
-		if (!mat->StartMatch(match))
-			continue;
+		auto mat = app.GetDefaultMat();
+		ASSERT_TRUE(mat);
 
-		ZED::Core::Pause(1000);
-
-		mat->Hajime();
-
-		ZED::Core::Pause(1000);
-
-		while (!mat->HasConcluded())
+		for (auto match : tourney->GetSchedule())
 		{
-			Fighter f = Fighter::White;
-			if (rand() % 2 == 0)
-				f = Fighter::Blue;
+			if (!mat->StartMatch(match))
+				continue;
 
-			int rnd = rand() % 6;
+			ZED::Core::Pause(1000);
 
-			if (rnd == 0)
-				mat->AddIppon(f);
-			else if (rnd == 1)
-				mat->AddWazaAri(f);
-			else if (rnd == 2)
-				mat->AddWazaAri(f);
-			else
+			mat->Hajime();
+
+			ZED::Core::Pause(1000);
+
+			while (!mat->HasConcluded())
 			{
-				mat->Osaekomi(f);
-				ZED::Core::Pause(11 * 1000);
+				Fighter f = Fighter::White;
+				if (rand() % 2 == 0)
+					f = Fighter::Blue;
+
+				int rnd = rand() % 6;
+
+				if (rnd == 0)
+					mat->AddIppon(f);
+				else if (rnd == 1)
+					mat->AddWazaAri(f);
+				else if (rnd == 2)
+					mat->AddWazaAri(f);
+				else
+				{
+					mat->Osaekomi(f);
+					ZED::Core::Pause(12 * 1000);
+				}
+
+				ZED::Core::Pause(10 * 1000);
 			}
 
-			ZED::Core::Pause(10 * 1000);
+			ZED::Core::Pause(3000);
+
+			EXPECT_TRUE(mat->EndMatch());
+			ZED::Core::Pause(15 * 1000);
 		}
 
-		EXPECT_TRUE(mat->EndMatch());
-		ZED::Core::Pause(11 * 1000);
+		ZED::Core::Pause(5000);
 	}
-
-	ZED::Core::Pause(5000);
 }
 
 
