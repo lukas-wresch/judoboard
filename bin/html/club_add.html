@@ -7,6 +7,11 @@
     <input style="margin-bottom:20px;" type="text" id="name" value="" size="30" maxlength="64"/>
 </div>
 
+<div>
+  <label style="width:150px;float:left;margin-top:5px;" id="label_parent">Parent</label>
+  <select style="margin-bottom:20px;" id="clubs">
+  </select>
+</div>
 
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddClub()" id="add">New Club</button>
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateClub()" id="update">Update Club</button>
@@ -51,6 +56,11 @@ function GetClub(id)
     var res = YAML.parse(response);
 
     document.getElementById("name").value = res.name;
+
+    GetAssociationsWithoutParents(function(response) {
+      if (typeof res.parent_uuid != 'undefined')
+        document.getElementById("clubs").value = res.parent_uuid;
+    });
   });
 }
 

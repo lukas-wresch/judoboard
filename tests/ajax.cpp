@@ -572,7 +572,7 @@ TEST(Ajax, ListAssociations)
 		auto assoc1 = new Association("Assoc 1", nullptr);
 		app.GetDatabase().AddAssociation(assoc1);
 
-		YAML::Node yaml = YAML::Load(app.Ajax_ListAssociations());
+		YAML::Node yaml = YAML::Load(app.Ajax_ListAssociations(HttpServer::Request("")));
 
 		ASSERT_EQ(yaml.size(), 1);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Assoc 1");
@@ -582,7 +582,7 @@ TEST(Ajax, ListAssociations)
 		auto assoc2 = new Association("Assoc 2", assoc1);
 		app.GetDatabase().AddAssociation(assoc2);
 
-		yaml = YAML::Load(app.Ajax_ListAssociations());
+		yaml = YAML::Load(app.Ajax_ListAssociations(HttpServer::Request("")));
 
 		ASSERT_EQ(yaml.size(), 2);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Assoc 1");
@@ -592,6 +592,15 @@ TEST(Ajax, ListAssociations)
 		EXPECT_EQ(yaml[1]["uuid"].as<std::string>(), (std::string)assoc2->GetUUID());
 		EXPECT_EQ(yaml[1]["parent_name"].as<std::string>(), "Assoc 1");
 		EXPECT_EQ(yaml[1]["parent_uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
+
+		yaml = YAML::Load(app.Ajax_ListAssociations(HttpServer::Request("only_children=true")));
+
+		ASSERT_EQ(yaml.size(), 1);
+
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Assoc 2");
+		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)assoc2->GetUUID());
+		EXPECT_EQ(yaml[0]["parent_name"].as<std::string>(), "Assoc 1");
+		EXPECT_EQ(yaml[0]["parent_uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
 	}
 
 	ZED::Core::RemoveFile("database.yml");

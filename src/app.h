@@ -118,7 +118,7 @@ namespace Judoboard
 		Error Ajax_DeleteClub(const HttpServer::Request& Request);
 
 		//Associations
-		std::string Ajax_ListAssociations();
+		std::string Ajax_ListAssociations(const HttpServer::Request& Request);
 
 		//Rule sets
 

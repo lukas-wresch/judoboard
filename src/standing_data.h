@@ -69,6 +69,7 @@ namespace Judoboard
 		Association* FindAssociation(const UUID& UUID);
 		const Association* FindAssociation(const UUID& UUID) const;
 		bool DeleteAssociation(const UUID& UUID);
+		bool AssociationHasChildren(const Association* Association) const;
 
 		//Rule sets
 		RuleSet* FindRuleSetByName(const std::string& RuleSetName);

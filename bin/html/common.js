@@ -577,6 +577,32 @@ function GetAssociations(callback)
 
 
 
+function GetAssociationsWithoutParents(callback)
+{
+  AjaxCallback("ajax/association/list?only_children=true", function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    var clubs = document.getElementById("clubs");
+
+    while (clubs.length >= 1)
+      clubs.remove(clubs.length-1);
+
+    for (const club of res)
+    {
+      var option = document.createElement("option");
+      option.value = club.uuid;
+      option.text  = club.name;
+      clubs.add(option);
+    }
+
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+}
+
+
+
 function GetColors(callback)
 {
   AjaxCallback("ajax/colors/get", function(response) {

@@ -1287,7 +1287,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		return Ajax_ListAssociations();
+		return Ajax_ListAssociations(Request);
 	});
 
 
@@ -2849,15 +2849,24 @@ std::string Application::Ajax_ListClubs()
 
 
 
-std::string Application::Ajax_ListAssociations()
+std::string Application::Ajax_ListAssociations(const HttpServer::Request& Request)
 {
+	bool only_children = HttpServer::DecodeURLEncoded(Request.m_Query, "only_children") == "true";
+
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
 
-	for (auto club : m_Database.GetAllAssociations())
+	LockTillScopeEnd();
+
+	for (auto assoc : m_Database.GetAllAssociations())
 	{
-		if (club)
-			club->ToString(ret);
+		if (assoc)
+		{
+			if (only_children && m_Database.AssociationHasChildren(assoc))
+				continue;
+
+			assoc->ToString(ret);
+		}
 	}
 
 	ret << YAML::EndSeq;

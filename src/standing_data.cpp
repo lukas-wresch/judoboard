@@ -441,6 +441,22 @@ bool StandingData::DeleteAssociation(const UUID& UUID)
 
 
 
+bool StandingData::AssociationHasChildren(const Association* Association) const
+{
+	if (!Association)
+		return false;
+
+	for (auto assoc : m_Associations)
+	{
+		if (assoc && assoc->GetParent() && *assoc->GetParent() == *Association)
+			return true;
+	}
+
+	return false;
+}
+
+
+
 RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName)
 {
 	for (auto rule : m_RuleSets)
