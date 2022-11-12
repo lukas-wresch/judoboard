@@ -61,11 +61,14 @@ namespace Judoboard
 		Club* FindClubByName(const std::string& Name);
 		const Club* FindClubByName(const std::string& Name) const;
 
+		bool DeleteClub(const UUID& UUID);
+
 		//Associations
 		auto& GetAllAssociations() const { return m_Associations; }
 		bool AddAssociation(Association* NewAssociation);
 		Association* FindAssociation(const UUID& UUID);
 		const Association* FindAssociation(const UUID& UUID) const;
+		bool DeleteAssociation(const UUID& UUID);
 
 		//Rule sets
 		RuleSet* FindRuleSetByName(const std::string& RuleSetName);

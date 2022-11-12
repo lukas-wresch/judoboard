@@ -358,6 +358,20 @@ const Club* StandingData::FindClubByName(const std::string& Name) const
 
 
 
+bool StandingData::DeleteClub(const UUID& UUID)
+{
+	for (auto club : m_Clubs)
+		if (club && club->GetUUID() == UUID)
+		{
+			//TODO
+			//return true;
+		}
+
+	return false;
+}
+
+
+
 bool StandingData::AddAssociation(Association* NewAssociation)
 {
 	if (!NewAssociation)
@@ -397,6 +411,20 @@ const Association* StandingData::FindAssociation(const UUID& UUID) const
 			return assoc;
 
 	return nullptr;
+}
+
+
+
+bool StandingData::DeleteAssociation(const UUID& UUID)
+{
+	for (auto assoc : m_Associations)
+		if (assoc && assoc->GetUUID() == UUID)
+		{
+			//TODO
+			//return true;
+		}
+
+	return false;
 }
 
 

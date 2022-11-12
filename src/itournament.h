@@ -69,6 +69,12 @@ namespace Judoboard
 		virtual MatchTable* FindMatchTable(const UUID& ID) { return nullptr; }
 		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
 
+		//Clubs
+		virtual bool RemoveClub(const UUID& UUID) { return false; }
+
+		//Associations
+		virtual bool RemoveAssociation(const UUID& UUID) { return false; }
+
 		//Rule Sets
 		virtual const RuleSet* GetDefaultRuleSet() const { return nullptr; }
 		virtual void SetDefaultRuleSet(RuleSet* NewDefaultRuleSet) {}

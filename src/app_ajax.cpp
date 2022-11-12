@@ -1274,6 +1274,14 @@ void Application::SetupHttpServer()
 		return Ajax_EditClub(Request);
 	});
 
+	m_Server.RegisterResource("/ajax/club/delete", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_DeleteClub(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/association/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -2761,6 +2769,46 @@ Error Application::Ajax_EditClub(const HttpServer::Request& Request)
 		club->SetParent(parent);
 
 	return Error::Type::NoError;
+}
+
+
+
+Error Application::Ajax_DeleteClub(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	LockTillScopeEnd();
+
+	auto assoc = m_Database.FindAssociation(id);
+
+	if (assoc)
+	{
+		if (!m_Database.DeleteAssociation(id))
+			return Error(Error::Type::OperationFailed);
+
+		if (!GetTournament()->RemoveAssociation(id))
+			return Error(Error::Type::OperationFailed);
+
+		return Error::Type::NoError;
+	}
+
+	else
+	{
+		auto club = m_Database.FindClub(id);
+
+		if (!club)
+			return Error(Error::Type::ItemNotFound);
+
+		if (!m_Database.DeleteClub(id))
+			return Error(Error::Type::OperationFailed);
+
+		if (!GetTournament()->RemoveClub(id))
+			return Error(Error::Type::OperationFailed);
+
+		return Error::Type::NoError;
+	}
+
+	return Error(Error::Type::ItemNotFound);
 }
 
 

@@ -76,13 +76,23 @@ TEST(Database, SaveAndLoad)
 		EXPECT_EQ(d.FindJudoka(j1.GetUUID())->GetWeight(), Weight(50));
 		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), Weight(60));
 
+		auto club1 = new Club("Club name");
+		d.AddClub(club1);
+
+		auto club2 = new Club("Club name 2");
+		d.AddClub(club2);
+
+		Judoka j3("Firstname3", "Lastname3", 60, Gender::Female);
+		j3.SetClub(club2);
+		d.AddJudoka(&j3);
+
 		EXPECT_TRUE(d.Save("temp.yml"));
 
 
 		Database d2;
 		EXPECT_TRUE(d2.Load("temp.yml"));
 
-		EXPECT_TRUE(d2.GetNumJudoka() == 2);
+		EXPECT_EQ(d2.GetNumJudoka(), 3);
 
 		ASSERT_TRUE(d2.FindJudoka(j1.GetUUID()));
 		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetUUID(), j1.GetUUID());
@@ -93,6 +103,17 @@ TEST(Database, SaveAndLoad)
 		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetUUID(), j2.GetUUID());
 		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetWeight(), Weight(60));
 		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetGender(), j2.GetGender());
+
+		ASSERT_TRUE(d2.FindClub(club1->GetUUID()));
+		EXPECT_EQ(d2.FindClub(club1->GetUUID())->GetName(), club1->GetName());
+		EXPECT_EQ(d2.FindClub(club1->GetUUID())->GetUUID(), club1->GetUUID());
+
+		EXPECT_TRUE(d2.DeleteClub(club1->GetUUID()));
+		EXPECT_FALSE(d2.FindClub(club1->GetUUID()));
+
+		EXPECT_FALSE(d2.DeleteClub(club2->GetUUID()));
+		EXPECT_TRUE(d2.DeleteJudoka(j3.GetUUID()));
+		EXPECT_TRUE(d2.DeleteClub(club2->GetUUID()));
 
 		auto rule_set = d2.FindRuleSetByName("Test");
 		ASSERT_TRUE(rule_set);
@@ -276,7 +297,7 @@ TEST(Database, RuleSets)
 
 		RuleSet* rules = new RuleSet(name, 60, 30, 30, 20);
 
-		ASSERT_TRUE(d.FindRuleSetByName(name) == nullptr);
+		ASSERT_EQ(d.FindRuleSetByName(name), nullptr);
 
 		d.AddRuleSet(rules);
 
