@@ -2709,7 +2709,7 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 {
 	auto name      = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-	bool is_assoc  = HttpServer::DecodeURLEncoded(Request.m_Body, "is_association") == "true";
+	bool is_assoc  = HttpServer::DecodeURLEncoded(Request.m_Query, "is_association") == "true";
 	UUID parent_id = HttpServer::DecodeURLEncoded(Request.m_Body, "parent");
 
 	if (name.size() == 0)
@@ -2721,10 +2721,15 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 		m_Database.AddClub(new Club(name));
 	else
 	{
-		auto parent = m_Database.FindAssociation(parent_id);
+		Association* parent = nullptr;
 
-		if (!parent)
-			return Error::Type::OperationFailed;
+		if (parent_id)
+		{
+			parent = m_Database.FindAssociation(parent_id);
+
+			if (!parent)
+				return Error::Type::OperationFailed;
+		}
 
 		m_Database.AddAssociation(new Association(name, parent));
 	}

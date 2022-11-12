@@ -365,6 +365,24 @@ TEST(Ajax, AddClub)
 
 
 
+TEST(Ajax, AddAssociation)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("is_association=true", "name=Test Club")), "ok");
+
+		auto& clubs = app.GetDatabase().GetAllAssociations();
+
+		ASSERT_EQ(clubs.size(), 1);
+		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
+	}
+}
+
+
+
 TEST(Ajax, GetClub)
 {
 	initialize();
