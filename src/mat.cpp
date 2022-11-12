@@ -136,7 +136,7 @@ bool Mat::Reset()
 
 	m_pMatch = nullptr;
 
-	ZED::Log::Info("New match created");
+	ZED::Log::Info("Mat got resetted");
 	return true;
 }
 
@@ -180,6 +180,7 @@ bool Mat::StartMatch(Match* NewMatch)
 
 	if (!Reset())
 	{
+		ZED::Log::Warn("Could not reset mat");
 		m_mutex.unlock();
 		return false;
 	}
@@ -195,6 +196,7 @@ bool Mat::StartMatch(Match* NewMatch)
 
 	m_mutex.unlock();
 
+	ZED::Log::Debug("New match started");
 	return true;
 }
 
@@ -219,9 +221,12 @@ bool Mat::EndMatch()
 		Reset();
 		m_mutex.unlock();
 
+		ZED::Log::Debug("Match ended");
+
 		return true;
 	}
 
+	ZED::Log::Warn("Could not end match");
 	return false;
 }
 
@@ -412,6 +417,8 @@ void Mat::Hajime()
 
 		m_mutex.unlock();
 	}
+
+	ZED::Log::Debug("Hajime");
 }
 
 
@@ -456,6 +463,8 @@ void Mat::Mate()
 
 		m_mutex.unlock();
 	}
+
+	ZED::Log::Debug("Mate");
 }
 
 
@@ -507,6 +516,8 @@ void Mat::AddIppon(Fighter Whom)
 
 		Mate();
 	}
+
+	ZED::Log::Debug("Ippon");
 }
 
 
@@ -552,6 +563,8 @@ void Mat::AddWazaAri(Fighter Whom)
 		else if (m_GoldenScore)
 			Mate();
 	}
+
+	ZED::Log::Debug("Wazaari");
 }
 
 

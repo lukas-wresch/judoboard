@@ -337,12 +337,16 @@ TEST(App, FullTournament_SingleElimination14)
 		auto mat = app.GetDefaultMat();
 		ASSERT_TRUE(mat);
 
+		ZED::Core::Pause(3000);
+
 		for (auto match : tourney->GetSchedule())
 		{
 			ASSERT_TRUE(match);
 			ASSERT_TRUE(mat->StartMatch(match));
 
 			ZED::Core::Pause(1000);
+
+			ASSERT_TRUE(mat->AreFightersOnMat());
 
 			mat->Hajime();
 
@@ -420,12 +424,16 @@ TEST(App, FullTournament_SingleElimination7_BO3)
 		auto mat = app.GetDefaultMat();
 		ASSERT_TRUE(mat);
 
+		ZED::Core::Pause(3000);
+
 		for (auto match : tourney->GetSchedule())
 		{
 			if (!mat->StartMatch(match))
 				continue;
 
 			ZED::Core::Pause(1000);
+
+			ASSERT_TRUE(mat->AreFightersOnMat());
 
 			mat->Hajime();
 
