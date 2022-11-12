@@ -1279,14 +1279,6 @@ void Application::SetupHttpServer()
 		return Ajax_ListClubs();
 	});
 
-	m_Server.RegisterResource("/ajax/club/update", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-
-		return Ajax_EditClub(Request);
-	});
-
 
 	m_Server.RegisterResource("/ajax/association/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
