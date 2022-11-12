@@ -17,7 +17,7 @@ namespace Judoboard
 	class Association : public ID
 	{
 	public:
-		Association(const std::string& Name, const Association* Parent = nullptr);
+		Association(const std::string& Name, const Association* Parent) {}
 		Association(const YAML::Node&  Yaml, const StandingData* StandingData);
 
 		//0 for the highest level, +1 for every level below

@@ -17,6 +17,7 @@
 
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddClub()" id="add">New Club</button>
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateClub()" id="update">Update Club</button>
+<button class="remove" onclick="return DeleteClub()" id="delete">Delete</button>
 
 </form>
 
@@ -29,8 +30,8 @@ function AddClub()
     name:             document.getElementById("name").value
   });
 
-  AjaxPost('ajax/club/add', params, function() {
-    navigate("club_list.html");
+  AjaxPost('ajax/club/add?is_association=true', params, function() {
+    navigate("association_list.html");
   });
 
   return false;
@@ -68,6 +69,18 @@ function GetClub(id)
 }
 
 
+function DeleteClub()
+{
+  if (confirm(lang.delete_club_confirm))
+  {
+    Ajax('ajax/club/delete?id='+id);
+    navigate('association_list.html');
+  }
+
+  return false;
+}
+
+
 
 document.getElementById("add").innerHTML    = lang.new_club;
 document.getElementById("update").innerHTML = lang.update_club;
@@ -85,6 +98,7 @@ else
 {
   document.getElementById("headline").innerHTML = lang.new_club;
   document.getElementById("update").style.display = "none";
+  document.getElementById("delete").style.display = "none";
 }
 
 </script>

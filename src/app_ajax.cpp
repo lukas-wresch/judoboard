@@ -2708,13 +2708,27 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 
 Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 {
-	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	auto name      = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	bool is_assoc  = HttpServer::DecodeURLEncoded(Request.m_Body, "is_association") == "true";
+	UUID parent_id = HttpServer::DecodeURLEncoded(Request.m_Body, "parent");
 
 	if (name.size() == 0)
 		return Error::Type::InvalidInput;
 
 	LockTillScopeEnd();
-	m_Database.AddClub(new Club(name));
+
+	if (!is_assoc)
+		m_Database.AddClub(new Club(name));
+	else
+	{
+		auto parent = m_Database.FindAssociation(parent_id);
+
+		if (!parent)
+			return Error::Type::OperationFailed;
+
+		m_Database.AddAssociation(new Association(name, parent));
+	}
+
 	m_Database.Save();
 	return Error();//OK
 }

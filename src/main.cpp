@@ -318,7 +318,7 @@ int main(int argc, char** argv)
 //#ifdef _DEBUG
 	if (app.GetDatabase().GetNumJudoka() < 5)
 	{
-		auto inter = new Judoboard::Association("International");
+		auto inter = new Judoboard::Association("International", nullptr);
 
 		auto de = new Judoboard::Association("Deutschland", inter);
 

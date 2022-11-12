@@ -440,7 +440,7 @@ TEST(Ajax, DeleteAssociation)
 	{
 		Application app;
 
-		auto inter = new Judoboard::Association("International");
+		auto inter = new Judoboard::Association("International", nullptr);
 
 		auto de = new Judoboard::Association("Deutschland", inter);
 
@@ -481,7 +481,7 @@ TEST(Ajax, EditAssociation)
 	{
 		Application app;
 
-		auto inter = new Judoboard::Association("International");
+		auto inter = new Judoboard::Association("International", nullptr);
 
 		auto de = new Judoboard::Association("Deutschland", inter);
 
@@ -551,7 +551,7 @@ TEST(Ajax, ListAssociations)
 		ZED::Core::RemoveFile("database.yml");
 		Application app;
 
-		auto assoc1 = new Association("Assoc 1");
+		auto assoc1 = new Association("Assoc 1", nullptr);
 		app.GetDatabase().AddAssociation(assoc1);
 
 		YAML::Node yaml = YAML::Load(app.Ajax_ListAssociations());
