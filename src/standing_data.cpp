@@ -360,11 +360,18 @@ const Club* StandingData::FindClubByName(const std::string& Name) const
 
 bool StandingData::DeleteClub(const UUID& UUID)
 {
-	for (auto club : m_Clubs)
-		if (club && club->GetUUID() == UUID)
+	for (auto club = m_Clubs.begin(); club != m_Clubs.end(); ++club)
+		if (*club && (*club)->GetUUID() == UUID)
 		{
-			//TODO
-			//return true;
+			//Check if there is any judoka associated to this club
+			for (auto [id, judoka] : m_Judokas)
+			{
+				if (judoka->GetClub() && *judoka->GetClub() == UUID)
+					return false;
+			}
+
+			m_Clubs.erase(club);
+			return true;
 		}
 
 	return false;
@@ -417,11 +424,16 @@ const Association* StandingData::FindAssociation(const UUID& UUID) const
 
 bool StandingData::DeleteAssociation(const UUID& UUID)
 {
-	for (auto assoc : m_Associations)
-		if (assoc && assoc->GetUUID() == UUID)
+	for (auto assoc = m_Associations.begin(); assoc != m_Associations.end(); ++assoc)
+		if (*assoc && (*assoc)->GetUUID() == UUID)
 		{
-			//TODO
-			//return true;
+			//Check if this is a parent of some association
+			for (auto possible_parent : m_Associations)
+				if ((*assoc)->GetParent() && *(*assoc)->GetParent() == *possible_parent)
+					return false;
+
+			m_Associations.erase(assoc);
+			return true;
 		}
 
 	return false;

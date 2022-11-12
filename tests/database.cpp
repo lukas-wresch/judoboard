@@ -104,6 +104,9 @@ TEST(Database, SaveAndLoad)
 		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetWeight(), Weight(60));
 		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetGender(), j2.GetGender());
 
+		ASSERT_TRUE(d2.FindJudoka(j3.GetUUID())->GetClub());
+		EXPECT_EQ(*d2.FindJudoka(j3.GetUUID())->GetClub(), *club2);
+
 		ASSERT_TRUE(d2.FindClub(club1->GetUUID()));
 		EXPECT_EQ(d2.FindClub(club1->GetUUID())->GetName(), club1->GetName());
 		EXPECT_EQ(d2.FindClub(club1->GetUUID())->GetUUID(), club1->GetUUID());
@@ -111,6 +114,7 @@ TEST(Database, SaveAndLoad)
 		EXPECT_TRUE(d2.DeleteClub(club1->GetUUID()));
 		EXPECT_FALSE(d2.FindClub(club1->GetUUID()));
 
+		EXPECT_TRUE(d2.FindClub(club2->GetUUID()));
 		EXPECT_FALSE(d2.DeleteClub(club2->GetUUID()));
 		EXPECT_TRUE(d2.DeleteJudoka(j3.GetUUID()));
 		EXPECT_TRUE(d2.DeleteClub(club2->GetUUID()));
