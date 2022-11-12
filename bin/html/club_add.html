@@ -3,7 +3,7 @@
 <form>
 
 <div>
-    <label style="width:200px;float:left; margin-top:4px;" id="label_name">Name</label>
+    <label style="width:150px;float:left; margin-top:4px;" id="label_name">Name</label>
     <input style="margin-bottom:20px;" type="text" id="name" value="" size="30" maxlength="64"/>
 </div>
 
@@ -25,7 +25,8 @@
 function AddClub()
 {
   var params = URLEncode({
-    name:             document.getElementById("name").value
+    name:             document.getElementById("name").value,
+    parent:           document.getElementById("clubs").value,
   });
 
   AjaxPost('ajax/club/add', params, function() {
@@ -39,7 +40,8 @@ function AddClub()
 function UpdateClub()
 {
   var params = URLEncode({
-    name:             document.getElementById("name").value
+    name:             document.getElementById("name").value,
+    parent:           document.getElementById("clubs").value,
   });
 
   AjaxPost('ajax/club/update?id='+id, params, function() {
@@ -53,6 +55,7 @@ function UpdateClub()
 function GetClub(id)
 {
   AjaxCallback("ajax/club/get?id="+id, function(response) {
+    console.log(response);
     var res = YAML.parse(response);
 
     document.getElementById("name").value = res.name;
@@ -95,6 +98,8 @@ else
   document.getElementById("headline").innerHTML = lang.new_club;
   document.getElementById("update").style.display = "none";
   document.getElementById("delete").style.display = "none";
+
+  GetAssociationsWithoutParents();
 }
 
 </script>

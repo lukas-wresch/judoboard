@@ -2717,22 +2717,20 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 
 	LockTillScopeEnd();
 
-	if (!is_assoc)
-		m_Database.AddClub(new Club(name));
-	else
+	Association* parent = nullptr;
+
+	if (parent_id)
 	{
-		Association* parent = nullptr;
+		parent = m_Database.FindAssociation(parent_id);
 
-		if (parent_id)
-		{
-			parent = m_Database.FindAssociation(parent_id);
-
-			if (!parent)
-				return Error::Type::OperationFailed;
-		}
-
-		m_Database.AddAssociation(new Association(name, parent));
+		if (!parent)
+			return Error::Type::OperationFailed;
 	}
+
+	if (!is_assoc)
+		m_Database.AddClub(new Club(name, parent));
+	else
+		m_Database.AddAssociation(new Association(name, parent));
 
 	m_Database.Save();
 	return Error();//OK

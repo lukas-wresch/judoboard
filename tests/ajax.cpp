@@ -356,10 +356,24 @@ TEST(Ajax, AddClub)
 
 		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club")), "ok");
 
-		auto clubs = app.GetDatabase().GetAllClubs();
+		auto& clubs = app.GetDatabase().GetAllClubs();
 
 		ASSERT_EQ(clubs.size(), 1);
 		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
+
+
+		auto inter = new Judoboard::Association("International", nullptr);
+
+		app.GetDatabase().AddAssociation(inter);
+
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club 2&parent=" + (std::string)inter->GetUUID())), "ok");
+
+		ASSERT_EQ(clubs.size(), 2);
+		EXPECT_EQ(clubs[1]->GetName(), "Test Club 2");
+		ASSERT_TRUE(clubs[1]->GetParent());
+		EXPECT_EQ(*clubs[1]->GetParent(), *inter);
+
+		EXPECT_EQ(app.Ajax_AddClub(HttpServer::Request("", "name=Test Club 3&parent=XXX")), Error(Error::Type::OperationFailed));
 	}
 }
 
