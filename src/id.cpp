@@ -20,15 +20,6 @@ ID::ID()
 
 
 
-ID::ID(ZED::Blob& Stream)
-{
-	ZED::SHA256 hash;
-	Stream >> hash;
-	m_UUID = hash;
-}
-
-
-
 ID::~ID()
 {
 	s_UsedUUIDs.erase(m_UUID);

@@ -360,14 +360,19 @@ const Club* StandingData::FindClubByName(const std::string& Name) const
 
 bool StandingData::DeleteClub(const UUID& UUID)
 {
-	for (auto it = m_Clubs.begin(); it != m_Clubs.end(); ++it)
-	{
-		if (*it && (*it)->GetUUID() == UUID)
+	for (auto club = m_Clubs.begin(); club != m_Clubs.end(); ++club)
+		if (*club && (*club)->GetUUID() == UUID)
 		{
-			m_Clubs.erase(it);
+			//Check if there is any judoka associated to this club
+			for (auto [id, judoka] : m_Judokas)
+			{
+				if (judoka->GetClub() && *judoka->GetClub() == UUID)
+					return false;
+			}
+
+			m_Clubs.erase(club);
 			return true;
 		}
-	}
 
 	return false;
 }
@@ -413,6 +418,41 @@ const Association* StandingData::FindAssociation(const UUID& UUID) const
 			return assoc;
 
 	return nullptr;
+}
+
+
+
+bool StandingData::DeleteAssociation(const UUID& UUID)
+{
+	for (auto assoc = m_Associations.begin(); assoc != m_Associations.end(); ++assoc)
+		if (*assoc && (*assoc)->GetUUID() == UUID)
+		{
+			//Check if this association has childen
+			for (auto possible_child : m_Associations)
+				if (possible_child->GetParent() && *possible_child->GetParent() == UUID)
+					return false;
+
+			m_Associations.erase(assoc);
+			return true;
+		}
+
+	return false;
+}
+
+
+
+bool StandingData::AssociationHasChildren(const Association* Association) const
+{
+	if (!Association)
+		return false;
+
+	for (auto assoc : m_Associations)
+	{
+		if (assoc && assoc->GetParent() && *assoc->GetParent() == *Association)
+			return true;
+	}
+
+	return false;
 }
 
 

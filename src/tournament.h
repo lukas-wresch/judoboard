@@ -85,6 +85,12 @@ namespace Judoboard
 		MatchTable* FindMatchTableByName(const std::string& Name);
 		MatchTable* FindMatchTableByDescription(const std::string& Description);
 
+		//Clubs
+		virtual bool RemoveClub(const UUID& UUID) override { return m_StandingData.DeleteClub(UUID); }
+
+		//Associations
+		virtual bool RemoveAssociation(const UUID& UUID) override { return m_StandingData.DeleteAssociation(UUID); }
+
 		//Rule Sets
 		virtual const RuleSet* GetDefaultRuleSet() const override { return m_pDefaultRules; }
 		virtual void SetDefaultRuleSet(RuleSet* NewDefaultRuleSet) override {

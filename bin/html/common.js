@@ -107,6 +107,7 @@ var lang_en = {
     delete_account_confirm: "Are you sure you want to delete this account?",
     delete_judoka: "Delete",
     delete_judoka_confirm: "Are you sure you want to delete this judoka?",
+    delete_club_confirm: "Are you sure you want to delete this club/association?",
     empty_tournament_confirm: "Are you sure you want to delete all match results of this tournament?",
     delete_tournament_confirm: "Are you sure you want to completely delete this tournament?",
     delete_rules_confirm: "Are you sure you want to delete this rule set?",
@@ -226,6 +227,7 @@ var lang_de = {
     delete_account_confirm: unescape("Willst du dieses Benutzerkonto wirklich l%F6schen?"),
     delete_judoka: "L&ouml;schen",
     delete_judoka_confirm: unescape("Willst du diesen Judoka wirklich l%F6schen?"),
+    delete_club_confirm: unescape("Willst du diesen Verein/Assoziation wirklich l%F6schen?"),
     empty_tournament_confirm: unescape("Willst du wirklich alle Ergebnisse dieses Turnieres l%F6schen?"),
     delete_tournament_confirm: unescape("Willst du wirklich dieses Turnier vollst%E4ndig l%F6schen?"),
     delete_rules_confirm: unescape("Willst du wirklich dieses Regelwerk l%F6schen?"),
@@ -530,6 +532,63 @@ function GetClubs(callback)
     option.value = 0;
     option.text  = "(None)";
     clubs.add(option);
+
+    for (const club of res)
+    {
+      var option = document.createElement("option");
+      option.value = club.uuid;
+      option.text  = club.name;
+      clubs.add(option);
+    }
+
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+}
+
+
+
+function GetAssociations(callback)
+{
+  AjaxCallback("ajax/association/list", function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    var clubs = document.getElementById("clubs");
+
+    while (clubs.length >= 1)
+      clubs.remove(clubs.length-1);
+
+    var option = document.createElement("option");
+    option.value = 0;
+    option.text  = "(None)";
+    clubs.add(option);
+
+    for (const club of res)
+    {
+      var option = document.createElement("option");
+      option.value = club.uuid;
+      option.text  = club.name;
+      clubs.add(option);
+    }
+
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+}
+
+
+
+function GetAssociationsWithoutParents(callback)
+{
+  AjaxCallback("ajax/association/list?only_children=true", function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    var clubs = document.getElementById("clubs");
+
+    while (clubs.length >= 1)
+      clubs.remove(clubs.length-1);
 
     for (const club of res)
     {

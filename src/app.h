@@ -117,13 +117,13 @@ namespace Judoboard
 
 		//Clubs
 		Error Ajax_AddClub(const HttpServer::Request& Request);
-		Error Ajax_EditClub(const HttpServer::Request& Request);
-		Error Ajax_DeleteClub(const HttpServer::Request& Request);
-		std::string Ajax_ListClubs();
 		std::string Ajax_GetClub(const HttpServer::Request& Request);
+		Error Ajax_EditClub(const HttpServer::Request& Request);
+		std::string Ajax_ListClubs();
+		Error Ajax_DeleteClub(const HttpServer::Request& Request);
 
 		//Associations
-		std::string Ajax_ListAssociations();
+		std::string Ajax_ListAssociations(const HttpServer::Request& Request);
 
 		//Rule sets
 

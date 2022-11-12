@@ -1279,12 +1279,21 @@ void Application::SetupHttpServer()
 		return Ajax_ListClubs();
 	});
 
+	m_Server.RegisterResource("/ajax/club/update", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_EditClub(Request);
+	});
+
+
 	m_Server.RegisterResource("/ajax/association/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
 
-		return Ajax_ListAssociations();
+		return Ajax_ListAssociations(Request);
 	});
 
 
@@ -2866,53 +2875,124 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 
 Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 {
-	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	auto name      = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	bool is_assoc  = HttpServer::DecodeURLEncoded(Request.m_Query, "is_association") == "true";
+	UUID parent_id = HttpServer::DecodeURLEncoded(Request.m_Body, "parent");
 
 	if (name.length() == 0)
 		return Error::Type::InvalidInput;
 
 	LockTillScopeEnd();
 
-	m_Database.AddClub(new Club(name));
+	Association* parent = nullptr;
+
+	if (parent_id)
+	{
+		parent = m_Database.FindAssociation(parent_id);
+
+		if (!parent)
+			return Error::Type::OperationFailed;
+	}
+
+	if (!is_assoc)
+		m_Database.AddClub(new Club(name, parent));
+	else
+		m_Database.AddAssociation(new Association(name, parent));
+
 	m_Database.Save();
 	return Error();//OK
+}
+
+
+
+std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	LockTillScopeEnd();
+
+	auto club = m_Database.FindAssociation(id);
+
+	if (!club)
+	{
+		club = m_Database.FindClub(id);
+
+		if (!club)
+			return Error(Error::Type::ItemNotFound);
+	}
+
+	YAML::Emitter ret;
+	club->ToString(ret);
+	return ret.c_str();
 }
 
 
 
 Error Application::Ajax_EditClub(const HttpServer::Request& Request)
 {
-	UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	UUID id   = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-
-	if (name.length() == 0)
-		return Error::Type::InvalidInput;
+	UUID parent_id = HttpServer::DecodeURLEncoded(Request.m_Body, "parent");
 
 	LockTillScopeEnd();
 
-	auto club = m_Database.FindClub(uuid);
+	auto club   = m_Database.FindAssociation(id);
+	auto parent = m_Database.FindAssociation(parent_id);
 
 	if (!club)
-		return Error::Type::ItemNotFound;
+	{
+		club = m_Database.FindClub(id);
 
-	club->SetName(name);
-	m_Database.Save();
-	return Error();//OK
+		if (!club)
+			return Error(Error::Type::ItemNotFound);
+	}
+
+	if (!name.empty())
+		club->SetName(name);
+	if (parent)
+		club->SetParent(parent);
+
+	return Error::Type::NoError;
 }
 
 
 
 Error Application::Ajax_DeleteClub(const HttpServer::Request& Request)
 {
-	UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 	LockTillScopeEnd();
 
-	if (!m_Database.DeleteClub(uuid))
-		return Error::Type::OperationFailed;
+	auto assoc = m_Database.FindAssociation(id);
 
-	m_Database.Save();
-	return Error();//OK
+	if (assoc)
+	{
+		if (!m_Database.DeleteAssociation(id))
+			return Error(Error::Type::OperationFailed);
+
+		if (GetTournament())
+			GetTournament()->RemoveAssociation(id);
+
+		return Error::Type::NoError;
+	}
+
+	else
+	{
+		auto club = m_Database.FindClub(id);
+
+		if (!club)
+			return Error(Error::Type::ItemNotFound);
+
+		if (!m_Database.DeleteClub(id))
+			return Error(Error::Type::OperationFailed);
+
+		if (GetTournament())
+			GetTournament()->RemoveClub(id);
+
+		return Error::Type::NoError;
+	}
+
+	return Error(Error::Type::ItemNotFound);
 }
 
 
@@ -2936,36 +3016,24 @@ std::string Application::Ajax_ListClubs()
 
 
 
-std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
+std::string Application::Ajax_ListAssociations(const HttpServer::Request& Request)
 {
-	UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	bool only_children = HttpServer::DecodeURLEncoded(Request.m_Query, "only_children") == "true";
 
-
-	YAML::Emitter ret;
-
-	LockTillScopeEnd();
-
-	auto club = m_Database.FindClub(uuid);
-
-	if (!club)
-		return Error(Error::Type::ItemNotFound);
-
-	*club >> ret;
-
-	return ret.c_str();
-}
-
-
-
-std::string Application::Ajax_ListAssociations()
-{
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
 
-	for (auto club : m_Database.GetAllAssociations())
+	LockTillScopeEnd();
+
+	for (auto assoc : m_Database.GetAllAssociations())
 	{
-		if (club)
-			club->ToString(ret);
+		if (assoc)
+		{
+			if (only_children && m_Database.AssociationHasChildren(assoc))
+				continue;
+
+			assoc->ToString(ret);
+		}
 	}
 
 	ret << YAML::EndSeq;

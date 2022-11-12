@@ -398,10 +398,192 @@ TEST(Ajax, Clubs_Add)
 
 		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club")), "ok");
 
+		auto& clubs = app.GetDatabase().GetAllClubs();
+
+		ASSERT_EQ(clubs.size(), 1);
+		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
+
+
+		auto inter = new Judoboard::Association("International", nullptr);
+
+		app.GetDatabase().AddAssociation(inter);
+
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club 2&parent=" + (std::string)inter->GetUUID())), "ok");
+
+		ASSERT_EQ(clubs.size(), 2);
+		EXPECT_EQ(clubs[1]->GetName(), "Test Club 2");
+		ASSERT_TRUE(clubs[1]->GetParent());
+		EXPECT_EQ(*clubs[1]->GetParent(), *inter);
+
+		EXPECT_EQ(app.Ajax_AddClub(HttpServer::Request("", "name=Test Club 3&parent=XXX")), Error(Error::Type::OperationFailed));
+	}
+}
+
+
+
+TEST(Ajax, AddAssociation)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("is_association=true", "name=Test Club")), "ok");
+
+		auto& clubs = app.GetDatabase().GetAllAssociations();
+
+		ASSERT_EQ(clubs.size(), 1);
+		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
+	}
+}
+
+
+
+TEST(Ajax, GetClub)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club")), "ok");
+
 		auto clubs = app.GetDatabase().GetAllClubs();
 
 		ASSERT_EQ(clubs.size(), 1);
 		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
+
+		Club club2(YAML::Load(app.Ajax_GetClub(HttpServer::Request("id="+(std::string)clubs[0]->GetUUID()))));
+
+		EXPECT_EQ(clubs[0]->GetName(),   club2.GetName());
+		EXPECT_EQ(clubs[0]->GetUUID(),   club2.GetUUID());
+		EXPECT_EQ(clubs[0]->GetParent(), club2.GetParent());
+		EXPECT_EQ(clubs[0]->GetLevel(),  club2.GetLevel());
+	}
+}
+
+
+
+TEST(Ajax, EditClub)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club")), "ok");
+
+		auto clubs = app.GetDatabase().GetAllClubs();
+
+		ASSERT_EQ(clubs.size(), 1);
+		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
+
+		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id="+(std::string)clubs[0]->GetUUID(), "name=Test Club 2")), "ok");
+
+		EXPECT_EQ(clubs[0]->GetName(), "Test Club 2");
+	}
+}
+
+
+
+TEST(Ajax, DeleteClub)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club")), "ok");
+
+		auto& clubs = app.GetDatabase().GetAllClubs();
+
+		ASSERT_EQ(clubs.size(), 1);
+
+		EXPECT_EQ((std::string)app.Ajax_DeleteClub(HttpServer::Request("id="+(std::string)clubs[0]->GetUUID(), "")), "ok");
+
+		EXPECT_EQ(clubs.size(), 0);
+	}
+}
+
+
+
+TEST(Ajax, DeleteAssociation)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto inter = new Judoboard::Association("International", nullptr);
+
+		auto de = new Judoboard::Association("Deutschland", inter);
+
+		auto dn = new Judoboard::Association("Deutschland-Nord", de);
+		auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+
+		auto nord  = new Judoboard::Association("Nord", dn);
+		auto west  = new Judoboard::Association("West", dn);
+		auto nost  = new Judoboard::Association("Nordost", dn);
+		auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
+		auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+
+		auto nieder  = new Judoboard::Association("Niedersachsen", nord);
+		auto hamburg = new Judoboard::Association("Hamburg", nord);
+		auto berlin  = new Judoboard::Association("Berlin", nost);
+		auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+		app.GetDatabase().AddAssociation(nieder);
+		app.GetDatabase().AddAssociation(hamburg);
+		app.GetDatabase().AddAssociation(berlin);
+		app.GetDatabase().AddAssociation(nrw);
+
+
+		EXPECT_EQ(app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)de->GetUUID())), Error(Error::Type::OperationFailed));
+		EXPECT_EQ((std::string)app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID())), "ok");
+
+		EXPECT_TRUE(app.GetDatabase().FindAssociation(de->GetUUID()));
+		EXPECT_FALSE(app.GetDatabase().FindAssociation(nieder->GetUUID()));
+	}
+}
+
+
+
+TEST(Ajax, EditAssociation)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto inter = new Judoboard::Association("International", nullptr);
+
+		auto de = new Judoboard::Association("Deutschland", inter);
+
+		auto dn = new Judoboard::Association("Deutschland-Nord", de);
+		auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+
+		auto nord  = new Judoboard::Association("Nord", dn);
+		auto west  = new Judoboard::Association("West", dn);
+		auto nost  = new Judoboard::Association("Nordost", dn);
+		auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
+		auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+
+		auto nieder  = new Judoboard::Association("Niedersachsen", nord);
+		auto hamburg = new Judoboard::Association("Hamburg", nord);
+		auto berlin  = new Judoboard::Association("Berlin", nost);
+		auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+		app.GetDatabase().AddAssociation(nieder);
+		app.GetDatabase().AddAssociation(hamburg);
+		app.GetDatabase().AddAssociation(berlin);
+		app.GetDatabase().AddAssociation(nrw);
+
+
+		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID(), "name=Niedersachen 2&parent=" + (std::string)de->GetUUID())), "ok");
+
+		EXPECT_EQ(nieder->GetName(), "Niedersachen 2");
+		EXPECT_EQ(nieder->GetLevel(), 2);
+		EXPECT_EQ(nieder->GetParent()->GetUUID(), de->GetUUID());
 	}
 
 	ZED::Core::RemoveFile("database.yml");
@@ -518,10 +700,10 @@ TEST(Ajax, ListAssociations)
 		ZED::Core::RemoveFile("database.yml");
 		Application app;
 
-		auto assoc1 = new Association("Assoc 1");
+		auto assoc1 = new Association("Assoc 1", nullptr);
 		app.GetDatabase().AddAssociation(assoc1);
 
-		YAML::Node yaml = YAML::Load(app.Ajax_ListAssociations());
+		YAML::Node yaml = YAML::Load(app.Ajax_ListAssociations(HttpServer::Request("")));
 
 		ASSERT_EQ(yaml.size(), 1);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Assoc 1");
@@ -531,7 +713,7 @@ TEST(Ajax, ListAssociations)
 		auto assoc2 = new Association("Assoc 2", assoc1);
 		app.GetDatabase().AddAssociation(assoc2);
 
-		yaml = YAML::Load(app.Ajax_ListAssociations());
+		yaml = YAML::Load(app.Ajax_ListAssociations(HttpServer::Request("")));
 
 		ASSERT_EQ(yaml.size(), 2);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Assoc 1");
@@ -541,6 +723,15 @@ TEST(Ajax, ListAssociations)
 		EXPECT_EQ(yaml[1]["uuid"].as<std::string>(), (std::string)assoc2->GetUUID());
 		EXPECT_EQ(yaml[1]["parent_name"].as<std::string>(), "Assoc 1");
 		EXPECT_EQ(yaml[1]["parent_uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
+
+		yaml = YAML::Load(app.Ajax_ListAssociations(HttpServer::Request("only_children=true")));
+
+		ASSERT_EQ(yaml.size(), 1);
+
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Assoc 2");
+		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)assoc2->GetUUID());
+		EXPECT_EQ(yaml[0]["parent_name"].as<std::string>(), "Assoc 1");
+		EXPECT_EQ(yaml[0]["parent_uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
 	}
 
 	ZED::Core::RemoveFile("database.yml");
