@@ -105,7 +105,7 @@ bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
 	}
 
 	SortParticipantsByStartingPosition();
-
+	GenerateSchedule();
 	return true;
 }
 
