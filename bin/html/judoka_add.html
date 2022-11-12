@@ -93,8 +93,8 @@ function GetJudoka(id)
     document.getElementById("number").value    = res.number;
 
     GetClubs(function(response) {
-      if (res.club != null)
-        document.getElementById("clubs").value = res.club;
+      if (typeof res.club_uuid != 'undefined')
+        document.getElementById("clubs").value = res.club_uuid;
     });
   });
 }
