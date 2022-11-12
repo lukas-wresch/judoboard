@@ -390,6 +390,69 @@ TEST(Ajax, GetClub)
 
 
 
+TEST(Ajax, EditClub)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club")), "ok");
+
+		auto clubs = app.GetDatabase().GetAllClubs();
+
+		ASSERT_EQ(clubs.size(), 1);
+		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
+
+		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id="+(std::string)clubs[0]->GetUUID(), "name=Test Club 2")), "ok");
+
+		EXPECT_EQ(clubs[0]->GetName(), "Test Club 2");
+	}
+}
+
+
+
+TEST(Ajax, EditAssociation)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto inter = new Judoboard::Association("International");
+
+		auto de = new Judoboard::Association("Deutschland", inter);
+
+		auto dn = new Judoboard::Association("Deutschland-Nord", de);
+		auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+
+		auto nord  = new Judoboard::Association("Nord", dn);
+		auto west  = new Judoboard::Association("West", dn);
+		auto nost  = new Judoboard::Association("Nordost", dn);
+		auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
+		auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+
+		auto nieder  = new Judoboard::Association("Niedersachsen", nord);
+		auto hamburg = new Judoboard::Association("Hamburg", nord);
+		auto berlin  = new Judoboard::Association("Berlin", nost);
+		auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+		app.GetDatabase().AddAssociation(nieder);
+		app.GetDatabase().AddAssociation(hamburg);
+		app.GetDatabase().AddAssociation(berlin);
+		app.GetDatabase().AddAssociation(nrw);
+
+
+		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID(), "name=Niedersachen 2&parent=" + (std::string)de->GetUUID())), "ok");
+
+		EXPECT_EQ(nieder->GetName(), "Niedersachen 2");
+		EXPECT_EQ(nieder->GetLevel(), 2);
+		EXPECT_EQ(nieder->GetParent()->GetUUID(), de->GetUUID());
+	}
+}
+
+
+
 TEST(Ajax, ListClubs)
 {
 	initialize();

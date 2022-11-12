@@ -1266,6 +1266,14 @@ void Application::SetupHttpServer()
 		return Ajax_ListClubs();
 	});
 
+	m_Server.RegisterResource("/ajax/club/update", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_EditClub(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/association/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -2724,6 +2732,35 @@ std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
 	YAML::Emitter ret;
 	club->ToString(ret);
 	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_EditClub(const HttpServer::Request& Request)
+{
+	UUID id   = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	UUID parent_id = HttpServer::DecodeURLEncoded(Request.m_Body, "parent");
+
+	LockTillScopeEnd();
+
+	auto club   = m_Database.FindAssociation(id);
+	auto parent = m_Database.FindAssociation(parent_id);
+
+	if (!club)
+	{
+		club = m_Database.FindClub(id);
+
+		if (!club)
+			return Error(Error::Type::ItemNotFound);
+	}
+
+	if (!name.empty())
+		club->SetName(name);
+	if (parent)
+		club->SetParent(parent);
+
+	return Error::Type::NoError;
 }
 
 

@@ -18,27 +18,29 @@ namespace Judoboard
 	{
 	public:
 		Association(const std::string& Name, const Association* Parent = nullptr);
-		Association(const YAML::Node& Yaml, const StandingData* StandingData);
+		Association(const YAML::Node&  Yaml, const StandingData* StandingData);
 
-		virtual int GetLevel() const { return m_Level; }
+		//0 for the highest level, +1 for every level below
+		virtual int GetLevel() const {
+			if (m_pParent)
+				return m_pParent->GetLevel() + 1;
+			return 0;//We are on the highest level
+		}
 
 		std::string GetName()   const { return m_Name; }
 		auto        GetParent() const { return m_pParent; }
 
 		void SetName(std::string NewName) { m_Name = NewName; }
+		void SetParent(const Association* NewParent) { m_pParent = NewParent; }
 
 		void operator >> (YAML::Emitter& Yaml) const;
 		void ToString(YAML::Emitter& Yaml) const;
 
-		bool operator < (const Association& rhs) const;
-
-	protected:
-		void SetParent(const Association* NewParent) { m_pParent = NewParent; }
+		bool operator < (const Association& rhs) const;		
 
 	private:
 		std::string m_Name;
 
-		int m_Level = 0;//0 for the highest level, +1 for every level below
 		const Association* m_pParent = nullptr;
 	};
 }

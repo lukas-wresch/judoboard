@@ -11,8 +11,8 @@ using namespace Judoboard;
 
 Association::Association(const std::string& Name, const Association* Parent) : m_Name(Name), m_pParent(Parent)
 {
-	if (Parent)
-		m_Level = m_pParent->GetLevel() + 1;
+	//if (Parent)
+		//m_Level = m_pParent->GetLevel() + 1;
 }
 
 
@@ -27,8 +27,8 @@ Association::Association(const YAML::Node& Yaml, const StandingData* StandingDat
 	if (Yaml["parent"] && StandingData)
 	{
 		m_pParent = StandingData->FindAssociation(Yaml["parent"].as<std::string>());
-		if (m_pParent)
-			m_Level = m_pParent->GetLevel() + 1;
+		//if (m_pParent)
+			//m_Level = m_pParent->GetLevel() + 1;
 	}
 }
 
