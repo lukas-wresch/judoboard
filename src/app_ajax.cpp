@@ -1250,6 +1250,14 @@ void Application::SetupHttpServer()
 		return Ajax_AddClub(Request);
 	});
 
+	m_Server.RegisterResource("/ajax/club/get", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_GetClub(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/club/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -2689,9 +2697,33 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 	if (name.size() == 0)
 		return Error::Type::InvalidInput;
 
+	LockTillScopeEnd();
 	m_Database.AddClub(new Club(name));
 	m_Database.Save();
 	return Error();//OK
+}
+
+
+
+std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	LockTillScopeEnd();
+
+	auto club = m_Database.FindAssociation(id);
+
+	if (!club)
+	{
+		club = m_Database.FindClub(id);
+
+		if (!club)
+			return Error(Error::Type::ItemNotFound);
+	}
+
+	YAML::Emitter ret;
+	club->ToString(ret);
+	return ret.c_str();
 }
 
 

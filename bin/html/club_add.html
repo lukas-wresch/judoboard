@@ -47,10 +47,9 @@ function UpdateClub()
 function GetClub(id)
 {
   AjaxCallback("ajax/club/get?id="+id, function(response) {
-    var res = response.split(",");
-    console.log(response);
+    var res = YAML.parse(response);
 
-    document.getElementById("name").value = res[0];
+    document.getElementById("name").value = res.name;
   });
 }
 

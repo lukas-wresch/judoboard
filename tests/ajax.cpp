@@ -365,6 +365,31 @@ TEST(Ajax, AddClub)
 
 
 
+TEST(Ajax, GetClub)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club")), "ok");
+
+		auto clubs = app.GetDatabase().GetAllClubs();
+
+		ASSERT_EQ(clubs.size(), 1);
+		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
+
+		Club club2(YAML::Load(app.Ajax_GetClub(HttpServer::Request("id="+(std::string)clubs[0]->GetUUID()))));
+
+		EXPECT_EQ(clubs[0]->GetName(),   club2.GetName());
+		EXPECT_EQ(clubs[0]->GetUUID(),   club2.GetUUID());
+		EXPECT_EQ(clubs[0]->GetParent(), club2.GetParent());
+		EXPECT_EQ(clubs[0]->GetLevel(),  club2.GetLevel());
+	}
+}
+
+
+
 TEST(Ajax, ListClubs)
 {
 	initialize();

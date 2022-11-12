@@ -112,6 +112,7 @@ namespace Judoboard
 
 		//Clubs
 		Error Ajax_AddClub(const HttpServer::Request& Request);
+		std::string Ajax_GetClub(const HttpServer::Request& Request);
 		std::string Ajax_ListClubs();
 
 		//Associations
