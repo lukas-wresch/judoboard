@@ -372,12 +372,14 @@ TEST(App, FullTournament_SingleElimination14)
 					ZED::Core::Pause(11 * 1000);
 				}
 
-				ZED::Core::Pause(10 * 1000);
+				ZED::Core::Pause(12 * 1000);
 			}
 
 			EXPECT_TRUE(mat->EndMatch());
-			ZED::Core::Pause(9000);
+			ZED::Core::Pause(12 * 1000);
 		}
+
+		ZED::Core::Pause(5000);
 	}
 }
 
