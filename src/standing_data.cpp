@@ -427,9 +427,9 @@ bool StandingData::DeleteAssociation(const UUID& UUID)
 	for (auto assoc = m_Associations.begin(); assoc != m_Associations.end(); ++assoc)
 		if (*assoc && (*assoc)->GetUUID() == UUID)
 		{
-			//Check if this is a parent of some association
-			for (auto possible_parent : m_Associations)
-				if ((*assoc)->GetParent() && *(*assoc)->GetParent() == *possible_parent)
+			//Check if this association has childen
+			for (auto possible_child : m_Associations)
+				if (possible_child->GetParent() && *possible_child->GetParent() == UUID)
 					return false;
 
 			m_Associations.erase(assoc);

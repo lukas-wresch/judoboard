@@ -421,11 +421,11 @@ TEST(Ajax, DeleteClub)
 
 		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club")), "ok");
 
-		auto clubs = app.GetDatabase().GetAllClubs();
+		auto& clubs = app.GetDatabase().GetAllClubs();
 
 		ASSERT_EQ(clubs.size(), 1);
 
-		EXPECT_EQ((std::string)app.Ajax_DeleteClub(HttpServer::Request("id="+(std::string)clubs[0]->GetUUID(), "name=Test Club 2")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_DeleteClub(HttpServer::Request("id="+(std::string)clubs[0]->GetUUID(), "")), "ok");
 
 		EXPECT_EQ(clubs.size(), 0);
 	}

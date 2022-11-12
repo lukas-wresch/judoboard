@@ -24,6 +24,7 @@ TEST(Judoka, Basic)
 }
 
 
+
 TEST(Judoka, ImportExport)
 {
 	for (int i = 0; i < 1000 * 10; i++)
@@ -43,6 +44,7 @@ TEST(Judoka, ImportExport)
 		EXPECT_EQ(j.GetLengthOfBreak(), j2.GetLengthOfBreak());
 	}
 }
+
 
 
 TEST(Judoka, ImportExport_RuleSet)
