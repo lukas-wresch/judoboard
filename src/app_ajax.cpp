@@ -1631,6 +1631,7 @@ void Application::SetupHttpServer()
 		new_table->SetAgeGroup(m_Database.FindAgeGroup(age_group));
 
 		GetTournament()->AddMatchTable(new_table);
+		GetTournament()->Save();
 		return Error();//OK
 	});
 
