@@ -32,7 +32,7 @@ namespace Judoboard
 
 	public:
 		Judoka(const std::string& Firstname, const std::string& Lastname, Weight Weight = 0, Gender Gender = Gender::Male, uint32_t Birthyear = 0);
-		Judoka(const YAML::Node& Yaml, const StandingData* pStandingData = nullptr);//Load judoka from file
+		Judoka(const YAML::Node& Yaml, const StandingData* pStandingData);//Load judoka from file
 		Judoka(const DM4::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from DM4 data
 		Judoka(const MD5::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from MD5 data
 		Judoka(const DMF::Participant& Participant);//Load judoka from DMF data

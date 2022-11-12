@@ -33,7 +33,7 @@ TEST(Judoka, ImportExport)
 		YAML::Emitter yaml;
 		j >> yaml;
 
-		Judoka j2(YAML::Load(yaml.c_str()));
+		Judoka j2(YAML::Load(yaml.c_str()), nullptr);
 
 		EXPECT_EQ(j.GetName(), j2.GetName());
 		EXPECT_EQ(j.GetGender(), j2.GetGender());

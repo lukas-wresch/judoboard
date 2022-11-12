@@ -68,7 +68,7 @@ void StandingData::operator << (YAML::Node& Yaml)
 
 		for (const auto& node : Yaml["judoka"])
 		{
-			Judoka* newJudoka = new Judoka(node);
+			Judoka* newJudoka = new Judoka(node, this);
 			m_Judokas.insert({ (std::string)newJudoka->GetUUID(), newJudoka });
 		}
 	}

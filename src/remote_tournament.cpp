@@ -43,7 +43,7 @@ Judoka* RemoteTournament::FindParticipant(const UUID& UUID)
 	if (!yaml)
 		return nullptr;
 
-	Judoka* judoka = new Judoka(yaml);
+	Judoka* judoka = new Judoka(yaml, &m_StandingData);//TODO replace by pointer to real standing data
 	m_StandingData.AddJudoka(judoka);
 
 	return judoka;
@@ -63,7 +63,7 @@ const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 	if (!yaml)
 		return nullptr;
 
-	Judoka* judoka = new Judoka(yaml);
+	Judoka* judoka = new Judoka(yaml, &m_StandingData);//TODO replace by pointer to real standing data
 	m_StandingData.AddJudoka(judoka);
 
 	return judoka;
