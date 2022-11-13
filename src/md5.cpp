@@ -83,6 +83,14 @@ MD5::MD5(const Tournament& Tournament)
 				m_AssociationLevelID = new_assoc->Tier + 1;
 			}
 		}
+
+		//No organizer
+		else if (assoc->GetLevel() == 0)//Should be 'international'
+		{
+			m_AssociationID  = new_assoc->ID;
+			m_TierToDisplay  = new_assoc->Tier;
+			m_AssociationLevelID = new_assoc->Tier + 1;
+		}
 	}
 
 	//Convert clubs
@@ -322,6 +330,8 @@ MD5::MD5(const Tournament& Tournament)
 
 		m_Matches.emplace_back(new_match);
 	}
+
+	m_IsValid = true;
 }
 
 
@@ -2529,6 +2539,7 @@ std::vector<std::string> MD5::ReadHeader(ZED::Blob& Data, int& DataCount)
 	}
 
 	assert(false);
+	DataCount = -1;
 	header.clear();
 	return header;
 }
