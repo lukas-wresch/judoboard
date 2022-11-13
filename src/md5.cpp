@@ -2099,7 +2099,10 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 		{
 			header.emplace_back(Line);
 			if (newline)
+			{
 				are_in_data_part = true;
+				ReadInt(Data);//Number of data entries
+			}
 		}
 
 		else
@@ -2287,10 +2290,13 @@ bool MD5::ReadResult(ZED::Blob& Data)
 		{
 			header.emplace_back(Line);
 			if (newline)
+			{
 				are_in_data_part = true;
+				ReadInt(Data);//Read number of data entries
+			}
 		}
 
-		if (are_in_data_part)
+		else
 		{
 			data.emplace_back(Line);
 
@@ -2775,6 +2781,24 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pStartOfHeading, bool* pNewLine
 	}
 
 	return Line;
+}
+
+
+
+int MD5::ReadInt(ZED::Blob& Data)
+{
+	int ret = 0;
+	while (!Data.EndReached())
+	{
+		unsigned char c = Data.ReadByte();//Returns 0x00 when the end of the data stream is reached
+
+		if (c == '\0')
+			return ret;
+
+		ret = (ret << 8) + c;
+	}
+
+	return -1;
 }
 
 
