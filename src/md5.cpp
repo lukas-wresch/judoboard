@@ -72,6 +72,17 @@ MD5::MD5(const Tournament& Tournament)
 		m_Associations.emplace_back(new_assoc);
 		UUID2ID.insert({ assoc->GetUUID(), id - 1 });
 		ID2PTR.insert({ id - 1, new_assoc });
+
+		//Check if we can find the organizer
+		if (Tournament.GetOrganizer())
+		{
+			if (*Tournament.GetOrganizer() == *assoc)
+			{
+				m_AssociationID = new_assoc->ID;
+				m_LevelShortID  = new_assoc->Tier;
+				m_AssociationLevelID = m_LevelShortID+1;
+			}
+		}
 	}
 
 	//Convert clubs
@@ -98,6 +109,20 @@ MD5::MD5(const Tournament& Tournament)
 			new_rel.Tier          = parent->GetLevel() + 2;
 
 			m_ClubRelations.emplace_back(new_rel);
+		}
+
+		//Check if we can find the organizer
+		if (Tournament.GetOrganizer())
+		{
+			if (*Tournament.GetOrganizer() == *club)
+			{
+				m_AssociationID = new_club->ID;
+				if (club->GetParent())
+				{
+					m_LevelShortID = club->GetParent()->GetLevel() + 2;
+					m_AssociationLevelID = m_LevelShortID + 1;
+				}
+			}
 		}
 	}
 

@@ -150,7 +150,7 @@ namespace Judoboard
 			int WeightInGrammsLargerThan  = -1;
 			int WeightInGrammsSmallerThan = -1;
 
-			int MaxPooled = -1;
+			int MaxPooled = -1;//Maximum participant for pooled system
 
 			std::string Description;
 			int Status = 0;
@@ -373,7 +373,7 @@ namespace Judoboard
 		int m_AssociationID  = -1;//Association that is conducting the tournament
 		int m_AssociationLevelID = -1;//Tier of m_AssociationID + 1
 		int m_LevelShortID = -1;//Tier of m_AssociationID
-		int m_MAXJGJ = -1;
+		int m_MAXJGJ = -1;//Maximum participants for round robin
 		int m_LotteryProcess = -1;
 
 		int m_NumOfRelays = -1;
