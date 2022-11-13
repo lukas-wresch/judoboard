@@ -212,6 +212,16 @@ bool Tournament::LoadYAML(const std::string& Filename)
 	//Read standing data
 	m_StandingData << yaml;
 
+	if (yaml["organizer"] && yaml["organizer"].IsScalar())
+	{
+		m_Organizer = m_StandingData.FindAssociation(yaml["organizer"].as<std::string>());
+		if (!m_Organizer)
+			m_Organizer = m_StandingData.FindClub(yaml["organizer"].as<std::string>());
+
+		if (!m_Organizer)
+			ZED::Log::Error("Could not resolve organizer in tournament data");
+	}
+
 	if (yaml["judoka_to_age_group"] && yaml["judoka_to_age_group"].IsMap())
 	{
 		for (const auto& node : yaml["judoka_to_age_group"])
@@ -301,6 +311,9 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 	yaml << YAML::Value << "1";
 
 	m_StandingData >> yaml;
+
+	if (m_Organizer)
+		yaml << YAML::Key << "organizer" << YAML::Value << (std::string)m_Organizer->GetUUID();
 
 	yaml << YAML::Key << "judoka_to_age_group";
 	yaml << YAML::Value;

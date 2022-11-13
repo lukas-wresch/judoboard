@@ -8,6 +8,8 @@ TEST(Club, Basic)
 	Club c("name");
 
 	EXPECT_EQ(c.GetName(), "name");
+	EXPECT_EQ(c.GetLevel(), -1);
+	EXPECT_EQ(c.GetParent(), nullptr);
 }
 
 

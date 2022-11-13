@@ -49,7 +49,15 @@ namespace Judoboard
 		bool IsAutoSave() const { return m_AutoSave; }
 
 		const Association* GetOrganizer() const { return m_Organizer; }
-		void SetOrganizer(const Association* NewOrganizer) { m_Organizer = NewOrganizer;}
+		void SetOrganizer(Association* NewOrganizer) {
+			if (!NewOrganizer)
+				return;
+			if (NewOrganizer->GetLevel() == -1)
+				m_StandingData.AddClub((Club*)NewOrganizer);
+			else
+				m_StandingData.AddAssociation(NewOrganizer);
+			m_Organizer = NewOrganizer;
+		}
 
 		Status GetStatus() const;
 		bool CanCloseTournament() const;

@@ -438,7 +438,7 @@ TEST(Tournament, CanNotAddParticipantOfWrongAssociation)
 	ASSERT_TRUE(t.FindParticipant(j1.GetUUID()));
 	EXPECT_EQ(j1.GetUUID(), t.FindParticipant(j1.GetUUID())->GetUUID());
 	ASSERT_TRUE(t.GetOrganizer());
-	EXPECT_EQ(*t.GetOrganizer(), *club2);
+	EXPECT_EQ(*t.GetOrganizer(), *club1);
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
