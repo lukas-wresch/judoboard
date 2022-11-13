@@ -171,6 +171,8 @@ void Tournament::Reset()
 	//Don't delete since this could be shared memory
 	//m_pDefaultRules = nullptr;
 
+	m_Organizer = nullptr;
+
 	assert(m_StandingData.GetNumJudoka() == 0);
 }
 
@@ -737,12 +739,14 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		if (!club)
 		{
 			ZED::Log::Info("Can not add a participant to a tournament without a club");
+			Unlock();
 			return false;
 		}
 
 		if (!club->IsChildOf(*m_Organizer))
 		{
 			ZED::Log::Info("Participant can not be added, wrong tier");
+			Unlock();
 			return false;
 		}
 	}
