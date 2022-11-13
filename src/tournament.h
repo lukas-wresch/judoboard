@@ -48,6 +48,9 @@ namespace Judoboard
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 		bool IsAutoSave() const { return m_AutoSave; }
 
+		const Association* GetOrganizer() const { return m_Organizer; }
+		void SetOrganizer(const Association* NewOrganizer) { m_Organizer = NewOrganizer;}
+
 		Status GetStatus() const;
 		bool CanCloseTournament() const;
 		void DeleteAllMatchResults();
@@ -162,6 +165,8 @@ namespace Judoboard
 
 		std::string m_Name;
 		bool m_AutoSave = true;
+
+		const Association* m_Organizer = nullptr;//Tournament is organized by this association, only childen of this association can participate
 
 		std::vector<MatchTable*> m_MatchTables;
 		std::vector<Match*> m_Schedule;
