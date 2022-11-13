@@ -2008,3 +2008,57 @@ TEST(MD5, ConvertToMD5AndBack)
 
 	ZED::Core::RemoveFile("tournaments/KEM U15 KT U10 - U18.yml");
 }
+
+
+
+TEST(MD5, ReadStructureData1)
+{
+	initialize();
+
+	MD5 file("test-data/structure-1.md5");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	ASSERT_TRUE(file.GetOrganizer());
+	auto organizer = file.GetOrganizer();
+	EXPECT_EQ(organizer->Description, "International");
+	EXPECT_EQ(organizer->Tier, 2);
+}
+
+
+
+TEST(MD5, ReadStructureData2)
+{
+	initialize();
+
+	MD5 file("test-data/structure-2.md5");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	ASSERT_TRUE(file.GetOrganizer());
+	auto organizer = file.GetOrganizer();
+	EXPECT_EQ(organizer->Description, "Bayern");
+	EXPECT_EQ(organizer->Tier, 8);
+}
+
+
+
+TEST(MD5, ReadStructureData3)
+{
+	initialize();
+
+	MD5 file("test-data/structure-3.md5");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	ASSERT_TRUE(file.GetOrganizer());
+	auto organizer = file.GetOrganizer();
+	EXPECT_EQ(organizer->Description, "Berlin");
+	EXPECT_EQ(organizer->Tier, 8);
+}

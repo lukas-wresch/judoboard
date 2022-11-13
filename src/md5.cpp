@@ -78,9 +78,9 @@ MD5::MD5(const Tournament& Tournament)
 		{
 			if (*Tournament.GetOrganizer() == *assoc)
 			{
-				m_AssociationID = new_assoc->ID;
-				m_LevelShortID  = new_assoc->Tier;
-				m_AssociationLevelID = m_LevelShortID+1;
+				m_AssociationID  = new_assoc->ID;
+				m_TierToDisplay  = new_assoc->Tier;
+				m_AssociationLevelID = new_assoc->Tier + 1;
 			}
 		}
 	}
@@ -119,8 +119,8 @@ MD5::MD5(const Tournament& Tournament)
 				m_AssociationID = new_club->ID;
 				if (club->GetParent())
 				{
-					m_LevelShortID = club->GetParent()->GetLevel() + 2;
-					m_AssociationLevelID = m_LevelShortID + 1;
+					m_AssociationLevelID = club->GetParent()->GetLevel() + 3;
+					m_TierToDisplay      = club->GetParent()->GetLevel() + 2;
 				}
 			}
 		}
@@ -426,7 +426,7 @@ bool MD5::Save(const std::string& Filename) const
 		Write_Int(m_LotteryLevelID);
 		Write_Int(m_AssociationID);
 		Write_Int(m_AssociationLevelID);
-		Write_Int(m_LevelShortID);
+		Write_Int(m_TierToDisplay);
 		Write_Int(m_MAXJGJ);
 		Write_Int(m_ThirdPlaceMatch ? 0 : -1);
 		Write_Int(m_FifthPlaceMatch ? 0 : -1);
@@ -1044,6 +1044,19 @@ MD5::Association* MD5::FindAssociation(int AssociationID)
 
 
 
+MD5::Association* MD5::FindAssociation(int AssociationID) const
+{
+	if (AssociationID <= -1)
+		return nullptr;
+
+	for (auto association : m_Associations)
+		if (association && association->ID == AssociationID)
+			return association;
+	return nullptr;
+}
+
+
+
 MD5::Club* MD5::FindClub(int ClubID)
 {
 	if (ClubID <= -1)
@@ -1410,7 +1423,7 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 					}
 					else if (header[i] == "KuerzelEbenePK")
 					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_LevelShortID) != 1)
+						if (sscanf_s(data[i].c_str(), "%d", &m_TierToDisplay) != 1)
 							ZED::Log::Warn("Could not parse schema LevelShortID");
 					}
 					else if (header[i] == "MAXJGJ")
@@ -1871,10 +1884,10 @@ bool MD5::ReadLottery(ZED::Blob& Data)
 
 				m_Lottery.emplace_back(new_lottery);
 				data.clear();
-
-				if (newline)
-					return true;
 			}
+
+			if (newline)
+				return true;
 		}
 	}
 
@@ -2012,24 +2025,21 @@ bool MD5::ReadRelationParticipantMatchTable(ZED::Blob& Data)
 {
 	std::vector<std::string> header;
 	std::vector<std::string> data;
-	bool are_in_header_part = true;
-	bool are_in_data_part   = false;
+	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
 	{
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
-		if (are_in_header_part)//We are reading the header
+		if (!are_in_data_part)//We are reading the header
 		{
 			header.emplace_back(Line);
 			if (newline)
-				are_in_header_part = false;
+				are_in_data_part = true;
 		}
-		else if (start_of_heading)
-			are_in_data_part = true;
 
-		if (are_in_data_part)
+		else
 		{
 			data.emplace_back(Line);
 
@@ -2062,10 +2072,10 @@ bool MD5::ReadRelationParticipantMatchTable(ZED::Blob& Data)
 
 				m_Relations.emplace_back(new_relation);
 				data.clear();
-
-				if (newline)
-					return true;
 			}
+
+			if (newline)
+				return true;
 		}
 	}
 
@@ -2078,7 +2088,6 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 {
 	std::vector<std::string> header;
 	std::vector<std::string> data;
-	bool are_in_header_part = true;
 	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
@@ -2086,16 +2095,14 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
-		if (are_in_header_part)//We are reading the header
+		if (!are_in_data_part)//We are reading the header
 		{
 			header.emplace_back(Line);
 			if (newline)
-				are_in_header_part = false;
+				are_in_data_part = true;
 		}
-		else if (start_of_heading)
-			are_in_data_part = true;
 
-		if (are_in_data_part)
+		else
 		{
 			data.emplace_back(Line);
 
@@ -2253,10 +2260,10 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 
 				m_Matches.emplace_back(new_match);
 				data.clear();
-
-				if (newline)
-					return true;
 			}
+
+			if (newline)
+				return true;
 		}
 	}
 
@@ -2269,7 +2276,6 @@ bool MD5::ReadResult(ZED::Blob& Data)
 {
 	std::vector<std::string> header;
 	std::vector<std::string> data;
-	bool are_in_header_part = true;
 	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
@@ -2277,14 +2283,12 @@ bool MD5::ReadResult(ZED::Blob& Data)
 		bool start_of_heading, newline;
 		auto Line = ReadLine(Data, &start_of_heading, &newline);
 
-		if (are_in_header_part)//We are reading the header
+		if (!are_in_data_part)//We are reading the header
 		{
 			header.emplace_back(Line);
 			if (newline)
-				are_in_header_part = false;
+				are_in_data_part = true;
 		}
-		else if (start_of_heading)
-			are_in_data_part = true;
 
 		if (are_in_data_part)
 		{
@@ -2365,10 +2369,10 @@ bool MD5::ReadResult(ZED::Blob& Data)
 				if (new_result.ParticipantID > 0)//Filter invalid result data
 					m_Results.emplace_back(new_result);
 				data.clear();
-
-				if (newline)
-					return true;
 			}
+
+			if (newline)
+				return true;
 		}
 	}
 

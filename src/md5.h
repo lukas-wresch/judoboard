@@ -295,15 +295,16 @@ namespace Judoboard
 
 		bool Save(const std::string& Filename) const;
 
-		Association* FindAssociation(int AssociationID);
-		Club*        FindClub(int ClubID);
-		Participant* FindParticipant(int ParticipantID);
-		AgeGroup*    FindAgeGroup(int AgeGroupID);
-		Weightclass* FindWeightclass(int AgeGroupID, int WeightclassID);
-		const Result* FindResult(int AgeGroupID, int WeightclassID, int Rank) const;
-		const Result* FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const;
-		std::vector<const Result*> FindResults(int AgeGroupID, int WeightclassID) const;
-		int FindStartNo(int AgeGroupID, int WeightclassID, int ParticipantID) const;
+		[[nodiscard]] Association*  FindAssociation(int AssociationID);
+		[[nodiscard]] Association*  FindAssociation(int AssociationID) const;
+		[[nodiscard]] Club*         FindClub(int ClubID);
+		[[nodiscard]] Participant*  FindParticipant(int ParticipantID);
+		[[nodiscard]] AgeGroup*     FindAgeGroup(int AgeGroupID);
+		[[nodiscard]] Weightclass*  FindWeightclass(int AgeGroupID, int WeightclassID);
+		[[nodiscard]] const Result* FindResult(int AgeGroupID, int WeightclassID, int Rank) const;
+		[[nodiscard]] const Result* FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const;
+		[[nodiscard]] std::vector<const Result*> FindResults(int AgeGroupID, int WeightclassID) const;
+		[[nodiscard]] int FindStartNo(int AgeGroupID, int WeightclassID, int ParticipantID) const;
 
 		void Dump() const;
 
@@ -323,6 +324,10 @@ namespace Judoboard
 		std::string GetDateStart()   const { return m_DateStart; }
 		std::string GetDateEnd()     const { return m_DateEnd; }
 		std::string GetDescription() const { return m_Description; }
+
+		const Association* GetOrganizer() const {
+			return FindAssociation(m_AssociationID);
+		}
 
 		operator bool() const { return m_IsValid; }
 
@@ -372,7 +377,7 @@ namespace Judoboard
 		int m_LotteryLevelID = -1;
 		int m_AssociationID  = -1;//Association that is conducting the tournament
 		int m_AssociationLevelID = -1;//Tier of m_AssociationID + 1
-		int m_LevelShortID = -1;//Tier of m_AssociationID
+		int m_TierToDisplay = -1;//Tier that should be displayed on lists
 		int m_MAXJGJ = -1;//Maximum participants for round robin
 		int m_LotteryProcess = -1;
 
