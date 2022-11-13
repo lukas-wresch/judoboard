@@ -1267,8 +1267,8 @@ bool MD5::Parse(ZED::Blob&& Data)
 
 	while (!Data.EndReached() && is_ok)
 	{
-		bool start_of_heading, newline;
-		auto line = ReadLine(Data, &start_of_heading, &newline);
+		bool newline;
+		auto line = ReadLine(Data, &newline);
 
 		if (line == "Turnier")
 			is_ok &= ReadTournamentData(Data);
@@ -1313,6 +1313,8 @@ bool MD5::Parse(ZED::Blob&& Data)
 			assert(is_ok);
 			break;
 		}
+
+		assert(is_ok);
 	}
 
 	if (!found_end)//Did we find the \\end tag at the end of the file?
@@ -1371,113 +1373,104 @@ bool MD5::Parse(ZED::Blob&& Data)
 
 bool MD5::ReadTournamentData(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading;
-		auto Line = ReadLine(Data, &start_of_heading);
+		auto Line = ReadLine(Data);
 
-		if (start_of_heading)
-			are_in_data_part = true;
+		data.emplace_back(RemoveControlCharacters(Line));
 
-		if (!are_in_data_part)//We are reading the header
-			header.emplace_back(RemoveControlCharacters(Line));
-		else
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			data.emplace_back(RemoveControlCharacters(Line));
-
-			if (data.size() >= header.size())//Have we read the entire data block?
+			for (size_t i = 0; i < header.size(); i++) //-V1008
 			{
-				for (size_t i = 0; i < header.size(); i++) //-V1008
+				if (header[i] == "Bezeichnung")
+					m_Description = Latin1ToUTF8(data[i]);
+				else if (header[i] == "VorzugsschemaPK")
 				{
-					if (header[i] == "Bezeichnung")
-						m_Description = Latin1ToUTF8(data[i]);
-					else if (header[i] == "VorzugsschemaPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_SchemaID) != 1)
-							ZED::Log::Warn("Could not parse schema id");
-					}
-					else if (header[i] == "Ort")
-						m_Place = Latin1ToUTF8(data[i]);
-					else if (header[i] == "DatumVon")
-						m_DateStart = data[i];
-					else if (header[i] == "DatumBis")
-						m_DateEnd = data[i];
-					else if (header[i] == "LosEbenePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_LotteryLevelID) != 1)
-							ZED::Log::Warn("Could not parse schema LotteryLevelID");
-					}
-					else if (header[i] == "VerbandPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_AssociationID) != 1)
-							ZED::Log::Warn("Could not parse schema AssociationID");
-					}
-					else if (header[i] == "VerbandEbenePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_AssociationLevelID) != 1)
-							ZED::Log::Warn("Could not parse schema AssociationLevelID");
-					}
-					else if (header[i] == "KuerzelEbenePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_TierToDisplay) != 1)
-							ZED::Log::Warn("Could not parse schema LevelShortID");
-					}
-					else if (header[i] == "MAXJGJ")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_MAXJGJ) != 1)
-							ZED::Log::Warn("Could not parse schema MAXJGJ");
-					}
-					else if (header[i] == "KampfumPlatz3")
-						m_ThirdPlaceMatch = data[i] != "-1";
-					else if (header[i] == "KampfUmPlatz5")
-						m_FifthPlaceMatch = data[i] != "-1";
-					else if (header[i] == "SportlicheLeitung")
-						m_SportAdministrator = Latin1ToUTF8(data[i]);
-					else if (header[i] == "AnzWeitermelden")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_NumOfRelays) != 1)
-							ZED::Log::Warn("Could not parse schema NumOfRelays");
-					}
-					else if (header[i] == "LOSVERFAHREN")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_LotteryProcess) != 1)
-							ZED::Log::Warn("Could not parse schema LotteryProcess");
-					}
-					else if (header[i] == "AktVereinPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_NumClubs) != 1)
-							ZED::Log::Warn("Could not parse schema m_NumClubs");
-					}
-					else if (header[i] == "AktTNPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_NumParticipants) != 1)
-							ZED::Log::Warn("Could not parse m_NumParticipants");
-					}
-					else if (header[i] == "AktVerbandPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_NumAssociations) != 1)
-							ZED::Log::Warn("Could not parse m_NumAssociations");
-					}
-					else if (header[i] == "Meldegeld")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_Money) != 1)
-							ZED::Log::Warn("Could not parse Money");
-					}
-					else if (header[i] == "Meldegelderhoeht")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &m_MoneyIncreased) != 1)
-							ZED::Log::Warn("Could not parse Money Increased");
-					}
-					else if (header[i] == "JGJIgnoreNegativeUnterbew")
-						m_IgnoreNegativeScores = data[i] == "0";
+					if (sscanf_s(data[i].c_str(), "%d", &m_SchemaID) != 1)
+						ZED::Log::Warn("Could not parse schema id");
 				}
-
-				return true;
+				else if (header[i] == "Ort")
+					m_Place = Latin1ToUTF8(data[i]);
+				else if (header[i] == "DatumVon")
+					m_DateStart = data[i];
+				else if (header[i] == "DatumBis")
+					m_DateEnd = data[i];
+				else if (header[i] == "LosEbenePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &m_LotteryLevelID) != 1)
+						ZED::Log::Warn("Could not parse schema LotteryLevelID");
+				}
+				else if (header[i] == "VerbandPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &m_AssociationID) != 1)
+						ZED::Log::Warn("Could not parse schema AssociationID");
+				}
+				else if (header[i] == "VerbandEbenePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &m_AssociationLevelID) != 1)
+						ZED::Log::Warn("Could not parse schema AssociationLevelID");
+				}
+				else if (header[i] == "KuerzelEbenePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &m_TierToDisplay) != 1)
+						ZED::Log::Warn("Could not parse schema LevelShortID");
+				}
+				else if (header[i] == "MAXJGJ")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &m_MAXJGJ) != 1)
+						ZED::Log::Warn("Could not parse schema MAXJGJ");
+				}
+				else if (header[i] == "KampfumPlatz3")
+					m_ThirdPlaceMatch = data[i] != "-1";
+				else if (header[i] == "KampfUmPlatz5")
+					m_FifthPlaceMatch = data[i] != "-1";
+				else if (header[i] == "SportlicheLeitung")
+					m_SportAdministrator = Latin1ToUTF8(data[i]);
+				else if (header[i] == "AnzWeitermelden")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &m_NumOfRelays) != 1)
+						ZED::Log::Warn("Could not parse schema NumOfRelays");
+				}
+				else if (header[i] == "LOSVERFAHREN")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &m_LotteryProcess) != 1)
+						ZED::Log::Warn("Could not parse schema LotteryProcess");
+				}
+				else if (header[i] == "AktVereinPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &m_NumClubs) != 1)
+						ZED::Log::Warn("Could not parse schema m_NumClubs");
+				}
+				else if (header[i] == "AktTNPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &m_NumParticipants) != 1)
+						ZED::Log::Warn("Could not parse m_NumParticipants");
+				}
+				else if (header[i] == "AktVerbandPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &m_NumAssociations) != 1)
+						ZED::Log::Warn("Could not parse m_NumAssociations");
+				}
+				else if (header[i] == "Meldegeld")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &m_Money) != 1)
+						ZED::Log::Warn("Could not parse Money");
+				}
+				else if (header[i] == "Meldegelderhoeht")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &m_MoneyIncreased) != 1)
+						ZED::Log::Warn("Could not parse Money Increased");
+				}
+				else if (header[i] == "JGJIgnoreNegativeUnterbew")
+					m_IgnoreNegativeScores = data[i] == "0";
 			}
+
+			return true;
 		}
 	}
 
@@ -1488,54 +1481,42 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 
 bool MD5::ReadRankScore(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
-	bool end_of_data_part = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
 
-		if (are_in_data_part && newline)//Read all data blocks?
-			end_of_data_part = true;
+		data.emplace_back(Line);
 
-		if (start_of_heading)
-			are_in_data_part = true;
-
-		if (!are_in_data_part)//We are reading the header
-			header.emplace_back(Line);
-		else//We are reading actual data
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			data.emplace_back(Line);
+			RankToPoints new_ranktopoints;
 
-			if (data.size() >= header.size())//Have we read the entire data block?
+			for (size_t i = 0; i < header.size(); i++)
 			{
-				RankToPoints new_ranktopoints;
-
-				for (size_t i = 0; i < header.size(); i++)
+				if (header[i] == "PlatzPK")
 				{
-					if (header[i] == "PlatzPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_ranktopoints.RankID) != 1)
-							ZED::Log::Warn("Could not read rank of relation table rank -> points");
-					}
-					else if (header[i] == "Punkte")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_ranktopoints.Points) != 1)
-							ZED::Log::Warn("Could not read points of relation table rank -> points");
-					}
+					if (sscanf_s(data[i].c_str(), "%d", &new_ranktopoints.RankID) != 1)
+						ZED::Log::Warn("Could not read rank of relation table rank -> points");
 				}
-
-				m_RankToPoints.emplace_back(new_ranktopoints);
-
-				data.clear();//Clear block
-
-				if (end_of_data_part)//Last data entry read?
-					return true;
+				else if (header[i] == "Punkte")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_ranktopoints.Points) != 1)
+						ZED::Log::Warn("Could not read points of relation table rank -> points");
+				}
 			}
+
+			m_RankToPoints.emplace_back(new_ranktopoints);
+
+			data.clear();//Clear block	
 		}
+
+		if (newline)//Last data entry read?
+			return m_RankToPoints.size() == data_count;
 	}
 
 	return false;
@@ -1545,112 +1526,104 @@ bool MD5::ReadRankScore(ZED::Blob& Data)
 
 bool MD5::ReadAgeGroups(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline, doublezero;
-		auto Line = ReadLine(Data, &start_of_heading, &newline, &doublezero);
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
 
-		if (start_of_heading)
-			are_in_data_part = true;
+		data.emplace_back(RemoveControlCharacters(Line));
 
-		if (!are_in_data_part)//We are reading the header
-			header.emplace_back(RemoveControlCharacters(Line));
-		else
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			data.emplace_back(RemoveControlCharacters(Line));
+			AgeGroup age_group;
 
-			if (data.size() >= header.size())//Have we read the entire data block?
+			for (size_t i = 0; i < data.size(); i++)
 			{
-				AgeGroup age_group;
-
-				for (size_t i = 0; i < data.size(); i++)
+				if (header[i] == "AltersgruppePK")
 				{
-					if (header[i] == "AltersgruppePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &age_group.ID) != 1)
-							ZED::Log::Warn("Could not read id of age group");
-					}
-					else if (header[i] == "Bezeichnung")
-						age_group.Name = Latin1ToUTF8(data[i]);
-					else if (header[i] == "MinJahrgang")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &age_group.MinBirthyear) != 1)
-							ZED::Log::Warn("Could not read MinBirthyear of age group");
-					}
-					else if (header[i] == "MaxJahrgang")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &age_group.MaxBirthyear) != 1)
-							ZED::Log::Warn("Could not read MinBirthyear of age group");
-					}
-					else if (header[i] == "Geschlecht")
-						age_group.Gender = data[i] == "m" ? Gender::Male : Gender::Female;
-					else if (header[i] == "Aufruecken")
-						age_group.MoveUp = data[i] == "1";
-					else if (header[i] == "Toleranz")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &age_group.Tolerance) != 1)
-							ZED::Log::Warn("Could not read Tolerance of age group");
-					}
-					else if (header[i] == "GewichtAnWaageAendern")
-						age_group.ChangeWeightAtScale = data[i] == "1";
-					else if (header[i] == "LosverfahrenPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &age_group.LotterySchemaID) != 1)
-							ZED::Log::Warn("Could not read LotterySchemaID of age group");
-					}
-					else if (header[i] == "Allkategorie")
-						age_group.AllCategories = data[i] != "F";
-					else if (header[i] == "Kata")
-						age_group.Kata = data[i] != "F";
-					else if (header[i] == "Meldegeld")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &age_group.Money) != 1)
-							ZED::Log::Warn("Could not read Money of age group");
-					}
-					else if (header[i] == "MeldegeldKata")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyKata) != 1)
-							ZED::Log::Warn("Could not read MoneyKata of age group");
-					}
-					else if (header[i] == "MeldegeldAllkategorie")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyAllCategories) != 1)
-							ZED::Log::Warn("Could not read MoneyAllCategories of age group");
-					}
-					else if (header[i] == "Meldegelderhoeht")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyIncreased) != 1)
-							ZED::Log::Warn("Could not read MoneyIncreased of age group");
-					}
-					else if (header[i] == "MeldegeldKataerhoeht")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyKataIncreased) != 1)
-							ZED::Log::Warn("Could not read MoneyKataIncreased of age group");
-					}
-					else if (header[i] == "MeldegeldAllkategorieerho")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyAllCategoriesIncreased) != 1)
-							ZED::Log::Warn("Could not read MoneyKataIncreased of age group");
-					}
-					else if (header[i] == "Poolsystem")
-						age_group.PoolSystem = data[i] == "T";
-					else if (header[i] == "AlleTNinErgebnisliste")
-						age_group.AllParticipantsInResultTable = data[i] == "T";
-					else if (header[i] == "Mannschaft")
-						age_group.Team = data[i] == "T";
+					if (sscanf_s(data[i].c_str(), "%d", &age_group.ID) != 1)
+						ZED::Log::Warn("Could not read id of age group");
 				}
-
-				m_AgeGroups.emplace_back(new AgeGroup(age_group));
-				data.clear();
-
-				if (newline)
-					return true;
+				else if (header[i] == "Bezeichnung")
+					age_group.Name = Latin1ToUTF8(data[i]);
+				else if (header[i] == "MinJahrgang")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &age_group.MinBirthyear) != 1)
+						ZED::Log::Warn("Could not read MinBirthyear of age group");
+				}
+				else if (header[i] == "MaxJahrgang")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &age_group.MaxBirthyear) != 1)
+						ZED::Log::Warn("Could not read MinBirthyear of age group");
+				}
+				else if (header[i] == "Geschlecht")
+					age_group.Gender = data[i] == "m" ? Gender::Male : Gender::Female;
+				else if (header[i] == "Aufruecken")
+					age_group.MoveUp = data[i] == "1";
+				else if (header[i] == "Toleranz")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &age_group.Tolerance) != 1)
+						ZED::Log::Warn("Could not read Tolerance of age group");
+				}
+				else if (header[i] == "GewichtAnWaageAendern")
+					age_group.ChangeWeightAtScale = data[i] == "1";
+				else if (header[i] == "LosverfahrenPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &age_group.LotterySchemaID) != 1)
+						ZED::Log::Warn("Could not read LotterySchemaID of age group");
+				}
+				else if (header[i] == "Allkategorie")
+					age_group.AllCategories = data[i] != "F";
+				else if (header[i] == "Kata")
+					age_group.Kata = data[i] != "F";
+				else if (header[i] == "Meldegeld")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &age_group.Money) != 1)
+						ZED::Log::Warn("Could not read Money of age group");
+				}
+				else if (header[i] == "MeldegeldKata")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyKata) != 1)
+						ZED::Log::Warn("Could not read MoneyKata of age group");
+				}
+				else if (header[i] == "MeldegeldAllkategorie")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyAllCategories) != 1)
+						ZED::Log::Warn("Could not read MoneyAllCategories of age group");
+				}
+				else if (header[i] == "Meldegelderhoeht")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyIncreased) != 1)
+						ZED::Log::Warn("Could not read MoneyIncreased of age group");
+				}
+				else if (header[i] == "MeldegeldKataerhoeht")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyKataIncreased) != 1)
+						ZED::Log::Warn("Could not read MoneyKataIncreased of age group");
+				}
+				else if (header[i] == "MeldegeldAllkategorieerho")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &age_group.MoneyAllCategoriesIncreased) != 1)
+						ZED::Log::Warn("Could not read MoneyKataIncreased of age group");
+				}
+				else if (header[i] == "Poolsystem")
+					age_group.PoolSystem = data[i] == "T";
+				else if (header[i] == "AlleTNinErgebnisliste")
+					age_group.AllParticipantsInResultTable = data[i] == "T";
+				else if (header[i] == "Mannschaft")
+					age_group.Team = data[i] == "T";
 			}
+
+			m_AgeGroups.emplace_back(new AgeGroup(age_group));
+			data.clear();
 		}
+
+		if (newline)
+			return m_AgeGroups.size() == data_count;
 	}
 
 	return false;
@@ -1660,119 +1633,103 @@ bool MD5::ReadAgeGroups(ZED::Blob& Data)
 
 bool MD5::ReadWeightclasses(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_header_part = true;
-	bool are_in_data_part   = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);		
+		bool newline;
+		auto Line = ReadLine(Data,&newline);		
 			
+		data.emplace_back(RemoveControlCharacters(Line));
 
-		if (are_in_header_part)//We are reading the header
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			header.emplace_back(RemoveControlCharacters(Line));
+			Weightclass new_weightclass;
 
-			if (newline)
-				are_in_header_part = false;
-		}
-		else if (start_of_heading)
-			are_in_data_part = true;
-
-
-		if (are_in_data_part)
-		{
-			data.emplace_back(RemoveControlCharacters(Line));
-
-			if (data.size() >= header.size())//Have we read the entire data block?
+			for (size_t i = 0; i < header.size(); i++)
 			{
-				Weightclass new_weightclass;
-
-				for (size_t i = 0; i < header.size(); i++)
+				if (header[i] == "AltersgruppePK")
 				{
-					if (header[i] == "AltersgruppePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.AgeGroupID) != 1)
-							ZED::Log::Warn("Could not read age group id of weightclass");
-					}
-					else if (header[i] == "GewichtsklassePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.ID) != 1)
-							ZED::Log::Warn("Could not read id of weightclass");
-					}
-					else if (header[i] == "GewichtGroesser")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.WeightLargerThan) != 1)
-							ZED::Log::Warn("Could not read WeightLargerThan of weightclass");
-					}
-					else if (header[i] == "GewichtKleiner")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.WeightSmallerThan) != 1)
-							ZED::Log::Warn("Could not read WeightSmallerThan of weightclass");
-					}
-					else if (header[i] == "Bezeichnung")
-						new_weightclass.Description = Latin1ToUTF8(data[i]);
-					else if (header[i] == "Status")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.Status) != 1)
-							ZED::Log::Warn("Could not read status of weightclass");
-					}
-					else if (header[i] == "WettkampfsystemPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.FightSystemID) != 1)
-							ZED::Log::Warn("Could not read FightSystemID of weightclass");
-					}
-					else if (header[i] == "WettkampfsystemTypPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.FightSystemTypeID) != 1)
-							ZED::Log::Warn("Could not read FightSystemTypeID of weightclass");
-					}
-					else if (header[i] == "KampfUmPlatz3")
-						new_weightclass.MatchForThirdPlace = data[i] != "-1";
-					else if (header[i] == "KampfUmPlatz5")
-						new_weightclass.MatchForFifthPlace = data[i] != "-1";
-					else if (header[i] == "Datum")
-						new_weightclass.Date = data[i];
-					else if (header[i] == "Weitermelden")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.Relay) != 1)
-							ZED::Log::Warn("Could not read Relay of weightclass");
-					}
-					else if (header[i] == "MaxJGJ")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.MaxJGJ) != 1)
-							ZED::Log::Warn("Could not read MaxJGJ of weightclass");
-					}
-					else if (header[i] == "Identifikation")
-						new_weightclass.Identifier = data[i];
-					else if (header[i] == "ForReference")
-						new_weightclass.ForReference = data[i];
-					else if (header[i] == "GewichtGroesserGramm")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.WeightInGrammsLargerThan) != 1)
-							ZED::Log::Warn("Could not read WeightInGrammsLargerThan of weightclass");
-					}
-					else if (header[i] == "GewichtKleinerGramm")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.WeightInGrammsSmallerThan) != 1)
-							ZED::Log::Warn("Could not read WeightInGrammsSmallerThan of weightclass");
-					}
-					else if (header[i] == "MaxVorgepoolt")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.MaxPooled) != 1)
-							ZED::Log::Warn("Could not read MaxPooled of weightclass");
-					}
+					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.AgeGroupID) != 1)
+						ZED::Log::Warn("Could not read age group id of weightclass");
 				}
-
-				m_Weightclasses.emplace_back(new Weightclass(new_weightclass));
-				data.clear();
-
-				if (newline)
-					return true;
+				else if (header[i] == "GewichtsklassePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.ID) != 1)
+						ZED::Log::Warn("Could not read id of weightclass");
+				}
+				else if (header[i] == "GewichtGroesser")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.WeightLargerThan) != 1)
+						ZED::Log::Warn("Could not read WeightLargerThan of weightclass");
+				}
+				else if (header[i] == "GewichtKleiner")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.WeightSmallerThan) != 1)
+						ZED::Log::Warn("Could not read WeightSmallerThan of weightclass");
+				}
+				else if (header[i] == "Bezeichnung")
+					new_weightclass.Description = Latin1ToUTF8(data[i]);
+				else if (header[i] == "Status")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.Status) != 1)
+						ZED::Log::Warn("Could not read status of weightclass");
+				}
+				else if (header[i] == "WettkampfsystemPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.FightSystemID) != 1)
+						ZED::Log::Warn("Could not read FightSystemID of weightclass");
+				}
+				else if (header[i] == "WettkampfsystemTypPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.FightSystemTypeID) != 1)
+						ZED::Log::Warn("Could not read FightSystemTypeID of weightclass");
+				}
+				else if (header[i] == "KampfUmPlatz3")
+					new_weightclass.MatchForThirdPlace = data[i] != "-1";
+				else if (header[i] == "KampfUmPlatz5")
+					new_weightclass.MatchForFifthPlace = data[i] != "-1";
+				else if (header[i] == "Datum")
+					new_weightclass.Date = data[i];
+				else if (header[i] == "Weitermelden")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.Relay) != 1)
+						ZED::Log::Warn("Could not read Relay of weightclass");
+				}
+				else if (header[i] == "MaxJGJ")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.MaxJGJ) != 1)
+						ZED::Log::Warn("Could not read MaxJGJ of weightclass");
+				}
+				else if (header[i] == "Identifikation")
+					new_weightclass.Identifier = data[i];
+				else if (header[i] == "ForReference")
+					new_weightclass.ForReference = data[i];
+				else if (header[i] == "GewichtGroesserGramm")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.WeightInGrammsLargerThan) != 1)
+						ZED::Log::Warn("Could not read WeightInGrammsLargerThan of weightclass");
+				}
+				else if (header[i] == "GewichtKleinerGramm")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.WeightInGrammsSmallerThan) != 1)
+						ZED::Log::Warn("Could not read WeightInGrammsSmallerThan of weightclass");
+				}
+				else if (header[i] == "MaxVorgepoolt")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.MaxPooled) != 1)
+						ZED::Log::Warn("Could not read MaxPooled of weightclass");
+				}
 			}
+
+			m_Weightclasses.emplace_back(new Weightclass(new_weightclass));
+			data.clear();
 		}
+
+		if (newline)
+			return m_Weightclasses.size() == data_count;
 	}
 
 	return false;
@@ -1782,60 +1739,47 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 
 bool MD5::ReadRelationClubAssociation(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
 
-		if (!are_in_data_part)//We are reading the header
+		data.emplace_back(Line);
+
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			header.emplace_back(Line);
-			if (newline)
-			{
-				//Read number of columns
-				ReadLine(Data, &start_of_heading, &newline);
-				are_in_data_part = true;
-			}
-		}
-		else
-		{
-			data.emplace_back(Line);
+			RelationClubAssociation new_relation;
 
-			if (data.size() >= header.size())//Have we read the entire data block?
+			for (size_t i = 0; i < header.size(); i++)
 			{
-				RelationClubAssociation new_relation;
-
-				for (size_t i = 0; i < header.size(); i++)
+				if (header[i] == "VereinPK")
 				{
-					if (header[i] == "VereinPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_relation.ClubID) != 1)
-							ZED::Log::Warn("Could not read club id of club relations table");
-					}
-					else if (header[i] == "EbenePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_relation.Tier) != 1)
-							ZED::Log::Warn("Could not read tier of club relations table");
-					}
-					else if (header[i] == "VerbandPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_relation.AssociationID) != 1)
-							ZED::Log::Warn("Could not read association id of club relations table");
-					}
+					if (sscanf_s(data[i].c_str(), "%d", &new_relation.ClubID) != 1)
+						ZED::Log::Warn("Could not read club id of club relations table");
 				}
-
-				m_ClubRelations.emplace_back(new_relation);
-
-				data.clear();
-
-				if (newline)
-					return true;
+				else if (header[i] == "EbenePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_relation.Tier) != 1)
+						ZED::Log::Warn("Could not read tier of club relations table");
+				}
+				else if (header[i] == "VerbandPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_relation.AssociationID) != 1)
+						ZED::Log::Warn("Could not read association id of club relations table");
+				}
 			}
+
+			m_ClubRelations.emplace_back(new_relation);
+
+			data.clear();
 		}
+
+		if (newline)
+			return m_ClubRelations.size() == data_count;
 	}
 
 	return false;
@@ -1845,50 +1789,41 @@ bool MD5::ReadRelationClubAssociation(ZED::Blob& Data)
 
 bool MD5::ReadLottery(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
 
-		if (!are_in_data_part)//We are reading the header
-		{
-			header.emplace_back(Line);
-			if (newline)
-				are_in_data_part = true;
-		}
-		else
-		{
-			data.emplace_back(Line);
+		data.emplace_back(Line);
 
-			if (data.size() >= header.size())//Have we read the entire data block?
+		if (data.size() >= header.size())//Have we read the entire data block?
+		{
+			Lottery new_lottery;
+
+			for (size_t i = 0; i < header.size(); i++)
 			{
-				Lottery new_lottery;
-
-				for (size_t i = 0; i < header.size(); i++)
+				if (header[i] == "VerbandPK")
 				{
-					if (header[i] == "VerbandPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_lottery.AssociationID) != 1)
-							ZED::Log::Warn("Could not read AssociationID of lottery table");
-					}
-					else if (header[i] == "LosNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_lottery.StartNo) != 1)
-							ZED::Log::Warn("Could not read StartNo of lottery table");
-					}
+					if (sscanf_s(data[i].c_str(), "%d", &new_lottery.AssociationID) != 1)
+						ZED::Log::Warn("Could not read AssociationID of lottery table");
 				}
-
-				m_Lottery.emplace_back(new_lottery);
-				data.clear();
+				else if (header[i] == "LosNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_lottery.StartNo) != 1)
+						ZED::Log::Warn("Could not read StartNo of lottery table");
+				}
 			}
 
-			if (newline)
-				return true;
+			m_Lottery.emplace_back(new_lottery);
+			data.clear();
 		}
+
+		if (newline)
+			return m_Lottery.size() == data_count;
 	}
 
 	return false;
@@ -1898,58 +1833,48 @@ bool MD5::ReadLottery(ZED::Blob& Data)
 
 bool MD5::ReadLotteryScheme(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
 
-		if (!are_in_data_part)//We are reading the header
+		data.emplace_back(Line);
+
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			header.emplace_back(Line);
+			LotterySchema new_lotteryschema;
 
-			if (newline)
-				are_in_data_part = true;
-		}
-		else
-		{
-			data.emplace_back(Line);
-
-			if (data.size() >= header.size())//Have we read the entire data block?
+			for (size_t i = 0; i < header.size(); i++)
 			{
-				LotterySchema new_lotteryschema;
-
-				for (size_t i = 0; i < header.size(); i++)
+				if (header[i] == "LosSchemaPK")
 				{
-					if (header[i] == "LosSchemaPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschema.ID) != 1)
-							ZED::Log::Warn("Could not read id of lottery schema");
-					}
-					else if (header[i] == "Bezeichnung")
-						new_lotteryschema.Description = Latin1ToUTF8(data[i]);
-					else if (header[i] == "VerbandPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschema.AssociationID) != 1)
-							ZED::Log::Warn("Could not read association of lottery schema");
-					}
-					else if (header[i] == "EbenePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschema.TierID) != 1)
-							ZED::Log::Warn("Could not read tier id of lottery schema");
-					}
+					if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschema.ID) != 1)
+						ZED::Log::Warn("Could not read id of lottery schema");
 				}
-
-				m_LotterySchemas.emplace_back(new_lotteryschema);
-				data.clear();
+				else if (header[i] == "Bezeichnung")
+					new_lotteryschema.Description = Latin1ToUTF8(data[i]);
+				else if (header[i] == "VerbandPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschema.AssociationID) != 1)
+						ZED::Log::Warn("Could not read association of lottery schema");
+				}
+				else if (header[i] == "EbenePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschema.TierID) != 1)
+						ZED::Log::Warn("Could not read tier id of lottery schema");
+				}
 			}
 
-			if (newline)
-				return true;
+			m_LotterySchemas.emplace_back(new_lotteryschema);
+			data.clear();
 		}
+
+		if (newline)
+			return m_LotterySchemas.size() == data_count;
 	}
 
 	return false;
@@ -1959,61 +1884,51 @@ bool MD5::ReadLotteryScheme(ZED::Blob& Data)
 
 bool MD5::ReadLotterySchemaLine(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
 
-		if (!are_in_data_part)//We are reading the header
+		data.emplace_back(Line);
+
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			header.emplace_back(Line);
+			LotterySchemaLine new_lotteryschemaline;
 
-			if (newline)
-				are_in_data_part = true;
-		}
-		else
-		{
-			data.emplace_back(Line);
-
-			if (data.size() >= header.size())//Have we read the entire data block?
+			for (size_t i = 0; i < header.size(); i++)
 			{
-				LotterySchemaLine new_lotteryschemaline;
-
-				for (size_t i = 0; i < header.size(); i++)
+				if (header[i] == "LosschemaPK")
 				{
-					if (header[i] == "LosschemaPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschemaline.LotterySchemaID) != 1)
-							ZED::Log::Warn("Could not read lottery schema id of lottery schema line");
-					}
-					else if (header[i] == "PosPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschemaline.PositionID) != 1)
-							ZED::Log::Warn("Could not read position of lottery schema line");
-					}
-					else if (header[i] == "VerbandPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschemaline.AssociationID) != 1)
-							ZED::Log::Warn("Could not read association id of lottery schema line");
-					}
-					else if (header[i] == "PlatzPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschemaline.RankID) != 1)
-							ZED::Log::Warn("Could not read rank of lottery schema line");
-					}
+					if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschemaline.LotterySchemaID) != 1)
+						ZED::Log::Warn("Could not read lottery schema id of lottery schema line");
 				}
-
-				m_LotterySchemaLines.emplace_back(new_lotteryschemaline);
-				data.clear();
+				else if (header[i] == "PosPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschemaline.PositionID) != 1)
+						ZED::Log::Warn("Could not read position of lottery schema line");
+				}
+				else if (header[i] == "VerbandPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschemaline.AssociationID) != 1)
+						ZED::Log::Warn("Could not read association id of lottery schema line");
+				}
+				else if (header[i] == "PlatzPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_lotteryschemaline.RankID) != 1)
+						ZED::Log::Warn("Could not read rank of lottery schema line");
+				}
 			}
 
-			if (newline)
-				return true;
+			m_LotterySchemaLines.emplace_back(new_lotteryschemaline);
+			data.clear();
 		}
+
+		if (newline)
+			return m_LotterySchemaLines.size() == data_count;
 	}
 
 	return false;
@@ -2023,60 +1938,50 @@ bool MD5::ReadLotterySchemaLine(ZED::Blob& Data)
 
 bool MD5::ReadRelationParticipantMatchTable(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
 
-		if (!are_in_data_part)//We are reading the header
+		data.emplace_back(Line);
+
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			header.emplace_back(Line);
-			if (newline)
-				are_in_data_part = true;
-		}
-
-		else
-		{
-			data.emplace_back(Line);
-
-			if (data.size() >= header.size())//Have we read the entire data block?
+			RelationParticipantMatchTable new_relation;
+			for (size_t i = 0; i < header.size(); i++)
 			{
-				RelationParticipantMatchTable new_relation;
-				for (size_t i = 0; i < header.size(); i++)
+				if (header[i] == "AltersgruppePK")
 				{
-					if (header[i] == "AltersgruppePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_relation.AgeGroupID) != 1)
-							ZED::Log::Warn("Could not read age group id of relation table");
-					}
-					else if (header[i] == "GewichtsklassePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_relation.WeightclassID) != 1)
-							ZED::Log::Warn("Could not read weight class id of relation table");
-					}
-					else if (header[i] == "StartNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_relation.StartNo) != 1)
-							ZED::Log::Warn("Could not read start number of relation table");
-					}
-					else if (header[i] == "TeilnehmerPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_relation.ParticipantID) != 1)
-							ZED::Log::Warn("Could not read participant id of relation table");
-					}
+					if (sscanf_s(data[i].c_str(), "%d", &new_relation.AgeGroupID) != 1)
+						ZED::Log::Warn("Could not read age group id of relation table");
 				}
-
-				m_Relations.emplace_back(new_relation);
-				data.clear();
+				else if (header[i] == "GewichtsklassePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_relation.WeightclassID) != 1)
+						ZED::Log::Warn("Could not read weight class id of relation table");
+				}
+				else if (header[i] == "StartNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_relation.StartNo) != 1)
+						ZED::Log::Warn("Could not read start number of relation table");
+				}
+				else if (header[i] == "TeilnehmerPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_relation.ParticipantID) != 1)
+						ZED::Log::Warn("Could not read participant id of relation table");
+				}
 			}
 
-			if (newline)
-				return true;
+			m_Relations.emplace_back(new_relation);
+			data.clear();
 		}
+
+		if (newline)
+			return m_Relations.size() == data_count;
 	}
 
 	return false;
@@ -2086,188 +1991,175 @@ bool MD5::ReadRelationParticipantMatchTable(ZED::Blob& Data)
 
 bool MD5::ReadMatchData(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
 
-		if (!are_in_data_part)//We are reading the header
+		data.emplace_back(Line);
+
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			header.emplace_back(Line);
-			if (newline)
+			Match new_match;
+			for (size_t i = 0; i < header.size(); i++)
 			{
-				are_in_data_part = true;
-				ReadInt(Data);//Number of data entries
-			}
-		}
-
-		else
-		{
-			data.emplace_back(Line);
-
-			if (data.size() >= header.size())//Have we read the entire data block?
-			{
-				Match new_match;
-				for (size_t i = 0; i < header.size(); i++)
+				if (header[i] == "AltersgruppePK")
 				{
-					if (header[i] == "AltersgruppePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.AgeGroupID) != 1)
-							ZED::Log::Warn("Could not read age group id of match");
-					}
-					else if (header[i] == "GewichtsklassePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.WeightclassID) != 1)
-							ZED::Log::Warn("Could not read weight class id of match");
-					}
-					else if (header[i] == "KampfNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.MatchNo) != 1)
-							ZED::Log::Warn("Could not read MatchNo of match");
-					}
-					else if (header[i] == "StartNRRot")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.StartNoRed) != 1)
-							ZED::Log::Warn("Could not read StartNoRed of match");
-					}
-					else if (header[i] == "RotPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.RedID) != 1)
-							ZED::Log::Warn("Could not read RedID of match");
-					}
-					else if (header[i] == "RotAusKampfNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.RedFromMatch) != 1)
-							ZED::Log::Warn("Could not read RedFromMatch of match");
-					}
-					else if (header[i] == "RotTyp")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.RedTyp) != 1)
-							ZED::Log::Warn("Could not read RedTyp of match");
-					}
-					else if (header[i] == "StartNRWeiss")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.StartNoWhite) != 1)
-							ZED::Log::Warn("Could not read StartNoWhite of match");
-					}
-					else if (header[i] == "WeissPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteID) != 1)
-							ZED::Log::Warn("Could not read WhiteID of match");
-					}
-					else if (header[i] == "WeissAusKampfNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteFromMatch) != 1)
-							ZED::Log::Warn("Could not read WhiteFromMatch of match");
-					}
-					else if (header[i] == "WeissTyp")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteTyp) != 1)
-							ZED::Log::Warn("Could not read WhiteTyp of match");
-					}
-					else if (header[i] == "SiegerPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.WinnerID) != 1)
-							ZED::Log::Warn("Could not read WinnerID of match");
-					}
-					else if (header[i] == "SiegerKampfNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.WinnerMatchNo) != 1)
-							ZED::Log::Warn("Could not read WinnerMatchNo of match");
-					}
-					else if (header[i] == "SiegerFarbe")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.WinnerColor) != 1)
-							ZED::Log::Warn("Could not read WinnerMatchNo of match");
-					}
-					else if (header[i] == "VerliererPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.LoserID) != 1)
-							ZED::Log::Warn("Could not read LoserColor of match");
-					}
-					else if (header[i] == "VerliererKampfNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.LoserMatchNo) != 1)
-							ZED::Log::Warn("Could not read LoserMatchNo of match");
-					}
-					else if (header[i] == "VerliererFarbe")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.LoserColor) != 1)
-							ZED::Log::Warn("Could not read LoserColor of match");
-					}
-					else if (header[i] == "WarteAufSiegerAusKampf")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.WaitingForWinnerFromMatch) != 1)
-							ZED::Log::Warn("Could not read WaitingForWinnerFromMatch of match");
-					}
-					else if (header[i] == "Zeit")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.Time) != 1)
-							ZED::Log::Warn("Could not read Time of match");
-					}
-					else if (header[i] == "Bewertung")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.Result) != 1)
-							ZED::Log::Warn("Could not read Result of match");
-					}
-					else if (header[i] == "UnterbewertungSieger")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.ScoreWinner) != 1)
-							ZED::Log::Warn("Could not read Result of match");
-					}
-					else if (header[i] == "UnterbewertungVerlierer")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.ScoreLoser) != 1)
-							ZED::Log::Warn("Could not read ScoreLoser of match");
-					}
-					else if (header[i] == "Status")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.Status) != 1)
-							ZED::Log::Warn("Could not read Status of match");
-					}
-					else if (header[i] == "RotAusgeschiedenKampfNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.RedOutMatchID) != 1)
-							ZED::Log::Warn("Could not read RedOutMatchID of match");
-					}
-					else if (header[i] == "WeissAusgeschiedenKampfNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteOutMatchID) != 1)
-							ZED::Log::Warn("Could not read WhiteOutMatchID of match");
-					}
-					else if (header[i] == "Pool")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.Pool) != 1)
-							ZED::Log::Warn("Could not read Pool of match");
-					}
-					else if (header[i] == "DritterKampfNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.ThirdMatchNo) != 1)
-							ZED::Log::Warn("Could not read ThirdMatchNo of match");
-					}
-					else if (header[i] == "DritterFarbe")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.ThirdColor) != 1)
-							ZED::Log::Warn("Could not read ThirdMatchNo of match");
-					}
-					else if (header[i] == "BereichPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_match.AreaID) != 1)
-							ZED::Log::Warn("Could not read AreaID of match");
-					}
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.AgeGroupID) != 1)
+						ZED::Log::Warn("Could not read age group id of match");
 				}
-
-				m_Matches.emplace_back(new_match);
-				data.clear();
+				else if (header[i] == "GewichtsklassePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.WeightclassID) != 1)
+						ZED::Log::Warn("Could not read weight class id of match");
+				}
+				else if (header[i] == "KampfNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.MatchNo) != 1)
+						ZED::Log::Warn("Could not read MatchNo of match");
+				}
+				else if (header[i] == "StartNRRot")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.StartNoRed) != 1)
+						ZED::Log::Warn("Could not read StartNoRed of match");
+				}
+				else if (header[i] == "RotPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.RedID) != 1)
+						ZED::Log::Warn("Could not read RedID of match");
+				}
+				else if (header[i] == "RotAusKampfNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.RedFromMatch) != 1)
+						ZED::Log::Warn("Could not read RedFromMatch of match");
+				}
+				else if (header[i] == "RotTyp")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.RedTyp) != 1)
+						ZED::Log::Warn("Could not read RedTyp of match");
+				}
+				else if (header[i] == "StartNRWeiss")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.StartNoWhite) != 1)
+						ZED::Log::Warn("Could not read StartNoWhite of match");
+				}
+				else if (header[i] == "WeissPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteID) != 1)
+						ZED::Log::Warn("Could not read WhiteID of match");
+				}
+				else if (header[i] == "WeissAusKampfNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteFromMatch) != 1)
+						ZED::Log::Warn("Could not read WhiteFromMatch of match");
+				}
+				else if (header[i] == "WeissTyp")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteTyp) != 1)
+						ZED::Log::Warn("Could not read WhiteTyp of match");
+				}
+				else if (header[i] == "SiegerPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.WinnerID) != 1)
+						ZED::Log::Warn("Could not read WinnerID of match");
+				}
+				else if (header[i] == "SiegerKampfNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.WinnerMatchNo) != 1)
+						ZED::Log::Warn("Could not read WinnerMatchNo of match");
+				}
+				else if (header[i] == "SiegerFarbe")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.WinnerColor) != 1)
+						ZED::Log::Warn("Could not read WinnerMatchNo of match");
+				}
+				else if (header[i] == "VerliererPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.LoserID) != 1)
+						ZED::Log::Warn("Could not read LoserColor of match");
+				}
+				else if (header[i] == "VerliererKampfNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.LoserMatchNo) != 1)
+						ZED::Log::Warn("Could not read LoserMatchNo of match");
+				}
+				else if (header[i] == "VerliererFarbe")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.LoserColor) != 1)
+						ZED::Log::Warn("Could not read LoserColor of match");
+				}
+				else if (header[i] == "WarteAufSiegerAusKampf")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.WaitingForWinnerFromMatch) != 1)
+						ZED::Log::Warn("Could not read WaitingForWinnerFromMatch of match");
+				}
+				else if (header[i] == "Zeit")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.Time) != 1)
+						ZED::Log::Warn("Could not read Time of match");
+				}
+				else if (header[i] == "Bewertung")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.Result) != 1)
+						ZED::Log::Warn("Could not read Result of match");
+				}
+				else if (header[i] == "UnterbewertungSieger")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.ScoreWinner) != 1)
+						ZED::Log::Warn("Could not read Result of match");
+				}
+				else if (header[i] == "UnterbewertungVerlierer")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.ScoreLoser) != 1)
+						ZED::Log::Warn("Could not read ScoreLoser of match");
+				}
+				else if (header[i] == "Status")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.Status) != 1)
+						ZED::Log::Warn("Could not read Status of match");
+				}
+				else if (header[i] == "RotAusgeschiedenKampfNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.RedOutMatchID) != 1)
+						ZED::Log::Warn("Could not read RedOutMatchID of match");
+				}
+				else if (header[i] == "WeissAusgeschiedenKampfNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteOutMatchID) != 1)
+						ZED::Log::Warn("Could not read WhiteOutMatchID of match");
+				}
+				else if (header[i] == "Pool")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.Pool) != 1)
+						ZED::Log::Warn("Could not read Pool of match");
+				}
+				else if (header[i] == "DritterKampfNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.ThirdMatchNo) != 1)
+						ZED::Log::Warn("Could not read ThirdMatchNo of match");
+				}
+				else if (header[i] == "DritterFarbe")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.ThirdColor) != 1)
+						ZED::Log::Warn("Could not read ThirdMatchNo of match");
+				}
+				else if (header[i] == "BereichPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.AreaID) != 1)
+						ZED::Log::Warn("Could not read AreaID of match");
+				}
 			}
 
-			if (newline)
-				return true;
+			m_Matches.emplace_back(new_match);
+			data.clear();
 		}
+
+		if (newline)
+			return m_Matches.size() == data_count;
 	}
 
 	return false;
@@ -2277,109 +2169,99 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 
 bool MD5::ReadResult(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
 
-		if (!are_in_data_part)//We are reading the header
+		data.emplace_back(Line);
+
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			header.emplace_back(Line);
-			if (newline)
+			Result new_result;
+
+			for (size_t i = 0; i < header.size(); i++)
 			{
-				are_in_data_part = true;
-				ReadInt(Data);//Read number of data entries
-			}
-		}
-
-		else
-		{
-			data.emplace_back(Line);
-
-			if (data.size() >= header.size())//Have we read the entire data block?
-			{
-				Result new_result;
-
-				for (size_t i = 0; i < header.size(); i++)
+				if (header[i] == "AltersgruppePK")
 				{
-					if (header[i] == "AltersgruppePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_result.AgeGroupID) != 1)
-							ZED::Log::Warn("Could not read age group id of result");
-					}
-					else if (header[i] == "GewichtsklassePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_result.WeightclassID) != 1)
-							ZED::Log::Warn("Could not read weight class group id of result");
-					}
-					else if (header[i] == "PlatzPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_result.RankID) != 1)
-							ZED::Log::Warn("Could not read RankID of result");
-					}
-					else if (header[i] == "Pool")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_result.Pool) != 1)
-							ZED::Log::Warn("Could not read Pool of result");
-					}
-					else if (header[i] == "PlatzNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_result.RankNo) != 1)
-							ZED::Log::Warn("Could not read RankNo of result");
-					}
-					else if (header[i] == "KampfNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_result.MatchNo) != 1)
-							ZED::Log::Warn("Could not read MatchNo of result");
-					}
-					else if (header[i] == "Platztyp")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_result.RankType) != 1)
-							ZED::Log::Warn("Could not read RankType of result");
-					}
-					else if (header[i] == "TeilnehmerPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_result.ParticipantID) != 1)
-							ZED::Log::Warn("Could not read ParticipantID of result");
-					}
-					else if (header[i] == "PunktePl")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_result.PointsPlus) != 1)
-							ZED::Log::Warn("Could not read PointsPlus of result");
-					}
-					else if (header[i] == "PunkteMi")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_result.PointsMinus) != 1)
-							ZED::Log::Warn("Could not read PointsMinus of result");
-					}
-					else if (header[i] == "UnterbewertungPl")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_result.ScorePlus) != 1)
-							ZED::Log::Warn("Could not read ScorePlus of result");
-					}
-					else if (header[i] == "UnterbewertungMi")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_result.ScoreMinus) != 1)
-							ZED::Log::Warn("Could not read ScoreMinus of result");
-					}
-					else if (header[i] == "Weitermelden")
-						new_result.Relay = data[i] == "1";
-					else if (header[i] == "AusPool")
-						new_result.FromPool = data[i] != "0";
+					if (sscanf_s(data[i].c_str(), "%d", &new_result.AgeGroupID) != 1)
+						ZED::Log::Warn("Could not read age group id of result");
 				}
-
-				if (new_result.ParticipantID > 0)//Filter invalid result data
-					m_Results.emplace_back(new_result);
-				data.clear();
+				else if (header[i] == "GewichtsklassePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_result.WeightclassID) != 1)
+						ZED::Log::Warn("Could not read weight class group id of result");
+				}
+				else if (header[i] == "PlatzPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_result.RankID) != 1)
+						ZED::Log::Warn("Could not read RankID of result");
+				}
+				else if (header[i] == "Pool")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_result.Pool) != 1)
+						ZED::Log::Warn("Could not read Pool of result");
+				}
+				else if (header[i] == "PlatzNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_result.RankNo) != 1)
+						ZED::Log::Warn("Could not read RankNo of result");
+				}
+				else if (header[i] == "KampfNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_result.MatchNo) != 1)
+						ZED::Log::Warn("Could not read MatchNo of result");
+				}
+				else if (header[i] == "Platztyp")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_result.RankType) != 1)
+						ZED::Log::Warn("Could not read RankType of result");
+				}
+				else if (header[i] == "TeilnehmerPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_result.ParticipantID) != 1)
+						ZED::Log::Warn("Could not read ParticipantID of result");
+				}
+				else if (header[i] == "PunktePl")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_result.PointsPlus) != 1)
+						ZED::Log::Warn("Could not read PointsPlus of result");
+				}
+				else if (header[i] == "PunkteMi")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_result.PointsMinus) != 1)
+						ZED::Log::Warn("Could not read PointsMinus of result");
+				}
+				else if (header[i] == "UnterbewertungPl")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_result.ScorePlus) != 1)
+						ZED::Log::Warn("Could not read ScorePlus of result");
+				}
+				else if (header[i] == "UnterbewertungMi")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_result.ScoreMinus) != 1)
+						ZED::Log::Warn("Could not read ScoreMinus of result");
+				}
+				else if (header[i] == "Weitermelden")
+					new_result.Relay = data[i] == "1";
+				else if (header[i] == "AusPool")
+					new_result.FromPool = data[i] != "0";
 			}
 
-			if (newline)
-				return true;
+			if (new_result.ParticipantID > 0)//Filter invalid result data
+				m_Results.emplace_back(new_result);
+			else
+				data_count--;
+
+			data.clear();
 		}
+
+		if (newline)
+			return m_Results.size() == data_count;
 	}
 
 	return false;
@@ -2389,124 +2271,109 @@ bool MD5::ReadResult(ZED::Blob& Data)
 
 bool MD5::ReadParticipants(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_header_part = true;
-	bool are_in_data_part   = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
+		
+		data.emplace_back(RemoveControlCharacters(Line));
 
-		if (are_in_header_part)//We are reading the header
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			header.emplace_back(RemoveControlCharacters(Line));
+			Participant new_participant;
 
-			if (newline)
-				are_in_header_part = false;
-		}
-		else
-		{
-			if (start_of_heading)
-				are_in_data_part = true;
-		}
-
-		if (are_in_data_part)
-		{
-			data.emplace_back(RemoveControlCharacters(Line));
-
-			if (data.size() >= header.size())//Have we read the entire data block?
+			for (size_t i = 0; i < header.size(); i++)
 			{
-				Participant new_participant;
-
-				for (size_t i = 0; i < header.size(); i++)
+				if (header[i] == "TeilnehmerPK")
 				{
-					if (header[i] == "TeilnehmerPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.ID) != 1)
-							ZED::Log::Warn("Could not read id of participant");
-					}
-					else if (header[i] == "AltersgruppePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.AgeGroupID) != 1)
-							ZED::Log::Warn("Could not read age group id of participant");
-					}
-					else if (header[i] == "VereinPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.ClubID) != 1)
-							ZED::Log::Warn("Could not read club id of participant");
-					}
-					else if (header[i] == "Nachname")
-						new_participant.Lastname = Latin1ToUTF8(data[i]);
-					else if (header[i] == "Vorname")
-						new_participant.Firstname = Latin1ToUTF8(data[i]);
-					else if (header[i] == "GradPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.Graduation) != 1)
-							ZED::Log::Warn("Could not read graduation data of participant");
-					}
-					else if (header[i] == "GewichtsklassePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.WeightclassID) != 1)
-							ZED::Log::Warn("Could not read weight class id of participant");
-					}
-					else if (header[i] == "gewogen")
-						new_participant.HasBeenWeighted = data[i] == "x";
-					else if (header[i] == "Geburtsjahr")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.Birthyear) != 1)
-							ZED::Log::Warn("Could not read birthyear of participant");
-					}
-					else if (header[i] == "StartNR")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.StartNo) != 1)
-							ZED::Log::Warn("Could not read start number of participant");
-					}
-					else if (header[i] == "PlatzPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.Rank) != 1)
-							ZED::Log::Warn("Could not read rank of participant");
-					}
-					else if (header[i] == "StatusAenderung")
-						new_participant.StatusChanged = data[i] == "1";
-					else if (header[i] == "REDAusgeschrieben")
-						new_participant.ClubFullname = Latin1ToUTF8(data[i]);
-					else if (header[i] == "REDKuerzel")
-						new_participant.AssociationShortname = Latin1ToUTF8(data[i]);
-					else if (header[i] == "AllkategorieTNPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.AllCategoriesParticipantID) != 1)
-							ZED::Log::Warn("Could not read AllCategoriesParticipantID of participant");
-					}
-					else if (header[i] == "KataTNPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.KataParticipantID) != 1)
-							ZED::Log::Warn("Could not read KataParticipantID of participant");
-					}
-					else if (header[i] == "GKTNPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.GKParticipantID) != 1)
-							ZED::Log::Warn("Could not read GKParticipantID of participant");
-					}
-					else if (header[i] == "Meldegelderhoeht")
-						new_participant.MoneyIncreased = data[i] != "F";
-					else if (header[i] == "Gewichtgramm")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_participant.WeightInGrams) != 1)
-							ZED::Log::Warn("Could not read WeightInGramm of participant");
-					}
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.ID) != 1)
+						ZED::Log::Warn("Could not read id of participant");
 				}
-
-				if (new_participant.ID != 0)//To filter dummy participants
-					m_Participants.emplace_back(new Participant(new_participant));
-
-				data.clear();
-
-				if (newline)
-					return true;
+				else if (header[i] == "AltersgruppePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.AgeGroupID) != 1)
+						ZED::Log::Warn("Could not read age group id of participant");
+				}
+				else if (header[i] == "VereinPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.ClubID) != 1)
+						ZED::Log::Warn("Could not read club id of participant");
+				}
+				else if (header[i] == "Nachname")
+					new_participant.Lastname  = Latin1ToUTF8(data[i]);
+				else if (header[i] == "Vorname")
+					new_participant.Firstname = Latin1ToUTF8(data[i]);
+				else if (header[i] == "GradPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.Graduation) != 1)
+						ZED::Log::Warn("Could not read graduation data of participant");
+				}
+				else if (header[i] == "GewichtsklassePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.WeightclassID) != 1)
+						ZED::Log::Warn("Could not read weight class id of participant");
+				}
+				else if (header[i] == "gewogen")
+					new_participant.HasBeenWeighted = data[i] == "x";
+				else if (header[i] == "Geburtsjahr")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.Birthyear) != 1)
+						ZED::Log::Warn("Could not read birthyear of participant");
+				}
+				else if (header[i] == "StartNR")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.StartNo) != 1)
+						ZED::Log::Warn("Could not read start number of participant");
+				}
+				else if (header[i] == "PlatzPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.Rank) != 1)
+						ZED::Log::Warn("Could not read rank of participant");
+				}
+				else if (header[i] == "StatusAenderung")
+					new_participant.StatusChanged = data[i] == "1";
+				else if (header[i] == "REDAusgeschrieben")
+					new_participant.ClubFullname = Latin1ToUTF8(data[i]);
+				else if (header[i] == "REDKuerzel")
+					new_participant.AssociationShortname = Latin1ToUTF8(data[i]);
+				else if (header[i] == "AllkategorieTNPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.AllCategoriesParticipantID) != 1)
+						ZED::Log::Warn("Could not read AllCategoriesParticipantID of participant");
+				}
+				else if (header[i] == "KataTNPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.KataParticipantID) != 1)
+						ZED::Log::Warn("Could not read KataParticipantID of participant");
+				}
+				else if (header[i] == "GKTNPK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.GKParticipantID) != 1)
+						ZED::Log::Warn("Could not read GKParticipantID of participant");
+				}
+				else if (header[i] == "Meldegelderhoeht")
+					new_participant.MoneyIncreased = data[i] != "F";
+				else if (header[i] == "Gewichtgramm")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.WeightInGrams) != 1)
+						ZED::Log::Warn("Could not read WeightInGramm of participant");
+				}
 			}
+
+			if (new_participant.ID == 0)//To filter dummy participants
+				data_count--;
+			else
+				m_Participants.emplace_back(new Participant(new_participant));
+
+			data.clear();
 		}
+
+		if (newline)
+			return m_Participants.size() == data_count;
 	}
 
 	return false;
@@ -2516,69 +2383,54 @@ bool MD5::ReadParticipants(ZED::Blob& Data)
 
 bool MD5::ReadAssociation(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_header_part = true;
-	bool are_in_data_part   = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
 
+		data.emplace_back(RemoveControlCharacters(Line));
 
-		if (are_in_header_part)//We are reading the header
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			header.emplace_back(RemoveControlCharacters(Line));
-			if (newline)
-				are_in_header_part = false;
-		}
-		else if (start_of_heading)
-			are_in_data_part = true;
+			Association new_association;
 
-
-		if (are_in_data_part)
-		{
-			data.emplace_back(RemoveControlCharacters(Line));
-
-			if (data.size() >= header.size())//Have we read the entire data block?
+			for (size_t i = 0; i < header.size(); i++)
 			{
-				Association new_association;
-
-				for (size_t i = 0; i < header.size(); i++)
+				if (header[i] == "VerbandPK")
 				{
-					if (header[i] == "VerbandPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_association.ID) != 1)
-							ZED::Log::Warn("Could not read id of association");
-					}
-					else if (header[i] == "EbenePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_association.Tier) != 1)
-							ZED::Log::Warn("Could not read tier of association");
-					}
-					else if (header[i] == "Bezeichnung")
-						new_association.Description = Latin1ToUTF8(data[i]);
-					else if (header[i] == "Kuerzel")
-						new_association.ShortName   = Latin1ToUTF8(data[i]);
-					else if (header[i] == "Nummer")
-						new_association.Number = data[i];
-					else if (header[i] == "NaechsteEbenePK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_association.NextAsscociationID) != 1)
-							ZED::Log::Warn("Could not read NextAsscociationID of association");
-					}
-					else if (header[i] == "Aktiv")
-						new_association.Active = data[i] == "1";
+					if (sscanf_s(data[i].c_str(), "%d", &new_association.ID) != 1)
+						ZED::Log::Warn("Could not read id of association");
 				}
-
-				m_Associations.emplace_back(new Association(new_association));
-				data.clear();
-
-				if (newline)
-					return true;
+				else if (header[i] == "EbenePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_association.Tier) != 1)
+						ZED::Log::Warn("Could not read tier of association");
+				}
+				else if (header[i] == "Bezeichnung")
+					new_association.Description = Latin1ToUTF8(data[i]);
+				else if (header[i] == "Kuerzel")
+					new_association.ShortName   = Latin1ToUTF8(data[i]);
+				else if (header[i] == "Nummer")
+					new_association.Number = data[i];
+				else if (header[i] == "NaechsteEbenePK")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_association.NextAsscociationID) != 1)
+						ZED::Log::Warn("Could not read NextAsscociationID of association");
+				}
+				else if (header[i] == "Aktiv")
+					new_association.Active = data[i] == "1";
 			}
+
+			m_Associations.emplace_back(new Association(new_association));
+			data.clear();
 		}
+
+		if (newline)
+			return m_Associations.size() == data_count;
 	}
 
 	return false;
@@ -2588,78 +2440,70 @@ bool MD5::ReadAssociation(ZED::Blob& Data)
 
 bool MD5::ReadClubs(ZED::Blob& Data)
 {
-	std::vector<std::string> header;
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
 	std::vector<std::string> data;
-	bool are_in_data_part = false;
 
 	while (!Data.EndReached())
 	{
-		bool start_of_heading, newline;
-		auto Line = ReadLine(Data, &start_of_heading, &newline);
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
 
-		if (start_of_heading)
-			are_in_data_part = true;
+		data.emplace_back(Line);
 
-		if (!are_in_data_part)//We are reading the header
-			header.emplace_back(Line);
-		else
+		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			data.emplace_back(Line);
+			Club new_club;
 
-			if (data.size() >= header.size())//Have we read the entire data block?
+			for (size_t i = 0; i < header.size(); i++)
 			{
-				Club new_club;
-
-				for (size_t i = 0; i < header.size(); i++)
+				if (header[i] == "VereinPK")
 				{
-					if (header[i] == "VereinPK")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_club.ID) != 1)
-							ZED::Log::Warn("Could not read club id");
-					}
-					else if (header[i] == "Sortierbezeichnung")
-						new_club.Name_ForSorting = Latin1ToUTF8(data[i]);
-					else if (header[i] == "Bezeichnung")
-						new_club.Name = Latin1ToUTF8(data[i]);
-					else if (header[i] == "Nachname")
-						new_club.Representative_Lastname  = Latin1ToUTF8(data[i]);
-					else if (header[i] == "Vorname")
-						new_club.Representative_Firstname = Latin1ToUTF8(data[i]);
-					else if (header[i] == "Strasse")
-						new_club.Representative_Street = Latin1ToUTF8(data[i]);
-					else if (header[i] == "Ort")
-						new_club.Representative_Place = Latin1ToUTF8(data[i]);
-					else if (header[i] == "PLZ")
-						new_club.Representative_ZipCode = data[i];
-					else if (header[i] == "Telp")
-						new_club.Representative_TelPrivate = data[i];
-					else if (header[i] == "Teld")
-						new_club.Representative_TelProfessional = data[i];
-					else if (header[i] == "Handy")
-						new_club.Representative_TelMobil = data[i];
-					else if (header[i] == "email")
-						new_club.Representative_Email = data[i];
-					else if (header[i] == "fax")
-						new_club.Representative_Fax = data[i];
-					else if (header[i] == "Vereinsnummer")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_club.OfficialClubNo) != 1)
-							ZED::Log::Warn("Could not read club number");
-					}
-					else if (header[i] == "StatusAenderung")
-					{
-						if (sscanf_s(data[i].c_str(), "%d", &new_club.StatusChanged) != 1)
-							ZED::Log::Info("Could not read club StatusChanged");
-					}
+					if (sscanf_s(data[i].c_str(), "%d", &new_club.ID) != 1)
+						ZED::Log::Warn("Could not read club id");
 				}
-
-				m_Clubs.emplace_back(new Club(new_club));
-				data.clear();
-
-				if (newline)
-					return true;
+				else if (header[i] == "Sortierbezeichnung")
+					new_club.Name_ForSorting = Latin1ToUTF8(data[i]);
+				else if (header[i] == "Bezeichnung")
+					new_club.Name = Latin1ToUTF8(data[i]);
+				else if (header[i] == "Nachname")
+					new_club.Representative_Lastname  = Latin1ToUTF8(data[i]);
+				else if (header[i] == "Vorname")
+					new_club.Representative_Firstname = Latin1ToUTF8(data[i]);
+				else if (header[i] == "Strasse")
+					new_club.Representative_Street = Latin1ToUTF8(data[i]);
+				else if (header[i] == "Ort")
+					new_club.Representative_Place = Latin1ToUTF8(data[i]);
+				else if (header[i] == "PLZ")
+					new_club.Representative_ZipCode = data[i];
+				else if (header[i] == "Telp")
+					new_club.Representative_TelPrivate = data[i];
+				else if (header[i] == "Teld")
+					new_club.Representative_TelProfessional = data[i];
+				else if (header[i] == "Handy")
+					new_club.Representative_TelMobil = data[i];
+				else if (header[i] == "email")
+					new_club.Representative_Email = data[i];
+				else if (header[i] == "fax")
+					new_club.Representative_Fax = data[i];
+				else if (header[i] == "Vereinsnummer")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_club.OfficialClubNo) != 1)
+						ZED::Log::Warn("Could not read club number");
+				}
+				else if (header[i] == "StatusAenderung")
+				{
+					if (sscanf_s(data[i].c_str(), "%d", &new_club.StatusChanged) != 1)
+						ZED::Log::Info("Could not read club StatusChanged");
+				}
 			}
+
+			m_Clubs.emplace_back(new Club(new_club));
+			data.clear();
 		}
+
+		if (newline)
+			return m_Clubs.size() == data_count;
 	}
 
 	return false;
@@ -2667,14 +2511,34 @@ bool MD5::ReadClubs(ZED::Blob& Data)
 
 
 
-std::string MD5::ReadLine(ZED::Blob& Data, bool* pStartOfHeading, bool* pNewLine, bool* pDoubleZero)
+std::vector<std::string> MD5::ReadHeader(ZED::Blob& Data, int& DataCount)
 {
-	if (pStartOfHeading)
-		*pStartOfHeading = false;
+	std::vector<std::string> header;
+
+	while (!Data.EndReached())
+	{
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
+
+		header.emplace_back(Line);
+		if (newline)
+		{
+			DataCount = ReadInt(Data);//Read number of data entries
+			return header;
+		}
+	}
+
+	assert(false);
+	header.clear();
+	return header;
+}
+
+
+
+std::string MD5::ReadLine(ZED::Blob& Data, bool* pNewLine)
+{
 	if (pNewLine)
 		*pNewLine = false;
-	if (pDoubleZero)
-		*pDoubleZero = false;
 
 	bool carry_return = false;
 	bool newline      = false;
@@ -2691,19 +2555,15 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pStartOfHeading, bool* pNewLine
 		{
 			if (eof)
 			{
-				if (pDoubleZero)
-					*pDoubleZero = true;
+				//if (pDoubleZero)
+					//*pDoubleZero = true;
 				return "";
 			}
 			eof = true;
 			continue;
 		}
 		else if (c == 0x01)//Start of Heading
-		{
-			if (pStartOfHeading)
-				*pStartOfHeading = true;
 			continue;
-		}
 		else if (c == 0x02)//Start of text
 			continue;
 		else if (c == 0x03)//End of Text
