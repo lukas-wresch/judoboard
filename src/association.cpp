@@ -22,10 +22,10 @@ Association::Association(const YAML::Node& Yaml, const StandingData* StandingDat
 
 
 
-Association::Association(const MD5::Association& Association) : Association(Association.Description, nullptr)
+Association::Association(const MD5::Association& MD5Association) : Association(MD5Association.Description, nullptr)
 {
-	if (Association.NextAsscociation && Association.NextAsscociation->Description != m_Name)
-		m_pParent = new Judoboard::Association(*Association.NextAsscociation);
+	if (MD5Association.NextAsscociation && MD5Association.NextAsscociation->Description != m_Name)
+		m_pParent = new Association(*MD5Association.NextAsscociation);
 }
 
 
