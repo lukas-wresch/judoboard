@@ -33,6 +33,8 @@ namespace Judoboard
 		void SetName(std::string NewName) { m_Name = NewName; }
 		void SetParent(const Association* NewParent) { m_pParent = NewParent; }
 
+		bool IsChildOf(const UUID& UUID) const;
+
 		void operator >> (YAML::Emitter& Yaml) const;
 		void ToString(YAML::Emitter& Yaml) const;
 

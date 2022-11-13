@@ -22,6 +22,18 @@ Association::Association(const YAML::Node& Yaml, const StandingData* StandingDat
 
 
 
+bool Association::IsChildOf(const UUID& UUID) const
+{
+	if (*this == UUID)//Are we our own child?
+		return true;
+
+	if (m_pParent)
+		return m_pParent->IsChildOf(UUID);
+	return false;
+}
+
+
+
 void Association::operator >> (YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginMap;

@@ -727,6 +727,26 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 
 	Lock();
 
+	//Do we have an organizer?
+	if (m_Organizer)
+	{
+		//Check if the judoka is allowed to participate as in
+		//his/her club belongs to this association
+
+		auto club = Judoka->GetClub();
+		if (!club)
+		{
+			ZED::Log::Info("Can not add a participant to a tournament without a club");
+			return false;
+		}
+
+		if (!club->IsChildOf(*m_Organizer))
+		{
+			ZED::Log::Info("Participant can not be added, wrong tier");
+			return false;
+		}
+	}
+
 	m_StandingData.AddJudoka(Judoka);
 	m_StandingData.AddClub(const_cast<Club*>(Judoka->GetClub()));
 
