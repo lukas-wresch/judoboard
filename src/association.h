@@ -1,5 +1,6 @@
 #pragma once
 #include "id.h"
+#include "md5.h"
 
 
 namespace YAML
@@ -14,11 +15,13 @@ namespace Judoboard
 {
 	class StandingData;
 
+
 	class Association : public ID
 	{
 	public:
 		Association(const std::string& Name, const Association* Parent) : m_Name(Name), m_pParent(Parent) {}
 		Association(const YAML::Node&  Yaml, const StandingData* StandingData);
+		Association(const MD5::Association& Association);
 
 		//0 for the highest level, +1 for every level below
 		virtual int GetLevel() const {

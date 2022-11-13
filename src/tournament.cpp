@@ -55,6 +55,20 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			m_StandingData.AddClub(new Club(*club));
 	}
 
+	//Find organizer
+	assert(File.GetOrganizer());
+	if (File.GetOrganizer())
+	{
+		for (auto assoc : m_StandingData.GetAllAssociations())
+		{
+			if (assoc->GetName() == File.GetOrganizer()->Description)
+			{
+				m_Organizer = assoc;
+				break;
+			}
+		}
+	}
+
 	//Add age groups
 	for (auto age_group : File.GetAgeGroups())
 	{

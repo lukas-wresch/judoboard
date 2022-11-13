@@ -16,7 +16,7 @@ TEST(MD5, ReadTestData)
 	EXPECT_EQ(file.GetClubs().size(),		 file.GetNumClubs());
 	EXPECT_EQ(file.GetParticipants().size(), file.GetNumParticipants());
 
-	EXPECT_EQ(file.GetClubs().size(), 21);
+	EXPECT_EQ(file.GetClubs().size(), 20);
 	EXPECT_EQ(file.GetParticipants().size(), 142);
 
 	ASSERT_TRUE( file.FindResult("Jugend u10 w", "-20,7 kg", 1));
@@ -299,7 +299,7 @@ TEST(MD5, CreateTournamentFromTestData)
 	Tournament tour(file);
 
 	EXPECT_EQ(tour.GetDatabase().GetNumJudoka(), 142);
-	EXPECT_EQ(tour.GetDatabase().GetNumClubs(),   21);
+	EXPECT_EQ(tour.GetDatabase().GetNumClubs(),   20);
 }
 
 
@@ -317,7 +317,7 @@ TEST(MD5, CreateTournamentFromTestData2)
 		Tournament tour(file, &db);
 
 		EXPECT_EQ(db.GetNumJudoka(), 142);
-		EXPECT_EQ(db.GetNumClubs(), 21);
+		EXPECT_EQ(db.GetNumClubs(), 20);
 	}
 
 	ZED::Core::RemoveFile("tournaments/KEM U15 KT U10 - U18.yml");
@@ -336,8 +336,16 @@ TEST(MD5, ImportIntoTournament)
 
 		ASSERT_TRUE(file);
 
+		file.Dump();
+
+		ASSERT_TRUE(file.GetOrganizer());
+		EXPECT_EQ(file.GetOrganizer()->Description, u8"Bielefeld/G\u00fctersloh");
+
 		Database db;
 		Tournament tour(file, &db);
+
+		ASSERT_TRUE(tour.GetOrganizer());
+		EXPECT_EQ(tour.GetOrganizer()->GetName(), u8"Bielefeld/G\u00fctersloh");
 
 		auto table = tour.FindMatchTableByDescription("Jugend u10 w -20,7 kg");
 		ASSERT_TRUE(table);
@@ -1279,8 +1287,11 @@ TEST(MD5, ConvertToMD5)
 
 		MD5 file(tour_temp);//Convert back to MD5
 
+		ASSERT_TRUE(file.GetOrganizer());
+		ASSERT_TRUE(file1.GetOrganizer());
+		EXPECT_EQ(file.GetOrganizer()->Description, file1.GetOrganizer()->Description);
 
-		EXPECT_EQ(file.GetClubs().size(), 21);
+		EXPECT_EQ(file.GetClubs().size(), 20);
 		EXPECT_EQ(file.GetParticipants().size(), 142);
 
 		ASSERT_TRUE(file.FindResult("Jugend u10 w", "-20,7 kg", 1));
@@ -2061,4 +2072,31 @@ TEST(MD5, ReadStructureData3)
 	auto organizer = file.GetOrganizer();
 	EXPECT_EQ(organizer->Description, "Berlin");
 	EXPECT_EQ(organizer->Tier, 6);
+}
+
+
+
+TEST(MD5, ExportStructureData)
+{
+	initialize();
+
+	auto j = new Judoka("first", "last");
+	auto in = new Association("International", nullptr);
+	auto club = new Club("club", in);
+
+	j->SetClub(club);
+
+	Tournament tour("deleteMe");
+	tour.AddParticipant(j);
+
+	MD5 file(tour);
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	ASSERT_TRUE(file.GetOrganizer());
+	auto organizer = file.GetOrganizer();
+	EXPECT_EQ(organizer->Description, "International");
+	EXPECT_EQ(organizer->Tier, 2);
 }

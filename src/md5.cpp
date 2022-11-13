@@ -112,11 +112,14 @@ MD5::MD5(const Tournament& Tournament)
 		{
 			RelationClubAssociation new_rel;
 
-			new_rel.ClubID = new_club->ID;
+			new_rel.ClubID        = new_club->ID;
 			new_rel.AssociationID = uuid2id(parent->GetUUID());
 			new_rel.Tier          = parent->GetLevel() + 2;
 
 			m_ClubRelations.emplace_back(new_rel);
+
+			new_club->AssociationID = uuid2id(parent->GetUUID());
+			new_club->Association   = (Association*)id2ptr(new_club->AssociationID);
 		}
 
 		//Check if we can find the organizer
@@ -1197,6 +1200,20 @@ void MD5::Dump() const
 		ZED::Log::Info(line);
 	}
 
+	//Dump clubs
+	ZED::Log::Info("\n\n--- Clubs ---");
+	for (auto club : m_Clubs)
+	{
+		std::string line;
+
+		if (!club->Association)
+			line = club->Name + "  ->  " + std::to_string(club->AssociationID) + "  Name:  NONE!!!";
+		else
+			line = club->Name + "  ->  " + std::to_string(club->AssociationID) + "  Name:  " + club->Association->Description;
+
+		ZED::Log::Info(line);
+	}
+
 
 	//Dump results
 	ZED::Log::Info("\n\n--- Results ---");
@@ -1333,9 +1350,29 @@ bool MD5::Parse(ZED::Blob&& Data)
 	if (is_ok)
 	{
 		//Resolve dependencies
-		for (auto& association : m_Associations)
+		for (auto association : m_Associations)
 		{
 			association->NextAsscociation = FindAssociation(association->NextAsscociationID);
+		}
+
+		//Resolve club -> association connection
+		for (auto rel : m_ClubRelations)
+		{
+			auto club  = FindClub(rel.ClubID);
+			auto assoc = FindAssociation(rel.AssociationID);
+
+			if (club && assoc)
+			{
+				if (club->Association)//Already connected?
+				{
+					//Reconnect if lower tier
+					if (assoc->Tier < club->Association->Tier)
+						continue;//Skip
+				}
+
+				club->AssociationID = assoc->ID;
+				club->Association   = assoc;
+			}
 		}
 
 		for (auto& age_group : m_AgeGroups)
@@ -2374,7 +2411,7 @@ bool MD5::ReadParticipants(ZED::Blob& Data)
 				}
 			}
 
-			if (new_participant.ID == 0)//To filter dummy participants
+			if (new_participant.ID <= 0)//To filter dummy participants
 				data_count--;
 			else
 				m_Participants.emplace_back(new Participant(new_participant));
@@ -2508,7 +2545,13 @@ bool MD5::ReadClubs(ZED::Blob& Data)
 				}
 			}
 
-			m_Clubs.emplace_back(new Club(new_club));
+			if (new_club.ID <= 0 || new_club.Name.empty())//Valid club?
+			{
+				data_count--;
+				m_NumClubs--;//Fix header
+			}
+			else
+				m_Clubs.emplace_back(new Club(new_club));
 			data.clear();
 		}
 

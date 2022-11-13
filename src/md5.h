@@ -19,9 +19,28 @@ namespace Judoboard
 		struct Weightclass;
 
 
+		struct Association
+		{
+			int ID   = -1;
+			int Tier = -1;//International starts at 2, everything below increases the tier level
+
+			std::string Description;
+			std::string ShortName;
+
+			std::string Number;//"Number" of the association, can also include characters like '.'
+			int NextAsscociationID = -1;//Association of the parent
+			const Association* NextAsscociation = nullptr;
+
+			bool Active = false;
+		};
+
 		struct Club
 		{
 			int ID = -1;
+
+			int AssociationID = -1;
+			const Association* Association = nullptr;
+
 			std::string Name_ForSorting;
 			std::string Name;
 
@@ -39,21 +58,6 @@ namespace Judoboard
 
 			int OfficialClubNo = 0;//Official no. of the club
 			int StatusChanged  = -1;
-		};
-
-		struct Association
-		{
-			int ID = -1;
-			int Tier = -1;//International starts at 2, everything below increases the tier level
-
-			std::string Description;
-			std::string ShortName;
-
-			std::string Number;//"Number" of the association, can also include characters like '.'
-			int NextAsscociationID = -1;//Association of the parent
-			const Association* NextAsscociation = nullptr;
-
-			bool Active = false;
 		};
 
 		struct RelationClubAssociation//Relational table to connect clubs to associations

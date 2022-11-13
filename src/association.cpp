@@ -22,6 +22,14 @@ Association::Association(const YAML::Node& Yaml, const StandingData* StandingDat
 
 
 
+Association::Association(const MD5::Association& Association) : Association(Association.Description, nullptr)
+{
+	if (Association.NextAsscociation && Association.NextAsscociation->Description != m_Name)
+		m_pParent = new Judoboard::Association(*Association.NextAsscociation);
+}
+
+
+
 bool Association::IsChildOf(const UUID& UUID) const
 {
 	if (*this == UUID)//Are we our own child?
