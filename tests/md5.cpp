@@ -2042,7 +2042,7 @@ TEST(MD5, ReadStructureData2)
 	ASSERT_TRUE(file.GetOrganizer());
 	auto organizer = file.GetOrganizer();
 	EXPECT_EQ(organizer->Description, "Bayern");
-	EXPECT_EQ(organizer->Tier, 8);
+	EXPECT_EQ(organizer->Tier, 6);
 }
 
 
@@ -2060,5 +2060,5 @@ TEST(MD5, ReadStructureData3)
 	ASSERT_TRUE(file.GetOrganizer());
 	auto organizer = file.GetOrganizer();
 	EXPECT_EQ(organizer->Description, "Berlin");
-	EXPECT_EQ(organizer->Tier, 8);
+	EXPECT_EQ(organizer->Tier, 6);
 }
