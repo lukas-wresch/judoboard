@@ -2100,3 +2100,108 @@ TEST(MD5, ExportStructureData)
 	EXPECT_EQ(organizer->Description, "International");
 	EXPECT_EQ(organizer->Tier, 2);
 }
+
+
+
+TEST(MD5, ExportTest)
+{
+	initialize();
+
+	Tournament tour("demo-file");
+
+	auto inter = new Judoboard::Association("International", nullptr);
+
+	auto de = new Judoboard::Association("Deutschland", inter);
+
+	auto dn = new Judoboard::Association("Deutschland-Nord", de);
+	auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+
+	auto nord  = new Judoboard::Association("Nord", dn);
+	auto west  = new Judoboard::Association("West", dn);
+	auto nost  = new Judoboard::Association("Nordost", dn);
+	auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
+	auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+
+	auto nieder  = new Judoboard::Association("Niedersachsen", nord);
+	auto hamburg = new Judoboard::Association("Hamburg", nord);
+	auto berlin  = new Judoboard::Association("Berlin", nost);
+	auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+	/*tour.GetDatabase().AddAssociation(nieder);
+	tour.GetDatabase().AddAssociation(hamburg);
+	tour.GetDatabase().AddAssociation(berlin);
+	tour.GetDatabase().AddAssociation(nrw);*/
+
+	auto detmold = new Judoboard::Association("Detmold", nrw);
+
+	auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+
+	tour.SetOrganizer(biegue);
+
+	std::vector<Club*> clubs;
+	clubs.push_back(new Judoboard::Club("Altenhagen", biegue));
+	clubs.push_back(new Judoboard::Club("Brackwede", biegue));
+	clubs.push_back(new Judoboard::Club("Senne", biegue));
+
+	auto age_group1 = new AgeGroup("U11",  8,  10, nullptr, tour.GetDatabase());
+	auto age_group2 = new AgeGroup("U15", 12,  14, nullptr, tour.GetDatabase());
+	tour.AddAgeGroup(age_group1);
+	tour.AddAgeGroup(age_group2);
+
+	for (int i = 0; i < 200; ++i)
+	{
+		const std::string firstname_male[] =
+		{ "Ben", "Friedrich", "Phillipp", "Tim", "Lukas", "Marco", "Peter", "Martin", "Detlef", "Andreas", "Dominik", "Mathias", "Stephan", u8"S\u00f6ren", "Eric", "Finn", "Felix", "Julian", "Maximilian", "Jannik" };
+		const std::string firstname_female[] =
+		{ "Emma", "Stephanie", "Julia", "Jana", "Uta", "Petra", "Sophie", "Kerstin", "Lena", "Jennifer", "Kathrin", "Katherina", "Anna", "Carla", "Paulina", "Clara", "Hanna" };
+		const std::string lastname[] =
+		{ "Ehrlichmann", "Dresdner", "Biermann", "Fisher", "Vogler", "Pfaff", "Eberhart", "Frankfurter", u8"K\u00f6nig", "Pabst", "Ziegler", "Hartmann", "Pabst", "Kortig", "Schweitzer", "Luft", "Wexler", "Kaufmann", u8"Fr\u00fchauf", "Bieber", "Schumacher", u8"M\u00fcncher", "Schmidt", "Meier", "Fischer", "Weber", "Meyer", "Wagner", "Becker", "Schulz", "Hoffmann" };
+
+		Judoboard::Judoka* j = nullptr;
+
+		if (rand() & 1)
+		{
+			auto fname = firstname_male[rand() % (sizeof(firstname_male) / sizeof(firstname_male[0]) - 1)];
+			auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
+			j = new Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Male);
+		}
+		else
+		{
+			auto fname = firstname_female[rand() % (sizeof(firstname_female) / sizeof(firstname_female[0]) - 1)];
+			auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
+			j = new Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Female);
+		}
+
+		j->SetBirthyear(2005 + rand() % 15);
+		if (!age_group1->IsElgiable(*j) && !age_group2->IsElgiable(*j))
+		{
+			delete j;
+			continue;
+		}
+
+		int club_index = rand() % clubs.size();
+		j->SetClub(clubs[club_index]);
+
+		tour.AddParticipant(j);
+	}
+
+	auto age_groups  = tour.GetAgeGroups();
+	auto descriptors = tour.GenerateWeightclasses(3, 5, 20, age_groups, true);
+
+	EXPECT_TRUE(tour.ApplyWeightclasses(descriptors));
+
+
+	MD5 file(tour);
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	tour.Save();
+	file.Save("demo-file.md5");
+
+	ASSERT_TRUE(file.GetOrganizer());
+	auto organizer = file.GetOrganizer();
+	EXPECT_EQ(organizer->Description, u8"Bielefeld/G\u00fctersloh");
+	//EXPECT_EQ(organizer->Tier, 2);
+}
