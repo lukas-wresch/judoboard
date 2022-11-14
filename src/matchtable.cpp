@@ -366,7 +366,7 @@ Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
 
 size_t MatchTable::FindMatchIndex(const UUID& UUID) const
 {
-	for (size_t i = 0; m_Schedule.size(); ++i)
+	for (size_t i = 0; i < m_Schedule.size(); ++i)
 		if (m_Schedule[i] && m_Schedule[i]->GetUUID() == UUID)
 			return i;
 	return -1;

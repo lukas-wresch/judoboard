@@ -17,7 +17,7 @@ void Database::Reset()
 {
 	StandingData::Reset();
 
-	m_CurrentTournament = "";
+	m_CurrentTournament.clear();
 
 	for (auto account : m_Accounts)
 		delete account;

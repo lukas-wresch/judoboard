@@ -11,10 +11,8 @@ using namespace Judoboard;
 
 
 Judoka::Judoka(const std::string& Firstname, const std::string& Lastname, Weight Weight, Gender Gender, uint32_t Birthyear)
-	: m_Firstname(Firstname), m_Lastname(Lastname)
+	: m_Firstname(Firstname), m_Lastname(Lastname), m_Weight(Weight)
 {
-	m_Weight = Weight;
-
 	if (Gender == Gender::Male || Gender == Gender::Female)
 		m_Gender = Gender;
 

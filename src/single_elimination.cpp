@@ -147,7 +147,7 @@ void SingleElimination::GenerateSchedule()
 	for (int round = 1; round < rounds; ++round)
 	{
 		lastRound = std::move(nextRound);
-		nextRound.clear();
+		//nextRound.clear();
 
 		for (size_t i = 0; i < lastRound.size(); i += 2)
 		{

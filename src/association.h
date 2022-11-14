@@ -33,7 +33,7 @@ namespace Judoboard
 		std::string GetName()   const { return m_Name; }
 		auto        GetParent() const { return m_pParent; }
 
-		void SetName(std::string NewName) { m_Name = NewName; }
+		void SetName(const std::string& NewName) { m_Name = NewName; }
 		void SetParent(const Association* NewParent) { m_pParent = NewParent; }
 
 		bool IsChildOf(const UUID& UUID) const;

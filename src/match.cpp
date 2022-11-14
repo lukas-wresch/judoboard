@@ -214,7 +214,7 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 			return m_White.m_Judoka;
 
 		else if (m_White.m_Dependency == DependencyType::BestOfThree && m_White.m_DependentMatch)
-			m_White.m_DependentMatch->GetFighter(Fighter::White);
+			return m_White.m_DependentMatch->GetFighter(Fighter::White);
 
 		else if (m_White.m_Dependency == DependencyType::TakeWinner)
 		{
@@ -230,7 +230,7 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 		return m_Blue.m_Judoka;
 
 	else if (m_Blue.m_Dependency == DependencyType::BestOfThree && m_Blue.m_DependentMatch)
-		m_Blue.m_DependentMatch->GetFighter(Fighter::Blue);
+		return m_Blue.m_DependentMatch->GetFighter(Fighter::Blue);
 
 	else if (m_Blue.m_Dependency == DependencyType::TakeWinner)
 	{
@@ -328,8 +328,15 @@ const Judoka* Match::GetLoser() const
 	if (IsBestOfThree() && m_White.m_DependentMatch && m_Blue.m_DependentMatch)
 	{
 		if (m_White.m_DependentMatch->HasConcluded() && m_Blue.m_DependentMatch->HasConcluded())
-			if (*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())
+		{
+			if (!m_White.m_DependentMatch->GetLoser())
+				return nullptr;
+			if (!m_Blue.m_DependentMatch->GetLoser())
+				return nullptr;
+
+			if (*m_White.m_DependentMatch->GetLoser() == *m_Blue.m_DependentMatch->GetLoser())
 				return m_White.m_DependentMatch->GetLoser();
+		}
 	}
 
 	auto result = GetResult();
