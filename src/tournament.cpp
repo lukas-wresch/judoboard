@@ -1344,6 +1344,7 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 	bool temp_auto_save = IsAutoSave();
 	EnableAutoSave(false);//Disable temporarily for performance reasons
 
+	//Remove old weightclasses
 	for (const auto& desc : Descriptors)
 	{
 		if (desc.m_AgeGroup)
@@ -1354,7 +1355,7 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 			{
 				if (match_table->GetType() == MatchTable::Type::Weightclass &&
 					match_table->GetAgeGroup() &&
-					match_table->GetAgeGroup()->GetUUID() == desc.m_AgeGroup->GetUUID())
+					*match_table->GetAgeGroup() == *desc.m_AgeGroup)
 					RemoveMatchTable(match_table->GetUUID());
 			}
 		}
@@ -1368,7 +1369,11 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 					RemoveMatchTable(match_table->GetUUID());
 			}
 		}
+	}
 
+
+	for (const auto& desc : Descriptors)
+	{	
 		for (auto weight_desc : desc.m_Collection)
 		{
 			auto new_weightclass = new Weightclass(weight_desc.m_Min, weight_desc.m_Max, desc.m_Gender, this);
