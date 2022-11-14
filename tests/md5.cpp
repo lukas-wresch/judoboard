@@ -2107,6 +2107,7 @@ TEST(MD5, ExportTest)
 {
 	initialize();
 
+	ZED::Core::RemoveFile("tournaments/demo-file.yml");
 	Tournament tour("demo-file");
 
 	auto inter = new Judoboard::Association("International", nullptr);
