@@ -68,6 +68,11 @@ MD5::MD5(const Tournament& Tournament)
 			new_assoc->NextAsscociationID = uuid2id(assoc->GetParent()->GetUUID());
 			new_assoc->NextAsscociation   = (Association*)id2ptr(new_assoc->NextAsscociationID);
 		}
+		else
+		{
+			new_assoc->NextAsscociationID = new_assoc->ID;
+			new_assoc->NextAsscociation   = new_assoc;
+		}
 
 		m_Associations.emplace_back(new_assoc);
 		UUID2ID.insert({ assoc->GetUUID(), id - 1 });

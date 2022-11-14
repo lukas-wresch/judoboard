@@ -2261,6 +2261,10 @@ void Application::SetupHttpServer()
 
 		std::string filename = tournament->GetName() + ".md5";
 		md5_tournament.Save(filename);
+
+#ifdef _DEBUG
+		md5_tournament.Dump();
+#endif
 		
 		Request.m_ResponseHeader = std::string("Content-Disposition: attachment; filename=") + filename;
 

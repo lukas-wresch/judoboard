@@ -21,7 +21,7 @@ namespace Judoboard
 	public:
 		Association(const std::string& Name, const Association* Parent) : m_Name(Name), m_pParent(Parent) {}
 		Association(const YAML::Node&  Yaml, const StandingData* StandingData);
-		Association(const MD5::Association& Association);
+		Association(const MD5::Association& MD5Association);
 
 		//0 for the highest level, +1 for every level below
 		virtual int GetLevel() const {
