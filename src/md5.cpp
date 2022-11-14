@@ -79,22 +79,13 @@ MD5::MD5(const Tournament& Tournament)
 		ID2PTR.insert({ id - 1, new_assoc });
 
 		//Check if we can find the organizer
-		if (Tournament.GetOrganizer())
+		if ( (Tournament.GetOrganizer() && *Tournament.GetOrganizer() == *assoc) ||
+		    (!Tournament.GetOrganizer() && assoc->GetLevel() == 0) )//No organizer, assoc should be 'international'
 		{
-			if (*Tournament.GetOrganizer() == *assoc)
-			{
-				m_AssociationID  = new_assoc->ID;
-				m_TierToDisplay  = new_assoc->Tier;
-				m_AssociationLevelID = new_assoc->Tier + 1;
-			}
-		}
-
-		//No organizer
-		else if (assoc->GetLevel() == 0)//Should be 'international'
-		{
-			m_AssociationID  = new_assoc->ID;
-			m_TierToDisplay  = new_assoc->Tier;
+			m_AssociationID      = new_assoc->ID;
+			m_TierToDisplay      = new_assoc->Tier;
 			m_AssociationLevelID = new_assoc->Tier + 1;
+			m_LotteryTierID      = new_assoc->Tier + 1;//Set lottery to same tier as organizer
 		}
 	}
 
@@ -441,13 +432,13 @@ bool MD5::Save(const std::string& Filename) const
 		Write_Line(m_Place);
 		Write_Line(m_DateStart);
 		Write_Line(m_DateEnd);
-		Write_Int(m_LotteryLevelID);
+		Write_Int(m_LotteryTierID);
 		Write_Int(m_AssociationID);
 		Write_Int(m_AssociationLevelID);
 		Write_Int(m_TierToDisplay);
 		Write_Int(m_MAXJGJ);
-		Write_Int(m_ThirdPlaceMatch ? 0 : -1);
-		Write_Int(m_FifthPlaceMatch ? 0 : -1);
+		Write_Int(m_ThirdPlaceMatch ? 1 : 0);
+		Write_Int(m_FifthPlaceMatch ? 1 : 0);
 		Write_Line(m_SportAdministrator);
 		Write_Int(m_NumOfRelays);
 		Write_Int(m_LotteryProcess);
@@ -804,7 +795,7 @@ bool MD5::Save(const std::string& Filename) const
 			else
 				Write_Int(judoka->StartNo);
 
-			Write_Int(judoka->Rank);
+			Write_Int(judoka->QualificationRank);
 			Write_Line(judoka->StatusChanged ? "1" : "");
 			Write_Line(UTF8ToLatin1(judoka->ClubFullname));
 			Write_Line(UTF8ToLatin1(judoka->AssociationShortname));
@@ -1454,7 +1445,7 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 					m_DateEnd = data[i];
 				else if (header[i] == "LosEbenePK")
 				{
-					if (sscanf_s(data[i].c_str(), "%d", &m_LotteryLevelID) != 1)
+					if (sscanf_s(data[i].c_str(), "%d", &m_LotteryTierID) != 1)
 						ZED::Log::Warn("Could not parse schema LotteryLevelID");
 				}
 				else if (header[i] == "VerbandPK")
@@ -1478,9 +1469,9 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 						ZED::Log::Warn("Could not parse schema MAXJGJ");
 				}
 				else if (header[i] == "KampfumPlatz3")
-					m_ThirdPlaceMatch = data[i] != "-1";
+					m_ThirdPlaceMatch = data[i] == "1";
 				else if (header[i] == "KampfUmPlatz5")
-					m_FifthPlaceMatch = data[i] != "-1";
+					m_FifthPlaceMatch = data[i] == "1";
 				else if (header[i] == "SportlicheLeitung")
 					m_SportAdministrator = Latin1ToUTF8(data[i]);
 				else if (header[i] == "AnzWeitermelden")
@@ -2383,7 +2374,7 @@ bool MD5::ReadParticipants(ZED::Blob& Data)
 				}
 				else if (header[i] == "PlatzPK")
 				{
-					if (sscanf_s(data[i].c_str(), "%d", &new_participant.Rank) != 1)
+					if (sscanf_s(data[i].c_str(), "%d", &new_participant.QualificationRank) != 1)
 						ZED::Log::Warn("Could not read rank of participant");
 				}
 				else if (header[i] == "StatusAenderung")

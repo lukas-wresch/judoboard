@@ -116,7 +116,7 @@ namespace Judoboard
 			std::string Firstname;
 			std::string Lastname;
 
-			int Graduation = 0;//Kyu/Dan, 0 for unknown
+			int Graduation = 0;//Kyu/Dan, 0 for unknown, 1=9. Kyu, 9=9. Kyu, 10=1. Dan, 21=12. Dan
 
 			int  WeightclassID = -1;//Remember these IDs are NOT unique!
 			const Weightclass* Weightclass = nullptr;
@@ -125,7 +125,11 @@ namespace Judoboard
 			int Birthyear = -1;//< 0 if no value is known
 
 			int StartNo = -1;
-			int Rank    = -1;//Rank for qualification (place), 9 for placed on 1
+			int QualificationRank = 99;//Rank for qualification (place), 9 for placed on 1
+			//1 for place 1, 2 for place 2 (till place 8)
+			//9 = seeded 1 (till 16 = seeded 8)
+			//17 = nachruecker 1, (till 20 nachruecker 4)
+			//99 = no place
 
 			bool StatusChanged = false;
 
@@ -134,7 +138,7 @@ namespace Judoboard
 
 			int AllCategoriesParticipantID = -1;
 			int KataParticipantID = -1;
-			int GKParticipantID = -1;//Weightclass participant id???
+			int GKParticipantID   = -1;//Weightclass participant id???
 
 			bool MoneyIncreased = false;
 			int  WeightInGrams  = -1;
@@ -381,8 +385,8 @@ namespace Judoboard
 		std::string m_Description;
 
 		int m_SchemaID = -1;
-		int m_LotteryLevelID = -1;
-		int m_AssociationID  = -1;//Association that is conducting the tournament
+		int m_LotteryTierID = -1;//Lottery is conducted on which tier?
+		int m_AssociationID = -1;//Association that is conducting the tournament
 		int m_AssociationLevelID = -1;//Tier of m_AssociationID + 1
 		int m_TierToDisplay = -1;//Tier that should be displayed on lists
 		int m_MAXJGJ = -1;//Maximum participants for round robin
