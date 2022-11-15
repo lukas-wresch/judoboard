@@ -2186,7 +2186,7 @@ TEST(MD5, ExportCompletedTournament)
 
 	EXPECT_TRUE(tour.ApplyWeightclasses(descriptors));
 
-	/*Mat mat(1);
+	Mat mat(1);
 
 	while (auto match = tour.GetNextMatch(-1))
 	{
@@ -2198,7 +2198,7 @@ TEST(MD5, ExportCompletedTournament)
 			mat.AddIppon(Fighter::Blue);
 
 		EXPECT_TRUE(mat.EndMatch());
-	}*/
+	}
 
 
 	MD5 file(tour);
@@ -2210,6 +2210,7 @@ TEST(MD5, ExportCompletedTournament)
 	tour.Save();
 	file.Save("demo-file.md5");
 
+	MD5 file_cmp("demo-file-fixed.md5");
 	//MD5 file_cmp("test-data/Test.md5");
 
 	ASSERT_TRUE(file.GetOrganizer());
@@ -2225,6 +2226,11 @@ TEST(MD5, ExportCompletedTournament)
 	for (auto table : file.GetWeightclasses())
 	{
 		EXPECT_EQ(table->Status, 4);
+	}
+
+	for (const auto& match : file.GetMatches())
+	{
+		EXPECT_LE(match.MatchNo, 30);
 	}
 
 	for (const auto& result : file.GetResults())

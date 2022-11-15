@@ -151,12 +151,12 @@ MD5::MD5(const Tournament& Tournament)
 		{
 			new_judoka->ClubID = uuid2id(judoka->GetClub()->GetUUID());
 			new_judoka->Club   = (Club*)id2ptr(new_judoka->ClubID);
-			new_judoka->ClubFullname  = new_judoka->Club->Name;
-			new_judoka->AssociationShortname = new_judoka->Club->Name_ForSorting;//TODO
+			new_judoka->ClubFullname         = new_judoka->Club->Name;
+			new_judoka->AssociationShortname = new_judoka->ClubFullname.substr(0, 6);//6 characters only
 		}
 
-		if (Tournament.GetStatus() != Status::Scheduled)//Tournament has started
-			new_judoka->HasBeenWeighted = true;//Marked judoka as being weighted
+		//if (Tournament.GetStatus() != Status::Scheduled)//Tournament has started
+			new_judoka->HasBeenWeighted = true;//Mark judoka as being weighted
 
 		m_Participants.emplace_back(new_judoka);
 		UUID2ID.insert({ uuid, id - 1 });
@@ -297,21 +297,25 @@ MD5::MD5(const Tournament& Tournament)
 			continue;
 
 		Match new_match;
-		new_match.MatchNo = match_no++;
 		new_match.WhiteID = uuid2id(match->GetFighter(Fighter::White)->GetUUID());
 		new_match.RedID   = uuid2id(match->GetFighter(Fighter::Blue )->GetUUID());
 
 		new_match.White = (Participant*)id2ptr(new_match.WhiteID);
 		new_match.Red   = (Participant*)id2ptr(new_match.RedID);
 
-		if (match->GetMatchTable() && match->GetMatchTable()->GetAgeGroup())
+		auto match_table = match->GetMatchTable();
+
+		if (match_table && match_table->GetAgeGroup())
 		{
-			new_match.Weightclass = FindWeightclass(uuid2id(match->GetMatchTable()->GetAgeGroup()->GetUUID()),
-													uuid2id(match->GetMatchTable()->GetUUID()));
+			new_match.Weightclass = FindWeightclass(uuid2id(match_table->GetAgeGroup()->GetUUID()),
+													uuid2id(match_table->GetUUID()));
 			if (new_match.Weightclass)
 				new_match.WeightclassID = new_match.Weightclass->ID;
 
 			new_match.AgeGroupID = uuid2id(match->GetMatchTable()->GetAgeGroup()->GetUUID());
+			new_match.AgeGroup   = (AgeGroup*)id2ptr(new_match.AgeGroupID);
+
+			new_match.MatchNo = (int)match_table->FindMatchIndex(*match) + 1;
 
 			//Find start numbers
 			new_match.StartNoWhite = FindStartNo(new_match.AgeGroupID, new_match.WeightclassID, new_match.WhiteID);

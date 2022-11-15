@@ -245,6 +245,7 @@ namespace Judoboard
 		bool HasConcluded() const;
 
 		Match*  FindMatch(const UUID& UUID) const;
+		size_t  FindMatchIndex(const UUID& UUID) const;
 		Judoka* FindParticipant(const UUID& UUID) const;
 
 		//Rule sets
@@ -271,7 +272,6 @@ namespace Judoboard
 		Match* CreateAutoMatch(const Judoka* White, const Judoka* Blue);
 		Match* AddMatchForWinners(Match* Match1, Match* Match2);
 
-		size_t FindMatchIndex(const UUID& UUID) const;
 		std::pair<size_t, size_t> GetParticipantIndicesOfMatch(const Match* Match) const;
 
 		size_t GetIndexOfParticipant(const Judoka* Participant) const;

@@ -50,6 +50,16 @@ Match* MatchTable::FindMatch(const UUID& UUID) const
 
 
 
+size_t MatchTable::FindMatchIndex(const UUID& UUID) const
+{
+	for (size_t i = 0; i < m_Schedule.size(); ++i)
+		if (m_Schedule[i] && m_Schedule[i]->GetUUID() == UUID)
+			return i;
+	return -1;
+}
+
+
+
 Judoka* MatchTable::FindParticipant(const UUID& UUID) const
 {
 	for (auto participant : m_Participants)
@@ -370,16 +380,6 @@ Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
 		new_match->SetDependency(Fighter::Blue,  Match::DependencyType::TakeWinner, Match2);
 
 	return new_match;
-}
-
-
-
-size_t MatchTable::FindMatchIndex(const UUID& UUID) const
-{
-	for (size_t i = 0; i < m_Schedule.size(); ++i)
-		if (m_Schedule[i] && m_Schedule[i]->GetUUID() == UUID)
-			return i;
-	return -1;
 }
 
 

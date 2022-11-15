@@ -226,7 +226,7 @@ namespace Judoboard
 			int WeightclassID = -1;
 			const Weightclass* Weightclass = nullptr;
 
-			int MatchNo = -1;
+			int MatchNo = 1;
 
 			int StartNoRed = -1;
 			int RedID = -1;
@@ -296,11 +296,11 @@ namespace Judoboard
 			int ParticipantID = -1;
 			const Participant* Participant = nullptr;
 
-			int PointsPlus  = -1;
-			int PointsMinus = -1;
+			int PointsPlus  = 0;//Number of won matches
+			int PointsMinus = 0;//Number of lost matches
 
-			int ScorePlus  = -1;
-			int ScoreMinus = -1;
+			int ScorePlus  = 0;//Sum of score
+			int ScoreMinus = 0;//Sum of score of enemies
 
 			bool Relay    = false;
 			bool FromPool = false;
