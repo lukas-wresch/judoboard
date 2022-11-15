@@ -2215,8 +2215,25 @@ TEST(MD5, ExportCompletedTournament)
 	tour.Save();
 	file.Save("demo-file.md5");
 
+	//MD5 file_cmp("test-data/Test.md5");
+
 	ASSERT_TRUE(file.GetOrganizer());
 	auto organizer = file.GetOrganizer();
 	EXPECT_EQ(organizer->Description, u8"Bielefeld/G\u00fctersloh");
 	//EXPECT_EQ(organizer->Tier, 2);
+
+	for (auto judoka : file.GetParticipants())
+	{
+		EXPECT_TRUE(judoka->HasBeenWeighted);
+	}
+
+	for (auto table : file.GetWeightclasses())
+	{
+		EXPECT_EQ(table->Status, 4);
+	}
+
+	for (auto result : file.GetResults())
+	{
+		EXPECT_EQ(result.RankType, 1);
+	}
 }

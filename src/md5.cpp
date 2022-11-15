@@ -262,11 +262,13 @@ MD5::MD5(const Tournament& Tournament)
 	}
 
 	//Create relations table
-	int startNo = 1;
+	
 	for (auto age_group : m_AgeGroups)
 	{
 		for (auto weightclass : m_Weightclasses)
 		{
+			int startNo = 1;
+
 			for (auto judoka : m_Participants)
 			{
 				if (judoka->AgeGroupID != age_group->ID)
@@ -1219,6 +1221,29 @@ void MD5::Dump() const
 	}
 
 
+	ZED::Log::Info("\n\n--- Judokas ---");
+	for (auto judoka : m_Participants)
+	{
+		std::string line;
+		line += judoka->Firstname + " " + judoka->Lastname;
+		line += "   ID: "      + std::to_string(judoka->ID);
+		line += "   StartNo: " + std::to_string(judoka->StartNo);
+		ZED::Log::Info(line);
+	}
+
+	ZED::Log::Info("\n\n--- Matches ---");
+	for (const auto& match : m_Matches)
+	{
+		std::string line;
+		line += "   RedID: "        + std::to_string(match.RedID);
+		line += "   WhiteID: "      + std::to_string(match.WhiteID);
+		line += "   StartNoRed: "   + std::to_string(match.StartNoRed);
+		line += "   StartNoWhite: " + std::to_string(match.StartNoWhite);
+		line += "   Status: "       + std::to_string(match.Status);
+		line += "   AreaID: "       + std::to_string(match.AreaID);
+		ZED::Log::Info(line);
+	}
+
 	//Dump results
 	ZED::Log::Info("\n\n--- Results ---");
 	for (auto age_group : m_AgeGroups)
@@ -1261,6 +1286,8 @@ void MD5::Dump() const
 					line += std::to_string(result->Participant->Birthyear);
 					if (result->Participant->Club)
 						line += "\t" + result->Participant->Club->Name;
+
+					line += "\tMatchNo: " + std::to_string(result->MatchNo);
 				}
 
 				ZED::Log::Info(line);

@@ -229,41 +229,44 @@ namespace Judoboard
 			int StartNoRed = -1;
 			int RedID = -1;
 			int RedFromMatch = -1;
-			int RedTyp = -1;
+			int RedTyp = 0;//Unknown field (likely related to RedFromMatch)
 			const Participant* Red = nullptr;
 
 			int StartNoWhite = -1;
 			int WhiteID = -1;
 			int WhiteFromMatch = -1;
-			int WhiteTyp = -1;
+			int WhiteTyp = 0;//Unknown field (likely related to WhiteFromMatch)
 			const Participant* White = nullptr;
 
 			int WinnerID = -1;
-			int WinnerMatchNo = -1;
-			int WinnerColor = -1;
+			int WinnerMatchNo = 0;
+			int WinnerColor = 0;
 
 			int LoserID = -1;
-			int LoserMatchNo = -1;
-			int LoserColor = -1;
+			int LoserMatchNo = 0;
+			int LoserColor = 0;
 
-			int WaitingForWinnerFromMatch = -1;
+			int WaitingForWinnerFromMatch = 0;
 
-			int Time   = -1;
-			int Result = -1;
+			int Time   = 0;
+			int Result = 1;//Could be: result available
 
 			int ScoreWinner = -1;
 			int ScoreLoser  = -1;
 
-			int Status = -1;
+			int Status = 3;
+			//1 = invalid match (RedID == White ID)
+			//3 = completed match
+			//0, 2, 4, 5 = ???
 
-			int RedOutMatchID = -1;
+			int RedOutMatchID   = -1;
 			int WhiteOutMatchID = -1;
 
-			int Pool = -1;
+			int Pool = 0;//Unknown field
 
-			int ThirdMatchNo = -1;
-			int ThirdColor   = -1;
-			int AreaID = -1;
+			int ThirdMatchNo = 0;//Unknown field
+			int ThirdColor   = 0;//Unknown field
+			int AreaID       = 1;//Unknown field
 		};
 
 		struct Result
@@ -274,12 +277,12 @@ namespace Judoboard
 			const Weightclass* Weightclass = nullptr;
 
 			int RankID = -1;
-			int Pool = -1;
+			int Pool   = 0;
 
-			int RankNo = -1;
-			int MatchNo = -1;
+			int RankNo  = -1;
+			int MatchNo = -1;//Unknown field
 
-			int RankType = -1;
+			int RankType = 1;//Unknown field
 			int ParticipantID = -1;
 			Participant* Participant = nullptr;
 
@@ -289,7 +292,7 @@ namespace Judoboard
 			int ScorePlus  = -1;
 			int ScoreMinus = -1;
 
-			bool Relay = false;
+			bool Relay    = false;
 			bool FromPool = false;
 		};
 
