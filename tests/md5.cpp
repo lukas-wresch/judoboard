@@ -2128,11 +2128,6 @@ TEST(MD5, ExportCompletedTournament)
 	auto berlin  = new Judoboard::Association("Berlin", nost);
 	auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
 
-	/*tour.GetDatabase().AddAssociation(nieder);
-	tour.GetDatabase().AddAssociation(hamburg);
-	tour.GetDatabase().AddAssociation(berlin);
-	tour.GetDatabase().AddAssociation(nrw);*/
-
 	auto detmold = new Judoboard::Association("Detmold", nrw);
 
 	auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
@@ -2191,7 +2186,7 @@ TEST(MD5, ExportCompletedTournament)
 
 	EXPECT_TRUE(tour.ApplyWeightclasses(descriptors));
 
-	Mat mat(1);
+	/*Mat mat(1);
 
 	while (auto match = tour.GetNextMatch(-1))
 	{
@@ -2203,7 +2198,7 @@ TEST(MD5, ExportCompletedTournament)
 			mat.AddIppon(Fighter::Blue);
 
 		EXPECT_TRUE(mat.EndMatch());
-	}
+	}*/
 
 
 	MD5 file(tour);
@@ -2232,8 +2227,53 @@ TEST(MD5, ExportCompletedTournament)
 		EXPECT_EQ(table->Status, 4);
 	}
 
-	for (auto result : file.GetResults())
+	for (const auto& result : file.GetResults())
 	{
 		EXPECT_EQ(result.RankType, 1);
 	}
+}
+
+
+
+TEST(MD5, ReadRoundRobin)
+{
+	initialize();
+
+	MD5 file("test-data/roundrobin.md5");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	ASSERT_TRUE(file.GetOrganizer());
+}
+
+
+
+TEST(MD5, ReadPool)
+{
+	initialize();
+
+	MD5 file("test-data/pool.md5");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	ASSERT_TRUE(file.GetOrganizer());
+}
+
+
+
+TEST(MD5, ReadDoubleElimination)
+{
+	initialize();
+
+	MD5 file("test-data/doubleelimination.md5");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	ASSERT_TRUE(file.GetOrganizer());
 }

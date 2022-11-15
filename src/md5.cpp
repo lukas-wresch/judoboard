@@ -210,6 +210,8 @@ MD5::MD5(const Tournament& Tournament)
 
 		if (weightclass->HasConcluded())
 			new_weightclass->Status = 4;//Completed
+		else
+			new_weightclass->Status = 3;//Scheduled
 
 		if (match_table->GetAgeGroup())
 		{
@@ -318,6 +320,8 @@ MD5::MD5(const Tournament& Tournament)
 
 		if (match->HasConcluded())
 		{//Convert result
+			new_match.Status = 3;//Completed
+
 			if (match->GetResult().m_Winner == Winner::White)
 			{
 				new_match.WinnerID = new_match.WhiteID;
@@ -335,6 +339,10 @@ MD5::MD5(const Tournament& Tournament)
 
 			new_match.ScoreWinner = (int)match->GetResult().m_Score;
 			new_match.Time        = match->GetResult().m_Time / 1000;
+		}
+		else//Not concluded
+		{
+			new_match.Status = 1;//Ready
 		}
 
 		m_Matches.emplace_back(new_match);
@@ -1231,6 +1239,16 @@ void MD5::Dump() const
 		ZED::Log::Info(line);
 	}
 
+	//Dump weightclasses
+	ZED::Log::Info("\n\n--- Weightclasses ---");
+	for (auto table : m_Weightclasses)
+	{
+		std::string line = table->Description;
+		line += "   FightSystemID: "        + std::to_string(table->FightSystemID);
+		line += "   FightSystemTypeID: "    + std::to_string(table->FightSystemTypeID);
+		ZED::Log::Info(line);
+	}
+
 	ZED::Log::Info("\n\n--- Matches ---");
 	for (const auto& match : m_Matches)
 	{
@@ -1240,6 +1258,7 @@ void MD5::Dump() const
 		line += "   StartNoRed: "   + std::to_string(match.StartNoRed);
 		line += "   StartNoWhite: " + std::to_string(match.StartNoWhite);
 		line += "   Status: "       + std::to_string(match.Status);
+		line += "   Pool: "         + std::to_string(match.Pool);
 		line += "   AreaID: "       + std::to_string(match.AreaID);
 		ZED::Log::Info(line);
 	}

@@ -158,8 +158,6 @@ namespace Judoboard
 			int WeightInGrammsLargerThan  = -1;
 			int WeightInGrammsSmallerThan = -1;
 
-			int MaxPooled = -1;//Maximum participant for pooled system
-
 			std::string Description;
 			int Status = 0;
 			//0 = input phase
@@ -167,16 +165,20 @@ namespace Judoboard
 			//3 = schedule complete
 			//4 = completed
 
-			int FightSystemID = -1;
-			int FightSystemTypeID = -1;
+			int FightSystemID = 16;
+			//1  = double elimination (7 participants, 16 system)
+			//16 = round robin (5 participants)
+			//24 = pooled (6 participants) 3+3 pool
+			int FightSystemTypeID = 1;//Unknown field, always 1
 
 			bool MatchForThirdPlace = false;
 			bool MatchForFifthPlace = false;
 
 			std::string Date;
 
-			int Relay  = -1;
-			int MaxJGJ = -1;
+			int Relay     = 1;
+			int MaxJGJ    =  6;//Maximum participant for round robin system
+			int MaxPooled = 10;//Maximum participant for pooled system
 
 			std::string Identifier;
 			std::string ForReference = "T";
@@ -238,13 +240,13 @@ namespace Judoboard
 			int WhiteTyp = 0;//Unknown field (likely related to WhiteFromMatch)
 			const Participant* White = nullptr;
 
-			int WinnerID = -1;
+			int WinnerID      = -1;
 			int WinnerMatchNo = 0;
-			int WinnerColor = 0;
+			int WinnerColor   = 0;
 
-			int LoserID = -1;
+			int LoserID      = -1;
 			int LoserMatchNo = 0;
-			int LoserColor = 0;
+			int LoserColor   = 0;
 
 			int WaitingForWinnerFromMatch = 0;
 
@@ -254,19 +256,27 @@ namespace Judoboard
 			int ScoreWinner = -1;
 			int ScoreLoser  = -1;
 
-			int Status = 3;
-			//1 = invalid match (RedID == White ID)
+			int Status = 0;
+			//0 = Not ready (unresolved dependencies) OR completely empty match (both fighters are empty)
+			//1 = GO (ready), could also be invalid match (RedID == WhiteID)
+			//2 = Half empty match (one of the fighters is empty)
 			//3 = completed match
 			//0, 2, 4, 5 = ???
 
 			int RedOutMatchID   = -1;
 			int WhiteOutMatchID = -1;
 
-			int Pool = 0;//Unknown field
+			int Pool = 1;//ID of the pool
+			//1 for round robin
+			//1-4 for pool matches in pool match table, 0 for final round
 
 			int ThirdMatchNo = 0;//Unknown field
 			int ThirdColor   = 0;//Unknown field
 			int AreaID       = 1;//Unknown field
+			//Typical 1
+			//2 = first round elimination system
+			//9 = final match elimination system
+			//4 = third place match
 		};
 
 		struct Result
@@ -284,7 +294,7 @@ namespace Judoboard
 
 			int RankType = 1;//Unknown field
 			int ParticipantID = -1;
-			Participant* Participant = nullptr;
+			const Participant* Participant = nullptr;
 
 			int PointsPlus  = -1;
 			int PointsMinus = -1;
