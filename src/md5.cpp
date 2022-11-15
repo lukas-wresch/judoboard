@@ -155,6 +155,9 @@ MD5::MD5(const Tournament& Tournament)
 			new_judoka->AssociationShortname = new_judoka->Club->Name_ForSorting;//TODO
 		}
 
+		if (Tournament.GetStatus() != Status::Scheduled)//Tournament has started
+			new_judoka->HasBeenWeighted = true;//Marked judoka as being weighted
+
 		m_Participants.emplace_back(new_judoka);
 		UUID2ID.insert({ uuid, id - 1 });
 		ID2PTR.insert({ id - 1, new_judoka });
@@ -180,6 +183,8 @@ MD5::MD5(const Tournament& Tournament)
 		ID2PTR.insert({ id - 1, new_age_group });
 	}
 
+	//Convert match tables
+
 	for (auto match_table : Tournament.GetMatchTables())
 	{
 		if (match_table->GetType() != MatchTable::Type::Weightclass)
@@ -202,6 +207,9 @@ MD5::MD5(const Tournament& Tournament)
 		new_weightclass->WeightInGrammsSmallerThan = (uint32_t)weightclass->GetMaxWeight() % 1000;
 
 		new_weightclass->Date = m_DateStart;
+
+		if (weightclass->HasConcluded())
+			new_weightclass->Status = 4;//Completed
 
 		if (match_table->GetAgeGroup())
 		{

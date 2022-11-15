@@ -242,6 +242,8 @@ namespace Judoboard
 		virtual Color GetColor() const { return m_Color; }
 		void  SetColor(Color NewColor) { m_Color = NewColor; }
 
+		bool HasConcluded() const;
+
 		Match*  FindMatch(const UUID& UUID) const;
 		Judoka* FindParticipant(const UUID& UUID) const;
 

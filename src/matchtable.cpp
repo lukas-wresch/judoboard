@@ -30,6 +30,16 @@ void MatchTable::SetMatID(int32_t MatID)
 
 
 
+bool MatchTable::HasConcluded() const
+{
+	for (auto match : m_Schedule)
+		if (match && !match->HasConcluded())
+			return false;
+	return true;
+}
+
+
+
 Match* MatchTable::FindMatch(const UUID& UUID) const
 {
 	for (auto match : m_Schedule)

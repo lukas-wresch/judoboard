@@ -2103,7 +2103,7 @@ TEST(MD5, ExportStructureData)
 
 
 
-TEST(MD5, ExportTest)
+TEST(MD5, ExportCompletedTournament)
 {
 	initialize();
 
@@ -2190,6 +2190,20 @@ TEST(MD5, ExportTest)
 	auto descriptors = tour.GenerateWeightclasses(3, 5, 20, age_groups, true);
 
 	EXPECT_TRUE(tour.ApplyWeightclasses(descriptors));
+
+	Mat mat(1);
+
+	while (auto match = tour.GetNextMatch(-1))
+	{
+		EXPECT_TRUE(mat.StartMatch(match));
+
+		if (rand() & 1)
+			mat.AddIppon(Fighter::White);
+		else
+			mat.AddIppon(Fighter::Blue);
+
+		EXPECT_TRUE(mat.EndMatch());
+	}
 
 
 	MD5 file(tour);

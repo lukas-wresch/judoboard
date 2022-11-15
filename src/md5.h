@@ -162,6 +162,10 @@ namespace Judoboard
 
 			std::string Description;
 			int Status = 0;
+			//0 = input phase
+			//2 = lottery done
+			//3 = schedule complete
+			//4 = completed
 
 			int FightSystemID = -1;
 			int FightSystemTypeID = -1;
