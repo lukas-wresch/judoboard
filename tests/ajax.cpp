@@ -396,22 +396,24 @@ TEST(Ajax, Clubs_Add)
 	{
 		Application app;
 
-		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club&shortname=short")), "ok");
 
 		auto& clubs = app.GetDatabase().GetAllClubs();
 
 		ASSERT_EQ(clubs.size(), 1);
 		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
+		EXPECT_EQ(clubs[0]->GetShortName(), "short");
 
 
 		auto inter = new Judoboard::Association("International", nullptr);
 
 		app.GetDatabase().AddAssociation(inter);
 
-		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club 2&parent=" + (std::string)inter->GetUUID())), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club 2&shortname=test&parent=" + (std::string)inter->GetUUID())), "ok");
 
 		ASSERT_EQ(clubs.size(), 2);
 		EXPECT_EQ(clubs[1]->GetName(), "Test Club 2");
+		EXPECT_EQ(clubs[1]->GetShortName(), "test");
 		ASSERT_TRUE(clubs[1]->GetParent());
 		EXPECT_EQ(*clubs[1]->GetParent(), *inter);
 
@@ -428,12 +430,13 @@ TEST(Ajax, AddAssociation)
 	{
 		Application app;
 
-		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("is_association=true", "name=Test Club")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("is_association=true", "name=Test Club&shortname=short")), "ok");
 
 		auto& clubs = app.GetDatabase().GetAllAssociations();
 
 		ASSERT_EQ(clubs.size(), 1);
 		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
+		EXPECT_EQ(clubs[0]->GetShortName(), "short");
 	}
 }
 
@@ -446,12 +449,13 @@ TEST(Ajax, GetClub)
 	{
 		Application app;
 
-		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddClub(HttpServer::Request("", "name=Test Club&shortname=club")), "ok");
 
 		auto clubs = app.GetDatabase().GetAllClubs();
 
 		ASSERT_EQ(clubs.size(), 1);
 		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
+		EXPECT_EQ(clubs[0]->GetShortName(), "club");
 
 		Club club2(YAML::Load(app.Ajax_GetClub(HttpServer::Request("id="+(std::string)clubs[0]->GetUUID()))));
 
@@ -459,6 +463,7 @@ TEST(Ajax, GetClub)
 		EXPECT_EQ(clubs[0]->GetUUID(),   club2.GetUUID());
 		EXPECT_EQ(clubs[0]->GetParent(), club2.GetParent());
 		EXPECT_EQ(clubs[0]->GetLevel(),  club2.GetLevel());
+		EXPECT_EQ(clubs[0]->GetShortName(), club2.GetShortName());
 	}
 }
 
@@ -478,9 +483,10 @@ TEST(Ajax, EditClub)
 		ASSERT_EQ(clubs.size(), 1);
 		EXPECT_EQ(clubs[0]->GetName(), "Test Club");
 
-		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id="+(std::string)clubs[0]->GetUUID(), "name=Test Club 2")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id="+(std::string)clubs[0]->GetUUID(), "name=Test Club 2&shortname=test")), "ok");
 
 		EXPECT_EQ(clubs[0]->GetName(), "Test Club 2");
+		EXPECT_EQ(clubs[0]->GetShortName(), "test");
 	}
 }
 
@@ -579,11 +585,12 @@ TEST(Ajax, EditAssociation)
 		app.GetDatabase().AddAssociation(nrw);
 
 
-		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID(), "name=Niedersachen 2&parent=" + (std::string)de->GetUUID())), "ok");
+		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID(), "name=Niedersachen 2&shortname=NS&parent=" + (std::string)de->GetUUID())), "ok");
 
 		EXPECT_EQ(nieder->GetName(), "Niedersachen 2");
+		EXPECT_EQ(nieder->GetShortName(), "NS");
 		EXPECT_EQ(nieder->GetLevel(), 2);
-		EXPECT_EQ(nieder->GetParent()->GetUUID(), de->GetUUID());
+		EXPECT_EQ(*nieder->GetParent(), *de);
 	}
 
 	ZED::Core::RemoveFile("database.yml");
@@ -599,7 +606,9 @@ TEST(Ajax, Clubs_List)
 		ZED::Core::RemoveFile("database.yml");
 		Application app;
 
-		app.GetDatabase().AddClub(new Club("Club 1"));
+		auto c1 = new Club("Club 1");
+		c1->SetShortName("c1");
+		app.GetDatabase().AddClub(c1);
 
 		YAML::Node yaml = YAML::Load(app.Ajax_ListClubs());
 
@@ -613,6 +622,7 @@ TEST(Ajax, Clubs_List)
 
 		ASSERT_EQ(yaml.size(), 2);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
+		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c1");
 		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "Club 2");
 	}
 
@@ -630,12 +640,14 @@ TEST(Ajax, Clubs_Get)
 		Application app;
 
 		auto c = new Club("Club 1");
+		c->SetShortName("c");
 		app.GetDatabase().AddClub(c);
 
 		YAML::Node yaml = YAML::Load(app.Ajax_GetClub(HttpServer::Request("id=" + (std::string)c->GetUUID())));
 
 		EXPECT_EQ(yaml["uuid"].as<std::string>(), c->GetUUID());
 		EXPECT_EQ(yaml["name"].as<std::string>(), c->GetName());
+		EXPECT_EQ(yaml["short_name"].as<std::string>(), c->GetShortName());
 	}
 
 	ZED::Core::RemoveFile("database.yml");
@@ -654,7 +666,7 @@ TEST(Ajax, Clubs_Edit)
 		auto c = new Club("Club 1");
 		app.GetDatabase().AddClub(c);
 
-		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)c->GetUUID(), "name=NewName")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)c->GetUUID(), "name=NewName&shortname=c")), "ok");
 
 
 		auto yaml = YAML::Load(app.Ajax_ListClubs());
@@ -662,6 +674,7 @@ TEST(Ajax, Clubs_Edit)
 		ASSERT_EQ(yaml.size(), 1);
 		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), c->GetUUID());
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "NewName");
+		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c");
 	}
 
 	ZED::Core::RemoveFile("database.yml");
@@ -701,25 +714,30 @@ TEST(Ajax, ListAssociations)
 		Application app;
 
 		auto assoc1 = new Association("Assoc 1", nullptr);
+		assoc1->SetShortName("assoc1");
 		app.GetDatabase().AddAssociation(assoc1);
 
 		YAML::Node yaml = YAML::Load(app.Ajax_ListAssociations(HttpServer::Request("")));
 
 		ASSERT_EQ(yaml.size(), 1);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Assoc 1");
+		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "assoc1");
 		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
 
 
 		auto assoc2 = new Association("Assoc 2", assoc1);
+		assoc2->SetShortName("assoc2");
 		app.GetDatabase().AddAssociation(assoc2);
 
 		yaml = YAML::Load(app.Ajax_ListAssociations(HttpServer::Request("")));
 
 		ASSERT_EQ(yaml.size(), 2);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Assoc 1");
+		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "assoc1");
 		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
 
 		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "Assoc 2");
+		EXPECT_EQ(yaml[1]["short_name"].as<std::string>(), "assoc2");
 		EXPECT_EQ(yaml[1]["uuid"].as<std::string>(), (std::string)assoc2->GetUUID());
 		EXPECT_EQ(yaml[1]["parent_name"].as<std::string>(), "Assoc 1");
 		EXPECT_EQ(yaml[1]["parent_uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
@@ -729,6 +747,7 @@ TEST(Ajax, ListAssociations)
 		ASSERT_EQ(yaml.size(), 1);
 
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Assoc 2");
+		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "assoc2");
 		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)assoc2->GetUUID());
 		EXPECT_EQ(yaml[0]["parent_name"].as<std::string>(), "Assoc 1");
 		EXPECT_EQ(yaml[0]["parent_uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
