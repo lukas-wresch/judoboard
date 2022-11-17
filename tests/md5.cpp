@@ -6,7 +6,7 @@ TEST(MD5, ReadTestData)
 {
 	initialize();
 
-	MD5 file("test-data/Test.md5");
+	MD5 file("test-data/Test-cleaned.md5");
 
 	ASSERT_TRUE(file);
 
@@ -292,7 +292,7 @@ TEST(MD5, CreateTournamentFromTestData)
 {
 	initialize();
 
-	MD5 file("test-data/Test.md5");
+	MD5 file("test-data/Test-cleaned.md5");
 
 	ASSERT_TRUE(file);
 
@@ -309,14 +309,17 @@ TEST(MD5, CreateTournamentFromTestData2)
 	initialize();
 
 	{
-		MD5 file("test-data/Test.md5");
+		MD5 file("test-data/Test-cleaned.md5");
 
 		ASSERT_TRUE(file);
 
 		Database db;
 		Tournament tour(file, &db);
 
-		EXPECT_EQ(db.GetNumJudoka(), 142);
+		EXPECT_EQ(file.GetNumParticipants(),     142);
+		EXPECT_EQ(file.GetParticipants().size(), 142);
+		EXPECT_EQ(db.GetNumJudoka(),             142);
+		EXPECT_EQ(db.GetAllJudokas().size(),     142);
 		EXPECT_EQ(db.GetNumClubs(), 20);
 	}
 
@@ -332,7 +335,7 @@ TEST(MD5, ImportIntoTournament)
 	{
 		Localizer::SetLanguage(Language::German);
 
-		MD5 file("test-data/Test.md5");
+		MD5 file("test-data/Test-cleaned.md5");
 
 		ASSERT_TRUE(file);
 
@@ -791,7 +794,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 {
 	initialize();
 
-	MD5 file("test-data/Test.md5");
+	MD5 file("test-data/Test-cleaned.md5");
 
 	ASSERT_TRUE(file);
 
@@ -1278,7 +1281,7 @@ TEST(MD5, ConvertToMD5)
 	initialize();
 
 	{
-		MD5 file1("test-data/Test.md5");//Read MD5 file
+		MD5 file1("test-data/Test-cleaned.md5");//Read MD5 file
 
 		ASSERT_TRUE(file1);
 
@@ -1571,7 +1574,7 @@ TEST(MD5, ConvertToMD5AndBack)
 	initialize();
 
 	{
-		MD5 file("test-data/Test.md5");//Read MD5 file
+		MD5 file("test-data/Test-cleaned.md5");//Read MD5 file
 
 		ASSERT_TRUE(file);
 
@@ -2211,7 +2214,6 @@ TEST(MD5, ExportCompletedTournament)
 	file.Save("demo-file.md5");
 
 	MD5 file_cmp("demo-file-fixed.md5");
-	//MD5 file_cmp("test-data/Test.md5");
 
 	ASSERT_TRUE(file.GetOrganizer());
 	auto organizer = file.GetOrganizer();
