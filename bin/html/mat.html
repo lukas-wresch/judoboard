@@ -28,6 +28,7 @@
       <button class="remove" onclick="SetScore('white', '-wazaari');">-Waza-Ari</button>
       <br/>
       <button disabled class="neutral" id="white_osaekomi" onclick="Osaekomi('white');">Osaekomi</button>
+      <button disabled class="neutral" id="tokeda1" onclick="Tokeda();">Tokeda</button>
     </td>
 
     <td style="text-align: center;">
@@ -38,6 +39,7 @@
       <button class="remove" onclick="SetScore('blue', '-wazaari');">-Waza-Ari</button>
       <br/>
       <button disabled class="neutral" id="blue_osaekomi" onclick="Osaekomi('blue');">Osaekomi</button>
+      <button disabled class="neutral" id="tokeda2" onclick="Tokeda();">Tokeda</button>
     </td>
   </tr>
 
@@ -54,8 +56,7 @@
     <td colspan="2">
       <button class="neutral" id="hajime" onclick="Hajime()">Hajime</button>
       <button disabled class="neutral" id="mate" onclick="Mate()">Mate</button>
-      <button disabled class="neutral" style="margin-left: 20mm;" id="tokeda" onclick="Tokeda();">Tokeda</button>
-      <button class="additional" id="more" onclick="More();">More</button>
+      <button class="additional" id="more" style="margin-left: 35mm" onclick="More();">More</button>
     </td>
   </tr>
 
@@ -231,7 +232,7 @@ function Osaekomi(who)
   });
 
   document.getElementById(who+"_osaekomi").disabled = true;
-  document.getElementById("tokeda").disabled = false;
+  document.getElementById("tokeda1").disabled = false;
 }
 
 
@@ -242,7 +243,8 @@ function Tokeda()
   OsaekomiBlueTimer  = false;
   document.getElementById("white_osaekomi").disabled = false;
   document.getElementById("blue_osaekomi").disabled  = false;
-  document.getElementById("tokeda").disabled = true;
+  document.getElementById("tokeda1").disabled = true;
+  document.getElementById("tokeda2").disabled = true;
 
   GetScore();
 }
@@ -425,12 +427,14 @@ function GetScore()
 
     if (OsaekomiWhiteTimer > 0 || OsaekomiBlueTimer > 0)
     {
-      document.getElementById("tokeda").disabled = false;
+      document.getElementById("tokeda1").disabled = false;
+      document.getElementById("tokeda2").disabled = false;
       document.getElementById("mate").innerHTML = "Sonomama";
     }
     else
     {
-      document.getElementById("tokeda").disabled = true;
+      document.getElementById("tokeda1").disabled = true;
+      document.getElementById("tokeda2").disabled = true;
       document.getElementById("mate").innerHTML = "Mate";
     }
 
