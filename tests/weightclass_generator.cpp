@@ -136,3 +136,86 @@ TEST(WeightclassGenerator, CorrectOutput)
 	EXPECT_GE(result.m_Collection[2].m_Max, Weight(72));
 	EXPECT_LT(result.m_Collection[2].m_Max, Weight(74));
 }
+
+
+
+TEST(WeightclassGenerator, FullTest)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+		Tournament tour("deleteMe");
+		tour.EnableAutoSave(false);
+
+		std::vector<Club*> clubs;
+		clubs.push_back(new Judoboard::Club("Altenhagen"));
+		clubs.push_back(new Judoboard::Club("Brackwede"));
+		clubs.push_back(new Judoboard::Club("Senne"));
+
+		auto age_group1 = new AgeGroup("U11", 8, 10, nullptr, tour.GetDatabase());
+		auto age_group2 = new AgeGroup("U15", 12, 14, nullptr, tour.GetDatabase());
+		tour.AddAgeGroup(age_group1);
+		tour.AddAgeGroup(age_group2);
+
+		for (int i = 0; i < 200; ++i)
+		{
+			const std::string firstname_male[] =
+			{ "Ben", "Friedrich", "Phillipp", "Tim", "Lukas", "Marco", "Peter", "Martin", "Detlef", "Andreas", "Dominik", "Mathias", "Stephan", u8"S\u00f6ren", "Eric", "Finn", "Felix", "Julian", "Maximilian", "Jannik" };
+			const std::string firstname_female[] =
+			{ "Emma", "Stephanie", "Julia", "Jana", "Uta", "Petra", "Sophie", "Kerstin", "Lena", "Jennifer", "Kathrin", "Katherina", "Anna", "Carla", "Paulina", "Clara", "Hanna" };
+			const std::string lastname[] =
+			{ "Ehrlichmann", "Dresdner", "Biermann", "Fisher", "Vogler", "Pfaff", "Eberhart", "Frankfurter", u8"K\u00f6nig", "Pabst", "Ziegler", "Hartmann", "Pabst", "Kortig", "Schweitzer", "Luft", "Wexler", "Kaufmann", u8"Fr\u00fchauf", "Bieber", "Schumacher", u8"M\u00fcncher", "Schmidt", "Meier", "Fischer", "Weber", "Meyer", "Wagner", "Becker", "Schulz", "Hoffmann" };
+
+			Judoboard::Judoka* j = nullptr;
+
+			if (rand() & 1)
+			{
+				auto fname = firstname_male[rand() % (sizeof(firstname_male) / sizeof(firstname_male[0]) - 1)];
+				auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
+				j = new Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Male);
+			}
+			else
+			{
+				auto fname = firstname_female[rand() % (sizeof(firstname_female) / sizeof(firstname_female[0]) - 1)];
+				auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
+				j = new Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Female);
+			}
+
+			j->SetBirthyear(2005 + rand() % 15);
+			if (!age_group1->IsElgiable(*j) && !age_group2->IsElgiable(*j))
+			{
+				delete j;
+				continue;
+			}
+
+			int club_index = rand() % clubs.size();
+			j->SetClub(clubs[club_index]);
+
+			tour.AddParticipant(j);
+		}
+
+		auto age_groups = tour.GetAgeGroups();
+		auto descriptors = tour.GenerateWeightclasses(3, 5, 20, age_groups, true);
+
+		EXPECT_TRUE(tour.ApplyWeightclasses(descriptors));
+
+		//Check if everyone is in a match table
+		for (auto [id, judoka] : tour.GetParticipants())
+		{
+			bool is_included = false;
+			for (auto table : tour.GetMatchTables())
+			{
+				if (table->IsIncluded(*judoka))
+				{
+					is_included = true;
+					break;
+				}
+			}
+
+			EXPECT_TRUE(is_included);
+		}
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}

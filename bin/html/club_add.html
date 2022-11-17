@@ -8,6 +8,11 @@
 </div>
 
 <div>
+    <label style="width:150px;float:left; margin-top:4px;" id="label_shortname">Short Name</label>
+    <input style="margin-bottom:20px;" type="text" id="shortname" value="" size="20" maxlength="64"/>
+</div>
+
+<div>
   <label style="width:150px;float:left;margin-top:5px;" id="label_parent">Parent</label>
   <select style="margin-bottom:20px;" id="clubs">
   </select>
@@ -30,6 +35,7 @@ function AddClub()
 {
   var params = URLEncode({
     name:             document.getElementById("name").value,
+    shortname:        document.getElementById("shortname").value,
     parent:           document.getElementById("clubs").value,
   });
 
@@ -45,6 +51,7 @@ function UpdateClub()
 {
   var params = URLEncode({
     name:             document.getElementById("name").value,
+    shortname:        document.getElementById("shortname").value,
     parent:           document.getElementById("clubs").value,
   });
 
@@ -72,7 +79,8 @@ function GetClub(id)
     console.log(response);
     var res = YAML.parse(response);
 
-    document.getElementById("name").value = res.name;
+    document.getElementById("name").value      = res.name;
+    document.getElementById("shortname").value = res.short_name;
 
     GetAssociationsWithoutParents(function(response) {
       if (typeof res.parent_uuid != 'undefined')

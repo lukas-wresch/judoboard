@@ -2899,6 +2899,7 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 {
 	auto name      = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	auto shortname = HttpServer::DecodeURLEncoded(Request.m_Body, "shortname");
 	bool is_assoc  = HttpServer::DecodeURLEncoded(Request.m_Query, "is_association") == "true";
 	UUID parent_id = HttpServer::DecodeURLEncoded(Request.m_Body, "parent");
 
@@ -2918,9 +2919,19 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 	}
 
 	if (!is_assoc)
-		m_Database.AddClub(new Club(name, parent));
+	{
+		auto new_club = new Club(name, parent);
+		if (!shortname.empty())
+			new_club->SetShortName(shortname);
+		m_Database.AddClub(new_club);
+	}
 	else
-		m_Database.AddAssociation(new Association(name, parent));
+	{
+		auto new_assoc = new Association(name, parent);
+		if (!shortname.empty())
+			new_assoc->SetShortName(shortname);
+		m_Database.AddAssociation(new_assoc);
+	}
 
 	m_Database.Save();
 	return Error();//OK
@@ -2953,8 +2964,9 @@ std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
 
 Error Application::Ajax_EditClub(const HttpServer::Request& Request)
 {
-	UUID id   = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	UUID id        = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	auto name      = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	auto shortname = HttpServer::DecodeURLEncoded(Request.m_Body, "shortname");
 	UUID parent_id = HttpServer::DecodeURLEncoded(Request.m_Body, "parent");
 
 	LockTillScopeEnd();
@@ -2972,6 +2984,8 @@ Error Application::Ajax_EditClub(const HttpServer::Request& Request)
 
 	if (!name.empty())
 		club->SetName(name);
+	if (!shortname.empty())
+		club->SetShortName(shortname);
 	if (parent)
 		club->SetParent(parent);
 

@@ -19,7 +19,7 @@ namespace Judoboard
 	class Association : public ID
 	{
 	public:
-		Association(const std::string& Name, const Association* Parent) : m_Name(Name), m_pParent(Parent) {}
+		Association(const std::string& Name, const Association* Parent);
 		Association(const YAML::Node&  Yaml, const StandingData* StandingData);
 		Association(const MD5::Association& MD5Association);
 
@@ -30,10 +30,21 @@ namespace Judoboard
 			return 0;//We are on the highest level
 		}
 
-		std::string GetName()   const { return m_Name; }
-		auto        GetParent() const { return m_pParent; }
+		std::string GetName()      const { return m_Name; }
+		std::string GetShortName() const { return m_ShortName; }
+		auto        GetParent()    const { return m_pParent; }
 
-		void SetName(const std::string& NewName) { m_Name = NewName; }
+		void SetName(const std::string& NewName) {
+			m_Name = NewName;
+			if (m_ShortName.empty())
+				m_ShortName = m_Name.substr(0, 5);
+		}
+		void SetShortName(const std::string& NewShortName) {
+			m_ShortName = NewShortName;
+			if (m_Name.empty())
+				m_Name = m_ShortName;
+		}
+
 		void SetParent(const Association* NewParent) { m_pParent = NewParent; }
 
 		bool IsChildOf(const UUID& UUID) const;
@@ -45,6 +56,7 @@ namespace Judoboard
 
 	private:
 		std::string m_Name;
+		std::string m_ShortName;
 
 		const Association* m_pParent = nullptr;
 	};
