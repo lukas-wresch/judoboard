@@ -9,12 +9,21 @@ using namespace Judoboard;
 
 
 
+Association::Association(const std::string& Name, const Association* Parent) : m_Name(Name), m_pParent(Parent)
+{
+	m_ShortName = m_Name.substr(0, 5);
+}
+
+
+
 Association::Association(const YAML::Node& Yaml, const StandingData* StandingData)
 {
 	if (Yaml["uuid"])
 		SetUUID(Yaml["uuid"].as<std::string>());
 	if (Yaml["name"])
-		m_Name = Yaml["name"].as<std::string>();
+		SetName(Yaml["name"].as<std::string>());
+	if (Yaml["short_name"])
+		SetShortName(Yaml["short_name"].as<std::string>());
 
 	if (Yaml["parent"] && StandingData)
 		m_pParent = StandingData->FindAssociation(Yaml["parent"].as<std::string>());
@@ -28,6 +37,7 @@ void Association::operator >> (YAML::Emitter& Yaml) const
 
 	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
 	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
+	Yaml << YAML::Key << "short_name" << YAML::Value << m_ShortName;
 
 	if (m_pParent)
 		Yaml << YAML::Key << "parent" << YAML::Value << (std::string)m_pParent->GetUUID();
@@ -43,7 +53,8 @@ void Association::ToString(YAML::Emitter& Yaml) const
 
 	Yaml << YAML::Key << "uuid"  << YAML::Value << (std::string)GetUUID();
 	Yaml << YAML::Key << "name"  << YAML::Value << m_Name;
-	Yaml << YAML::Key << "level" << YAML::Value << GetLevel();
+	Yaml << YAML::Key << "short_name" << YAML::Value << m_ShortName;
+	Yaml << YAML::Key << "level"      << YAML::Value << GetLevel();
 
 	if (m_pParent)
 	{
