@@ -2247,29 +2247,37 @@ TEST(MD5, ReadRoundRobin)
 
 	MD5 file("test-data/roundrobin.md5");
 	//MD5 file2("test-data/roundrobin-1match.md5");
-	MD5 file3("test-data/roundrobin-no-lottery.md5");
+	//MD5 file3("test-data/roundrobin-no-lottery.md5");
 
 	ASSERT_TRUE(file);
 
-	//file.m_Lottery.clear();
-	//file.Save("roundrobin-no-lottery.md5");
-
 	file.Dump();
-	file3.Dump();
 
-
-	Tournament tour(file3);
+	Tournament tour(file);
 
 	ASSERT_EQ(tour.GetMatchTables().size(), 12);
 	EXPECT_EQ(tour.GetMatchTables()[0]->GetSchedule().size(), 6);
 
 	MD5 exprt(tour);
 
-	exprt.Save("export.md5");
-
-	MD5 exprt_fixed("export-fixed.md5");
+	//exprt.Save("export.md5");
 
 	ASSERT_TRUE(file.GetOrganizer());
+
+	for (int i = 0; i < exprt.GetWeightclasses().size(); ++i)
+	{
+		EXPECT_EQ(exprt.GetWeightclasses()[i]->Status,
+			       file.GetWeightclasses()[i]->Status);
+	}
+
+
+	for (int i = 0; i < exprt.GetMatches().size(); ++i)
+	{
+		EXPECT_EQ(exprt.GetMatches()[i].Result,
+				   file.GetMatches()[i].Result);
+		EXPECT_EQ(exprt.GetMatches()[i].Pool,
+				   file.GetMatches()[i].Pool);
+	}
 }
 
 

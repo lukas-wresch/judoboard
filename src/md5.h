@@ -169,6 +169,8 @@ namespace Judoboard
 
 			int FightSystemID = 16;
 			//1  = double elimination (7 participants, 16 system)
+			//13 = 1 participant
+			//14 = 2 participants (best of 3?)
 			//16 = round robin (5 participants)
 			//24 = pooled (6 participants) 3+3 pool
 			int FightSystemTypeID = 1;//Unknown field, always 1
@@ -253,7 +255,7 @@ namespace Judoboard
 			int WaitingForWinnerFromMatch = 0;
 
 			int Time   = -1;
-			int Result = -1;//Could be: result available, but is always 1
+			int Result = -1;//Could be: result available
 
 			int ScoreWinner = -1;
 			int ScoreLoser  = -1;
