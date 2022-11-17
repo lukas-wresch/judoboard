@@ -181,14 +181,9 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 
 	for (auto dmf_judoka : File.GetParticipants())
 	{
-		//Convert to judoka
-		Judoka judoka(dmf_judoka);
-		judoka.SetGender(File.GetGender());
-		judoka.SetClub(club);
-
 		ret += "Judoka: " + dmf_judoka.Firstname + " " + dmf_judoka.Lastname + "<br/>";
 
-		auto new_judoka = GetDatabase().UpdateOrAdd(judoka, ParseOnly, ret);		
+		auto new_judoka = GetDatabase().UpdateOrAdd(JudokaData(dmf_judoka), ParseOnly, ret);		
 
 		//Judoka is now added/updated
 

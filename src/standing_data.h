@@ -44,11 +44,8 @@ namespace Judoboard
 		[[nodiscard]] Judoka* FindJudoka(const UUID& UUID);
 		[[nodiscard]] const Judoka* FindJudoka(const UUID& UUID) const;
 
-		[[nodiscard]] Judoka* FindJudoka_ExactMatch(const Judoka& NewJudoka);
-		[[nodiscard]] Judoka* FindJudoka_SameName(const Judoka& NewJudoka);
-
-		[[nodiscard]] Judoka* FindJudoka_DM4_ExactMatch(const DM4::Participant& NewJudoka);
-		[[nodiscard]] Judoka* FindJudoka_DM4_SameName(const DM4::Participant& NewJudoka);
+		[[nodiscard]] Judoka* FindJudoka_ExactMatch(const JudokaData& NewJudoka);
+		[[nodiscard]] Judoka* FindJudoka_SameName(const JudokaData& NewJudoka);
 
 		bool DeleteJudoka(const UUID& UUID);
 

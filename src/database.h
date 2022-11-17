@@ -30,9 +30,7 @@ namespace Judoboard
 		void SetLastTournamentName(const std::string& Name) { m_CurrentTournament = Name; }
 
 		//Judoka
-		Judoka* UpdateOrAdd(const MD5::Participant& NewJudoka);
-		Judoka* UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly, std::string& Output);
-		Judoka* UpdateOrAdd(const Judoka& NewJudoka, bool ParseOnly, std::string& Output);
+		Judoka* UpdateOrAdd(const JudokaData& NewJudoka, bool ParseOnly, std::string& Output);
 
 		//Accounts
 		const Account* AddAccount(const Account& NewAccount) { return AddAccount(new Account(NewAccount)); }

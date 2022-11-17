@@ -105,11 +105,12 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	for (auto judoka : File.GetParticipants())
 	{
 		Judoka* new_judoka = nullptr;
+		std::string dummy;
 
 		if (pDatabase)
-			new_judoka = pDatabase->UpdateOrAdd(*judoka);
+			new_judoka = pDatabase->UpdateOrAdd(*judoka, false, dummy);
 		else
-			new_judoka = new Judoka(*judoka);
+			new_judoka = new Judoka(JudokaData(*judoka), &m_StandingData);
 
 		if (new_judoka)
 		{
