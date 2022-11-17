@@ -31,13 +31,13 @@ namespace Judoboard
 		std::string GetShortName() const { return m_ShortName; }
 		auto        GetParent()    const { return m_pParent; }
 
-		void SetName(std::string NewName) {
+		void SetName(const std::string& NewName) {
 			m_Name = NewName;
 			if (m_ShortName.empty())
 				m_ShortName = m_Name.substr(0, 5);
 		}
 		void SetShortName(const std::string& NewShortName) {
-			m_Name = NewShortName;
+			m_ShortName = NewShortName;
 			if (m_Name.empty())
 				m_Name = m_ShortName;
 		}
