@@ -58,6 +58,8 @@ namespace Judoboard
 
 			int OfficialClubNo = 0;//Official no. of the club
 			int StatusChanged  = -1;
+
+			mutable void* pUserData = nullptr;
 		};
 
 		struct RelationClubAssociation//Relational table to connect clubs to associations
@@ -78,27 +80,27 @@ namespace Judoboard
 
 			Gender Gender = Gender::Male;
 
-			int LotterySchemaID = -1;
+			int LotterySchemaID = 0;
 
-			bool MoveUp = false;
+			bool MoveUp = true;
 			bool ChangeWeightAtScale = false;
 
 			bool AllCategories = false;
 			bool Kata = false;
 
 			bool PoolSystem = false;
-			bool AllParticipantsInResultTable = false;
+			bool AllParticipantsInResultTable = true;
 
-			int Money = -1;
-			int MoneyKata = -1;
-			int MoneyAllCategories = -1;
-			int MoneyIncreased = -1;
-			int MoneyKataIncreased = -1;
-			int MoneyAllCategoriesIncreased = -1;
+			int Money = 0;
+			int MoneyKata = 0;
+			int MoneyAllCategories = 0;
+			int MoneyIncreased = 0;
+			int MoneyKataIncreased = 0;
+			int MoneyAllCategoriesIncreased = 0;
 
 			int Tolerance = 0;
 
-			int Team = -1;
+			int Team = 0;
 
 			mutable void* pUserData = nullptr;
 		};
@@ -250,13 +252,13 @@ namespace Judoboard
 
 			int WaitingForWinnerFromMatch = 0;
 
-			int Time   = 0;
-			int Result = 1;//Could be: result available
+			int Time   = -1;
+			int Result = -1;//Could be: result available, but is always 1
 
 			int ScoreWinner = -1;
 			int ScoreLoser  = -1;
 
-			int Status = 0;
+			int Status = 1;
 			//0 = Not ready (unresolved dependencies) OR completely empty match (both fighters are empty)
 			//1 = GO (ready), could also be invalid match (RedID == WhiteID)
 			//2 = Half empty match (one of the fighters is empty)
@@ -266,8 +268,8 @@ namespace Judoboard
 			int RedOutMatchID   = -1;
 			int WhiteOutMatchID = -1;
 
-			int Pool = 1;//ID of the pool
-			//1 for round robin
+			int Pool = 0;//ID of the pool
+			//1 for round robin (sometimes 0!?)
 			//1-4 for pool matches in pool match table, 0 for final round
 
 			int ThirdMatchNo = 0;//Unknown field
@@ -401,15 +403,15 @@ namespace Judoboard
 		std::string m_FileDate;//Date the file was saved
 		std::string m_Description;
 
-		int m_SchemaID = -1;
+		int m_SchemaID = 1;
 		int m_LotteryTierID = -1;//Lottery is conducted on which tier?
 		int m_AssociationID = -1;//Association that is conducting the tournament
 		int m_AssociationLevelID = -1;//Tier of m_AssociationID + 1
 		int m_TierToDisplay = -1;//Tier that should be displayed on lists
-		int m_MAXJGJ = -1;//Maximum participants for round robin
-		int m_LotteryProcess = -1;
+		int m_MAXJGJ = 5;//Maximum participants for round robin
+		int m_LotteryProcess = 0;
 
-		int m_NumOfRelays = -1;
+		int m_NumOfRelays = 2;
 
 		std::string m_Place;
 		std::string m_DateStart;
@@ -424,8 +426,8 @@ namespace Judoboard
 		int m_NumParticipants = -1;//Number of participants in the md5 file
 		int m_NumAssociations = -1;//Number of associations in the md5 file
 
-		int m_Money = -1;
-		int m_MoneyIncreased = -1;
+		int m_Money = 0;
+		int m_MoneyIncreased = 0;
 
 		bool m_IsValid = false;
 	};

@@ -2246,10 +2246,28 @@ TEST(MD5, ReadRoundRobin)
 	initialize();
 
 	MD5 file("test-data/roundrobin.md5");
+	//MD5 file2("test-data/roundrobin-1match.md5");
+	MD5 file3("test-data/roundrobin-no-lottery.md5");
 
 	ASSERT_TRUE(file);
 
+	//file.m_Lottery.clear();
+	//file.Save("roundrobin-no-lottery.md5");
+
 	file.Dump();
+	file3.Dump();
+
+
+	Tournament tour(file3);
+
+	ASSERT_EQ(tour.GetMatchTables().size(), 12);
+	EXPECT_EQ(tour.GetMatchTables()[0]->GetSchedule().size(), 6);
+
+	MD5 exprt(tour);
+
+	exprt.Save("export.md5");
+
+	MD5 exprt_fixed("export-fixed.md5");
 
 	ASSERT_TRUE(file.GetOrganizer());
 }

@@ -60,7 +60,7 @@ MD5::MD5(const Tournament& Tournament)
 
 		new_assoc->ID = id++;
 		new_assoc->Description = assoc->GetName();
-		new_assoc->ShortName   = assoc->GetName();
+		new_assoc->ShortName   = new_assoc->Description.substr(0, 5);
 		new_assoc->Tier        = assoc->GetLevel() + 2;//International starts a 2 in MD5 files
 
 		if (assoc->GetParent())
@@ -144,6 +144,8 @@ MD5::MD5(const Tournament& Tournament)
 		new_judoka->Lastname  = judoka->GetLastname();
 		new_judoka->WeightInGrams = (uint32_t)judoka->GetWeight();
 		new_judoka->Birthyear     = judoka->GetBirthyear();
+		if (new_judoka->Birthyear == 0)
+			new_judoka->Birthyear = -1;
 		//new_judoka->Rank = 1;//DEBUG
 		new_judoka->GKParticipantID = new_judoka->ID;
 
@@ -237,29 +239,34 @@ MD5::MD5(const Tournament& Tournament)
 			}
 		}
 
-		//Convert results
-
-		auto results = match_table->CalculateResults();
-		int rank = 1;
-		for (const auto& result : results)
+		if (match_table->GetParticipants().empty())//match table doesn't have any participants yet
+			new_weightclass->Status = 0;//input phase
+		else if (weightclass->HasConcluded())
 		{
-			Result new_result;
-			new_result.Weightclass   = new_weightclass;
-			new_result.WeightclassID = new_weightclass->ID;
-			new_result.AgeGroup   = new_weightclass->AgeGroup;
-			new_result.AgeGroupID = new_weightclass->AgeGroupID;
+			//Convert results
 
-			new_result.ParticipantID = uuid2id(result.Judoka->GetUUID());
-			new_result.Participant   = (Participant*)id2ptr(new_result.ParticipantID);
-			new_result.PointsPlus    = result.Wins;
-			new_result.ScorePlus     = result.Score;
+			auto results = match_table->CalculateResults();
+			int rank = 1;
+			for (const auto& result : results)
+			{
+				Result new_result;
+				new_result.Weightclass   = new_weightclass;
+				new_result.WeightclassID = new_weightclass->ID;
+				new_result.AgeGroup   = new_weightclass->AgeGroup;
+				new_result.AgeGroupID = new_weightclass->AgeGroupID;
 
-			new_result.RankNo = rank++;
-			new_result.RankID = id++;
+				new_result.ParticipantID = uuid2id(result.Judoka->GetUUID());
+				new_result.Participant = (Participant*)id2ptr(new_result.ParticipantID);
+				new_result.PointsPlus  = result.Wins;
+				new_result.ScorePlus   = result.Score;
 
-			//new_result.Participant->Rank = new_result.RankID;
+				new_result.RankNo = rank++;
+				new_result.RankID = id++;
 
-			m_Results.emplace_back(new_result);
+				//new_result.Participant->Rank = new_result.RankID;
+
+				m_Results.emplace_back(new_result);
+			}
 		}
 	}
 
@@ -289,7 +296,7 @@ MD5::MD5(const Tournament& Tournament)
 		}
 	}
 
-	int match_no = 1;
+	//Convert matches
 
 	for (auto match : Tournament.GetSchedule())
 	{
@@ -312,7 +319,7 @@ MD5::MD5(const Tournament& Tournament)
 			if (new_match.Weightclass)
 				new_match.WeightclassID = new_match.Weightclass->ID;
 
-			new_match.AgeGroupID = uuid2id(match->GetMatchTable()->GetAgeGroup()->GetUUID());
+			new_match.AgeGroupID = uuid2id(match_table->GetAgeGroup()->GetUUID());
 			new_match.AgeGroup   = (AgeGroup*)id2ptr(new_match.AgeGroupID);
 
 			new_match.MatchNo = (int)match_table->FindMatchIndex(*match) + 1;
@@ -351,6 +358,10 @@ MD5::MD5(const Tournament& Tournament)
 
 		m_Matches.emplace_back(new_match);
 	}
+
+	m_NumClubs        = (int)m_Clubs.size();
+	m_NumParticipants = (int)m_Participants.size();
+	m_NumAssociations = (int)m_Associations.size();
 
 	m_IsValid = true;
 }

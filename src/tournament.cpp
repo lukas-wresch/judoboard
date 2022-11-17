@@ -45,14 +45,15 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add clubs
 	for (auto club : File.GetClubs())
 	{
-		if (pDatabase)
-		{
-			Club* new_club = pDatabase->AddClub(*club);
-			m_StandingData.AddClub(new_club);
-		}
+		Club* new_club = nullptr;
 
+		if (pDatabase)
+			new_club = pDatabase->AddClub(*club);
 		else
-			m_StandingData.AddClub(new Club(*club));
+			new_club = new Club(*club);
+		
+		m_StandingData.AddClub(new_club);
+		club->pUserData = new_club;
 	}
 
 	//Find organizer
@@ -115,6 +116,9 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			judoka->pUserData = new_judoka;
 			m_StandingData.AddJudoka(new_judoka);
 
+			if (judoka->Club)//Connect to club
+				new_judoka->SetClub((Club*)judoka->Club->pUserData);
+
 			if (judoka->Weightclass)
 			{
 				auto match_table = (Weightclass*)judoka->Weightclass->pUserData;
@@ -123,6 +127,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			}
 		}
 	}
+
+	//Clear all matches (these got added when the participants got added)
+	for (auto table : m_MatchTables)
+		table->DeleteSchedule();
 
 	//Add matches
 	for (auto& match : File.GetMatches())
@@ -137,10 +145,13 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		Match* new_match = new Match(this, (Judoka*)match.White->pUserData, (Judoka*)match.Red->pUserData);
 
-		if (match.WinnerID == match.WhiteID)
-			new_match->SetResult(Match::Result(Fighter::White, (Match::Score)match.ScoreWinner, match.Time));
-		else
-			new_match->SetResult(Match::Result(Fighter::Blue,  (Match::Score)match.ScoreWinner, match.Time));
+		if (match.Status == 3)//Match completed?
+		{
+			if (match.WinnerID == match.WhiteID)
+				new_match->SetResult(Match::Result(Fighter::White, (Match::Score)match.ScoreWinner, match.Time));
+			else
+				new_match->SetResult(Match::Result(Fighter::Blue,  (Match::Score)match.ScoreWinner, match.Time));
+		}
 
 		if (match.Weightclass && match.Weightclass->pUserData)
 		{

@@ -287,6 +287,8 @@ namespace Judoboard
 			});
 		}
 
+		void DeleteSchedule() { m_Schedule.clear(); }
+
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
 
