@@ -45,14 +45,29 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add clubs
 	for (auto club : File.GetClubs())
 	{
-		if (pDatabase)
-		{
-			Club* new_club = pDatabase->AddClub(*club);
-			m_StandingData.AddClub(new_club);
-		}
+		Club* new_club = nullptr;
 
+		if (pDatabase)
+			new_club = pDatabase->AddClub(*club);
 		else
-			m_StandingData.AddClub(new Club(*club));
+			new_club = new Club(*club);
+		
+		m_StandingData.AddClub(new_club);
+		club->pUserData = new_club;
+	}
+
+	//Find organizer
+	assert(File.GetOrganizer());
+	if (File.GetOrganizer())
+	{
+		for (auto assoc : m_StandingData.GetAllAssociations())
+		{
+			if (assoc->GetName() == File.GetOrganizer()->Description)
+			{
+				m_Organizer = assoc;
+				break;
+			}
+		}
 	}
 
 	//Add age groups
@@ -90,16 +105,20 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	for (auto judoka : File.GetParticipants())
 	{
 		Judoka* new_judoka = nullptr;
+		std::string dummy;
 
 		if (pDatabase)
-			new_judoka = pDatabase->UpdateOrAdd(*judoka);
+			new_judoka = pDatabase->UpdateOrAdd(*judoka, false, dummy);
 		else
-			new_judoka = new Judoka(*judoka);
+			new_judoka = new Judoka(JudokaData(*judoka), &m_StandingData);
 
 		if (new_judoka)
 		{
 			judoka->pUserData = new_judoka;
 			m_StandingData.AddJudoka(new_judoka);
+
+			if (judoka->Club)//Connect to club
+				new_judoka->SetClub((Club*)judoka->Club->pUserData);
 
 			if (judoka->Weightclass)
 			{
@@ -109,6 +128,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			}
 		}
 	}
+
+	//Clear all matches (these got added when the participants got added)
+	for (auto table : m_MatchTables)
+		table->DeleteSchedule();
 
 	//Add matches
 	for (auto& match : File.GetMatches())
@@ -123,10 +146,13 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		Match* new_match = new Match(this, (Judoka*)match.White->pUserData, (Judoka*)match.Red->pUserData);
 
-		if (match.WinnerID == match.WhiteID)
-			new_match->SetResult(Match::Result(Fighter::White, (Match::Score)match.ScoreWinner, match.Time));
-		else
-			new_match->SetResult(Match::Result(Fighter::Blue,  (Match::Score)match.ScoreWinner, match.Time));
+		if (match.Status == 3)//Match completed?
+		{
+			if (match.WinnerID == match.WhiteID)
+				new_match->SetResult(Match::Result(Fighter::White, (Match::Score)match.ScoreWinner, match.Time));
+			else
+				new_match->SetResult(Match::Result(Fighter::Blue,  (Match::Score)match.ScoreWinner, match.Time));
+		}
 
 		if (match.Weightclass && match.Weightclass->pUserData)
 		{
@@ -171,6 +197,8 @@ void Tournament::Reset()
 	//Don't delete since this could be shared memory
 	//m_pDefaultRules = nullptr;
 
+	m_Organizer = nullptr;
+
 	assert(m_StandingData.GetNumJudoka() == 0);
 }
 
@@ -209,6 +237,16 @@ bool Tournament::LoadYAML(const std::string& Filename)
 
 	//Read standing data
 	m_StandingData << yaml;
+
+	if (yaml["organizer"] && yaml["organizer"].IsScalar())
+	{
+		m_Organizer = m_StandingData.FindAssociation(yaml["organizer"].as<std::string>());
+		if (!m_Organizer)
+			m_Organizer = m_StandingData.FindClub(yaml["organizer"].as<std::string>());
+
+		if (!m_Organizer)
+			ZED::Log::Error("Could not resolve organizer in tournament data");
+	}
 
 	if (yaml["judoka_to_age_group"] && yaml["judoka_to_age_group"].IsMap())
 	{
@@ -299,6 +337,9 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 	yaml << YAML::Value << "1";
 
 	m_StandingData >> yaml;
+
+	if (m_Organizer)
+		yaml << YAML::Key << "organizer" << YAML::Value << (std::string)m_Organizer->GetUUID();
 
 	yaml << YAML::Key << "judoka_to_age_group";
 	yaml << YAML::Value;
@@ -726,6 +767,28 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		return false;
 
 	Lock();
+
+	//Do we have an organizer?
+	if (m_Organizer)
+	{
+		//Check if the judoka is allowed to participate as in
+		//his/her club belongs to this association
+
+		auto club = Judoka->GetClub();
+		if (!club)
+		{
+			ZED::Log::Info("Can not add a participant to a tournament without a club");
+			Unlock();
+			return false;
+		}
+
+		if (!club->IsChildOf(*m_Organizer))
+		{
+			ZED::Log::Info("Participant can not be added, wrong tier");
+			Unlock();
+			return false;
+		}
+	}
 
 	m_StandingData.AddJudoka(Judoka);
 	m_StandingData.AddClub(const_cast<Club*>(Judoka->GetClub()));

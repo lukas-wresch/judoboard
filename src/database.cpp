@@ -17,7 +17,7 @@ void Database::Reset()
 {
 	StandingData::Reset();
 
-	m_CurrentTournament = "";
+	m_CurrentTournament.clear();
 
 	for (auto account : m_Accounts)
 		delete account;
@@ -134,67 +134,7 @@ bool Database::Save(const std::string& Filename) const
 
 
 
-Judoka* Database::UpdateOrAdd(const MD5::Participant& NewJudoka)
-{
-	DM4::Participant dm4_judoka(NewJudoka);
-
-	std::string output;
-	auto ret = UpdateOrAdd(dm4_judoka, false, output);
-	ZED::Log::Debug(output);
-
-	return ret;
-}
-
-
-
-Judoka* Database::UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly, std::string& Output)
-{
-	auto old_judoka = FindJudoka_DM4_ExactMatch(NewJudoka);
-
-	if (old_judoka)//Exact match
-		return old_judoka;
-
-	else//No exact match
-	{
-		old_judoka = FindJudoka_DM4_SameName(NewJudoka);
-
-		if (old_judoka)//Found someone with the right name but incorrect club/birthyear
-		{
-			Output += "Updating information of judoka: " + old_judoka->GetName(NameStyle::GivenName) + "<br/>";
-
-			if (!ParseOnly)
-			{
-				if (NewJudoka.Club && FindClubByName(NewJudoka.Club->Name))
-					old_judoka->SetClub(FindClubByName(NewJudoka.Club->Name));
-				if (NewJudoka.Birthyear > 0)
-					old_judoka->SetBirthyear(NewJudoka.Birthyear);
-				if (NewJudoka.WeightInGrams > 0)
-					old_judoka->SetWeight(NewJudoka.WeightInGrams);
-			}
-
-			return old_judoka;
-		}
-
-		else//We don't have a judoka with this name
-		{
-			//Add to database
-			Output += "Adding judoka: " + NewJudoka.Firstname + " " + NewJudoka.Lastname + "<br/>";
-
-			if (!ParseOnly)
-			{
-				auto new_judoka = new Judoka(NewJudoka);
-				AddJudoka(new_judoka);
-				return new_judoka;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-
-
-Judoka* Database::UpdateOrAdd(const Judoka& NewJudoka, bool ParseOnly, std::string& Output)
+Judoka* Database::UpdateOrAdd(const JudokaData& NewJudoka, bool ParseOnly, std::string& Output)
 {
 	auto old_judoka = FindJudoka_ExactMatch(NewJudoka);
 
@@ -203,7 +143,7 @@ Judoka* Database::UpdateOrAdd(const Judoka& NewJudoka, bool ParseOnly, std::stri
 
 	else//No exact match
 	{
-		old_judoka = FindJudoka_SameName(NewJudoka);
+		/*old_judoka = FindJudoka_SameName(NewJudoka);
 
 		if (old_judoka)//Found someone with the right name but incorrect club/birthyear
 		{
@@ -211,25 +151,25 @@ Judoka* Database::UpdateOrAdd(const Judoka& NewJudoka, bool ParseOnly, std::stri
 
 			if (!ParseOnly)
 			{
-				if (NewJudoka.GetClub() && FindClubByName(NewJudoka.GetClub()->GetName()))
-					old_judoka->SetClub(FindClubByName(NewJudoka.GetClub()->GetName()));
-				if (NewJudoka.GetBirthyear() > 0)
-					old_judoka->SetBirthyear(NewJudoka.GetBirthyear());
-				if ((uint32_t)NewJudoka.GetWeight() > 0)
-					old_judoka->SetWeight(NewJudoka.GetWeight());
+				if (FindClubByName(NewJudoka.m_ClubName))
+					old_judoka->SetClub(FindClubByName(NewJudoka.m_ClubName));
+				if (NewJudoka.m_Birthyear > 0)
+					old_judoka->SetBirthyear(NewJudoka.m_Birthyear);
+				if (NewJudoka.m_Weight > 0)
+					old_judoka->SetWeight(NewJudoka.m_Weight);
 			}
 
 			return old_judoka;
-		}
+		}*/
 
-		else//We don't have a judoka with this name
+		//else//We don't have a judoka with this name
 		{
 			//Add to database
-			Output += "Adding judoka: " + NewJudoka.GetFirstname() + " " + NewJudoka.GetLastname() + "<br/>";
+			Output += "Adding judoka: " + NewJudoka.m_Firstname + " " + NewJudoka.m_Lastname + "<br/>";
 
 			if (!ParseOnly)
 			{
-				auto new_judoka = new Judoka(NewJudoka);
+				auto new_judoka = new Judoka(NewJudoka, this);
 				AddJudoka(new_judoka);
 				return new_judoka;
 			}

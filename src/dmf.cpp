@@ -182,6 +182,10 @@ bool DMF::Parse(ZED::Blob&& Data)
 			ZED::Log::Warn("Could not parse weight");
 		new_participant.WeightInGrams *= 1000;//Convert to gram
 
+		//Fill out additional info based on meta data
+		new_participant.Gender   = m_Gender;
+		new_participant.ClubName = m_Club.Name;
+
 		m_Participants.emplace_back(new_participant);
 
 		ReadLine(Data);//Empty

@@ -102,7 +102,7 @@ namespace Judoboard
 
 		//Judoka* GetFighter(Fighter Fighter);
 		//const Judoka* GetFighter(Fighter Fighter) const { return (const_cast<Match*>(this))->GetFighter(Fighter); }
-		const Judoka* GetFighter(Fighter Fighter) const;
+		[[nodiscard]] const Judoka* GetFighter(Fighter Fighter) const;
 		void SetFighter(Fighter Fighter, const Judoka* NewFighter) {
 			if (Fighter == Fighter::White)
 				m_White.m_Judoka = NewFighter;

@@ -75,6 +75,8 @@ namespace Judoboard
 			m_InGrams = Yaml.as<uint32_t>();
 		}
 
+		void SetWeightInGrams(int Grams) { m_InGrams = Grams; }
+
 		void operator >> (YAML::Emitter& Yaml) const {
 			Yaml << m_InGrams;
 		}

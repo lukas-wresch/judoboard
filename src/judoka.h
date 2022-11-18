@@ -12,6 +12,29 @@
 namespace Judoboard
 {
 	class StandingData;
+	class Judoka;
+
+
+
+	struct JudokaData
+	{
+		JudokaData(const Judoka& Judoka);
+		JudokaData(const MD5::Participant& Judoka);
+		JudokaData(const DM4::Participant& Judoka);
+		JudokaData(const DMF::Participant& Judoka);
+
+		std::string m_Firstname;
+		std::string m_Lastname;
+
+		Weight m_Weight = 0;//Weight in grams
+		Gender m_Gender = Gender::Unknown;
+
+		uint16_t m_Birthyear = 0;
+
+		std::string m_ClubName;
+
+		std::string m_Number;//Official number of this judoka according to his "judo passport"
+	};
 
 
 
@@ -25,9 +48,10 @@ namespace Judoboard
 	public:
 		Judoka(const std::string& Firstname, const std::string& Lastname, Weight Weight = 0, Gender Gender = Gender::Male, uint32_t Birthyear = 0);
 		Judoka(const YAML::Node& Yaml, const StandingData* pStandingData);//Load judoka from file
-		Judoka(const DM4::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from DM4 data
-		Judoka(const MD5::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from MD5 data
-		Judoka(const DMF::Participant& Participant);//Load judoka from DMF data
+		Judoka(const JudokaData& JudokaData, const StandingData* pStandingData);
+		[[deprecated]] Judoka(const DM4::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from DM4 data
+		[[deprecated]] Judoka(const MD5::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from MD5 data
+		[[deprecated]] Judoka(const DMF::Participant& Participant);//Load judoka from DMF data
 
 		auto GetGender() const { return m_Gender; }
 		auto GetWeight() const { return m_Weight; }

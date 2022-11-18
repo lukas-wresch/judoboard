@@ -242,7 +242,10 @@ namespace Judoboard
 		virtual Color GetColor() const { return m_Color; }
 		void  SetColor(Color NewColor) { m_Color = NewColor; }
 
+		bool HasConcluded() const;
+
 		Match*  FindMatch(const UUID& UUID) const;
+		size_t  FindMatchIndex(const UUID& UUID) const;
 		Judoka* FindParticipant(const UUID& UUID) const;
 
 		//Rule sets
@@ -269,7 +272,6 @@ namespace Judoboard
 		Match* CreateAutoMatch(const Judoka* White, const Judoka* Blue);
 		Match* AddMatchForWinners(Match* Match1, Match* Match2);
 
-		size_t FindMatchIndex(const UUID& UUID) const;
 		std::pair<size_t, size_t> GetParticipantIndicesOfMatch(const Match* Match) const;
 
 		size_t GetIndexOfParticipant(const Judoka* Participant) const;
@@ -284,6 +286,8 @@ namespace Judoboard
 				return GetStartingPosition(a) < GetStartingPosition(b);
 			});
 		}
+
+		void DeleteSchedule() { m_Schedule.clear(); }
 
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called

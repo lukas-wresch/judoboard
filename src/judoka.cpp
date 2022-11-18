@@ -10,11 +10,67 @@ using namespace Judoboard;
 
 
 
-Judoka::Judoka(const std::string& Firstname, const std::string& Lastname, Weight Weight, Gender Gender, uint32_t Birthyear)
-	: m_Firstname(Firstname), m_Lastname(Lastname)
+JudokaData::JudokaData(const Judoka& Judoka)
 {
-	m_Weight = Weight;
+	m_Firstname = Judoka.GetFirstname();
+	m_Lastname  = Judoka.GetLastname();
+	m_Weight    = Judoka.GetWeight();
+	m_Gender    = Judoka.GetGender();
+	m_Birthyear = Judoka.GetBirthyear();
+	m_Number    = Judoka.GetNumber();
+	if (Judoka.GetClub())
+		m_ClubName = Judoka.GetClub()->GetName();
+}
 
+
+
+JudokaData::JudokaData(const MD5::Participant& Judoka)
+{
+	m_Firstname = Judoka.Firstname;
+	m_Lastname  = Judoka.Lastname;
+	if (Judoka.WeightInGrams > 0)
+		m_Weight.SetWeightInGrams(Judoka.WeightInGrams);
+	if (Judoka.AgeGroup)
+		m_Gender = Judoka.AgeGroup->Gender;
+	if (Judoka.Birthyear >= 0)
+		m_Birthyear = Judoka.Birthyear;
+	m_ClubName = Judoka.ClubFullname;
+}
+
+
+
+JudokaData::JudokaData(const DM4::Participant& Judoka)
+{
+	m_Firstname = Judoka.Firstname;
+	m_Lastname  = Judoka.Lastname;
+	if (Judoka.WeightInGrams > 0)
+		m_Weight.SetWeightInGrams(Judoka.WeightInGrams);
+	m_Gender = Judoka.Gender;
+	if (Judoka.Birthyear >= 0)
+		m_Birthyear = Judoka.Birthyear;
+	if (Judoka.Club)
+		m_ClubName = Judoka.Club->Name;
+}
+
+
+
+JudokaData::JudokaData(const DMF::Participant& Judoka)
+{
+	m_Firstname = Judoka.Firstname;
+	m_Lastname  = Judoka.Lastname;
+	if (Judoka.WeightInGrams > 0)
+		m_Weight.SetWeightInGrams(Judoka.WeightInGrams);
+	m_Gender = Judoka.Gender;
+	if (Judoka.Birthyear >= 0)
+		m_Birthyear = Judoka.Birthyear;
+	m_ClubName = Judoka.ClubName;
+}
+
+
+
+Judoka::Judoka(const std::string& Firstname, const std::string& Lastname, Weight Weight, Gender Gender, uint32_t Birthyear)
+	: m_Firstname(Firstname), m_Lastname(Lastname), m_Weight(Weight)
+{
 	if (Gender == Gender::Male || Gender == Gender::Female)
 		m_Gender = Gender;
 
@@ -41,6 +97,24 @@ Judoka::Judoka(const YAML::Node& Yaml, const StandingData* pStandingData)
 		m_Number = Yaml["number"].as<std::string>();
 	if (Yaml["club"] && pStandingData)
 		m_pClub = pStandingData->FindClub(Yaml["club"].as<std::string>());
+}
+
+
+
+Judoka::Judoka(const JudokaData& JudokaData, const StandingData* pStandingData)
+{
+	m_Firstname = JudokaData.m_Firstname;
+	m_Lastname  = JudokaData.m_Lastname;
+	m_Gender    = JudokaData.m_Gender;
+	m_Number    = JudokaData.m_Number;
+
+	if (JudokaData.m_Birthyear > 0)
+		m_Birthyear = JudokaData.m_Birthyear;
+	if (JudokaData.m_Weight > 0)
+		m_Weight = JudokaData.m_Weight;
+
+	if (pStandingData)
+		m_pClub = pStandingData->FindClubByName(JudokaData.m_ClubName);
 }
 
 
