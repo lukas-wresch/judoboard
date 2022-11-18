@@ -15,7 +15,7 @@ RuleSet s_default_rules;
 
 
 
-Match::Match(const ITournament* Tournament, const Judoka* White, const Judoka* Blue, uint32_t MatID) : m_Tournament(Tournament)
+Match::Match(const Judoka* White, const Judoka* Blue, const ITournament* Tournament, uint32_t MatID) : m_Tournament(Tournament)
 {
 	m_White.m_Judoka = White;
 	m_Blue.m_Judoka  = Blue;

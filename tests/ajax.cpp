@@ -233,7 +233,7 @@ TEST(Ajax, GetHansokumake)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
@@ -258,7 +258,7 @@ TEST(Ajax, GetHansokumake)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
@@ -284,7 +284,7 @@ TEST(Ajax, GetHansokumake)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
@@ -316,7 +316,7 @@ TEST(Ajax, GetHansokumake2)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
@@ -385,6 +385,109 @@ TEST(Ajax, Judoka_Edit)
 	}
 
 	ZED::Core::RemoveFile("database.yml");
+}
+
+
+
+TEST(Ajax, GetNamesOnMat)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.StartLocalMat(5);
+		auto mat = app.GetDefaultMat();
+
+		Tournament* tourney = new Tournament;
+
+		Match* match1 = new Match(new Judoka("A", "B"), new Judoka("C", "D"), nullptr, 5);
+		Match* match2 = new Match(new Judoka("E", "F"), new Judoka("G", "H"), nullptr, 5);
+		Match* match3 = new Match(new Judoka("I", "J"), new Judoka("K", "L"), nullptr, 5);
+
+		tourney->AddMatch(match1);
+		tourney->AddMatch(match2);
+		tourney->AddMatch(match3);
+
+		app.AddTournament(tourney);
+
+		ZED::Core::Pause(500);
+
+		YAML::Node yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
+
+		ASSERT_TRUE(yaml.IsMap());
+		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
+		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
+		ASSERT_TRUE(yaml["next_matches"].IsSequence());
+		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "A B");
+		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "C D");
+		EXPECT_EQ(yaml["next_matches"][1]["white_name"].as<std::string>(), "E F");
+		EXPECT_EQ(yaml["next_matches"][1]["blue_name" ].as<std::string>(), "G H");
+		EXPECT_EQ(yaml["next_matches"][2]["white_name"].as<std::string>(), "I J");
+		EXPECT_EQ(yaml["next_matches"][2]["blue_name" ].as<std::string>(), "K L");
+
+		mat->StartMatch(match1);
+
+		ZED::Core::Pause(500);
+
+		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
+
+		ASSERT_TRUE(yaml.IsMap());
+		EXPECT_EQ(yaml["white_name"].as<std::string>(), "A B");
+		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "C D");
+		ASSERT_TRUE(yaml["next_matches"].IsSequence());
+		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "E F");
+		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "G H");
+		EXPECT_EQ(yaml["next_matches"][1]["white_name"].as<std::string>(), "I J");
+		EXPECT_EQ(yaml["next_matches"][1]["blue_name" ].as<std::string>(), "K L");
+
+		mat->AddIppon(Fighter::White);
+		mat->EndMatch();
+
+		ZED::Core::Pause(500);
+
+		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
+
+		ASSERT_TRUE(yaml.IsMap());
+		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
+		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
+		ASSERT_TRUE(yaml["next_matches"].IsSequence());
+		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "E F");
+		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "G H");
+		EXPECT_EQ(yaml["next_matches"][1]["white_name"].as<std::string>(), "I J");
+		EXPECT_EQ(yaml["next_matches"][1]["blue_name" ].as<std::string>(), "K L");
+
+		mat->StartMatch(match2);
+
+		ZED::Core::Pause(500);
+
+		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
+
+		ASSERT_TRUE(yaml.IsMap());
+		EXPECT_EQ(yaml["white_name"].as<std::string>(), "E F");
+		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "G H");
+		ASSERT_TRUE(yaml["next_matches"].IsSequence());
+		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "I J");
+		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "K L");
+
+		mat->AddIppon(Fighter::White);
+		mat->EndMatch();
+
+		ZED::Core::Pause(500);
+
+		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
+
+		ASSERT_TRUE(yaml.IsMap());
+		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
+		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
+		ASSERT_TRUE(yaml["next_matches"].IsSequence());
+		EXPECT_EQ(yaml["next_matches"].size(), 1);
+		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "I J");
+		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "K L");
+
+		EXPECT_TRUE(mat->Close());
+		ZED::Core::Pause(500);
+	}
 }
 
 
@@ -805,7 +908,7 @@ TEST(Ajax, AddDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		mat->StartMatch(&match);
 		mat->AddHansokuMake(f);
@@ -835,7 +938,7 @@ TEST(Ajax, RemoveDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		mat->StartMatch(&match);
 		mat->AddHansokuMake(f);
@@ -877,7 +980,7 @@ TEST(Ajax, NoDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		mat->StartMatch(&match);
 		mat->AddHansokuMake(f);
@@ -907,7 +1010,7 @@ TEST(Ajax, RemoveNoDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		mat->StartMatch(&match);
 		mat->AddHansokuMake(f);

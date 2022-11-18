@@ -1134,32 +1134,7 @@ void Application::SetupHttpServer()
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id <= 0)
-			return Error(Error::Type::InvalidID);
-
-		auto mat = FindMat(id);
-
-		if (!mat)
-			return std::string();
-
-		ZED::CSV ret;
-		if (!mat->AreFightersOnMat())
-			ret << "- - -,- - -";
-		else if (mat->GetMatch())
-			ret << mat->GetMatch()->GetFighter(Fighter::White)->GetName(NameStyle::GivenName) << mat->GetMatch()->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
-		else//Not supported by mat
-			ret << "???,???";
-
-		auto nextMatches = mat->GetNextMatches();
-		for (auto match : nextMatches)
-		{
-			if (match.GetFighter(Fighter::White) && match.GetFighter(Fighter::Blue))
-				ret << match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName) << match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
-		}
-
-		return ret;
+		return Ajax_GetNamesOnMat(Request);
 	});
 
 
@@ -1845,13 +1820,15 @@ void Application::SetupHttpServer()
 		UUID whiteID = HttpServer::DecodeURLEncoded(Request.m_Body, "white");
 		UUID blueID  = HttpServer::DecodeURLEncoded(Request.m_Body, "blue");
 
+		LockTillScopeEnd();
+
 		auto white = m_Database.FindJudoka(whiteID);
 		auto blue  = m_Database.FindJudoka(blueID);
 
 		if (!white || !blue)//Judokas exist?
 			return std::string("Judoka not found in database");
 
-		GetTournament()->AddMatch(Match(GetTournament(), white, blue, FindDefaultMatID()));
+		GetTournament()->AddMatch(Match(white, blue, GetTournament(), FindDefaultMatID()));
 
 		return Error();//OK
 	});
@@ -3317,4 +3294,64 @@ Error Application::Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request
 
 	mat->SetFullscreen(Fullscreen);
 	return Error();//OK
+}
+
+
+
+std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
+{
+	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	if (id <= 0)
+		return Error(Error::Type::InvalidID);
+
+	LockTillScopeEnd();
+
+	auto mat = FindMat(id);
+
+	if (!mat)
+		return Error(Error::Type::MatNotFound);
+
+	YAML::Emitter ret;
+	ret << YAML::BeginMap;
+
+	auto current_match = mat->GetMatch();
+
+	ret << YAML::Key << "white_name" << YAML::Value;
+	if (current_match && current_match->GetFighter(Fighter::White))
+		ret << current_match->GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+	else
+		ret << "- - -";
+
+	ret << YAML::Key << "blue_name" << YAML::Value;
+	if (current_match && current_match->GetFighter(Fighter::Blue))
+		ret << current_match->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+	else
+		ret << "- - -";
+
+	ret << YAML::Key << "next_matches" << YAML::Value << YAML::BeginSeq;
+
+	auto nextMatches = mat->GetNextMatches();
+	for (auto& match : nextMatches)
+	{
+		ret << YAML::BeginMap;
+
+		ret << YAML::Key << "white_name" << YAML::Value;
+		if (match.GetFighter(Fighter::White))
+			ret << match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+		else
+			ret << "- - -";
+
+		ret << YAML::Key << "blue_name" << YAML::Value;
+		if (match.GetFighter(Fighter::Blue))
+			ret << match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+		else
+			ret << "- - -";
+
+		ret << YAML::EndMap;
+	}
+
+	ret << YAML::EndSeq;
+	ret << YAML::EndMap;
+	return ret.c_str();
 }

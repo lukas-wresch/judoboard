@@ -56,7 +56,7 @@ TEST(Tournament, MatchAgainstOneself)
 	tourney->Reset();
 	tourney->EnableAutoSave(false);
 
-	EXPECT_FALSE(tourney->AddMatch(new Match(tourney, &j1, &j1)));
+	EXPECT_FALSE(tourney->AddMatch(new Match(&j1, &j1, tourney)));
 }
 
 
@@ -72,7 +72,7 @@ TEST(Tournament, Disqualification)
 	tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	Match* match = new Match(&tourney, &j1, &j2);
+	Match* match = new Match(&j1, &j2, &tourney);
 	tourney.AddMatch(match);
 
 	tourney.Disqualify(j1);
@@ -103,14 +103,14 @@ TEST(Tournament, AddMatchAfterDisqualification)
 	//tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	Match* match1 = new Match(&tourney, j1, j2);
+	Match* match1 = new Match(j1, j2, &tourney);
 	EXPECT_TRUE(tourney.AddMatch(match1));
-	Match* matchdummy = new Match(&tourney, j2, j3);
+	Match* matchdummy = new Match(j2, j3, &tourney);
 	EXPECT_TRUE(tourney.AddMatch(matchdummy));
 
 	tourney.Disqualify(*j1);
 
-	Match* match2 = new Match(&tourney, j1, j2);
+	Match* match2 = new Match(j1, j2, &tourney);
 	EXPECT_TRUE(tourney.AddMatch(match2));
 
 	EXPECT_TRUE(match1->HasConcluded());
@@ -177,7 +177,7 @@ TEST(Tournament, DoubleDisqualification)
 	tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	Match* match = new Match(&tourney, &j1, &j2);
+	Match* match = new Match(&j1, &j2, &tourney);
 	tourney.AddMatch(match);
 
 	tourney.Disqualify(j1);
@@ -206,8 +206,8 @@ TEST(Tournament, DoubleDisqualification2)
 		tourney.Reset();
 		tourney.EnableAutoSave(false);
 
-		Match* match1 = new Match(&tourney, &j1, &j2, 1);
-		Match* match2 = new Match(&tourney, &j1, &j2, 1);
+		Match* match1 = new Match(&j1, &j2, &tourney, 1);
+		Match* match2 = new Match(&j1, &j2, &tourney, 1);
 
 		tourney.AddMatch(match1);
 		tourney.AddMatch(match2);
@@ -251,7 +251,7 @@ TEST(Tournament, RevokeDisqualification)
 	tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	Match* match = new Match(&tourney, &j1, &j2);
+	Match* match = new Match(&j1, &j2, &tourney);
 	tourney.AddMatch(match);
 
 	tourney.Disqualify(j1);
@@ -274,7 +274,7 @@ TEST(Tournament, RevokeDoubleDisqualification)
 	tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	Match* match = new Match(&tourney, &j1, &j2);
+	Match* match = new Match(&j1, &j2, &tourney);
 	tourney.AddMatch(match);
 
 	tourney.Disqualify(j1);
@@ -480,10 +480,10 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 		Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 		tourney.Reset();
 
-		Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
 		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
 
-		Match* m = new Match(&tourney, &j1, &j2);
+		Match* m = new Match(&j1, &j2, &tourney);
 		m->SetRuleSet(d.FindRuleSetByName("Test"));
 		tourney.AddMatch(m);
 
@@ -539,8 +539,8 @@ TEST(Tournament, SaveAndLoad)
 
 		tourney->AddMatchTable(new Weightclass(50, 55));
 		tourney->AddMatchTable(new Weightclass(60, 65));
-		tourney->AddMatch(new Match(tourney, &j1, &j3, 1));
-		tourney->AddMatch(new Match(tourney, &j1, &j4, 2));
+		tourney->AddMatch(new Match(&j1, &j3, tourney, 1));
+		tourney->AddMatch(new Match(&j1, &j4, tourney, 2));
 		tourney->GenerateSchedule();
 
 		tourney->Disqualify(j1);
@@ -756,8 +756,8 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 
 		tourney->AddMatchTable(new Weightclass(50, 55));
 		tourney->AddMatchTable(new Weightclass(60, 65));
-		tourney->AddMatch(new Match(tourney, &j1, &j3, 2));
-		tourney->AddMatch(new Match(tourney, &j1, &j4, 2));
+		tourney->AddMatch(new Match(&j1, &j3, tourney, 2));
+		tourney->AddMatch(new Match(&j1, &j4, tourney, 2));
 		tourney->GenerateSchedule();
 
 		tourney->EnableAutoSave(false);
@@ -1000,8 +1000,8 @@ TEST(Tournament, AddMatchAfterConclusion)
 		EXPECT_TRUE(tourney.AddParticipant(&j3));
 		EXPECT_TRUE(tourney.AddParticipant(&j4));
 
-		auto match1 = new Match(&tourney, &j1, &j3, 1);
-		auto match2 = new Match(&tourney, &j1, &j4, 1);
+		auto match1 = new Match(&j1, &j3, &tourney, 1);
+		auto match2 = new Match(&j1, &j4, &tourney, 1);
 
 		EXPECT_TRUE(tourney.AddMatch(match1));
 
@@ -1048,8 +1048,8 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 	EXPECT_TRUE(tourney.AddParticipant(&j3));
 	EXPECT_TRUE(tourney.AddParticipant(&j4));
 
-	auto match1 = new Match(&tourney, &j1, &j3, 1);
-	auto match2 = new Match(&tourney, &j1, &j4, 1);
+	auto match1 = new Match(&j1, &j3, &tourney, 1);
+	auto match2 = new Match(&j1, &j4, &tourney, 1);
 
 	EXPECT_TRUE(tourney.AddMatch(match1));
 

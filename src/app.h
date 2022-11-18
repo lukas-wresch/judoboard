@@ -102,6 +102,8 @@ namespace Judoboard
 		Error Ajax_UpdateMat(const HttpServer::Request& Request);
 		Error Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request);
 
+		std::string Ajax_GetNamesOnMat(const HttpServer::Request& Request);
+
 		//Commands
 		Error Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request);
 		Error Ajax_RemoveDisqualification(Fighter Whom, const HttpServer::Request& Request);

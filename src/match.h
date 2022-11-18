@@ -57,7 +57,7 @@ namespace Judoboard
 		};
 
 
-		Match(const ITournament* Tournament, const Judoka* White, const Judoka* Blue, uint32_t MatID = 0);
+		Match(const Judoka* White, const Judoka* Blue, const ITournament* Tournament, uint32_t MatID = 0);
 		Match(const YAML::Node& Yaml, MatchTable* MatchTable, ITournament* Tournament);
 		Match(const Match&) = default;//Deep copy
 

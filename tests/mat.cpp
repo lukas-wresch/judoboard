@@ -126,7 +126,7 @@ TEST(Mat, StartMatch)
 	Application app;
 	Mat m(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	EXPECT_TRUE(m.StartMatch(&match));
 
@@ -164,7 +164,7 @@ TEST(Mat, CorrectWinner)
 			Application app;
 			Mat m(1);
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 2, 0, 30, 20, true, true, true, 0));
 
@@ -212,7 +212,7 @@ TEST(Mat, ForceClose)
 
 	ZED::Core::Pause(500);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	EXPECT_TRUE(m.StartMatch(&match));
 }
@@ -228,7 +228,7 @@ TEST(Mat, RemoveIpponShouldRecoverPreviousWazaari)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -262,7 +262,7 @@ TEST(Mat, RemoveWazariShouldRemoveIppon)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -296,7 +296,7 @@ TEST(Mat, Scores)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -330,7 +330,7 @@ TEST(Mat, Shido)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -385,7 +385,7 @@ TEST(Mat, ShidoDoesntEndGoldenScore)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 2, 60, 30, 20, false, false, true, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -423,7 +423,7 @@ TEST(Mat, ScoreEndsGoldenScore)
 			Application app;
 			Mat m(1);
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 2, 60, 30, 20, true, true, true, 0));
 
@@ -462,7 +462,7 @@ TEST(Mat, ShidosResultInIndirectHansokumake)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -494,7 +494,7 @@ TEST(Mat, HansokumakeResultsInDirectHansokumake)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -528,7 +528,7 @@ TEST(Mat, DirectHansokumakeDoesNotConcludeMatch)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -551,7 +551,7 @@ TEST(Mat, DirectHansokumakeAndDisqDoesConcludeMatch)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -575,7 +575,7 @@ TEST(Mat, DisqualificationCanBeRemoved)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -611,7 +611,7 @@ TEST(Mat, Gachi)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -633,7 +633,7 @@ TEST(Mat, GachiResultsInMate)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -659,7 +659,7 @@ TEST(Mat, DoubleIppon)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -693,7 +693,7 @@ TEST(Mat, DoubleIpponFightersKeepWazaari)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -731,7 +731,7 @@ TEST(Mat, DoubleIpponDuringGoldenScore)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 1, 60, 30, 20, false, false, false, 0));
 
@@ -769,7 +769,7 @@ TEST(Mat, DoubleIpponDuringGoldenScoreFightersKeepWazaari)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 1, 60, 30, 20, false, false, false, 0));
 
@@ -812,7 +812,7 @@ TEST(Mat, IpponResultsInMate)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -836,7 +836,7 @@ TEST(Mat, HansokumakeResultsInMate)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -864,7 +864,7 @@ TEST(Mat, ThirdShidoIsHansokumake)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -896,7 +896,7 @@ TEST(Mat, DoubleHansokumake)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -938,7 +938,7 @@ TEST(Mat, DoubleGachi)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -964,7 +964,7 @@ TEST(Mat, Hansokumake)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -1001,7 +1001,7 @@ TEST(Mat, MedicalExaminiations)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -1045,7 +1045,7 @@ TEST(Mat, MatchTime)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", time, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1074,7 +1074,7 @@ TEST(Mat, GoldenScoreTime)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 2, time, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1109,7 +1109,7 @@ TEST(Mat, OsaekomiTime)
 			Application app;
 			Mat m(1);
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 100, 0, time, 20, false, false, false, 0));
 			EXPECT_TRUE(m.StartMatch(&match));
@@ -1145,7 +1145,7 @@ TEST(Mat, OsaekomiWithWazaAriTime)
 			Application app;
 			Mat m(1);
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 100, 0, 100, time, false, false, false, 0));
 			EXPECT_TRUE(m.StartMatch(&match));
@@ -1180,7 +1180,7 @@ TEST(Mat, OsaekomiUkeGainsIppon)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 100, 0, 100, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1212,7 +1212,7 @@ TEST(Mat, OsaekomiToriGivesUp)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 100, 0, 100, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1246,7 +1246,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 			Application app;
 			Mat m(1);
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 100, 0, time*2, time, false, false, false, 0));
 			EXPECT_TRUE(m.StartMatch(&match));
@@ -1298,7 +1298,7 @@ TEST(Mat, OsaekomiTillEndDuringGoldenScore)
 			Application app;
 			Mat m(1);
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 2, 60, 2*time, time, false, false, false, 0));
 			EXPECT_TRUE(m.StartMatch(&match));
@@ -1336,7 +1336,7 @@ TEST(Mat, Sonomama)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 500, 0, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1392,7 +1392,7 @@ TEST(Mat, Tokeda)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 500, 0, 20, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1450,7 +1450,7 @@ TEST(Mat, OsaekomiSwitch)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 500, 0, 25, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1490,7 +1490,7 @@ TEST(Mat, MatchContinuesDuringOsaekomi)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 10, 0, 10, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1525,7 +1525,7 @@ TEST(Mat, Yuko)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, true, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1557,7 +1557,7 @@ TEST(Mat, Yuko2)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1601,7 +1601,7 @@ TEST(Mat, ShidoForToriDuringOsaekomi)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1641,7 +1641,7 @@ TEST(Mat, MateDuringSonomama)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1684,7 +1684,7 @@ TEST(Mat, HansokumakeDuringOsaekomi)
 
 			EXPECT_TRUE(m.Open());
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
 			EXPECT_TRUE(m.StartMatch(&match));
@@ -1724,7 +1724,7 @@ TEST(Mat, Koka)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, true, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1756,7 +1756,7 @@ TEST(Mat, Koka2)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1790,7 +1790,7 @@ TEST(Mat, WazariAwaseteIppon)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -1832,7 +1832,7 @@ TEST(Mat, GoldenScore)
 	Application app;
 	Mat m(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 2, 10, 30, 20, false, false, true, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
@@ -1870,7 +1870,7 @@ TEST(Mat, GoldenScore2)
 	Application app;
 	Mat m(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 10, 0, 30, 20, false, false, true, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
@@ -1905,7 +1905,7 @@ TEST(Mat, GoldenScoreResetTime)
 	Application app;
 	Mat m(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 5, 5, 30, 20, false, false, true, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
@@ -1935,7 +1935,7 @@ TEST(Mat, GoldenScoreKeepsShidosAndMedicalExaminations)
 	Application app;
 	Mat m(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 5, 5, 30, 20, false, false, true, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
@@ -1974,7 +1974,7 @@ TEST(Mat, Draw)
 	Application app;
 	Mat m(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 10, 60, 30, 20, false, false, true, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
@@ -2006,7 +2006,7 @@ TEST(Mat, Draw2)
 	Application app;
 	Mat m(1, &app);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
@@ -2043,7 +2043,7 @@ TEST(Mat, Hantei)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 2, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -2083,7 +2083,7 @@ TEST(Mat, BreakTime)
 		Judoka* j2 = new Judoka("White", "LastnameW");
 		Judoka* j3 = new Judoka("Blue",  "LastnameB");
 
-		Match match(nullptr, j1, j2);
+		Match match(j1, j2, nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(rule_set);
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -2094,7 +2094,7 @@ TEST(Mat, BreakTime)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		Match match2(nullptr, j1, j3, 1);
+		Match match2(j1, j3, nullptr, 1);
 		match2.SetRuleSet(rule_set);
 
 		for (int k = 0; k < time-1; k++)

@@ -14,7 +14,7 @@ TEST(Match, ExportImport)
 		RuleSet rule_set("test", rand(), rand(), rand(), rand());
 		Tournament tourney;
 
-		Match* match = new Match(&tourney, &j1, &j2, matid);
+		Match* match = new Match(&j1, &j2, &tourney, matid);
 		match->SetRuleSet(&rule_set);
 		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
 
@@ -53,7 +53,7 @@ TEST(Match, ExportImport_CopyConstructor)
 		RuleSet rule_set("test", rand(), rand(), rand(), rand());
 		Tournament tourney;
 
-		Match* match = new Match(&tourney, &j1, &j2, matid);
+		Match* match = new Match(&j1, &j2, &tourney, matid);
 		match->SetRuleSet(&rule_set);
 		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
 
@@ -90,9 +90,9 @@ TEST(Match, BestOf3)
 
 		Tournament tourney;
 
-		Match m1(&tourney, &j1, &j2, 1);
-		Match m2(&tourney, &j2, &j1, 1);
-		Match m3(&tourney, &j1, &j2, 1);
+		Match m1(&j1, &j2, &tourney, 1);
+		Match m2(&j2, &j1, &tourney, 1);
+		Match m3(&j1, &j2, &tourney, 1);
 
 		m3.SetBestOfThree(&m1, &m2);
 
@@ -132,9 +132,9 @@ TEST(Match, BestOf3_2)
 		Tournament tourney;
 		tourney.EnableAutoSave(false);
 
-		Match m1(&tourney, &j1, &j2, 1);
-		Match m2(&tourney, &j2, &j1, 1);
-		Match m3(&tourney, &j1, &j2, 1);
+		Match m1(&j1, &j2, &tourney, 1);
+		Match m2(&j2, &j1, &tourney, 1);
+		Match m3(&j1, &j2, &tourney, 1);
 
 		m3.SetBestOfThree(&m1, &m2);
 
@@ -174,9 +174,9 @@ TEST(Match, BestOf3_3)
 		Tournament tourney;
 		tourney.EnableAutoSave(false);
 
-		Match m1(&tourney, &j1, &j2, 1);
-		Match m2(&tourney, &j1, &j2, 1);
-		Match m3(&tourney, &j1, &j2, 1);
+		Match m1(&j1, &j2, &tourney, 1);
+		Match m2(&j1, &j2, &tourney, 1);
+		Match m3(&j1, &j2, &tourney, 1);
 
 		m3.SetBestOfThree(&m1, &m2);
 
@@ -216,9 +216,9 @@ TEST(Match, BestOf3ExportImport)
 	{
 		Tournament tourney("deleteMe");
 
-		Match* m1 = new Match(&tourney, &j1, &j2, 1);
-		Match* m2 = new Match(&tourney, &j2, &j1, 1);
-		Match* m3 = new Match(&tourney, &j1, &j2, 1);
+		Match* m1 = new Match(&j1, &j2, &tourney, 1);
+		Match* m2 = new Match(&j2, &j1, &tourney, 1);
+		Match* m3 = new Match(&j1, &j2, &tourney, 1);
 
 		m3->SetBestOfThree(m1, m2);
 

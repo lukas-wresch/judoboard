@@ -121,7 +121,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (!match.White->pUserData || !match.Red->pUserData)
 			continue;
 
-		Match* new_match = new Match(this, (Judoka*)match.White->pUserData, (Judoka*)match.Red->pUserData);
+		Match* new_match = new Match((Judoka*)match.White->pUserData, (Judoka*)match.Red->pUserData, this);
 
 		if (match.WinnerID == match.WhiteID)
 			new_match->SetResult(Match::Result(Fighter::White, (Match::Score)match.ScoreWinner, match.Time));
