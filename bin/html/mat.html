@@ -471,30 +471,25 @@ function GetJudokaName()
 {
   AjaxCallback("ajax/mat/names_on_mat?id="+id, function(response) {
     console.log(response);
-    var res = response.split(",");
+    var res = YAML.parse(response);
 
-    var table2 = document.getElementById("waiting_list");
+    document.getElementById("white_name").innerHTML = res.white_name;
+    document.getElementById("blue_name").innerHTML  = res.blue_name;
 
-    while (table2.rows.length > 1)
-      table2.deleteRow(table2.rows.length-1);
+    var table = document.getElementById("waiting_list");
 
-    for (var i=0; i < res.length; i+=2)
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    for (const match of res.next_matches)
     {
-      if (i == 0)
-      {
-        document.getElementById("white_name").innerHTML = res[i];
-        document.getElementById("blue_name").innerHTML  = res[i+1];
-      }
-      else
-      {
-        var row = table2.insertRow(-1);
+      var row = table.insertRow(-1);
 
-        var cell1 = row.insertCell(0);
-        var cell2 = row.insertCell(1);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
 
-        cell1.innerHTML = res[i];
-        cell2.innerHTML = res[i+1];
-      }
+      cell1.innerHTML = match.white_name;
+      cell2.innerHTML = match.blue_name;
     }
 
   });
