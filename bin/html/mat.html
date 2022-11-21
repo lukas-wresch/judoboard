@@ -1,12 +1,26 @@
-<div style="margin-left: 5.5cm;">
-  <h2><label id="mat">Mat</label></h2>
-  <h2><label id="time">Time</label>: <span id="hajimetime">0:00.0</span></h2>
+<div style="margin-left: 0.5cm;">
+  <h2><label id="mat">Mat</label> - <label id="time">Time</label>: <span id="hajimetime">0:00.0</span></h2>
 </div>
 
 <table border="1" rules="all" style="margin-bottom: 3mm;">
-  <tr>
-    <td style="text-align: center; font-size: 16pt;" id="white_name">- - -</td>
-    <td style="text-align: center; font-size: 16pt; background-color: rgba(30, 30, 255, 1.0); color: white;" id="blue_name" >- - -</td>
+  <tr id="next_matches_row" style="display: none;">
+    <td style="text-align: center; font-size: 16pt;" colspan="2">
+    <div id="next_matches_div" style="display: none; height: 0px;">
+    <table width="100%" id="next_matches_table" border="0" rules="all">
+      <tr><td id="next_matches" style="text-align: center; font-size: 16pt;" colspan="2"></td></tr>
+    </table>
+    </div>
+  </td>
+  </tr>
+
+  <tr id="current_match_row">
+    <td style="text-align: center; font-size: 16pt;" colspan="2">
+    <div id="current_match_div">
+    <table width="100%" id="current_match_table" border="0" rules="all">
+      <tr><td width="50%" id="white_name">- - - </td><td id="blue_name" style="background-color: rgba(30, 30, 255, 1.0); color: white;">- - - </td></tr>
+    </table>
+    </div>
+    </td>
   </tr>
 
   <tr>
@@ -53,10 +67,10 @@
   </tr>
 
   <tr>
-    <td colspan="2">
+    <td style="text-align: center;" colspan="2">
       <button class="neutral" id="hajime" onclick="Hajime()">Hajime</button>
       <button disabled class="neutral" id="mate" onclick="Mate()">Mate</button>
-      <button class="additional" id="more" style="margin-left: 35mm" onclick="More();">More</button>
+      <button class="additional" id="more" style="margin-left: 35mm" onclick="ToggleMore();">More</button>
     </td>
   </tr>
 
@@ -85,29 +99,26 @@
     <td style="text-align: center;">
       <div id="additional2" style="display: none; height: 0px;">
         <div style="font-size: 18pt;">
-          <label>Shidos:</label> <span id="white_shidos">0</span></h2>
+          <label>Shidos:</label> <span id="white_shidos">0</span>
         </div>
         <button class="add" onclick="SetScore('white', '+shido');">+Shido</button>
         <button class="add" onclick="SetScore('white', '+hansokumake');">+Hansoku-Make</button>
         <br/>
         <button class="remove" onclick="SetScore('white', '-shido');">-Shido</button>
         <button class="remove" onclick="SetScore('white', '-hansokumake');">-Hansoku-Make</button>
-        <br/>
       </div>
     </td>
 
     <td style="text-align: center;">
       <div id="additional1" style="display: none; height: 0px;">
         <div style="font-size: 18pt;">
-          <label>Shidos:</label> <span id="blue_shidos">0</span></h2>
+          <label>Shidos:</label> <span id="blue_shidos">0</span>
         </div>
-        <br/>
         <button class="add" onclick="SetScore('blue', '+shido');">+Shido</button>
         <button class="add" onclick="SetScore('blue', '+hansokumake');">+Hansoku-Make</button>
         <br/>
         <button class="remove" onclick="SetScore('blue', '-shido');">-Shido</button>
         <button class="remove" onclick="SetScore('blue', '-hansokumake');">-Hansoku-Make</button>
-        <br/>
       </div>
     </td>
 
@@ -160,11 +171,6 @@
       <button disabled class="neutral" style="width: 45mm; margin-top: 8mm;" id="next_fight" onclick="StartNextMatch()">Start next match</button>
 
       <button disabled class="neutral" style="width: 45mm; margin-left: 22mm;" id="end_match" onclick="EndMatch()">End match</button>
-
-      <p style="font-size: 16pt; text-decoration: underline;" id="next_matches">Next Matches</p>
-      <table id="waiting_list" border="1" rules="all">
-        <tr><th style="width: 5.0cm;" id="waiting_white">White</th><th style="width: 5.0cm;" id="waiting_blue">Blue</th></tr>
-      </table>
     </td>
 
     <td style="vertical-align: top;">
@@ -178,7 +184,6 @@
   </tr>
 </table>
 
-
 <script>
 var HajimeTimer = 0;
 var HajimeTimer_Running = false;
@@ -190,6 +195,8 @@ var OsaekomiBlueTimer = 0;
 var OsaekomiBlueTimer_Running = false;
 
 var ScoreUpdate_Counter = 10;
+
+var show_next_matches = false;
 
 
 
@@ -267,7 +274,7 @@ function EndMatch()
 }
 
 
-function More()
+function ToggleMore()
 {
   if (more)
   {
@@ -295,6 +302,33 @@ function More()
   }
 
   more = !more;
+}
+
+
+
+function ShowNextMatches(show)
+{
+  if (show_next_matches == show)
+    return;
+
+  if (!show)
+  {
+    $("#next_matches_div").animate({height: '0px', opacity: 0}, 1000);
+    $("#next_matches_row").hide(1000);
+
+    $("#current_match_row").show();
+    $("#current_match_div").show().animate({height: '25px', opacity: 100}, 1000);
+  }
+  else
+  {
+    $("#next_matches_row").show();
+    $("#next_matches_div").show().animate({height: '110px', opacity: 100}, 1000);
+
+    $("#current_match_div").animate({height: '0px', opacity: 0}, 1000);
+    $("#current_match_row").hide(1000);
+  }
+
+  show_next_matches = show;
 }
 
 
@@ -438,6 +472,11 @@ function GetScore()
       document.getElementById("mate").innerHTML = "Mate";
     }
 
+    //if (areFightersOnMat == 1)
+      //ShowNextMatches(false);
+    //else
+      //ShowNextMatches(true);
+
     if (canNextMatchStart == 1)
     {
       document.getElementById("next_fight").disabled = false;
@@ -476,7 +515,7 @@ function GetJudokaName()
     document.getElementById("white_name").innerHTML = res.white_name;
     document.getElementById("blue_name").innerHTML  = res.blue_name;
 
-    var table = document.getElementById("waiting_list");
+    var table = document.getElementById("next_matches_table");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
@@ -490,6 +529,8 @@ function GetJudokaName()
 
       cell1.innerHTML = match.white_name;
       cell2.innerHTML = match.blue_name;
+      cell1.style = "width: 50%;";
+      cell2.style = "background-color: rgba(30, 30, 255, 1.0); color: white;";
     }
 
   });
@@ -584,7 +625,7 @@ function UpdateTimer()
     GetScore();
     GetJudokaName();
     GetOsaekomiList();
-    ScoreUpdate_Counter = 5;
+    ScoreUpdate_Counter = 10;
   }
 }
 

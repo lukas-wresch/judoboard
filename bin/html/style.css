@@ -203,6 +203,12 @@ a:hover {
     margin: 4px 1px;
     font-size: 14pt;
 }
+.neutral:active
+{
+  box-shadow: 0 3px #666;
+  background-color: #ea3;
+  transform: translateY(2px);
+}
 .neutral:disabled
 {
     //color: #000;
@@ -212,12 +218,6 @@ a:hover {
     //background-color: #530;
     color: #eee;
     background-color: #ccc;
-}
-.neutral:active
-{
-  box-shadow: 0 3px #666;
-  background-color: #ea3;
-  transform: translateY(2px);
 }
 
 
