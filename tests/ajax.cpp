@@ -398,6 +398,7 @@ TEST(Ajax, GetNamesOnMat)
 
 		app.StartLocalMat(5);
 		auto mat = app.GetDefaultMat();
+		mat->SetName("mat name");
 
 		Tournament* tourney = new Tournament;
 
@@ -409,6 +410,10 @@ TEST(Ajax, GetNamesOnMat)
 		tourney->AddMatch(match2);
 		tourney->AddMatch(match3);
 
+		tourney->GetMatchTables()[0]->SetName("table1");
+		tourney->GetMatchTables()[1]->SetName("table2");
+		tourney->GetMatchTables()[2]->SetName("table3");
+
 		app.AddTournament(tourney);
 
 		ZED::Core::Pause(500);
@@ -418,6 +423,8 @@ TEST(Ajax, GetNamesOnMat)
 		ASSERT_TRUE(yaml.IsMap());
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
+		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
+		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "");
 		ASSERT_TRUE(yaml["next_matches"].IsSequence());
 		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "A B");
 		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "C D");
@@ -435,6 +442,8 @@ TEST(Ajax, GetNamesOnMat)
 		ASSERT_TRUE(yaml.IsMap());
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "A B");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "C D");
+		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
+		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "table1");
 		ASSERT_TRUE(yaml["next_matches"].IsSequence());
 		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "E F");
 		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "G H");
@@ -451,6 +460,8 @@ TEST(Ajax, GetNamesOnMat)
 		ASSERT_TRUE(yaml.IsMap());
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
+		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
+		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "");
 		ASSERT_TRUE(yaml["next_matches"].IsSequence());
 		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "E F");
 		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "G H");
@@ -466,6 +477,8 @@ TEST(Ajax, GetNamesOnMat)
 		ASSERT_TRUE(yaml.IsMap());
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "E F");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "G H");
+		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
+		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "table2");
 		ASSERT_TRUE(yaml["next_matches"].IsSequence());
 		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "I J");
 		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "K L");

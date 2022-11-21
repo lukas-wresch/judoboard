@@ -3315,6 +3315,8 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 	YAML::Emitter ret;
 	ret << YAML::BeginMap;
 
+	ret << YAML::Key << "mat_name" << YAML::Value << mat->GetName();
+
 	auto current_match = mat->GetMatch();
 
 	ret << YAML::Key << "white_name" << YAML::Value;
@@ -3328,6 +3330,12 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 		ret << current_match->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
 	else
 		ret << "- - -";
+
+	ret << YAML::Key << "match_table_name" << YAML::Value;
+	if (current_match && current_match->GetMatchTable())
+		ret << current_match->GetMatchTable()->GetDescription();
+	else
+		ret << "";
 
 	ret << YAML::Key << "next_matches" << YAML::Value << YAML::BeginSeq;
 

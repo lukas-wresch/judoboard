@@ -126,6 +126,13 @@ namespace Judoboard
 			IMat::SetIsFullscreen(Enabled);
 		}
 
+		virtual void SetName(const std::string& NewName) override
+		{
+			m_mutex.lock();
+			IMat::SetName(NewName);
+			m_mutex.unlock();
+		}
+
 
 	private:
 		Scoreboard& SetScoreboard(Fighter Whom)
@@ -323,13 +330,6 @@ namespace Judoboard
 			} m_Aligment = Aligment::Left;
 		};
 
-
-		void SetName(const std::string& NewName) override
-		{
-			m_mutex.lock();
-			IMat::SetName(NewName);
-			m_mutex.unlock();
-		}
 
 		//Processing
 		void Process();

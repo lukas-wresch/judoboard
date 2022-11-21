@@ -1,5 +1,6 @@
 <div style="margin-left: 0.5cm;">
-  <h2><label id="mat">Mat</label> - <label id="time">Time</label>: <span id="hajimetime">0:00.0</span></h2>
+  <h2><label id="mat"></label> - <label id="time"></label>: <span id="hajimetime"></span></h2>
+  <h2><label id="matchtable_label"></label>: <label id="matchtable"></label></h2>
 </div>
 
 <table border="1" rules="all" style="margin-bottom: 3mm;">
@@ -178,7 +179,7 @@
         <label style="font-size: 14pt; text-decoration: underline;">Osaekomis:</label>
       </div>
       <table id="osaekomi_list" border="1" rules="all">
-        <tr><th style="width: 2.0cm;" id="osaekomi_for">For</th><th style="width: 2.0cm;" id="osaekomi_time">Time</th></tr>
+        <tr><th style="width: 2.0cm;" id="osaekomi_for"></th><th style="width: 2.0cm;" id="osaekomi_time"></th></tr>
       </table>
     </td>
   </tr>
@@ -223,12 +224,14 @@ function Mate()
 
 function SetScore(who, command)
 {
+  var url;
   if (who.length >= 1)
-    Ajax('ajax/mat/' + who + '/' + command + '?id='+id);
+    url = 'ajax/mat/' + who + '/' + command + '?id='+id;
   else
-    Ajax('ajax/mat/' + command + '?id='+id);
-
-  GetScore();
+    url = 'ajax/mat/' + command + '?id='+id;
+  AjaxCallback(url, function(response) {
+    GetScore();
+  });
 }
 
 
@@ -245,15 +248,16 @@ function Osaekomi(who)
 
 function Tokeda()
 {
-  Ajax('ajax/mat/tokeda?id='+id);
+  AjaxCallback('ajax/mat/tokeda?id='+id, function(response) {
+    GetOsaekomiList();
+    GetScore();
+  });
   OsaekomiWhiteTimer = false;
   OsaekomiBlueTimer  = false;
   document.getElementById("white_osaekomi").disabled = false;
   document.getElementById("blue_osaekomi").disabled  = false;
   document.getElementById("tokeda1").disabled = true;
   document.getElementById("tokeda2").disabled = true;
-
-  GetScore();
 }
 
 
@@ -262,15 +266,16 @@ function StartNextMatch()
   AjaxCallback('ajax/mat/start_match?id='+id, function(response) {
     if (response != "ok")
         alert("Error: " + response);
+    GetScore();
   });
-  GetScore();
 }
 
 
 function EndMatch()
 {
-  Ajax('ajax/mat/end_match?id='+id);
-  GetScore();
+  AjaxCallback('ajax/mat/end_match?id='+id, function(respone) {
+    GetScore();
+  });
 }
 
 
@@ -472,10 +477,10 @@ function GetScore()
       document.getElementById("mate").innerHTML = "Mate";
     }
 
-    //if (areFightersOnMat == 1)
-      //ShowNextMatches(false);
-    //else
-      //ShowNextMatches(true);
+    if (areFightersOnMat == 1)
+      ShowNextMatches(false);
+    else
+      ShowNextMatches(true);
 
     if (canNextMatchStart == 1)
     {
@@ -511,6 +516,9 @@ function GetJudokaName()
   AjaxCallback("ajax/mat/names_on_mat?id="+id, function(response) {
     console.log(response);
     var res = YAML.parse(response);
+
+    document.getElementById("mat").innerHTML = res.mat_name;
+    document.getElementById("matchtable").innerHTML = res.match_table_name;
 
     document.getElementById("white_name").innerHTML = res.white_name;
     document.getElementById("blue_name").innerHTML  = res.blue_name;
@@ -620,12 +628,16 @@ function UpdateTimer()
   }
 
   ScoreUpdate_Counter--;
-  if (ScoreUpdate_Counter <= 0)
+  if (ScoreUpdate_Counter == 0)
   {
     GetScore();
     GetJudokaName();
     GetOsaekomiList();
     ScoreUpdate_Counter = 10;
+  }
+  else if (ScoreUpdate_Counter == 5)
+  {
+    GetScore();
   }
 }
 
@@ -651,11 +663,11 @@ document.getElementById("end_match").innerHTML  = lang.end_match;
 document.getElementById("more").innerHTML = lang.more;
 
 document.getElementById("next_matches").innerHTML  = lang.next_matches;
-document.getElementById("waiting_white").innerHTML = lang.white;
-document.getElementById("waiting_blue").innerHTML  = lang.blue;
 
 document.getElementById("osaekomi_time").innerHTML = lang.time;
 document.getElementById("osaekomi_for").innerHTML  = lang.for;
+
+document.getElementById("matchtable_label").innerHTML  = lang.matchtable;
 
 for (const el of document.getElementsByClassName("medical_examiniations"))
     el.innerHTML = lang.medical_examiniations;
