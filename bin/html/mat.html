@@ -3,24 +3,27 @@
   <label id="matchtable_label"></label>: <label id="matchtable"></label>
 </div>
 
-<table border="1" rules="all" style="margin-top: 3mm; margin-bottom: 3mm;">
-  <tr id="next_matches_row" style="display: none;">
-    <td style="text-align: center; font-size: 16pt;" colspan="2">
-    <div id="next_matches_div" style="display: none; height: 0px;">
-    <table width="100%" id="next_matches_table" border="0" rules="all">
-      <tr><td id="next_matches" style="text-align: center; font-size: 16pt;" colspan="2"></td></tr>
-    </table>
-    </div>
-  </td>
+<table border="1" rules="all" style="margin-top: 3mm; margin-bottom: 0mm; width: 21.0cm;">
+  <tr id="next_matches_row" style="display:none;">
+    <td style="text-align: center; font-size: 16pt; width: 100%;">
+      <div id="next_matches_div" style="display:none; height: 0px;">
+      <table width="100%" id="next_matches_table" border="0" rules="all">
+        <tr><td id="next_matches" style="width: 13.07cm; text-align: center; font-size: 16pt;" colspan="2"></td>
+        <td id="label_break"></td><td></td></tr>
+      </table>
+      </div>
+    </td>
   </tr>
+</table>
 
+<table border="1" rules="all" style="margin-top: 0mm; margin-bottom: 3mm; width: 13.2cm;">
   <tr id="current_match_row">
     <td style="text-align: center; font-size: 16pt;" colspan="2">
-    <div id="current_match_div">
-    <table width="100%" id="current_match_table" border="0" rules="all">
-      <tr><td width="50%" id="white_name">- - - </td><td id="blue_name" style="background-color: rgba(30, 30, 255, 1.0); color: white;">- - - </td></tr>
-    </table>
-    </div>
+      <div id="current_match_div">
+        <table width="100%" id="current_match_table" border="0" rules="all">
+          <tr><td width="50%" id="white_name">- - - </td><td id="blue_name" style="background-color: rgba(30, 30, 255, 1.0); color: white;">- - - </td></tr>
+        </table>
+      </div>
     </td>
   </tr>
 
@@ -327,7 +330,7 @@ function ShowNextMatches(show)
   else
   {
     $("#next_matches_row").show();
-    $("#next_matches_div").show().animate({height: '110px', opacity: 100}, 1000);
+    $("#next_matches_div").show().animate({height: '165px', opacity: 100}, 1000);
 
     $("#current_match_div").animate({height: '0px', opacity: 0}, 1000);
     $("#current_match_row").hide(1000);
@@ -535,17 +538,29 @@ function GetJudokaName()
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
+    var i = 0;
     for (const match of res.next_matches)
     {
       var row = table.insertRow(-1);
 
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+      var cell4 = row.insertCell(3);
 
       cell1.innerHTML = match.white_name;
       cell2.innerHTML = match.blue_name;
-      cell1.style = "width: 50%;";
-      cell2.style = "background-color: rgba(30, 30, 255, 1.0); color: white;";
+      cell1.style = "width: 6.5cm;";
+      cell2.style = "width: 6.5cm; background-color: rgba(30, 30, 255, 1.0); color: white;";
+
+      cell3.innerHTML = "1m / 3m";
+
+      if (i == 0)
+        cell4.innerHTML = '<button class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="StartNextMatch()">' + lang.start_next_match + '</button>';
+      else
+        cell4.innerHTML = '<button class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="PushUp()">' + lang.push_up + '</button>';
+
+      i++;
     }
 
   });
@@ -664,8 +679,10 @@ var showHansokumakeDecisionBlue  = false;
 document.getElementById("time").innerHTML = lang.time;
 document.getElementById("mat").innerHTML  = lang.mat + ' ' + id;
 
-document.getElementById("next_fight").innerHTML = lang.start_next_match;
+//document.getElementById("next_fight").innerHTML = lang.start_next_match;
 document.getElementById("end_match").innerHTML  = lang.end_match;
+
+document.getElementById("label_break").innerHTML = lang.break_time;
 
 document.getElementById("more").innerHTML = lang.more;
 

@@ -1,6 +1,7 @@
 var lang_en = {
     age_group: "Age group",
     age_groups: "Age groups",
+    break_time: "Break Time",
     club: "Club",
     name: "Name",
     username: "Username",
@@ -94,7 +95,7 @@ var lang_en = {
     no_disqualification: "No Disqualification",
     osaekomi_time_ippon:   "Osaekomi Time (Ippon)",
     osaekomi_time_wazaari: "Osaekomi Time (Waza-Ari)",
-    break_time: "Break Time",
+    push_up: "Push Up",
     start_next_match: "Start Next Match",
     end_match: "End Match",
     more: "More",
@@ -120,6 +121,7 @@ var lang_en = {
 var lang_de = {
     age_group: "Altersklasse",
     age_groups: "Altersklassen",
+    break_time: "Ruhepause",
     club: "Verein",
     name: "Name",
     username: "Benutzername",
@@ -214,7 +216,7 @@ var lang_de = {
     no_disqualification: "Nicht disqualifiziert",
     osaekomi_time_ippon:   "Osaekomi Zeit (Ippon)",
     osaekomi_time_wazaari: "Osaekomi Zeit (Waza-Ari)",
-    break_time: "Ruhepause",
+    push_up: "Vorziehen",
     start_next_match: "Kampf starten",
     end_match: "Kampf beenden",
     more: "Mehr",
