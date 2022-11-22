@@ -1434,7 +1434,85 @@ TEST(Mat, Tokeda)
 
 		ZED::Core::Pause(6000);
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 1);
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
+TEST(Mat, OsaekomiTokedaOsaekomi)
+{
+	initialize();
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		match.SetRuleSet(new RuleSet("Test", 500, 0, 10, 10, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.Hajime();
+		m.Osaekomi(f);
+
+		ZED::Core::Pause(3 * 1000);
+
+		m.Tokeda();
+		m.Osaekomi(!f);
+
+		EXPECT_TRUE(m.IsOsaekomi());
+		EXPECT_TRUE(m.IsOsaekomiRunning());
+
+		ZED::Core::Pause(3 * 1000);
+		m.Tokeda();
+
+		EXPECT_FALSE(m.IsOsaekomiRunning());
+
+		ASSERT_EQ(m.GetOsaekomiList().size(), 2);
+		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, f);
+		EXPECT_EQ(m.GetOsaekomiList()[1].m_Who, !f);
+
+		m.AddIppon(f);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 1);
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
+TEST(Mat, TokedaDuringSonomama)
+{
+	initialize();
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		match.SetRuleSet(new RuleSet("Test", 500, 0, 10, 10, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.Hajime();
+		m.Osaekomi(f);
+
+		ZED::Core::Pause(3 * 1000);
+
+		m.Sonomama();
+		m.Tokeda();
+		m.Hajime();
+
+		EXPECT_FALSE(m.IsOsaekomi());
+		EXPECT_FALSE(m.IsOsaekomiRunning());
+
+		ASSERT_EQ(m.GetOsaekomiList().size(), 1);
+		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, f);
+
+		m.AddIppon(f);
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 	}
@@ -1547,7 +1625,7 @@ TEST(Mat, MatchContinuesDuringOsaekomi)
 		}
 
 		ZED::Core::Pause(2000);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 1);
 		EXPECT_TRUE(m.IsOutOfTime());
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
@@ -1670,7 +1748,7 @@ TEST(Mat, ShidoForToriDuringOsaekomi)
 TEST(Mat, MateDuringSonomama)
 {
 	//Mate can indeed be called during sonomama in the case the judges want to give a hansokumake
-	//or to discuss somethiong with the other judges in give tori a shido
+	//or to discuss something with the other judges or to give tori a shido
 
 	initialize();
 	for (Fighter osaekomi_holder = Fighter::White; osaekomi_holder <= Fighter::Blue; osaekomi_holder++)
