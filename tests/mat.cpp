@@ -1482,6 +1482,45 @@ TEST(Mat, OsaekomiSwitch)
 }
 
 
+
+TEST(Mat, OsaekomiSwitchDuringSonomama)
+{
+	initialize();
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		match.SetRuleSet(new RuleSet("Test", 500, 0, 5, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.Hajime();
+		m.Osaekomi(f);
+
+		ZED::Core::Pause(3 * 1000);
+		m.Sonomama();
+		m.Osaekomi(!f);
+		m.Hajime();
+		EXPECT_TRUE(m.IsOsaekomi());
+		EXPECT_TRUE(m.IsOsaekomiRunning());
+
+		ZED::Core::Pause(5 * 1000);
+
+		EXPECT_FALSE(m.IsOsaekomiRunning());
+
+		ASSERT_EQ(m.GetOsaekomiList().size(), 1);
+		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, !f);
+
+		EXPECT_EQ(m.GetScoreboard(!f).m_Ippon, 1);
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
 TEST(Mat, MatchContinuesDuringOsaekomi)
 {
 	initialize();

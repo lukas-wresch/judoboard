@@ -443,14 +443,21 @@ function GetScore()
       else
         document.getElementById("hajime").innerHTML = "Hajime";
 
+      if (OsaekomiWhiteTimer > 0)
+        document.getElementById("white_osaekomi").disabled = true;
+      else
+        document.getElementById("white_osaekomi").disabled = false;
+      if (OsaekomiBlueTimer > 0)
+        document.getElementById("blue_osaekomi").disabled = true;
+      else
+        document.getElementById("blue_osaekomi").disabled = false;
+
       if (areFightersOnMat == 1 && hasConcluded == 0)
         document.getElementById("hajime").disabled = false;
       else
         document.getElementById("hajime").disabled = true;
 
       document.getElementById("mate").disabled   = true;
-      document.getElementById("blue_osaekomi").disabled  = true;
-      document.getElementById("white_osaekomi").disabled = true;
     }
 
 

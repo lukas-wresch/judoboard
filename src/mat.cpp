@@ -431,7 +431,7 @@ void Mat::Mate()
 
 		m_HajimeTimer.Pause();
 
-		if (IsOsaekomi())//Mate during osaekomi?
+		if (IsOsaekomiRunning())//Mate during osaekomi?
 		{
 			const auto osaekomi_holder = GetOsaekomiHolder();
 
@@ -934,10 +934,11 @@ void Mat::Osaekomi(Fighter Whom)
 {
 	m_mutex.lock();
 
-	if (AreFightersOnMat() && IsHajime())
+	if (AreFightersOnMat())
 	{
-		if (!IsOsaekomi())//No Osaekomi time yet, start new osaekomi
+		if (IsHajime() && !IsOsaekomiRunning())//No Osaekomi time yet, start new osaekomi
 		{
+			m_OsaekomiTimer[(int)Whom].Reset();
 			m_OsaekomiTimer[(int)Whom].Start();
 
 			AddEvent(Whom, MatchLog::BiasedEvent::Osaekomi);
@@ -949,7 +950,7 @@ void Mat::Osaekomi(Fighter Whom)
 			m_Graphics["effect_osaekomi_" + Fighter2String(Whom)].StopAllAnimations().SetAlpha(255);
 		}
 
-		else if (Whom != GetOsaekomiHolder())//Switch osaekomi
+		else if (IsOsaekomi() && Whom != GetOsaekomiHolder())//Switch osaekomi
 		{
 			AddEvent(MatchLog::NeutralEvent::OsaekomiSwitched);
 
@@ -970,7 +971,7 @@ void Mat::Osaekomi(Fighter Whom)
 
 void Mat::Tokeda()
 {
-	if (AreFightersOnMat() && IsOsaekomi())
+	if (AreFightersOnMat() && IsOsaekomiRunning())
 	{
 		m_mutex.lock();
 
@@ -978,7 +979,7 @@ void Mat::Tokeda()
 
 		m_OsaekomiList.emplace_back(OsaekomiEntry(osaekomi_holder, m_OsaekomiTimer[(int)osaekomi_holder].GetElapsedTime()));
 
-		m_OsaekomiTimer[(int)osaekomi_holder].Stop();
+		m_OsaekomiTimer[(int)osaekomi_holder].Pause();
 
 		AddEvent(MatchLog::NeutralEvent::Tokeda);
 
@@ -1028,7 +1029,7 @@ void Mat::Process()
 
 			UpdateGraphics();
 
-			m_OsaekomiTimer[(int)GetOsaekomiHolder()].Stop();
+			m_OsaekomiTimer[(int)GetOsaekomiHolder()].Pause();
 
 			if (GetScoreboard(fighter).m_WazaAri == 1)
 				AddWazaAri(fighter);
