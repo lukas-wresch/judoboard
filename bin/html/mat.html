@@ -18,7 +18,7 @@
 
 <table border="1" rules="all" style="margin-top: 0mm; margin-bottom: 3mm; width: 13.2cm;">
   <tr id="current_match_row">
-    <td style="text-align: center; font-size: 16pt;" colspan="2">
+    <td style="text-align: center; font-size: 18pt;" colspan="2">
       <div id="current_match_div">
         <table width="100%" id="current_match_table" border="0" rules="all">
           <tr><td width="50%" id="white_name">- - - </td><td id="blue_name" style="background-color: rgba(30, 30, 255, 1.0); color: white;">- - - </td></tr>
@@ -530,8 +530,8 @@ function GetJudokaName()
     document.getElementById("mat").innerHTML = res.mat_name;
     document.getElementById("matchtable").innerHTML = res.match_table_name;
 
-    document.getElementById("white_name").innerHTML = res.white_name;
-    document.getElementById("blue_name").innerHTML  = res.blue_name;
+    document.getElementById("white_name").innerHTML = res.white_name + '<img src="winner.png" id="winner_white" style="width: 6mm; margin-top: 1mm; margin-left: 2mm;"/>';
+    document.getElementById("blue_name").innerHTML  = res.blue_name  + '<img src="winner.png" id="winner_blue"  style="width: 6mm; margin-top: 1mm; margin-left: 2mm;"/>';;
 
     var table = document.getElementById("next_matches_table");
 
@@ -697,7 +697,7 @@ for (const el of document.getElementsByClassName("medical_examiniations"))
     el.innerHTML = lang.medical_examiniations;
 for (const el of document.getElementsByClassName("add_medical_examiniations"))
     el.innerHTML = "+" + lang.medical_examiniations;
-    for (const el of document.getElementsByClassName("remove_medical_examiniations"))
+for (const el of document.getElementsByClassName("remove_medical_examiniations"))
     el.innerHTML = "-" + lang.medical_examiniations;
 
 </script>
