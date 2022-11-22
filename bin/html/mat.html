@@ -1,9 +1,9 @@
-<div style="margin-left: 0.5cm;">
-  <h2><label id="mat"></label> - <label id="time"></label>: <span id="hajimetime"></span></h2>
-  <h2><label id="matchtable_label"></label>: <label id="matchtable"></label></h2>
+<div style="margin-left: 0.5cm; font-size: 20pt;">
+  <label id="mat"></label> - <label id="time"></label>: <span id="hajimetime"></span><br/>
+  <label id="matchtable_label"></label>: <label id="matchtable"></label>
 </div>
 
-<table border="1" rules="all" style="margin-bottom: 3mm;">
+<table border="1" rules="all" style="margin-top: 3mm; margin-bottom: 3mm;">
   <tr id="next_matches_row" style="display: none;">
     <td style="text-align: center; font-size: 16pt;" colspan="2">
     <div id="next_matches_div" style="display: none; height: 0px;">
@@ -42,8 +42,8 @@
       <button class="remove" onclick="SetScore('white', '-ippon');">-Ippon</button>
       <button class="remove" onclick="SetScore('white', '-wazaari');">-Waza-Ari</button>
       <br/>
-      <button disabled class="neutral" id="white_osaekomi" onclick="Osaekomi('white');">Osaekomi</button>
-      <button disabled class="neutral" id="tokeda1" onclick="Tokeda();">Tokeda</button>
+      <button disabled class="neutral" id="white_osaekomi" onclick="Osaekomi('white');" ontouchstart="Osaekomi('white');">Osaekomi</button>
+      <button disabled class="neutral" id="tokeda1" onclick="Tokeda();" ontouchstart="Tokeda();">Tokeda</button>
     </td>
 
     <td style="text-align: center;">
@@ -53,8 +53,8 @@
       <button class="remove" onclick="SetScore('blue', '-ippon');">-Ippon</button>
       <button class="remove" onclick="SetScore('blue', '-wazaari');">-Waza-Ari</button>
       <br/>
-      <button disabled class="neutral" id="blue_osaekomi" onclick="Osaekomi('blue');">Osaekomi</button>
-      <button disabled class="neutral" id="tokeda2" onclick="Tokeda();">Tokeda</button>
+      <button disabled class="neutral" id="blue_osaekomi" onclick="Osaekomi('blue');" ontouchstart="Osaekomi('blue');">Osaekomi</button>
+      <button disabled class="neutral" id="tokeda2" onclick="Tokeda();" ontouchstart="Tokeda();">Tokeda</button>
     </td>
   </tr>
 
@@ -69,8 +69,8 @@
 
   <tr>
     <td style="text-align: center;" colspan="2">
-      <button class="neutral" id="hajime" onclick="Hajime()">Hajime</button>
-      <button disabled class="neutral" id="mate" onclick="Mate()">Mate</button>
+      <button class="neutral" id="hajime" onclick="Hajime()" ontouchstart="Hajime()">Hajime</button>
+      <button disabled class="neutral" id="mate" onclick="Mate()" ontouchstart="Mate()">Mate</button>
       <button class="additional" id="more" style="margin-left: 35mm" onclick="ToggleMore();">More</button>
     </td>
   </tr>
