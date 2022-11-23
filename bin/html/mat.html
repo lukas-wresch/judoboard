@@ -19,8 +19,8 @@
 <table border="1" rules="all" style="margin-top: 0mm; margin-bottom: 3mm; width: 15.0cm;">
   <tr id="current_match_row">
     <td style="text-align: center; font-size: 18pt;" colspan="2">
-      <div id="current_match_div">
-        <table width="100%" id="current_match_table" border="0" rules="all">
+      <div id="current_match_div" style="height: 35px;">
+        <table width="100%" id="current_match_table" style="height: 36px;" border="0" rules="all">
           <tr><td width="50%" id="white_name">- - - </td><td id="blue_name" style="background-color: rgba(30, 30, 255, 1.0); color: white;">- - - </td></tr>
         </table>
       </div>
@@ -39,25 +39,25 @@
 
   <tr>
     <td style="text-align: center;">
-      <button class="add" onclick="SetScore('white', '+ippon');">+Ippon</button>
-      <button class="add" onclick="SetScore('white', '+wazaari');">+Waza-Ari</button>
+      <button class="add" id="add_ippon_white" onclick="SetScore('white', '+ippon');">+Ippon</button>
+      <button class="add" id="add_wazaari_white" style="margin-left: 5mm;" onclick="SetScore('white', '+wazaari');">+Waza-Ari</button>
       <br/>
-      <button class="remove" onclick="SetScore('white', '-ippon');">-Ippon</button>
-      <button class="remove" onclick="SetScore('white', '-wazaari');">-Waza-Ari</button>
+      <button class="remove" id="rem_ippon_white" onclick="SetScore('white', '-ippon');">-Ippon</button>
+      <button class="remove" id="rem_wazaari_white" style="margin-left: 5mm;" onclick="SetScore('white', '-wazaari');">-Waza-Ari</button>
       <br/>
       <button disabled class="neutral" id="white_osaekomi" onclick="Osaekomi('white');" ontouchstart="Osaekomi('white');">Osaekomi</button>
-      <button disabled class="neutral" id="tokeda1" onclick="Tokeda();" ontouchstart="Tokeda();">Tokeda</button>
+      <button disabled class="neutral" style="margin-left: 5mm;" id="tokeda1" onclick="Tokeda();" ontouchstart="Tokeda();">Tokeda</button>
     </td>
 
     <td style="text-align: center;">
-      <button class="add" onclick="SetScore('blue', '+ippon');">+Ippon</button>
-      <button class="add" onclick="SetScore('blue', '+wazaari');">+Waza-Ari</button>
+      <button class="add" id="add_ippon_blue" onclick="SetScore('blue', '+ippon');">+Ippon</button>
+      <button class="add" id="add_wazaari_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '+wazaari');">+Waza-Ari</button>
       <br/>
-      <button class="remove" onclick="SetScore('blue', '-ippon');">-Ippon</button>
-      <button class="remove" onclick="SetScore('blue', '-wazaari');">-Waza-Ari</button>
+      <button class="remove" id="rem_ippon_blue" onclick="SetScore('blue', '-ippon');">-Ippon</button>
+      <button class="remove" id="rem_wazaari_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '-wazaari');">-Waza-Ari</button>
       <br/>
       <button disabled class="neutral" id="blue_osaekomi" onclick="Osaekomi('blue');" ontouchstart="Osaekomi('blue');">Osaekomi</button>
-      <button disabled class="neutral" id="tokeda2" onclick="Tokeda();" ontouchstart="Tokeda();">Tokeda</button>
+      <button disabled class="neutral" style="margin-left: 5mm;" id="tokeda2" onclick="Tokeda();" ontouchstart="Tokeda();">Tokeda</button>
     </td>
   </tr>
 
@@ -171,10 +171,8 @@
 
 <table>
   <tr>
-    <td style="width: 12.0cm;">
-      <button disabled class="neutral" style="width: 45mm; margin-top: 8mm;" id="next_fight" onclick="StartNextMatch()">Start next match</button>
-
-      <button disabled class="neutral" style="width: 45mm; margin-left: 22mm;" id="end_match" onclick="EndMatch()">End match</button>
+    <td style="width: 10.0cm;">
+      <button disabled class="neutral" style="width: 45mm; margin-top: 3mm;" id="end_match" onclick="EndMatch()">End match</button>
     </td>
 
     <td style="vertical-align: top;">
@@ -345,7 +343,7 @@ function ShowNextMatches(show)
     $("#next_matches_row").hide(1000);
 
     $("#current_match_row").show();
-    $("#current_match_div").show().animate({height: '25px', opacity: 100}, 1000);
+    $("#current_match_div").show().animate({height: '35px', opacity: 100}, 1000);
   }
   else
   {
@@ -433,48 +431,72 @@ function GetScore()
     document.getElementById("white_medics").innerHTML = res.white.medical;
     document.getElementById("blue_medics").innerHTML  = res.blue.medical;
 
+
+    document.getElementById("add_ippon_white").disabled   = !res.are_fighters_on_mat;
+    document.getElementById("add_wazaari_white").disabled = !res.are_fighters_on_mat;
+    document.getElementById("rem_ippon_white").disabled   = !res.are_fighters_on_mat;
+    document.getElementById("rem_wazaari_white").disabled = !res.are_fighters_on_mat;
+
+    document.getElementById("add_ippon_blue").disabled   = !res.are_fighters_on_mat;
+    document.getElementById("add_wazaari_blue").disabled = !res.are_fighters_on_mat;
+    document.getElementById("rem_ippon_blue").disabled   = !res.are_fighters_on_mat;
+    document.getElementById("rem_wazaari_blue").disabled = !res.are_fighters_on_mat;
+
     HajimeTimer = parseInt(res.hajime_time);
 
     OsaekomiWhiteTimer = parseInt(res.white.osaekomi_time);
-    OsaekomiWhiteTimer_Running = res.white.is_osaekomi;
+    OsaekomiWhiteTimer_Running = res.white.is_osaekomi_running;
     OsaekomiBlueTimer  = parseInt(res.blue.osaekomi_time);
-    OsaekomiBlueTimer_Running = res.blue.is_osaekomi;
-
-    /*canNextMatchStart = parseInt(res[i++]);
-    hasConcluded      = parseInt(res[i++]);
-    isOutOfTime       = parseInt(res[i++]);
-    noWinnerYet       = parseInt(res[i++]);
-    isGoldenScore     = parseInt(res[i++]);
-    areFightersOnMat  = parseInt(res[i++]);
-    whiteNeedHanDesc  = parseInt(res[i++]);
-    blueNeedHanDesc   = parseInt(res[i++]);*/
+    OsaekomiBlueTimer_Running = res.blue.is_osaekomi_running;
 
     if (res.is_hajime)
     {
       HajimeTimer_Running = true;
       document.getElementById("hajime").innerHTML = "Hajime";
-      document.getElementById("hajime").disabled = true;
-      document.getElementById("mate").disabled   = false;
-      document.getElementById("blue_osaekomi").disabled  = false;
-      document.getElementById("white_osaekomi").disabled = false;
-    }
-    else
-    {
-      HajimeTimer_Running = false;
-      if (res.white.is_osaekomi || res.blue.is_osaekomi)
-        document.getElementById("hajime").innerHTML = "Yoshi";
-      else
-        document.getElementById("hajime").innerHTML = "Hajime";
+      document.getElementById("hajime").disabled  = true;
+      document.getElementById("mate").disabled    = false;
 
-      if (res.white.is_osaekomi)
+      if (res.white.is_osaekomi_running)
         document.getElementById("white_osaekomi").disabled = true;
       else
         document.getElementById("white_osaekomi").disabled = false;
 
-      if (res.blue.is_osaekomi)
+      if (res.blue.is_osaekomi_running)
         document.getElementById("blue_osaekomi").disabled = true;
       else
         document.getElementById("blue_osaekomi").disabled = false;
+
+      if (res.is_osaekomi)
+      {
+        document.getElementById("tokeda1").disabled = false;
+        document.getElementById("tokeda2").disabled = false;
+        document.getElementById("mate").innerHTML = "Sonomama";
+      }
+      else
+      {
+        document.getElementById("tokeda1").disabled = true;
+        document.getElementById("tokeda2").disabled = true;
+        document.getElementById("mate").innerHTML = "Mate";
+      }
+    }
+    else
+    {
+      HajimeTimer_Running = false;
+
+      if (res.is_osaekomi)
+        document.getElementById("hajime").innerHTML = "Yoshi";
+      else
+        document.getElementById("hajime").innerHTML = "Hajime";
+
+      if (res.white.is_osaekomi_running)
+        document.getElementById("blue_osaekomi").disabled = false;
+      else
+        document.getElementById("blue_osaekomi").disabled = true;
+
+      if (res.blue.is_osaekomi_running)
+        document.getElementById("white_osaekomi").disabled = false;
+      else
+        document.getElementById("white_osaekomi").disabled = true;
 
       if (res.are_fighters_on_mat && !res.has_concluded)
         document.getElementById("hajime").disabled = false;
@@ -495,18 +517,6 @@ function GetScore()
     else
       OsaekomiBlueTimer_Running = false;
 
-    if (res.white.is_osaekomi || res.blue.is_osaekomi)
-    {
-      document.getElementById("tokeda1").disabled = false;
-      document.getElementById("tokeda2").disabled = false;
-      document.getElementById("mate").innerHTML = "Sonomama";
-    }
-    else
-    {
-      document.getElementById("tokeda1").disabled = true;
-      document.getElementById("tokeda2").disabled = true;
-      document.getElementById("mate").innerHTML = "Mate";
-    }
 
     if (res.are_fighters_on_mat)
       ShowNextMatches(false);
@@ -515,11 +525,11 @@ function GetScore()
 
     if (res.can_next_match_start)
     {
-      document.getElementById("next_fight").disabled = false;
+      //document.getElementById("next_fight").disabled = false;
       document.getElementById("hajime").disabled = true;
     }
-    else
-      document.getElementById("next_fight").disabled = true;
+    //else
+      //document.getElementById("next_fight").disabled = true;
 
     if (res.has_concluded)
     {
@@ -568,15 +578,15 @@ function GetJudokaName()
     if (name2.length > 20)
       name2 = name2.substr(0, 20) + ".";
 
-    var display = 'none';
+    var hidden = 'hidden';
     if (CurrentScore.winner == 0)
-      display = 'inline';
-    document.getElementById("white_name").innerHTML = name1 + '<img src="winner.png" id="winner_white" style="display: ' + display + '; width: 5mm; margin-top: 1.5mm; margin-left: 2mm;"/>';
+      hidden = '';
+    document.getElementById("white_name").innerHTML = name1 + '<img src="winner.png" id="winner_white" ' + hidden + ' style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;"/>';
 
-    display = 'none';
+    hidden = 'hidden';
     if (CurrentScore.winner == 1)
-      display = 'inline';
-    document.getElementById("blue_name").innerHTML  = name2 + '<img src="winner.png" id="winner_blue"  style="display: ' + display + '; width: 5mm; margin-top: 1.5mm; margin-left: 2mm;"/>';;
+      hidden = '';
+    document.getElementById("blue_name").innerHTML  = name2 + '<img src="winner.png" id="winner_blue"  ' + hidden + ' style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;"/>';;
 
     var table = document.getElementById("next_matches_table");
 

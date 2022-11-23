@@ -392,8 +392,8 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "shido"   << YAML::Value << (GetScoreboard(Who).m_HansokuMake ? 3 : GetScoreboard(Who).m_Shido);
 		Yaml << YAML::Key << "medical" << YAML::Value <<  GetScoreboard(Who).m_MedicalExamination;
 
-		Yaml << YAML::Key << "osaekomi_time" << YAML::Value << m_OsaekomiTimer[(int)Who].GetElapsedTime();
-		Yaml << YAML::Key << "is_osaekomi"   << YAML::Value << m_OsaekomiTimer[(int)Who].IsRunning();
+		Yaml << YAML::Key << "osaekomi_time"       << YAML::Value << m_OsaekomiTimer[(int)Who].GetElapsedTime();
+		Yaml << YAML::Key << "is_osaekomi_running" << YAML::Value << m_OsaekomiTimer[(int)Who].IsRunning();
 
 		if (GetScoreboard(Who).IsUnknownDisqualification())
 			Yaml << YAML::Key << "unknown_disqualification" << YAML::Value << true;
@@ -408,6 +408,7 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 
 	Yaml << YAML::Key << "hajime_time" << YAML::Value << GetTime2Display();
 	Yaml << YAML::Key << "is_hajime"   << YAML::Value << IsHajime();
+	Yaml << YAML::Key << "is_osaekomi" << YAML::Value << IsOsaekomi();
 
 	Yaml << YAML::Key << "are_fighters_on_mat"  << YAML::Value << AreFightersOnMat();
 	Yaml << YAML::Key << "can_next_match_start" << YAML::Value << CanNextMatchStart();
