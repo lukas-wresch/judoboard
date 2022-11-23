@@ -3366,9 +3366,11 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 	ret << YAML::Key << "next_matches" << YAML::Value << YAML::BeginSeq;
 
 	auto nextMatches = mat->GetNextMatches();
-	for (auto& match : nextMatches)
+	for (const auto& match : nextMatches)
 	{
 		ret << YAML::BeginMap;
+
+		ret << YAML::Key << "uuid" << YAML::Value << (std::string)match.GetUUID();
 
 		ret << YAML::Key << "white_name" << YAML::Value;
 		if (match.GetFighter(Fighter::White))

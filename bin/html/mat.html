@@ -282,6 +282,24 @@ function EndMatch()
 }
 
 
+function MoveUp(match_id)
+{
+  AjaxCallback('/ajax/match/move_up?id=' + match_id + '&mat=' + id, function() {
+    GetJudokaName();
+  });
+  return false;
+}
+
+
+function MoveDown(match_id)
+{
+  AjaxCallback('/ajax/match/move_down?id=' + match_id + '&mat=' + id, function() {
+    GetJudokaName();
+  });
+  return false;
+}
+
+
 function ToggleMore()
 {
   if (more)
@@ -558,7 +576,7 @@ function GetJudokaName()
       if (i == 0)
         cell4.innerHTML = '<button class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="StartNextMatch()">' + lang.start_next_match + '</button>';
       else
-        cell4.innerHTML = '<button class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="PushUp()">' + lang.push_up + '</button>';
+        cell4.innerHTML = '<button class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="MoveUp(\'' + match.uuid + '\')">' + lang.push_up + '</button>';
 
       i++;
     }

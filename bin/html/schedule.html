@@ -75,6 +75,7 @@
 
 function MoveEntryUp(id)
 {
+  var mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_up?id=' + id, function() {
     Update();
   });
@@ -84,6 +85,7 @@ function MoveEntryUp(id)
 
 function MoveEntryDown(id)
 {
+  var mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_down?id=' + id, function() {
     Update();
   });
@@ -105,7 +107,8 @@ function SetEntryMat(id, mat)
 
 function MoveUp(id)
 {
-  AjaxCallback('/ajax/match/move_up?id=' + id, function() {
+  var mat_to_display = document.getElementById("display_mat").value;
+  AjaxCallback('/ajax/match/move_up?id=' + id + '&mat=' + mat_to_display, function() {
     Update();
   });
   return false;
@@ -114,7 +117,8 @@ function MoveUp(id)
 
 function MoveDown(id)
 {
-  AjaxCallback('/ajax/match/move_down?id=' + id, function() {
+  var mat_to_display = document.getElementById("display_mat").value;
+  AjaxCallback('/ajax/match/move_down?id=' + id + '&mat=' + mat_to_display, function() {
     Update();
   });
   return false;
