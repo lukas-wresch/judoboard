@@ -61,7 +61,7 @@ namespace Judoboard
 
 		operator const UUID& () const { return m_UUID; }
 
-		operator bool () const { return (bool)m_UUID; }
+		explicit operator bool () const { return (bool)m_UUID; }
 
 	protected:
 		void SetUUID(std::string&& UUID) { m_UUID = std::move(UUID); }

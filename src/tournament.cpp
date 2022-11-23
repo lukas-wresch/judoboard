@@ -624,33 +624,37 @@ Match* Tournament::FindMatch(const UUID& UUID) const
 
 
 
-bool Tournament::MoveMatchUp(const UUID& MatchID)
+bool Tournament::MoveMatchUp(const UUID& MatchID, uint32_t MatID)
 {
-	size_t Index = 0;
-	for (; Index < m_Schedule.size(); Index++)
+	size_t prev_match_index = 0;
+	size_t current_index = 0;
+	for (; current_index < m_Schedule.size(); current_index++)
 	{
-		if (m_Schedule[Index]->GetUUID() == MatchID)
+		if (MatID != 0 && m_Schedule[current_index]->GetMatID() != MatID)
+			continue;
+		if (m_Schedule[current_index]->GetUUID() == MatchID)
 			break;
+		prev_match_index = current_index;
 	}
 
-	if (Index == 0 || Index == m_Schedule.size())
+	if (current_index == 0 || current_index == m_Schedule.size())
 		return false;
 
-	auto prev_match = m_Schedule[Index - 1];
-	auto match = m_Schedule[Index];
+	auto prev_match = m_Schedule[prev_match_index];
+	auto curr_match = m_Schedule[current_index];
 
-	if (!prev_match || !match)
+	if (!prev_match || !curr_match)
 		return false;
 
 	//Is either match running?
-	if (!prev_match->IsScheduled() || !match->IsScheduled())
+	if (!prev_match->IsScheduled() || !curr_match->IsScheduled())
 		return false;
 
 	//Swap matches
 	Lock();
 
-	m_Schedule[Index-1] = match;
-	m_Schedule[Index]   = prev_match;
+	m_Schedule[prev_match_index] = curr_match;
+	m_Schedule[current_index]    = prev_match;
 
 	Unlock();
 	Save();
@@ -660,36 +664,45 @@ bool Tournament::MoveMatchUp(const UUID& MatchID)
 
 
 
-bool Tournament::MoveMatchDown(const UUID& MatchID)
+bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 {
-	size_t Index = 0;
+	size_t next_match_index = 0;
+	size_t curr_match_index = 0;
 	bool found = false;
-	for (; Index < m_Schedule.size(); Index++)
+	for (size_t index = 0; index < m_Schedule.size(); index++)
 	{
-		if (m_Schedule[Index]->GetUUID() == MatchID)
+		if (MatID != 0 && m_Schedule[index]->GetMatID() != MatID)
+			continue;
+
+		if (!found && m_Schedule[index]->GetUUID() == MatchID)
 		{
+			curr_match_index = index;
 			found = true;
+		}
+		else if (found)
+		{
+			next_match_index = index;
 			break;
 		}
 	}
 
-	if (!found || Index+1 >= m_Schedule.size())
+	if (!found || curr_match_index >= m_Schedule.size() || next_match_index >= m_Schedule.size() || next_match_index < curr_match_index)
 		return false;
 
-	auto match = m_Schedule[Index];
-	auto next_match = m_Schedule[Index + 1];
+	auto curr_match = m_Schedule[curr_match_index];
+	auto next_match = m_Schedule[next_match_index];
 
-	if (!match || !next_match)
+	if (!curr_match || !next_match)
 		return false;
 
 	//Is either match running?
-	if (!match->IsScheduled() || !next_match->IsScheduled())
+	if (!curr_match->IsScheduled() || !next_match->IsScheduled())
 		return false;
 
 	//Swap matches
 	Lock();
-	m_Schedule[Index]   = next_match;
-	m_Schedule[Index+1] = match;
+	m_Schedule[curr_match_index]   = next_match;
+	m_Schedule[next_match_index] = curr_match;
 
 	Unlock();
 	Save();

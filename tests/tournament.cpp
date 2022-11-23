@@ -61,6 +61,86 @@ TEST(Tournament, MatchAgainstOneself)
 
 
 
+TEST(Tournament, MoveSchedule)
+{
+	initialize();
+
+
+	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+	Judoka j2("Firstname", "Lastname", 50, Gender::Male);
+
+	Tournament tourney("deleteMe");
+	tourney.Reset();
+	tourney.EnableAutoSave(false);
+
+	auto match1 = new Match(&j1, &j2, &tourney, 1);
+	auto match2 = new Match(&j1, &j2, &tourney, 1);
+	auto match3 = new Match(&j1, &j2, &tourney, 1);
+	auto match4 = new Match(&j1, &j2, &tourney, 2);
+	auto match5 = new Match(&j1, &j2, &tourney, 2);
+	auto match6 = new Match(&j1, &j2, &tourney, 2);
+
+	tourney.AddMatch(match1);
+	tourney.AddMatch(match2);
+	tourney.AddMatch(match3);
+	tourney.AddMatch(match4);
+	tourney.AddMatch(match5);
+	tourney.AddMatch(match6);
+
+	EXPECT_EQ(*tourney.GetSchedule()[0], *match1);
+	EXPECT_EQ(*tourney.GetSchedule()[1], *match2);
+
+	EXPECT_FALSE(tourney.MoveMatchUp(*match1));
+	EXPECT_TRUE(tourney.MoveMatchUp(*match2));
+
+	EXPECT_EQ(*tourney.GetSchedule()[0], *match2);
+	EXPECT_EQ(*tourney.GetSchedule()[1], *match1);
+
+	EXPECT_TRUE(tourney.MoveMatchUp(*match4));
+	EXPECT_TRUE(tourney.MoveMatchUp(*match4));
+	EXPECT_TRUE(tourney.MoveMatchUp(*match4));
+	EXPECT_FALSE(tourney.MoveMatchUp(*match4));
+
+	EXPECT_EQ(*tourney.GetSchedule()[0], *match4);
+	EXPECT_EQ(*tourney.GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney.GetSchedule()[2], *match1);
+	EXPECT_EQ(*tourney.GetSchedule()[3], *match3);
+	EXPECT_EQ(*tourney.GetSchedule()[4], *match5);
+	EXPECT_EQ(*tourney.GetSchedule()[5], *match6);
+
+	EXPECT_TRUE(tourney.MoveMatchUp(*match5, 2));
+
+	EXPECT_EQ(*tourney.GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney.GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney.GetSchedule()[2], *match1);
+	EXPECT_EQ(*tourney.GetSchedule()[3], *match3);
+	EXPECT_EQ(*tourney.GetSchedule()[4], *match4);
+	EXPECT_EQ(*tourney.GetSchedule()[5], *match6);
+
+	EXPECT_FALSE(tourney.MoveMatchDown(*match6));
+
+	EXPECT_TRUE(tourney.MoveMatchUp(*match4));
+	EXPECT_TRUE(tourney.MoveMatchUp(*match4));
+
+	EXPECT_EQ(*tourney.GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney.GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney.GetSchedule()[2], *match4);
+	EXPECT_EQ(*tourney.GetSchedule()[3], *match1);
+	EXPECT_EQ(*tourney.GetSchedule()[4], *match3);
+	EXPECT_EQ(*tourney.GetSchedule()[5], *match6);
+
+	EXPECT_TRUE(tourney.MoveMatchDown(*match4, 2));
+
+	EXPECT_EQ(*tourney.GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney.GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney.GetSchedule()[2], *match6);
+	EXPECT_EQ(*tourney.GetSchedule()[3], *match1);
+	EXPECT_EQ(*tourney.GetSchedule()[4], *match3);
+	EXPECT_EQ(*tourney.GetSchedule()[5], *match4);
+}
+
+
+
 TEST(Tournament, Disqualification)
 {
 	initialize();

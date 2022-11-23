@@ -58,8 +58,8 @@ namespace Judoboard
 		const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 
 		bool RemoveMatch(const UUID& MatchID);
-		bool MoveMatchUp(const UUID&  MatchID);
-		bool MoveMatchDown(const UUID&  MatchID);
+		bool MoveMatchUp(const UUID&  MatchID, uint32_t MatID = 0);
+		bool MoveMatchDown(const UUID&  MatchID, uint32_t MatID = 0);
 
 		std::vector<Match> GetNextMatches(uint32_t MatID) const;
 
