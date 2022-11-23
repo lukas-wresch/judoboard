@@ -1175,3 +1175,87 @@ TEST(Ajax, ListAgeGroups)
 	EXPECT_EQ(result[4]["name"].as<std::string>(), "U21");
 	EXPECT_EQ(result[5]["name"].as<std::string>(), "Seniors");
 }
+
+
+
+TEST(Ajax, MoveSchedule)
+{
+	initialize();
+
+	Application app;
+
+	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+	Judoka j2("Firstname", "Lastname", 50, Gender::Male);
+
+	Tournament* tourney = new Tournament("deleteMe");
+	tourney->Reset();
+	tourney->EnableAutoSave(false);
+
+	auto match1 = new Match(&j1, &j2, tourney, 1);
+	auto match2 = new Match(&j1, &j2, tourney, 1);
+	auto match3 = new Match(&j1, &j2, tourney, 1);
+	auto match4 = new Match(&j1, &j2, tourney, 2);
+	auto match5 = new Match(&j1, &j2, tourney, 2);
+	auto match6 = new Match(&j1, &j2, tourney, 2);
+
+	tourney->AddMatch(match1);
+	tourney->AddMatch(match2);
+	tourney->AddMatch(match3);
+	tourney->AddMatch(match4);
+	tourney->AddMatch(match5);
+	tourney->AddMatch(match6);
+
+	app.AddTournament(tourney);
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match2);
+
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match1->GetUUID())), Error::Type::OperationFailed);
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match2->GetUUID())), Error::Type::NoError);
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match1);
+
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match4->GetUUID())), Error::Type::NoError);
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match4->GetUUID())), Error::Type::NoError);
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match4->GetUUID())), Error::Type::NoError);
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match4->GetUUID())), Error::Type::OperationFailed);
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match4);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match5);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match6);
+
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match5->GetUUID() + "&mat=2")), Error::Type::NoError);
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match5->GetUUID() + "&mat=5")), Error::Type::OperationFailed);
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match4);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match6);
+
+	EXPECT_EQ(app.Ajax_MoveMatchDown(HttpServer::Request("id=" + (std::string)match6->GetUUID())), Error::Type::OperationFailed);
+
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match4->GetUUID())), Error::Type::NoError);
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match4->GetUUID())), Error::Type::NoError);
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match4);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match6);
+
+	EXPECT_EQ(app.Ajax_MoveMatchDown(HttpServer::Request("id=" + (std::string)match4->GetUUID() + "&mat=2")), Error::Type::NoError);
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match6);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match4);
+}

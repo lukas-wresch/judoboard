@@ -464,37 +464,19 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/match/move_up", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		auto error = CheckPermission(Request, Account::AccessLevel::User);
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		LockTillScopeEnd();
-
-		if (!GetTournament())
-			return std::string("No tournament open");
-
-		GetTournament()->MoveMatchUp(id);
-
-		return std::string();
+		return Ajax_MoveMatchUp(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/match/move_down", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		auto error = CheckPermission(Request, Account::AccessLevel::User);
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		LockTillScopeEnd();
-
-		if (!GetTournament())
-			return std::string("No tournament open");
-
-		GetTournament()->MoveMatchDown(id);
-
-		return std::string();
+		return Ajax_MoveMatchDown(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/match/delete", [this](auto& Request) -> std::string {
@@ -3241,6 +3223,48 @@ Error Application::Ajax_RemoveNoDisqualification(Fighter Whom, const HttpServer:
 
 	mat->RemoveNoDisqualification(Whom);
 	return Error();//OK
+}
+
+
+
+Error Application::Ajax_MoveMatchUp(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
+
+	if (mat <= -1)
+		mat = 0;
+
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	if (!GetTournament()->MoveMatchUp(id, mat))
+		return Error::Type::OperationFailed;
+
+	return Error::Type::NoError;
+}
+
+
+
+Error Application::Ajax_MoveMatchDown(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
+
+	if (mat <= -1)
+		mat = 0;
+
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	if (!GetTournament()->MoveMatchDown(id, mat))
+		return Error::Type::OperationFailed;
+
+	return Error::Type::NoError;
 }
 
 
