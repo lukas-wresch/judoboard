@@ -3,7 +3,7 @@
   <label id="matchtable_label"></label>: <label id="matchtable"></label>
 </div>
 
-<table border="1" rules="all" style="margin-top: 3mm; margin-bottom: 0mm; width: 21.0cm;">
+<table border="1" rules="all" style="margin-top: 3mm; margin-bottom: 0mm; width: 23.0cm;">
   <tr id="next_matches_row" style="display:none;">
     <td style="text-align: center; font-size: 16pt; width: 100%;">
       <div id="next_matches_div" style="display:none; height: 0px;">
@@ -16,7 +16,7 @@
   </tr>
 </table>
 
-<table border="1" rules="all" style="margin-top: 0mm; margin-bottom: 3mm; width: 13.2cm;">
+<table border="1" rules="all" style="margin-top: 0mm; margin-bottom: 3mm; width: 15.0cm;">
   <tr id="current_match_row">
     <td style="text-align: center; font-size: 18pt;" colspan="2">
       <div id="current_match_div">
@@ -189,6 +189,8 @@
 </table>
 
 <script>
+var CurrentScore;
+
 var HajimeTimer = 0;
 var HajimeTimer_Running = false;
 
@@ -411,43 +413,43 @@ function GetScore()
 {
   AjaxCallback("ajax/mat/get_score?id="+id, function(response) {
     console.log(response);
-    var res = response.split(",");
+    var res = YAML.parse(response);
 
-    var i=0;
-    document.getElementById("white_ippon").innerHTML   = res[i++];
-    document.getElementById("white_wazaari").innerHTML = res[i++];
-    document.getElementById("blue_ippon").innerHTML    = res[i++];
-    document.getElementById("blue_wazaari").innerHTML  = res[i++];
+    CurrentScore = res;
 
-    var white_yuko = res[i++];
+    document.getElementById("white_ippon").innerHTML   = res.white.ippon;
+    document.getElementById("white_wazaari").innerHTML = res.white.wazaari;
+    document.getElementById("blue_ippon").innerHTML    = res.blue.ippon;
+    document.getElementById("blue_wazaari").innerHTML  = res.blue.wazaari;
+
+    /*var white_yuko = res[i++];
     var blue_yuko  = res[i++];
     var white_koka = res[i++];
-    var blue_koka  = res[i++];
+    var blue_koka  = res[i++];*/
 
-    document.getElementById("white_shidos").innerHTML = res[i++];
-    document.getElementById("blue_shidos").innerHTML  = res[i++];
+    document.getElementById("white_shidos").innerHTML = res.white.shido;
+    document.getElementById("blue_shidos").innerHTML  = res.blue.shido;
 
-    document.getElementById("white_medics").innerHTML = res[i++];
-    document.getElementById("blue_medics").innerHTML  = res[i++];
+    document.getElementById("white_medics").innerHTML = res.white.medical;
+    document.getElementById("blue_medics").innerHTML  = res.blue.medical;
 
-    HajimeTimer = parseInt(res[i++]);
-    isHajime    = parseInt(res[i++]);
+    HajimeTimer = parseInt(res.hajime_time);
 
-    OsaekomiWhiteTimer = parseInt(res[i++]);
-    OsaekomiWhiteTimer_Running = parseInt(res[i++]);
-    OsaekomiBlueTimer  = parseInt(res[i++]);
-    OsaekomiBlueTimer_Running = parseInt(res[i++]);
+    OsaekomiWhiteTimer = parseInt(res.white.osaekomi_time);
+    OsaekomiWhiteTimer_Running = res.white.is_osaekomi;
+    OsaekomiBlueTimer  = parseInt(res.blue.osaekomi_time);
+    OsaekomiBlueTimer_Running = res.blue.is_osaekomi;
 
-    canNextMatchStart = parseInt(res[i++]);
+    /*canNextMatchStart = parseInt(res[i++]);
     hasConcluded      = parseInt(res[i++]);
     isOutOfTime       = parseInt(res[i++]);
     noWinnerYet       = parseInt(res[i++]);
     isGoldenScore     = parseInt(res[i++]);
     areFightersOnMat  = parseInt(res[i++]);
     whiteNeedHanDesc  = parseInt(res[i++]);
-    blueNeedHanDesc   = parseInt(res[i++]);
+    blueNeedHanDesc   = parseInt(res[i++]);*/
 
-    if (isHajime == 1)
+    if (res.is_hajime)
     {
       HajimeTimer_Running = true;
       document.getElementById("hajime").innerHTML = "Hajime";
@@ -459,21 +461,22 @@ function GetScore()
     else
     {
       HajimeTimer_Running = false;
-      if (OsaekomiWhiteTimer > 0 || OsaekomiBlueTimer > 0)
+      if (res.white.is_osaekomi || res.blue.is_osaekomi)
         document.getElementById("hajime").innerHTML = "Yoshi";
       else
         document.getElementById("hajime").innerHTML = "Hajime";
 
-      if (OsaekomiWhiteTimer > 0)
+      if (res.white.is_osaekomi)
         document.getElementById("white_osaekomi").disabled = true;
       else
         document.getElementById("white_osaekomi").disabled = false;
-      if (OsaekomiBlueTimer > 0)
+
+      if (res.blue.is_osaekomi)
         document.getElementById("blue_osaekomi").disabled = true;
       else
         document.getElementById("blue_osaekomi").disabled = false;
 
-      if (areFightersOnMat == 1 && hasConcluded == 0)
+      if (res.are_fighters_on_mat && !res.has_concluded)
         document.getElementById("hajime").disabled = false;
       else
         document.getElementById("hajime").disabled = true;
@@ -492,7 +495,7 @@ function GetScore()
     else
       OsaekomiBlueTimer_Running = false;
 
-    if (OsaekomiWhiteTimer > 0 || OsaekomiBlueTimer > 0)
+    if (res.white.is_osaekomi || res.blue.is_osaekomi)
     {
       document.getElementById("tokeda1").disabled = false;
       document.getElementById("tokeda2").disabled = false;
@@ -505,12 +508,12 @@ function GetScore()
       document.getElementById("mate").innerHTML = "Mate";
     }
 
-    if (areFightersOnMat == 1)
+    if (res.are_fighters_on_mat)
       ShowNextMatches(false);
     else
       ShowNextMatches(true);
 
-    if (canNextMatchStart == 1)
+    if (res.can_next_match_start)
     {
       document.getElementById("next_fight").disabled = false;
       document.getElementById("hajime").disabled = true;
@@ -518,21 +521,30 @@ function GetScore()
     else
       document.getElementById("next_fight").disabled = true;
 
-    if (hasConcluded == 1)
+    if (res.has_concluded)
+    {
       document.getElementById("end_match").disabled = false;
+
+      //if (res.winner == 0)
+        //$("#winner_white").show();
+      //else if (res.winner == 1)
+        //$("#winner_blue").show();
+    }
     else
       document.getElementById("end_match").disabled = true;
 
-    if (hasConcluded == 0 && isOutOfTime == 1 && noWinnerYet == 1)
+    if (!res.has_concluded && res.is_out_of_time && res.no_winner_yet)
       ShowHantei(true);
 
-    if (isGoldenScore == 1)
+    if (res.is_goldenscore)
       document.getElementById("golden_score").disabled = true;
     else
       document.getElementById("golden_score").disabled = false;
 
-    if (whiteNeedHanDesc)
+    if (typeof res.white.unknown_disqualification !== 'undefined')
         ShowHansokumakeDecision(true, 'white');
+    if (typeof res.blue.unknown_disqualification !== 'undefined')
+        ShowHansokumakeDecision(true, 'blue');
 
     DisplayTimer();
   });
@@ -548,8 +560,23 @@ function GetJudokaName()
     document.getElementById("mat").innerHTML = res.mat_name;
     document.getElementById("matchtable").innerHTML = res.match_table_name;
 
-    document.getElementById("white_name").innerHTML = res.white_name + '<img src="winner.png" id="winner_white" style="width: 6mm; margin-top: 1mm; margin-left: 2mm;"/>';
-    document.getElementById("blue_name").innerHTML  = res.blue_name  + '<img src="winner.png" id="winner_blue"  style="width: 6mm; margin-top: 1mm; margin-left: 2mm;"/>';;
+    var name1 = res.white_name;
+    if (name1.length > 20)
+      name1 = name1.substr(0, 20) + ".";
+
+    var name2 = res.blue_name;
+    if (name2.length > 20)
+      name2 = name2.substr(0, 20) + ".";
+
+    var display = 'none';
+    if (CurrentScore.winner == 0)
+      display = 'inline';
+    document.getElementById("white_name").innerHTML = name1 + '<img src="winner.png" id="winner_white" style="display: ' + display + '; width: 5mm; margin-top: 1.5mm; margin-left: 2mm;"/>';
+
+    display = 'none';
+    if (CurrentScore.winner == 1)
+      display = 'inline';
+    document.getElementById("blue_name").innerHTML  = name2 + '<img src="winner.png" id="winner_blue"  style="display: ' + display + '; width: 5mm; margin-top: 1.5mm; margin-left: 2mm;"/>';;
 
     var table = document.getElementById("next_matches_table");
 
@@ -568,8 +595,8 @@ function GetJudokaName()
 
       cell1.innerHTML = match.white_name;
       cell2.innerHTML = match.blue_name;
-      cell1.style = "width: 6.5cm;";
-      cell2.style = "width: 6.5cm; background-color: rgba(30, 30, 255, 1.0); color: white;";
+      cell1.style = "width: 7.4cm;";
+      cell2.style = "width: 7.4cm; background-color: rgba(30, 30, 255, 1.0); color: white;";
 
       cell3.innerHTML = "1m / 3m";
 

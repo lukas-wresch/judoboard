@@ -376,6 +376,52 @@ ZED::CSV Mat::Osaekomi2String(Fighter Who) const
 
 
 
+void Mat::ToString(YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+
+	auto print_scoreboard = [this, &Yaml](Fighter Who) {
+		Yaml << YAML::BeginMap;
+		Yaml << YAML::Key << "ippon"   << YAML::Value << GetScoreboard(Who).m_Ippon;
+		Yaml << YAML::Key << "wazaari" << YAML::Value << (GetScoreboard(Who).m_Ippon ? 0 : GetScoreboard(Who).m_WazaAri);
+		if (m_pMatch && m_pMatch->GetRuleSet().IsYukoEnabled())
+			Yaml << YAML::Key << "yuko" << YAML::Value << GetScoreboard(Who).m_Yuko;
+		if (m_pMatch && m_pMatch->GetRuleSet().IsKokaEnabled())
+			Yaml << YAML::Key << "koka" << YAML::Value << GetScoreboard(Who).m_Koka;
+
+		Yaml << YAML::Key << "shido"   << YAML::Value << (GetScoreboard(Who).m_HansokuMake ? 3 : GetScoreboard(Who).m_Shido);
+		Yaml << YAML::Key << "medical" << YAML::Value <<  GetScoreboard(Who).m_MedicalExamination;
+
+		Yaml << YAML::Key << "osaekomi_time" << YAML::Value << m_OsaekomiTimer[(int)Who].GetElapsedTime();
+		Yaml << YAML::Key << "is_osaekomi"   << YAML::Value << m_OsaekomiTimer[(int)Who].IsRunning();
+
+		if (GetScoreboard(Who).IsUnknownDisqualification())
+			Yaml << YAML::Key << "unknown_disqualification" << YAML::Value << true;
+
+		Yaml << YAML::EndMap;
+	};
+
+	Yaml << YAML::Key << "white" << YAML::Value;
+	print_scoreboard(Fighter::White);
+	Yaml << YAML::Key << "blue"  << YAML::Value;
+	print_scoreboard(Fighter::Blue);
+
+	Yaml << YAML::Key << "hajime_time" << YAML::Value << GetTime2Display();
+	Yaml << YAML::Key << "is_hajime"   << YAML::Value << IsHajime();
+
+	Yaml << YAML::Key << "are_fighters_on_mat"  << YAML::Value << AreFightersOnMat();
+	Yaml << YAML::Key << "can_next_match_start" << YAML::Value << CanNextMatchStart();
+	Yaml << YAML::Key << "has_concluded"        << YAML::Value << HasConcluded();
+	Yaml << YAML::Key << "winner"               << YAML::Value << (int)GetResult().m_Winner;
+	Yaml << YAML::Key << "is_out_of_time"       << YAML::Value << IsOutOfTime();
+	Yaml << YAML::Key << "no_winner_yet"        << YAML::Value << (GetResult().m_Winner == Winner::Draw);
+	Yaml << YAML::Key << "is_goldenscore"       << YAML::Value << IsGoldenScore();	
+
+	Yaml << YAML::EndMap;
+}
+
+
+
 void Mat::Hajime()
 {
 	//Double ippons during golden score?

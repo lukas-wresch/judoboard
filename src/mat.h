@@ -109,8 +109,9 @@ namespace Judoboard
 		virtual void Tokeda() override;
 
 		//Serialization
-		ZED::CSV Scoreboard2String() const override;
-		ZED::CSV Osaekomi2String(Fighter Who) const override;
+		[[deprecated]] ZED::CSV Scoreboard2String() const;
+		[[deprecated]] ZED::CSV Osaekomi2String(Fighter Who) const;
+		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 		virtual const Scoreboard& GetScoreboard(Fighter Whom) const override
 		{

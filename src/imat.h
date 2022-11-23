@@ -175,8 +175,7 @@ namespace Judoboard
 		virtual ZED::Blob RequestScreenshot() const = 0;
 
 		//Serialization
-		virtual ZED::CSV Scoreboard2String() const = 0;
-		virtual ZED::CSV Osaekomi2String(Fighter Who) const = 0;
+		virtual void ToString(YAML::Emitter& Yaml) const = 0;
 
 		//Config
 		IpponStyle GetIpponStyle() const { return m_IpponStyle; }
