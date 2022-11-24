@@ -449,6 +449,19 @@ function GetScore()
     OsaekomiBlueTimer  = parseInt(res.blue.osaekomi_time);
     OsaekomiBlueTimer_Running = res.blue.is_osaekomi_running;
 
+    OsaekomiBlueTimer_Running = res.blue.is_osaekomi_running;
+
+    if (res.is_osaekomi)
+    {
+      document.getElementById("tokeda1").disabled = false;
+      document.getElementById("tokeda2").disabled = false;
+    }
+    else
+    {
+      document.getElementById("tokeda1").disabled = true;
+      document.getElementById("tokeda2").disabled = true;
+    }
+
     if (res.is_hajime)
     {
       HajimeTimer_Running = true;
@@ -467,18 +480,11 @@ function GetScore()
         document.getElementById("blue_osaekomi").disabled = false;
 
       if (res.is_osaekomi)
-      {
-        document.getElementById("tokeda1").disabled = false;
-        document.getElementById("tokeda2").disabled = false;
         document.getElementById("mate").innerHTML = "Sonomama";
-      }
       else
-      {
-        document.getElementById("tokeda1").disabled = true;
-        document.getElementById("tokeda2").disabled = true;
         document.getElementById("mate").innerHTML = "Mate";
-      }
     }
+
     else
     {
       HajimeTimer_Running = false;
@@ -524,12 +530,7 @@ function GetScore()
       ShowNextMatches(true);
 
     if (res.can_next_match_start)
-    {
-      //document.getElementById("next_fight").disabled = false;
       document.getElementById("hajime").disabled = true;
-    }
-    //else
-      //document.getElementById("next_fight").disabled = true;
 
     if (res.has_concluded)
     {
@@ -611,7 +612,13 @@ function GetJudokaName()
       cell3.innerHTML = "1m / 3m";
 
       if (i == 0)
-        cell4.innerHTML = '<button class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="StartNextMatch()">' + lang.start_next_match + '</button>';
+      {
+        var dis = 'disabled';
+        if (CurrentScore.can_next_match_start)
+          dis = '';
+
+        cell4.innerHTML = '<button ' + dis + ' class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="StartNextMatch()">' + lang.start_next_match + '</button>';
+      }
       else
         cell4.innerHTML = '<button class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="MoveUp(\'' + match.uuid + '\')">' + lang.push_up + '</button>';
 

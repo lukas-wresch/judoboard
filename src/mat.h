@@ -109,8 +109,6 @@ namespace Judoboard
 		virtual void Tokeda() override;
 
 		//Serialization
-		[[deprecated]] ZED::CSV Scoreboard2String() const;
-		[[deprecated]] ZED::CSV Osaekomi2String(Fighter Who) const;
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 		virtual const Scoreboard& GetScoreboard(Fighter Whom) const override
@@ -251,9 +249,9 @@ namespace Judoboard
 					if (m_Aligment == Aligment::Left)
 						Renderer.RenderTransformed(*m_Texture.data, (int)m_x, (int)m_y);
 					else if (m_Aligment == Aligment::Center)
-						Renderer.RenderTransformed(*m_Texture.data, (int)m_x - m_Texture->GetWidth()/2, (int)m_y-m_Texture->GetHeight()/2);
+						Renderer.RenderTransformed(*m_Texture.data, (int)m_x - (int)(m_Texture->GetWidth()*m_Texture->GetSizeX()/2.0f), (int)m_y - (int)(m_Texture->GetHeight()*m_Texture->GetSizeY()/2.0f));
 					else if (m_Aligment == Aligment::Right)
-						Renderer.RenderTransformed(*m_Texture.data, (int)m_x - m_Texture->GetWidth(), (int)m_y);
+						Renderer.RenderTransformed(*m_Texture.data, (int)m_x - (int)(m_Texture->GetWidth()*m_Texture->GetSizeX()), (int)m_y);
 				}
 			}
 
@@ -269,6 +267,12 @@ namespace Judoboard
 			{
 				m_x = X;
 				m_y = Y;
+				return *this;
+			}
+
+			GraphicElement& SetTexture(ZED::Texture* NewTexture)
+			{
+				m_Texture = NewTexture;
 				return *this;
 			}
 

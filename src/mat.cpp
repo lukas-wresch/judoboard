@@ -82,6 +82,9 @@ bool Mat::Open()
 		if (!m_Winner)
 			m_Winner = m_Window.GetRenderer().CreateTexture("assets/winner2.png");
 
+		m_Graphics["winner_blue" ].SetTexture(m_Winner);
+		m_Graphics["winner_white"].SetTexture(m_Winner);
+
 		ZED::Log::Info("Logo loaded");
 
 		while (m_Window.IsRunning())
@@ -344,40 +347,6 @@ bool Mat::EnableGoldenScore(bool GoldenScore)
 
 
 
-ZED::CSV Mat::Scoreboard2String() const
-{
-	ZED::CSV ret;
-	ret << GetScoreboard(Fighter::White).m_Ippon << (GetScoreboard(Fighter::White).m_Ippon ? 0 : GetScoreboard(Fighter::White).m_WazaAri);
-	ret << GetScoreboard(Fighter::Blue).m_Ippon  << (GetScoreboard(Fighter::Blue ).m_Ippon ? 0 : GetScoreboard(Fighter::Blue ).m_WazaAri);
-
-	if (m_pMatch && m_pMatch->GetRuleSet().IsYukoEnabled())
-		ret << GetScoreboard(Fighter::White).m_Yuko << GetScoreboard(Fighter::Blue).m_Yuko;
-	else
-		ret << -1 << -1;
-
-	if (m_pMatch && m_pMatch->GetRuleSet().IsKokaEnabled())
-		ret << GetScoreboard(Fighter::White).m_Koka << GetScoreboard(Fighter::Blue).m_Koka;
-	else
-		ret << -1 << -1;
-
-	ret << (GetScoreboard(Fighter::White).m_HansokuMake ? 3 : GetScoreboard(Fighter::White).m_Shido);
-	ret << (GetScoreboard(Fighter::Blue ).m_HansokuMake ? 3 : GetScoreboard(Fighter::Blue ).m_Shido);
-
-	ret << GetScoreboard(Fighter::White).m_MedicalExamination << GetScoreboard(Fighter::Blue).m_MedicalExamination;
-
-	return ret;
-}
-
-
-
-ZED::CSV Mat::Osaekomi2String(Fighter Who) const
-{
-	ZED::CSV ret;
-	return ret << m_OsaekomiTimer[(int)Who].GetElapsedTime() << m_OsaekomiTimer[(int)Who].IsRunning();
-}
-
-
-
 void Mat::ToString(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginMap;
@@ -461,6 +430,10 @@ void Mat::Hajime()
 
 			m_Graphics["hajime"].SetAlpha(255).AddAnimation(Animation(0.0, 0.0, -50.0, [](auto& g) { return g.m_a > 0.0; }));
 			m_Graphics["mate"].StopAllAnimations().AddAnimation(Animation(0.0, 0.0, -90.0, [](auto& g) { return g.m_a > 0.0; }));
+
+			m_Graphics["osaekomi_text"].StopAllAnimations().SetPosition(0, 0, 255);
+			m_Graphics["osaekomi_bar_border"].StopAllAnimations().SetPosition(0, 0, 0);
+			m_Graphics["osaekomi_bar"].StopAllAnimations().SetPosition(0, 0, 0);
 		}
 
 		m_mutex.unlock();
@@ -2022,18 +1995,6 @@ bool Mat::Render(double dt) const
 		RenderTimer(dt);
 		RenderShidos(dt);
 
-		if (HasConcluded() && m_Winner)//Render winner animation
-		{
-			m_Winner->SetSize((float)(0.5 * m_ScalingFactor));
-
-			if (GetResult().m_Winner == Winner::Blue)
-				renderer.RenderTransformed(*m_Winner, (int)(200.0*m_ScalingFactor),
-										   height/2 + (int)(70.0*m_ScalingFactor));
-			else if (GetResult().m_Winner == Winner::White)
-				renderer.RenderTransformed(*m_Winner, width - (int)(m_Winner->GetWidth() * 0.5 * m_ScalingFactor) - (int)(200.0*m_ScalingFactor),
-										   height/2 + (int)(70.0*m_ScalingFactor));
-		}
-
 		m_Graphics["matchtable"].Render(renderer, dt);
 		m_Graphics["mat_name"  ].Render(renderer, dt);
 
@@ -2066,6 +2027,42 @@ bool Mat::Render(double dt) const
 
 		m_Graphics["effect_hansokumake_white"].Render(renderer, dt);
 		m_Graphics["effect_hansokumake_blue" ].Render(renderer, dt);
+
+
+		//if (HasConcluded() && m_Winner)//Render winner animation
+		if (m_Winner)//Render winner animation
+		{
+			const float size = 0.55f;
+
+			//if (GetResult().m_Winner == Winner::Blue)
+			{
+				m_Graphics["winner_blue"]->SetSize((float)((size + 0.1f * sin(0.004 * (double)Timer::GetTimestamp())) * m_ScalingFactor));
+				m_Graphics["winner_blue"].SetAlpha(255.0);
+				m_Graphics["winner_blue"].Center();
+				m_Graphics["winner_blue"].SetPosition((int)(200.0 * m_ScalingFactor) + (int)(m_Winner->GetWidth() * size / 2.0f),
+					height / 2 + (int)(20.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * size / 2.0f));
+				m_Graphics["winner_blue"].Render(renderer, dt);
+			}
+
+			//else if (GetResult().m_Winner == Winner::White)
+			{
+				m_Graphics["winner_white"]->SetSize((float)((size + 0.1f * sin(0.004 * (double)Timer::GetTimestamp())) * m_ScalingFactor));
+				m_Graphics["winner_white"].SetAlpha(255.0);
+				m_Graphics["winner_white"].Center();
+				m_Graphics["winner_white"].SetPosition(width - (int)(200.0 * m_ScalingFactor) - (int)(m_Winner->GetWidth() * size / 2.0f),
+					height / 2 + (int)(20.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * size / 2.0f));
+				m_Graphics["winner_white"].Render(renderer, dt);
+			}
+
+			/*m_Winner->SetSize((float)(0.5 * m_ScalingFactor));
+
+			if (GetResult().m_Winner == Winner::Blue)
+			renderer.RenderTransformed(*m_Winner, (int)(200.0*m_ScalingFactor),
+			height/2 + (int)(70.0*m_ScalingFactor));
+			else if (GetResult().m_Winner == Winner::White)
+			renderer.RenderTransformed(*m_Winner, width - (int)(m_Winner->GetWidth() * 0.5 * m_ScalingFactor) - (int)(200.0*m_ScalingFactor),
+			height/2 + (int)(70.0*m_ScalingFactor));*/
+		}
 
 		break;
 
