@@ -1343,22 +1343,25 @@ void Mat::NextState(State NextState) const
 			//Winner animation
 			const double base_size = 0.75 * m_ScalingFactor;
 
-			m_Graphics["winner_blue"].SetAlpha(0.0);
+			m_Graphics["winner_blue"].SetAlpha(-400.0);
 			m_Graphics["winner_blue"].Center();			
 			m_Graphics["winner_blue"].SetPosition((int)(220.0 * m_ScalingFactor) + (int)(m_Winner->GetWidth() * base_size / 2.0f),
 				height / 2 + (int)(-100.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * base_size / 2.0f));
+
 			m_Graphics["winner_blue"].StopAllAnimations();
 			m_Graphics["winner_blue"].AddAnimation(Animation::CreateScaleSinus(0.1 * m_ScalingFactor, 0.004, base_size));
 			m_Graphics["winner_blue"].GetAnimations()[0].RunInParallel();
-			m_Graphics["winner_blue"].AddAnimation(Animation::CreateLinear(0.0, 0.0, 50.0));
+			m_Graphics["winner_blue"].AddAnimation(Animation::CreateLinear(0.0, 0.0, 140.0, [=](auto& g) { return g.m_a < 255.0; }));
 
-			m_Graphics["winner_white"].SetAlpha(0.0);
+			m_Graphics["winner_white"].SetAlpha(-400.0);
 			m_Graphics["winner_white"].Center();			
 			m_Graphics["winner_white"].SetPosition(width - (int)(220.0 * m_ScalingFactor) - (int)(m_Winner->GetWidth() * base_size / 2.0f),
 				height / 2 + (int)(-100.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * base_size / 2.0f));
+
+			m_Graphics["winner_white"].StopAllAnimations();
 			m_Graphics["winner_white"].AddAnimation(Animation::CreateScaleSinus(0.1 * m_ScalingFactor, 0.004, base_size));	
 			m_Graphics["winner_white"].GetAnimations()[0].RunInParallel();
-			m_Graphics["winner_white"].AddAnimation(Animation::CreateLinear(0.0, 0.0, 50.0));
+			m_Graphics["winner_white"].AddAnimation(Animation::CreateLinear(0.0, 0.0, 140.0, [=](auto& g) { return g.m_a < 255.0; }));
 
 			break;
 		}
@@ -1435,6 +1438,9 @@ void Mat::NextState(State NextState) const
 
 			m_Graphics["mat_name"].SetPosition(20, height - (int)(60.0 * m_ScalingFactor))
 								  .AddAnimation(Animation::CreateLinear(0.0, 0.0, 10.0, [=](auto& g) { return g.m_a < 255.0; }));
+
+			m_Graphics["winner_blue" ].AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0));
+			m_Graphics["winner_white"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0));
 			break;
 	}
 }
@@ -2054,20 +2060,13 @@ bool Mat::Render(double dt) const
 		m_Graphics["effect_hansokumake_blue" ].Render(renderer, dt);
 
 
-		//if (HasConcluded() && m_Winner)//Render winner animation
-		if (m_Winner)//Render winner animation
+		if (HasConcluded() && m_Winner)//Render winner animation
 		{
-			const float size = 0.75f;
-
-			//if (GetResult().m_Winner == Winner::Blue)
-			{
+			if (GetResult().m_Winner == Winner::Blue)
 				m_Graphics["winner_blue"].Render(renderer, dt);
-			}
 
-			//else if (GetResult().m_Winner == Winner::White)
-			{
+			else if (GetResult().m_Winner == Winner::White)
 				m_Graphics["winner_white"].Render(renderer, dt);
-			}
 		}
 
 		break;
@@ -2075,9 +2074,6 @@ bool Mat::Render(double dt) const
 
 
 	case State::TransitionToWaiting:
-		//float alpha = 270.0f + (elapsed - 1000.0f) / 80.0f;
-		//RenderBackgroundEffect(alpha);
-
 
 		m_Graphics["osaekomi_bar_border"].Render(renderer, dt);
 		m_Graphics["osaekomi_bar" ].Render(renderer, dt);
@@ -2094,6 +2090,12 @@ bool Mat::Render(double dt) const
 
 		m_Graphics["matchtable"].Render(renderer, dt);
 		m_Graphics["mat_name"  ].Render(renderer, dt);
+
+		//Render winner animation
+		if (m_Graphics["winner_blue"].m_a > 0)
+			m_Graphics["winner_blue"].Render(renderer, dt);
+		if (m_Graphics["winner_white"].m_a > 0)
+			m_Graphics["winner_white"].Render(renderer, dt);
 
 		for (int i = 0; i < 2; i++)
 		{
