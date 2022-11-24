@@ -79,6 +79,8 @@ bool Mat::Open()
 
 		if (!m_Logo)
 			m_Logo = m_Window.GetRenderer().CreateTexture("assets/logo.png");
+		if (!m_Winner)
+			m_Winner = m_Window.GetRenderer().CreateTexture("assets/winner2.png");
 
 		ZED::Log::Info("Logo loaded");
 
@@ -2019,6 +2021,18 @@ bool Mat::Render(double dt) const
 		RenderScore(dt);
 		RenderTimer(dt);
 		RenderShidos(dt);
+
+		if (HasConcluded() && m_Winner)//Render winner animation
+		{
+			m_Winner->SetSize((float)(0.5 * m_ScalingFactor));
+
+			if (GetResult().m_Winner == Winner::Blue)
+				renderer.RenderTransformed(*m_Winner, (int)(200.0*m_ScalingFactor),
+										   height/2 + (int)(70.0*m_ScalingFactor));
+			else if (GetResult().m_Winner == Winner::White)
+				renderer.RenderTransformed(*m_Winner, width - (int)(m_Winner->GetWidth() * 0.5 * m_ScalingFactor) - (int)(200.0*m_ScalingFactor),
+										   height/2 + (int)(70.0*m_ScalingFactor));
+		}
 
 		m_Graphics["matchtable"].Render(renderer, dt);
 		m_Graphics["mat_name"  ].Render(renderer, dt);

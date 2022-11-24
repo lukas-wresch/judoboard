@@ -384,6 +384,7 @@ namespace Judoboard
 
 		mutable ZED::Ref<ZED::Texture> m_Background;
 		mutable ZED::Ref<ZED::Texture> m_Logo;
+		mutable ZED::Ref<ZED::Texture> m_Winner;
 
 		double m_ScalingFactor = 1.0;//Should be 1.0 for 1080p screen, smaller for smaller screen and > 1.0 for larger screens
 	};
