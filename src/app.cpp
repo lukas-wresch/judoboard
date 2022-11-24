@@ -212,8 +212,16 @@ bool Application::OpenTournament(const UUID& UUID)
 		return false;
 
 	m_CurrentTournament = FindTournament(UUID);
+
 	if (m_CurrentTournament)
+	{
 		m_Database.SetLastTournamentName(m_CurrentTournament->GetName());
+
+		//Reset break time for all participants
+		for (auto [id, judoka] : m_CurrentTournament->GetParticipants())
+			judoka->StartBreak();
+	}
+
 	return true;
 }
 
