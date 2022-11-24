@@ -3373,6 +3373,8 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 		ret << YAML::BeginMap;
 
 		ret << YAML::Key << "uuid" << YAML::Value << (std::string)match.GetUUID();
+		ret << YAML::Key << "current_breaktime" << YAML::Value << match.GetCurrentBreaktime();
+		ret << YAML::Key << "breaktime"         << YAML::Value << match.GetRuleSet().GetBreakTime();
 
 		ret << YAML::Key << "white_name" << YAML::Value;
 		if (match.GetFighter(Fighter::White))

@@ -115,6 +115,10 @@ bool Mat::Close()
 	if (m_Thread.joinable())
 		m_Thread.join();
 
+	//Remove texture so that they don't get freed twice
+	m_Graphics["winner_blue" ].Reset();
+	m_Graphics["winner_white"].Reset();
+
 	return true;
 }
 

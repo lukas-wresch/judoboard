@@ -428,6 +428,8 @@ TEST(Ajax, GetNamesOnMat)
 		ASSERT_TRUE(yaml["next_matches"].IsSequence());
 		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "A B");
 		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "C D");
+		EXPECT_TRUE(yaml["next_matches"][0]["current_breaktime"].as<int>() > 0);
+		EXPECT_EQ(yaml["next_matches"][0]["breaktime"].as<int>(), 0);
 		EXPECT_EQ(yaml["next_matches"][1]["white_name"].as<std::string>(), "E F");
 		EXPECT_EQ(yaml["next_matches"][1]["blue_name" ].as<std::string>(), "G H");
 		EXPECT_EQ(yaml["next_matches"][2]["white_name"].as<std::string>(), "I J");

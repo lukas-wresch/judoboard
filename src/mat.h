@@ -218,6 +218,11 @@ namespace Judoboard
 			GraphicElement() = default;
 			//GraphicElement(ZED::Texture* Tex) : m_Texture(Tex) {}
 
+			void Reset()
+			{
+				m_Texture.Reset();
+			}
+
 			void Clear()
 			{
 				m_Name.clear();
@@ -248,9 +253,6 @@ namespace Judoboard
 
 			void Render(const ZED::Renderer& Renderer, double dt)
 			{
-				//if (m_Animations.size() > 0)
-					//if (m_Animations.front().Process(*this, dt))
-						//m_Animations.erase(m_Animations.begin());
 				for (size_t i = 0; i < m_Animations.size(); ++i)
 				{
 					if (m_Animations[i].Process(*this, dt))
@@ -289,11 +291,11 @@ namespace Judoboard
 						m_Texture->SetAlpha((unsigned char)m_a);
 
 					if (m_Aligment == Aligment::Left)
-						Renderer.RenderTransformed(*m_Texture.data, (int)m_x, (int)m_y);
+						Renderer.RenderTransformed(m_Texture, (int)m_x, (int)m_y);
 					else if (m_Aligment == Aligment::Center)
-						Renderer.RenderTransformed(*m_Texture.data, (int)m_x - (int)(m_Texture->GetWidth()*m_Texture->GetSizeX()/2.0f), (int)m_y - (int)(m_Texture->GetHeight()*m_Texture->GetSizeY()/2.0f));
+						Renderer.RenderTransformed(m_Texture, (int)m_x - (int)(m_Texture->GetWidth()*m_Texture->GetSizeX()/2.0f), (int)m_y - (int)(m_Texture->GetHeight()*m_Texture->GetSizeY()/2.0f));
 					else if (m_Aligment == Aligment::Right)
-						Renderer.RenderTransformed(*m_Texture.data, (int)m_x - (int)(m_Texture->GetWidth()*m_Texture->GetSizeX()), (int)m_y);
+						Renderer.RenderTransformed(m_Texture, (int)m_x - (int)(m_Texture->GetWidth()*m_Texture->GetSizeX()), (int)m_y);
 				}
 			}
 
@@ -358,9 +360,11 @@ namespace Judoboard
 
 			ZED::Texture* operator->() { return m_Texture; }
 			const ZED::Texture* operator->() const { return m_Texture; }
-			operator ZED::Texture* () { return m_Texture; }
+			//operator ZED::Texture* () { return m_Texture; }
+			operator bool () { return m_Texture && m_Texture->IsLoaded(); }
 
 			ZED::Ref<ZED::Texture> m_Texture;
+			//ZED::Texture* m_Texture = nullptr;
 
 			ZED::FontSize m_Size = ZED::FontSize::Huge;
 			std::string m_Name;
