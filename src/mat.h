@@ -354,6 +354,8 @@ namespace Judoboard
 				return *this;
 			}
 
+			auto& GetAnimations() { return m_Animations; }
+
 			ZED::Texture* operator->() { return m_Texture; }
 			const ZED::Texture* operator->() const { return m_Texture; }
 			operator ZED::Texture* () { return m_Texture; }

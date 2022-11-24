@@ -1340,6 +1340,26 @@ void Mat::NextState(State NextState) const
 			m_Graphics["effect_hansokumake_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row3);
 			m_Graphics["effect_hansokumake_white"].SetPosition(width - (int)(645.0 * m_ScalingFactor), effect_row3);
 
+			//Winner animation
+			const double base_size = 0.75 * m_ScalingFactor;
+
+			m_Graphics["winner_blue"].SetAlpha(0.0);
+			m_Graphics["winner_blue"].Center();			
+			m_Graphics["winner_blue"].SetPosition((int)(220.0 * m_ScalingFactor) + (int)(m_Winner->GetWidth() * base_size / 2.0f),
+				height / 2 + (int)(-100.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * base_size / 2.0f));
+			m_Graphics["winner_blue"].StopAllAnimations();
+			m_Graphics["winner_blue"].AddAnimation(Animation::CreateScaleSinus(0.1 * m_ScalingFactor, 0.004, base_size));
+			m_Graphics["winner_blue"].GetAnimations()[0].RunInParallel();
+			m_Graphics["winner_blue"].AddAnimation(Animation::CreateLinear(0.0, 0.0, 50.0));
+
+			m_Graphics["winner_white"].SetAlpha(0.0);
+			m_Graphics["winner_white"].Center();			
+			m_Graphics["winner_white"].SetPosition(width - (int)(220.0 * m_ScalingFactor) - (int)(m_Winner->GetWidth() * base_size / 2.0f),
+				height / 2 + (int)(-100.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * base_size / 2.0f));
+			m_Graphics["winner_white"].AddAnimation(Animation::CreateScaleSinus(0.1 * m_ScalingFactor, 0.004, base_size));	
+			m_Graphics["winner_white"].GetAnimations()[0].RunInParallel();
+			m_Graphics["winner_white"].AddAnimation(Animation::CreateLinear(0.0, 0.0, 50.0));
+
 			break;
 		}
 
@@ -2041,36 +2061,13 @@ bool Mat::Render(double dt) const
 
 			//if (GetResult().m_Winner == Winner::Blue)
 			{
-				m_Graphics["winner_blue"]->SetSize((float)((size + 0.1f * sin(0.004 * (double)Timer::GetTimestamp())) * m_ScalingFactor));
-				m_Graphics["winner_blue"].SetAlpha(255.0);
-				m_Graphics["winner_blue"].Center();
-				//m_Graphics["winner_blue"].SetPosition((int)(200.0 * m_ScalingFactor) + (int)(m_Winner->GetWidth() * size / 2.0f),
-					//height / 2 + (int)(20.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * size / 2.0f));
-				m_Graphics["winner_blue"].SetPosition((int)(220.0 * m_ScalingFactor) + (int)(m_Winner->GetWidth() * size / 2.0f),
-					height / 2 + (int)(-100.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * size / 2.0f));
 				m_Graphics["winner_blue"].Render(renderer, dt);
 			}
 
 			//else if (GetResult().m_Winner == Winner::White)
 			{
-				m_Graphics["winner_white"]->SetSize((float)((size + 0.1f * sin(0.004 * (double)Timer::GetTimestamp())) * m_ScalingFactor));
-				m_Graphics["winner_white"].SetAlpha(255.0);
-				m_Graphics["winner_white"].Center();
-				//m_Graphics["winner_white"].SetPosition(width - (int)(200.0 * m_ScalingFactor) - (int)(m_Winner->GetWidth() * size / 2.0f),
-					//height / 2 + (int)(20.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * size / 2.0f));
-				m_Graphics["winner_white"].SetPosition(width - (int)(220.0 * m_ScalingFactor) - (int)(m_Winner->GetWidth() * size / 2.0f),
-					height / 2 + (int)(-100.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * size / 2.0f));
 				m_Graphics["winner_white"].Render(renderer, dt);
 			}
-
-			/*m_Winner->SetSize((float)(0.5 * m_ScalingFactor));
-
-			if (GetResult().m_Winner == Winner::Blue)
-			renderer.RenderTransformed(*m_Winner, (int)(200.0*m_ScalingFactor),
-			height/2 + (int)(70.0*m_ScalingFactor));
-			else if (GetResult().m_Winner == Winner::White)
-			renderer.RenderTransformed(*m_Winner, width - (int)(m_Winner->GetWidth() * 0.5 * m_ScalingFactor) - (int)(200.0*m_ScalingFactor),
-			height/2 + (int)(70.0*m_ScalingFactor));*/
 		}
 
 		break;
