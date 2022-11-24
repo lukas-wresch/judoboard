@@ -416,8 +416,8 @@ void Mat::Hajime()
 
 			AddEvent(MatchLog::NeutralEvent::Yoshi);
 
-			m_Graphics["yoshi"].SetAlpha(255).AddAnimation(Animation(0.0, 0.0, -45.0, [](auto& g) { return g.m_a > 0.0; }));
-			m_Graphics["sonomama"].StopAllAnimations().AddAnimation(Animation(0.0, 0.0, -70.0, [](auto& g) { return g.m_a > 0.0; }));
+			m_Graphics["yoshi"].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -45.0, [](auto& g) { return g.m_a > 0.0; }));
+			m_Graphics["sonomama"].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -70.0, [](auto& g) { return g.m_a > 0.0; }));
 		}
 
 		else if (!IsOutOfTime())//Normal hajime
@@ -428,8 +428,8 @@ void Mat::Hajime()
 
 			AddEvent(MatchLog::NeutralEvent::Hajime);
 
-			m_Graphics["hajime"].SetAlpha(255).AddAnimation(Animation(0.0, 0.0, -50.0, [](auto& g) { return g.m_a > 0.0; }));
-			m_Graphics["mate"].StopAllAnimations().AddAnimation(Animation(0.0, 0.0, -90.0, [](auto& g) { return g.m_a > 0.0; }));
+			m_Graphics["hajime"].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0, [](auto& g) { return g.m_a > 0.0; }));
+			m_Graphics["mate"].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -90.0, [](auto& g) { return g.m_a > 0.0; }));
 
 			m_Graphics["osaekomi_text"].StopAllAnimations().SetPosition(0, 0, 255);
 			m_Graphics["osaekomi_bar_border"].StopAllAnimations().SetPosition(0, 0, 0);
@@ -462,26 +462,26 @@ void Mat::Mate()
 			m_IsOsaekomi = false;
 
 			//In case mate is called during sonomama
-			m_Graphics["sonomama"].StopAllAnimations().AddAnimation(Animation(0.0, 0.0, -500.0, [](auto& g) { return g.m_a > 0.0; }));
+			m_Graphics["sonomama"].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -500.0, [](auto& g) { return g.m_a > 0.0; }));
 
-			m_Graphics["osaekomi_text"].AddAnimation(Animation(0.0, 0.0, -25.0));
-			m_Graphics["osaekomi_bar_border"].AddAnimation(Animation(0.0, 0.0, -50.0));
-			m_Graphics["osaekomi_bar"].AddAnimation(Animation(0.0, 0.0, -25.0));
+			m_Graphics["osaekomi_text"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0));
+			m_Graphics["osaekomi_bar_border"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0));
+			m_Graphics["osaekomi_bar"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0));
 
-			m_Graphics["effect_osaekomi_" + Fighter2String(osaekomi_holder)].AddAnimation(Animation(0.0, 0.0, -55.0, [](auto& g) { return g.m_a > 0.0; }));
+			m_Graphics["effect_osaekomi_" + Fighter2String(osaekomi_holder)].AddAnimation(Animation::CreateLinear(0.0, 0.0, -55.0, [](auto& g) { return g.m_a > 0.0; }));
 		}
 
 		AddEvent(MatchLog::NeutralEvent::Mate);
 
-		m_Graphics["hajime"].StopAllAnimations().AddAnimation(Animation(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["hajime"].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
 
 		if (!HasConcluded())//Only show mate when the match can continue (otherwise it would be soremade)
-			m_Graphics["mate"].SetAlpha(255).AddAnimation(Animation(0.0, 0.0, -30.0, [](auto& g) { return g.m_a > 0.0; }));
+			m_Graphics["mate"].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -30.0, [](auto& g) { return g.m_a > 0.0; }));
 
-		m_Graphics["effect_osaekomi_white"].StopAllAnimations().AddAnimation(Animation(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
-		m_Graphics["effect_osaekomi_blue" ].StopAllAnimations().AddAnimation(Animation(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
-		m_Graphics["effect_tokeda_white"  ].StopAllAnimations().AddAnimation(Animation(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
-		m_Graphics["effect_tokeda_blue"   ].StopAllAnimations().AddAnimation(Animation(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["effect_osaekomi_white"].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["effect_osaekomi_blue" ].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["effect_tokeda_white"  ].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["effect_tokeda_blue"   ].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
 
 		m_mutex.unlock();
 	}
@@ -503,7 +503,7 @@ void Mat::Sonomama()
 
 		AddEvent(MatchLog::NeutralEvent::Sonomama);
 
-		m_Graphics["sonomama"].SetAlpha(255).StopAllAnimations().AddAnimation(Animation(0.0, 0.0, -10.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["sonomama"].SetAlpha(255).StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -10.0, [](auto& g) { return g.m_a > 0.0; }));
 
 		m_mutex.unlock();
 	}
@@ -529,11 +529,11 @@ void Mat::AddIppon(Fighter Whom)
 			m_OsaekomiTimer[1].Pause();
 			m_IsOsaekomi = false;
 
-			m_Graphics["effect_osaekomi_" + Fighter2String(GetOsaekomiHolder())].AddAnimation(Animation(0.0, 0.0, -30.0, [](auto& g) { return g.m_a > 0.0; }));
+			m_Graphics["effect_osaekomi_" + Fighter2String(GetOsaekomiHolder())].AddAnimation(Animation::CreateLinear(0.0, 0.0, -30.0, [](auto& g) { return g.m_a > 0.0; }));
 		}
 
 		if (!GetScoreboard(!Whom).m_HansokuMake)//Don't show ippon effect if its due to an hansokumake
-			m_Graphics["effect_ippon_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation(0.0, 0.0, -15.0, [](auto& g) { return g.m_a > 0.0; }));
+			m_Graphics["effect_ippon_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0, [](auto& g) { return g.m_a > 0.0; }));
 
 		m_mutex.unlock();
 
@@ -571,7 +571,7 @@ void Mat::AddWazaAri(Fighter Whom)
 
 		AddEvent(Whom, MatchLog::BiasedEvent::AddWazaari);
 
-		m_Graphics["effect_wazaari_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation(0.0, 0.0, -20.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["effect_wazaari_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -20.0, [](auto& g) { return g.m_a > 0.0; }));
 
 		m_mutex.unlock();
 
@@ -632,7 +632,7 @@ void Mat::AddYuko(Fighter Whom)
 
 		AddEvent(Whom, MatchLog::BiasedEvent::AddYuko);	
 
-		m_Graphics["effect_yuko_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["effect_yuko_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
 
 		m_mutex.unlock();
 
@@ -669,7 +669,7 @@ void Mat::AddKoka(Fighter Whom)
 
 		AddEvent(Whom, MatchLog::BiasedEvent::AddKoka);
 
-		m_Graphics["effect_koka_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["effect_koka_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
 
 		m_mutex.unlock();
 
@@ -746,7 +746,7 @@ void Mat::AddShido(Fighter Whom)
 		SetScoreboard(Whom).m_Shido++;
 
 		AddEvent(Whom, MatchLog::BiasedEvent::AddShido);
-		m_Graphics["effect_shido_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation(0.0, 0.0, -20.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["effect_shido_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -20.0, [](auto& g) { return g.m_a > 0.0; }));
 
 		m_mutex.unlock();
 
@@ -795,7 +795,7 @@ void Mat::AddHansokuMake(Fighter Whom, bool Direct)
 			AddEvent(Whom, MatchLog::BiasedEvent::AddHansokuMake_Indirect);
 		}
 
-		m_Graphics["effect_hansokumake_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation(0.0, 0.0, -10.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["effect_hansokumake_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -10.0, [](auto& g) { return g.m_a > 0.0; }));
 
 		m_mutex.unlock();
 
@@ -1010,12 +1010,12 @@ void Mat::Tokeda()
 
 		AddEvent(MatchLog::NeutralEvent::Tokeda);
 
-		m_Graphics["osaekomi_text"].AddAnimation(Animation(0.0, 0.0, -15.0));
-		m_Graphics["osaekomi_bar_border"].AddAnimation(Animation(0.0, 0.0, -50.0));
-		m_Graphics["osaekomi_bar"].AddAnimation(Animation(0.0, 0.0, -25.0));
+		m_Graphics["osaekomi_text"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0));
+		m_Graphics["osaekomi_bar_border"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0));
+		m_Graphics["osaekomi_bar"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0));
 
-		m_Graphics["effect_osaekomi_" + Fighter2String(osaekomi_holder)].AddAnimation(Animation(0.0, 0.0, -55.0, [](auto& g) { return g.m_a > 0.0; }));
-		m_Graphics["effect_tokeda_"   + Fighter2String(osaekomi_holder)].StopAllAnimations().SetAlpha(255).AddAnimation(Animation(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["effect_osaekomi_" + Fighter2String(osaekomi_holder)].AddAnimation(Animation::CreateLinear(0.0, 0.0, -55.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["effect_tokeda_"   + Fighter2String(osaekomi_holder)].StopAllAnimations().SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
 	
 		m_mutex.unlock();
 	}
@@ -1137,16 +1137,19 @@ void Mat::RenderBackgroundEffect(float alpha) const
 
 bool Mat::Animation::Process(GraphicElement& Graphic, double dt)
 {
+	if (m_AnimateTill && !m_AnimateTill(Graphic))
+		return true;//Cancel animation
+
 	switch (m_Type)
 	{
 		case Type::MoveConstantVelocity:
-			if (m_AnimateTill && !m_AnimateTill(Graphic))
-				return true;//Cancel animation
-
 			Graphic.m_x += m_vx * dt;
 			Graphic.m_y += m_vy * dt;
 			Graphic.m_a += m_va * dt;
+			return false;
 
+		case Type::ScaleSinus:
+			Graphic->SetSize((float)((m_BaseSize + m_Amplitude * sin(m_Frequency * (double)Timer::GetTimestamp()))) );
 			return false;
 	}
 
@@ -1184,7 +1187,7 @@ void Mat::NextState(State NextState) const
 	switch (m_State)
 	{
 		case State::StartUp:
-			m_Graphics["mat_name"].AddAnimation(Animation(0.0, 0.0, -30.0, [](auto& g) { return g.m_a > 0.0; }));
+			m_Graphics["mat_name"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -30.0, [](auto& g) { return g.m_a > 0.0; }));
 			break;
 
 		case State::Waiting:
@@ -1225,62 +1228,62 @@ void Mat::NextState(State NextState) const
 		{
 			for (int i = 0; i < 2; i++)
 			{
-				m_Graphics["next_matches_white_" + std::to_string(i)].AddAnimation(Animation(+100.0, 0.0, -83.0));
-				m_Graphics["next_matches_blue_"  + std::to_string(i)].AddAnimation(Animation(-100.0, 0.0, -83.0));
-				m_Graphics["next_matches_white2_" + std::to_string(i)].AddAnimation(Animation(+100.0, 0.0, -83.0));
-				m_Graphics["next_matches_blue2_"  + std::to_string(i)].AddAnimation(Animation(-100.0, 0.0, -83.0));
-				m_Graphics["next_matches_white_club_" + std::to_string(i)].AddAnimation(Animation(+100.0, 0.0, -83.0));
-				m_Graphics["next_matches_blue_club_"  + std::to_string(i)].AddAnimation(Animation(-100.0, 0.0, -83.0));
+				m_Graphics["next_matches_white_" + std::to_string(i)].AddAnimation(Animation::CreateLinear(+100.0, 0.0, -83.0));
+				m_Graphics["next_matches_blue_"  + std::to_string(i)].AddAnimation(Animation::CreateLinear(-100.0, 0.0, -83.0));
+				m_Graphics["next_matches_white2_" + std::to_string(i)].AddAnimation(Animation::CreateLinear(+100.0, 0.0, -83.0));
+				m_Graphics["next_matches_blue2_"  + std::to_string(i)].AddAnimation(Animation::CreateLinear(-100.0, 0.0, -83.0));
+				m_Graphics["next_matches_white_club_" + std::to_string(i)].AddAnimation(Animation::CreateLinear(+100.0, 0.0, -83.0));
+				m_Graphics["next_matches_blue_club_"  + std::to_string(i)].AddAnimation(Animation::CreateLinear(-100.0, 0.0, -83.0));
 			}
 
 			m_Graphics["blue_name"].SetPosition(50, name_height-620, 80)
-								    .AddAnimation(Animation(0.0, 67.0, 20.0, [=](auto& g) { return g.m_y < name_height; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 67.0, 20.0, [=](auto& g) { return g.m_y < name_height; }));
 
 			m_Graphics["white_name"].SetPosition(width/2 + 60, name_height-620, 80)
-								   .AddAnimation(Animation(0.0, 67.0, 20.0, [=](auto& g) { return g.m_y < name_height; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 67.0, 20.0, [=](auto& g) { return g.m_y < name_height; }));
 
 			m_Graphics["blue_club"].SetPosition(50, club_height, -150)
-				.AddAnimation(Animation(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
 
 			m_Graphics["white_club"].SetPosition(width/2 + 60, club_height, -150)
-				.AddAnimation(Animation(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
 
 
 			double a = 25.0;
 			m_Graphics["blue_ippon"].SetPosition(score_margin, score_height - 500, 80).Center()
-									 .AddAnimation(Animation(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
-			
+				.AddAnimation(Animation::CreateLinear(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
+
 			m_Graphics["blue_wazari"].SetPosition(score_margin + score_padding, score_height - 500, 80).Center()
-									  .AddAnimation(Animation(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
 
 			m_Graphics["blue_yuko"].SetPosition(score_margin + 2*score_padding, score_height - 500, 80).Center()
-									.AddAnimation(Animation(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
 
 			m_Graphics["blue_koka"].SetPosition(score_margin + 3*score_padding, score_height - 500, 80).Center()
-									.AddAnimation(Animation(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
 
 			m_Graphics["white_ippon"].SetPosition(width/2 + score_margin, score_height - 500, 80).Center()
-								    .AddAnimation(Animation(0.0, 67.0, a,  [=](auto& g) { return g.m_y < score_height; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 67.0, a,  [=](auto& g) { return g.m_y < score_height; }));
 
 			m_Graphics["white_wazari"].SetPosition(width/2 + score_margin + score_padding, score_height - 500, 80).Center()
-									 .AddAnimation(Animation(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
 
 			m_Graphics["white_yuko"].SetPosition(width/2 + score_margin + 2*score_padding, score_height - 500, 80).Center()
-								   .AddAnimation(Animation(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
 
 			m_Graphics["white_koka"].SetPosition(width/2 + score_margin + 3*score_padding, score_height - 500, 80).Center()
-								   .AddAnimation(Animation(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
 
 			m_Graphics["timer"].SetPosition(width/2, height/2, -120).Center()
-							   .AddAnimation(Animation(0.0, 0.0, 33.0, [](auto& g) { return g.m_a < 255.0; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 0.0, 33.0, [](auto& g) { return g.m_a < 255.0; }));
 
-			m_Graphics["mat_name"  ].AddAnimation(Animation(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
+			m_Graphics["mat_name"  ].AddAnimation(Animation::CreateLinear(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
 
 			m_Graphics["next_match"].StopAllAnimations()
-									.AddAnimation(Animation(0.0, 0.0, -38.0, [](auto& g) { return g.m_a > 0.0; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 0.0, -38.0, [](auto& g) { return g.m_a > 0.0; }));
 
 			m_Graphics["following_match"].StopAllAnimations()
-										 .AddAnimation(Animation(0.0, 0.0, -40.0, [](auto& g) { return g.m_a > 0.0; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0, [](auto& g) { return g.m_a > 0.0; }));
 
 			m_Graphics["hajime"].UpdateTexture(renderer, "Hajime", ZED::Color(255, 255, 255));
 			m_Graphics["mate"  ].UpdateTexture(renderer, "Mate",   ZED::Color(0, 0, 0));
@@ -1355,63 +1358,63 @@ void Mat::NextState(State NextState) const
 				
 				m_Graphics["next_matches_blue_" + std::to_string(i)].StopAllAnimations()
 																	 .SetPosition(40 - 1320, (int)shift_y, 0)
-																	 .AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
-				
-				m_Graphics["next_matches_white_"  + std::to_string(i)].StopAllAnimations().Right()
-																	 .SetPosition(width - 40 + 1320, (int)shift_y, 0)
-																	 .AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
+																	 .AddAnimation(Animation::CreateLinear( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
 
-				
+				m_Graphics["next_matches_white_"  + std::to_string(i)].StopAllAnimations().Right()
+					.SetPosition(width - 40 + 1320, (int)shift_y, 0)
+					.AddAnimation(Animation::CreateLinear(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
+
+
 				m_Graphics["next_matches_blue2_" + std::to_string(i)].StopAllAnimations()
-																	 .SetPosition(40 - 1320, (int)shift_y + (int)(158.0*m_ScalingFactor), 0)
-																	 .AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
-				
+					.SetPosition(40 - 1320, (int)shift_y + (int)(158.0*m_ScalingFactor), 0)
+					.AddAnimation(Animation::CreateLinear( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
+
 				m_Graphics["next_matches_white2_"  + std::to_string(i)].StopAllAnimations().Right()
-																	 .SetPosition(width - 40 + 1320, (int)shift_y + (int)(158.0*m_ScalingFactor), 0)
-																	 .AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
+					.SetPosition(width - 40 + 1320, (int)shift_y + (int)(158.0*m_ScalingFactor), 0)
+					.AddAnimation(Animation::CreateLinear(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
 
 				m_Graphics["next_matches_blue_club_" + std::to_string(i)].StopAllAnimations()
 					.SetPosition(40 - 1320, (int)shift_y + (int)(330.0*m_ScalingFactor), 0)
-					.AddAnimation(Animation( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
+					.AddAnimation(Animation::CreateLinear( 140.0, 0.0, 32.0, [](auto& g) { return g.m_x < 40.0; }));
 
 				m_Graphics["next_matches_white_club_"  + std::to_string(i)].StopAllAnimations().Right()
 					.SetPosition(width - 40 + 1320, (int)shift_y + (int)(330.0*m_ScalingFactor), 0)
-					.AddAnimation(Animation(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
+					.AddAnimation(Animation::CreateLinear(-140.0, 0.0, 32.0, [=](auto& g) { return g.m_x > width - 40; }));
 			}
 
 			m_Graphics["next_match"].StopAllAnimations().Center()
 				.SetPosition(width/2, (int)(80*m_ScalingFactor), -115)
-				.AddAnimation(Animation(0.0, 0.0, 35.0, [](auto& g) { return g.m_a < 255.0; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 0.0, 35.0, [](auto& g) { return g.m_a < 255.0; }));
 
 			m_Graphics["following_match"].StopAllAnimations().Center()
 				.SetPosition(width/2, (int)(565 * m_ScalingFactor), -120)
-				.AddAnimation(Animation(0.0, 0.0, 32.0, [](auto& g) { return g.m_a < 255.0; }));
+				.AddAnimation(Animation::CreateLinear(0.0, 0.0, 32.0, [](auto& g) { return g.m_a < 255.0; }));
 
-			m_Graphics["osaekomi_bar_border"].AddAnimation(Animation(0.0, 0.0, -60.0));
-			m_Graphics["osaekomi_text"].AddAnimation(Animation(0.0, 0.0, -40.0));
-			m_Graphics["osaekomi_bar" ].AddAnimation(Animation(0.0, 0.0, -40.0));
+			m_Graphics["osaekomi_bar_border"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -60.0));
+			m_Graphics["osaekomi_text"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0));
+			m_Graphics["osaekomi_bar" ].AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0));
 
 
-			m_Graphics["white_name"].AddAnimation(Animation(0.0, -67.0, -25.0));
-			m_Graphics["blue_name" ].AddAnimation(Animation(0.0, -67.0, -25.0));
+			m_Graphics["white_name"].AddAnimation(Animation::CreateLinear(0.0, -67.0, -25.0));
+			m_Graphics["blue_name" ].AddAnimation(Animation::CreateLinear(0.0, -67.0, -25.0));
 
-			m_Graphics["white_club"].AddAnimation(Animation(0.0, -67.0, -25.0));
-			m_Graphics["blue_club" ].AddAnimation(Animation(0.0, -67.0, -25.0));
+			m_Graphics["white_club"].AddAnimation(Animation::CreateLinear(0.0, -67.0, -25.0));
+			m_Graphics["blue_club" ].AddAnimation(Animation::CreateLinear(0.0, -67.0, -25.0));
 
-			m_Graphics["white_ippon" ].AddAnimation(Animation(0.0, -67.0, -18.0));
-			m_Graphics["white_wazari"].AddAnimation(Animation(0.0, -67.0, -18.0));
-			m_Graphics["white_yuko"].AddAnimation(Animation(0.0, -67.0, -18.0));
-			m_Graphics["white_koka"].AddAnimation(Animation(0.0, -67.0, -18.0));
+			m_Graphics["white_ippon" ].AddAnimation(Animation::CreateLinear(0.0, -67.0, -18.0));
+			m_Graphics["white_wazari"].AddAnimation(Animation::CreateLinear(0.0, -67.0, -18.0));
+			m_Graphics["white_yuko"].AddAnimation(Animation::CreateLinear(0.0, -67.0, -18.0));
+			m_Graphics["white_koka"].AddAnimation(Animation::CreateLinear(0.0, -67.0, -18.0));
 
-			m_Graphics["blue_ippon" ].AddAnimation(Animation(0.0, -67.0, -18.0));
-			m_Graphics["blue_wazari"].AddAnimation(Animation(0.0, -67.0, -18.0));
-			m_Graphics["blue_yuko"].AddAnimation(Animation(0.0, -67.0, -18.0));
-			m_Graphics["blue_koka"].AddAnimation(Animation(0.0, -67.0, -18.0));
+			m_Graphics["blue_ippon" ].AddAnimation(Animation::CreateLinear(0.0, -67.0, -18.0));
+			m_Graphics["blue_wazari"].AddAnimation(Animation::CreateLinear(0.0, -67.0, -18.0));
+			m_Graphics["blue_yuko"].AddAnimation(Animation::CreateLinear(0.0, -67.0, -18.0));
+			m_Graphics["blue_koka"].AddAnimation(Animation::CreateLinear(0.0, -67.0, -18.0));
 
-			m_Graphics["timer"].AddAnimation(Animation(0.0, 0.0, -33.0));
+			m_Graphics["timer"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -33.0));
 
 			m_Graphics["mat_name"].SetPosition(20, height - (int)(60.0 * m_ScalingFactor))
-								  .AddAnimation(Animation(0.0, 0.0, 10.0, [=](auto& g) { return g.m_a < 255.0; }));
+								  .AddAnimation(Animation::CreateLinear(0.0, 0.0, 10.0, [=](auto& g) { return g.m_a < 255.0; }));
 			break;
 	}
 }
@@ -1751,7 +1754,8 @@ void Mat::RenderShidos(double dt) const
 		int shido_start_y = (int)(380.0 * m_ScalingFactor);
 
 		if (fighter == Fighter::White)
-			shido_start_x = width - (int)(540.0 * m_ScalingFactor);
+			shido_start_x = width - (int)(630.0 * m_ScalingFactor);
+			//shido_start_x = width - (int)(540.0 * m_ScalingFactor);
 
 		int shido_x = shido_start_x;
 		int shido_y = shido_start_y;
@@ -1780,7 +1784,8 @@ void Mat::RenderShidos(double dt) const
 		}
 
 		//Render medical examinations
-		int medical_x = shido_start_x + (int)(300.0 * m_ScalingFactor);
+		//int medical_x = shido_start_x + (int)(300.0 * m_ScalingFactor);
+		int medical_x = shido_start_x + (int)(350.0 * m_ScalingFactor);
 		int medical_y = shido_start_y;
 		//int medical_y = shido_start_y + (int)( 30.0 * m_ScalingFactor);
 
@@ -2032,15 +2037,17 @@ bool Mat::Render(double dt) const
 		//if (HasConcluded() && m_Winner)//Render winner animation
 		if (m_Winner)//Render winner animation
 		{
-			const float size = 0.55f;
+			const float size = 0.75f;
 
 			//if (GetResult().m_Winner == Winner::Blue)
 			{
 				m_Graphics["winner_blue"]->SetSize((float)((size + 0.1f * sin(0.004 * (double)Timer::GetTimestamp())) * m_ScalingFactor));
 				m_Graphics["winner_blue"].SetAlpha(255.0);
 				m_Graphics["winner_blue"].Center();
-				m_Graphics["winner_blue"].SetPosition((int)(200.0 * m_ScalingFactor) + (int)(m_Winner->GetWidth() * size / 2.0f),
-					height / 2 + (int)(20.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * size / 2.0f));
+				//m_Graphics["winner_blue"].SetPosition((int)(200.0 * m_ScalingFactor) + (int)(m_Winner->GetWidth() * size / 2.0f),
+					//height / 2 + (int)(20.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * size / 2.0f));
+				m_Graphics["winner_blue"].SetPosition((int)(220.0 * m_ScalingFactor) + (int)(m_Winner->GetWidth() * size / 2.0f),
+					height / 2 + (int)(-100.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * size / 2.0f));
 				m_Graphics["winner_blue"].Render(renderer, dt);
 			}
 
@@ -2049,8 +2056,10 @@ bool Mat::Render(double dt) const
 				m_Graphics["winner_white"]->SetSize((float)((size + 0.1f * sin(0.004 * (double)Timer::GetTimestamp())) * m_ScalingFactor));
 				m_Graphics["winner_white"].SetAlpha(255.0);
 				m_Graphics["winner_white"].Center();
-				m_Graphics["winner_white"].SetPosition(width - (int)(200.0 * m_ScalingFactor) - (int)(m_Winner->GetWidth() * size / 2.0f),
-					height / 2 + (int)(20.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * size / 2.0f));
+				//m_Graphics["winner_white"].SetPosition(width - (int)(200.0 * m_ScalingFactor) - (int)(m_Winner->GetWidth() * size / 2.0f),
+					//height / 2 + (int)(20.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * size / 2.0f));
+				m_Graphics["winner_white"].SetPosition(width - (int)(220.0 * m_ScalingFactor) - (int)(m_Winner->GetWidth() * size / 2.0f),
+					height / 2 + (int)(-100.0 * m_ScalingFactor) + (int)(m_Winner->GetHeight() * size / 2.0f));
 				m_Graphics["winner_white"].Render(renderer, dt);
 			}
 

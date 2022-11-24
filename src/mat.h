@@ -155,31 +155,61 @@ namespace Judoboard
 
 		struct GraphicElement;
 
-		struct Animation
+		class Animation
 		{
+		public:
 			enum class Type
 			{
-				MoveConstantVelocity
+				MoveConstantVelocity,
+				ScaleSinus
 			};
 
-			Animation(double vx, double vy, double va = 0.0f, std::function<bool(const GraphicElement&)> AnimateTill = nullptr) : m_AnimateTill(AnimateTill)
+			static Animation CreateLinear(double vx, double vy, double va = 0.0f, std::function<bool(const GraphicElement&)> AnimateTill = nullptr)
 			{
-				m_Type = Type::MoveConstantVelocity;
-				m_vx = vx;
-				m_vy = vy;
-				m_va = va;
+				Animation ret;
+				ret.m_Type = Type::MoveConstantVelocity;
+				ret.m_AnimateTill = AnimateTill;
+				ret.m_vx = vx;
+				ret.m_vy = vy;
+				ret.m_va = va;
+				return ret;
 			}
 
-			bool Process(GraphicElement& Graphic, double dt);
+			static Animation CreateScaleSinus(double Amplitude, double Frequency, double BaseSize = 1.0, std::function<bool(const GraphicElement&)> AnimateTill = nullptr)
+			{
+				Animation ret;
+				ret.m_Type = Type::ScaleSinus;
+				ret.m_AnimateTill = AnimateTill;
+				ret.m_Amplitude = Amplitude;
+				ret.m_Frequency = Frequency;
+				ret.m_BaseSize  = BaseSize;
+				return ret;
+			}
+
+			bool Process(GraphicElement& Graphic, double dt);//Returns true when the animation ends
+
+			bool IsRunInParallel() const { return m_RunInParallelToNextAnimation; }
+			void RunInParallel(bool Enable = true) { m_RunInParallelToNextAnimation = Enable; }
+
+		private:
+			Animation() = default;
 
 			Type m_Type;
 			std::function<bool(const GraphicElement&)> m_AnimateTill;
 			std::function<void(Mat&)> m_onEnd = nullptr;//Will be executed when the animation ends
 
-			uint32_t m_sx = 0, m_sy = 0;
-			uint32_t m_ex = 0, m_ey = 0;
+			bool m_RunInParallelToNextAnimation = false;//If true the next animation will be executed at the same time
 
-			double m_vx, m_vy, m_va;
+			union
+			{
+				struct {//For linear move animation
+					double m_vx, m_vy, m_va;
+				};
+
+				struct {//For scale animation
+					double m_Amplitude, m_Frequency, m_BaseSize;
+				};
+			};
 		};
 
 
@@ -218,9 +248,21 @@ namespace Judoboard
 
 			void Render(const ZED::Renderer& Renderer, double dt)
 			{
-				if (m_Animations.size() > 0)
-					if (m_Animations.front().Process(*this, dt))
-						m_Animations.erase(m_Animations.begin());
+				//if (m_Animations.size() > 0)
+					//if (m_Animations.front().Process(*this, dt))
+						//m_Animations.erase(m_Animations.begin());
+				for (size_t i = 0; i < m_Animations.size(); ++i)
+				{
+					if (m_Animations[i].Process(*this, dt))
+					{
+						//Animation has finished
+						m_Animations.erase(m_Animations.begin() + i);
+						i--;
+					}
+
+					else if (!m_Animations[i].IsRunInParallel())//Run next animations as well?
+						break;
+				}
 
 				if (m_CustomRenderRoutine)
 					m_CustomRenderRoutine(Renderer);
