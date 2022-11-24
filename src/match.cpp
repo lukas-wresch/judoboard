@@ -434,6 +434,24 @@ const RuleSet& Match::GetRuleSet() const
 
 
 
+uint32_t Match::GetCurrentBreaktime() const
+{
+	uint32_t break1 = 0, break2 = 0;
+	if (m_White.m_Judoka)
+		break1 = m_White.m_Judoka->GetLengthOfBreak();
+	if (m_Blue.m_Judoka)
+		break2 = m_Blue.m_Judoka->GetLengthOfBreak();
+
+	if (break1 == 0)
+		return break2;
+	if (break2 == 0)
+		return break1;
+
+	return std::min(break1, break2);
+}
+
+
+
 void Match::EndMatch()
 {
 	m_State = Status::Concluded;

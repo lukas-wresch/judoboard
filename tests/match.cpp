@@ -273,3 +273,32 @@ TEST(Match, BestOf3ExportImport)
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
+
+
+
+TEST(Match, BreakTime)
+{
+	initialize();
+
+	Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j3(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j4(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+
+	Match m1(&j1, &j2, nullptr, 1);
+	Match m2(&j2, &j1, nullptr, 1);
+	Match m3(&j3, &j4, nullptr, 1);
+	Match m4(&j1, nullptr, nullptr, 1);
+
+	m1.StartMatch();
+	m1.EndMatch();
+
+	EXPECT_EQ(m2.GetCurrentBreaktime(), 0);
+	ZED::Core::Pause(10 * 1000);
+	EXPECT_EQ(m2.GetCurrentBreaktime(), 10);
+	ZED::Core::Pause(10 * 1000);
+	EXPECT_EQ(m2.GetCurrentBreaktime(), 20);
+	EXPECT_EQ(m4.GetCurrentBreaktime(), 20);
+
+	EXPECT_TRUE(m3.GetCurrentBreaktime() > 20);
+}

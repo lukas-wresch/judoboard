@@ -58,7 +58,8 @@ namespace Judoboard
 		void SetNumber(const std::string& NewNumber) { m_Number = NewNumber; }
 
 		void StartBreak() const { m_LastMatch_Timestamp = Timer::GetTimestamp(); }
-		uint32_t GetLengthOfBreak()  const { return (Timer::GetTimestamp() - m_LastMatch_Timestamp) / 1000; }//Returns the number of seconds this judoka had a break
+		//Returns the number of seconds this judoka had a break
+		uint32_t GetLengthOfBreak()  const { return (Timer::GetTimestamp() - m_LastMatch_Timestamp) / 1000; }
 
 		void operator >> (YAML::Emitter& Yaml) const;
 		void ToString(YAML::Emitter& Yaml) const;
