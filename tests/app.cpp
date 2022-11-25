@@ -233,12 +233,12 @@ TEST(App, FullTournament)
 		ASSERT_TRUE(app.FindTournamentByName(tournament_name));
 		EXPECT_TRUE(app.OpenTournament(app.FindTournamentByName(tournament_name)->GetUUID()));
 
-		EXPECT_EQ(j1.GetLengthOfBreak(), 0);
-		EXPECT_EQ(j2.GetLengthOfBreak(), 0);
-		EXPECT_EQ(j3.GetLengthOfBreak(), 0);
-		EXPECT_EQ(j4.GetLengthOfBreak(), 0);
-		EXPECT_EQ(j5.GetLengthOfBreak(), 0);
-		EXPECT_EQ(j6.GetLengthOfBreak(), 0);
+		EXPECT_GE(j1.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j2.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j3.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j4.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j5.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j6.GetLengthOfBreak(), 60u);
 
 		tourney->AddParticipant(&j1);
 		tourney->AddParticipant(&j2);

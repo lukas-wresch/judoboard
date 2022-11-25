@@ -613,7 +613,9 @@ function GetJudokaName()
       var current_breaktime = Math.floor(match.current_breaktime/60) + ':' + zeroPad(Math.floor(match.current_breaktime)%60, 2);
       var breaktime         = Math.floor(match.breaktime/60) + ':' + zeroPad(Math.floor(match.breaktime)%60, 2);
 
-      if (match.breaktime > 0)
+      if (match.current_breaktime >= 10*60)
+        cell3.innerHTML = '- - -';
+      else if (match.breaktime > 0)
         cell3.innerHTML = current_breaktime + ' / ' + breaktime;
       else
         cell3.innerHTML = current_breaktime;

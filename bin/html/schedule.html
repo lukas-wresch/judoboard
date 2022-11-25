@@ -396,7 +396,7 @@ function Update()
       cell6.style.fontSize  = "16pt";
       cell6.style.textAlign = "center";
 
-      if (match.state == 1 || match.state == 2)
+      if (match.state == 1 || match.state == 2 || match.current_breaktime >= 10*60)
         cell6.innerHTML = '- - -';
       else
       {
