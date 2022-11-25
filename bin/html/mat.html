@@ -73,8 +73,8 @@
   <tr>
     <td style="text-align: center;" colspan="2">
       <button class="neutral" id="hajime" onclick="Hajime()" ontouchstart="Hajime()">Hajime</button>
-      <button disabled class="neutral" id="mate" onclick="Mate()" ontouchstart="Mate()">Mate</button>
-      <button class="additional" id="more" style="margin-left: 35mm" onclick="ToggleMore();">More</button>
+      <button disabled class="neutral" id="mate" style="margin-left: 5mm;" onclick="Mate()" ontouchstart="Mate()">Mate</button>
+      <button class="additional" id="more" style="margin-left: 44mm" onclick="ToggleMore();">More</button>
     </td>
   </tr>
 
@@ -277,6 +277,7 @@ function StartNextMatch()
 function EndMatch()
 {
   AjaxCallback('ajax/mat/end_match?id='+id, function(respone) {
+    GetJudokaName();
     GetScore();
   });
 }
@@ -580,12 +581,12 @@ function GetJudokaName()
       name2 = name2.substr(0, 20) + ".";
 
     var hidden = 'hidden';
-    if (CurrentScore.winner == 0)
+    if (CurrentScore.has_concluded && CurrentScore.winner == 0)
       hidden = '';
     document.getElementById("white_name").innerHTML = name1 + '<img src="winner.png" id="winner_white" ' + hidden + ' style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;"/>';
 
     hidden = 'hidden';
-    if (CurrentScore.winner == 1)
+    if (CurrentScore.has_concluded && CurrentScore.winner == 1)
       hidden = '';
     document.getElementById("blue_name").innerHTML  = name2 + '<img src="winner.png" id="winner_blue"  ' + hidden + ' style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;"/>';;
 
@@ -609,12 +610,27 @@ function GetJudokaName()
       cell1.style = "width: 7.4cm;";
       cell2.style = "width: 7.4cm; background-color: rgba(30, 30, 255, 1.0); color: white;";
 
-      cell3.innerHTML = "1m / 3m";
+      var current_breaktime = Math.floor(match.current_breaktime/60) + ':' + zeroPad(Math.floor(match.current_breaktime)%60, 2);
+      var breaktime         = Math.floor(match.breaktime/60) + ':' + zeroPad(Math.floor(match.breaktime)%60, 2);
+
+      if (match.breaktime > 0)
+        cell3.innerHTML = current_breaktime + ' / ' + breaktime;
+      else
+        cell3.innerHTML = current_breaktime;
+
+      if (match.current_breaktime < match.breaktime)
+      {
+        if (match.current_breaktime + 30 > match.breaktime)
+          cell3.style.backgroundColor = "#ff6d";
+        else
+          cell3.style.backgroundColor = "#e33d";
+      }
+
 
       if (i == 0)
       {
         var dis = 'disabled';
-        if (CurrentScore.can_next_match_start)
+        if (CurrentScore.can_next_match_start && match.current_breaktime >= match.breaktime)
           dis = '';
 
         cell4.innerHTML = '<button ' + dis + ' class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="StartNextMatch()">' + lang.start_next_match + '</button>';

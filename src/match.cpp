@@ -142,6 +142,8 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::BeginMap;
 
 	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "current_breaktime" << YAML::Value << GetCurrentBreaktime();
+	Yaml << YAML::Key << "breaktime"         << YAML::Value << GetRuleSet().GetBreakTime();
 
 	if (GetFighter(Fighter::White))
 		Yaml << YAML::Key << "white_name" << YAML::Value << GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
