@@ -29,8 +29,8 @@ namespace Judoboard
 		bool IsThirdPlaceMatch() const { return m_ThirdPlaceMatch; }
 		bool IsFifthPlaceMatch() const { return m_FifthPlaceMatch; }
 
-		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; }
-		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; }
+		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; GenerateSchedule(); }
+		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; GenerateSchedule(); }
 
 		virtual size_t GetStartingPosition(const Judoka* Judoka) const override;
 		virtual void   SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition) override;

@@ -147,7 +147,6 @@ void SingleElimination::GenerateSchedule()
 	for (int round = 1; round < rounds; ++round)
 	{
 		lastRound = std::move(nextRound);
-		//nextRound.clear();
 
 		for (size_t i = 0; i < lastRound.size(); i += 2)
 		{
@@ -162,7 +161,22 @@ void SingleElimination::GenerateSchedule()
 		}
 	}
 
+
+	//Add additional match for 3rd place
+	if (IsThirdPlaceMatch() && m_Schedule.size() >= 3)
+	{
+		auto match1 = m_Schedule[m_Schedule.size() - 2];
+		auto match2 = m_Schedule[m_Schedule.size() - 3];
+
+		auto third_place = CreateAutoMatch(nullptr, nullptr);
+		third_place->SetDependency(Fighter::White, Match::DependencyType::TakeLoser, match1);
+		third_place->SetDependency(Fighter::Blue,  Match::DependencyType::TakeLoser, match2);
+
+		//Swap matches so that match for 1st place is still the last one
+		std::swap(m_Schedule[m_Schedule.size() - 1], m_Schedule[m_Schedule.size() - 2]);
+	}
 	
+
 	//Add additional matches for best of three
 	if (IsBestOfThree())
 	{
@@ -233,6 +247,20 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 	{
 		ret.emplace_back(lastMatch->GetWinner(), this);
 		ret.emplace_back(lastMatch->GetLoser(),  this);
+	}
+
+	if (IsThirdPlaceMatch())
+	{
+		const Match* third_place_match = m_Schedule[m_Schedule.size() - 2];
+		ret.emplace_back(third_place_match->GetWinner(), this);
+		ret.emplace_back(third_place_match->GetLoser(),  this);
+	}
+
+	if (IsFifthPlaceMatch())
+	{
+		const Match* fifth_place_match = m_Schedule[m_Schedule.size() - 3];
+		ret.emplace_back(fifth_place_match->GetWinner(), this);
+		ret.emplace_back(fifth_place_match->GetLoser(),  this);
 	}
 
 	return ret;
