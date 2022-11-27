@@ -420,3 +420,42 @@ size_t MatchTable::GetIndexOfParticipant(const Judoka* Participant) const
 
 	return 0;
 }
+
+
+
+const std::string MatchTable::ResultsToHTML() const
+{
+	auto results = CalculateResults();
+
+	std::string ret;
+
+	if (results.size() == 0)
+		return ret;
+
+	ret += "</table><br/><br/><table border=\"1\" rules=\"all\">";
+	ret += "<tr><th style=\"width: 0.5cm; text-align: center;\">#</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name")
+		+ "</th><th style=\"width: 1.0cm;\">" + Localizer::Translate("Wins") + "</th><th style=\"width: 1.0cm;\">"
+		+ Localizer::Translate("Score") + "</th><th style=\"width: 1.3cm;\">" + Localizer::Translate("Time") + "</th></tr>";
+
+	for (size_t i = 0; i < results.size(); i++)
+	{
+		const auto& score = results[i];
+
+		ret += "<tr><td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
+		ret += "<td>" + score.Judoka->GetName(NameStyle::GivenName) + "</td>";
+
+		ret += "<td>" + std::to_string(score.Wins)  + "</td>";
+		ret += "<td>" + std::to_string(score.Score) + "</td>";
+		ret += "<td>" + Timer::TimestampToString(score.Time);
+
+		if (score.NotSortable && score.Time > 0)
+			ret += " Not sortable!";//TODO make proper message
+
+		ret += "</td>";
+
+		ret += "</tr>";
+	}
+
+	ret += "</table>";
+	return ret;
+}

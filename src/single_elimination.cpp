@@ -220,6 +220,9 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 {
 	std::vector<Result> ret;
 
+	if (GetParticipants().size() == 0 || m_Schedule.size() == 0)
+		return ret;
+
 	if (GetParticipants().size() == 1)
 	{
 		ret.emplace_back(GetParticipants()[0], this);
@@ -293,14 +296,13 @@ const std::string SingleElimination::ToHTML() const
 
 	ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 
-	ret += "<table width='50%' border='1' rules='all'>";
-
-	//auto results = CalculateResults();
+	ret += "<table border='1' rules='all'>";
 
 	const auto rounds = GetNumberOfRounds();
 	const auto N = pow(2, rounds);
 
-	auto renderMatch = [this, N](int roundIndex, int matchOfRound) -> std::string {
+
+	auto renderMatch = [this, N](size_t roundIndex, int matchOfRound) -> std::string {
 		int matchIndex = 0;
 		for (int i = 1; i <= roundIndex; ++i)
 			matchIndex += (int)(N / pow(2.0, i));
@@ -312,7 +314,14 @@ const std::string SingleElimination::ToHTML() const
 
 		auto match = GetSchedule()[matchIndex];
 
-		std::string ret = "<td>";
+		std::string style;
+
+		if (roundIndex == 0)
+			style = "border-left-style: hidden;";
+		if (matchOfRound % 2 == 0)
+			style += "border-right-style: hidden;";
+
+		std::string ret = "<td style=\"" + style + "\">";
 
 		if (!match->IsEmptyMatch())
 			ret += "<a href='#edit_match.html?id=" + (std::string)match->GetUUID() + "'>";
@@ -356,20 +365,27 @@ const std::string SingleElimination::ToHTML() const
 	};
 
 
+	size_t width = 100 / rounds;
 	ret += "<tr style='height: 5mm; text-align: center'>";
 	for (int round = 0; round < rounds; ++round)
-		ret += "<th>" + Localizer::Translate("Round") + " " + std::to_string(round + 1) + "</th>";
+		ret += "<th width=\"" + std::to_string(width) + "%\">" + Localizer::Translate("Round") + " " + std::to_string(round + 1) + "</th>";
 	ret += "</tr>";
 
 	for (int y = 0; y < N; ++y)
 	{
 		ret += "<tr style='height: 5mm; text-align: center'>";
 
-		for (int round = 0; round < rounds; ++round)
+		for (size_t round = 0; round < rounds; ++round)
 		{
 			if ( (y + (int)std::pow(2, round) + 1) % (int)std::pow(2, round+1) != 0)
 			{
-				ret += "<td></td>";
+				std::string style;
+				if (round == 0 || (y + (int)std::pow(2, round) + (int)std::pow(2, round-1) ) % (int)std::pow(2, round+1)  >= (int)std::pow(2, round))
+					style += "border-left-style: hidden;";
+				if (round+1 == rounds)
+					style += "border-right-style: hidden;";
+
+				ret += "<td style=\"" + style + "border-bottom-style: hidden; \"></td>";
 				continue;
 			}
 
@@ -381,7 +397,8 @@ const std::string SingleElimination::ToHTML() const
 	}
 
 	ret += "</table>";
-	
+
+	ret += ResultsToHTML();	
 
 	return ret;
 }
