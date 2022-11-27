@@ -1715,6 +1715,8 @@ void Application::SetupHttpServer()
 			single_table->SetMaxWeight(Weight(maxWeight));
 			single_table->SetGender((Gender)gender);
 			single_table->IsBestOfThree(bo3);
+			single_table->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
+			single_table->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
 
 			GetTournament()->Unlock();
 			break;
@@ -1724,7 +1726,8 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::InternalError);
 		}
 
-		GetTournament()->UpdateMatchTable(id);
+		if (!GetTournament()->UpdateMatchTable(id))
+			return Error(Error::Type::OperationFailed);
 		return Error();//OK
 	});
 
