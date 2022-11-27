@@ -272,6 +272,8 @@ TEST(Weightclass, ExportImport)
 
 	auto w = new Weightclass(10, 100);
 
+	w->SetScheduleIndex(rand());
+
 	EXPECT_TRUE(w->AddParticipant(&j1));
 	EXPECT_TRUE(w->AddParticipant(&j2));
 
@@ -292,5 +294,10 @@ TEST(Weightclass, ExportImport)
 		EXPECT_EQ(group2.GetSchedule().size(), w->GetSchedule().size());
 		EXPECT_EQ(group2.ToHTML(),  w->ToHTML());
 		EXPECT_EQ(group2.GetUUID(), w->GetUUID());
+
+		YAML::Emitter yaml2, yaml3;
+		w->ToString(yaml2);
+		group2.ToString(yaml3);
+		EXPECT_EQ((std::string)yaml2.c_str(), (std::string)yaml3.c_str());
 	}
 }

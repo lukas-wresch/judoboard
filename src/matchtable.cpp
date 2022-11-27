@@ -238,8 +238,12 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tour
 {
 	if (Yaml["uuid"])
 		SetUUID(Yaml["uuid"].as<std::string>());
+	if (Yaml["schedule_index"])
+		m_ScheduleIndex = Yaml["schedule_index"].as<int>();
 	if (Yaml["mat_id"])
 		m_MatID = Yaml["mat_id"].as<int>();
+	if (Yaml["color"])
+		m_Color = Yaml["color"].as<int>();
 
 	if (Yaml["name"])
 		m_Name = Yaml["name"].as<std::string>();

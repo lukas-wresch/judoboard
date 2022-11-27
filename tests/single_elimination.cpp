@@ -8,6 +8,8 @@ TEST(SingleElimination, ExportImport)
 
 	SingleElimination group(0, 200);
 
+	group.SetScheduleIndex(rand());
+
 	group.IsThirdPlaceMatch(true);
 	group.IsFifthPlaceMatch(true);
 
@@ -35,6 +37,11 @@ TEST(SingleElimination, ExportImport)
 
 		EXPECT_EQ(group2.IsThirdPlaceMatch(), group.IsThirdPlaceMatch());
 		EXPECT_EQ(group2.IsFifthPlaceMatch(), group.IsFifthPlaceMatch());
+
+		YAML::Emitter yaml2, yaml3;
+		group.ToString(yaml2);
+		group2.ToString(yaml3);
+		EXPECT_EQ((std::string)yaml2.c_str(), (std::string)yaml3.c_str());
 	}
 }
 
