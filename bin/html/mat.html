@@ -16,15 +16,17 @@
   </tr>
 </table>
 
-<table border="1" rules="all" style="margin-top: 0mm; margin-bottom: 3mm; width: 15.0cm;">
+<table border="1" rules="all" style="margin-top: 0mm; margin-bottom: 3mm; width: 23.0cm;">
   <tr id="current_match_row">
     <td style="text-align: center; font-size: 18pt;" colspan="2">
       <div id="current_match_div" style="height: 35px;">
         <table width="100%" id="current_match_table" style="height: 36px;" border="0" rules="all">
-          <tr><td width="50%" id="white_name">- - - </td><td id="blue_name" style="background-color: rgba(30, 30, 255, 1.0); color: white;">- - - </td></tr>
+          <tr><td width="50%" id="white_name">- - -</td><td id="blue_name" style="background-color: rgba(30, 30, 255, 1.0); color: white;">- - -</td></tr>
         </table>
       </div>
     </td>
+
+    <td style="width: 5.0cm; border-right-style: hidden; border-bottom-style: hidden; border-top-style: hidden;"></td>
   </tr>
 
   <tr>
@@ -34,6 +36,10 @@
 
     <td style="width: 65mm; text-align: center; background-color: rgba(30, 30, 255, 1.0); color: white;">
       <span class="score" id="blue_ippon">0</span> <span class="score" id="blue_wazaari">0</span>
+    </td>
+
+    <td style="text-align: center; font-size: 18pt; width: 6.9cm; border-right-style: hidden; border-bottom-style: hidden;">
+      <button disabled class="neutral" style="width: 45mm; margin-top: 3mm; margin-right: 8mm; display: none;" id="end_match" onclick="EndMatch()">End match</button>
     </td>
   </tr>
 
@@ -58,6 +64,17 @@
       <br/>
       <button disabled class="neutral" id="blue_osaekomi" onclick="Osaekomi('blue');" ontouchstart="Osaekomi('blue');">Osaekomi</button>
       <button disabled class="neutral" style="margin-left: 5mm;" id="tokeda2" onclick="Tokeda();" ontouchstart="Tokeda();">Tokeda</button>
+    </td>
+
+    <td style="text-align: center; font-size: 18pt; vertical-align: top; border-right-style: hidden; border-bottom-style: hidden;" rowspan="8">
+      <div id="osaekomi_list_div" style="width: 6.4cm; margin-left: 4mm; display: none;">
+        <div style="margin-bottom: 3mm;">
+          <label style="text-decoration: underline;">Osaekomis:</label>
+        </div>
+        <table id="osaekomi_list" border="1" rules="all" width="100%">
+          <tr><th style="width: 50%;" id="osaekomi_for"></th><th style="width: 50%;" id="osaekomi_time"></th></tr>
+        </table>
+      </div>
     </td>
   </tr>
 
@@ -164,24 +181,6 @@
         <button class="additional" style="width: 3.5cm;" onclick="SetScore('blue', 'hantei'); ShowHantei(false);">Blue wins</button>
         <button class="neutral" style="width: 3.5cm;" onclick="SetScore('', '+golden_score'); ShowHantei(false);" id="golden_score">Golden Score</button>
       </div>
-    </td>
-  </tr>
-</table>
-
-
-<table>
-  <tr>
-    <td style="width: 10.0cm;">
-      <button disabled class="neutral" style="width: 45mm; margin-top: 3mm;" id="end_match" onclick="EndMatch()">End match</button>
-    </td>
-
-    <td style="vertical-align: top;">
-      <div style="margin-bottom: 3mm;">
-        <label style="font-size: 14pt; text-decoration: underline;">Osaekomis:</label>
-      </div>
-      <table id="osaekomi_list" border="1" rules="all">
-        <tr><th style="width: 2.0cm;" id="osaekomi_for"></th><th style="width: 2.0cm;" id="osaekomi_time"></th></tr>
-      </table>
     </td>
   </tr>
 </table>
@@ -463,6 +462,23 @@ function GetScore()
       document.getElementById("tokeda2").disabled = true;
     }
 
+    if (res.has_concluded)
+    {
+      document.getElementById("end_match").disabled = false;
+      $('#end_match').show(1000);
+
+      //if (res.winner == 0)
+        //$("#winner_white").show();
+      //else if (res.winner == 1)
+        //$("#winner_blue").show();
+    }
+    else
+    {
+      document.getElementById("end_match").disabled = true;
+      $("#end_match").hide(1000);
+    }
+
+
     if (res.is_hajime)
     {
       HajimeTimer_Running = true;
@@ -532,18 +548,6 @@ function GetScore()
 
     if (res.can_next_match_start)
       document.getElementById("hajime").disabled = true;
-
-    if (res.has_concluded)
-    {
-      document.getElementById("end_match").disabled = false;
-
-      //if (res.winner == 0)
-        //$("#winner_white").show();
-      //else if (res.winner == 1)
-        //$("#winner_blue").show();
-    }
-    else
-      document.getElementById("end_match").disabled = true;
 
     if (!res.has_concluded && res.is_out_of_time && res.no_winner_yet)
       ShowHantei(true);
@@ -643,6 +647,25 @@ function GetJudokaName()
       i++;
     }
 
+
+    for (; i < 3; i++)
+    {
+      var row = table.insertRow(-1);
+
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+      var cell4 = row.insertCell(3);
+
+      cell1.style = "width: 7.4cm;";
+      cell2.style = "width: 7.4cm; background-color: rgba(30, 30, 255, 1.0); color: white;";
+
+      cell1.innerHTML = '- - -';
+      cell2.innerHTML = '- - -';
+      cell3.innerHTML = '- - -';
+      cell4.innerHTML = ' ';
+    }
+
   });
 }
 
@@ -659,7 +682,12 @@ function GetOsaekomiList()
       table.deleteRow(table.rows.length-1);
 
     if (res.length <= 1)
+    {
+      $("#osaekomi_list_div").hide(1000);
       return;
+    }
+    else
+      $("#osaekomi_list_div").show(1000);
 
     for (var i=0; i < res.length; i+=2)
     {
@@ -675,7 +703,6 @@ function GetOsaekomiList()
       
       cell2.innerHTML = Math.floor((res[i+1]/1000)) + '.' + Math.floor((res[i+1]%1000)/100);
     }
-
   });
 }
 
@@ -772,6 +799,9 @@ document.getElementById("osaekomi_time").innerHTML = lang.time;
 document.getElementById("osaekomi_for").innerHTML  = lang.for;
 
 document.getElementById("matchtable_label").innerHTML  = lang.matchtable;
+
+document.getElementById("label_hansokumake_desc_white").innerHTML = lang.white;
+document.getElementById("label_hansokumake_desc_blue" ).innerHTML = lang.blue;
 
 for (const el of document.getElementsByClassName("medical_examiniations"))
     el.innerHTML = lang.medical_examiniations;
