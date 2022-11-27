@@ -19,9 +19,28 @@ namespace Judoboard
 		struct Weightclass;
 
 
+		struct Association
+		{
+			int ID   = -1;
+			int Tier = -1;//International starts at 2, everything below increases the tier level
+
+			std::string Description;
+			std::string ShortName;
+
+			std::string Number;//"Number" of the association, can also include characters like '.'
+			int NextAsscociationID = -1;//Association of the parent
+			const Association* NextAsscociation = nullptr;
+
+			bool Active = false;
+		};
+
 		struct Club
 		{
 			int ID = -1;
+
+			int AssociationID = -1;
+			const Association* Association = nullptr;
+
 			std::string Name_ForSorting;
 			std::string Name;
 
@@ -39,21 +58,8 @@ namespace Judoboard
 
 			int OfficialClubNo = 0;//Official no. of the club
 			int StatusChanged  = -1;
-		};
 
-		struct Association
-		{
-			int ID = -1;
-			int Tier = -1;//International starts at 2, everything below increases the tier level
-
-			std::string Description;
-			std::string ShortName;
-
-			std::string Number;//"Number" of the association, can also include characters like '.'
-			int NextAsscociationID = -1;//Association of the parent
-			const Association* NextAsscociation = nullptr;
-
-			bool Active = false;
+			mutable void* pUserData = nullptr;
 		};
 
 		struct RelationClubAssociation//Relational table to connect clubs to associations
@@ -74,27 +80,27 @@ namespace Judoboard
 
 			Gender Gender = Gender::Male;
 
-			int LotterySchemaID = -1;
+			int LotterySchemaID = 0;
 
-			bool MoveUp = false;
+			bool MoveUp = true;
 			bool ChangeWeightAtScale = false;
 
 			bool AllCategories = false;
 			bool Kata = false;
 
 			bool PoolSystem = false;
-			bool AllParticipantsInResultTable = false;
+			bool AllParticipantsInResultTable = true;
 
-			int Money = -1;
-			int MoneyKata = -1;
-			int MoneyAllCategories = -1;
-			int MoneyIncreased = -1;
-			int MoneyKataIncreased = -1;
-			int MoneyAllCategoriesIncreased = -1;
+			int Money = 0;
+			int MoneyKata = 0;
+			int MoneyAllCategories = 0;
+			int MoneyIncreased = 0;
+			int MoneyKataIncreased = 0;
+			int MoneyAllCategoriesIncreased = 0;
 
 			int Tolerance = 0;
 
-			int Team = -1;
+			int Team = 0;
 
 			mutable void* pUserData = nullptr;
 		};
@@ -112,7 +118,7 @@ namespace Judoboard
 			std::string Firstname;
 			std::string Lastname;
 
-			int Graduation = 0;//Kyu/Dan, 0 for unknown
+			int Graduation = 0;//Kyu/Dan, 0 for unknown, 1=9. Kyu, 9=9. Kyu, 10=1. Dan, 21=12. Dan
 
 			int  WeightclassID = -1;//Remember these IDs are NOT unique!
 			const Weightclass* Weightclass = nullptr;
@@ -121,7 +127,11 @@ namespace Judoboard
 			int Birthyear = -1;//< 0 if no value is known
 
 			int StartNo = -1;
-			int Rank    = -1;//Rank for qualification (place), 9 for placed on 1
+			int QualificationRank = 99;//Rank for qualification (place), 9 for placed on 1
+			//1 for place 1, 2 for place 2 (till place 8)
+			//9 = seeded 1 (till 16 = seeded 8)
+			//17 = nachruecker 1, (till 20 nachruecker 4)
+			//99 = no place
 
 			bool StatusChanged = false;
 
@@ -130,7 +140,7 @@ namespace Judoboard
 
 			int AllCategoriesParticipantID = -1;
 			int KataParticipantID = -1;
-			int GKParticipantID = -1;//Weightclass participant id???
+			int GKParticipantID   = -1;//Weightclass participant id???
 
 			bool MoneyIncreased = false;
 			int  WeightInGrams  = -1;
@@ -150,21 +160,29 @@ namespace Judoboard
 			int WeightInGrammsLargerThan  = -1;
 			int WeightInGrammsSmallerThan = -1;
 
-			int MaxPooled = -1;
-
 			std::string Description;
 			int Status = 0;
+			//0 = input phase
+			//2 = lottery done
+			//3 = schedule complete
+			//4 = completed
 
-			int FightSystemID = -1;
-			int FightSystemTypeID = -1;
+			int FightSystemID = 16;
+			//1  = double elimination (7 participants, 16 system)
+			//13 = 1 participant
+			//14 = 2 participants (best of 3?)
+			//16 = round robin (5 participants)
+			//24 = pooled (6 participants) 3+3 pool
+			int FightSystemTypeID = 1;//Unknown field, always 1
 
 			bool MatchForThirdPlace = false;
 			bool MatchForFifthPlace = false;
 
 			std::string Date;
 
-			int Relay  = -1;
-			int MaxJGJ = -1;
+			int Relay     = 1;
+			int MaxJGJ    =  6;//Maximum participant for round robin system
+			int MaxPooled = 10;//Maximum participant for pooled system
 
 			std::string Identifier;
 			std::string ForReference = "T";
@@ -212,46 +230,57 @@ namespace Judoboard
 			int WeightclassID = -1;
 			const Weightclass* Weightclass = nullptr;
 
-			int MatchNo = -1;
+			int MatchNo = 1;
 
 			int StartNoRed = -1;
 			int RedID = -1;
 			int RedFromMatch = -1;
-			int RedTyp = -1;
+			int RedTyp = 0;//Unknown field (likely related to RedFromMatch)
 			const Participant* Red = nullptr;
 
 			int StartNoWhite = -1;
 			int WhiteID = -1;
 			int WhiteFromMatch = -1;
-			int WhiteTyp = -1;
+			int WhiteTyp = 0;//Unknown field (likely related to WhiteFromMatch)
 			const Participant* White = nullptr;
 
-			int WinnerID = -1;
-			int WinnerMatchNo = -1;
-			int WinnerColor = -1;
+			int WinnerID      = -1;
+			int WinnerMatchNo = 0;
+			int WinnerColor   = 0;
 
-			int LoserID = -1;
-			int LoserMatchNo = -1;
-			int LoserColor = -1;
+			int LoserID      = -1;
+			int LoserMatchNo = 0;
+			int LoserColor   = 0;
 
-			int WaitingForWinnerFromMatch = -1;
+			int WaitingForWinnerFromMatch = 0;
 
 			int Time   = -1;
-			int Result = -1;
+			int Result = -1;//Could be: result available
 
 			int ScoreWinner = -1;
 			int ScoreLoser  = -1;
 
-			int Status = -1;
+			int Status = 1;
+			//0 = Not ready (unresolved dependencies) OR completely empty match (both fighters are empty)
+			//1 = GO (ready), could also be invalid match (RedID == WhiteID)
+			//2 = Half empty match (one of the fighters is empty)
+			//3 = completed match
+			//0, 2, 4, 5 = ???
 
-			int RedOutMatchID = -1;
+			int RedOutMatchID   = -1;
 			int WhiteOutMatchID = -1;
 
-			int Pool = -1;
+			int Pool = 0;//ID of the pool
+			//1 for round robin (sometimes 0!?)
+			//1-4 for pool matches in pool match table, 0 for final round
 
-			int ThirdMatchNo = -1;
-			int ThirdColor   = -1;
-			int AreaID = -1;
+			int ThirdMatchNo = 0;//Unknown field
+			int ThirdColor   = 0;//Unknown field
+			int AreaID       = 1;//Unknown field
+			//Typical 1
+			//2 = first round elimination system
+			//9 = final match elimination system
+			//4 = third place match
 		};
 
 		struct Result
@@ -262,22 +291,22 @@ namespace Judoboard
 			const Weightclass* Weightclass = nullptr;
 
 			int RankID = -1;
-			int Pool = -1;
+			int Pool   = 0;
 
-			int RankNo = -1;
-			int MatchNo = -1;
+			int RankNo  = -1;
+			int MatchNo = -1;//Unknown field
 
-			int RankType = -1;
+			int RankType = 1;//Unknown field
 			int ParticipantID = -1;
-			Participant* Participant = nullptr;
+			const Participant* Participant = nullptr;
 
-			int PointsPlus  = -1;
-			int PointsMinus = -1;
+			int PointsPlus  = 0;//Number of won matches
+			int PointsMinus = 0;//Number of lost matches
 
-			int ScorePlus  = -1;
-			int ScoreMinus = -1;
+			int ScorePlus  = 0;//Sum of score
+			int ScoreMinus = 0;//Sum of score of enemies
 
-			bool Relay = false;
+			bool Relay    = false;
 			bool FromPool = false;
 		};
 
@@ -295,15 +324,16 @@ namespace Judoboard
 
 		bool Save(const std::string& Filename) const;
 
-		Association* FindAssociation(int AssociationID);
-		Club*        FindClub(int ClubID);
-		Participant* FindParticipant(int ParticipantID);
-		AgeGroup*    FindAgeGroup(int AgeGroupID);
-		Weightclass* FindWeightclass(int AgeGroupID, int WeightclassID);
-		const Result* FindResult(int AgeGroupID, int WeightclassID, int Rank) const;
-		const Result* FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const;
-		std::vector<const Result*> FindResults(int AgeGroupID, int WeightclassID) const;
-		int FindStartNo(int AgeGroupID, int WeightclassID, int ParticipantID) const;
+		[[nodiscard]] Association*  FindAssociation(int AssociationID);
+		[[nodiscard]] Association*  FindAssociation(int AssociationID) const;
+		[[nodiscard]] Club*         FindClub(int ClubID);
+		[[nodiscard]] Participant*  FindParticipant(int ParticipantID);
+		[[nodiscard]] AgeGroup*     FindAgeGroup(int AgeGroupID);
+		[[nodiscard]] Weightclass*  FindWeightclass(int AgeGroupID, int WeightclassID);
+		[[nodiscard]] const Result* FindResult(int AgeGroupID, int WeightclassID, int Rank) const;
+		[[nodiscard]] const Result* FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const;
+		[[nodiscard]] std::vector<const Result*> FindResults(int AgeGroupID, int WeightclassID) const;
+		[[nodiscard]] int FindStartNo(int AgeGroupID, int WeightclassID, int ParticipantID) const;
 
 		void Dump() const;
 
@@ -324,12 +354,19 @@ namespace Judoboard
 		std::string GetDateEnd()     const { return m_DateEnd; }
 		std::string GetDescription() const { return m_Description; }
 
+		const Association* GetOrganizer() const {
+			return FindAssociation(m_AssociationID);
+		}
+
 		operator bool() const { return m_IsValid; }
 
 	private:
 		bool Parse(ZED::Blob&& Data);
-		std::string ReadLine(ZED::Blob& Data, bool* pStartOfHeading = nullptr, bool* pNewLine = nullptr, bool* pDoubleZero = nullptr);
+		std::string ReadLine(ZED::Blob& Data, bool* pNewLine = nullptr);
 		std::string RemoveControlCharacters(std::string& Str);//Removes all ASCII and Latin1 control characters
+		int ReadInt(ZED::Blob& Data);
+
+		std::vector<std::string> ReadHeader(ZED::Blob& Data, int& DataCount);
 
 		bool ReadTournamentData(ZED::Blob& Data);
 		bool ReadRankScore(ZED::Blob& Data);
@@ -368,15 +405,15 @@ namespace Judoboard
 		std::string m_FileDate;//Date the file was saved
 		std::string m_Description;
 
-		int m_SchemaID = -1;
-		int m_LotteryLevelID = -1;
-		int m_AssociationID  = -1;//Association that is conducting the tournament
+		int m_SchemaID = 1;
+		int m_LotteryTierID = -1;//Lottery is conducted on which tier?
+		int m_AssociationID = -1;//Association that is conducting the tournament
 		int m_AssociationLevelID = -1;//Tier of m_AssociationID + 1
-		int m_LevelShortID = -1;//Tier of m_AssociationID
-		int m_MAXJGJ = -1;
-		int m_LotteryProcess = -1;
+		int m_TierToDisplay = -1;//Tier that should be displayed on lists
+		int m_MAXJGJ = 5;//Maximum participants for round robin
+		int m_LotteryProcess = 0;
 
-		int m_NumOfRelays = -1;
+		int m_NumOfRelays = 2;
 
 		std::string m_Place;
 		std::string m_DateStart;
@@ -391,8 +428,8 @@ namespace Judoboard
 		int m_NumParticipants = -1;//Number of participants in the md5 file
 		int m_NumAssociations = -1;//Number of associations in the md5 file
 
-		int m_Money = -1;
-		int m_MoneyIncreased = -1;
+		int m_Money = 0;
+		int m_MoneyIncreased = 0;
 
 		bool m_IsValid = false;
 	};

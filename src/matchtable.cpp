@@ -30,12 +30,32 @@ void MatchTable::SetMatID(int32_t MatID)
 
 
 
+bool MatchTable::HasConcluded() const
+{
+	for (auto match : m_Schedule)
+		if (match && !match->HasConcluded())
+			return false;
+	return true;
+}
+
+
+
 Match* MatchTable::FindMatch(const UUID& UUID) const
 {
 	for (auto match : m_Schedule)
 		if (match && match->GetUUID() == UUID)
 			return match;
 	return nullptr;
+}
+
+
+
+size_t MatchTable::FindMatchIndex(const UUID& UUID) const
+{
+	for (size_t i = 0; i < m_Schedule.size(); ++i)
+		if (m_Schedule[i] && m_Schedule[i]->GetUUID() == UUID)
+			return i;
+	return -1;
 }
 
 
@@ -360,16 +380,6 @@ Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
 		new_match->SetDependency(Fighter::Blue,  Match::DependencyType::TakeWinner, Match2);
 
 	return new_match;
-}
-
-
-
-size_t MatchTable::FindMatchIndex(const UUID& UUID) const
-{
-	for (size_t i = 0; m_Schedule.size(); ++i)
-		if (m_Schedule[i] && m_Schedule[i]->GetUUID() == UUID)
-			return i;
-	return -1;
 }
 
 

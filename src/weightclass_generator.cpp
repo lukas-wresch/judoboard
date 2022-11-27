@@ -121,7 +121,7 @@ bool Generator::isGroupOK(std::vector<std::pair<Weight, int>>& WeightsSlots, int
 	const unsigned int count  = End-Start;
 
 	const bool must_split = count > m_Max;//Must split
-	const bool should_split = must_split || (count >= 2 * m_Min) && (spread > Weight(m_Diff));
+	const bool should_split = must_split || ((count >= 2 * m_Min) && (spread > Weight(m_Diff)));
 
 	return !should_split;
 }
@@ -154,7 +154,7 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 		
 
 	bool must_split = count > m_Max;//Must split
-	bool should_split = must_split || (count >= 2 * m_Min) && (max - min > Weight(m_Diff));
+	bool should_split = must_split || ((count >= 2 * m_Min) && (max - min > Weight(m_Diff)));
 	//Don't split if the result is too tiny, unless we must
 	bool can_split = (Middle + 1 - Start >= (int)m_Min) && (End - Middle - 1 >= (int)m_Min);
 

@@ -23,6 +23,12 @@
   </select>
 </div>
 
+<div>
+  <label style="width:200px;float:left;margin-top:5px;" id="label_parent">Organizer</label>
+  <select style="margin-bottom:20px;" id="clubs">
+  </select>
+</div>
+
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddTournament()" id="add">New Tournament</button>
 <button class="add" style="margin-top: 0.8cm;" onclick="return UpdateTournament()" id="update">Save Tournament</button>
 <br/>
@@ -42,7 +48,8 @@ function AddTournament()
   var params = URLEncode({
     name:        document.getElementById("name").value,
     year:        document.getElementById("year").value,
-    rules:       document.getElementById("rule").value
+    rules:       document.getElementById("rule").value,
+    organizer:   document.getElementById("clubs").value,
   });
 
   AjaxPost('ajax/tournament/add', params, function() {
@@ -58,7 +65,8 @@ function UpdateTournament()
   var params = URLEncode({
     name:        document.getElementById("name").value,
     year:        document.getElementById("year").value,
-    rules:       document.getElementById("rule").value
+    rules:       document.getElementById("rule").value,
+    organizer:   document.getElementById("clubs").value,
   });
 
   AjaxPost('ajax/tournament/update?id='+id, params, function() {
@@ -135,6 +143,11 @@ function GetTournament(id)
       if (typeof res.rule_set_uuid !== 'undefined')
         document.getElementById("rule").value = res.rule_set_uuid;
     });
+
+    GetAssociations(function() {
+      if (typeof res.organizer_uuid !== 'undefined')
+        document.getElementById("clubs").value = res.organizer_uuid;
+    });
   });
 }
 
@@ -166,6 +179,7 @@ else
   document.getElementById("delete").style.display = "none";
 
   GetRuleSets();
+  GetAssociations();
 }
 
 </script>

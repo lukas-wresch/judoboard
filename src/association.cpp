@@ -31,6 +31,26 @@ Association::Association(const YAML::Node& Yaml, const StandingData* StandingDat
 
 
 
+Association::Association(const MD5::Association& MD5Association) : Association(MD5Association.Description, nullptr)
+{
+	if (MD5Association.NextAsscociation && MD5Association.NextAsscociation->Description != m_Name)
+		m_pParent = new Association(*MD5Association.NextAsscociation);
+}
+
+
+
+bool Association::IsChildOf(const UUID& UUID) const
+{
+	if (*this == UUID)//Are we our own child?
+		return true;
+
+	if (m_pParent)
+		return m_pParent->IsChildOf(UUID);
+	return false;
+}
+
+
+
 void Association::operator >> (YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginMap;

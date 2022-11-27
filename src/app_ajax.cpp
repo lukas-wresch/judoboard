@@ -2013,29 +2013,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-		auto year = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "year"));
-		UUID rule_id = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
-
-		if (FindTournamentByName(name))
-			return std::string("There is already a tournament with that name");
-
-		auto rules = m_Database.FindRuleSet(rule_id);
-		if (!rules)
-			ZED::Log::Warn("Adding tournament: Could not find rule set in database");
-
-		Tournament* new_tournament = new Tournament(name);
-		if (year > 0)
-			new_tournament->SetYear(year);
-		new_tournament->SetDefaultRuleSet(rules);
-
-		LockTillScopeEnd();//In case the tournament gets closed at the same time
-
-		if (!AddTournament(new_tournament))
-			return std::string("Could not add tournament");
-
-		new_tournament->Save();
-		return Error();//OK
+		return Ajax_AddTournament(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/update", [this](auto& Request) -> std::string {
@@ -2043,36 +2021,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-		auto year = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "year"));
-		UUID rule_id = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
-
-		LockTillScopeEnd();
-
-		auto tournament = FindTournament(id);
-		if (!tournament)
-			return Error(Error::Type::ItemNotFound);
-
-		//Check if the tournament is closed
-		if (GetTournament() && tournament->GetName() == GetTournament()->GetName())
-			return Error(Error::Type::OperationFailed);
-
-		auto rules = m_Database.FindRuleSet(rule_id);
-		if (!rules)
-			ZED::Log::Warn("Adding tournament: Could not find rule set in database");
-
-		tournament->SetName(name);
-		if (year >= 0)
-			tournament->SetYear(year);
-		tournament->SetDefaultRuleSet(rules);
-
-		if (!tournament->Save())
-			return Error(Error::Type::OperationFailed);
-
-		//TODO delete the old tournament file in case the name changed
-
-		return Error();//OK
+		return Ajax_EditTournament(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/get", [this](auto& Request) -> std::string {
@@ -2224,6 +2173,10 @@ void Application::SetupHttpServer()
 
 		std::string filename = tournament->GetName() + ".md5";
 		md5_tournament.Save(filename);
+
+#ifdef _DEBUG
+		md5_tournament.Dump();
+#endif
 		
 		Request.m_ResponseHeader = std::string("Content-Disposition: attachment; filename=") + filename;
 
@@ -2597,6 +2550,84 @@ Error Application::Ajax_UpdatePassword(Account* Account, const HttpServer::Reque
 	Account->SetPassword(password);
 	m_Database.Save();
 	return Error::Type::NoError;//OK
+}
+
+
+
+Error Application::Ajax_AddTournament(const HttpServer::Request& Request)
+{
+	auto name         = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	auto year         = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "year"));
+	UUID rule_id      = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
+	UUID organizer_id = HttpServer::DecodeURLEncoded(Request.m_Body, "organizer");
+
+	if (name.empty())
+		return Error::Type::InvalidInput;
+
+	LockTillScopeEnd();//In case the tournament gets closed at the same time
+
+	if (FindTournamentByName(name))
+		return Error::Type::OperationFailed;
+
+	auto rules = m_Database.FindRuleSet(rule_id);
+	if (!rules)
+		ZED::Log::Warn("Adding tournament: Could not find rule set in database");
+
+	auto organizer = m_Database.FindAssociation(organizer_id);
+
+	Tournament* new_tournament = new Tournament(name);
+	if (year > 0)
+		new_tournament->SetYear(year);
+	new_tournament->SetDefaultRuleSet(rules);
+	new_tournament->SetOrganizer(organizer);
+
+	if (!AddTournament(new_tournament))
+		return Error::Type::OperationFailed;
+
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
+{
+	UUID id           = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	auto name         = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	auto year         = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "year"));
+	UUID rule_id      = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
+	UUID organizer_id = HttpServer::DecodeURLEncoded(Request.m_Body, "organizer");
+
+	if (name.empty())
+		return Error::Type::InvalidInput;
+
+	LockTillScopeEnd();
+
+	auto tournament = FindTournament(id);
+	if (!tournament)
+		return Error(Error::Type::ItemNotFound);
+
+	//Check if the tournament is closed
+	if (GetTournament() && tournament->GetName() == GetTournament()->GetName())
+		return Error(Error::Type::OperationFailed);
+
+	auto rules = m_Database.FindRuleSet(rule_id);
+	if (!rules)
+		ZED::Log::Warn("Adding tournament: Could not find rule set in database");
+
+	auto organizer = m_Database.FindAssociation(organizer_id);
+
+	tournament->SetName(name);
+	if (year >= 0)
+		tournament->SetYear(year);
+	tournament->SetDefaultRuleSet(rules);
+	tournament->SetOrganizer(organizer);
+
+	if (!tournament->Save())
+		return Error(Error::Type::OperationFailed);
+
+	//TODO delete the old tournament file in case the name changed
+
+	return Error();//OK
 }
 
 

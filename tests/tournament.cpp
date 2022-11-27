@@ -484,6 +484,47 @@ TEST(Tournament, ParticipantHasSameIDAsInDatabase)
 
 
 
+TEST(Tournament, CanNotAddParticipantOfWrongAssociation)
+{
+	initialize();
+	
+	auto club1 = new Club("Club1");
+	auto club2 = new Club("Club2");
+	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+
+	j1.SetClub(club1);
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament tourney("deleteMe");
+	tourney.Reset();
+
+	EXPECT_FALSE(tourney.GetOrganizer());
+	tourney.SetOrganizer(club2);
+	ASSERT_TRUE(tourney.GetOrganizer());
+	EXPECT_EQ(*tourney.GetOrganizer(), *club2);
+
+	EXPECT_FALSE(tourney.AddParticipant(&j1));
+	tourney.SetOrganizer(club1);
+	EXPECT_EQ(*tourney.GetOrganizer(), *club1);
+	EXPECT_TRUE(tourney.AddParticipant(&j1));
+
+	//tourney gets saved now
+	tourney.EnableAutoSave(false);
+
+
+	Tournament t("deleteMe");
+	t.EnableAutoSave(false);
+	EXPECT_EQ(t.GetParticipants().size(), 1);
+	ASSERT_TRUE(t.FindParticipant(j1.GetUUID()));
+	EXPECT_EQ(j1.GetUUID(), t.FindParticipant(j1.GetUUID())->GetUUID());
+	ASSERT_TRUE(t.GetOrganizer());
+	EXPECT_EQ(*t.GetOrganizer(), *club1);
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, HasDefaultRuleSet)
 {
 	initialize();

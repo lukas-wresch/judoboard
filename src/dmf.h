@@ -38,6 +38,10 @@ namespace Judoboard
 
 			int WeightInGrams = -1;//< 0 if no weight is known
 			int Birthyear = -1;//< 0 if no value is known
+
+			//The two fields are derived from DMF meta data:
+			Gender Gender;
+			std::string ClubName;
 		};
 
 

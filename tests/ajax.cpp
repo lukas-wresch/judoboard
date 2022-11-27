@@ -1268,3 +1268,70 @@ TEST(Ajax, MoveSchedule)
 	EXPECT_EQ(*tourney->GetSchedule()[4], *match3);
 	EXPECT_EQ(*tourney->GetSchedule()[5], *match4);
 }
+
+
+
+TEST(Ajax, AddTournament)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("database.yml");
+	Application app;
+
+	auto rules = new RuleSet("Test Rules", 100, 100, 20, 10);
+	app.GetDatabase().AddRuleSet(rules);
+
+	auto assoc = new Association("Organizer", nullptr);
+	app.GetDatabase().AddAssociation(assoc);
+
+	EXPECT_TRUE(app.Ajax_AddTournament(HttpServer::Request("", "name=test&year=2000&rules=" + (std::string)rules->GetUUID() + "&organizer=" + (std::string)assoc->GetUUID())));
+
+	auto tour = app.FindTournamentByName("test");
+	ASSERT_TRUE(tour);
+	ASSERT_TRUE(tour->GetDefaultRuleSet());
+	EXPECT_EQ(*tour->GetDefaultRuleSet(), *rules);
+	EXPECT_EQ(tour->GetDatabase().GetYear(), 2000);
+	ASSERT_TRUE(tour->GetOrganizer());
+	EXPECT_EQ(*tour->GetOrganizer(), *assoc);
+}
+
+
+
+TEST(Ajax, EditTournament)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("database.yml");
+	Application app;
+
+	auto rules1 = new RuleSet("Test Rules1", 100, 100, 20, 10);
+	auto rules2 = new RuleSet("Test Rules2", 100, 100, 20, 10);
+	app.GetDatabase().AddRuleSet(rules1);
+	app.GetDatabase().AddRuleSet(rules2);
+
+	auto assoc1 = new Association("Organizer1", nullptr);
+	auto assoc2 = new Association("Organizer2", nullptr);
+	app.GetDatabase().AddAssociation(assoc1);
+	app.GetDatabase().AddAssociation(assoc2);
+
+	EXPECT_TRUE(app.Ajax_AddTournament(HttpServer::Request("", "name=test&year=2000&rules=" + (std::string)rules1->GetUUID() + "&organizer=" + (std::string)assoc1->GetUUID())));
+
+	EXPECT_FALSE(app.Ajax_EditTournament(HttpServer::Request("", "name=test2&year=2001&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
+
+	auto tour1 = app.FindTournamentByName("test");
+	ASSERT_TRUE(tour1);
+
+	EXPECT_FALSE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test2&year=2001&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
+
+	EXPECT_TRUE(app.CloseTournament());
+
+	EXPECT_TRUE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test2&year=2001&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
+
+	auto tour = app.FindTournamentByName("test2");
+	ASSERT_TRUE(tour);
+	ASSERT_TRUE(tour->GetDefaultRuleSet());
+	EXPECT_EQ(*tour->GetDefaultRuleSet(), *rules2);
+	EXPECT_EQ(tour->GetDatabase().GetYear(), 2001);
+	ASSERT_TRUE(tour->GetOrganizer());
+	EXPECT_EQ(*tour->GetOrganizer(), *assoc2);
+}
