@@ -34,7 +34,7 @@ namespace Judoboard
 		void SetMaxWeight(Weight MaxWeight) { m_MaxWeight = MaxWeight; }
 		void SetGender(Gender Gender) { m_Gender = Gender; }
 		auto IsBestOfThree() const { return m_BestOfThree; }
-		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; }
+		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; GenerateSchedule(); }
 
 		//Serialization
 		virtual const std::string ToHTML() const override;

@@ -225,13 +225,12 @@ void SingleElimination::GenerateSchedule()
 		{
 			auto match1 = schedule_copy[i];
 
-			m_Schedule.push_back(match1);
-
 			auto match2 = new Match(*match1);
 			match2->SwapFighters();
 			auto match3 = new Match(*match1);
 			match3->SetBestOfThree(match1, match2);
 
+			m_Schedule.push_back(match1);
 			m_Schedule.emplace_back(match2);
 			m_Schedule.emplace_back(match3);
 		}
@@ -380,6 +379,14 @@ const std::string SingleElimination::ToHTML() const
 			matchIndex += (int)(N / pow(2.0, i));
 
 		matchIndex += matchOfRound;
+
+		if (IsThirdPlaceMatch() && matchIndex >= GetSchedule().size() - 2)
+			matchIndex++;
+		if (IsFifthPlaceMatch() && matchIndex >= GetSchedule().size() - 5)
+			matchIndex+=3;
+
+		if (IsBestOfThree())
+			matchIndex = matchIndex*3;
 
 		if (matchIndex >= GetSchedule().size())
 			return "";
