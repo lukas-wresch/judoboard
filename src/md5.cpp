@@ -3,6 +3,7 @@
 #include "md5.h"
 #include "tournament.h"
 #include "weightclass.h"
+#include "single_elimination.h"
 #include "age_group.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/file.h"
@@ -189,28 +190,52 @@ MD5::MD5(const Tournament& Tournament)
 
 	for (auto match_table : Tournament.GetMatchTables())
 	{
-		if (match_table->GetType() != MatchTable::Type::Weightclass)
+		if (match_table->GetType() == MatchTable::Type::Weightclass)
 			continue;
-
-		auto weightclass = (Judoboard::Weightclass*)match_table;
 
 		Weightclass* new_weightclass = new Weightclass;
 
 		new_weightclass->ID = id++;
 
-		if (weightclass->GetName().length() > 0)
-			new_weightclass->Description = weightclass->GetName();
+		if (match_table->GetName().length() > 0)
+			new_weightclass->Description = match_table->GetName();
 		else
-			new_weightclass->Description = weightclass->GetDescription();
-
-		new_weightclass->WeightLargerThan          = (uint32_t)weightclass->GetMinWeight() / 1000;
-		new_weightclass->WeightInGrammsLargerThan  = (uint32_t)weightclass->GetMinWeight() % 1000;
-		new_weightclass->WeightSmallerThan         = (uint32_t)weightclass->GetMaxWeight() / 1000;
-		new_weightclass->WeightInGrammsSmallerThan = (uint32_t)weightclass->GetMaxWeight() % 1000;
+			new_weightclass->Description = match_table->GetDescription();
 
 		new_weightclass->Date = m_DateStart;
 
-		if (weightclass->HasConcluded())
+		if (match_table->GetType() == MatchTable::Type::Weightclass)
+		{
+			const auto weightclass = (Judoboard::Weightclass*)match_table;
+
+			new_weightclass->FightSystemID = 16;//Round robin
+
+			new_weightclass->WeightLargerThan          = (uint32_t)weightclass->GetMinWeight() / 1000;
+			new_weightclass->WeightInGrammsLargerThan  = (uint32_t)weightclass->GetMinWeight() % 1000;
+			new_weightclass->WeightSmallerThan         = (uint32_t)weightclass->GetMaxWeight() / 1000;
+			new_weightclass->WeightInGrammsSmallerThan = (uint32_t)weightclass->GetMaxWeight() % 1000;
+		}
+		else if (match_table->GetType() == MatchTable::Type::SingleElimination)
+		{
+			const auto single_elimination = (Judoboard::SingleElimination*)match_table;
+
+			new_weightclass->FightSystemID = 19;
+
+			new_weightclass->WeightLargerThan          = (uint32_t)single_elimination->GetMinWeight() / 1000;
+			new_weightclass->WeightInGrammsLargerThan  = (uint32_t)single_elimination->GetMinWeight() % 1000;
+			new_weightclass->WeightSmallerThan         = (uint32_t)single_elimination->GetMaxWeight() / 1000;
+			new_weightclass->WeightInGrammsSmallerThan = (uint32_t)single_elimination->GetMaxWeight() % 1000;
+
+			new_weightclass->MatchForThirdPlace = single_elimination->IsThirdPlaceMatch();
+			new_weightclass->MatchForFifthPlace = single_elimination->IsFifthPlaceMatch();
+		}
+		else
+		{
+			delete new_weightclass;
+			continue;
+		}
+
+		if (match_table->HasConcluded())
 			new_weightclass->Status = 4;//Completed
 		else
 			new_weightclass->Status = 3;//Scheduled
@@ -222,7 +247,7 @@ MD5::MD5(const Tournament& Tournament)
 		}
 
 		m_Weightclasses.emplace_back(new_weightclass);
-		UUID2ID.insert({ weightclass->GetUUID(), id - 1 });
+		UUID2ID.insert({ match_table->GetUUID(), id - 1 });
 		ID2PTR.insert({ id - 1, new_weightclass });
 
 		//Convert participants
@@ -241,7 +266,7 @@ MD5::MD5(const Tournament& Tournament)
 
 		if (match_table->GetParticipants().empty())//match table doesn't have any participants yet
 			new_weightclass->Status = 0;//input phase
-		else if (weightclass->HasConcluded())
+		else if (match_table->HasConcluded())
 		{
 			//Convert results
 
@@ -602,8 +627,8 @@ bool MD5::Save(const std::string& Filename) const
 
 			Write_Int(weightclass->FightSystemTypeID);
 
-			Write_Int(weightclass->MatchForThirdPlace ? 0 : -1);
-			Write_Int(weightclass->MatchForFifthPlace ? 0 : -1);
+			Write_Int(weightclass->MatchForThirdPlace ? -1 : 1);
+			Write_Int(weightclass->MatchForFifthPlace ? -1 : 1);
 			Write_Line(weightclass->Date);
 			Write_Int(weightclass->Relay);
 			Write_Int(weightclass->MaxJGJ);
@@ -1800,9 +1825,9 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 						ZED::Log::Warn("Could not read FightSystemTypeID of weightclass");
 				}
 				else if (header[i] == "KampfUmPlatz3")
-					new_weightclass.MatchForThirdPlace = data[i] != "-1";
+					new_weightclass.MatchForThirdPlace = data[i] == "-1";
 				else if (header[i] == "KampfUmPlatz5")
-					new_weightclass.MatchForFifthPlace = data[i] != "-1";
+					new_weightclass.MatchForFifthPlace = data[i] == "-1";
 				else if (header[i] == "Datum")
 					new_weightclass.Date = data[i];
 				else if (header[i] == "Weitermelden")
