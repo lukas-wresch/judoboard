@@ -29,8 +29,8 @@ TEST(Match, ExportImport)
 		ASSERT_EQ(match->GetRuleSet().GetUUID(), match2.GetRuleSet().GetUUID());
 
 		YAML::Emitter yaml1, yaml2;
-		match->ToString(yaml1);
-		match2.ToString(yaml2);
+		*match >> yaml1;
+		match2 >> yaml2;
 		ASSERT_EQ((std::string)yaml1.c_str(), (std::string)yaml2.c_str());
 
 		ASSERT_EQ(match->GetUUID(),      match2.GetUUID());
