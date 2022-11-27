@@ -190,23 +190,12 @@ MD5::MD5(const Tournament& Tournament)
 
 	for (auto match_table : Tournament.GetMatchTables())
 	{
-		if (match_table->GetType() == MatchTable::Type::Weightclass)
-			continue;
-
-		Weightclass* new_weightclass = new Weightclass;
-
-		new_weightclass->ID = id++;
-
-		if (match_table->GetName().length() > 0)
-			new_weightclass->Description = match_table->GetName();
-		else
-			new_weightclass->Description = match_table->GetDescription();
-
-		new_weightclass->Date = m_DateStart;
+		Weightclass* new_weightclass = nullptr;		
 
 		if (match_table->GetType() == MatchTable::Type::Weightclass)
 		{
 			const auto weightclass = (Judoboard::Weightclass*)match_table;
+			new_weightclass = new Weightclass;
 
 			new_weightclass->FightSystemID = 16;//Round robin
 
@@ -218,6 +207,7 @@ MD5::MD5(const Tournament& Tournament)
 		else if (match_table->GetType() == MatchTable::Type::SingleElimination)
 		{
 			const auto single_elimination = (Judoboard::SingleElimination*)match_table;
+			new_weightclass = new Weightclass;
 
 			new_weightclass->FightSystemID = 19;
 
@@ -230,10 +220,16 @@ MD5::MD5(const Tournament& Tournament)
 			new_weightclass->MatchForFifthPlace = single_elimination->IsFifthPlaceMatch();
 		}
 		else
-		{
-			delete new_weightclass;
 			continue;
-		}
+
+		new_weightclass->ID = id++;
+		new_weightclass->Date = m_DateStart;
+
+		if (match_table->GetName().length() > 0)
+			new_weightclass->Description = match_table->GetName();
+		else
+			new_weightclass->Description = match_table->GetDescription();
+
 
 		if (match_table->HasConcluded())
 			new_weightclass->Status = 4;//Completed
