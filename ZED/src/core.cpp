@@ -126,6 +126,10 @@ std::string Core::int2hex(unsigned int value, unsigned int width)
 int Core::ToInt(const std::string& Number)
 {
 	int ret = -1;
+
+	if (Number.empty())
+		return ret;
+
 	try
 	{
 		ret = std::stoi(Number);
