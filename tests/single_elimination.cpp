@@ -571,14 +571,11 @@ TEST(SingleElimination, Count10)
 
 	for (auto match : group.GetSchedule())
 	{
-		if (!match->HasValidFighters())
-			continue;
-
 		for (int i = 0; i < 10; ++i)
 		{
-			if (match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
+			if (match->GetFighter(Fighter::White) && match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
 				has_match[i] = true;
-			if (match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
+			if (match->GetFighter(Fighter::Blue ) && match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
 				has_match[i] = true;
 		}
 	}
@@ -636,14 +633,11 @@ TEST(SingleElimination, Count14)
 
 	for (auto match : group.GetSchedule())
 	{
-		if (!match->HasValidFighters())
-			continue;
-
 		for (int i = 0; i < 14; ++i)
 		{
-			if (match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
+			if (match->GetFighter(Fighter::White) && match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
 				has_match[i] = true;
-			if (match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
+			if (match->GetFighter(Fighter::Blue ) && match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
 				has_match[i] = true;
 		}
 	}
