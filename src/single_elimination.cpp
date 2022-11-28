@@ -220,7 +220,7 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 {
 	std::vector<Result> ret;
 
-	if (GetParticipants().size() == 0 || m_Schedule.size() == 0)
+	if (GetParticipants().size() == 0)
 		return ret;
 
 	if (GetParticipants().size() == 1)
@@ -228,6 +228,9 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 		ret.emplace_back(GetParticipants()[0], this);
 		return ret;
 	}
+
+	if (m_Schedule.size() == 0)
+		return ret;
 
 	//Get final match
 	const Match* lastMatch = m_Schedule[m_Schedule.size() - 1];
