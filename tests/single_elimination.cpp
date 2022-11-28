@@ -818,6 +818,101 @@ TEST(SingleElimination, Count32)
 
 
 
+TEST(SingleElimination, Count64)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	Judoka* j[65];
+	bool has_match[65];
+
+	for (int i = 1; i <= 64; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		has_match[i] = false;
+		t->AddParticipant(j[i]);
+	}
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	t->AddMatchTable(&group);
+
+	for (int i = 0; i < 64; ++i)
+		group.SetStartingPosition(j[i+1], i);
+
+	EXPECT_TRUE(group.GetMatch(0)->Contains(*j[1]));
+	EXPECT_TRUE(group.GetMatch(0)->Contains(*j[33]));
+	EXPECT_TRUE(group.GetMatch(1)->Contains(*j[17]));
+	EXPECT_TRUE(group.GetMatch(1)->Contains(*j[49]));
+	EXPECT_TRUE(group.GetMatch(2)->Contains(*j[9]));
+	EXPECT_TRUE(group.GetMatch(2)->Contains(*j[41]));
+	EXPECT_TRUE(group.GetMatch(3)->Contains(*j[25]));
+	EXPECT_TRUE(group.GetMatch(3)->Contains(*j[57]));
+	EXPECT_TRUE(group.GetMatch(4)->Contains(*j[5]));
+	EXPECT_TRUE(group.GetMatch(4)->Contains(*j[37]));
+	EXPECT_TRUE(group.GetMatch(5)->Contains(*j[21]));
+	EXPECT_TRUE(group.GetMatch(5)->Contains(*j[53]));
+	EXPECT_TRUE(group.GetMatch(6)->Contains(*j[13]));
+	EXPECT_TRUE(group.GetMatch(6)->Contains(*j[45]));
+	EXPECT_TRUE(group.GetMatch(7)->Contains(*j[29]));
+	EXPECT_TRUE(group.GetMatch(7)->Contains(*j[61]));
+	EXPECT_TRUE(group.GetMatch(8)->Contains(*j[3]));
+	EXPECT_TRUE(group.GetMatch(8)->Contains(*j[35]));
+	EXPECT_TRUE(group.GetMatch(9)->Contains(*j[19]));
+	EXPECT_TRUE(group.GetMatch(9)->Contains(*j[51]));
+	EXPECT_TRUE(group.GetMatch(10)->Contains(*j[11]));
+	EXPECT_TRUE(group.GetMatch(10)->Contains(*j[43]));
+	EXPECT_TRUE(group.GetMatch(11)->Contains(*j[27]));
+	EXPECT_TRUE(group.GetMatch(11)->Contains(*j[59]));
+	EXPECT_TRUE(group.GetMatch(12)->Contains(*j[7]));
+	EXPECT_TRUE(group.GetMatch(12)->Contains(*j[39]));
+	EXPECT_TRUE(group.GetMatch(13)->Contains(*j[23]));
+	EXPECT_TRUE(group.GetMatch(13)->Contains(*j[55]));
+	EXPECT_TRUE(group.GetMatch(14)->Contains(*j[15]));
+	EXPECT_TRUE(group.GetMatch(14)->Contains(*j[47]));
+	EXPECT_TRUE(group.GetMatch(15)->Contains(*j[31]));
+	EXPECT_TRUE(group.GetMatch(15)->Contains(*j[63]));
+	EXPECT_TRUE(group.GetMatch(16)->Contains(*j[2]));
+	EXPECT_TRUE(group.GetMatch(16)->Contains(*j[34]));
+	EXPECT_TRUE(group.GetMatch(17)->Contains(*j[18]));
+	EXPECT_TRUE(group.GetMatch(17)->Contains(*j[50]));
+	EXPECT_TRUE(group.GetMatch(18)->Contains(*j[10]));
+	EXPECT_TRUE(group.GetMatch(18)->Contains(*j[42]));
+	EXPECT_TRUE(group.GetMatch(19)->Contains(*j[26]));
+	EXPECT_TRUE(group.GetMatch(19)->Contains(*j[58]));
+	EXPECT_TRUE(group.GetMatch(20)->Contains(*j[6]));
+	EXPECT_TRUE(group.GetMatch(20)->Contains(*j[38]));
+	EXPECT_TRUE(group.GetMatch(21)->Contains(*j[22]));
+	EXPECT_TRUE(group.GetMatch(21)->Contains(*j[54]));
+	EXPECT_TRUE(group.GetMatch(22)->Contains(*j[14]));
+	EXPECT_TRUE(group.GetMatch(22)->Contains(*j[46]));
+	EXPECT_TRUE(group.GetMatch(23)->Contains(*j[30]));
+	EXPECT_TRUE(group.GetMatch(23)->Contains(*j[62]));
+	EXPECT_TRUE(group.GetMatch(24)->Contains(*j[4]));
+	EXPECT_TRUE(group.GetMatch(24)->Contains(*j[36]));
+	EXPECT_TRUE(group.GetMatch(25)->Contains(*j[20]));
+	EXPECT_TRUE(group.GetMatch(25)->Contains(*j[52]));
+	EXPECT_TRUE(group.GetMatch(26)->Contains(*j[12]));
+	EXPECT_TRUE(group.GetMatch(26)->Contains(*j[44]));
+	EXPECT_TRUE(group.GetMatch(27)->Contains(*j[28]));
+	EXPECT_TRUE(group.GetMatch(27)->Contains(*j[60]));
+	EXPECT_TRUE(group.GetMatch(28)->Contains(*j[8]));
+	EXPECT_TRUE(group.GetMatch(28)->Contains(*j[40]));
+	EXPECT_TRUE(group.GetMatch(29)->Contains(*j[24]));
+	EXPECT_TRUE(group.GetMatch(29)->Contains(*j[56]));
+	EXPECT_TRUE(group.GetMatch(30)->Contains(*j[16]));
+	EXPECT_TRUE(group.GetMatch(30)->Contains(*j[48]));
+	EXPECT_TRUE(group.GetMatch(31)->Contains(*j[32]));
+	EXPECT_TRUE(group.GetMatch(31)->Contains(*j[64]));
+		
+	ASSERT_EQ(group.GetParticipants().size(), 64);
+	ASSERT_EQ(group.GetSchedule().size(),     63);
+}
+
+
+
 TEST(SingleElimination, Count4_ExportImport)
 {
 	initialize();

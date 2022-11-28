@@ -173,6 +173,21 @@ void SingleElimination::GenerateSchedule()
 		nextRound.emplace_back(new_match);
 	};
 
+	if (rounds == 2)//4 participants hardcoded
+	{
+		for (int j = 0; j < 2; j++)
+			create_pair(1 + j);
+	}
+
+	else if (rounds == 3)//8 participants hardcoded
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			create_pair(1 + j);
+			create_pair(3 + j);
+		}
+	}
+
 	if (rounds == 4)//16 participants hardcoded
 	{
 		for (int j = 0; j < 2; j++)
@@ -196,6 +211,29 @@ void SingleElimination::GenerateSchedule()
 			create_pair(11 + j);
 			create_pair(7  + j);
 			create_pair(15 + j);
+		}
+	}
+
+	else if (rounds == 6)//64 participants hardcoded
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			create_pair(1  + j);
+			create_pair(17 + j);
+			create_pair(9  + j);
+			create_pair(25 + j);
+			create_pair(5  + j);
+			create_pair(21 + j);
+			create_pair(13 + j);
+			create_pair(29 + j);
+			create_pair(3  + j);
+			create_pair(19 + j);
+			create_pair(11 + j);
+			create_pair(27 + j);
+			create_pair(7  + j);
+			create_pair(23 + j);
+			create_pair(15 + j);
+			create_pair(31 + j);
 		}
 	}
 
