@@ -188,10 +188,14 @@ void SingleElimination::GenerateSchedule()
 	{
 		for (int j = 0; j < 2; j++)
 		{
-			create_pair(1 + j);
-			create_pair(5 + j);
-			create_pair(3 + j);
-			create_pair(7 + j);
+			create_pair(1  + j);
+			create_pair(9  + j);
+			create_pair(5  + j);
+			create_pair(13 + j);
+			create_pair(3  + j);
+			create_pair(11 + j);
+			create_pair(7  + j);
+			create_pair(15 + j);
 		}
 	}
 
