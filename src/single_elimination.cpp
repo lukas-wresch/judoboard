@@ -188,7 +188,7 @@ void SingleElimination::GenerateSchedule()
 		}
 	}
 
-	if (rounds == 4)//16 participants hardcoded
+	else if (rounds == 4)//16 participants hardcoded
 	{
 		for (int j = 0; j < 2; j++)
 		{
