@@ -60,8 +60,8 @@ void SingleElimination::ToString(YAML::Emitter& Yaml) const
 {
 	Weightclass::ToString(Yaml);
 
-	Yaml << YAML::Key << "3rd_place" << YAML::Value << IsThirdPlaceMatch();
-	Yaml << YAML::Key << "5th_place" << YAML::Value << IsFifthPlaceMatch();
+	Yaml << YAML::Key << "third_place" << YAML::Value << IsThirdPlaceMatch();
+	Yaml << YAML::Key << "fifth_place" << YAML::Value << IsFifthPlaceMatch();
 }
 
 

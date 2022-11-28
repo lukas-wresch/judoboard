@@ -111,10 +111,10 @@ function GetForm(callback)
       document.getElementById("gender").value = g_yaml.gender;
     if (g_yaml && typeof g_yaml.best_of_three !== 'undefined')
       document.getElementById("bo3").checked = g_yaml.best_of_three;
-    if (g_yaml && typeof g_yaml.3rd_place !== 'undefined')
-      document.getElementById("mf3").checked = g_yaml.3rd_place;
-      if (g_yaml && typeof g_yaml.5th_place !== 'undefined')
-      document.getElementById("mf5").checked = g_yaml.5th_place;
+    if (g_yaml && typeof g_yaml.third_place !== 'undefined')
+      document.getElementById("mf3").checked = g_yaml.third_place;
+    if (g_yaml && typeof g_yaml.fifth_place !== 'undefined')
+      document.getElementById("mf5").checked = g_yaml.fifth_place;
       
     if (typeof callback !== 'undefined')
       callback();
