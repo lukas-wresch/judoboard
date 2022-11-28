@@ -144,12 +144,15 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (match.WhiteID == match.RedID)//Filter dummy matches
 			continue;
 
-		if (!match.White || !match.Red)
-			continue;
-		if (!match.White->pUserData || !match.Red->pUserData)
-			continue;
+		Judoka* white = nullptr;
+		if (match.White && match.White->pUserData)
+			white = (Judoka*)match.White->pUserData;
 
-		Match* new_match = new Match(this, (Judoka*)match.White->pUserData, (Judoka*)match.Red->pUserData);
+		Judoka* blue = nullptr;
+		if (match.Red && match.Red->pUserData)
+			blue = (Judoka*)match.Red->pUserData;
+
+		Match* new_match = new Match(this, white, blue);
 
 		if (match.Status == 3)//Match completed?
 		{
