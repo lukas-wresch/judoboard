@@ -988,6 +988,16 @@ TEST(Ajax, MatchTable_Get)
 		tables[2]->ToString(yaml3);
 		yaml3 << YAML::EndMap;
 		EXPECT_EQ(yaml3.c_str(), output);
+
+		auto node = YAML::Load(output);
+
+		ASSERT_TRUE(node["best_of_three"].IsDefined());
+		ASSERT_TRUE(node["3rd_place"].IsDefined());
+		ASSERT_TRUE(node["5th_place"].IsDefined());
+
+		EXPECT_EQ(node["best_of_three"].as<bool>(), true);
+		EXPECT_EQ(node["3rd_place"].as<bool>(), true);
+		EXPECT_EQ(node["5th_place"].as<bool>(), true);
 	}
 }
 
