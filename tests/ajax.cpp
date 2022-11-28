@@ -1013,7 +1013,10 @@ TEST(Ajax, MatchTable_StartingPositionsAfterUpdate)
 		
 		for (int i = 0; i < 100; i++)
 		{
-			auto t = app.GetTournament();
+			auto t = new Tournament("deleteMe" + std::to_string(i));
+			t->EnableAutoSave(false);
+
+			ASSERT_TRUE(app.AddTournament(t));
 
 			auto group = new SingleElimination(0, 200);
 			t->AddMatchTable(group);
@@ -1034,11 +1037,11 @@ TEST(Ajax, MatchTable_StartingPositionsAfterUpdate)
 			t->AddParticipant(j5);
 
 
-			int start_j1 = rand() % 8;
-			int start_j2 = rand() % 8;
-			int start_j3 = rand() % 8;
-			int start_j4 = rand() % 8;
-			int start_j5 = rand() % 8;
+			size_t start_j1 = rand() % 8;
+			size_t start_j2 = rand() % 8;
+			size_t start_j3 = rand() % 8;
+			size_t start_j4 = rand() % 8;
+			size_t start_j5 = rand() % 8;
 
 			group->SetStartingPosition(j1, start_j1);
 			group->SetStartingPosition(j2, start_j2);
@@ -1046,6 +1049,11 @@ TEST(Ajax, MatchTable_StartingPositionsAfterUpdate)
 			group->SetStartingPosition(j4, start_j4);
 			group->SetStartingPosition(j5, start_j5);
 
+			start_j1 = group->GetStartingPosition(j1);
+			start_j2 = group->GetStartingPosition(j2);
+			start_j3 = group->GetStartingPosition(j3);
+			start_j4 = group->GetStartingPosition(j4);
+			start_j5 = group->GetStartingPosition(j5);
 
 			EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)group->GetUUID(), "name=Test2&mat=5&minWeight=0,7&maxWeight=200.3&bo3=true")), "ok");
 
@@ -1055,6 +1063,8 @@ TEST(Ajax, MatchTable_StartingPositionsAfterUpdate)
 			ASSERT_EQ(group->GetStartingPosition(j3), start_j3);
 			ASSERT_EQ(group->GetStartingPosition(j4), start_j4);
 			ASSERT_EQ(group->GetStartingPosition(j5), start_j5);
+
+			app.CloseTournament();
 		}
 	}
 }

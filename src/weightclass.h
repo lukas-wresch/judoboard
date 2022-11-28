@@ -21,7 +21,6 @@ namespace Judoboard
 		virtual Type GetType() const override { return Type::Weightclass; }
 
 		virtual std::string GetDescription() const override;
-		virtual Status GetStatus() const override;
 
 		virtual std::vector<Result> CalculateResults() const override;
 		virtual bool IsElgiable(const Judoka& Fighter) const override;
