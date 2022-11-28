@@ -2392,3 +2392,62 @@ TEST(MD5, ImportSingleElimination)
 	EXPECT_TRUE(table->GetMatch(10)->Contains(*j6));
 	EXPECT_TRUE(table->GetMatch(11)->Contains(*j4));
 }
+
+
+
+TEST(MD5, ExportSingleElimination)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	Judoka* j[17];
+
+	for (int i = 1; i <= 16; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		t->AddParticipant(j[i]);
+	}
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	t->AddMatchTable(&group);
+
+	for (int i = 1; i <= 16; ++i)
+		group.SetStartingPosition(j[i], i-1);
+
+	ASSERT_EQ(group.GetParticipants().size(), 16);
+
+	Mat m(1);
+
+	for (auto match : group.GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = group.CalculateResults();
+
+	ASSERT_EQ(results.size(), 2);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[16]->GetUUID());
+
+
+	MD5 file(*t);
+
+	ASSERT_EQ(file.GetWeightclasses().size(), 1);
+	auto& table = file.GetWeightclasses()[0];
+
+	auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+	ASSERT_EQ(results2.size(), 2);
+
+	EXPECT_EQ(results2[0]->RankNo, 1);
+	EXPECT_EQ(results2[0]->Participant->Firstname, j[16]->GetFirstname());
+}
