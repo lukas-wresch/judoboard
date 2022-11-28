@@ -67,6 +67,9 @@ void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 void SingleElimination::ToString(YAML::Emitter& Yaml) const
 {
 	Weightclass::ToString(Yaml);
+
+	Yaml << YAML::Key << "third_place" << YAML::Value << IsThirdPlaceMatch();
+	Yaml << YAML::Key << "fifth_place" << YAML::Value << IsFifthPlaceMatch();
 }
 
 
@@ -115,6 +118,23 @@ bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
 	SortParticipantsByStartingPosition();
 	GenerateSchedule();
 	return true;
+}
+
+
+
+bool SingleElimination::RemoveParticipant(const Judoka* Participant)
+{
+	if (MatchTable::RemoveParticipant(Participant))
+	{
+		auto pos = GetStartingPosition(Participant);
+		if (pos != SIZE_MAX)
+		{
+			m_StartingPositions.erase(pos);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 
@@ -358,7 +378,7 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 size_t SingleElimination::GetStartingPosition(const Judoka* Judoka) const
 {
 	if (!Judoka)
-		return 0;
+		return SIZE_MAX;
 
 	for (auto [pos, participant] : m_StartingPositions)
 	{
@@ -366,7 +386,7 @@ size_t SingleElimination::GetStartingPosition(const Judoka* Judoka) const
 			return pos;
 	}
 
-	return 0;
+	return SIZE_MAX;
 }
 
 

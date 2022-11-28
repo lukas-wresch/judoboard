@@ -866,6 +866,211 @@ TEST(Ajax, RemoveDisqualification)
 
 
 
+TEST(Ajax, MatchTable_Add)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test&mat=7")), "ok");
+
+		ASSERT_EQ(tables.size(), 1);
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::Weightclass);
+		EXPECT_EQ(tables[0]->GetName(), "Test");
+		EXPECT_EQ(tables[0]->GetMatID(), 7);
+
+
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+
+		ASSERT_EQ(tables.size(), 2);
+		ASSERT_EQ(tables[1]->GetType(), MatchTable::Type::Weightclass);
+		EXPECT_EQ(tables[1]->GetName(), "Test2");
+		EXPECT_EQ(tables[1]->GetMatID(), 5);
+		EXPECT_EQ(((Weightclass*)tables[1])->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ(((Weightclass*)tables[1])->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ(((Weightclass*)tables[1])->GetGender(), Gender::Male);
+		EXPECT_EQ(((Weightclass*)tables[1])->IsBestOfThree(), true);
+
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=4", "name=Test3&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
+
+		ASSERT_EQ(tables.size(), 3);
+		ASSERT_EQ(tables[2]->GetType(), MatchTable::Type::SingleElimination);
+		EXPECT_EQ(tables[2]->GetName(), "Test3");
+		EXPECT_EQ(tables[2]->GetMatID(), 5);
+		EXPECT_EQ(((SingleElimination*)tables[1])->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ(((SingleElimination*)tables[1])->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ(((SingleElimination*)tables[1])->GetGender(), Gender::Female);
+		EXPECT_EQ(((SingleElimination*)tables[1])->IsBestOfThree(), true);
+		EXPECT_EQ(((SingleElimination*)tables[1])->IsThirdPlaceMatch(), true);
+		EXPECT_EQ(((SingleElimination*)tables[1])->IsFifthPlaceMatch(), true);
+	}
+}
+
+
+
+TEST(Ajax, MatchTable_Edit)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test&mat=7")), "ok");
+
+		ASSERT_EQ(tables.size(), 1);
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::Weightclass);
+		EXPECT_EQ(tables[0]->GetName(), "Test");
+		EXPECT_EQ(tables[0]->GetMatID(), 7);
+
+
+		EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+
+		ASSERT_EQ(tables.size(), 1);
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::Weightclass);
+		EXPECT_EQ(tables[0]->GetName(), "Test2");
+		EXPECT_EQ(tables[0]->GetMatID(), 5);
+		EXPECT_EQ(((Weightclass*)tables[0])->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ(((Weightclass*)tables[0])->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ(((Weightclass*)tables[0])->GetGender(), Gender::Male);
+		EXPECT_EQ(((Weightclass*)tables[0])->IsBestOfThree(), true);
+	}
+}
+
+
+
+TEST(Ajax, MatchTable_Get)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test&mat=7")), "ok");
+
+		ASSERT_EQ(tables.size(), 1);
+
+		auto output = app.Ajax_GetMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID()));
+
+		YAML::Emitter yaml1;
+		yaml1 << YAML::BeginMap;
+		tables[0]->ToString(yaml1);
+		yaml1 << YAML::EndMap;
+		EXPECT_EQ(yaml1.c_str(), output);
+
+
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+
+		ASSERT_EQ(tables.size(), 2);
+
+		output = app.Ajax_GetMatchTable(HttpServer::Request("id=" + (std::string)tables[1]->GetUUID()));
+
+		YAML::Emitter yaml2;
+		yaml2 << YAML::BeginMap;
+		tables[1]->ToString(yaml2);
+		yaml2 << YAML::EndMap;
+		EXPECT_EQ(yaml2.c_str(), output);
+
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=4", "name=Test3&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
+
+		ASSERT_EQ(tables.size(), 3);
+
+		output = app.Ajax_GetMatchTable(HttpServer::Request("id=" + (std::string)tables[2]->GetUUID()));
+
+		YAML::Emitter yaml3;
+		yaml3 << YAML::BeginMap;
+		tables[2]->ToString(yaml3);
+		yaml3 << YAML::EndMap;
+		EXPECT_EQ(yaml3.c_str(), output);
+
+		auto node = YAML::Load(output);
+
+		ASSERT_TRUE(node["best_of_three"].IsDefined());
+		ASSERT_TRUE(node["third_place"].IsDefined());
+		ASSERT_TRUE(node["fifth_place"].IsDefined());
+
+		EXPECT_EQ(node["best_of_three"].as<bool>(), true);
+		EXPECT_EQ(node["third_place"].as<bool>(), true);
+		EXPECT_EQ(node["fifth_place"].as<bool>(), true);
+	}
+}
+
+
+
+TEST(Ajax, MatchTable_StartingPositionsAfterUpdate)
+{
+	initialize();
+
+	{
+		Application app;
+
+		
+		for (int i = 0; i < 100; i++)
+		{
+			auto t = new Tournament("deleteMe" + std::to_string(i));
+			t->EnableAutoSave(false);
+
+			ASSERT_TRUE(app.AddTournament(t));
+
+			auto group = new SingleElimination(0, 200);
+			t->AddMatchTable(group);
+
+			auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+			t->AddParticipant(j1);
+
+			auto j2 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+			t->AddParticipant(j2);
+
+			auto j3 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 70);
+			t->AddParticipant(j3);
+
+			auto j4 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 80);
+			t->AddParticipant(j4);
+
+			auto j5 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 90);
+			t->AddParticipant(j5);
+
+
+			size_t start_j1 = rand() % 8;
+			size_t start_j2 = rand() % 8;
+			size_t start_j3 = rand() % 8;
+			size_t start_j4 = rand() % 8;
+			size_t start_j5 = rand() % 8;
+
+			group->SetStartingPosition(j1, start_j1);
+			group->SetStartingPosition(j2, start_j2);
+			group->SetStartingPosition(j3, start_j3);
+			group->SetStartingPosition(j4, start_j4);
+			group->SetStartingPosition(j5, start_j5);
+
+			start_j1 = group->GetStartingPosition(j1);
+			start_j2 = group->GetStartingPosition(j2);
+			start_j3 = group->GetStartingPosition(j3);
+			start_j4 = group->GetStartingPosition(j4);
+			start_j5 = group->GetStartingPosition(j5);
+
+			EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)group->GetUUID(), "name=Test2&mat=5&minWeight=0,7&maxWeight=200.3&bo3=true")), "ok");
+
+
+			ASSERT_EQ(group->GetStartingPosition(j1), start_j1);
+			ASSERT_EQ(group->GetStartingPosition(j2), start_j2);
+			ASSERT_EQ(group->GetStartingPosition(j3), start_j3);
+			ASSERT_EQ(group->GetStartingPosition(j4), start_j4);
+			ASSERT_EQ(group->GetStartingPosition(j5), start_j5);
+
+			app.CloseTournament();
+		}
+	}
+}
+
+
+
 TEST(Ajax, NoDisqualification)
 {
 	initialize();
