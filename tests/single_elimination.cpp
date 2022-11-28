@@ -697,6 +697,9 @@ TEST(SingleElimination, Count16)
 	group.SetMatID(1);
 	t->AddMatchTable(&group);
 
+	for (int i = 0; i < 16; ++i)
+		group.SetStartingPosition(j[0], i);
+
 	EXPECT_TRUE(group.GetMatch(0)->Contains(*j[0]));
 	EXPECT_TRUE(group.GetMatch(0)->Contains(*j[8]));
 	EXPECT_TRUE(group.GetMatch(1)->Contains(*j[4]));
@@ -778,6 +781,9 @@ TEST(SingleElimination, Count32)
 	SingleElimination group(0, 200);
 	group.SetMatID(1);
 	t->AddMatchTable(&group);
+
+	for (int i = 0; i < 32; ++i)
+		group.SetStartingPosition(j[i+1], i);
 
 	EXPECT_TRUE(group.GetMatch(0)->Contains(*j[1]));
 	EXPECT_TRUE(group.GetMatch(0)->Contains(*j[17]));
