@@ -171,6 +171,7 @@ namespace Judoboard
 			//1  = double elimination (7 participants, 16 system)
 			//13 = 1 participant
 			//14 = 2 participants (best of 3?)
+			//15 = round robin?
 			//16 = round robin (5 participants)
 			//19 = Single elimination (single consulation bracket, 16 system)
 			//24 = pooled (6 participants) 3+3 pool
