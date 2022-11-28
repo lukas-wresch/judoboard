@@ -2324,5 +2324,68 @@ TEST(MD5, ReadSingleElimination)
 
 	file.Dump();
 
-	ASSERT_TRUE(file.GetOrganizer());
+	auto table = file.FindWeightclass("Jugend u10 m", "-10 kg");
+	ASSERT_TRUE(table);
+	EXPECT_EQ(table->FightSystemID, 19);
+	EXPECT_EQ(table->MatchForThirdPlace, true);
+	EXPECT_EQ(table->MatchForFifthPlace, true);
+
+	auto matches = file.GetMatches();
+	ASSERT_EQ(matches.size(), 21);
+
+	EXPECT_EQ(matches[0].Status, 2);
+	EXPECT_EQ(matches[0].Red->Firstname, "v1");
+}
+
+
+
+TEST(MD5, ImportSingleElimination)
+{
+	initialize();
+
+	MD5 file("test-data/single-elimination(single-consulation-bracket).md5");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	Database db;
+	Tournament tour(file, &db);
+
+	auto j1 = db.FindJudokaByName("v1 n1");
+	auto j2 = db.FindJudokaByName("v2 n2");
+	auto j3 = db.FindJudokaByName("v3 n3");
+	auto j4 = db.FindJudokaByName("v4 n4");
+	auto j5 = db.FindJudokaByName("v5 n5");
+	auto j6 = db.FindJudokaByName("v6 n6");
+
+	auto table = tour.FindMatchTableByDescription("Jugend u10 m -10 kg");
+	ASSERT_TRUE(table);
+	ASSERT_EQ(table->GetParticipants().size(), 6);
+
+	EXPECT_EQ(table->GetType(), MatchTable::Type::SingleElimination);
+
+	EXPECT_EQ(table->GetStartingPosition(j1)+1, 1);
+	EXPECT_EQ(table->GetStartingPosition(j2)+1, 2);
+	EXPECT_EQ(table->GetStartingPosition(j3)+1, 3);
+	EXPECT_EQ(table->GetStartingPosition(j4)+1, 4);
+	EXPECT_EQ(table->GetStartingPosition(j5)+1, 5);
+	EXPECT_EQ(table->GetStartingPosition(j6)+1, 6);
+
+	ASSERT_TRUE(table->GetMatch(11));
+
+	EXPECT_TRUE(table->GetMatch(0)->Contains(*j1));
+	EXPECT_TRUE(table->GetMatch(1)->Contains(*j5));
+	EXPECT_TRUE(table->GetMatch(2)->Contains(*j3));
+
+	EXPECT_TRUE(table->GetMatch(4)->Contains(*j2));
+	EXPECT_TRUE(table->GetMatch(5)->Contains(*j6));
+	EXPECT_TRUE(table->GetMatch(6)->Contains(*j4));
+
+	EXPECT_TRUE(table->GetMatch(8)->Contains(*j1));
+	EXPECT_TRUE(table->GetMatch(8)->Contains(*j5));
+	EXPECT_TRUE(table->GetMatch(9)->Contains(*j3));
+	EXPECT_TRUE(table->GetMatch(10)->Contains(*j2));
+	EXPECT_TRUE(table->GetMatch(10)->Contains(*j6));
+	EXPECT_TRUE(table->GetMatch(11)->Contains(*j4));
 }

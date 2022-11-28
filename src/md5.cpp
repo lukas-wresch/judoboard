@@ -1185,6 +1185,16 @@ MD5::Weightclass* MD5::FindWeightclass(int AgeGroupID, int WeightclassID)
 
 
 
+const MD5::Weightclass* MD5::FindWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const
+{
+	for (auto table : m_Weightclasses)
+		if (table->AgeGroup && table->AgeGroup->Name == AgeGroup && table->Description == Weightclass)
+			return table;
+	return nullptr;
+}
+
+
+
 const MD5::Result* MD5::FindResult(int AgeGroupID, int WeightclassID, int Rank) const
 {
 	for (auto& result : m_Results)

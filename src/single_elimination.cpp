@@ -35,6 +35,14 @@ SingleElimination::SingleElimination(const YAML::Node& Yaml, ITournament* Tourna
 
 
 
+SingleElimination::SingleElimination(const MD5::Weightclass& Weightclass, const ITournament* Tournament)
+	: Weightclass(Weightclass, Tournament)
+{
+	//TODO
+}
+
+
+
 void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 {
 	Weightclass::operator >>(Yaml);
