@@ -401,6 +401,19 @@ const std::string SingleElimination::ToHTML() const
 
 	ret += "</table>";
 
+	if (IsThirdPlaceMatch())
+	{
+		ret += "<table border='1' rules='all'>";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += "<th width=\"" + std::to_string(width) + "%\">" + Localizer::Translate("3rd Place Match") + "</th>";
+		ret += "</tr>";
+
+		//ret += renderMatch(round, matchOfRound);
+
+		ret += "</table>";
+	}
+
 	ret += ResultsToHTML();	
 
 	return ret;
