@@ -1291,7 +1291,7 @@ TEST(Mat, OsaekomiTillEndDuringGoldenScore)
 	//and now get cancelled after reaching the wazaari time
 
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 2; time <= 25; time += 5 + rand() % 8)
+	for (int time = 5; time <= 25; time += 5 + rand() % 8)
 	{
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 		{
@@ -1300,11 +1300,11 @@ TEST(Mat, OsaekomiTillEndDuringGoldenScore)
 
 			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
 			match.SetMatID(1);
-			match.SetRuleSet(new RuleSet("Test", 2, 60, 2*time, time, false, false, false, 0));
+			match.SetRuleSet(new RuleSet("Test", 1, 60, 2*time, time, false, false, false, 0));
 			EXPECT_TRUE(m.StartMatch(&match));
 
 			m.Hajime();
-			ZED::Core::Pause(2500);
+			ZED::Core::Pause(1500);
 
 			m.EnableGoldenScore();
 			m.Hajime();
