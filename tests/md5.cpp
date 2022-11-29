@@ -2402,11 +2402,45 @@ TEST(MD5, ExportSingleElimination)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
+	auto inter = new Judoboard::Association("International", nullptr);
+
+	auto de = new Judoboard::Association("Deutschland", inter);
+
+	auto dn = new Judoboard::Association("Deutschland-Nord", de);
+	auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+
+	auto nord  = new Judoboard::Association("Nord", dn);
+	auto west  = new Judoboard::Association("West", dn);
+	auto nost  = new Judoboard::Association("Nordost", dn);
+	auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
+	auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+
+	auto nieder  = new Judoboard::Association("Niedersachsen", nord);
+	auto hamburg = new Judoboard::Association("Hamburg", nord);
+	auto berlin  = new Judoboard::Association("Berlin", nost);
+	auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+	auto detmold = new Judoboard::Association("Detmold", nrw);
+
+	auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+
+	t->SetOrganizer(biegue);
+
+	std::vector<Club*> clubs;
+	clubs.push_back(new Judoboard::Club("Altenhagen", biegue));
+	clubs.push_back(new Judoboard::Club("Brackwede", biegue));
+	clubs.push_back(new Judoboard::Club("Senne", biegue));
+
+
+	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr, t->GetDatabase());
+	t->AddAgeGroup(age);
+
 	Judoka* j[17];
 
 	for (int i = 1; i <= 16; ++i)
 	{
 		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		j[i]->SetClub(clubs[rand()%3]);
 		t->AddParticipant(j[i]);
 	}
 
