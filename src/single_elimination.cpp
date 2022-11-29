@@ -59,6 +59,9 @@ void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 void SingleElimination::ToString(YAML::Emitter& Yaml) const
 {
 	Weightclass::ToString(Yaml);
+
+	Yaml << YAML::Key << "third_place" << YAML::Value << IsThirdPlaceMatch();
+	Yaml << YAML::Key << "fifth_place" << YAML::Value << IsFifthPlaceMatch();
 }
 
 
@@ -111,6 +114,23 @@ bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
 
 
 
+bool SingleElimination::RemoveParticipant(const Judoka* Participant)
+{
+	if (MatchTable::RemoveParticipant(Participant))
+	{
+		auto pos = GetStartingPosition(Participant);
+		if (pos != SIZE_MAX)
+		{
+			m_StartingPositions.erase(pos);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
 void SingleElimination::GenerateSchedule()
 {
 	for (auto it = m_Schedule.begin(); it != m_Schedule.end();)
@@ -147,7 +167,6 @@ void SingleElimination::GenerateSchedule()
 	for (int round = 1; round < rounds; ++round)
 	{
 		lastRound = std::move(nextRound);
-		//nextRound.clear();
 
 		for (size_t i = 0; i < lastRound.size(); i += 2)
 		{
@@ -162,7 +181,60 @@ void SingleElimination::GenerateSchedule()
 		}
 	}
 
+
+	//Add additional match for 3rd place
+	if (IsThirdPlaceMatch() && m_Schedule.size() >= 3)
+	{
+		auto match1 = m_Schedule[m_Schedule.size() - 3];
+		auto match2 = m_Schedule[m_Schedule.size() - 2];
+
+		auto third_place = CreateAutoMatch(nullptr, nullptr);
+		third_place->SetDependency(Fighter::White, Match::DependencyType::TakeLoser, match1);
+		third_place->SetDependency(Fighter::Blue,  Match::DependencyType::TakeLoser, match2);
+
+		//Swap matches so that match for 1st place is still the last one
+		std::swap(m_Schedule[m_Schedule.size() - 1], m_Schedule[m_Schedule.size() - 2]);
+	}
 	
+
+	//Add additional matches for 5th place
+	if (IsFifthPlaceMatch() && m_Schedule.size() >= 8)
+	{
+		int offset = 3;//Final and two semi finals
+		if (IsThirdPlaceMatch())
+			offset = 4;
+
+		auto match1 = m_Schedule[m_Schedule.size() - 1 - offset - 3];
+		auto match2 = m_Schedule[m_Schedule.size() - 1 - offset - 2];
+		auto match3 = m_Schedule[m_Schedule.size() - 1 - offset - 1];
+		auto match4 = m_Schedule[m_Schedule.size() - 1 - offset];
+
+		//Order gets fixed at the end
+		auto semi2 = CreateAutoMatch(nullptr, nullptr);
+		auto fifth = CreateAutoMatch(nullptr, nullptr);
+		auto semi1 = CreateAutoMatch(nullptr, nullptr);
+
+		semi1->SetDependency(Fighter::White, Match::DependencyType::TakeLoser, match1);
+		semi1->SetDependency(Fighter::Blue,  Match::DependencyType::TakeLoser, match2);
+
+		semi2->SetDependency(Fighter::White, Match::DependencyType::TakeLoser, match3);
+		semi2->SetDependency(Fighter::Blue,  Match::DependencyType::TakeLoser, match4);
+
+		fifth->SetDependency(Fighter::White, Match::DependencyType::TakeWinner, semi1);
+		fifth->SetDependency(Fighter::Blue,  Match::DependencyType::TakeWinner, semi2);
+
+		//Swap matches so that match for 1st place is still the last one
+		offset = 3;
+
+		std::swap(m_Schedule[m_Schedule.size() - 1 - offset - 2], m_Schedule[m_Schedule.size() - 1 - 2]);
+		std::swap(m_Schedule[m_Schedule.size() - 1 - offset - 1], m_Schedule[m_Schedule.size() - 1 - 1]);
+		std::swap(m_Schedule[m_Schedule.size() - 1 - offset],     m_Schedule[m_Schedule.size() - 1]);
+
+		if (IsThirdPlaceMatch())
+			std::swap(m_Schedule[m_Schedule.size() - 1 - offset - 3], m_Schedule[m_Schedule.size() - 1 - 3]);
+	}
+
+
 	//Add additional matches for best of three
 	if (IsBestOfThree())
 	{
@@ -173,13 +245,12 @@ void SingleElimination::GenerateSchedule()
 		{
 			auto match1 = schedule_copy[i];
 
-			m_Schedule.push_back(match1);
-
 			auto match2 = new Match(*match1);
 			match2->SwapFighters();
 			auto match3 = new Match(*match1);
 			match3->SetBestOfThree(match1, match2);
 
+			m_Schedule.push_back(match1);
 			m_Schedule.emplace_back(match2);
 			m_Schedule.emplace_back(match3);
 		}
@@ -240,6 +311,28 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 		ret.emplace_back(lastMatch->GetWinner(), this);
 		ret.emplace_back(lastMatch->GetLoser(),  this);
 	}
+	else
+		return ret;
+
+	if (IsThirdPlaceMatch())
+	{
+		const Match* third_place_match = m_Schedule[m_Schedule.size() - 2];
+		ret.emplace_back(third_place_match->GetWinner(), this);
+		ret.emplace_back(third_place_match->GetLoser(),  this);
+	}
+
+	if (IsThirdPlaceMatch() && IsFifthPlaceMatch())
+	{
+		//int offset = 4;
+		//if (IsThirdPlaceMatch())
+		//offset = 5;
+
+		int offset = 5;
+
+		const Match* fifth_place_match = m_Schedule[m_Schedule.size() - offset];
+		ret.emplace_back(fifth_place_match->GetWinner(), this);
+		ret.emplace_back(fifth_place_match->GetLoser(),  this);
+	}
 
 	return ret;
 }
@@ -249,7 +342,7 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 size_t SingleElimination::GetStartingPosition(const Judoka* Judoka) const
 {
 	if (!Judoka)
-		return 0;
+		return SIZE_MAX;
 
 	for (auto [pos, participant] : m_StartingPositions)
 	{
@@ -257,7 +350,7 @@ size_t SingleElimination::GetStartingPosition(const Judoka* Judoka) const
 			return pos;
 	}
 
-	return 0;
+	return SIZE_MAX;
 }
 
 
@@ -311,6 +404,14 @@ const std::string SingleElimination::ToHTML() const
 			matchIndex += (int)(N / pow(2.0, i));
 
 		matchIndex += matchOfRound;
+
+		if (IsThirdPlaceMatch() && matchIndex >= GetSchedule().size() - 2)
+			matchIndex++;
+		if (IsFifthPlaceMatch() && matchIndex >= GetSchedule().size() - 5)
+			matchIndex+=3;
+
+		if (IsBestOfThree())
+			matchIndex = matchIndex*3;
 
 		if (matchIndex >= GetSchedule().size())
 			return "";

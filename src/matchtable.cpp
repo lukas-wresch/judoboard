@@ -80,6 +80,35 @@ bool MatchTable::IsIncluded(const Judoka& Fighter) const
 
 
 
+Status MatchTable::GetStatus() const
+{
+	if (m_Schedule.size() == 0)
+		return Status::Scheduled;
+
+	bool one_match_finished = false;
+	bool all_matches_finished = true;
+
+	for (auto match : m_Schedule)
+	{
+		if (match->IsEmptyMatch() || match->IsBestOfThree())
+			continue;
+
+		if (!match->HasConcluded())
+			all_matches_finished = false;
+
+		if (match->IsRunning() || match->HasConcluded())
+			one_match_finished = true;
+	}
+
+	if (all_matches_finished)
+		return Status::Concluded;
+	if (one_match_finished)
+		return Status::Running;
+	return Status::Scheduled;
+}
+
+
+
 bool MatchTable::AddMatch(Match* NewMatch)
 {
 	if (!NewMatch)
@@ -112,6 +141,26 @@ bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 	m_Participants.push_back(NewParticipant);
 	GenerateSchedule();
 	return true;
+}
+
+
+
+bool MatchTable::RemoveParticipant(const Judoka* Participant)
+{
+	if (!Participant)
+		return false;
+
+	for (auto it = m_Participants.begin(); it != m_Participants.end(); ++it)
+	{
+		if (*it && *(*it) == *Participant)
+		{
+			m_Participants.erase(it);
+			m_Schedule.clear();
+			return true;
+		}
+	}
+
+	return false;
 }
 
 
@@ -238,8 +287,12 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tour
 {
 	if (Yaml["uuid"])
 		SetUUID(Yaml["uuid"].as<std::string>());
+	if (Yaml["schedule_index"])
+		m_ScheduleIndex = Yaml["schedule_index"].as<int>();
 	if (Yaml["mat_id"])
 		m_MatID = Yaml["mat_id"].as<int>();
+	if (Yaml["color"])
+		m_Color = Yaml["color"].as<int>();
 
 	if (Yaml["name"])
 		m_Name = Yaml["name"].as<std::string>();

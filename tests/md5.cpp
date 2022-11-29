@@ -2311,3 +2311,18 @@ TEST(MD5, ReadDoubleElimination)
 
 	ASSERT_TRUE(file.GetOrganizer());
 }
+
+
+
+TEST(MD5, ReadSingleElimination)
+{
+	initialize();
+
+	MD5 file("test-data/single-elimination(single-consulation-bracket).md5");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	ASSERT_TRUE(file.GetOrganizer());
+}

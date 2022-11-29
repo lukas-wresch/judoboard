@@ -8,6 +8,8 @@ TEST(SingleElimination, ExportImport)
 
 	SingleElimination group(0, 200);
 
+	group.SetScheduleIndex(rand());
+
 	group.IsThirdPlaceMatch(true);
 	group.IsFifthPlaceMatch(true);
 
@@ -35,6 +37,11 @@ TEST(SingleElimination, ExportImport)
 
 		EXPECT_EQ(group2.IsThirdPlaceMatch(), group.IsThirdPlaceMatch());
 		EXPECT_EQ(group2.IsFifthPlaceMatch(), group.IsFifthPlaceMatch());
+
+		YAML::Emitter yaml2, yaml3;
+		group.ToString(yaml2);
+		group2.ToString(yaml3);
+		EXPECT_EQ((std::string)yaml2.c_str(), (std::string)yaml3.c_str());
 	}
 }
 
@@ -466,6 +473,79 @@ TEST(SingleElimination, Count8)
 
 
 
+TEST(SingleElimination, Count8_BO3)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	t->AddMatchTable(&group);
+
+	Judoka* j[8];
+	bool has_match[8];
+
+	for (int i = 0; i < 8; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		t->AddParticipant(j[i]);
+		has_match[i] = false;
+	}
+
+	ASSERT_EQ(group.GetParticipants().size(), 8);
+	ASSERT_EQ(group.GetSchedule().size(), 7);
+
+	group.IsBestOfThree(true);
+
+	ASSERT_EQ(group.GetParticipants().size(), 8);
+	ASSERT_EQ(group.GetSchedule().size(), 7*3);
+
+	for (auto match : group.GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		for (int i = 0; i < 8; ++i)
+		{
+			if (match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
+				has_match[i] = true;
+			if (match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
+				has_match[i] = true;
+		}
+	}
+
+	for (int i = 0; i < 8; ++i)
+		EXPECT_TRUE(has_match[i]);
+
+	Mat m(1);
+
+	for (auto match : group.GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+		if (match->HasConcluded())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = group.CalculateResults();
+
+	ASSERT_EQ(results.size(), 2);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());
+	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
+	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
+}
+
+
+
 TEST(SingleElimination, Count10)
 {
 	initialize();
@@ -761,4 +841,280 @@ TEST(SingleElimination, Count5_ExportImport)
 
 	EXPECT_EQ(group.ToHTML().length(), group2.ToHTML().length());
 	EXPECT_EQ(group.ToHTML(), group2.ToHTML());
+}
+
+
+
+TEST(SingleElimination, Count4_ThirdPlace)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	group.IsThirdPlaceMatch(true);
+	t->AddMatchTable(&group);
+
+	auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+	t->AddParticipant(j1);
+
+	auto j2 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 70);
+	t->AddParticipant(j2);
+
+	auto j3 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+	t->AddParticipant(j3);
+
+	auto j4 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 80);
+	t->AddParticipant(j4);
+
+	EXPECT_EQ(group.GetParticipants().size(), 4);
+	EXPECT_EQ(group.GetSchedule().size(),     4);
+
+	Mat m(1);
+
+	for (auto match : group.GetSchedule())
+	{
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = group.CalculateResults();
+
+	ASSERT_EQ(results.size(), 4);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j4->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
+	EXPECT_EQ(results[2].Judoka->GetUUID(), j3->GetUUID());
+	EXPECT_EQ(results[3].Judoka->GetUUID(), j1->GetUUID());
+}
+
+
+
+TEST(SingleElimination, Count8_3rd_5th)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	group.IsThirdPlaceMatch(true);
+	group.IsFifthPlaceMatch(true);
+	t->AddMatchTable(&group);
+
+	Judoka* j[8];
+	bool has_match[8];
+
+	for (int i = 0; i < 8; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		t->AddParticipant(j[i]);
+		has_match[i] = false;
+	}
+
+	ASSERT_EQ(group.GetParticipants().size(), 8);
+
+	for (auto match : group.GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		for (int i = 0; i < 8; ++i)
+		{
+			if (match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
+				has_match[i] = true;
+			if (match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
+				has_match[i] = true;
+		}
+	}
+
+	for (int i = 0; i < 8; ++i)
+		EXPECT_TRUE(has_match[i]);
+
+	Mat m(1);
+
+	for (auto match : group.GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = group.CalculateResults();
+
+	//j0 vs j1, j2 vs j3, j4 vs j5, j6 vs j7
+	//j1 vs j3, j5 vs j7
+	//j3 vs j7
+
+	ASSERT_EQ(results.size(), 6);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[3]->GetUUID());
+	EXPECT_EQ(results[2].Judoka->GetUUID(), j[5]->GetUUID());
+	EXPECT_EQ(results[3].Judoka->GetUUID(), j[1]->GetUUID());
+	EXPECT_EQ(results[4].Judoka->GetUUID(), j[6]->GetUUID());
+	EXPECT_EQ(results[5].Judoka->GetUUID(), j[2]->GetUUID());
+}
+
+
+
+TEST(SingleElimination, Count8_5th)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	group.IsThirdPlaceMatch(false);
+	group.IsFifthPlaceMatch(true);
+	t->AddMatchTable(&group);
+
+	Judoka* j[8];
+	bool has_match[8];
+
+	for (int i = 0; i < 8; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		t->AddParticipant(j[i]);
+		has_match[i] = false;
+	}
+
+	ASSERT_EQ(group.GetParticipants().size(), 8);
+
+	for (auto match : group.GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		for (int i = 0; i < 8; ++i)
+		{
+			if (match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
+				has_match[i] = true;
+			if (match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
+				has_match[i] = true;
+		}
+	}
+
+	for (int i = 0; i < 8; ++i)
+		EXPECT_TRUE(has_match[i]);
+
+	Mat m(1);
+
+	for (auto match : group.GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = group.CalculateResults();
+
+	//j0 vs j1, j2 vs j3, j4 vs j5, j6 vs j7
+	//j1 vs j3, j5 vs j7
+	//j3 vs j7
+
+	ASSERT_EQ(results.size(), 2);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[3]->GetUUID());
+}
+
+
+
+TEST(SingleElimination, Count8_3rd_5th_ExportImport)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	group.IsThirdPlaceMatch(true);
+	group.IsFifthPlaceMatch(true);
+
+	YAML::Emitter yaml;
+	yaml << YAML::BeginMap;
+	group >> yaml;
+	yaml << YAML::EndMap;
+
+	SingleElimination group2(YAML::Load(yaml.c_str()), t);
+
+	t->AddMatchTable(&group2);
+
+	Judoka* j[8];
+	bool has_match[8];
+
+	for (int i = 0; i < 8; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		t->AddParticipant(j[i]);
+		has_match[i] = false;
+	}
+
+	ASSERT_EQ(group2.GetParticipants().size(), 8);
+
+	for (auto match : group2.GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		for (int i = 0; i < 8; ++i)
+		{
+			if (match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
+				has_match[i] = true;
+			if (match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
+				has_match[i] = true;
+		}
+	}
+
+	for (int i = 0; i < 8; ++i)
+		EXPECT_TRUE(has_match[i]);
+
+	Mat m(1);
+
+	for (auto match : group2.GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = group2.CalculateResults();
+
+	//j0 vs j1, j2 vs j3, j4 vs j5, j6 vs j7
+	//j1 vs j3, j5 vs j7
+	//j3 vs j7
+
+	ASSERT_EQ(results.size(), 6);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[3]->GetUUID());
+	EXPECT_EQ(results[2].Judoka->GetUUID(), j[5]->GetUUID());
+	EXPECT_EQ(results[3].Judoka->GetUUID(), j[1]->GetUUID());
+	EXPECT_EQ(results[4].Judoka->GetUUID(), j[6]->GetUUID());
+	EXPECT_EQ(results[5].Judoka->GetUUID(), j[2]->GetUUID());
 }

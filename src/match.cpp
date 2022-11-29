@@ -222,6 +222,12 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 				return m_White.m_DependentMatch->GetWinner();
 		}
 
+		else if (m_White.m_Dependency == DependencyType::TakeLoser)
+		{
+			if (m_White.m_DependentMatch && m_White.m_DependentMatch->HasConcluded())
+				return m_White.m_DependentMatch->GetLoser();
+		}
+
 		return nullptr;
 	}
 
@@ -236,6 +242,12 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 	{
 		if (m_Blue.m_DependentMatch && m_Blue.m_DependentMatch->HasConcluded())
 			return m_Blue.m_DependentMatch->GetWinner();
+	}
+
+	else if (m_Blue.m_Dependency == DependencyType::TakeLoser)
+	{
+		if (m_Blue.m_DependentMatch && m_Blue.m_DependentMatch->HasConcluded())
+			return m_Blue.m_DependentMatch->GetLoser();
 	}
 
 	return nullptr;

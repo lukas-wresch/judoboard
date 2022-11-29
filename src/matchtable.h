@@ -197,11 +197,13 @@ namespace Judoboard
 
 		~MatchTable();
 
-		bool IsIncluded(const Judoka& Fighter) const;
-		size_t GetNumberOfMatches() const { return m_Schedule.size(); }
-
 		virtual Type GetType() const { return Type::Unknown; }
 		virtual bool IsEditable() const { return true; }
+
+		virtual uint32_t GetMatID() const { return m_MatID; }
+		virtual void SetMatID(int32_t MatID);
+
+		virtual Status GetStatus() const;
 
 		virtual std::string GetDescription() const = 0;
 		virtual std::vector<Result> CalculateResults() const = 0;
@@ -219,6 +221,7 @@ namespace Judoboard
 		virtual void   SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition) {}
 
 		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false);
+		virtual bool RemoveParticipant(const Judoka* Participant);
 		virtual void RemoveAllParticipants() {
 			m_Participants.clear();
 			m_Schedule.clear();
@@ -231,13 +234,11 @@ namespace Judoboard
 
 		bool Contains(const Judoka* Judoka) const;
 
+		bool IsIncluded(const Judoka& Fighter) const;
+		size_t GetNumberOfMatches() const { return m_Schedule.size(); }
+
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& Name) { m_Name = Name; }
-
-		virtual uint32_t GetMatID() const { return m_MatID; }
-		virtual void SetMatID(int32_t MatID);
-
-		virtual Status GetStatus() const = 0;
 
 		virtual Color GetColor() const { return m_Color; }
 		void  SetColor(Color NewColor) { m_Color = NewColor; }

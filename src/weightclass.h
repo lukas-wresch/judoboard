@@ -21,7 +21,6 @@ namespace Judoboard
 		virtual Type GetType() const override { return Type::Weightclass; }
 
 		virtual std::string GetDescription() const override;
-		virtual Status GetStatus() const override;
 
 		virtual std::vector<Result> CalculateResults() const override;
 		virtual bool IsElgiable(const Judoka& Fighter) const override;
@@ -34,7 +33,7 @@ namespace Judoboard
 		void SetMaxWeight(Weight MaxWeight) { m_MaxWeight = MaxWeight; }
 		void SetGender(Gender Gender) { m_Gender = Gender; }
 		auto IsBestOfThree() const { return m_BestOfThree; }
-		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; }
+		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; GenerateSchedule(); }
 
 		//Serialization
 		virtual const std::string ToHTML() const override;

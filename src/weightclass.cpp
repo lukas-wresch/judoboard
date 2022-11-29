@@ -128,32 +128,6 @@ std::string Weightclass::GetDescription() const
 
 
 
-Status Weightclass::GetStatus() const
-{
-	if (m_Schedule.size() == 0)
-		return Status::Scheduled;
-
-	bool one_match_finished = false;
-	bool all_matches_finished = true;
-
-	for (auto match : m_Schedule)
-	{
-		if (!match->HasConcluded())
-			all_matches_finished = false;
-
-		if (match->IsRunning() || match->HasConcluded())
-			one_match_finished = true;
-	}
-
-	if (all_matches_finished)
-		return Status::Concluded;
-	if (one_match_finished)
-		return Status::Running;
-	return Status::Scheduled;
-}
-
-
-
 std::string Weightclass::GetHTMLForm()
 {
 	std::string ret = R"(
@@ -193,9 +167,9 @@ std::string Weightclass::GetHTMLForm()
 bool Weightclass::IsElgiable(const Judoka& Fighter) const
 {
 	//Is already in this weight class?
-	for (auto judoka : GetParticipants())
+	/*for (auto judoka : GetParticipants())
 		if (*judoka == Fighter)
-			return false;
+			return false;*/
 
 	if ((uint32_t)m_MaxWeight == 0)//No maximum weight
 	{

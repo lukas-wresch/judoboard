@@ -1559,81 +1559,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		LockTillScopeEnd();
-
-		if (!GetTournament())
-			return std::string("No tournament is open");
-
-		MatchTable::Type type = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "type"));
-		int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
-		UUID rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
-		UUID age_group = HttpServer::DecodeURLEncoded(Request.m_Body, "age_group");
-
-		MatchTable* new_table = nullptr;
-
-		switch (type)
-		{
-		case MatchTable::Type::Weightclass:
-		{
-			auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
-			auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
-
-			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
-			bool bo3   = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
-
-			auto new_weightclass = new Weightclass(Weight(minWeight), Weight(maxWeight));
-
-			if (gender == (int)Gender::Male || gender == (int)Gender::Female)
-				new_weightclass->SetGender((Gender)gender);
-
-			new_weightclass->IsBestOfThree(bo3);
-
-			new_table = new_weightclass;
-			break;
-		}
-
-		case MatchTable::Type::SingleElimination:
-		{
-			auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
-			auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
-
-			int gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
-			bool bo3   = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
-
-			auto new_single = new SingleElimination(Weight(minWeight), Weight(maxWeight));
-
-			if (gender == (int)Gender::Male || gender == (int)Gender::Female)
-				new_single->SetGender((Gender)gender);
-
-			new_single->IsBestOfThree(bo3);
-
-			new_table = new_single;
-			break;
-		}
-
-		case MatchTable::Type::Pause:
-			return std::string("NOT IMPLEMENTED");
-			break;
-
-		case MatchTable::Type::Custom:
-			new_table = new CustomTable(GetTournament());
-			break;
-
-		default:
-			return std::string("Unknown type");
-		}
-
-		if (mat >= 0)
-			new_table->SetMatID(mat);
-		else
-			new_table->SetMatID(FindDefaultMatID());
-
-		new_table->SetRuleSet(m_Database.FindRuleSet(rule));
-		new_table->SetAgeGroup(m_Database.FindAgeGroup(age_group));
-
-		GetTournament()->AddMatchTable(new_table);
-		GetTournament()->Save();
-		return Error();//OK
+		return Ajax_AddMatchTable(Request);
 	});
 
 
@@ -1643,89 +1569,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament is open");
-
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-		auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-		int color = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "color"));
-		int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
-		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Body, "age_group");
-		UUID rule_set_id  = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
-
-		LockTillScopeEnd();
-
-		auto table = GetTournament()->FindMatchTable(id);
-
-		if (!table)
-			return Error(Error::Type::ItemNotFound);
-
-		auto age_group = m_Database.FindAgeGroup(age_group_id);
-		auto rule_set  = m_Database.FindRuleSet(rule_set_id);
-
-		GetTournament()->Lock();
-
-		if (color >= 0)
-			table->SetColor(color);
-
-		table->SetName(name);
-
-		if (mat >= 0)
-			table->SetMatID(mat);
-		
-		table->SetAgeGroup(age_group);
-		GetTournament()->AddAgeGroup(age_group);
-		
-		table->SetRuleSet(rule_set);
-		GetTournament()->AddRuleSet(rule_set);
-
-		GetTournament()->Unlock();
-
-
-		auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
-		auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
-		int  gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
-		bool bo3       = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
-
-
-		switch (table->GetType())
-		{
-		case MatchTable::Type::Weightclass:
-		{
-			Weightclass* weight_table = (Weightclass*)table;
-
-			GetTournament()->Lock();
-
-			weight_table->SetMinWeight(Weight(minWeight));
-			weight_table->SetMaxWeight(Weight(maxWeight));
-			weight_table->SetGender((Gender)gender);
-			weight_table->IsBestOfThree(bo3);
-
-			GetTournament()->Unlock();
-			break;
-		}
-
-		case MatchTable::Type::SingleElimination:
-		{
-			SingleElimination* single_table = (SingleElimination*)table;
-
-			GetTournament()->Lock();
-
-			single_table->SetMinWeight(Weight(minWeight));
-			single_table->SetMaxWeight(Weight(maxWeight));
-			single_table->SetGender((Gender)gender);
-			single_table->IsBestOfThree(bo3);
-
-			GetTournament()->Unlock();
-			break;
-		}
-
-		default:
-			return Error(Error::Type::InternalError);
-		}
-
-		GetTournament()->UpdateMatchTable(id);
-		return Error();//OK
+		return Ajax_EditMatchTable(Request);
 	});
 
 
@@ -1812,24 +1656,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		if (!GetTournament())
-			return std::string("No tournament is open");
-
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		LockTillScopeEnd();
-
-		auto match_table = GetTournament()->FindMatchTable(id);
-
-		if (!match_table)
-			return std::string("Could not find class");
-
-		YAML::Emitter ret;
-		ret << YAML::BeginMap;
-		match_table->ToString(ret);
-		ret << YAML::EndMap;
-
-		return ret.c_str();
+		return Ajax_GetMatchTable(Request);
 	});
 
 
@@ -3105,6 +2932,170 @@ std::string Application::Ajax_ListAllAgeGroups() const
 	}
 
 	ret << YAML::EndSeq;
+	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_AddMatchTable(HttpServer::Request& Request)
+{
+	MatchTable::Type type = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "type"));
+
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	MatchTable* new_table = nullptr;
+
+	switch (type)
+	{
+	case MatchTable::Type::Weightclass:
+	{
+		new_table = new Weightclass(0, 0);
+		break;
+	}
+
+	case MatchTable::Type::SingleElimination:
+	{
+		new_table = new SingleElimination(0, 0);
+		break;
+	}
+
+	case MatchTable::Type::Pause:
+		return Error::Type::InternalError;
+		break;
+
+	case MatchTable::Type::Custom:
+		new_table = new CustomTable(GetTournament());
+		break;
+
+	default:
+		return Error::Type::InvalidInput;
+	}
+
+	GetTournament()->AddMatchTable(new_table);
+
+	Request.m_Query = "id=" + (std::string)new_table->GetUUID();
+	Ajax_EditMatchTable(Request);
+
+	GetTournament()->Save();
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
+{
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	UUID id   = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	int color = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "color"));
+	int mat   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
+	UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Body, "age_group");
+	UUID rule_set_id  = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
+
+	LockTillScopeEnd();
+
+	auto table = GetTournament()->FindMatchTable(id);
+
+	if (!table)
+		return Error(Error::Type::ItemNotFound);
+
+	auto age_group = m_Database.FindAgeGroup(age_group_id);
+	auto rule_set  = m_Database.FindRuleSet(rule_set_id);
+
+	GetTournament()->Lock();
+
+	if (color >= 0)
+		table->SetColor(color);
+
+	table->SetName(name);
+
+	if (mat >= 0)
+		table->SetMatID(mat);
+
+	table->SetAgeGroup(age_group);
+	GetTournament()->AddAgeGroup(age_group);
+
+	table->SetRuleSet(rule_set);
+	GetTournament()->AddRuleSet(rule_set);
+
+	GetTournament()->Unlock();
+
+
+	auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
+	auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
+	int  gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+	bool bo3       = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
+
+
+	switch (table->GetType())
+	{
+	case MatchTable::Type::Weightclass:
+	{
+		Weightclass* weight_table = (Weightclass*)table;
+
+		GetTournament()->Lock();
+
+		weight_table->SetMinWeight(Weight(minWeight));
+		weight_table->SetMaxWeight(Weight(maxWeight));
+		weight_table->SetGender((Gender)gender);
+		weight_table->IsBestOfThree(bo3);
+
+		GetTournament()->Unlock();
+		break;
+	}
+
+	case MatchTable::Type::SingleElimination:
+	{
+		SingleElimination* single_table = (SingleElimination*)table;
+
+		GetTournament()->Lock();
+
+		single_table->SetMinWeight(Weight(minWeight));
+		single_table->SetMaxWeight(Weight(maxWeight));
+		single_table->SetGender((Gender)gender);
+		single_table->IsBestOfThree(bo3);
+		single_table->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
+		single_table->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
+
+		GetTournament()->Unlock();
+		break;
+	}
+
+	default:
+		return Error(Error::Type::InternalError);
+	}
+
+	if (!GetTournament()->UpdateMatchTable(id))
+		return Error(Error::Type::OperationFailed);
+	return Error();//OK
+}
+
+
+
+std::string Application::Ajax_GetMatchTable(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	auto match_table = GetTournament()->FindMatchTable(id);
+
+	if (!match_table)
+		return Error(Error::Type::ItemNotFound);
+
+	YAML::Emitter ret;
+	ret << YAML::BeginMap;
+	match_table->ToString(ret);
+	ret << YAML::EndMap;
+
 	return ret.c_str();
 }
 
