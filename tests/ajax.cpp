@@ -900,12 +900,12 @@ TEST(Ajax, MatchTable_Add)
 		ASSERT_EQ(tables[2]->GetType(), MatchTable::Type::SingleElimination);
 		EXPECT_EQ(tables[2]->GetName(), "Test3");
 		EXPECT_EQ(tables[2]->GetMatID(), 5);
-		EXPECT_EQ(((SingleElimination*)tables[1])->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ(((SingleElimination*)tables[1])->GetMaxWeight(), Weight("20.3"));
-		EXPECT_EQ(((SingleElimination*)tables[1])->GetGender(), Gender::Female);
-		EXPECT_EQ(((SingleElimination*)tables[1])->IsBestOfThree(), true);
-		EXPECT_EQ(((SingleElimination*)tables[1])->IsThirdPlaceMatch(), true);
-		EXPECT_EQ(((SingleElimination*)tables[1])->IsFifthPlaceMatch(), true);
+		EXPECT_EQ(((SingleElimination*)tables[2])->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ(((SingleElimination*)tables[2])->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ(((SingleElimination*)tables[2])->GetGender(), Gender::Female);
+		EXPECT_EQ(((SingleElimination*)tables[2])->IsBestOfThree(), true);
+		EXPECT_EQ(((SingleElimination*)tables[2])->IsThirdPlaceMatch(), true);
+		EXPECT_EQ(((SingleElimination*)tables[2])->IsFifthPlaceMatch(), true);
 	}
 }
 
