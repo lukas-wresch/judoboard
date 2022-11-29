@@ -410,27 +410,35 @@ const std::string SingleElimination::ToHTML() const
 		if (!match->IsEmptyMatch())
 			ret += "<a href='#edit_match.html?id=" + (std::string)match->GetUUID() + "'>";
 
+		bool show_result = true;
+
 		//Output name of fighters
 		if (match->GetFighter(Fighter::White))
 			ret += match->GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
-		else if (match->HasDependentMatches())
-			ret += "???";
-		else
+		else if (match->GetPotentialFighters(Fighter::White).size() == 0)
+		{
 			ret += "- - -";
+			show_result = false;
+		}
+		else
+			ret += "???";
 
 		ret += " vs. ";
 
 		if (match->GetFighter(Fighter::Blue))
 			ret += match->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
-		else if (match->HasDependentMatches())
-			ret += "???";
-		else
+		else if (match->GetPotentialFighters(Fighter::Blue).size() == 0)
+		{
 			ret += "- - -";
+			show_result = false;
+		}
+		else
+			ret += "???";
 
 		//Output result
 		if (match->IsRunning())
 			ret += "<br/>" + Localizer::Translate("In Progress");
-		else if (match->HasConcluded() && !match->IsCompletelyEmptyMatch())
+		else if (match->HasConcluded() && show_result)
 		{
 			const auto& result = match->GetResult();
 			if (result.m_Winner == Winner::White)
