@@ -2937,7 +2937,7 @@ std::string Application::Ajax_ListAllAgeGroups() const
 
 
 
-Error Application::Ajax_AddMatchTable(HttpServer::Request& Request)
+Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 {
 	MatchTable::Type type = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "type"));
 

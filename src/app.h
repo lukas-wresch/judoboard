@@ -135,7 +135,7 @@ namespace Judoboard
 		std::string Ajax_ListAllAgeGroups() const;
 
 		//Match tables
-		Error Ajax_AddMatchTable(HttpServer::Request& Request);
+		Error Ajax_AddMatchTable(HttpServer::Request Request);
 		Error Ajax_EditMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_GetMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_ListAllMatchTables(const HttpServer::Request& Request);
