@@ -398,38 +398,18 @@ const std::string SingleElimination::ToHTML() const
 	const auto N = pow(2, rounds);
 
 
-	auto renderMatch = [this, N](size_t roundIndex, int matchOfRound) -> std::string {
-		int matchIndex = 0;
-		for (int i = 1; i <= roundIndex; ++i)
-			matchIndex += (int)(N / pow(2.0, i));
-
-		matchIndex += matchOfRound;
-
-		if (IsThirdPlaceMatch() && matchIndex >= GetSchedule().size() - 2)
-			matchIndex++;
-		if (IsFifthPlaceMatch() && matchIndex >= GetSchedule().size() - 5)
-			matchIndex+=3;
-
-		if (IsBestOfThree())
-			matchIndex = matchIndex*3;
+	auto renderMatchIndex = [this, N](size_t matchIndex, std::string style = "") -> std::string {
 
 		if (matchIndex >= GetSchedule().size())
 			return "";
 
 		auto match = GetSchedule()[matchIndex];
 
-		std::string style;
-
-		if (roundIndex == 0)
-			style = "border-left-style: hidden;";
-		if (matchOfRound % 2 == 0)
-			style += "border-right-style: hidden;";
-
 		std::string ret = "<td style=\"" + style + "\">";
 
 		if (!match->IsEmptyMatch())
 			ret += "<a href='#edit_match.html?id=" + (std::string)match->GetUUID() + "'>";
-		
+
 		//Output name of fighters
 		if (match->GetFighter(Fighter::White))
 			ret += match->GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
@@ -450,7 +430,7 @@ const std::string SingleElimination::ToHTML() const
 		//Output result
 		if (match->IsRunning())
 			ret += "<br/>" + Localizer::Translate("In Progress");
-		else if (match->HasConcluded())
+		else if (match->HasConcluded() && !match->IsCompletelyEmptyMatch())
 		{
 			const auto& result = match->GetResult();
 			if (result.m_Winner == Winner::White)
@@ -466,6 +446,32 @@ const std::string SingleElimination::ToHTML() const
 		ret += "</a></td>";
 
 		return ret;
+	};
+
+
+	auto renderMatch = [this, N, renderMatchIndex](size_t roundIndex, int matchOfRound) -> std::string {
+		int matchIndex = 0;
+		for (int i = 1; i <= roundIndex; ++i)
+			matchIndex += (int)(N / pow(2.0, i));
+
+		matchIndex += matchOfRound;
+
+		if (IsThirdPlaceMatch() && matchIndex >= GetSchedule().size() - 2)
+			matchIndex++;
+		if (IsFifthPlaceMatch() && matchIndex >= GetSchedule().size() - 5)
+			matchIndex += 3;
+
+		if (IsBestOfThree())
+			matchIndex = matchIndex * 3;
+
+		std::string style;
+
+		if (roundIndex == 0)
+			style = "border-left-style: hidden;";
+		if (matchOfRound % 2 == 0)
+			style += "border-right-style: hidden;";
+
+		return renderMatchIndex(matchIndex, style);
 	};
 
 
@@ -502,18 +508,53 @@ const std::string SingleElimination::ToHTML() const
 
 	ret += "</table>";
 
+
 	if (IsThirdPlaceMatch())
 	{
-		ret += "<table border='1' rules='all'>";
+		ret += "<table width=\"" + std::to_string(width) + "%\" border='1' rules='all' style=\"margin-bottom: 5mm;\">";
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += "<th width=\"" + std::to_string(width) + "%\">" + Localizer::Translate("3rd Place Match") + "</th>";
+		ret += "<th>" + Localizer::Translate("3rd Place Match") + "</th>";
 		ret += "</tr>";
 
-		//ret += renderMatch(round, matchOfRound);
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += renderMatchIndex(m_Schedule.size() - 2);
+		ret += "</tr>";
 
 		ret += "</table>";
 	}
+
+
+	if (IsFifthPlaceMatch())
+	{
+		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += "<th colspan=\"2\" width=\"" + std::to_string(width*2) + "%\">" + Localizer::Translate("5th Place Match") + "</th>";
+		ret += "</tr>";
+
+		int offset = 4;
+		if (IsThirdPlaceMatch())
+			offset = 5;
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += renderMatchIndex(m_Schedule.size() - offset - 2, "border-left-style: hidden; border-right-style: hidden;");
+		ret += "<td style=\"border-bottom-style: hidden; border-right-style: hidden;\"></td>";
+		ret += "</tr>";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += "<td style=\"border-bottom-style: hidden; border-left-style: hidden;\"></td>";
+		ret += renderMatchIndex(m_Schedule.size() - offset, "border-right-style: hidden;");
+		ret += "</tr>";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += renderMatchIndex(m_Schedule.size() - offset - 1, "border-left-style: hidden;");
+		ret += "<td style=\"border-bottom-style: hidden; border-right-style: hidden;\"></td>";
+		ret += "</tr>";
+
+		ret += "</table>";
+	}
+
 
 	ret += ResultsToHTML();	
 
