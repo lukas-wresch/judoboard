@@ -3,6 +3,8 @@
 #include "timer.h"
 #include "club.h"
 #include "judoboard.h"
+#include "match.h"
+#include "matchtable.h"
 #include "dm4.h"
 #include "md5.h"
 #include "dmf.h"
@@ -13,6 +15,29 @@ namespace Judoboard
 {
 	class StandingData;
 	class Judoka;
+
+
+
+	class IJudoka : public ID
+	{
+	public:
+		virtual bool IsValid() const = 0;
+	private:
+	};
+
+
+
+	class DependentJudoka : public IJudoka
+	{
+	public:
+		DependentJudoka(Match::DependencyType Type, const MatchTable& Reference) : m_Type(Type), m_MatchTable(Reference) {}
+
+		virtual bool IsValid() const;
+
+	private:
+		Match::DependencyType m_Type;
+		const MatchTable& m_MatchTable;
+	};
 
 
 
@@ -38,7 +63,7 @@ namespace Judoboard
 
 
 
-	class Judoka : public ID
+	class Judoka : public IJudoka
 	{
 		friend class StandingData;
 		friend class Database;
@@ -52,6 +77,8 @@ namespace Judoboard
 		[[deprecated]] Judoka(const DM4::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from DM4 data
 		[[deprecated]] Judoka(const MD5::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from MD5 data
 		[[deprecated]] Judoka(const DMF::Participant& Participant);//Load judoka from DMF data
+
+		virtual bool IsValid() const { return true; }
 
 		auto GetGender() const { return m_Gender; }
 		auto GetWeight() const { return m_Weight; }

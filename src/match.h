@@ -1,5 +1,4 @@
 #pragma once
-#include "judoka.h"
 #include "matchlog.h"
 #include "matchtable.h"
 
@@ -33,6 +32,17 @@ namespace Judoboard
 			BestOfThree = 1,//Match is the last in the series of a best of three series
 			TakeWinner  = 2,//Take the winner of the match this match depends upon
 			TakeLoser   = 3,//Take the loser of the match this match depends upon
+
+			TakeRank1  = 11,//Take the 1st of a match table
+			TakeRank2  = 12,//Take the 2nd of a match table
+			TakeRank3  = 13,//Take the 3rd of a match table
+			TakeRank4  = 14,//Take the 4th of a match table
+			TakeRank5  = 15,//Take the 5th of a match table
+			TakeRank6  = 16,//Take the 6th of a match table
+			TakeRank7  = 17,//Take the 7th of a match table
+			TakeRank8  = 18,//Take the 8th of a match table
+			TakeRank9  = 19,//Take the 9th of a match table
+			TakeRank10 = 20,//Take the 10th of a match table
 		};
 
 		struct Result
@@ -67,23 +77,7 @@ namespace Judoboard
 
 		bool IsScheduled()  const { return m_State == Status::Scheduled; }
 		bool IsRunning()    const { return m_State == Status::Running; }
-		bool HasConcluded() const {
-			if (IsEmptyMatch())
-				return true;
-			if (IsBestOfThree() && m_White.m_DependentMatch && m_Blue.m_DependentMatch)
-			{
-				if (m_White.m_DependentMatch->HasConcluded() && m_Blue.m_DependentMatch->HasConcluded())
-				{
-					if (!m_White.m_DependentMatch->GetWinner())
-						return true;
-					if (!m_Blue.m_DependentMatch->GetWinner())
-						return true;
-					if (*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())
-						return true;
-				}
-			}
-			return m_State == Status::Concluded;
-		}
+		bool HasConcluded() const;
 		bool IsAssociatedWithMat() const { return GetMatID() > 0; }
 		MatchLog& GetLog() { return m_Log; }
 		const MatchLog& GetLog() const { return m_Log; }
@@ -94,11 +88,7 @@ namespace Judoboard
 		const MatchTable* GetMatchTable() const { return m_Table; }
 		void SetMatchTable(MatchTable* MatchTable) { m_Table = MatchTable; }
 
-		uint32_t GetMatID() const {
-			if (m_MatID <= 0 && m_Table)//No override specified and associated to a match table
-				return m_Table->GetMatID();//Take the mat of the match table
-			return m_MatID;
-		}
+		uint32_t GetMatID() const;
 
 		//Judoka* GetFighter(Fighter Fighter);
 		//const Judoka* GetFighter(Fighter Fighter) const { return (const_cast<Match*>(this))->GetFighter(Fighter); }
@@ -122,6 +112,7 @@ namespace Judoboard
 
 		//Match dependencies
 		void SetDependency(Fighter Fighter, DependencyType Type, Match* Reference);
+		void SetDependency(Fighter Fighter, DependencyType Type, const MatchTable* Reference);
 		void SetBestOfThree(Match* Reference1, Match* Reference2);
 		bool HasUnresolvedDependency() const;
 		bool HasDependentMatches() const {//Returns true if and only if this match depends upon other matches (as in the depend matches needs to conclude in order for this match to start)
@@ -177,6 +168,7 @@ namespace Judoboard
 		struct {
 			const Judoka* m_Judoka = nullptr;
 			Match* m_DependentMatch = nullptr;
+			const MatchTable* m_DependentMatchTable = nullptr;
 			DependencyType m_Dependency = DependencyType::None;
 		} m_White, m_Blue;
 

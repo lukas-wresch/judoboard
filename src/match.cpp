@@ -473,6 +473,29 @@ uint32_t Match::GetCurrentBreaktime() const
 
 
 
+bool Match::HasConcluded() const
+{
+	if (IsEmptyMatch())
+		return true;
+
+	if (IsBestOfThree() && m_White.m_DependentMatch && m_Blue.m_DependentMatch)
+	{
+		if (m_White.m_DependentMatch->HasConcluded() && m_Blue.m_DependentMatch->HasConcluded())
+		{
+			if (!m_White.m_DependentMatch->GetWinner())
+				return true;
+			if (!m_Blue.m_DependentMatch->GetWinner())
+				return true;
+			if (*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())
+				return true;
+		}
+	}
+
+	return m_State == Status::Concluded;
+}
+
+
+
 void Match::EndMatch()
 {
 	m_State = Status::Concluded;
@@ -484,4 +507,13 @@ void Match::EndMatch()
 
 	if (GetTournament())
 		GetTournament()->OnMatchConcluded(*this);
+}
+
+
+
+uint32_t Match::GetMatID() const
+{
+	if (m_MatID <= 0 && m_Table)//No override specified and associated to a match table
+		return m_Table->GetMatID();//Take the mat of the match table
+	return m_MatID;
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "judoka.h"
+#include "judoboard.h"
 
 
 
