@@ -37,6 +37,7 @@
     <th style="width: 2cm; text-align: center;" class="class">Class</th>
     <th style="width: 1cm;" class="mat">Mat</th>
     <th style="width: 2.5cm; text-align: center;" class="status">Status</th>
+    <th style="width: 2.5cm; text-align: center;" id="break">Break</th>
     <th style="width: 2.5cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -75,6 +76,7 @@
 
 function MoveEntryUp(id)
 {
+  var mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_up?id=' + id, function() {
     Update();
   });
@@ -84,6 +86,7 @@ function MoveEntryUp(id)
 
 function MoveEntryDown(id)
 {
+  var mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_down?id=' + id, function() {
     Update();
   });
@@ -105,7 +108,8 @@ function SetEntryMat(id, mat)
 
 function MoveUp(id)
 {
-  AjaxCallback('/ajax/match/move_up?id=' + id, function() {
+  var mat_to_display = document.getElementById("display_mat").value;
+  AjaxCallback('/ajax/match/move_up?id=' + id + '&mat=' + mat_to_display, function() {
     Update();
   });
   return false;
@@ -114,7 +118,8 @@ function MoveUp(id)
 
 function MoveDown(id)
 {
-  AjaxCallback('/ajax/match/move_down?id=' + id, function() {
+  var mat_to_display = document.getElementById("display_mat").value;
+  AjaxCallback('/ajax/match/move_down?id=' + id + '&mat=' + mat_to_display, function() {
     Update();
   });
   return false;
@@ -321,6 +326,7 @@ function Update()
       var cell4 = row.insertCell(4);
       var cell5 = row.insertCell(5);
       var cell6 = row.insertCell(6);
+      var cell7 = row.insertCell(7);
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
@@ -386,9 +392,27 @@ function Update()
 
       cell5.style.textAlign = "center";
 
+
+      cell6.style.fontSize  = "16pt";
+      cell6.style.textAlign = "center";
+
+      if (match.state == 1 || match.state == 2 || match.current_breaktime >= 10*60)
+        cell6.innerHTML = '- - -';
+      else
+      {
+        var current_breaktime = Math.floor(match.current_breaktime/60) + ':' + zeroPad(Math.floor(match.current_breaktime)%60, 2);
+        cell6.innerHTML = current_breaktime;
+      
+        if (match.current_breaktime < match.breaktime)
+        {
+          if (match.current_breaktime + 30 > match.breaktime)
+            cell6.style.backgroundColor = "#ff6d";
+          else
+            cell6.style.backgroundColor = "#e33d";
+        }
+      }
+
       var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
-
-
       var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 1.8cm; margin-right: 2mm;\" onclick=navigate(\"edit_match.html?id="+match.uuid+"\");>" + lang.details + "</button></td>";
 
       if (match.state == 0)
@@ -396,7 +420,7 @@ function Update()
       else
         options += "<td></td></tr><tr><td></td></tr></table>";
 
-      cell6.innerHTML = options;
+      cell7.innerHTML = options;
     }
   });
 
@@ -670,3 +694,5 @@ document.getElementById("new_participant").innerHTML  = lang.new_participant;
 document.getElementById("new_match").innerHTML  = lang.new_match;
 document.getElementById("age_groups_participants").innerHTML = lang.num_participants;
 document.getElementById("headline_age_groups").innerHTML = lang.age_groups;
+
+document.getElementById("break").innerHTML = lang.break_time;

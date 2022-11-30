@@ -207,8 +207,10 @@ bool Application::OpenTournament(const UUID& UUID)
 		return false;
 
 	m_CurrentTournament = FindTournament(UUID);
+
 	if (m_CurrentTournament)
 		m_Database.SetLastTournamentName(m_CurrentTournament->GetName());
+
 	return true;
 }
 

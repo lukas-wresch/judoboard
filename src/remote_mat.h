@@ -84,8 +84,7 @@ namespace Judoboard
 		virtual ZED::Blob RequestScreenshot() const;
 
 		//Serialization
-		virtual ZED::CSV Scoreboard2String() const override { return ""; }
-		virtual ZED::CSV Osaekomi2String(Fighter Who) const  override { return ""; }
+		virtual void ToString(YAML::Emitter& Yaml) const override {}
 
 		//Config
 		virtual void SetFullscreen(bool Enabled = true) override
