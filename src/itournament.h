@@ -35,8 +35,8 @@ namespace Judoboard
 		virtual std::vector<Match> GetNextMatches(uint32_t MatID) const = 0;
 
 		virtual bool RemoveMatch(const UUID& MatchID) { return false; }
-		virtual bool MoveMatchUp(const UUID& MatchID) { return false; }
-		virtual bool MoveMatchDown(const UUID& MatchID) { return false; }
+		virtual bool MoveMatchUp(const UUID& MatchID, uint32_t MatID = 0) { return false; }
+		virtual bool MoveMatchDown(const UUID& MatchID, uint32_t MatID = 0) { return false; }
 
 		//Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;

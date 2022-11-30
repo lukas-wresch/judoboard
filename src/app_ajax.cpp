@@ -34,7 +34,9 @@ void Application::SetupHttpServer()
 	m_Server.RegisterResource("/yaml.min.js", [](auto& Request) { return HttpServer::LoadFile("html/yaml.min.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
 
 	m_Server.RegisterResource("/slideout.min.js", [](auto& Request) { return HttpServer::LoadFile("html/slideout.min.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
-	m_Server.RegisterResource("/menu.png", [](auto& Request) { return HttpServer::LoadFile("html/menu.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
+
+	m_Server.RegisterResource("/menu.png",   [](auto& Request) { return HttpServer::LoadFile("html/menu.png");     }, HttpServer::ResourceType::Image_PNG, 24*60*60);
+	m_Server.RegisterResource("/winner.png", [](auto& Request) { return HttpServer::LoadFile("assets/winner.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
 
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit",
@@ -462,37 +464,19 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/match/move_up", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		auto error = CheckPermission(Request, Account::AccessLevel::User);
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		LockTillScopeEnd();
-
-		if (!GetTournament())
-			return std::string("No tournament open");
-
-		GetTournament()->MoveMatchUp(id);
-
-		return std::string();
+		return Ajax_MoveMatchUp(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/match/move_down", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		auto error = CheckPermission(Request, Account::AccessLevel::User);
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		LockTillScopeEnd();
-
-		if (!GetTournament())
-			return std::string("No tournament open");
-
-		GetTournament()->MoveMatchDown(id);
-
-		return std::string();
+		return Ajax_MoveMatchDown(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/match/delete", [this](auto& Request) -> std::string {
@@ -697,14 +681,16 @@ void Application::SetupHttpServer()
 		if (!mat)
 			return Error(Error::Type::MatNotFound);
 
-		ZED::CSV ret;
+		/*ZED::CSV ret;
 		ret << mat->Scoreboard2String();
 		ret << mat->GetTime2Display() << mat->IsHajime() << mat->Osaekomi2String(Fighter::White) << mat->Osaekomi2String(Fighter::Blue);
 		ret << mat->CanNextMatchStart() << mat->HasConcluded() << mat->IsOutOfTime() << (mat->GetResult().m_Winner == Winner::Draw) << mat->IsGoldenScore() << mat->AreFightersOnMat();
 		//Hansokumake with decision needed?
 		ret << mat->GetScoreboard(Fighter::White).IsUnknownDisqualification();
-		ret << mat->GetScoreboard(Fighter::Blue).IsUnknownDisqualification();
-		return ret;
+		ret << mat->GetScoreboard(Fighter::Blue).IsUnknownDisqualification();*/
+		YAML::Emitter yaml;
+		mat->ToString(yaml);
+		return yaml.c_str();
 	});
 
 	m_Server.RegisterResource("/ajax/mat/get_osaekomilist", [this](auto& Request) -> std::string {
@@ -1134,32 +1120,7 @@ void Application::SetupHttpServer()
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
 
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id <= 0)
-			return Error(Error::Type::InvalidID);
-
-		auto mat = FindMat(id);
-
-		if (!mat)
-			return std::string();
-
-		ZED::CSV ret;
-		if (!mat->AreFightersOnMat())
-			ret << "- - -,- - -";
-		else if (mat->GetMatch())
-			ret << mat->GetMatch()->GetFighter(Fighter::White)->GetName(NameStyle::GivenName) << mat->GetMatch()->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
-		else//Not supported by mat
-			ret << "???,???";
-
-		auto nextMatches = mat->GetNextMatches();
-		for (auto match : nextMatches)
-		{
-			if (match.GetFighter(Fighter::White) && match.GetFighter(Fighter::Blue))
-				ret << match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName) << match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
-		}
-
-		return ret;
+		return Ajax_GetNamesOnMat(Request);
 	});
 
 
@@ -1672,13 +1633,15 @@ void Application::SetupHttpServer()
 		UUID whiteID = HttpServer::DecodeURLEncoded(Request.m_Body, "white");
 		UUID blueID  = HttpServer::DecodeURLEncoded(Request.m_Body, "blue");
 
+		LockTillScopeEnd();
+
 		auto white = m_Database.FindJudoka(whiteID);
 		auto blue  = m_Database.FindJudoka(blueID);
 
 		if (!white || !blue)//Judokas exist?
 			return std::string("Judoka not found in database");
 
-		GetTournament()->AddMatch(Match(GetTournament(), white, blue, FindDefaultMatID()));
+		GetTournament()->AddMatch(Match(white, blue, GetTournament(), FindDefaultMatID()));
 
 		return Error();//OK
 	});
@@ -3288,6 +3251,48 @@ Error Application::Ajax_RemoveNoDisqualification(Fighter Whom, const HttpServer:
 
 
 
+Error Application::Ajax_MoveMatchUp(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
+
+	if (mat <= -1)
+		mat = 0;
+
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	if (!GetTournament()->MoveMatchUp(id, mat))
+		return Error::Type::OperationFailed;
+
+	return Error::Type::NoError;
+}
+
+
+
+Error Application::Ajax_MoveMatchDown(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
+
+	if (mat <= -1)
+		mat = 0;
+
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	if (!GetTournament()->MoveMatchDown(id, mat))
+		return Error::Type::OperationFailed;
+
+	return Error::Type::NoError;
+}
+
+
+
 std::string Application::Ajax_GetHansokumake() const
 {
 	LockTillScopeEnd();
@@ -3339,4 +3344,76 @@ Error Application::Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request
 
 	mat->SetFullscreen(Fullscreen);
 	return Error();//OK
+}
+
+
+
+std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
+{
+	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	if (id <= 0)
+		return Error(Error::Type::InvalidID);
+
+	LockTillScopeEnd();
+
+	auto mat = FindMat(id);
+
+	if (!mat)
+		return Error(Error::Type::MatNotFound);
+
+	YAML::Emitter ret;
+	ret << YAML::BeginMap;
+
+	ret << YAML::Key << "mat_name" << YAML::Value << mat->GetName();
+
+	auto current_match = mat->GetMatch();
+
+	ret << YAML::Key << "white_name" << YAML::Value;
+	if (current_match && current_match->GetFighter(Fighter::White))
+		ret << current_match->GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+	else
+		ret << "- - -";
+
+	ret << YAML::Key << "blue_name" << YAML::Value;
+	if (current_match && current_match->GetFighter(Fighter::Blue))
+		ret << current_match->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+	else
+		ret << "- - -";
+
+	ret << YAML::Key << "match_table_name" << YAML::Value;
+	if (current_match && current_match->GetMatchTable())
+		ret << current_match->GetMatchTable()->GetDescription();
+	else
+		ret << "";
+
+	ret << YAML::Key << "next_matches" << YAML::Value << YAML::BeginSeq;
+
+	auto nextMatches = mat->GetNextMatches();
+	for (const auto& match : nextMatches)
+	{
+		ret << YAML::BeginMap;
+
+		ret << YAML::Key << "uuid" << YAML::Value << (std::string)match.GetUUID();
+		ret << YAML::Key << "current_breaktime" << YAML::Value << match.GetCurrentBreaktime();
+		ret << YAML::Key << "breaktime"         << YAML::Value << match.GetRuleSet().GetBreakTime();
+
+		ret << YAML::Key << "white_name" << YAML::Value;
+		if (match.GetFighter(Fighter::White))
+			ret << match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+		else
+			ret << "- - -";
+
+		ret << YAML::Key << "blue_name" << YAML::Value;
+		if (match.GetFighter(Fighter::Blue))
+			ret << match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+		else
+			ret << "- - -";
+
+		ret << YAML::EndMap;
+	}
+
+	ret << YAML::EndSeq;
+	ret << YAML::EndMap;
+	return ret.c_str();
 }

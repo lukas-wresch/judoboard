@@ -233,7 +233,7 @@ TEST(Ajax, GetHansokumake)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
@@ -258,7 +258,7 @@ TEST(Ajax, GetHansokumake)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
@@ -284,7 +284,7 @@ TEST(Ajax, GetHansokumake)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
@@ -316,7 +316,7 @@ TEST(Ajax, GetHansokumake2)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
@@ -385,6 +385,131 @@ TEST(Ajax, Judoka_Edit)
 	}
 
 	ZED::Core::RemoveFile("database.yml");
+}
+
+
+
+TEST(Ajax, GetNamesOnMat)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.StartLocalMat(5);
+		auto mat = app.GetDefaultMat();
+		mat->SetName("mat name");
+
+		Tournament* tourney = new Tournament;
+
+		Match* match1 = new Match(new Judoka("A", "B"), new Judoka("C", "D"), nullptr, 5);
+		Match* match2 = new Match(new Judoka("E", "F"), new Judoka("G", "H"), nullptr, 5);
+		Match* match3 = new Match(new Judoka("I", "J"), new Judoka("K", "L"), nullptr, 5);
+
+		tourney->AddMatch(match1);
+		tourney->AddMatch(match2);
+		tourney->AddMatch(match3);
+
+		tourney->GetMatchTables()[0]->SetName("table1");
+		tourney->GetMatchTables()[1]->SetName("table2");
+		tourney->GetMatchTables()[2]->SetName("table3");
+
+		app.AddTournament(tourney);
+
+		ZED::Core::Pause(500);
+
+		YAML::Node yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
+
+		ASSERT_TRUE(yaml.IsMap());
+		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
+		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
+		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
+		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "");
+		ASSERT_TRUE(yaml["next_matches"].IsSequence());
+		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "A B");
+		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "C D");
+		EXPECT_TRUE(yaml["next_matches"][0]["current_breaktime"].as<int>() > 0);
+		EXPECT_EQ(yaml["next_matches"][0]["breaktime"].as<int>(), 0);
+		EXPECT_EQ(yaml["next_matches"][1]["white_name"].as<std::string>(), "E F");
+		EXPECT_EQ(yaml["next_matches"][1]["blue_name" ].as<std::string>(), "G H");
+		EXPECT_EQ(yaml["next_matches"][2]["white_name"].as<std::string>(), "I J");
+		EXPECT_EQ(yaml["next_matches"][2]["blue_name" ].as<std::string>(), "K L");
+
+		EXPECT_EQ(yaml["next_matches"][0]["uuid"].as<std::string>(), match1->GetUUID());
+		EXPECT_EQ(yaml["next_matches"][1]["uuid"].as<std::string>(), match2->GetUUID());
+		EXPECT_EQ(yaml["next_matches"][2]["uuid"].as<std::string>(), match3->GetUUID());
+
+		mat->StartMatch(match1);
+
+		ZED::Core::Pause(500);
+
+		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
+
+		ASSERT_TRUE(yaml.IsMap());
+		EXPECT_EQ(yaml["white_name"].as<std::string>(), "A B");
+		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "C D");
+		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
+		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "table1 Custom");
+		ASSERT_TRUE(yaml["next_matches"].IsSequence());
+		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "E F");
+		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "G H");
+		EXPECT_EQ(yaml["next_matches"][1]["white_name"].as<std::string>(), "I J");
+		EXPECT_EQ(yaml["next_matches"][1]["blue_name" ].as<std::string>(), "K L");
+
+		EXPECT_EQ(yaml["next_matches"][0]["uuid"].as<std::string>(), match2->GetUUID());
+		EXPECT_EQ(yaml["next_matches"][1]["uuid"].as<std::string>(), match3->GetUUID());
+
+		mat->AddIppon(Fighter::White);
+		mat->EndMatch();
+
+		ZED::Core::Pause(500);
+
+		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
+
+		ASSERT_TRUE(yaml.IsMap());
+		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
+		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
+		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
+		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "");
+		ASSERT_TRUE(yaml["next_matches"].IsSequence());
+		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "E F");
+		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "G H");
+		EXPECT_EQ(yaml["next_matches"][1]["white_name"].as<std::string>(), "I J");
+		EXPECT_EQ(yaml["next_matches"][1]["blue_name" ].as<std::string>(), "K L");
+
+		mat->StartMatch(match2);
+
+		ZED::Core::Pause(500);
+
+		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
+
+		ASSERT_TRUE(yaml.IsMap());
+		EXPECT_EQ(yaml["white_name"].as<std::string>(), "E F");
+		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "G H");
+		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
+		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "table2 Custom");
+		ASSERT_TRUE(yaml["next_matches"].IsSequence());
+		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "I J");
+		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "K L");
+
+		mat->AddIppon(Fighter::White);
+		mat->EndMatch();
+
+		ZED::Core::Pause(500);
+
+		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
+
+		ASSERT_TRUE(yaml.IsMap());
+		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
+		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
+		ASSERT_TRUE(yaml["next_matches"].IsSequence());
+		EXPECT_EQ(yaml["next_matches"].size(), 1);
+		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "I J");
+		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "K L");
+
+		EXPECT_TRUE(mat->Close());
+		ZED::Core::Pause(500);
+	}
 }
 
 
@@ -805,7 +930,7 @@ TEST(Ajax, AddDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		mat->StartMatch(&match);
 		mat->AddHansokuMake(f);
@@ -835,7 +960,7 @@ TEST(Ajax, RemoveDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		mat->StartMatch(&match);
 		mat->AddHansokuMake(f);
@@ -1014,7 +1139,7 @@ TEST(Ajax, NoDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		mat->StartMatch(&match);
 		mat->AddHansokuMake(f);
@@ -1044,7 +1169,7 @@ TEST(Ajax, RemoveNoDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(nullptr, new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), 1);
+		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		mat->StartMatch(&match);
 		mat->AddHansokuMake(f);
@@ -1195,6 +1320,90 @@ TEST(Ajax, ListAgeGroups)
 	EXPECT_EQ(result[3]["name"].as<std::string>(), "U18");
 	EXPECT_EQ(result[4]["name"].as<std::string>(), "U21");
 	EXPECT_EQ(result[5]["name"].as<std::string>(), "Seniors");
+}
+
+
+
+TEST(Ajax, MoveSchedule)
+{
+	initialize();
+
+	Application app;
+
+	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+	Judoka j2("Firstname", "Lastname", 50, Gender::Male);
+
+	Tournament* tourney = new Tournament("deleteMe");
+	tourney->Reset();
+	tourney->EnableAutoSave(false);
+
+	auto match1 = new Match(&j1, &j2, tourney, 1);
+	auto match2 = new Match(&j1, &j2, tourney, 1);
+	auto match3 = new Match(&j1, &j2, tourney, 1);
+	auto match4 = new Match(&j1, &j2, tourney, 2);
+	auto match5 = new Match(&j1, &j2, tourney, 2);
+	auto match6 = new Match(&j1, &j2, tourney, 2);
+
+	tourney->AddMatch(match1);
+	tourney->AddMatch(match2);
+	tourney->AddMatch(match3);
+	tourney->AddMatch(match4);
+	tourney->AddMatch(match5);
+	tourney->AddMatch(match6);
+
+	app.AddTournament(tourney);
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match2);
+
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match1->GetUUID())), Error::Type::OperationFailed);
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match2->GetUUID())), Error::Type::NoError);
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match1);
+
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match4->GetUUID())), Error::Type::NoError);
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match4->GetUUID())), Error::Type::NoError);
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match4->GetUUID())), Error::Type::NoError);
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match4->GetUUID())), Error::Type::OperationFailed);
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match4);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match5);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match6);
+
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match5->GetUUID() + "&mat=2")), Error::Type::NoError);
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match5->GetUUID() + "&mat=5")), Error::Type::OperationFailed);
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match4);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match6);
+
+	EXPECT_EQ(app.Ajax_MoveMatchDown(HttpServer::Request("id=" + (std::string)match6->GetUUID())), Error::Type::OperationFailed);
+
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match4->GetUUID())), Error::Type::NoError);
+	EXPECT_EQ(app.Ajax_MoveMatchUp(HttpServer::Request("id=" + (std::string)match4->GetUUID())), Error::Type::NoError);
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match4);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match6);
+
+	EXPECT_EQ(app.Ajax_MoveMatchDown(HttpServer::Request("id=" + (std::string)match4->GetUUID() + "&mat=2")), Error::Type::NoError);
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match6);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match4);
 }
 
 
