@@ -397,17 +397,6 @@ const std::string SingleElimination::ToHTML() const
 	const auto rounds = GetNumberOfRounds();
 	const auto N = pow(2, rounds);
 
-	auto renderMatch = [this, N](size_t roundIndex, int matchOfRound) -> std::string {
-		int matchIndex = 0;
-		for (int i = 1; i <= roundIndex; ++i)
-			matchIndex += (int)(N / pow(2.0, i));
-
-		matchIndex += matchOfRound;
-
-		if (IsThirdPlaceMatch() && matchIndex >= GetSchedule().size() - 2)
-			matchIndex++;
-		if (IsFifthPlaceMatch() && matchIndex >= GetSchedule().size() - 5)
-			matchIndex+=3;
 
 	auto renderMatchIndex = [this, N](size_t matchIndex, std::string style = "") -> std::string {
 
@@ -421,35 +410,27 @@ const std::string SingleElimination::ToHTML() const
 		if (!match->IsEmptyMatch())
 			ret += "<a href='#edit_match.html?id=" + (std::string)match->GetUUID() + "'>";
 
-		bool show_result = true;
-
 		//Output name of fighters
 		if (match->GetFighter(Fighter::White))
 			ret += match->GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
-		else if (match->GetPotentialFighters(Fighter::White).size() == 0)
-		{
-			ret += "- - -";
-			show_result = false;
-		}
-		else
+		else if (match->HasDependentMatches())
 			ret += "???";
+		else
+			ret += "- - -";
 
 		ret += " vs. ";
 
 		if (match->GetFighter(Fighter::Blue))
 			ret += match->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
-		else if (match->GetPotentialFighters(Fighter::Blue).size() == 0)
-		{
-			ret += "- - -";
-			show_result = false;
-		}
-		else
+		else if (match->HasDependentMatches())
 			ret += "???";
+		else
+			ret += "- - -";
 
 		//Output result
 		if (match->IsRunning())
 			ret += "<br/>" + Localizer::Translate("In Progress");
-		else if (match->HasConcluded() && show_result)
+		else if (match->HasConcluded() && !match->IsCompletelyEmptyMatch())
 		{
 			const auto& result = match->GetResult();
 			if (result.m_Winner == Winner::White)
