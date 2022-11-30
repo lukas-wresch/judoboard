@@ -18,17 +18,17 @@ namespace Judoboard
 
 		virtual Type GetType() const override { return Type::SingleElimination; }
 
-		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false) override;
+		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false) override;
 		virtual void RemoveAllParticipants() override {
 			MatchTable::RemoveAllParticipants();
 			m_StartingPositions.clear();
 		}
 
-		virtual std::vector<Result> CalculateResults() const override;
+		virtual std::vector<Result> CalculateResults() const override {std::vector<Result> ret; return ret;};//DUMMY
 		virtual void GenerateSchedule() override;
 
-		bool IsThirdPlaceMatch() const { return m_Finals.m_ThirdPlaceMatch(); }
-		bool IsFifthPlaceMatch() const { return m_Finals.m_FifthPlaceMatch(); }
+		bool IsThirdPlaceMatch() const { return m_Finals.IsThirdPlaceMatch(); }
+		bool IsFifthPlaceMatch() const { return m_Finals.IsFifthPlaceMatch(); }
 
 		void IsThirdPlaceMatch(bool Enable) { m_Finals.IsThirdPlaceMatch(Enable); GenerateSchedule(); }
 		void IsFifthPlaceMatch(bool Enable) { m_Finals.IsFifthPlaceMatch(Enable); GenerateSchedule(); }
@@ -43,6 +43,13 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	protected:
+		const Judoka* GetJudokaByStartPosition(size_t StartPosition)
+		{
+			auto result = m_StartingPositions.find(StartPosition);
+			if (result == m_StartingPositions.end())
+				return nullptr;
+			return result->second;
+		}
 		const Judoka* GetJudokaByStartPosition(size_t StartPosition) const
 		{
 			auto result = m_StartingPositions.find(StartPosition);
@@ -61,7 +68,7 @@ namespace Judoboard
 		std::unordered_map<size_t, const Judoka*> m_StartingPositions;
 		int m_PoolCount = 2;
 
-		std::vector<Weightclass> m_Pools;
+		std::vector<Weightclass*> m_Pools;
 		SingleElimination m_Finals;
 	};
 }

@@ -60,7 +60,7 @@ size_t MatchTable::FindMatchIndex(const UUID& UUID) const
 
 
 
-Judoka* MatchTable::FindParticipant(const UUID& UUID) const
+const Judoka* MatchTable::FindParticipant(const UUID& UUID) const
 {
 	for (auto participant : m_Participants)
 		if (participant && participant->GetUUID() == UUID)
@@ -95,7 +95,7 @@ bool MatchTable::AddMatch(Match* NewMatch)
 
 
 
-bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
+bool MatchTable::AddParticipant(const Judoka* NewParticipant, bool Force)
 {
 	if (!NewParticipant)
 		return false;

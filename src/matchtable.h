@@ -218,7 +218,7 @@ namespace Judoboard
 		virtual size_t GetStartingPosition(const Judoka* Judoka) const { return -1; }
 		virtual void   SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition) {}
 
-		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false);
+		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
 		virtual void RemoveAllParticipants() {
 			m_Participants.clear();
 			m_Schedule.clear();
@@ -246,7 +246,7 @@ namespace Judoboard
 
 		Match*  FindMatch(const UUID& UUID) const;
 		size_t  FindMatchIndex(const UUID& UUID) const;
-		Judoka* FindParticipant(const UUID& UUID) const;
+		const Judoka* FindParticipant(const UUID& UUID) const;
 
 		//Rule sets
 		const RuleSet& GetRuleSet() const;
@@ -257,7 +257,7 @@ namespace Judoboard
 		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
 		void SetAgeGroup(const AgeGroup* NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
 
-		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
+		const std::vector<const Judoka*>& GetParticipants() const { return m_Participants; }
 
 		//Scheduler
 		int32_t GetScheduleIndex() const { return m_ScheduleIndex; }
@@ -276,7 +276,7 @@ namespace Judoboard
 
 		size_t GetIndexOfParticipant(const Judoka* Participant) const;
 
-		Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
+		//Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
 
 		const ITournament* GetTournament() const { return m_Tournament; }
@@ -296,12 +296,12 @@ namespace Judoboard
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
 
 	private:
-		std::vector<Judoka*>& SetParticipants() { return m_Participants; }
-		std::vector<Match*>&  SetSchedule()     { return m_Schedule; }
+		auto& SetParticipants() { return m_Participants; }
+		auto&  SetSchedule()    { return m_Schedule; }
 		
 		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
 
-		std::vector<Judoka*> m_Participants;//List of all participants that are in the match table
+		std::vector<const Judoka*> m_Participants;//List of all participants that are in the match table
 		const RuleSet* m_Rules = nullptr;//Custom rule set for the matches (if available)
 
 		const AgeGroup* m_pAgeGroup = nullptr;//Age group for the matches (if available)

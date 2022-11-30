@@ -945,7 +945,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 	//Add all judoka of the match table to the tournament
 	for (auto judoka : NewMatchTable->GetParticipants())
-		AddParticipant(judoka);
+		AddParticipant(const_cast<Judoka*>(judoka));
 
 	if (NewMatchTable->GetAgeGroup())
 		AddAgeGroup(const_cast<AgeGroup*>(NewMatchTable->GetAgeGroup()));

@@ -93,7 +93,7 @@ std::string SingleElimination::GetHTMLForm()
 
 
 
-bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
+bool SingleElimination::AddParticipant(const Judoka* NewParticipant, bool Force)
 {
 	if (!MatchTable::AddParticipant(NewParticipant, Force))
 		return false;

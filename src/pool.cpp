@@ -12,14 +12,14 @@ using namespace Judoboard;
 
 
 Pool::Pool(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
-	: Weightclass(MinWeight, MaxWeight, Tournament)
+	: Weightclass(MinWeight, MaxWeight, Tournament), m_Finals(MinWeight, MaxWeight, Tournament)
 {
 }
 
 
 
 Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
-	: Weightclass(Yaml, Tournament)
+	: Weightclass(Yaml, Tournament), m_Finals(0, 0, Tournament)
 {
 	if (Yaml["pool_count"])
 		m_PoolCount = Yaml["pool_count"].as<bool>();
@@ -38,7 +38,7 @@ Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
 
 
 
-void SingleElimination::operator >> (YAML::Emitter& Yaml) const
+void Pool::operator >> (YAML::Emitter& Yaml) const
 {
 	Weightclass::operator >>(Yaml);
 
@@ -59,7 +59,7 @@ void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 
 
 
-void SingleElimination::ToString(YAML::Emitter& Yaml) const
+void Pool::ToString(YAML::Emitter& Yaml) const
 {
 	Weightclass::ToString(Yaml);
 
@@ -69,7 +69,7 @@ void SingleElimination::ToString(YAML::Emitter& Yaml) const
 
 
 
-std::string SingleElimination::GetHTMLForm()
+std::string Pool::GetHTMLForm()
 {
 	auto ret = Weightclass::GetHTMLForm();
 
@@ -106,7 +106,7 @@ std::string SingleElimination::GetHTMLForm()
 
 
 
-bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
+bool Pool::AddParticipant(const Judoka* NewParticipant, bool Force)
 {
 	if (!MatchTable::AddParticipant(NewParticipant, Force))
 		return false;
@@ -142,10 +142,16 @@ void Pool::GenerateSchedule()
 	if (GetParticipants().size() <= 1)
 		return;
 
-	const auto max_start_pos = std::floor(m_Participants.size() / m_PoolCount) * m_PoolCount;
+	const auto max_start_pos = std::floor(GetParticipants().size() / m_PoolCount) * m_PoolCount;
+
+	for (auto pool : m_Pools)
+		delete pool;
 
 	m_Pools.clear();
 	m_Pools.resize(m_PoolCount);
+
+	for (int i = 0; i < m_PoolCount; ++i)
+		m_Pools[i] = new Weightclass(GetMinWeight(), GetMaxWeight(), GetTournament());
 
 	//Distribute participants to pools
 	for (int pos = 0; pos < max_start_pos; ++pos)
@@ -157,7 +163,7 @@ void Pool::GenerateSchedule()
 
 		int pool = pos % m_PoolCount;
 
-		m_Pools[pool].AddParticipant(judoka, true);
+		m_Pools[pool]->AddParticipant(judoka, true);
 	}
 }
 

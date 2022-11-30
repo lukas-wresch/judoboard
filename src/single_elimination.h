@@ -17,7 +17,7 @@ namespace Judoboard
 
 		virtual Type GetType() const override { return Type::SingleElimination; }
 
-		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false) override;
+		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false) override;
 		virtual void RemoveAllParticipants() override {
 			MatchTable::RemoveAllParticipants();
 			m_StartingPositions.clear();
