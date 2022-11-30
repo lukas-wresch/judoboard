@@ -114,6 +114,11 @@ namespace ZED
 			New.data = nullptr;
 		}*/
 
+		void Reset(T* NewReference = nullptr)\
+		{
+			data = NewReference;
+		}
+
 		void operator =(Ref<T>&& New) noexcept
 		{
 			if (this != &New)

@@ -14,7 +14,7 @@ TEST(Match, ExportImport)
 		RuleSet rule_set("test", rand(), rand(), rand(), rand());
 		Tournament tourney;
 
-		Match* match = new Match(&tourney, &j1, &j2, matid);
+		Match* match = new Match(&j1, &j2, &tourney, matid);
 		match->SetRuleSet(&rule_set);
 		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
 
@@ -29,8 +29,8 @@ TEST(Match, ExportImport)
 		ASSERT_EQ(match->GetRuleSet().GetUUID(), match2.GetRuleSet().GetUUID());
 
 		YAML::Emitter yaml1, yaml2;
-		match->ToString(yaml1);
-		match2.ToString(yaml2);
+		*match >> yaml1;
+		match2 >> yaml2;
 		ASSERT_EQ((std::string)yaml1.c_str(), (std::string)yaml2.c_str());
 
 		ASSERT_EQ(match->GetUUID(),      match2.GetUUID());
@@ -53,7 +53,7 @@ TEST(Match, ExportImport_CopyConstructor)
 		RuleSet rule_set("test", rand(), rand(), rand(), rand());
 		Tournament tourney;
 
-		Match* match = new Match(&tourney, &j1, &j2, matid);
+		Match* match = new Match(&j1, &j2, &tourney, matid);
 		match->SetRuleSet(&rule_set);
 		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
 
@@ -65,8 +65,8 @@ TEST(Match, ExportImport_CopyConstructor)
 		ASSERT_EQ(match->GetRuleSet().GetUUID(), match2.GetRuleSet().GetUUID());
 
 		YAML::Emitter yaml1, yaml2;
-		match->ToString(yaml1);
-		match2.ToString(yaml2);
+		*match >> yaml1;
+		match2 >> yaml2;
 		ASSERT_EQ((std::string)yaml1.c_str(), (std::string)yaml2.c_str());
 
 		ASSERT_EQ(match->GetUUID(),      match2.GetUUID());
@@ -90,9 +90,9 @@ TEST(Match, BestOf3)
 
 		Tournament tourney;
 
-		Match m1(&tourney, &j1, &j2, 1);
-		Match m2(&tourney, &j2, &j1, 1);
-		Match m3(&tourney, &j1, &j2, 1);
+		Match m1(&j1, &j2, &tourney, 1);
+		Match m2(&j2, &j1, &tourney, 1);
+		Match m3(&j1, &j2, &tourney, 1);
 
 		m3.SetBestOfThree(&m1, &m2);
 
@@ -132,9 +132,9 @@ TEST(Match, BestOf3_2)
 		Tournament tourney;
 		tourney.EnableAutoSave(false);
 
-		Match m1(&tourney, &j1, &j2, 1);
-		Match m2(&tourney, &j2, &j1, 1);
-		Match m3(&tourney, &j1, &j2, 1);
+		Match m1(&j1, &j2, &tourney, 1);
+		Match m2(&j2, &j1, &tourney, 1);
+		Match m3(&j1, &j2, &tourney, 1);
 
 		m3.SetBestOfThree(&m1, &m2);
 
@@ -174,9 +174,9 @@ TEST(Match, BestOf3_3)
 		Tournament tourney;
 		tourney.EnableAutoSave(false);
 
-		Match m1(&tourney, &j1, &j2, 1);
-		Match m2(&tourney, &j1, &j2, 1);
-		Match m3(&tourney, &j1, &j2, 1);
+		Match m1(&j1, &j2, &tourney, 1);
+		Match m2(&j1, &j2, &tourney, 1);
+		Match m3(&j1, &j2, &tourney, 1);
 
 		m3.SetBestOfThree(&m1, &m2);
 
@@ -216,9 +216,9 @@ TEST(Match, BestOf3ExportImport)
 	{
 		Tournament tourney("deleteMe");
 
-		Match* m1 = new Match(&tourney, &j1, &j2, 1);
-		Match* m2 = new Match(&tourney, &j2, &j1, 1);
-		Match* m3 = new Match(&tourney, &j1, &j2, 1);
+		Match* m1 = new Match(&j1, &j2, &tourney, 1);
+		Match* m2 = new Match(&j2, &j1, &tourney, 1);
+		Match* m3 = new Match(&j1, &j2, &tourney, 1);
 
 		m3->SetBestOfThree(m1, m2);
 
@@ -272,4 +272,33 @@ TEST(Match, BestOf3ExportImport)
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Match, BreakTime)
+{
+	initialize();
+
+	Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j3(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j4(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+
+	Match m1(&j1, &j2, nullptr, 1);
+	Match m2(&j2, &j1, nullptr, 1);
+	Match m3(&j3, &j4, nullptr, 1);
+	Match m4(&j1, nullptr, nullptr, 1);
+
+	m1.StartMatch();
+	m1.EndMatch();
+
+	EXPECT_EQ(m2.GetCurrentBreaktime(), 0);
+	ZED::Core::Pause(10 * 1000);
+	EXPECT_EQ(m2.GetCurrentBreaktime(), 10);
+	ZED::Core::Pause(10 * 1000);
+	EXPECT_EQ(m2.GetCurrentBreaktime(), 20);
+	EXPECT_EQ(m4.GetCurrentBreaktime(), 20);
+
+	EXPECT_TRUE(m3.GetCurrentBreaktime() > 20);
 }

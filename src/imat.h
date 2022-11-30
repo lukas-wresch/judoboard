@@ -175,8 +175,7 @@ namespace Judoboard
 		virtual ZED::Blob RequestScreenshot() const = 0;
 
 		//Serialization
-		virtual ZED::CSV Scoreboard2String() const = 0;
-		virtual ZED::CSV Osaekomi2String(Fighter Who) const = 0;
+		virtual void ToString(YAML::Emitter& Yaml) const = 0;
 
 		//Config
 		IpponStyle GetIpponStyle() const { return m_IpponStyle; }
@@ -185,13 +184,13 @@ namespace Judoboard
 		bool IsFullscreen() const { return m_IsFullscreen; }
 		virtual void SetFullscreen(bool Enabled = true) = 0;
 
-	protected:
 		virtual void SetName(const std::string& NewName) { m_Name = NewName; }
 		virtual void SetIpponStyle(IpponStyle NewStyle) { m_IpponStyle = NewStyle; }
 		virtual void SetTimerStyle(TimerStyle NewStyle) { m_TimerStyle = NewStyle; }
 		virtual void SetNameStyle(NameStyle NewStyle) { m_NameStyle = NewStyle; }
 		virtual void SetIsFullscreen(bool Enabled) { m_IsFullscreen = Enabled; }
 
+	protected:
 		std::vector<Match> m_NextMatches;
 
 	private:
