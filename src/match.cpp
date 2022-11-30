@@ -15,7 +15,7 @@ RuleSet s_default_rules;
 
 
 
-Match::Match(const ITournament* Tournament, const Judoka* White, const Judoka* Blue, uint32_t MatID) : m_Tournament(Tournament)
+Match::Match(const Judoka* White, const Judoka* Blue, const ITournament* Tournament, uint32_t MatID) : m_Tournament(Tournament)
 {
 	m_White.m_Judoka = White;
 	m_Blue.m_Judoka  = Blue;
@@ -142,6 +142,8 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::BeginMap;
 
 	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "current_breaktime" << YAML::Value << GetCurrentBreaktime();
+	Yaml << YAML::Key << "breaktime"         << YAML::Value << GetRuleSet().GetBreakTime();
 
 	if (GetFighter(Fighter::White))
 		Yaml << YAML::Key << "white_name" << YAML::Value << GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
@@ -521,6 +523,24 @@ const RuleSet& Match::GetRuleSet() const
 	ZED::Log::Debug("Could not find rule set, using the default rule set");
 
 	return s_default_rules;
+}
+
+
+
+uint32_t Match::GetCurrentBreaktime() const
+{
+	uint32_t break1 = 0, break2 = 0;
+	if (m_White.m_Judoka)
+		break1 = m_White.m_Judoka->GetLengthOfBreak();
+	if (m_Blue.m_Judoka)
+		break2 = m_Blue.m_Judoka->GetLengthOfBreak();
+
+	if (break1 == 0)
+		return break2;
+	if (break2 == 0)
+		return break1;
+
+	return std::min(break1, break2);
 }
 
 

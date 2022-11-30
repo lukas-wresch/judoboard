@@ -397,6 +397,17 @@ const std::string SingleElimination::ToHTML() const
 	const auto rounds = GetNumberOfRounds();
 	const auto N = pow(2, rounds);
 
+	auto renderMatch = [this, N](size_t roundIndex, int matchOfRound) -> std::string {
+		int matchIndex = 0;
+		for (int i = 1; i <= roundIndex; ++i)
+			matchIndex += (int)(N / pow(2.0, i));
+
+		matchIndex += matchOfRound;
+
+		if (IsThirdPlaceMatch() && matchIndex >= GetSchedule().size() - 2)
+			matchIndex++;
+		if (IsFifthPlaceMatch() && matchIndex >= GetSchedule().size() - 5)
+			matchIndex+=3;
 
 	auto renderMatchIndex = [this, N](size_t matchIndex, std::string style = "") -> std::string {
 
@@ -562,7 +573,6 @@ const std::string SingleElimination::ToHTML() const
 
 		ret += "</table>";
 	}
-
 
 	ret += ResultsToHTML();	
 

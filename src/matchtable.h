@@ -99,7 +99,7 @@ namespace Judoboard
 			{
 			case Name::White:
 			case Name::Max:
-				return "#fff";
+				return "#fff8";
 			case Name::Blue:
 				return "#0bf8";
 			case Name::Red:

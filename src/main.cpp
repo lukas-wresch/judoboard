@@ -133,7 +133,7 @@ int main(int argc, char** argv)
 		srand(ZED::Core::CurrentTimestamp());
 		auto j1 = CreateRandomJudoka(&app.GetDatabase());
 		auto j2 = CreateRandomJudoka(&app.GetDatabase());
-		Judoboard::Match match(nullptr, &j1, &j2, mat->GetMatID());
+		Judoboard::Match match(&j1, &j2, nullptr, mat->GetMatID());
 		//Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, true, true);
 		Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, false, false);
 		Judoboard::AgeGroup age_group("U18", 15, 18, &rules, app.GetDatabase());
