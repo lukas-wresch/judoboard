@@ -2440,12 +2440,14 @@ TEST(MD5, ExportSingleElimination)
 	for (int i = 1; i <= 16; ++i)
 	{
 		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		j[i]->SetBirthyear(2000);
 		j[i]->SetClub(clubs[rand()%3]);
 		t->AddParticipant(j[i]);
 	}
 
 	SingleElimination group(0, 200);
 	group.SetMatID(1);
+	group.SetAgeGroup(age);
 	t->AddMatchTable(&group);
 
 	for (int i = 1; i <= 16; ++i)
@@ -2488,5 +2490,6 @@ TEST(MD5, ExportSingleElimination)
 	EXPECT_EQ(file.GetMatches()[0].MatchNo, 1);
 	EXPECT_EQ(file.GetMatches()[1].MatchNo, 2);
 
+	//MD5 file2("test-data/single-elimination(single-consulation-bracket).md5");
 	file.Save("output.md5");
 }
