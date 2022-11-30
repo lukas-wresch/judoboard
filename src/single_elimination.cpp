@@ -114,6 +114,23 @@ bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
 
 
 
+bool SingleElimination::RemoveParticipant(const Judoka* Participant)
+{
+	if (MatchTable::RemoveParticipant(Participant))
+	{
+		auto pos = GetStartingPosition(Participant);
+		if (pos != SIZE_MAX)
+		{
+			m_StartingPositions.erase(pos);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
 void SingleElimination::GenerateSchedule()
 {
 	for (auto it = m_Schedule.begin(); it != m_Schedule.end();)
@@ -325,7 +342,7 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 size_t SingleElimination::GetStartingPosition(const Judoka* Judoka) const
 {
 	if (!Judoka)
-		return 0;
+		return SIZE_MAX;
 
 	for (auto [pos, participant] : m_StartingPositions)
 	{
@@ -333,7 +350,7 @@ size_t SingleElimination::GetStartingPosition(const Judoka* Judoka) const
 			return pos;
 	}
 
-	return 0;
+	return SIZE_MAX;
 }
 
 
