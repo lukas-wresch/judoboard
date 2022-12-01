@@ -1,5 +1,6 @@
 #pragma once
-#include "weightclass.h"
+#include "judoboard.h"
+#include "matchtable.h"
 
 
 
@@ -11,14 +12,15 @@ namespace Judoboard
 
 	public:
 		SingleElimination(IFilter* Filter, const ITournament* Tournament = nullptr);
+		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament);
 		SingleElimination(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
 
-		static std::string GetHTMLForm();
+		std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::SingleElimination; }
 
-		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false) override;
-		virtual bool RemoveParticipant(const Judoka* Participant) override;
+		//virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false) override;
+		//virtual bool RemoveParticipant(const Judoka* Participant) override;
 
 		virtual std::vector<Result> CalculateResults() const override;
 		virtual void GenerateSchedule() override;
@@ -57,8 +59,6 @@ namespace Judoboard
 
 			return (size_t)std::ceil(std::log2(GetParticipants().size()));
 		}
-
-		std::unordered_map<size_t, const Judoka*> m_StartingPositions;
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;

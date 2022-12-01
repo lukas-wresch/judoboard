@@ -18,6 +18,8 @@ namespace Judoboard
 
 		virtual Type GetType() const override { return Type::Weightclass; }
 
+		virtual std::string GetHTMLForm() const;
+
 		virtual bool IsElgiable(const Judoka& Fighter) const override;
 
 		std::string GetDescription() const;
@@ -38,5 +40,7 @@ namespace Judoboard
 		Weight m_MaxWeight = 100*1000;//In gramms
 
 		Gender m_Gender = Gender::Unknown;
+
+		const ITournament* m_Tournament = nullptr;
 	};
 }

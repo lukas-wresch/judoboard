@@ -15,18 +15,14 @@ namespace Judoboard
 		RoundRobin(IFilter* Filter, const ITournament* Tournament = nullptr);
 		RoundRobin(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
 
-		static std::string GetHTMLForm();
+		std::string GetHTMLForm();
 
-		virtual Type GetType() const override { return Type::Weightclass; }
+		virtual Type GetType() const override { return Type::RoundRobin; }
 
 		virtual std::string GetDescription() const override;
 
 		virtual std::vector<Result> CalculateResults() const override;
-		virtual bool IsElgiable(const Judoka& Fighter) const override;
 		virtual void GenerateSchedule() override;
-
-		auto IsBestOfThree() const { return m_BestOfThree; }
-		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; GenerateSchedule(); }
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
@@ -35,6 +31,5 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	private:
-		bool m_BestOfThree = false;
 	};
 }

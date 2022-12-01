@@ -24,7 +24,7 @@ Match::Match(const Judoka* White, const Judoka* Blue, const ITournament* Tournam
 
 
 
-Match::Match(const YAML::Node& Yaml, MatchTable* MatchTable, ITournament* Tournament) : m_Tournament(Tournament)
+Match::Match(const YAML::Node& Yaml, MatchTable* MatchTable, const ITournament* Tournament) : m_Tournament(Tournament)
 {
 	if (!Yaml.IsMap())
 		return;

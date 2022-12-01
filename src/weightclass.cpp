@@ -13,10 +13,10 @@ using namespace Judoboard;
 
 
 Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
-	: MatchTable(Tournament)
 {
 	m_MinWeight = MinWeight;
 	m_MaxWeight = MaxWeight;
+	m_Tournament = Tournament;
 }
 
 
@@ -30,8 +30,9 @@ Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, Gender Gender, cons
 
 
 Weightclass::Weightclass(const YAML::Node& Yaml, ITournament* Tournament)
-	: MatchTable(Yaml, Tournament)
 {
+	m_Tournament = Tournament;
+
 	if (Yaml["min_weight"])
 		m_MinWeight = Weight(Yaml["min_weight"]);
 	if (Yaml["max_weight"])
@@ -43,9 +44,8 @@ Weightclass::Weightclass(const YAML::Node& Yaml, ITournament* Tournament)
 
 
 Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament)
-	: MatchTable(Tournament)
 {
-	SetName(Weightclass.Description);
+	m_Tournament = Tournament;
 
 	if (Weightclass.WeightLargerThan > 0)
 		m_MinWeight = Weightclass.WeightLargerThan  * 1000 + Weightclass.WeightInGrammsLargerThan;
@@ -60,8 +60,6 @@ Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament*
 
 void Weightclass::operator >> (YAML::Emitter& Yaml) const
 {
-	MatchTable::operator >>(Yaml);
-
 	Yaml << YAML::Key << "min_weight" << YAML::Value;
 	m_MinWeight >> Yaml;
 	Yaml << YAML::Key << "max_weight" << YAML::Value;
@@ -74,8 +72,6 @@ void Weightclass::operator >> (YAML::Emitter& Yaml) const
 
 void Weightclass::ToString(YAML::Emitter& Yaml) const
 {
-	MatchTable::ToString(Yaml);
-
 	Yaml << YAML::Key << "min_weight" << YAML::Value << m_MinWeight.ToString();
 	Yaml << YAML::Key << "max_weight" << YAML::Value << m_MaxWeight.ToString();
 	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;

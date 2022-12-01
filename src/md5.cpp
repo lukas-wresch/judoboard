@@ -192,7 +192,7 @@ MD5::MD5(const Tournament& Tournament)
 	{
 		Weightclass* new_weightclass = nullptr;		
 
-		if (match_table->GetType() == MatchTable::Type::Weightclass)
+		if (match_table->GetType() == MatchTable::Type::RoundRobin)
 		{
 			const auto weightclass = (Judoboard::Weightclass*)match_table;
 			new_weightclass = new Weightclass;

@@ -13,7 +13,7 @@ using namespace Judoboard;
 
 
 RoundRobin::RoundRobin(IFilter* Filter, const ITournament* Tournament)
-	: MatchTable(Tournament)
+	: MatchTable(Filter, Tournament)
 {
 }
 
@@ -49,85 +49,20 @@ void RoundRobin::operator >> (YAML::Emitter& Yaml) const
 void RoundRobin::ToString(YAML::Emitter& Yaml) const
 {
 	MatchTable::ToString(Yaml);
-
-	Yaml << YAML::Key << "best_of_three" << YAML::Value << m_BestOfThree;
 }
 
 
 
 std::string RoundRobin::GetHTMLForm()
 {
-	std::string ret = R"(
-<div>
-    <label style="width:150px;float:left;margin-top:5px;" id="label_min_weight">Min Weight</label>
-    <input style="margin-bottom:20px;" type="text" id="minWeight" value="" size="1" />
-</div>
+	std::string ret;
 
-<div>
-    <label style="width:150px;float:left;margin-top:5px;" id="label_max_weight">Max Weight</label>
-    <input style="margin-bottom:20px;" type="text" id="maxWeight" value="" size="1" />
-</div>
+	if (GetFilter())
+		ret += GetFilter()->GetHTMLForm();
 
-<div>
-  <label style="width:150px;float:left;margin-top:5px;" id="label_gender">Gender</label>
-  <select style="margin-bottom:20px;" id="gender">
-    <option selected value="-1" id="all">All</option>
-    <option value="0" id="male">Male</option>
-    <option value="1" id="female">Female</option>
-  </select>
-</div>
-
-<div>
-  <label style="width:150px;float:left;margin-top:5px;" id="label_bo3">Best of 3</label>
-  <input type="checkbox" id="bo3" class="switch-input">
-  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="bo3">
-    <span class="toggle-on" id="bo3_enabled"></span><span class="toggle-off" id="bo3_disabled"></span>
-  </label>
-</div>
-)";
+	ret += MatchTable::GetHTMLForm();
 
 	return ret;
-}
-
-
-
-bool RoundRobin::IsElgiable(const Judoka& Fighter) const
-{
-	//Is already in this weight class?
-	/*for (auto judoka : GetParticipants())
-		if (*judoka == Fighter)
-			return false;*/
-
-	if ((uint32_t)m_MaxWeight == 0)//No maximum weight
-	{
-		if (m_MinWeight > Fighter.GetWeight())
-			return false;
-	}
-
-	else if (m_MinWeight > Fighter.GetWeight() || Fighter.GetWeight() > m_MaxWeight)
-		return false;
-
-
-	if (GetAgeGroup())
-	{
-		//Does the judoka belong in this age group?
-		if (!GetAgeGroup()->IsElgiable(Fighter))
-			return false;
-
-		//Check if the judoka is indeed starting for that age group
-		if (GetTournament())
-		{
-			auto age_group_starting_for = GetTournament()->GetAgeGroupOfJudoka(&Fighter);
-			if (!age_group_starting_for || GetAgeGroup()->GetUUID() != age_group_starting_for->GetUUID())
-				return false;
-		}
-	}
-
-	if (m_Gender != Gender::Unknown)//Gender enforced?
-		if (m_Gender != Fighter.GetGender())
-			return false;
-
-	return true;
 }
 
 
@@ -225,24 +160,12 @@ void RoundRobin::GenerateSchedule()
 
 	
 	//Add additional matches for best of three
-	if (m_BestOfThree)
-	{
-		auto length = m_Schedule.size();
-		for (size_t i = 0; i < length; ++i)
-		{
-			auto match1 = m_Schedule[i];
-			auto indices = GetParticipantIndicesOfMatch(match1);
-
-			auto match2 = AddAutoMatch(indices.second, indices.first);
-			auto match3 = AddAutoMatch(indices.first,  indices.second);
-			if (match3)
-				match3->SetBestOfThree(match1, match2);
-		}
-	}
+	if (IsBestOfThree())
+		AddMatchesForBestOfThree();
 
 
-	for (auto match : m_Schedule)
-		match->SetMatchTable(this);
+	//for (auto match : m_Schedule)
+		//match->SetMatchTable(this);
 }
 
 

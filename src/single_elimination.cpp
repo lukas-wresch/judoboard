@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <random>
 #include "single_elimination.h"
+#include "weightclass.h"
 #include "tournament.h"
 #include "localizer.h"
 #include "match.h"
@@ -12,15 +13,18 @@ using namespace Judoboard;
 
 
 SingleElimination::SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
-	: Weightclass(MinWeight, MaxWeight, Tournament)
+	: MatchTable(new Weightclass(MinWeight, MaxWeight, Tournament), Tournament)
 {
 }
 
 
 
 SingleElimination::SingleElimination(const YAML::Node& Yaml, ITournament* Tournament)
-	: Weightclass(Yaml, Tournament)
+	: MatchTable(nullptr, Tournament)
 {
+	if (Yaml["filter"])
+		;//TODO
+
 	if (Yaml["third_place_match"])
 		m_ThirdPlaceMatch = Yaml["third_place_match"].as<bool>();
 	if (Yaml["fifth_place_match"])
@@ -58,7 +62,7 @@ void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 
 void SingleElimination::ToString(YAML::Emitter& Yaml) const
 {
-	Weightclass::ToString(Yaml);
+	MatchTable::ToString(Yaml);
 
 	Yaml << YAML::Key << "third_place" << YAML::Value << IsThirdPlaceMatch();
 	Yaml << YAML::Key << "fifth_place" << YAML::Value << IsFifthPlaceMatch();
@@ -68,7 +72,10 @@ void SingleElimination::ToString(YAML::Emitter& Yaml) const
 
 std::string SingleElimination::GetHTMLForm()
 {
-	auto ret = Weightclass::GetHTMLForm();
+	std::string ret;
+
+	if (GetFilter())
+		ret += GetFilter()->GetHTMLForm();
 
 	ret += R"(
 <div>
@@ -88,12 +95,14 @@ std::string SingleElimination::GetHTMLForm()
 </div>
 )";
 
+	ret += MatchTable::GetHTMLForm();
+
 	return ret;
 }
 
 
 
-bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
+/*bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
 {
 	if (!MatchTable::AddParticipant(NewParticipant, Force))
 		return false;
@@ -127,7 +136,7 @@ bool SingleElimination::RemoveParticipant(const Judoka* Participant)
 	}
 
 	return false;
-}
+}*/
 
 
 
@@ -237,52 +246,7 @@ void SingleElimination::GenerateSchedule()
 
 	//Add additional matches for best of three
 	if (IsBestOfThree())
-	{
-		auto schedule_copy = std::move(m_Schedule);
-
-		auto length = schedule_copy.size();
-		for (size_t i = 0; i < length; ++i)
-		{
-			auto match1 = schedule_copy[i];
-
-			auto match2 = new Match(*match1);
-			match2->SwapFighters();
-			auto match3 = new Match(*match1);
-			match3->SetBestOfThree(match1, match2);
-
-			m_Schedule.push_back(match1);
-			m_Schedule.emplace_back(match2);
-			m_Schedule.emplace_back(match3);
-		}
-
-		//Fix references, matches should take the winner of the BO3 match not the first one
-		for (auto match : m_Schedule)
-		{
-			if (match->GetDependencyTypeOf(Fighter::White) != Match::DependencyType::TakeWinner)
-				continue;
-			if (match->GetDependencyTypeOf(Fighter::Blue ) != Match::DependencyType::TakeWinner)
-				continue;
-			if (match->IsBestOfThree())
-				continue;
-
-			auto dependent_match1 = match->GetDependentMatchOf(Fighter::White);
-			auto dependent_match2 = match->GetDependentMatchOf(Fighter::Blue);
-
-			if (dependent_match1 && dependent_match2)
-			{
-				auto index1 = FindMatchIndex(dependent_match1->GetUUID());
-				auto index2 = FindMatchIndex(dependent_match2->GetUUID());
-
-				if (index1 != SIZE_MAX && index2 != SIZE_MAX)
-				{
-					if (index1 + 2 < m_Schedule.size())
-						match->SetDependency(Fighter::White, Match::DependencyType::TakeWinner, m_Schedule[index1 + 2]);
-					if (index2 + 2 < m_Schedule.size())
-						match->SetDependency(Fighter::Blue,  Match::DependencyType::TakeWinner, m_Schedule[index2 + 2]);
-				}
-			}
-		}
-	}
+		AddMatchesForBestOfThree();
 }
 
 

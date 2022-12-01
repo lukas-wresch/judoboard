@@ -1476,7 +1476,7 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/matchtable/get_form", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		/*auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
 
@@ -1484,8 +1484,8 @@ void Application::SetupHttpServer()
 
 		switch ((MatchTable::Type)type)
 		{
-			case MatchTable::Type::Weightclass:
-				return Weightclass::GetHTMLForm();
+			case MatchTable::Type::RoundRobin:
+				return RoundRobin::GetHTMLForm();
 			case MatchTable::Type::Pause:
 				return Pause::GetHTMLForm();
 			case MatchTable::Type::Custom:
@@ -1493,18 +1493,10 @@ void Application::SetupHttpServer()
 			case MatchTable::Type::SingleElimination:
 				return SingleElimination::GetHTMLForm();
 
-			default:
+			default:*/
 				return std::string("Unknown form");
-		}
+		//}
 	});
-
-
-	/*m_Server.RegisterResource("/ajax/matchtable/get_participants", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-		return Ajax_GetParticipantsFromMatchTable(Request);
-	});*/
 
 
 	m_Server.RegisterResource("/ajax/matchtable/get_matches", [this](auto& Request) -> std::string {
@@ -2953,7 +2945,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	if (!GetTournament())
 		return Error::Type::TournamentNotOpen;
 
-	UUID id   = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	/*UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int color = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "color"));
 	int mat   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
@@ -3029,12 +3021,12 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 		break;
 	}*/
 
-	default:
+	//default:
 		return Error(Error::Type::InternalError);
-	}
+	//}
 
-	if (!GetTournament()->UpdateMatchTable(id))
-		return Error(Error::Type::OperationFailed);
+	//if (!GetTournament()->UpdateMatchTable(id))
+		//return Error(Error::Type::OperationFailed);
 	return Error();//OK
 }
 

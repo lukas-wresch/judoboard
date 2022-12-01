@@ -16,7 +16,12 @@ namespace Judoboard
 
 		virtual Type GetType() const = 0;
 
+		virtual std::string GetHTMLForm() const = 0;
+
 		virtual bool IsElgiable(const Judoka& Fighter) const = 0;
+
+		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
+		virtual bool RemoveParticipant(const Judoka* Participant);
 
 		virtual DependentJudoka GetFromPosition(size_t Position) = 0;
 
@@ -30,13 +35,10 @@ namespace Judoboard
 		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
 		void SetAgeGroup(const AgeGroup* NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
 
-		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
+		auto& GetParticipants() const { return m_Participants; }
 
 	protected:
-		size_t GetIndexOfParticipant(const Judoka* Participant) const;
-
-		Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
-		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
+		const DependentJudoka* GetParticipantByStartingPosition(size_t StartingPosition) const;
 
 		void SortParticipantsByStartingPosition() {
 			std::sort(m_Participants.begin(), m_Participants.end(), [this](const Judoka* a, const Judoka* b) {
@@ -44,11 +46,11 @@ namespace Judoboard
 			});
 		}
 
-	
-		std::vector<Judoka*>& SetParticipants() { return m_Participants; }
 
 	private:
-		std::vector<Judoka*> m_Participants;//List of all participants that are in the match table
+		//std::vector<DependentJudoka*> m_Participants;//List of all participants that are in the match table
+
+		std::unordered_map<size_t, const DependentJudoka*> m_Participants;//List of all participants that are in the match table
 
 		const AgeGroup* m_pAgeGroup = nullptr;//Age group for the matches (if available)
 	};

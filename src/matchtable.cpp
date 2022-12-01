@@ -3,6 +3,7 @@
 #include "../ZED/include/log.h"
 #include "matchtable.h"
 #include "match.h"
+#include "filter.h"
 #include "tournament.h"
 
 
@@ -143,7 +144,7 @@ bool MatchTable::AddMatch(Match* NewMatch)
 
 
 
-bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
+bool MatchTable::AddParticipant(const Judoka* NewParticipant, bool Force)
 {
 	if (!NewParticipant || !m_Filter)
 		return false;
@@ -152,12 +153,12 @@ bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 		if (!m_Filter->IsElgiable(*NewParticipant))//Is the judoka allowed in this match table?
 			return false;
 
-	//Is the judoka alreay a participant?
+	//Is the judoka already a participant?
 	for (auto judoka : m_Filter->GetParticipants())
 		if (judoka && *judoka == *NewParticipant)
 			return false;
 
-	m_Filter->AddParticipant(NewParticipant);
+	m_Filter->AddParticipant(NewParticipant, Force);
 	GenerateSchedule();
 	return true;
 }
@@ -169,17 +170,11 @@ bool MatchTable::RemoveParticipant(const Judoka* Participant)
 	if (!Participant || !m_Filter)
 		return false;
 
-	for (auto it = m_Filter->GetParticipants().begin(); it != m_Filter->GetParticipants().end(); ++it)
-	{
-		if (*it && *(*it) == *Participant)
-		{
-			m_Participants.erase(it);
-			m_Schedule.clear();
-			return true;
-		}
-	}
+	if (!m_Filter->RemoveParticipant(Participant))
+		return false;
 
-	return false;
+	GenerateSchedule();
+	return true;
 }
 
 
@@ -302,7 +297,7 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 
 
 
-MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tournament(Tournament)
+MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament) : m_Tournament(Tournament)
 {
 	if (Yaml["uuid"])
 		SetUUID(Yaml["uuid"].as<std::string>());
@@ -320,7 +315,7 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tour
 		m_Rules = Tournament->FindRuleSet(Yaml["rule_set"].as<std::string>());
 
 	if (Yaml["age_group"] && Tournament)
-		m_pAgeGroup = Tournament->FindAgeGroup(Yaml["age_group"].as<std::string>());
+		SetAgeGroup(Tournament->FindAgeGroup(Yaml["age_group"].as<std::string>()));
 
 	if (Yaml["participants"] && Yaml["participants"].IsSequence() && Tournament)
 	{
@@ -328,7 +323,7 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tour
 		{
 			auto participant = Tournament->FindParticipant(node.as<std::string>());
 			if (participant)
-				m_Participants.emplace_back(participant);
+				AddParticipant(participant, true);
 		}
 	}
 
@@ -337,6 +332,38 @@ MatchTable::MatchTable(const YAML::Node& Yaml, ITournament* Tournament) : m_Tour
 		for (const auto& node : Yaml["matches"])
 			m_Schedule.emplace_back(new Match(node, this, Tournament));
 	}
+}
+
+
+
+size_t MatchTable::GetStartingPosition(const Judoka* Judoka) const
+{
+	if (m_Filter)
+		m_Filter->GetStartingPosition(Judoka);
+}
+
+
+
+void MatchTable::SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition)
+{
+	if (m_Filter)
+		m_Filter->SetStartingPosition(Judoka, NewStartingPosition);
+}
+
+
+
+const AgeGroup* MatchTable::GetAgeGroup() const
+{
+	if (m_Filter)
+		return m_Filter->GetAgeGroup();
+}
+
+
+
+void MatchTable::SetAgeGroup(const AgeGroup* NewAgeGroup)
+{
+	if (m_Filter)
+		return m_Filter->SetAgeGroup(NewAgeGroup);
 }
 
 
@@ -354,13 +381,13 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 
 	if (m_Rules)
 		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
-	if (m_pAgeGroup)
-		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)m_pAgeGroup->GetUUID();
+	if (GetAgeGroup())
+		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)GetAgeGroup()->GetUUID();
 
 	Yaml << YAML::Key << "participants";
 	Yaml << YAML::BeginSeq;
 
-	for (auto judoka : m_Participants)
+	for (auto judoka : GetParticipants())
 		Yaml << (std::string)judoka->GetUUID();
 
 	Yaml << YAML::EndSeq;
@@ -389,13 +416,13 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 
 	if (m_Rules)
 		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
-	if (m_pAgeGroup)
-		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)m_pAgeGroup->GetUUID();
+	if (GetAgeGroup())
+		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)GetAgeGroup()->GetUUID();
 
 	Yaml << YAML::Key << "participants";
 	Yaml << YAML::BeginSeq;
 
-	for (auto judoka : m_Participants)
+	for (auto judoka : GetParticipants())
 	{
 		Yaml << YAML::BeginMap;
 		Yaml << YAML::Key << "uuid"      << YAML::Value << (std::string)judoka->GetUUID();
@@ -407,20 +434,39 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 		Yaml << YAML::EndMap;
 	}
 
+	Yaml << YAML::Key << "best_of_three" << YAML::Value << m_BestOfThree;
+
 	Yaml << YAML::EndSeq;
 }
 
 
 
-Match* MatchTable::AddAutoMatch(size_t WhiteIndex, size_t BlueIndex)
+std::string MatchTable::GetHTMLForm() const
 {
-	if (!GetParticipant(WhiteIndex) || !GetParticipant(BlueIndex))
+	std::string ret = R"(
+<div>
+	<label style="width:150px;float:left;margin-top:5px;" id="label_bo3">Best Of Three</label>
+		<input type="checkbox" id="bo3" class="switch-input">
+		<label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="bo3">
+		<span class="toggle-on" id="bo3_enabled"></span><span class="toggle-off" id="bo3_disabled"></span>
+	</label>
+</div>
+)";
+
+	return ret;
+}
+
+
+
+Match* MatchTable::AddAutoMatch(size_t WhiteStartingPosition, size_t BlueStartingPosition)
+{
+	if (!GetJudokaByStartingPosition(WhiteStartingPosition) || !GetJudokaByStartingPosition(BlueStartingPosition))
 	{
 		ZED::Log::Error("Illegal participant index");
 		return nullptr;
 	}
 
-	return CreateAutoMatch(GetParticipant(WhiteIndex), GetParticipant(BlueIndex));
+	return CreateAutoMatch(GetJudokaByStartingPosition(WhiteStartingPosition), GetJudokaByStartingPosition(BlueStartingPosition));
 }
 
 
@@ -440,57 +486,60 @@ Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
 {
 	Match* new_match = CreateAutoMatch(nullptr, nullptr);
 
-	//Is this an 'empty' match?
-	//if (!Match1->HasDependentMatches() && Match1->GetSingleValidFighters())
-		//new_match->SetFighter(Fighter::White, Match1->GetSingleValidFighters());
-	//else if (!Match1->IsCompletelyEmptyMatch())
-		new_match->SetDependency(Fighter::White, Match::DependencyType::TakeWinner, Match1);
-
-	//if (!Match2->HasDependentMatches() && Match2->GetSingleValidFighters())
-		//new_match->SetFighter(Fighter::Blue, Match2->GetSingleValidFighters());
-	//else if (!Match2->IsCompletelyEmptyMatch())
-		new_match->SetDependency(Fighter::Blue,  Match::DependencyType::TakeWinner, Match2);
+	new_match->SetDependency(Fighter::White, Match::DependencyType::TakeWinner, Match1);
+	new_match->SetDependency(Fighter::Blue,  Match::DependencyType::TakeWinner, Match2);
 
 	return new_match;
 }
 
 
 
-std::pair<size_t, size_t> MatchTable::GetParticipantIndicesOfMatch(const Match* Match) const
+void MatchTable::AddMatchesForBestOfThree()
 {
-	std::pair ret(0, 0);
+	auto schedule_copy = std::move(m_Schedule);
 
-	if (!Match || !Match->HasValidFighters())
+	auto length = schedule_copy.size();
+	for (size_t i = 0; i < length; ++i)
 	{
-		ZED::Log::Error("Illegal match");
-		return ret;
+		auto match1 = schedule_copy[i];
+
+		auto match2 = new Match(*match1);
+		match2->SwapFighters();
+		auto match3 = new Match(*match1);
+		match3->SetBestOfThree(match1, match2);
+
+		m_Schedule.push_back(match1);
+		m_Schedule.emplace_back(match2);
+		m_Schedule.emplace_back(match3);
 	}
 
-	for (int i = 0; i < m_Participants.size(); ++i)
+	//Fix references, matches should take the winner of the BO3 match not the first one
+	for (auto match : m_Schedule)
 	{
-		if (m_Participants[i]->GetUUID() == Match->GetFighter(Fighter::White)->GetUUID())
-			ret.first = i;
-		if (m_Participants[i]->GetUUID() == Match->GetFighter(Fighter::Blue)->GetUUID())
-			ret.second = i;
-	}	
+		if (match->GetDependencyTypeOf(Fighter::White) != Match::DependencyType::TakeWinner)
+			continue;
+		if (match->GetDependencyTypeOf(Fighter::Blue ) != Match::DependencyType::TakeWinner)
+			continue;
+		if (match->IsBestOfThree())
+			continue;
 
-	return ret;
-}
+		auto dependent_match1 = match->GetDependentMatchOf(Fighter::White);
+		auto dependent_match2 = match->GetDependentMatchOf(Fighter::Blue);
 
+		if (dependent_match1 && dependent_match2)
+		{
+			auto index1 = FindMatchIndex(dependent_match1->GetUUID());
+			auto index2 = FindMatchIndex(dependent_match2->GetUUID());
 
-
-size_t MatchTable::GetIndexOfParticipant(const Judoka* Participant) const
-{
-	if (!Participant)
-		return 0;
-
-	for (size_t i = 0; i < m_Participants.size(); ++i)
-	{
-		if (Participant->GetUUID() == m_Participants[i]->GetUUID())
-			return i;
+			if (index1 != SIZE_MAX && index2 != SIZE_MAX)
+			{
+				if (index1 + 2 < m_Schedule.size())
+					match->SetDependency(Fighter::White, Match::DependencyType::TakeWinner, m_Schedule[index1 + 2]);
+				if (index2 + 2 < m_Schedule.size())
+					match->SetDependency(Fighter::Blue,  Match::DependencyType::TakeWinner, m_Schedule[index2 + 2]);
+			}
+		}
 	}
-
-	return 0;
 }
 
 
