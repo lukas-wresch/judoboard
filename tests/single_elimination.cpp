@@ -1213,6 +1213,55 @@ TEST(SingleElimination, Count8_5th)
 
 
 
+TEST(SingleElimination, Render_3rd_5th)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	t->AddMatchTable(&group);
+
+	Judoka* j[8];
+	bool has_match[8];
+
+	for (int i = 0; i < 8; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		t->AddParticipant(j[i]);
+		has_match[i] = false;
+	}
+
+	ASSERT_EQ(group.GetParticipants().size(), 8);
+
+	auto none = group.ToHTML();
+
+	group.IsFifthPlaceMatch(true);
+
+	auto with_5th = group.ToHTML();
+
+	group.IsThirdPlaceMatch(true);
+
+	auto with_3rd_5th = group.ToHTML();
+
+	group.IsFifthPlaceMatch(false);
+
+	auto with_3rd = group.ToHTML();
+
+	EXPECT_NE(none, with_3rd);
+	EXPECT_NE(none, with_5th);
+	EXPECT_NE(none, with_3rd_5th);
+
+	EXPECT_NE(with_3rd, with_5th);
+	EXPECT_NE(with_3rd, with_3rd_5th);
+
+	EXPECT_NE(with_5th, with_3rd_5th);
+}
+
+
+
 TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 {
 	initialize();

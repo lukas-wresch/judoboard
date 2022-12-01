@@ -104,6 +104,7 @@ Status MatchTable::GetStatus() const
 
 	if (all_matches_finished && one_match_finished)
 		return Status::Concluded;
+
 	return Status::Scheduled;
 }
 
