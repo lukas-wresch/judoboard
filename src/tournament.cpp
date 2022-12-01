@@ -154,7 +154,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (white && blue && *white == *blue)//Filter dummy matches
 			continue;
 
-		Match* new_match = new Match(this, white, blue);
+		Match* new_match = new Match(white, blue, this);
 
 		if (match.Status == 3)//Match completed?
 		{
