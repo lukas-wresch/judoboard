@@ -12,6 +12,13 @@ using namespace Judoboard;
 
 
 
+SingleElimination::SingleElimination(IFilter* Filter, const ITournament* Tournament)
+	: MatchTable(Filter, Tournament)
+{
+}
+
+
+
 SingleElimination::SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
 	: MatchTable(new Weightclass(MinWeight, MaxWeight, Tournament), Tournament)
 {

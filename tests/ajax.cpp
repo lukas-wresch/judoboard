@@ -1014,9 +1014,9 @@ TEST(Ajax, MatchTable_Add)
 		ASSERT_EQ(tables[1]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[1]->GetName(), "Test2");
 		EXPECT_EQ(tables[1]->GetMatID(), 5);
-		EXPECT_EQ(((RoundRobin*)tables[1])->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ(((RoundRobin*)tables[1])->GetMaxWeight(), Weight("20.3"));
-		EXPECT_EQ(((RoundRobin*)tables[1])->GetGender(), Gender::Male);
+		EXPECT_EQ( ((Weightclass*) (tables[1])->GetFilter())->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ( ((Weightclass*) (tables[1])->GetFilter())->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ( ((Weightclass*) (tables[1])->GetFilter())->GetGender(), Gender::Male);
 		EXPECT_EQ(((RoundRobin*)tables[1])->IsBestOfThree(), true);
 
 		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=4", "name=Test3&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
@@ -1025,9 +1025,9 @@ TEST(Ajax, MatchTable_Add)
 		ASSERT_EQ(tables[2]->GetType(), MatchTable::Type::SingleElimination);
 		EXPECT_EQ(tables[2]->GetName(), "Test3");
 		EXPECT_EQ(tables[2]->GetMatID(), 5);
-		EXPECT_EQ(((SingleElimination*)tables[2])->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ(((SingleElimination*)tables[2])->GetMaxWeight(), Weight("20.3"));
-		EXPECT_EQ(((SingleElimination*)tables[2])->GetGender(), Gender::Female);
+		EXPECT_EQ( ((Weightclass*) (tables[2])->GetFilter())->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ( ((Weightclass*) (tables[2])->GetFilter())->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ( ((Weightclass*) (tables[2])->GetFilter())->GetGender(), Gender::Female);
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsBestOfThree(), true);
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsThirdPlaceMatch(), true);
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsFifthPlaceMatch(), true);
@@ -1059,9 +1059,9 @@ TEST(Ajax, MatchTable_Edit)
 		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[0]->GetName(), "Test2");
 		EXPECT_EQ(tables[0]->GetMatID(), 5);
-		EXPECT_EQ(((RoundRobin*)tables[0])->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ(((RoundRobin*)tables[0])->GetMaxWeight(), Weight("20.3"));
-		EXPECT_EQ(((RoundRobin*)tables[0])->GetGender(), Gender::Male);
+		EXPECT_EQ( ((Weightclass*) (tables[2])->GetFilter())->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ( ((Weightclass*) (tables[2])->GetFilter())->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ( ((Weightclass*) (tables[2])->GetFilter())->GetGender(), Gender::Male);
 		EXPECT_EQ(((RoundRobin*)tables[0])->IsBestOfThree(), true);
 	}
 }
@@ -1143,7 +1143,7 @@ TEST(Ajax, MatchTable_StartPositionsAfterUpdate)
 
 			ASSERT_TRUE(app.AddTournament(t));
 
-			auto group = new SingleElimination(0, 200);
+			auto group = new SingleElimination(Weight(0), Weight(200));
 			t->AddMatchTable(group);
 
 			auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);

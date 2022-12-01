@@ -306,6 +306,8 @@ namespace Judoboard
 
 		const std::vector<const Judoka*> GetParticipants() const;
 
+		const IFilter* GetFilter() const { return m_Filter; }
+
 		//Rule sets
 		const RuleSet& GetRuleSet() const;
 		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
@@ -351,7 +353,6 @@ namespace Judoboard
 
 		void DeleteSchedule() { m_Schedule.clear(); }
 
-		const IFilter* GetFilter() const { return m_Filter; }
 		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
 
 		const std::string ResultsToHTML() const;
