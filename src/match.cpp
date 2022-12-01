@@ -257,6 +257,78 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 
 
 
+std::vector<const Judoka*> Match::GetPotentialFighters() const
+{
+	std::vector<const Judoka*> ret;
+
+	if (m_White.m_Judoka)
+		ret.emplace_back(m_White.m_Judoka);
+
+	else if (m_White.m_Dependency == DependencyType::TakeWinner || m_White.m_Dependency == DependencyType::TakeLoser)
+	{
+		if (m_White.m_DependentMatch)
+		{
+			auto list = m_White.m_DependentMatch->GetPotentialFighters();
+			ret.insert(ret.end(), list.begin(), list.end());
+		}
+	}
+
+	if (m_Blue.m_Judoka)
+		ret.emplace_back(m_Blue.m_Judoka);
+
+	else if (m_Blue.m_Dependency == DependencyType::TakeWinner || m_Blue.m_Dependency == DependencyType::TakeLoser)
+	{
+		if (m_Blue.m_DependentMatch)
+		{
+			auto list = m_Blue.m_DependentMatch->GetPotentialFighters();
+			ret.insert(ret.end(), list.begin(), list.end());
+		}
+	}
+
+	return ret;
+}
+
+
+
+std::vector<const Judoka*> Match::GetPotentialFighters(Fighter Fighter) const
+{
+	std::vector<const Judoka*> ret;
+
+	if (Fighter == Fighter::White)
+	{
+		if (m_White.m_Judoka)
+			ret.emplace_back(m_White.m_Judoka);
+
+		else if (m_White.m_Dependency == DependencyType::TakeWinner || m_White.m_Dependency == DependencyType::TakeLoser)
+		{
+			if (m_White.m_DependentMatch)
+			{
+				auto list = m_White.m_DependentMatch->GetPotentialFighters();
+				ret.insert(ret.end(), list.begin(), list.end());
+			}
+		}
+	}
+
+	else
+	{
+		if (m_Blue.m_Judoka)
+			ret.emplace_back(m_White.m_Judoka);
+
+		else if (m_Blue.m_Dependency == DependencyType::TakeWinner || m_Blue.m_Dependency == DependencyType::TakeLoser)
+		{
+			if (m_Blue.m_DependentMatch)
+			{
+				auto list = m_Blue.m_DependentMatch->GetPotentialFighters();
+				ret.insert(ret.end(), list.begin(), list.end());
+			}
+		}
+	}
+
+	return ret;
+}
+
+
+
 bool Match::Contains(const Judoka& Judoka) const
 {
 	if (m_White.m_Judoka && m_White.m_Judoka->GetUUID() == Judoka.GetUUID())
