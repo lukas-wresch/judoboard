@@ -87,6 +87,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			new_table = new Weightclass(*weightclass, this);
 		if (weightclass->FightSystemID == 19)//Single elimination (single consulation bracket)
 			new_table = new SingleElimination(*weightclass, this);
+		else
+			continue;
 
 		//Connect to age group
 		if (weightclass->AgeGroup)
