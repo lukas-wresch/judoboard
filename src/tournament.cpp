@@ -83,9 +83,9 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	{
 		Weightclass* new_table = nullptr;
 
-		if (weightclass->FightSystemID == 16)//Round robin
+		if (weightclass->FightSystemID == 16 || weightclass->FightSystemID == 13 || weightclass->FightSystemID == 14 || weightclass->FightSystemID == 15)//Round robin
 			new_table = new Weightclass(*weightclass, this);
-		if (weightclass->FightSystemID == 19)//Single elimination (single consulation bracket)
+		else if (weightclass->FightSystemID == 19)//Single elimination (single consulation bracket)
 			new_table = new SingleElimination(*weightclass, this);
 		else
 			continue;
@@ -143,9 +143,6 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add matches
 	for (auto& match : File.GetMatches())
 	{
-		if (match.WhiteID == match.RedID)//Filter dummy matches
-			continue;
-
 		Judoka* white = nullptr;
 		if (match.White && match.White->pUserData)
 			white = (Judoka*)match.White->pUserData;
@@ -154,7 +151,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (match.Red && match.Red->pUserData)
 			blue = (Judoka*)match.Red->pUserData;
 
-		Match* new_match = new Match(white, blue, this);
+		if (white && blue && *white == *blue)//Filter dummy matches
+			continue;
+
+		Match* new_match = new Match(this, white, blue);
 
 		if (match.Status == 3)//Match completed?
 		{
