@@ -13,7 +13,7 @@ namespace Judoboard
 	public:
 		SingleElimination(IFilter* Filter, const ITournament* Tournament = nullptr);
 		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament);
-		SingleElimination(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
+		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament = nullptr);
 
 		std::string GetHTMLForm();
 
@@ -36,20 +36,6 @@ namespace Judoboard
 
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
 		virtual void ToString(YAML::Emitter& Yaml) const override;
-
-	protected:
-		const Judoka* GetJudokaByStartPosition(size_t StartPosition) const
-		{
-			auto result = m_StartingPositions.find(StartPosition);
-			if (result == m_StartingPositions.end())
-				return nullptr;
-			return result->second;
-		}
-
-		bool IsStartPositionTaken(size_t StartPosition) const
-		{
-			return m_StartingPositions.find(StartPosition) != m_StartingPositions.end();
-		}
 
 
 	private:

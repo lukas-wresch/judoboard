@@ -81,7 +81,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add weightclasses
 	for (auto weightclass : File.GetWeightclasses())
 	{
-		auto new_weightclass = new Weightclass(*weightclass, this);
+		/*auto new_weightclass = new Weightclass(*weightclass, this);
 
 		//Connect to age group
 		if (weightclass->AgeGroup)
@@ -98,7 +98,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		weightclass->pUserData = new_weightclass;
 
-		m_MatchTables.emplace_back(new_weightclass);
+		m_MatchTables.emplace_back(new_weightclass);*/
 	}
 
 	//Add judoka
@@ -156,8 +156,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		if (match.Weightclass && match.Weightclass->pUserData)
 		{
-			auto match_table = (Weightclass*)match.Weightclass->pUserData;
-			match_table->AddMatch(new_match);//Add match to weightclass
+			auto match_table = (MatchTable*)match.Weightclass->pUserData;
+			//match_table->AddMatch(new_match);//Add match to weightclass
 		}
 
 		m_Schedule.emplace_back(new_match);

@@ -18,7 +18,7 @@ namespace Judoboard
 		virtual Type GetType() const { return Type::Pause; }
 		virtual std::string GetDescription() const override { return "Pause"; }
 
-		virtual bool IsElgiable(const Judoka& Fighter) const override { return false; }
+		//virtual bool IsElgiable(const Judoka& Fighter) const override { return false; }
 		virtual void GenerateSchedule() override {}
 
 		//Serialization

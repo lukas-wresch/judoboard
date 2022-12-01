@@ -14,6 +14,7 @@ namespace Judoboard
 	public:
 		RoundRobin(IFilter* Filter, const ITournament* Tournament = nullptr);
 		RoundRobin(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
+		RoundRobin(const MD5::Weightclass& Weightclass, const ITournament* Tournament = nullptr);
 
 		std::string GetHTMLForm();
 
@@ -26,9 +27,6 @@ namespace Judoboard
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
-
-		virtual void operator >> (YAML::Emitter& Yaml) const override;
-		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	private:
 	};

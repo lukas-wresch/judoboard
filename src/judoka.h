@@ -25,11 +25,9 @@ namespace Judoboard
 			m_Type   = Match::DependencyType::None;
 		}
 
-		bool operator == (const Judoka* rhs) const {
-			if (!m_Judoka || !rhs)
-				return false;
-			return *m_Judoka == *rhs;
-		}
+		const Judoka* GetJudoka() const { return m_Judoka; }
+
+		bool operator == (const Judoka* rhs) const;
 
 	private:
 		const Judoka* m_Judoka = nullptr;
@@ -112,11 +110,14 @@ namespace Judoboard
 		void operator >> (YAML::Emitter& Yaml) const;
 		void ToString(YAML::Emitter& Yaml) const;
 
-		bool operator ==(const Judoka& cmp) const { return GetUUID() == cmp.GetUUID(); }
+		bool operator ==(const Judoka& rhs) const { return GetUUID() == rhs.GetUUID(); }
 		bool operator ==(const Judoka* rhs) const {
 			if (!rhs)
 				return false;
 			return GetUUID() == rhs->GetUUID();
+		}
+		bool operator ==(const UUID& rhs) const {
+			return GetUUID() == rhs;
 		}
 
 	private:

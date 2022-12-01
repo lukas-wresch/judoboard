@@ -10,6 +10,15 @@ using namespace Judoboard;
 
 
 
+bool DependentJudoka::operator == (const Judoka* rhs) const
+{
+	if (!m_Judoka || !rhs)
+		return false;
+	return *m_Judoka == *rhs;
+}
+
+
+
 JudokaData::JudokaData(const Judoka& Judoka)
 {
 	m_Firstname = Judoka.GetFirstname();

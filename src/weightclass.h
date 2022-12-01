@@ -13,7 +13,7 @@ namespace Judoboard
 	public:
 		Weightclass(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
 		Weightclass(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament = nullptr);
-		Weightclass(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
+		Weightclass(const YAML::Node& Yaml, const ITournament* Tournament = nullptr);
 		Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament = nullptr);
 
 		virtual Type GetType() const override { return Type::Weightclass; }
@@ -40,7 +40,5 @@ namespace Judoboard
 		Weight m_MaxWeight = 100*1000;//In gramms
 
 		Gender m_Gender = Gender::Unknown;
-
-		const ITournament* m_Tournament = nullptr;
 	};
 }

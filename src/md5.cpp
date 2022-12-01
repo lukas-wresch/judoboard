@@ -192,7 +192,7 @@ MD5::MD5(const Tournament& Tournament)
 	{
 		Weightclass* new_weightclass = nullptr;		
 
-		if (match_table->GetType() == MatchTable::Type::RoundRobin)
+		/*if (match_table->GetType() == MatchTable::Type::RoundRobin)
 		{
 			const auto weightclass = (Judoboard::Weightclass*)match_table;
 			new_weightclass = new Weightclass;
@@ -219,7 +219,7 @@ MD5::MD5(const Tournament& Tournament)
 			new_weightclass->MatchForThirdPlace = single_elimination->IsThirdPlaceMatch();
 			new_weightclass->MatchForFifthPlace = single_elimination->IsFifthPlaceMatch();
 		}
-		else
+		else*/
 			continue;
 
 		new_weightclass->ID = id++;

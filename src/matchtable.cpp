@@ -61,26 +61,29 @@ size_t MatchTable::FindMatchIndex(const UUID& UUID) const
 
 
 
-Judoka* MatchTable::FindParticipant(const UUID& UUID) const
+const Judoka* MatchTable::FindParticipant(const UUID& UUID) const
 {
 	if (!m_Filter)
 		return nullptr;
 
-	for (auto participant : m_Filter->GetParticipants())
-		if (participant && participant->GetUUID() == UUID)
-			return participant;
+	for (auto [pos, judoka] : m_Filter->GetParticipants())
+		if (judoka.GetJudoka() && *judoka.GetJudoka() == UUID)
+			return judoka.GetJudoka();
 
 	return nullptr;
 }
 
 
 
-const std::vector<Judoka*>& MatchTable::GetParticipants() const
+const std::vector<const Judoka*> MatchTable::GetParticipants() const
 {
-	if (m_Filter)
-		return m_Filter->GetParticipants();
+	std::vector<const Judoka*> ret;
 
-	const std::vector<Judoka*> ret;
+	if (m_Filter)
+		for (auto [pos, judoka] : m_Filter->GetParticipants())
+			if (judoka.GetJudoka())
+				ret.emplace_back(judoka.GetJudoka());
+
 	return ret;
 }
 
@@ -88,14 +91,7 @@ const std::vector<Judoka*>& MatchTable::GetParticipants() const
 
 bool MatchTable::IsIncluded(const Judoka& Fighter) const
 {
-	if (!m_Filter)
-		return false;
-
-	for (auto participant : m_Filter->GetParticipants())
-		if (participant && participant->GetUUID() == Fighter.GetUUID())
-			return true;
-
-	return false;
+	return FindParticipant(Fighter.GetUUID()) != nullptr;
 }
 
 
@@ -149,16 +145,9 @@ bool MatchTable::AddParticipant(const Judoka* NewParticipant, bool Force)
 	if (!NewParticipant || !m_Filter)
 		return false;
 
-	if (!Force)//Don't check if we are adding we are forcing the judoka in this match table
-		if (!m_Filter->IsElgiable(*NewParticipant))//Is the judoka allowed in this match table?
-			return false;
+	if (!m_Filter->AddParticipant(NewParticipant, Force))
+		return false;
 
-	//Is the judoka already a participant?
-	for (auto judoka : m_Filter->GetParticipants())
-		if (judoka && *judoka == *NewParticipant)
-			return false;
-
-	m_Filter->AddParticipant(NewParticipant, Force);
 	GenerateSchedule();
 	return true;
 }
@@ -179,6 +168,21 @@ bool MatchTable::RemoveParticipant(const Judoka* Participant)
 
 
 
+std::string MatchTable::GetDescription() const
+{
+	std::string desc = GetName();
+
+	if (desc.length() > 0)
+		return desc;
+
+	if (m_Filter)
+		desc = m_Filter->GetDescription();
+
+	return desc;
+}
+
+
+
 const std::vector<const Match*> MatchTable::FindMatches(const Judoka& Fighter1, const Judoka& Fighter2) const
 {
 	std::vector<const Match*> ret;
@@ -194,20 +198,6 @@ const std::vector<const Match*> MatchTable::FindMatches(const Judoka& Fighter1, 
 	}
 
 	return ret;
-}
-
-
-
-bool MatchTable::Contains(const Judoka* Judoka) const
-{
-	if (!Judoka || !m_Filter)
-		return false;
-
-	for (auto participant : m_Filter->GetParticipants())
-		if (participant && *participant == *Judoka)
-			return true;
-
-	return false;
 }
 
 
@@ -341,6 +331,14 @@ size_t MatchTable::GetStartingPosition(const Judoka* Judoka) const
 	if (m_Filter)
 		m_Filter->GetStartingPosition(Judoka);
 }
+
+
+
+/*const Judoka* MatchTable::GetJudokaByStartingPosition(size_t StartingPosition)
+{
+	if (m_Filter)
+		m_Filter->GetJudokaByStartingPosition(StartingPosition);
+}*/
 
 
 

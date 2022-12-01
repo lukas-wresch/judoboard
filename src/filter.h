@@ -14,7 +14,11 @@ namespace Judoboard
 			Weightclass, Custom
 		};
 
+		IFilter(const YAML::Node& Yaml, const ITournament* Tournament);
+
 		virtual Type GetType() const = 0;
+
+		virtual std::string GetDescription() const { return ""; }
 
 		virtual std::string GetHTMLForm() const = 0;
 
@@ -23,13 +27,11 @@ namespace Judoboard
 		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
 
-		virtual DependentJudoka GetFromPosition(size_t Position) = 0;
-
 		virtual void operator >> (YAML::Emitter& Yaml) const = 0;
 		virtual void ToString(YAML::Emitter& Yaml) const = 0;
 
-		virtual size_t GetStartingPosition(const Judoka* Judoka) const { return -1; }
-		virtual void   SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition) {}
+		virtual size_t GetStartingPosition(const Judoka* Judoka) const;
+		virtual void   SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition);
 
 		//Age groups
 		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
@@ -37,21 +39,35 @@ namespace Judoboard
 
 		auto& GetParticipants() const { return m_Participants; }
 
+
 	protected:
-		const DependentJudoka* GetParticipantByStartingPosition(size_t StartingPosition) const;
+		IFilter(const ITournament* Tournament) : m_Tournament(Tournament) {}
+
+		const DependentJudoka& GetJudokaByStartingPosition(size_t StartPosition) const {
+			auto result = m_Participants.find(StartPosition);
+			if (result == m_Participants.end())
+				return nullptr;
+			return result->second;
+		}
+
+		bool IsStartPositionTaken(size_t StartPosition) const {
+			return m_Participants.find(StartPosition) != m_Participants.end();
+		}
 
 		void SortParticipantsByStartingPosition() {
-			std::sort(m_Participants.begin(), m_Participants.end(), [this](const Judoka* a, const Judoka* b) {
-				return GetStartingPosition(a) < GetStartingPosition(b);
-			});
+			//std::sort(m_Participants.begin(), m_Participants.end(), [this](const size_t a, const size_t b) {
+				//return a < b;
+			//});
 		}
+
+		const ITournament* GetTournament() const { return m_Tournament; }
 
 
 	private:
-		//std::vector<DependentJudoka*> m_Participants;//List of all participants that are in the match table
-
-		std::unordered_map<size_t, const DependentJudoka*> m_Participants;//List of all participants that are in the match table
+		std::unordered_map<size_t, const DependentJudoka> m_Participants;//List of all participants that are in the match table
 
 		const AgeGroup* m_pAgeGroup = nullptr;//Age group for the matches (if available)
+
+		const ITournament* m_Tournament = nullptr;
 	};
 }

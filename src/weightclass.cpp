@@ -12,11 +12,10 @@ using namespace Judoboard;
 
 
 
-Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
+Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament) : IFilter(Tournament)
 {
 	m_MinWeight = MinWeight;
 	m_MaxWeight = MaxWeight;
-	m_Tournament = Tournament;
 }
 
 
@@ -29,10 +28,8 @@ Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, Gender Gender, cons
 
 
 
-Weightclass::Weightclass(const YAML::Node& Yaml, ITournament* Tournament)
+Weightclass::Weightclass(const YAML::Node& Yaml, const ITournament* Tournament) : IFilter(Tournament)
 {
-	m_Tournament = Tournament;
-
 	if (Yaml["min_weight"])
 		m_MinWeight = Weight(Yaml["min_weight"]);
 	if (Yaml["max_weight"])
@@ -43,10 +40,8 @@ Weightclass::Weightclass(const YAML::Node& Yaml, ITournament* Tournament)
 
 
 
-Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament)
+Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament) : IFilter(Tournament)
 {
-	m_Tournament = Tournament;
-
 	if (Weightclass.WeightLargerThan > 0)
 		m_MinWeight = Weightclass.WeightLargerThan  * 1000 + Weightclass.WeightInGrammsLargerThan;
 	if (Weightclass.WeightSmallerThan > 0)
@@ -81,7 +76,7 @@ void Weightclass::ToString(YAML::Emitter& Yaml) const
 
 std::string Weightclass::GetDescription() const
 {
-	std::string desc = GetName();
+	/*std::string desc = GetName();
 
 	if (desc.length() > 0)
 	{
@@ -90,7 +85,9 @@ std::string Weightclass::GetDescription() const
 		else if (GetAgeGroup())
 			return GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender) + " " + desc;
 		return desc;
-	}
+	}*/
+
+	std::string desc;
 
 	if (GetAgeGroup())
 	{
@@ -118,7 +115,7 @@ std::string Weightclass::GetDescription() const
 
 
 
-std::string Weightclass::GetHTMLForm()
+std::string Weightclass::GetHTMLForm() const
 {
 	std::string ret = R"(
 <div>

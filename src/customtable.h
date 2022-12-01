@@ -22,7 +22,7 @@ namespace Judoboard
 
 		virtual std::vector<Result> CalculateResults() const override;
 
-		virtual bool IsElgiable(const Judoka& Fighter) const override { return false; }//Don't add judoka automatically
+		//virtual bool IsElgiable(const Judoka& Fighter) const override { return false; }//Don't add judoka automatically
 		virtual void GenerateSchedule() override {}
 
 		//Serialization

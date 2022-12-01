@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <random>
 #include "round_robin.h"
+#include "weightclass.h"
 #include "tournament.h"
 #include "localizer.h"
 #include "match.h"
@@ -22,33 +23,14 @@ RoundRobin::RoundRobin(IFilter* Filter, const ITournament* Tournament)
 RoundRobin::RoundRobin(const YAML::Node& Yaml, ITournament* Tournament)
 	: MatchTable(Yaml, Tournament)
 {
-	if (Yaml["best_of_three"])
-		m_BestOfThree = Yaml["best_of_three"].as<bool>();
 }
 
 
 
 RoundRobin::RoundRobin(const MD5::Weightclass& Weightclass, const ITournament* Tournament)
-	: MatchTable(Tournament)
+	: MatchTable(new Weightclass(Weightclass, Tournament), Tournament)
 {
 	SetName(Weightclass.Description);
-}
-
-
-
-void RoundRobin::operator >> (YAML::Emitter& Yaml) const
-{
-	MatchTable::operator >>(Yaml);
-
-	if (m_BestOfThree)
-		Yaml << YAML::Key << "best_of_three" << YAML::Value << m_BestOfThree;
-}
-
-
-
-void RoundRobin::ToString(YAML::Emitter& Yaml) const
-{
-	MatchTable::ToString(Yaml);
 }
 
 

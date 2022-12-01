@@ -3,6 +3,7 @@
 #include "database.h"
 #include "tournament.h"
 #include "weightclass.h"
+#include "round_robin.h"
 #include "standing_data.h"
 #include "../ZED/include/log.h"
 
@@ -138,7 +139,7 @@ int main(int argc, char** argv)
 		Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, false, false);
 		Judoboard::AgeGroup age_group("U18", 15, 18, &rules, app.GetDatabase());
 		match.SetRuleSet(&rules);
-		Judoboard::Weightclass* table = new Judoboard::Weightclass(10, 100);
+		Judoboard::RoundRobin* table = new Judoboard::RoundRobin(new Judoboard::Weightclass(10, 100));
 		table->SetAgeGroup(&age_group);
 		match.SetMatchTable(table);
 
@@ -204,7 +205,7 @@ int main(int argc, char** argv)
 		auto rule_set  = Judoboard::RuleSet("Demo", 180, 60, 20, 10);
 		auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set, app.GetDatabase());
 
-		auto m1 = new Judoboard::Weightclass(0, 120);
+		auto m1 = new Judoboard::RoundRobin(new Judoboard::Weightclass(0, 120));
 		m1->SetMatID(1);
 		m1->SetAgeGroup(&age_group);
 		tourney->AddMatchTable(m1);

@@ -205,7 +205,6 @@ namespace Judoboard
 
 		virtual Status GetStatus() const;
 
-		virtual std::string GetDescription() const = 0;
 		virtual std::vector<Result> CalculateResults() const = 0;
 
 		virtual bool AddMatch(Match* NewMatch);//Add a match manually to the match table. Use only for manual cases
@@ -213,7 +212,6 @@ namespace Judoboard
 		virtual const std::vector<Match*> GetSchedule() const { return m_Schedule; }
 		virtual uint32_t GetRecommendedNumMatchesBeforeBreak() const { return m_RecommendedNumMatches_Before_Break; }
 
-		virtual bool IsElgiable(const Judoka& Fighter) const = 0;
 		virtual void GenerateSchedule() = 0;
 		virtual const std::string ToHTML() const = 0;
 
@@ -227,9 +225,9 @@ namespace Judoboard
 		//Basics
 		const Match* GetMatch(size_t Index) const { if (Index >= m_Schedule.size()) return nullptr; return m_Schedule[Index]; }
 
-		const std::vector<const Match*> FindMatches(const Judoka& Fighter1, const Judoka& Fighter2) const;//Returns all matches where Fighter1 and Fighter2 fight against each other
+		virtual std::string GetDescription() const;
 
-		bool Contains(const Judoka* Judoka) const;
+		const std::vector<const Match*> FindMatches(const Judoka& Fighter1, const Judoka& Fighter2) const;//Returns all matches where Fighter1 and Fighter2 fight against each other
 
 		bool IsIncluded(const Judoka& Fighter) const;
 		size_t GetNumberOfMatches() const { return m_Schedule.size(); }
@@ -244,9 +242,9 @@ namespace Judoboard
 
 		Match*  FindMatch(const UUID& UUID) const;
 		size_t  FindMatchIndex(const UUID& UUID) const;
-		Judoka* FindParticipant(const UUID& UUID) const;
+		const Judoka* FindParticipant(const UUID& UUID) const;
 
-		const std::vector<Judoka*>& GetParticipants() const;
+		const std::vector<const Judoka*> GetParticipants() const;
 
 		//Rule sets
 		const RuleSet& GetRuleSet() const;
@@ -267,7 +265,7 @@ namespace Judoboard
 		virtual void SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition);
 
 		//Best of three
-		bool IsBestOfThree() { return m_BestOfThree; }
+		bool IsBestOfThree() const { return m_BestOfThree; }
 		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; GenerateSchedule(); }
 
 		//Serialization
