@@ -2216,7 +2216,7 @@ TEST(MD5, ExportCompletedTournament)
 	tour.Save();
 	file.Save("demo-file.md5");
 
-	MD5 file_cmp("demo-file-fixed.md5");
+	//MD5 file_cmp("demo-file-fixed.md5");
 
 	ASSERT_TRUE(file.GetOrganizer());
 	auto organizer = file.GetOrganizer();
@@ -2439,7 +2439,7 @@ TEST(MD5, ExportSingleElimination)
 
 	for (int i = 1; i <= 16; ++i)
 	{
-		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i, Judoboard::Gender::Male);
 		j[i]->SetBirthyear(2000);
 		j[i]->SetClub(clubs[rand()%3]);
 		t->AddParticipant(j[i]);
