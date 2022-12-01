@@ -22,7 +22,7 @@ namespace Judoboard
 		//virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false) override;
 		//virtual bool RemoveParticipant(const Judoka* Participant) override;
 
-		virtual std::vector<Result> CalculateResults() const override;
+		virtual Results CalculateResults() const override;
 		virtual void GenerateSchedule() override;
 
 		bool IsThirdPlaceMatch() const { return m_ThirdPlaceMatch; }

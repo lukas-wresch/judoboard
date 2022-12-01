@@ -44,7 +44,7 @@ bool IFilter::AddParticipant(const Judoka* NewParticipant, bool Force)
 		}
 	}
 
-	SortParticipantsByStartingPosition();
+	SortParticipantsByStartPosition();
 	return true;
 }
 
@@ -55,7 +55,7 @@ bool IFilter::RemoveParticipant(const Judoka* Participant)
 	if (!Participant)
 		return false;
 
-	auto pos = GetStartingPosition(Participant);
+	auto pos = GetStartPosition(Participant);
 	if (pos != SIZE_MAX)
 	{
 		m_Participants.erase(pos);
@@ -67,7 +67,7 @@ bool IFilter::RemoveParticipant(const Judoka* Participant)
 
 
 
-size_t IFilter::GetStartingPosition(const Judoka* Judoka) const
+size_t IFilter::GetStartPosition(const Judoka* Judoka) const
 {
 	if (!Judoka)
 		return SIZE_MAX;
@@ -83,29 +83,32 @@ size_t IFilter::GetStartingPosition(const Judoka* Judoka) const
 
 
 
-void IFilter::SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition)
+void IFilter::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
 {
 	if (!Judoka)
 		return;
 
-	auto my_old_pos = GetStartingPosition(Judoka);
+	auto my_old_pos = GetStartPosition(Judoka);
 	m_Participants.erase(my_old_pos);
 
-	if (IsStartPositionTaken(NewStartingPosition))
+	if (IsStartPositionTaken(NewStartPosition))
 	{
-		auto judoka_on_slot = GetJudokaByStartingPosition(NewStartingPosition);
+		auto judoka_on_slot = GetJudokaByStartPosition(NewStartPosition);
+
+		assert(judoka_on_slot);
 
 		m_Participants.erase(my_old_pos);
-		m_Participants.erase(NewStartingPosition);
-		m_Participants.insert({ my_old_pos, judoka_on_slot });
-		m_Participants.insert({ NewStartingPosition, Judoka });
+		m_Participants.erase(NewStartPosition);
+		if (judoka_on_slot)
+			m_Participants.insert({ my_old_pos, *judoka_on_slot });
+		m_Participants.insert({ NewStartPosition, Judoka });
 	}
 
 	else
 	{
-		m_Participants.erase(GetStartingPosition(Judoka));
-		m_Participants.insert({ NewStartingPosition, Judoka });
+		m_Participants.erase(GetStartPosition(Judoka));
+		m_Participants.insert({ NewStartPosition, Judoka });
 	}
 
-	SortParticipantsByStartingPosition();
+	SortParticipantsByStartPosition();
 }

@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include "judoboard.h"
+#include "match.h"
+#include "judoka.h"
 
 
 
@@ -191,6 +193,52 @@ namespace Judoboard
 		};
 
 
+
+		class Results
+		{
+		public:
+			Results(const MatchTable& Table) : m_Results(Table.GetParticipants().size()) {
+				size_t i = 0;
+
+				for (auto judoka : Table.GetParticipants())
+				{
+					m_Results[i].Set(judoka, &Table);
+					++i;
+				}
+			}
+
+			Results(size_t Count) : m_Results(Count) {
+				for (size_t i = 0; i < Count; ++i)
+					m_Results[i].Set(nullptr, nullptr);
+			}
+
+
+			Result* GetResultsOf(const Judoka* Judoka) {
+				for (size_t i = 0; i < m_Results.size(); ++i)
+					if (m_Results[i].Judoka && *m_Results[i].Judoka == *Judoka)
+						return &m_Results[i];
+				return nullptr;
+			}
+
+			void Sort() const
+			{
+				std::sort(m_Results.begin(), m_Results.end());
+			}
+
+			size_t GetSize() const { return m_Results.size(); }
+
+			Result& operator [] (size_t Index) {
+				assert(Index < m_Results.size());
+				if (Index < m_Results.size())
+					return m_Results[Index];
+				return m_Results[0];
+			}
+
+		private:
+			mutable std::vector<Result> m_Results;
+		};
+
+
 		MatchTable() = delete;
 		MatchTable(MatchTable&) = delete;
 		MatchTable(const MatchTable&) = delete;
@@ -205,14 +253,13 @@ namespace Judoboard
 
 		virtual Status GetStatus() const;
 
-		virtual std::vector<Result> CalculateResults() const = 0;
+		virtual Results CalculateResults() const = 0;
 
 		virtual bool AddMatch(Match* NewMatch);//Add a match manually to the match table. Use only for manual cases
 
 		virtual const std::vector<Match*> GetSchedule() const { return m_Schedule; }
 		virtual uint32_t GetRecommendedNumMatchesBeforeBreak() const { return m_RecommendedNumMatches_Before_Break; }
 
-		virtual void GenerateSchedule() = 0;
 		virtual const std::string ToHTML() const = 0;
 
 		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
@@ -244,6 +291,8 @@ namespace Judoboard
 		size_t  FindMatchIndex(const UUID& UUID) const;
 		const Judoka* FindParticipant(const UUID& UUID) const;
 
+		bool IsElgiable(const Judoka& Fighter) const;
+
 		const std::vector<const Judoka*> GetParticipants() const;
 
 		//Rule sets
@@ -259,10 +308,11 @@ namespace Judoboard
 		int32_t GetScheduleIndex() const { return m_ScheduleIndex; }
 		void SetScheduleIndex(int32_t ScheduleIndex) { m_ScheduleIndex = ScheduleIndex; }
 
-		//Starting positions
-		virtual size_t GetStartingPosition(const Judoka* Judoka) const;
-		virtual const Judoka* GetJudokaByStartingPosition(size_t StartingPosition);
-		virtual void SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition);
+		//Start positions
+		virtual size_t GetStartPosition(const Judoka* Judoka) const;
+		virtual const Judoka* GetJudokaByStartPosition(size_t StartPosition) const;
+		virtual void SetStartPosition(const Judoka* Judoka, size_t NewStartPosition);
+		virtual size_t GetMaxStartPositions() const;
 
 		//Best of three
 		bool IsBestOfThree() const { return m_BestOfThree; }
@@ -276,9 +326,11 @@ namespace Judoboard
 		MatchTable(IFilter* Filter, const ITournament* Tournament) : m_Filter(Filter), m_Tournament(Tournament) {}
 		MatchTable(const YAML::Node& Yaml, const ITournament* Tournament);
 
+		virtual void GenerateSchedule() = 0;
+
 		std::string GetHTMLForm() const;
 
-		Match* AddAutoMatch(size_t WhiteStartingPosition, size_t BlueStartingPosition);
+		Match* AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosition);
 		Match* CreateAutoMatch(const Judoka* White, const Judoka* Blue);
 		Match* AddMatchForWinners(Match* Match1, Match* Match2);
 
@@ -288,9 +340,10 @@ namespace Judoboard
 
 		void DeleteSchedule() { m_Schedule.clear(); }
 
-		IFilter* GetFilter() const { return m_Filter; }
+		const IFilter* GetFilter() const { return m_Filter; }
+		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
 
-		virtual const std::string ResultsToHTML() const;
+		const std::string ResultsToHTML() const;
 
 
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called

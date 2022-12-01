@@ -47,7 +47,7 @@ TEST(SingleElimination, ExportImport)
 
 
 
-TEST(SingleElimination, ExportImport_StartingPositions)
+TEST(SingleElimination, ExportImport_StartPositions)
 {
 	initialize();
 
@@ -75,11 +75,11 @@ TEST(SingleElimination, ExportImport_StartingPositions)
 		t->AddParticipant(j5);
 
 
-		group.SetStartingPosition(j1, rand() % 8);
-		group.SetStartingPosition(j2, rand() % 8);
-		group.SetStartingPosition(j3, rand() % 8);
-		group.SetStartingPosition(j4, rand() % 8);
-		group.SetStartingPosition(j5, rand() % 8);
+		group.SetStartPosition(j1, rand() % 8);
+		group.SetStartPosition(j2, rand() % 8);
+		group.SetStartPosition(j3, rand() % 8);
+		group.SetStartPosition(j4, rand() % 8);
+		group.SetStartPosition(j5, rand() % 8);
 
 		ASSERT_EQ(group.GetParticipants().size(), 5);
 
@@ -92,11 +92,11 @@ TEST(SingleElimination, ExportImport_StartingPositions)
 
 			SingleElimination group2(YAML::Load(yaml.c_str()), t);
 
-			EXPECT_EQ(group2.GetStartingPosition(j1), group.GetStartingPosition(j1));
-			EXPECT_EQ(group2.GetStartingPosition(j2), group.GetStartingPosition(j2));
-			EXPECT_EQ(group2.GetStartingPosition(j3), group.GetStartingPosition(j3));
-			EXPECT_EQ(group2.GetStartingPosition(j4), group.GetStartingPosition(j4));
-			EXPECT_EQ(group2.GetStartingPosition(j5), group.GetStartingPosition(j5));
+			EXPECT_EQ(group2.GetStartPosition(j1), group.GetStartPosition(j1));
+			EXPECT_EQ(group2.GetStartPosition(j2), group.GetStartPosition(j2));
+			EXPECT_EQ(group2.GetStartPosition(j3), group.GetStartPosition(j3));
+			EXPECT_EQ(group2.GetStartPosition(j4), group.GetStartPosition(j4));
+			EXPECT_EQ(group2.GetStartPosition(j5), group.GetStartPosition(j5));
 		}
 	}
 }

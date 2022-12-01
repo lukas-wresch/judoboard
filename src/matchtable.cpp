@@ -75,6 +75,15 @@ const Judoka* MatchTable::FindParticipant(const UUID& UUID) const
 
 
 
+bool MatchTable::IsElgiable(const Judoka& Fighter) const
+{
+	if (m_Filter)
+		return m_Filter->IsElgiable(Fighter);
+	return false;
+}
+
+
+
 const std::vector<const Judoka*> MatchTable::GetParticipants() const
 {
 	std::vector<const Judoka*> ret;
@@ -326,26 +335,37 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament) : 
 
 
 
-size_t MatchTable::GetStartingPosition(const Judoka* Judoka) const
+size_t MatchTable::GetStartPosition(const Judoka* Judoka) const
 {
 	if (m_Filter)
-		m_Filter->GetStartingPosition(Judoka);
+		return m_Filter->GetStartPosition(Judoka);
+	return SIZE_MAX;
 }
 
 
 
-/*const Judoka* MatchTable::GetJudokaByStartingPosition(size_t StartingPosition)
+const Judoka* MatchTable::GetJudokaByStartPosition(size_t StartPosition) const
 {
 	if (m_Filter)
-		m_Filter->GetJudokaByStartingPosition(StartingPosition);
-}*/
+		return m_Filter->GetJudokaByStartPosition(StartPosition)->GetJudoka();
+	return nullptr;
+}
 
 
 
-void MatchTable::SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition)
+void MatchTable::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
 {
 	if (m_Filter)
-		m_Filter->SetStartingPosition(Judoka, NewStartingPosition);
+		m_Filter->SetStartPosition(Judoka, NewStartPosition);
+}
+
+
+
+size_t MatchTable::GetMaxStartPositions() const
+{
+	if (m_Filter)
+		return m_Filter->GetMaxStartPositions();
+	return SIZE_MAX;
 }
 
 
@@ -354,6 +374,7 @@ const AgeGroup* MatchTable::GetAgeGroup() const
 {
 	if (m_Filter)
 		return m_Filter->GetAgeGroup();
+	return nullptr;
 }
 
 
@@ -361,7 +382,7 @@ const AgeGroup* MatchTable::GetAgeGroup() const
 void MatchTable::SetAgeGroup(const AgeGroup* NewAgeGroup)
 {
 	if (m_Filter)
-		return m_Filter->SetAgeGroup(NewAgeGroup);
+		m_Filter->SetAgeGroup(NewAgeGroup);
 }
 
 
@@ -427,8 +448,8 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "firstname" << YAML::Value << judoka->GetFirstname();
 		Yaml << YAML::Key << "lastname"  << YAML::Value << judoka->GetLastname();
 		Yaml << YAML::Key << "weight"    << YAML::Value << judoka->GetWeight().ToString();
-		if (GetStartingPosition(judoka) != -1)
-			Yaml << YAML::Key << "starting_pos" << YAML::Value << GetStartingPosition(judoka);
+		if (GetStartPosition(judoka) != -1)
+			Yaml << YAML::Key << "starting_pos" << YAML::Value << GetStartPosition(judoka);
 		Yaml << YAML::EndMap;
 	}
 
@@ -456,15 +477,15 @@ std::string MatchTable::GetHTMLForm() const
 
 
 
-Match* MatchTable::AddAutoMatch(size_t WhiteStartingPosition, size_t BlueStartingPosition)
+Match* MatchTable::AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosition)
 {
-	if (!GetJudokaByStartingPosition(WhiteStartingPosition) || !GetJudokaByStartingPosition(BlueStartingPosition))
+	if (!GetJudokaByStartPosition(WhiteStartPosition) || !GetJudokaByStartPosition(BlueStartPosition))
 	{
 		ZED::Log::Error("Illegal participant index");
 		return nullptr;
 	}
 
-	return CreateAutoMatch(GetJudokaByStartingPosition(WhiteStartingPosition), GetJudokaByStartingPosition(BlueStartingPosition));
+	return CreateAutoMatch(GetJudokaByStartPosition(WhiteStartPosition), GetJudokaByStartPosition(BlueStartPosition));
 }
 
 
@@ -548,7 +569,7 @@ const std::string MatchTable::ResultsToHTML() const
 
 	std::string ret;
 
-	if (results.size() == 0)
+	if (results.GetSize() == 0)
 		return ret;
 
 	ret += "</table><br/><br/><table border=\"1\" rules=\"all\">";
@@ -556,7 +577,7 @@ const std::string MatchTable::ResultsToHTML() const
 		+ "</th><th style=\"width: 1.0cm;\">" + Localizer::Translate("Wins") + "</th><th style=\"width: 1.0cm;\">"
 		+ Localizer::Translate("Score") + "</th><th style=\"width: 1.3cm;\">" + Localizer::Translate("Time") + "</th></tr>";
 
-	for (size_t i = 0; i < results.size(); i++)
+	for (size_t i = 0; i < results.GetSize(); i++)
 	{
 		const auto& score = results[i];
 

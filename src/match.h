@@ -1,6 +1,6 @@
 #pragma once
 #include "matchlog.h"
-#include "matchtable.h"
+#include "judoboard.h"
 
 
 
@@ -8,6 +8,7 @@ namespace Judoboard
 {
 	class ITournament;
 	class Tournament;
+	class MatchTable;
 	class RuleSet;
 	class Judoka;
 

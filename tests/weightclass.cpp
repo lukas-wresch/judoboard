@@ -151,7 +151,6 @@ TEST(Weightclass, CorrectOrder5)
 	EXPECT_TRUE(w.AddParticipant(&j4));
 	EXPECT_TRUE(w.AddParticipant(&j5));
 
-	w.GenerateSchedule();
 	ASSERT_EQ(w.GetSchedule().size(), 10);
 
 	EXPECT_EQ(w.GetSchedule()[0]->GetFighter(Fighter::White)->GetUUID(), j4.GetUUID());

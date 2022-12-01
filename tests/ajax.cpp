@@ -1128,7 +1128,7 @@ TEST(Ajax, MatchTable_Get)
 
 
 
-TEST(Ajax, MatchTable_StartingPositionsAfterUpdate)
+TEST(Ajax, MatchTable_StartPositionsAfterUpdate)
 {
 	initialize();
 
@@ -1168,26 +1168,26 @@ TEST(Ajax, MatchTable_StartingPositionsAfterUpdate)
 			size_t start_j4 = rand() % 8;
 			size_t start_j5 = rand() % 8;
 
-			group->SetStartingPosition(j1, start_j1);
-			group->SetStartingPosition(j2, start_j2);
-			group->SetStartingPosition(j3, start_j3);
-			group->SetStartingPosition(j4, start_j4);
-			group->SetStartingPosition(j5, start_j5);
+			group->SetStartPosition(j1, start_j1);
+			group->SetStartPosition(j2, start_j2);
+			group->SetStartPosition(j3, start_j3);
+			group->SetStartPosition(j4, start_j4);
+			group->SetStartPosition(j5, start_j5);
 
-			start_j1 = group->GetStartingPosition(j1);
-			start_j2 = group->GetStartingPosition(j2);
-			start_j3 = group->GetStartingPosition(j3);
-			start_j4 = group->GetStartingPosition(j4);
-			start_j5 = group->GetStartingPosition(j5);
+			start_j1 = group->GetStartPosition(j1);
+			start_j2 = group->GetStartPosition(j2);
+			start_j3 = group->GetStartPosition(j3);
+			start_j4 = group->GetStartPosition(j4);
+			start_j5 = group->GetStartPosition(j5);
 
 			EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)group->GetUUID(), "name=Test2&mat=5&minWeight=0,7&maxWeight=200.3&bo3=true")), "ok");
 
 
-			ASSERT_EQ(group->GetStartingPosition(j1), start_j1);
-			ASSERT_EQ(group->GetStartingPosition(j2), start_j2);
-			ASSERT_EQ(group->GetStartingPosition(j3), start_j3);
-			ASSERT_EQ(group->GetStartingPosition(j4), start_j4);
-			ASSERT_EQ(group->GetStartingPosition(j5), start_j5);
+			ASSERT_EQ(group->GetStartPosition(j1), start_j1);
+			ASSERT_EQ(group->GetStartPosition(j2), start_j2);
+			ASSERT_EQ(group->GetStartPosition(j3), start_j3);
+			ASSERT_EQ(group->GetStartPosition(j4), start_j4);
+			ASSERT_EQ(group->GetStartPosition(j5), start_j5);
 
 			app.CloseTournament();
 		}
@@ -1333,7 +1333,7 @@ TEST(Ajax, GetMatchesFromMatchTable)
 
 
 
-TEST(Ajax, SetStartingPosition)
+TEST(Ajax, SetStartPosition)
 {
 	initialize();
 
@@ -1353,17 +1353,17 @@ TEST(Ajax, SetStartingPosition)
 	for (int i = 0; i < 100; ++i)
 	{
 		int startpos = rand() % 4;
-		EXPECT_EQ((std::string)app.Ajax_SetStartingPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j1->GetUUID() + "&startpos=" + std::to_string(startpos) )), "ok");
+		EXPECT_EQ((std::string)app.Ajax_SetStartPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j1->GetUUID() + "&startpos=" + std::to_string(startpos) )), "ok");
 
-		EXPECT_EQ(table->GetStartingPosition(j1), startpos);
+		EXPECT_EQ(table->GetStartPosition(j1), startpos);
 	}
 
 	for (int i = 0; i < 100; ++i)
 	{
 		int startpos = rand() % 4;
-		EXPECT_EQ((std::string)app.Ajax_SetStartingPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j2->GetUUID() + "&startpos=" + std::to_string(startpos) )), "ok");
+		EXPECT_EQ((std::string)app.Ajax_SetStartPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j2->GetUUID() + "&startpos=" + std::to_string(startpos) )), "ok");
 
-		EXPECT_EQ(table->GetStartingPosition(j2), startpos);
+		EXPECT_EQ(table->GetStartPosition(j2), startpos);
 	}
 }
 

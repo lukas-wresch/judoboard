@@ -6,6 +6,9 @@
 
 namespace Judoboard
 {
+	class AgeGroup;
+
+
 	class IFilter : public ID
 	{
 	public:
@@ -30,31 +33,34 @@ namespace Judoboard
 		virtual void operator >> (YAML::Emitter& Yaml) const = 0;
 		virtual void ToString(YAML::Emitter& Yaml) const = 0;
 
-		virtual size_t GetStartingPosition(const Judoka* Judoka) const;
-		virtual void   SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition);
+		virtual size_t GetMaxStartPositions() const { return m_Participants.size(); }
 
 		//Age groups
 		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
 		void SetAgeGroup(const AgeGroup* NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
 
+		//Participants + Start Positions
 		auto& GetParticipants() const { return m_Participants; }
 
+		virtual size_t GetStartPosition(const Judoka* Judoka) const;
+		virtual void   SetStartPosition(const Judoka* Judoka, size_t NewStartPosition);
 
-	protected:
-		IFilter(const ITournament* Tournament) : m_Tournament(Tournament) {}
-
-		const DependentJudoka& GetJudokaByStartingPosition(size_t StartPosition) const {
+		const DependentJudoka* GetJudokaByStartPosition(size_t StartPosition) const {
 			auto result = m_Participants.find(StartPosition);
 			if (result == m_Participants.end())
 				return nullptr;
-			return result->second;
+			return &result->second;
 		}
 
 		bool IsStartPositionTaken(size_t StartPosition) const {
 			return m_Participants.find(StartPosition) != m_Participants.end();
 		}
 
-		void SortParticipantsByStartingPosition() {
+
+	protected:
+		IFilter(const ITournament* Tournament) : m_Tournament(Tournament) {}
+
+		void SortParticipantsByStartPosition() {
 			//std::sort(m_Participants.begin(), m_Participants.end(), [this](const size_t a, const size_t b) {
 				//return a < b;
 			//});

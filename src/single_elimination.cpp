@@ -39,11 +39,11 @@ void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 	if (m_FifthPlaceMatch)
 		Yaml << YAML::Key << "fifth_place_match" << YAML::Value << m_FifthPlaceMatch;
 
-	/*if (!m_StartingPositions.empty())
+	/*if (!m_StartPositions.empty())
 	{
 		Yaml << YAML::Key << "starting_positions" << YAML::Value;
 		Yaml << YAML::BeginMap;
-		for (const auto [starting_pos, judoka] : m_StartingPositions)
+		for (const auto [starting_pos, judoka] : m_StartPositions)
 			Yaml << YAML::Key << starting_pos << YAML::Value << (std::string)judoka->GetUUID();
 		Yaml << YAML::EndMap;
 	}*/
@@ -120,8 +120,8 @@ void SingleElimination::GenerateSchedule()
 
 	for (size_t i = 0; i < max_start_pos; i += 2)
 	{
-		auto new_match = CreateAutoMatch(GetJudokaByStartingPosition(i),
-			                             GetJudokaByStartingPosition(i+1));
+		auto new_match = CreateAutoMatch(GetJudokaByStartPosition(i),
+			                             GetJudokaByStartPosition(i+1));
 		nextRound.emplace_back(new_match);
 	}
 
@@ -204,16 +204,16 @@ void SingleElimination::GenerateSchedule()
 
 
 
-std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
+MatchTable::Results SingleElimination::CalculateResults() const
 {
-	std::vector<Result> ret;
+	Results ret(6);
 
 	if (GetParticipants().size() == 0)
 		return ret;
 
 	if (GetParticipants().size() == 1)
 	{
-		ret.emplace_back(GetParticipants()[0], this);
+		ret[0].Set(GetParticipants()[0], this);
 		return ret;
 	}
 
@@ -225,8 +225,8 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 
 	if (lastMatch->HasConcluded())
 	{
-		ret.emplace_back(lastMatch->GetWinner(), this);
-		ret.emplace_back(lastMatch->GetLoser(),  this);
+		ret[0].Set(lastMatch->GetWinner(), this);
+		ret[1].Set(lastMatch->GetLoser(),  this);
 	}
 	else
 		return ret;
@@ -234,8 +234,8 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 	if (IsThirdPlaceMatch())
 	{
 		const Match* third_place_match = m_Schedule[m_Schedule.size() - 2];
-		ret.emplace_back(third_place_match->GetWinner(), this);
-		ret.emplace_back(third_place_match->GetLoser(),  this);
+		ret[2].Set(third_place_match->GetWinner(), this);
+		ret[3].Set(third_place_match->GetLoser(),  this);
 	}
 
 	if (IsThirdPlaceMatch() && IsFifthPlaceMatch())
@@ -247,8 +247,8 @@ std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 		int offset = 5;
 
 		const Match* fifth_place_match = m_Schedule[m_Schedule.size() - offset];
-		ret.emplace_back(fifth_place_match->GetWinner(), this);
-		ret.emplace_back(fifth_place_match->GetLoser(),  this);
+		ret[4].Set(fifth_place_match->GetWinner(), this);
+		ret[5].Set(fifth_place_match->GetLoser(),  this);
 	}
 
 	return ret;

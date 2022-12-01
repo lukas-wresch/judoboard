@@ -1531,7 +1531,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		return Ajax_SetStartingPosition(Request);
+		return Ajax_SetStartPosition(Request);
 	});
 
 
@@ -3117,7 +3117,7 @@ std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request
 
 
 
-Error Application::Ajax_SetStartingPosition(const HttpServer::Request& Request)
+Error Application::Ajax_SetStartPosition(const HttpServer::Request& Request)
 {
 	UUID id        = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 	UUID judoka_id = HttpServer::DecodeURLEncoded(Request.m_Query, "judoka");
@@ -3144,7 +3144,7 @@ Error Application::Ajax_SetStartingPosition(const HttpServer::Request& Request)
 	if (!judoka)
 		return Error::Type::ItemNotFound;
 
-	table->SetStartingPosition(judoka, startpos);
+	table->SetStartPosition(judoka, startpos);
 	GetTournament()->GenerateSchedule();
 
 	return Error::Type::NoError;//OK

@@ -20,6 +20,13 @@ RoundRobin::RoundRobin(IFilter* Filter, const ITournament* Tournament)
 
 
 
+RoundRobin::RoundRobin(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
+	: MatchTable(new Weightclass(MinWeight, MaxWeight, Gender, Tournament), Tournament)
+{
+}
+
+
+
 RoundRobin::RoundRobin(const YAML::Node& Yaml, ITournament* Tournament)
 	: MatchTable(Yaml, Tournament)
 {
@@ -27,10 +34,10 @@ RoundRobin::RoundRobin(const YAML::Node& Yaml, ITournament* Tournament)
 
 
 
-RoundRobin::RoundRobin(const MD5::Weightclass& Weightclass, const ITournament* Tournament)
-	: MatchTable(new Weightclass(Weightclass, Tournament), Tournament)
+RoundRobin::RoundRobin(const MD5::Weightclass& Weightclass_, const ITournament* Tournament)
+	: MatchTable(new Weightclass(Weightclass_, Tournament), Tournament)
 {
-	SetName(Weightclass.Description);
+	SetName(Weightclass_.Description);
 }
 
 
@@ -144,44 +151,34 @@ void RoundRobin::GenerateSchedule()
 	//Add additional matches for best of three
 	if (IsBestOfThree())
 		AddMatchesForBestOfThree();
-
-
-	//for (auto match : m_Schedule)
-		//match->SetMatchTable(this);
 }
 
 
 
-std::vector<MatchTable::Result> RoundRobin::CalculateResults() const
+MatchTable::Results RoundRobin::CalculateResults() const
 {
-	std::vector<Result> ret(GetParticipants().size());
+	MatchTable::Results results(*this);
 
-	for (size_t i = 0; i < GetParticipants().size(); i++)
-	{
-		auto fighter = GetParticipant(i);
-		ret[i].Set(fighter, this);		
-	}
-
-	for (const Match* match : m_Schedule)
+	for (auto match : GetSchedule())
 	{
 		if (!match->HasConcluded())
 			continue;
 
 		const auto& result = match->GetResult();
 
-		auto i = GetIndexOfParticipant(match->GetWinner());
-		auto j = GetIndexOfParticipant(match->GetLoser());
+		auto winner = results.GetResultsOf(match->GetWinner());
+		auto loser  = results.GetResultsOf(match->GetLoser());
 
-		ret[i].Wins++;
-		ret[i].Score += (uint32_t)result.m_Score;
+		winner->Wins++;
+		winner->Score += (uint32_t)result.m_Score;
+		winner->Time  += result.m_Time;
 
-		ret[i].Time += result.m_Time;
-		ret[j].Time += result.m_Time;
+		loser->Time += result.m_Time;
 	}
 
-	std::sort(ret.begin(), ret.end());
+	results.Sort();
 
-	return ret;
+	return results;
 }
 
 
@@ -205,9 +202,9 @@ const std::string RoundRobin::ToHTML() const
 
 	auto results = CalculateResults();
 
-	for (size_t i = 0; i < GetParticipants().size();i++)
+	for (size_t i = 0; i < GetMaxStartPositions(); ++i)
 	{
-		auto fighter = GetParticipant(i);
+		auto fighter = GetJudokaByStartPosition(i);
 
 		if (!fighter)
 			continue;
@@ -216,9 +213,9 @@ const std::string RoundRobin::ToHTML() const
 		ret += "<td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
 		ret += "<td>" + fighter->GetName(NameStyle::GivenName) + "<br/>(" + fighter->GetWeight().ToString() + " kg)</td>";
 
-		for (size_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
+		for (size_t j = 0; j < GetMaxStartPositions(); ++j)
 		{
-			auto enemy = GetParticipant(j);
+			auto enemy = GetJudokaByStartPosition(j);
 			if (!enemy)
 				continue;
 
@@ -245,11 +242,9 @@ const std::string RoundRobin::ToHTML() const
 			}
 		}
 
-		for (const auto& result : results)
-		{
-			if (result.Judoka && result.Judoka->GetUUID() == fighter->GetUUID())
-				ret += "<td style=\"text-align: center;\">" + std::to_string(result.Wins) + " : " + std::to_string(result.Score) + "<br/>(" + Timer::TimestampToString(result.Time) + ")</td>";
-		}
+		const auto result = results.GetResultsOf(fighter);
+		if (result)
+			ret += "<td style=\"text-align: center;\">" + std::to_string(result->Wins) + " : " + std::to_string(result->Score) + "<br/>(" + Timer::TimestampToString(result->Time) + ")</td>";
 
 		ret += "</tr>";
 	}
