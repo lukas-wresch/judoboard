@@ -12,35 +12,9 @@ using namespace Judoboard;
 
 
 
-/*CustomTable::CustomTable(const ITournament* Tournament) : MatchTable(Tournament)
+CustomTable::CustomTable(const ITournament* Tournament) : RoundRobin(nullptr, Tournament)
 {
-	SetName(Localizer::Translate("Friendly"));
-}
-
-
-
-Status CustomTable::GetStatus() const
-{
-	if (m_Schedule.size() == 0)
-		return Status::Scheduled;
-
-	bool one_match_finished = false;
-	bool all_matches_finished = true;
-
-	for (auto match : m_Schedule)
-	{
-		if (!match->HasConcluded())
-			all_matches_finished = false;
-
-		if (match->IsRunning() || match->HasConcluded())
-			one_match_finished = true;
-	}
-
-	if (all_matches_finished)
-		return Status::Concluded;
-	if (one_match_finished)
-		return Status::Running;
-	return Status::Scheduled;
+	SetName(Localizer::Translate("Custom"));
 }
 
 
@@ -48,55 +22,6 @@ Status CustomTable::GetStatus() const
 std::string CustomTable::GetHTMLForm()
 {
 	std::string ret = R"()";
-
-	return ret;
-}
-
-
-
-std::vector<MatchTable::Result> CustomTable::CalculateResults() const
-{
-	std::vector<Result> ret(GetParticipants().size());
-
-	for (size_t i = 0; i < GetParticipants().size(); i++)
-	{
-		auto fighter = GetParticipant(i);
-
-		if (!fighter)
-			continue;
-
-		ret[i].Set(fighter, this);
-
-		for (size_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
-		{
-			auto enemy = GetParticipant(j);
-			if (!enemy)
-				continue;
-
-			if (fighter->GetUUID() == enemy->GetUUID())
-				continue;
-
-			auto matches = FindMatches(*fighter, *enemy);//Find all matches of these two
-
-			if (!matches.empty())
-			{
-				if (!matches[0]->HasConcluded())
-					continue;
-
-				const auto& result = matches[0]->GetResult();
-
-				if (matches[0]->GetWinner()->GetUUID() == fighter->GetUUID())
-				{
-					ret[i].Wins++;
-					ret[i].Score += (uint32_t)result.m_Score;
-				}
-
-				ret[i].Time += result.m_Time;
-			}
-		}
-	}
-
-	std::sort(ret.begin(), ret.end());
 
 	return ret;
 }
@@ -177,4 +102,4 @@ const std::string CustomTable::ToHTML() const
 
 void CustomTable::ToString(YAML::Emitter& Yaml) const
 {
-}*/
+}

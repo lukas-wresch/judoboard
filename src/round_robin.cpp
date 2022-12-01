@@ -27,7 +27,7 @@ RoundRobin::RoundRobin(Weight MinWeight, Weight MaxWeight, Gender Gender, const 
 
 
 
-RoundRobin::RoundRobin(const YAML::Node& Yaml, ITournament* Tournament)
+RoundRobin::RoundRobin(const YAML::Node& Yaml, const ITournament* Tournament)
 	: MatchTable(Yaml, Tournament)
 {
 }
@@ -137,8 +137,8 @@ void RoundRobin::GenerateSchedule()
 
 	else
 	{
-		for (size_t blue = 0; blue < GetParticipants().size(); ++blue)
-			for (size_t white = blue + 1; white < GetParticipants().size(); ++white)
+		for (size_t blue = 0; blue < GetMaxStartPositions(); ++blue)
+			for (size_t white = blue + 1; white < GetMaxStartPositions(); ++white)
 			{
 				AddAutoMatch(white, blue);
 			}

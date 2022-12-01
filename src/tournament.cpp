@@ -297,7 +297,7 @@ bool Tournament::LoadYAML(const std::string& Filename)
 				new_table = new RoundRobin(node, this);
 				break;
 			case MatchTable::Type::Custom:
-				new_table = new CustomTable(node, this);
+				//new_table = new CustomTable(node, this);
 				break;
 			case MatchTable::Type::SingleElimination:
 				new_table = new SingleElimination(node, this);

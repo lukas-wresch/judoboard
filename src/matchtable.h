@@ -234,6 +234,21 @@ namespace Judoboard
 				return m_Results[0];
 			}
 
+
+			class Iterator {
+			public:
+				Iterator(Result* Data) : m_Data(Data) {}
+				bool operator != (Iterator rhs) {return m_Data != rhs.m_Data; }
+				Result& operator*() { return *m_Data; }
+				void operator++() { ++m_Data; }
+
+			private:
+				Result* m_Data;
+			};
+
+			Iterator begin() { return Iterator(&m_Results[0]); }
+			Iterator end() { return Iterator(&m_Results[GetSize()]); }
+
 		private:
 			mutable std::vector<Result> m_Results;
 		};
@@ -264,10 +279,6 @@ namespace Judoboard
 
 		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
-		/*virtual void RemoveAllParticipants() {
-			m_Participants.clear();
-			m_Schedule.clear();
-		}*/
 
 		//Basics
 		const Match* GetMatch(size_t Index) const { if (Index >= m_Schedule.size()) return nullptr; return m_Schedule[Index]; }

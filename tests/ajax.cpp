@@ -1003,7 +1003,7 @@ TEST(Ajax, MatchTable_Add)
 		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test&mat=7")), "ok");
 
 		ASSERT_EQ(tables.size(), 1);
-		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::Weightclass);
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[0]->GetName(), "Test");
 		EXPECT_EQ(tables[0]->GetMatID(), 7);
 
@@ -1011,13 +1011,13 @@ TEST(Ajax, MatchTable_Add)
 		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
 
 		ASSERT_EQ(tables.size(), 2);
-		ASSERT_EQ(tables[1]->GetType(), MatchTable::Type::Weightclass);
+		ASSERT_EQ(tables[1]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[1]->GetName(), "Test2");
 		EXPECT_EQ(tables[1]->GetMatID(), 5);
-		EXPECT_EQ(((Weightclass*)tables[1])->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ(((Weightclass*)tables[1])->GetMaxWeight(), Weight("20.3"));
-		EXPECT_EQ(((Weightclass*)tables[1])->GetGender(), Gender::Male);
-		EXPECT_EQ(((Weightclass*)tables[1])->IsBestOfThree(), true);
+		EXPECT_EQ(((RoundRobin*)tables[1])->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ(((RoundRobin*)tables[1])->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ(((RoundRobin*)tables[1])->GetGender(), Gender::Male);
+		EXPECT_EQ(((RoundRobin*)tables[1])->IsBestOfThree(), true);
 
 		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=4", "name=Test3&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
 
@@ -1048,7 +1048,7 @@ TEST(Ajax, MatchTable_Edit)
 		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test&mat=7")), "ok");
 
 		ASSERT_EQ(tables.size(), 1);
-		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::Weightclass);
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[0]->GetName(), "Test");
 		EXPECT_EQ(tables[0]->GetMatID(), 7);
 
@@ -1056,13 +1056,13 @@ TEST(Ajax, MatchTable_Edit)
 		EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
 
 		ASSERT_EQ(tables.size(), 1);
-		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::Weightclass);
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[0]->GetName(), "Test2");
 		EXPECT_EQ(tables[0]->GetMatID(), 5);
-		EXPECT_EQ(((Weightclass*)tables[0])->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ(((Weightclass*)tables[0])->GetMaxWeight(), Weight("20.3"));
-		EXPECT_EQ(((Weightclass*)tables[0])->GetGender(), Gender::Male);
-		EXPECT_EQ(((Weightclass*)tables[0])->IsBestOfThree(), true);
+		EXPECT_EQ(((RoundRobin*)tables[0])->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ(((RoundRobin*)tables[0])->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ(((RoundRobin*)tables[0])->GetGender(), Gender::Male);
+		EXPECT_EQ(((RoundRobin*)tables[0])->IsBestOfThree(), true);
 	}
 }
 
@@ -1276,7 +1276,7 @@ TEST(Ajax, GetParticipantsFromMatchTable)
 	//app.GetTournament()->AddParticipant(j2);
 	//app.GetTournament()->AddParticipant(j3);
 
-	auto table = new Weightclass(10, 100);
+	auto table = new RoundRobin(Weight(10), Weight(100));
 	app.GetTournament()->AddMatchTable(table);
 
 	YAML::Node yaml = YAML::Load(app.Ajax_GetParticipantsFromMatchTable(HttpServer::Request("id=" + (std::string)table->GetUUID())));
@@ -1313,7 +1313,7 @@ TEST(Ajax, GetMatchesFromMatchTable)
 	app.GetTournament()->AddParticipant(j2);
 	app.GetTournament()->AddParticipant(j3);
 
-	auto table = new Weightclass(10, 100);
+	auto table = new RoundRobin(Weight(10), Weight(100));
 	app.GetTournament()->AddMatchTable(table);
 
 	YAML::Node yaml = YAML::Load(app.Ajax_GetMatchesFromMatchTable(HttpServer::Request("id=" + (std::string)table->GetUUID())));
@@ -1347,7 +1347,7 @@ TEST(Ajax, SetStartPosition)
 	app.GetTournament()->AddParticipant(j2);
 	app.GetTournament()->AddParticipant(j3);
 
-	auto table = new SingleElimination(10, 100);
+	auto table = new SingleElimination(Weight(10), Weight(100));
 	app.GetTournament()->AddMatchTable(table);
 
 	for (int i = 0; i < 100; ++i)
