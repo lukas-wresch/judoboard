@@ -3,6 +3,7 @@
 #include "timer.h"
 #include "club.h"
 #include "judoboard.h"
+#include "match.h"
 #include "dm4.h"
 #include "md5.h"
 #include "dmf.h"
@@ -13,6 +14,18 @@ namespace Judoboard
 {
 	class StandingData;
 	class Judoka;
+
+
+
+	class DependentJudoka
+	{
+	public:
+	private:
+		Judoka* m_Judoka = nullptr;
+		Match::DependencyType m_Type;
+		Match* m_DependentMatch = nullptr;
+		const MatchTable* m_DependentMatchTable = nullptr;
+	};
 
 
 

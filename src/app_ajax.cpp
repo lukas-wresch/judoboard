@@ -2913,7 +2913,7 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 
 	switch (type)
 	{
-	case MatchTable::Type::Weightclass:
+	/*case MatchTable::Type::Weightclass:
 	{
 		new_table = new Weightclass(0, 0);
 		break;
@@ -2923,7 +2923,7 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	{
 		new_table = new SingleElimination(0, 0);
 		break;
-	}
+	}*/
 
 	case MatchTable::Type::Pause:
 		return Error::Type::InternalError;
@@ -2997,7 +2997,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 	switch (table->GetType())
 	{
-	case MatchTable::Type::Weightclass:
+	/*case MatchTable::Type::Weightclass:
 	{
 		Weightclass* weight_table = (Weightclass*)table;
 
@@ -3027,7 +3027,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		GetTournament()->Unlock();
 		break;
-	}
+	}*/
 
 	default:
 		return Error(Error::Type::InternalError);

@@ -10,7 +10,7 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		Pause(const ITournament* Tournament) : MatchTable(Tournament) {}
+		Pause(const ITournament* Tournament) : MatchTable(nullptr, Tournament) {}
 		Pause(const YAML::Node& Yaml, ITournament* Tournament) : MatchTable(Yaml, Tournament) {}
 
 		static std::string GetHTMLForm() { return ""; }

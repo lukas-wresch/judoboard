@@ -62,19 +62,38 @@ size_t MatchTable::FindMatchIndex(const UUID& UUID) const
 
 Judoka* MatchTable::FindParticipant(const UUID& UUID) const
 {
-	for (auto participant : m_Participants)
+	if (!m_Filter)
+		return nullptr;
+
+	for (auto participant : m_Filter->GetParticipants())
 		if (participant && participant->GetUUID() == UUID)
 			return participant;
+
 	return nullptr;
+}
+
+
+
+const std::vector<Judoka*>& MatchTable::GetParticipants() const
+{
+	if (m_Filter)
+		return m_Filter->GetParticipants();
+
+	const std::vector<Judoka*> ret;
+	return ret;
 }
 
 
 
 bool MatchTable::IsIncluded(const Judoka& Fighter) const
 {
-	for (auto participant : m_Participants)
+	if (!m_Filter)
+		return false;
+
+	for (auto participant : m_Filter->GetParticipants())
 		if (participant && participant->GetUUID() == Fighter.GetUUID())
 			return true;
+
 	return false;
 }
 
@@ -126,19 +145,19 @@ bool MatchTable::AddMatch(Match* NewMatch)
 
 bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 {
-	if (!NewParticipant)
+	if (!NewParticipant || !m_Filter)
 		return false;
 
 	if (!Force)//Don't check if we are adding we are forcing the judoka in this match table
-		if (!IsElgiable(*NewParticipant))//Is the judoka allowed in this match table?
+		if (!m_Filter->IsElgiable(*NewParticipant))//Is the judoka allowed in this match table?
 			return false;
 
 	//Is the judoka alreay a participant?
-	for (auto judoka : m_Participants)
+	for (auto judoka : m_Filter->GetParticipants())
 		if (judoka && *judoka == *NewParticipant)
 			return false;
 
-	m_Participants.push_back(NewParticipant);
+	m_Filter->AddParticipant(NewParticipant);
 	GenerateSchedule();
 	return true;
 }
@@ -147,10 +166,10 @@ bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 
 bool MatchTable::RemoveParticipant(const Judoka* Participant)
 {
-	if (!Participant)
+	if (!Participant || !m_Filter)
 		return false;
 
-	for (auto it = m_Participants.begin(); it != m_Participants.end(); ++it)
+	for (auto it = m_Filter->GetParticipants().begin(); it != m_Filter->GetParticipants().end(); ++it)
 	{
 		if (*it && *(*it) == *Participant)
 		{
@@ -186,10 +205,10 @@ const std::vector<const Match*> MatchTable::FindMatches(const Judoka& Fighter1, 
 
 bool MatchTable::Contains(const Judoka* Judoka) const
 {
-	if (!Judoka)
+	if (!Judoka || !m_Filter)
 		return false;
 
-	for (auto participant : m_Participants)
+	for (auto participant : m_Filter->GetParticipants())
 		if (participant && *participant == *Judoka)
 			return true;
 

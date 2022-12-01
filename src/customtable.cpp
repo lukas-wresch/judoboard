@@ -12,7 +12,7 @@ using namespace Judoboard;
 
 
 
-CustomTable::CustomTable(const ITournament* Tournament) : MatchTable(Tournament)
+/*CustomTable::CustomTable(const ITournament* Tournament) : MatchTable(Tournament)
 {
 	SetName(Localizer::Translate("Friendly"));
 }
@@ -177,4 +177,4 @@ const std::string CustomTable::ToHTML() const
 
 void CustomTable::ToString(YAML::Emitter& Yaml) const
 {
-}
+}*/

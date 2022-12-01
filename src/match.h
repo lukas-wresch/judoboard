@@ -1,5 +1,4 @@
 #pragma once
-#include "judoka.h"
 #include "matchlog.h"
 #include "matchtable.h"
 
@@ -67,23 +66,7 @@ namespace Judoboard
 
 		bool IsScheduled()  const { return m_State == Status::Scheduled; }
 		bool IsRunning()    const { return m_State == Status::Running; }
-		bool HasConcluded() const {
-			if (IsEmptyMatch())
-				return true;
-			if (IsBestOfThree() && m_White.m_DependentMatch && m_Blue.m_DependentMatch)
-			{
-				if (m_White.m_DependentMatch->HasConcluded() && m_Blue.m_DependentMatch->HasConcluded())
-				{
-					if (!m_White.m_DependentMatch->GetWinner())
-						return true;
-					if (!m_Blue.m_DependentMatch->GetWinner())
-						return true;
-					if (*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())
-						return true;
-				}
-			}
-			return m_State == Status::Concluded;
-		}
+		bool HasConcluded() const;
 		bool IsAssociatedWithMat() const { return GetMatID() > 0; }
 		MatchLog& GetLog() { return m_Log; }
 		const MatchLog& GetLog() const { return m_Log; }
@@ -94,11 +77,7 @@ namespace Judoboard
 		const MatchTable* GetMatchTable() const { return m_Table; }
 		void SetMatchTable(MatchTable* MatchTable) { m_Table = MatchTable; }
 
-		uint32_t GetMatID() const {
-			if (m_MatID <= 0 && m_Table)//No override specified and associated to a match table
-				return m_Table->GetMatID();//Take the mat of the match table
-			return m_MatID;
-		}
+		uint32_t GetMatID() const;
 
 		//Judoka* GetFighter(Fighter Fighter);
 		//const Judoka* GetFighter(Fighter Fighter) const { return (const_cast<Match*>(this))->GetFighter(Fighter); }

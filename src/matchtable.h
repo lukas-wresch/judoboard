@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "judoka.h"
+#include "judoboard.h"
 
 
 
@@ -9,6 +9,7 @@ namespace Judoboard
 {
 	class ITournament;
 	class Tournament;
+	class IFilter;
 	class Match;
 	class RuleSet;
 	class AgeGroup;
@@ -182,7 +183,7 @@ namespace Judoboard
 			const Judoka* Judoka = nullptr;
 			const MatchTable* MatchTable = nullptr;
 
-			unsigned int Wins = 0;
+			unsigned int Wins  = 0;
 			unsigned int Score = 0;
 			uint32_t Time = 0;
 
@@ -190,7 +191,7 @@ namespace Judoboard
 		};
 
 
-		MatchTable(const ITournament* Tournament) : m_Tournament(Tournament) {}
+		MatchTable(IFilter* Filter, const ITournament* Tournament) : m_Filter(Filter), m_Tournament(Tournament) {}
 		MatchTable(const YAML::Node& Yaml, ITournament* Tournament);
 		MatchTable(MatchTable&) = delete;
 		MatchTable(const MatchTable&) = delete;
@@ -217,15 +218,12 @@ namespace Judoboard
 		virtual void GenerateSchedule() = 0;
 		virtual const std::string ToHTML() const = 0;
 
-		virtual size_t GetStartingPosition(const Judoka* Judoka) const { return -1; }
-		virtual void   SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition) {}
-
 		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
-		virtual void RemoveAllParticipants() {
+		/*virtual void RemoveAllParticipants() {
 			m_Participants.clear();
 			m_Schedule.clear();
-		}
+		}*/
 
 		//Basics
 		const Match* GetMatch(size_t Index) const { if (Index >= m_Schedule.size()) return nullptr; return m_Schedule[Index]; }
@@ -249,16 +247,12 @@ namespace Judoboard
 		size_t  FindMatchIndex(const UUID& UUID) const;
 		Judoka* FindParticipant(const UUID& UUID) const;
 
+		const std::vector<Judoka*>& GetParticipants() const;
+
 		//Rule sets
 		const RuleSet& GetRuleSet() const;
 		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
 		const RuleSet* GetOwnRuleSet() const { return m_Rules; }
-
-		//Age groups
-		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
-		void SetAgeGroup(const AgeGroup* NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
-
-		const std::vector<Judoka*>& GetParticipants() const { return m_Participants; }
 
 		//Scheduler
 		int32_t GetScheduleIndex() const { return m_ScheduleIndex; }
@@ -275,18 +269,7 @@ namespace Judoboard
 
 		std::pair<size_t, size_t> GetParticipantIndicesOfMatch(const Match* Match) const;
 
-		size_t GetIndexOfParticipant(const Judoka* Participant) const;
-
-		Judoka* GetParticipant(size_t Index) { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
-		const Judoka* GetParticipant(size_t Index) const { if (Index >= m_Participants.size()) return nullptr; return m_Participants[Index]; }
-
 		const ITournament* GetTournament() const { return m_Tournament; }
-
-		void SortParticipantsByStartingPosition() {
-			std::sort(m_Participants.begin(), m_Participants.end(), [this](const Judoka* a, const Judoka* b) {
-				return GetStartingPosition(a) < GetStartingPosition(b);
-			});
-		}
 
 		void DeleteSchedule() { m_Schedule.clear(); }
 
@@ -297,17 +280,15 @@ namespace Judoboard
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
 
 	private:
-		std::vector<Judoka*>& SetParticipants() { return m_Participants; }
 		std::vector<Match*>&  SetSchedule()     { return m_Schedule; }
 		
 		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
 
-		std::vector<Judoka*> m_Participants;//List of all participants that are in the match table
 		const RuleSet* m_Rules = nullptr;//Custom rule set for the matches (if available)
 
-		const AgeGroup* m_pAgeGroup = nullptr;//Age group for the matches (if available)
-
 		std::string m_Name;
+
+		IFilter* m_Filter = nullptr;
 
 		const ITournament* m_Tournament = nullptr;
 

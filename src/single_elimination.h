@@ -5,12 +5,12 @@
 
 namespace Judoboard
 {
-	class SingleElimination : public Weightclass
+	class SingleElimination : public MatchTable
 	{
 		friend class Tournament;
 
 	public:
-		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
+		SingleElimination(IFilter* Filter, const ITournament* Tournament = nullptr);
 		SingleElimination(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
 
 		static std::string GetHTMLForm();
@@ -19,10 +19,6 @@ namespace Judoboard
 
 		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false) override;
 		virtual bool RemoveParticipant(const Judoka* Participant) override;
-		virtual void RemoveAllParticipants() override {
-			MatchTable::RemoveAllParticipants();
-			m_StartingPositions.clear();
-		}
 
 		virtual std::vector<Result> CalculateResults() const override;
 		virtual void GenerateSchedule() override;
@@ -32,9 +28,6 @@ namespace Judoboard
 
 		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; GenerateSchedule(); }
 		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; GenerateSchedule(); }
-
-		virtual size_t GetStartingPosition(const Judoka* Judoka) const override;
-		virtual void   SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition) override;
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
