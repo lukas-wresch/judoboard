@@ -2905,17 +2905,17 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 
 	switch (type)
 	{
-	/*case MatchTable::Type::Weightclass:
+	case MatchTable::Type::RoundRobin:
 	{
-		new_table = new Weightclass(0, 0);
+		new_table = new RoundRobin(new Weightclass(0, 0), GetTournament());
 		break;
 	}
 
 	case MatchTable::Type::SingleElimination:
 	{
-		new_table = new SingleElimination(0, 0);
+		new_table = new SingleElimination(new Weightclass(0, 0), GetTournament());
 		break;
-	}*/
+	}
 
 	case MatchTable::Type::Pause:
 		return Error::Type::InternalError;
@@ -2945,7 +2945,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	if (!GetTournament())
 		return Error::Type::TournamentNotOpen;
 
-	/*UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int color = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "color"));
 	int mat   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
@@ -2986,19 +2986,23 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	int  gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 	bool bo3       = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
 
+	if (!table->GetFilter() || table->GetFilter()->GetType() != IFilter::Type::Weightclass)
+		return Error::Type::OperationFailed;
+
+	auto weightclass = (Weightclass*)table->GetFilter();
 
 	switch (table->GetType())
 	{
-	/*case MatchTable::Type::Weightclass:
+	case MatchTable::Type::RoundRobin:
 	{
-		Weightclass* weight_table = (Weightclass*)table;
+		RoundRobin* round_robin = (RoundRobin*)table;
 
 		GetTournament()->Lock();
 
-		weight_table->SetMinWeight(Weight(minWeight));
-		weight_table->SetMaxWeight(Weight(maxWeight));
-		weight_table->SetGender((Gender)gender);
-		weight_table->IsBestOfThree(bo3);
+		weightclass->SetMinWeight(Weight(minWeight));
+		weightclass->SetMaxWeight(Weight(maxWeight));
+		weightclass->SetGender((Gender)gender);
+		round_robin->IsBestOfThree(bo3);
 
 		GetTournament()->Unlock();
 		break;
@@ -3010,23 +3014,23 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		GetTournament()->Lock();
 
-		single_table->SetMinWeight(Weight(minWeight));
-		single_table->SetMaxWeight(Weight(maxWeight));
-		single_table->SetGender((Gender)gender);
+		weightclass->SetMinWeight(Weight(minWeight));
+		weightclass->SetMaxWeight(Weight(maxWeight));
+		weightclass->SetGender((Gender)gender);
 		single_table->IsBestOfThree(bo3);
 		single_table->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
 		single_table->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
 
 		GetTournament()->Unlock();
 		break;
-	}*/
+	}
 
-	//default:
+	default:
 		return Error(Error::Type::InternalError);
-	//}
+	}
 
-	//if (!GetTournament()->UpdateMatchTable(id))
-		//return Error(Error::Type::OperationFailed);
+	if (!GetTournament()->UpdateMatchTable(id))
+		return Error(Error::Type::OperationFailed);
 	return Error();//OK
 }
 

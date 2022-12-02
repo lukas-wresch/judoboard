@@ -158,8 +158,8 @@ void SingleElimination::GenerateSchedule()
 		auto match2 = m_Schedule[m_Schedule.size() - 2];
 
 		auto third_place = CreateAutoMatch(nullptr, nullptr);
-		third_place->SetDependency(Fighter::White, Match::DependencyType::TakeLoser, match1);
-		third_place->SetDependency(Fighter::Blue,  Match::DependencyType::TakeLoser, match2);
+		third_place->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
+		third_place->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
 
 		//Swap matches so that match for 1st place is still the last one
 		std::swap(m_Schedule[m_Schedule.size() - 1], m_Schedule[m_Schedule.size() - 2]);
@@ -183,14 +183,14 @@ void SingleElimination::GenerateSchedule()
 		auto fifth = CreateAutoMatch(nullptr, nullptr);
 		auto semi1 = CreateAutoMatch(nullptr, nullptr);
 
-		semi1->SetDependency(Fighter::White, Match::DependencyType::TakeLoser, match1);
-		semi1->SetDependency(Fighter::Blue,  Match::DependencyType::TakeLoser, match2);
+		semi1->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
+		semi1->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
 
-		semi2->SetDependency(Fighter::White, Match::DependencyType::TakeLoser, match3);
-		semi2->SetDependency(Fighter::Blue,  Match::DependencyType::TakeLoser, match4);
+		semi2->SetDependency(Fighter::White, DependencyType::TakeLoser, match3);
+		semi2->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match4);
 
-		fifth->SetDependency(Fighter::White, Match::DependencyType::TakeWinner, semi1);
-		fifth->SetDependency(Fighter::Blue,  Match::DependencyType::TakeWinner, semi2);
+		fifth->SetDependency(Fighter::White, DependencyType::TakeWinner, semi1);
+		fifth->SetDependency(Fighter::Blue,  DependencyType::TakeWinner, semi2);
 
 		//Swap matches so that match for 1st place is still the last one
 		offset = 3;

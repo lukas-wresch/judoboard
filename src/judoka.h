@@ -3,7 +3,6 @@
 #include "timer.h"
 #include "club.h"
 #include "judoboard.h"
-#include "match.h"
 #include "dm4.h"
 #include "md5.h"
 #include "dmf.h"
@@ -14,15 +13,19 @@ namespace Judoboard
 {
 	class StandingData;
 	class Judoka;
+	class Match;
+	class MatchTable;
 
 
 
 	class DependentJudoka
 	{
+		friend class Match;
+
 	public:
 		DependentJudoka(const Judoka* Judoka) {
 			m_Judoka = Judoka;
-			m_Type   = Match::DependencyType::None;
+			m_Type   = DependencyType::None;
 		}
 
 		const Judoka* GetJudoka() const { return m_Judoka; }
@@ -30,8 +33,10 @@ namespace Judoboard
 		bool operator == (const Judoka* rhs) const;
 
 	private:
-		const Judoka* m_Judoka = nullptr;
-		Match::DependencyType m_Type;
+		DependentJudoka() = default;
+
+		const Judoka* m_Judoka  = nullptr;
+		DependencyType m_Type   = DependencyType::None;
 		Match* m_DependentMatch = nullptr;
 		const MatchTable* m_DependentMatchTable = nullptr;
 	};

@@ -153,6 +153,16 @@ namespace Judoboard
 
 
 
+	enum class DependencyType
+	{
+		None        = 0,
+		BestOfThree = 1,//Match is the last in the series of a best of three series
+		TakeWinner  = 2,//Take the winner of the match this match depends upon
+		TakeLoser   = 3,//Take the loser of the match this match depends upon
+	};
+
+
+
 	inline std::string Latin1ToUTF8(const std::string& Input)
 	{
 		std::string ret;

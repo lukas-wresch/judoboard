@@ -304,11 +304,13 @@ bool Tournament::LoadYAML(const std::string& Filename)
 				break;
 			}
 
-			//Connect match table with filter
-			new_table->SetFilter(new_filter);
-
 			if (new_table)
+			{
+				//Connect match table with filter
+				new_table->SetFilter(new_filter);
+
 				m_MatchTables.push_back(new_table);
+			}
 		}
 	}
 

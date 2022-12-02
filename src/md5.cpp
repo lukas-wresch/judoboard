@@ -190,39 +190,40 @@ MD5::MD5(const Tournament& Tournament)
 
 	for (auto match_table : Tournament.GetMatchTables())
 	{
+		auto filter = match_table->GetFilter();
+		if (!filter)
+			continue;
+
 		Weightclass* new_weightclass = nullptr;		
 
-		/*if (match_table->GetType() == MatchTable::Type::RoundRobin)
-		{
-			const auto weightclass = (Judoboard::Weightclass*)match_table;
-			new_weightclass = new Weightclass;
+		if (filter->GetType() != IFilter::Type::Weightclass)
+			continue;
 
+		
+		const auto weightclass = (Judoboard::Weightclass*)filter;
+		new_weightclass = new Weightclass;
+
+		new_weightclass->WeightLargerThan          = (uint32_t)weightclass->GetMinWeight() / 1000;
+		new_weightclass->WeightInGrammsLargerThan  = (uint32_t)weightclass->GetMinWeight() % 1000;
+		new_weightclass->WeightSmallerThan         = (uint32_t)weightclass->GetMaxWeight() / 1000;
+		new_weightclass->WeightInGrammsSmallerThan = (uint32_t)weightclass->GetMaxWeight() % 1000;
+		
+
+		if (match_table->GetType() == MatchTable::Type::RoundRobin)
 			new_weightclass->FightSystemID = 16;//Round robin
-
-			new_weightclass->WeightLargerThan          = (uint32_t)weightclass->GetMinWeight() / 1000;
-			new_weightclass->WeightInGrammsLargerThan  = (uint32_t)weightclass->GetMinWeight() % 1000;
-			new_weightclass->WeightSmallerThan         = (uint32_t)weightclass->GetMaxWeight() / 1000;
-			new_weightclass->WeightInGrammsSmallerThan = (uint32_t)weightclass->GetMaxWeight() % 1000;
-		}
 		else if (match_table->GetType() == MatchTable::Type::SingleElimination)
 		{
-			const auto single_elimination = (Judoboard::SingleElimination*)match_table;
-			new_weightclass = new Weightclass;
+			const auto single_elimination = (Judoboard::SingleElimination*)filter;
 
 			new_weightclass->FightSystemID = 19;
-
-			new_weightclass->WeightLargerThan          = (uint32_t)single_elimination->GetMinWeight() / 1000;
-			new_weightclass->WeightInGrammsLargerThan  = (uint32_t)single_elimination->GetMinWeight() % 1000;
-			new_weightclass->WeightSmallerThan         = (uint32_t)single_elimination->GetMaxWeight() / 1000;
-			new_weightclass->WeightInGrammsSmallerThan = (uint32_t)single_elimination->GetMaxWeight() % 1000;
 
 			new_weightclass->MatchForThirdPlace = single_elimination->IsThirdPlaceMatch();
 			new_weightclass->MatchForFifthPlace = single_elimination->IsFifthPlaceMatch();
 		}
-		else*/
+		else
 			continue;
 
-		new_weightclass->ID = id++;
+		new_weightclass->ID   = id++;
 		new_weightclass->Date = m_DateStart;
 
 		if (match_table->GetName().length() > 0)

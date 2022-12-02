@@ -1006,6 +1006,7 @@ TEST(Ajax, MatchTable_Add)
 		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[0]->GetName(), "Test");
 		EXPECT_EQ(tables[0]->GetMatID(), 7);
+		ASSERT_TRUE(tables[0]->GetFilter());
 
 
 		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
@@ -1014,9 +1015,10 @@ TEST(Ajax, MatchTable_Add)
 		ASSERT_EQ(tables[1]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[1]->GetName(), "Test2");
 		EXPECT_EQ(tables[1]->GetMatID(), 5);
-		EXPECT_EQ( ((Weightclass*) (tables[1])->GetFilter())->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ( ((Weightclass*) (tables[1])->GetFilter())->GetMaxWeight(), Weight("20.3"));
-		EXPECT_EQ( ((Weightclass*) (tables[1])->GetFilter())->GetGender(), Gender::Male);
+		ASSERT_TRUE(tables[1]->GetFilter());
+		EXPECT_EQ( ((Weightclass*) tables[1]->GetFilter())->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ( ((Weightclass*) tables[1]->GetFilter())->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ( ((Weightclass*) tables[1]->GetFilter())->GetGender(), Gender::Male);
 		EXPECT_EQ(((RoundRobin*)tables[1])->IsBestOfThree(), true);
 
 		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=4", "name=Test3&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
@@ -1025,9 +1027,9 @@ TEST(Ajax, MatchTable_Add)
 		ASSERT_EQ(tables[2]->GetType(), MatchTable::Type::SingleElimination);
 		EXPECT_EQ(tables[2]->GetName(), "Test3");
 		EXPECT_EQ(tables[2]->GetMatID(), 5);
-		EXPECT_EQ( ((Weightclass*) (tables[2])->GetFilter())->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ( ((Weightclass*) (tables[2])->GetFilter())->GetMaxWeight(), Weight("20.3"));
-		EXPECT_EQ( ((Weightclass*) (tables[2])->GetFilter())->GetGender(), Gender::Female);
+		EXPECT_EQ( ((Weightclass*) tables[2]->GetFilter())->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ( ((Weightclass*) tables[2]->GetFilter())->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ( ((Weightclass*) tables[2]->GetFilter())->GetGender(), Gender::Female);
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsBestOfThree(), true);
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsThirdPlaceMatch(), true);
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsFifthPlaceMatch(), true);
@@ -1059,9 +1061,9 @@ TEST(Ajax, MatchTable_Edit)
 		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[0]->GetName(), "Test2");
 		EXPECT_EQ(tables[0]->GetMatID(), 5);
-		EXPECT_EQ( ((Weightclass*) (tables[2])->GetFilter())->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ( ((Weightclass*) (tables[2])->GetFilter())->GetMaxWeight(), Weight("20.3"));
-		EXPECT_EQ( ((Weightclass*) (tables[2])->GetFilter())->GetGender(), Gender::Male);
+		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetGender(), Gender::Male);
 		EXPECT_EQ(((RoundRobin*)tables[0])->IsBestOfThree(), true);
 	}
 }
