@@ -207,11 +207,17 @@ namespace Judoboard
 				}
 			}
 
+			Results() = default;
+
 			Results(size_t Count) : m_Results(Count) {
 				for (size_t i = 0; i < Count; ++i)
 					m_Results[i].Set(nullptr, nullptr);
 			}
 
+
+			void Add(const Judoka* Judoka, const MatchTable* Table) {
+				m_Results.emplace_back(Judoka, Table);
+			}
 
 			Result* GetResultsOf(const Judoka* Judoka) {
 				for (size_t i = 0; i < m_Results.size(); ++i)
@@ -323,7 +329,7 @@ namespace Judoboard
 
 		//Start positions
 		virtual size_t GetStartPosition(const Judoka* Judoka) const;
-		virtual const DependentJudoka* GetJudokaByStartPosition(size_t StartPosition) const;
+		virtual const Judoka* GetJudokaByStartPosition(size_t StartPosition) const;
 		virtual void SetStartPosition(const Judoka* Judoka, size_t NewStartPosition);
 		virtual size_t GetMaxStartPositions() const;
 
@@ -344,7 +350,7 @@ namespace Judoboard
 		std::string GetHTMLForm() const;
 
 		Match* AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosition);
-		Match* CreateAutoMatch(const DependentJudoka* White, const DependentJudoka* Blue);
+		Match* CreateAutoMatch(const DependentJudoka& White, const DependentJudoka& Blue);
 		Match* AddMatchForWinners(Match* Match1, Match* Match2);
 
 		void AddMatchesForBestOfThree();

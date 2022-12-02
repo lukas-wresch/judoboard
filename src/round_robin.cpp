@@ -204,10 +204,7 @@ const std::string RoundRobin::ToHTML() const
 
 	for (size_t i = 0; i < GetMaxStartPositions(); ++i)
 	{
-		if (!GetJudokaByStartPosition(i))
-			continue;
-
-		auto fighter = GetJudokaByStartPosition(i)->GetJudoka();
+		auto fighter = GetJudokaByStartPosition(i);
 
 		if (!fighter)
 			continue;
@@ -218,10 +215,7 @@ const std::string RoundRobin::ToHTML() const
 
 		for (size_t j = 0; j < GetMaxStartPositions(); ++j)
 		{
-			if (!GetJudokaByStartPosition(j))
-				continue;
-
-			auto enemy = GetJudokaByStartPosition(j)->GetJudoka();
+			auto enemy = GetJudokaByStartPosition(j);
 			if (!enemy)
 				continue;
 

@@ -27,7 +27,7 @@ SingleElimination::SingleElimination(Weight MinWeight, Weight MaxWeight, const I
 
 
 SingleElimination::SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament)
-	: MatchTable(nullptr, Tournament)
+	: MatchTable(Yaml, Tournament)
 {
 	if (Yaml["third_place_match"])
 		m_ThirdPlaceMatch = Yaml["third_place_match"].as<bool>();
@@ -213,14 +213,14 @@ void SingleElimination::GenerateSchedule()
 
 MatchTable::Results SingleElimination::CalculateResults() const
 {
-	Results ret(6);
+	Results ret;
 
 	if (GetParticipants().size() == 0)
 		return ret;
 
 	if (GetParticipants().size() == 1)
 	{
-		ret[0].Set(GetParticipants()[0], this);
+		ret.Add(GetParticipants()[0], this);
 		return ret;
 	}
 
@@ -232,8 +232,8 @@ MatchTable::Results SingleElimination::CalculateResults() const
 
 	if (lastMatch->HasConcluded())
 	{
-		ret[0].Set(lastMatch->GetWinner(), this);
-		ret[1].Set(lastMatch->GetLoser(),  this);
+		ret.Add(lastMatch->GetWinner(), this);
+		ret.Add(lastMatch->GetLoser(),  this);
 	}
 	else
 		return ret;
@@ -241,8 +241,8 @@ MatchTable::Results SingleElimination::CalculateResults() const
 	if (IsThirdPlaceMatch())
 	{
 		const Match* third_place_match = m_Schedule[m_Schedule.size() - 2];
-		ret[2].Set(third_place_match->GetWinner(), this);
-		ret[3].Set(third_place_match->GetLoser(),  this);
+		ret.Add(third_place_match->GetWinner(), this);
+		ret.Add(third_place_match->GetLoser(),  this);
 	}
 
 	if (IsThirdPlaceMatch() && IsFifthPlaceMatch())
@@ -254,8 +254,8 @@ MatchTable::Results SingleElimination::CalculateResults() const
 		int offset = 5;
 
 		const Match* fifth_place_match = m_Schedule[m_Schedule.size() - offset];
-		ret[4].Set(fifth_place_match->GetWinner(), this);
-		ret[5].Set(fifth_place_match->GetLoser(),  this);
+		ret.Add(fifth_place_match->GetWinner(), this);
+		ret.Add(fifth_place_match->GetLoser(),  this);
 	}
 
 	return ret;
