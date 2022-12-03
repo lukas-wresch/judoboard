@@ -242,6 +242,8 @@ TEST(Tournament, AddAgeGroup)
 		tourney->AddParticipant(new Judoboard::Judoka(Test_CreateRandomJudoka(&app.GetDatabase())));
 
 	EXPECT_EQ(tourney->GetSchedule().size(), 5*4/2);
+
+	delete tourney;
 }
 
 

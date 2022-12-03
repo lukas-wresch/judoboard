@@ -342,5 +342,7 @@ TEST(Database, RuleSets)
 
 		EXPECT_EQ(d.FindRuleSetByName(name)->GetUUID(), rules->GetUUID());
 		EXPECT_EQ(d.FindRuleSetByName(name)->GetName(), rules->GetName());
+
+		delete rules;
 	}
 }

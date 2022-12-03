@@ -98,6 +98,8 @@ TEST(SingleElimination, ExportImport_StartingPositions)
 			EXPECT_EQ(group2.GetStartingPosition(j4), group.GetStartingPosition(j4));
 			EXPECT_EQ(group2.GetStartingPosition(j5), group.GetStartingPosition(j5));
 		}
+
+		delete t;
 	}
 }
 
@@ -123,6 +125,8 @@ TEST(SingleElimination, Count1)
 
 	ASSERT_EQ(results.size(), 1);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j1->GetUUID());
+
+	delete t;
 }
 
 
@@ -161,6 +165,8 @@ TEST(SingleElimination, Count2)
 	ASSERT_EQ(results.size(), 2);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j2->GetUUID());
 	EXPECT_EQ(results[1].Judoka->GetUUID(), j1->GetUUID());
+
+	delete t;
 }
 
 
@@ -223,6 +229,8 @@ TEST(SingleElimination, Count3)
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j3->GetUUID());
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
+
+	delete t;
 }
 
 
@@ -302,6 +310,8 @@ TEST(SingleElimination, Count3_BO3)
 	ASSERT_TRUE(results[1].Judoka);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j3->GetUUID());
 	EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
+
+	delete t;
 }
 
 
@@ -350,6 +360,8 @@ TEST(SingleElimination, Count4)
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j4->GetUUID());
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
+
+	delete t;
 }
 
 
@@ -814,6 +826,8 @@ TEST(SingleElimination, Count32)
 
 	ASSERT_EQ(group.GetParticipants().size(), 32);
 	ASSERT_EQ(group.GetSchedule().size(),     31);
+
+	delete t;
 }
 
 
@@ -1258,6 +1272,8 @@ TEST(SingleElimination, Render_3rd_5th)
 	EXPECT_NE(with_3rd, with_3rd_5th);
 
 	EXPECT_NE(with_5th, with_3rd_5th);
+
+	delete t;
 }
 
 
