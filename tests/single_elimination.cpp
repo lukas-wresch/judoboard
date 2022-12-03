@@ -497,6 +497,13 @@ TEST(SingleElimination, Count8_Dont_allow_illegal_start_pos)
 	ASSERT_EQ(group.GetParticipants().size(), 8);
 
 	group.SetStartingPosition(j[7], 8);
+	for (int i = 0; i < 7; ++i)
+		group.RemoveParticipant(j[i]);
+
+	EXPECT_EQ(group.GetStartingPosition(j[7]), 0);
+
+	for (int i = 0; i < 8; ++i)
+		group.AddParticipant(j[i]);
 
 	for (auto match : group.GetSchedule())
 	{

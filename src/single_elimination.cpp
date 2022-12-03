@@ -101,10 +101,14 @@ std::string SingleElimination::GetHTMLForm()
 
 
 
-bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
+void SingleElimination::FindFreeStartPos(const Judoka* NewParticipant)
 {
-	if (!MatchTable::AddParticipant(NewParticipant, Force))
-		return false;
+	if (!NewParticipant)
+		return;
+
+	auto old_pos = GetStartingPosition(NewParticipant);
+	if (old_pos != SIZE_MAX)
+		m_StartingPositions.erase(old_pos);
 
 	for (size_t startPos = 0; true; startPos++)
 	{
@@ -114,6 +118,16 @@ bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
 			break;
 		}
 	}
+}
+
+
+
+bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
+{
+	if (!MatchTable::AddParticipant(NewParticipant, Force))
+		return false;
+
+	FindFreeStartPos(NewParticipant);
 
 	SortParticipantsByStartingPosition();
 	GenerateSchedule();
@@ -124,12 +138,28 @@ bool SingleElimination::AddParticipant(Judoka* NewParticipant, bool Force)
 
 bool SingleElimination::RemoveParticipant(const Judoka* Participant)
 {
+	auto old_max = GetMaxStartPos();
+
 	if (MatchTable::RemoveParticipant(Participant))
 	{
 		auto pos = GetStartingPosition(Participant);
 		if (pos != SIZE_MAX)
 		{
 			m_StartingPositions.erase(pos);
+
+			auto new_max = GetMaxStartPos();
+
+			if (new_max < old_max)
+			{
+				for (size_t i = new_max; i < old_max; ++i)
+				{
+					auto judoka = GetJudokaByStartPosition(i);
+
+					if (judoka)
+						FindFreeStartPos(judoka);
+				}
+			}
+
 			return true;
 		}
 	}
@@ -442,6 +472,12 @@ size_t SingleElimination::GetStartingPosition(const Judoka* Judoka) const
 void SingleElimination::SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition)
 {
 	if (!Judoka)
+		return;
+
+	const auto rounds = GetNumberOfRounds();
+	const auto max_start_pos = (int)pow(2, rounds);
+
+	if (NewStartingPosition >= max_start_pos)
 		return;
 
 	auto my_old_pos = GetStartingPosition(Judoka);
