@@ -12,6 +12,7 @@ namespace Judoboard
 	public:
 		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
 		SingleElimination(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
+		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 
 		static std::string GetHTMLForm();
 

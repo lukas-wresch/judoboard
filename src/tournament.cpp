@@ -81,24 +81,31 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add weightclasses
 	for (auto weightclass : File.GetWeightclasses())
 	{
-		auto new_weightclass = new Weightclass(*weightclass, this);
+		Weightclass* new_table = nullptr;
+
+		if (weightclass->FightSystemID == 16 || weightclass->FightSystemID == 13 || weightclass->FightSystemID == 14 || weightclass->FightSystemID == 15)//Round robin
+			new_table = new Weightclass(*weightclass, this);
+		else if (weightclass->FightSystemID == 19)//Single elimination (single consulation bracket)
+			new_table = new SingleElimination(*weightclass, this);
+		else
+			continue;
 
 		//Connect to age group
 		if (weightclass->AgeGroup)
-			new_weightclass->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
+			new_table->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
 
 		//Freeze the name
-		auto temp  = new_weightclass->GetGender();
-		auto temp2 = new_weightclass->GetAgeGroup();
-		new_weightclass->SetGender(Gender::Unknown);
-		new_weightclass->SetAgeGroup(nullptr);
-		new_weightclass->SetName(new_weightclass->GetDescription());
-		new_weightclass->SetGender(temp);
-		new_weightclass->SetAgeGroup(temp2);
+		auto temp  = new_table->GetGender();
+		auto temp2 = new_table->GetAgeGroup();
+		new_table->SetGender(Gender::Unknown);
+		new_table->SetAgeGroup(nullptr);
+		new_table->SetName(new_table->GetDescription());
+		new_table->SetGender(temp);
+		new_table->SetAgeGroup(temp2);
 
-		weightclass->pUserData = new_weightclass;
+		weightclass->pUserData = new_table;
 
-		m_MatchTables.emplace_back(new_weightclass);
+		m_MatchTables.emplace_back(new_table);
 	}
 
 	//Add judoka
@@ -136,15 +143,18 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add matches
 	for (auto& match : File.GetMatches())
 	{
-		if (match.WhiteID == match.RedID)//Filter dummy matches
+		Judoka* white = nullptr;
+		if (match.White && match.White->pUserData)
+			white = (Judoka*)match.White->pUserData;
+
+		Judoka* blue = nullptr;
+		if (match.Red && match.Red->pUserData)
+			blue = (Judoka*)match.Red->pUserData;
+
+		if (white && blue && *white == *blue)//Filter dummy matches
 			continue;
 
-		if (!match.White || !match.Red)
-			continue;
-		if (!match.White->pUserData || !match.Red->pUserData)
-			continue;
-
-		Match* new_match = new Match((Judoka*)match.White->pUserData, (Judoka*)match.Red->pUserData, this);
+		Match* new_match = new Match(white, blue, this);
 
 		if (match.Status == 3)//Match completed?
 		{
