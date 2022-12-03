@@ -15,6 +15,9 @@ namespace Judoboard
 		Database() {
 			Reset();
 		}
+		~Database() {
+			Reset();
+		}
 
 		void Reset();
 		bool Load(const std::string& Filename);
