@@ -496,7 +496,10 @@ const std::string MatchTable::ResultsToHTML() const
 		const auto& score = results[i];
 
 		ret += "<tr><td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
-		ret += "<td>" + score.Judoka->GetName(NameStyle::GivenName) + "</td>";
+		if (score.Judoka)
+			ret += "<td>" + score.Judoka->GetName(NameStyle::GivenName) + "</td>";
+		else
+			ret += "<td>- - -</td>";
 
 		ret += "<td>" + std::to_string(score.Wins)  + "</td>";
 		ret += "<td>" + std::to_string(score.Score) + "</td>";
