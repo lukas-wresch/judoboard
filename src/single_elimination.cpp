@@ -559,8 +559,10 @@ const std::string SingleElimination::ToHTML() const
 		return renderMatchIndex(matchIndex, style);
 	};
 
+	size_t width = 100;
+	if (rounds > 0)
+		width = 100 / rounds;
 
-	size_t width = 100 / rounds;
 	ret += "<tr style='height: 5mm; text-align: center'>";
 	for (int round = 0; round < rounds; ++round)
 		ret += "<th width=\"" + std::to_string(width) + "%\">" + Localizer::Translate("Round") + " " + std::to_string(round + 1) + "</th>";
