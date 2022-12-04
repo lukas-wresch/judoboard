@@ -14,24 +14,24 @@ TEST(Tournament, DontDuplicateParticipants)
 
 		EXPECT_TRUE(d.GetNumJudoka() == 0);
 
-		Judoka j1("Firstname", "Lastname", 50, Gender::Male);
-		Judoka j2("Firstname2", "Lastname2", 60, Gender::Female);
+		Judoka* j1 = new Judoka("Firstname", "Lastname", 50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 60, Gender::Female);
 
-		d.AddJudoka(&j1);
-		d.AddJudoka(&j2);
+		d.AddJudoka(j1);
+		d.AddJudoka(j2);
 
 		Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 		tourney.Reset();
 		tourney.EnableAutoSave(false);
 
-		EXPECT_TRUE(tourney.AddParticipant(&j1));
+		EXPECT_TRUE(tourney.AddParticipant(j1));
 		EXPECT_TRUE(tourney.GetParticipants().size() == 1);
-		EXPECT_FALSE(tourney.AddParticipant(&j1));
+		EXPECT_FALSE(tourney.AddParticipant(j1));
 		EXPECT_TRUE(tourney.GetParticipants().size() == 1);
 
-		EXPECT_TRUE(tourney.AddParticipant(&j2));
+		EXPECT_TRUE(tourney.AddParticipant(j2));
 		EXPECT_TRUE(tourney.GetParticipants().size() == 2);
-		EXPECT_FALSE(tourney.AddParticipant(&j2));
+		EXPECT_FALSE(tourney.AddParticipant(j2));
 		EXPECT_TRUE(tourney.GetParticipants().size() == 2);
 	}
 
@@ -48,15 +48,17 @@ TEST(Tournament, MatchAgainstOneself)
 	d.EnableAutoSave(false);
 
 
-	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+	Judoka* j1 = new Judoka("Firstname", "Lastname", 50, Gender::Male);
 
-	d.AddJudoka(&j1);
+	d.AddJudoka(j1);
 
 	Tournament* tourney = new Tournament("deleteMe", d.FindRuleSetByName("Default"));
 	tourney->Reset();
 	tourney->EnableAutoSave(false);
 
-	EXPECT_FALSE(tourney->AddMatch(new Match(&j1, &j1, tourney)));
+	EXPECT_FALSE(tourney->AddMatch(new Match(j1, j1, tourney)));
+
+	delete tourney;
 }
 
 
@@ -242,6 +244,8 @@ TEST(Tournament, AddAgeGroup)
 		tourney->AddParticipant(new Judoboard::Judoka(Test_CreateRandomJudoka(&app.GetDatabase())));
 
 	EXPECT_EQ(tourney->GetSchedule().size(), 5*4/2);
+
+	delete tourney;
 }
 
 
@@ -324,21 +328,21 @@ TEST(Tournament, RevokeDisqualification)
 {
 	initialize();
 
-	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
-	Judoka j2("Firstname2", "Lastname2", 50, Gender::Male);
+	Judoka* j1 = new Judoka("Firstname", "Lastname", 50, Gender::Male);
+	Judoka* j2 = new Judoka("Firstname2", "Lastname2", 50, Gender::Male);
 
 	Tournament tourney("deleteMe");
 	tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	Match* match = new Match(&j1, &j2, &tourney);
+	Match* match = new Match(j1, j2, &tourney);
 	tourney.AddMatch(match);
 
-	tourney.Disqualify(j1);
-	tourney.RevokeDisqualification(j1);
+	tourney.Disqualify(*j1);
+	tourney.RevokeDisqualification(*j1);
 
 	EXPECT_FALSE(match->HasConcluded());
-	EXPECT_FALSE(tourney.IsDisqualified(j1));
+	EXPECT_FALSE(tourney.IsDisqualified(*j1));
 }
 
 
@@ -415,15 +419,15 @@ TEST(Tournament, ColorsForMatchTables)
 
 		EXPECT_TRUE(d.GetNumJudoka() == 0);
 
-		Judoka j1("Firstname", "Lastname", 50, Gender::Male);
-		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
-		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
-		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
-		d.AddJudoka(&j1);
-		d.AddJudoka(&j2);
-		d.AddJudoka(&j3);
-		d.AddJudoka(&j4);
+		d.AddJudoka(j1);
+		d.AddJudoka(j2);
+		d.AddJudoka(j3);
+		d.AddJudoka(j4);
 
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
@@ -431,10 +435,10 @@ TEST(Tournament, ColorsForMatchTables)
 		tourney.Reset();
 		tourney.EnableAutoSave(false);
 
-		EXPECT_TRUE(tourney.AddParticipant(&j1));
-		EXPECT_TRUE(tourney.AddParticipant(&j2));
-		EXPECT_TRUE(tourney.AddParticipant(&j3));
-		EXPECT_TRUE(tourney.AddParticipant(&j4));
+		EXPECT_TRUE(tourney.AddParticipant(j1));
+		EXPECT_TRUE(tourney.AddParticipant(j2));
+		EXPECT_TRUE(tourney.AddParticipant(j3));
+		EXPECT_TRUE(tourney.AddParticipant(j4));
 
 		tourney.AddMatchTable(new Weightclass(50, 55));
 		tourney.AddMatchTable(new Weightclass(60, 65));
@@ -457,17 +461,17 @@ TEST(Tournament, ParticipantHasSameIDAsInDatabase)
 
 	EXPECT_TRUE(d.GetNumJudoka() == 0);
 
-	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+	Judoka* j1 = new Judoka("Firstname", "Lastname", 50, Gender::Male);
 
-	d.AddJudoka(&j1);
+	d.AddJudoka(j1);
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 	Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 	tourney.Reset();
 
-	EXPECT_TRUE(tourney.AddParticipant(&j1));
-	ASSERT_TRUE(tourney.FindParticipant(j1.GetUUID()));
-	EXPECT_EQ(j1.GetUUID(), tourney.FindParticipant(j1.GetUUID())->GetUUID());
+	EXPECT_TRUE(tourney.AddParticipant(j1));
+	ASSERT_TRUE(tourney.FindParticipant(j1->GetUUID()));
+	EXPECT_EQ(j1->GetUUID(), tourney.FindParticipant(j1->GetUUID())->GetUUID());
 	//tourney gets saved now
 
 	tourney.EnableAutoSave(false);
@@ -476,8 +480,8 @@ TEST(Tournament, ParticipantHasSameIDAsInDatabase)
 	Tournament t("deleteMe");
 	t.EnableAutoSave(false);
 	EXPECT_EQ(t.GetParticipants().size(), 1);
-	ASSERT_TRUE(t.FindParticipant(j1.GetUUID()));
-	EXPECT_EQ(j1.GetUUID(), t.FindParticipant(j1.GetUUID())->GetUUID());
+	ASSERT_TRUE(t.FindParticipant(j1->GetUUID()));
+	EXPECT_EQ(j1->GetUUID(), t.FindParticipant(j1->GetUUID())->GetUUID());
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
@@ -490,9 +494,9 @@ TEST(Tournament, CanNotAddParticipantOfWrongAssociation)
 	
 	auto club1 = new Club("Club1");
 	auto club2 = new Club("Club2");
-	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
+	Judoka* j1 = new Judoka("Firstname", "Lastname", 50, Gender::Male);
 
-	j1.SetClub(club1);
+	j1->SetClub(club1);
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 	Tournament tourney("deleteMe");
@@ -503,10 +507,10 @@ TEST(Tournament, CanNotAddParticipantOfWrongAssociation)
 	ASSERT_TRUE(tourney.GetOrganizer());
 	EXPECT_EQ(*tourney.GetOrganizer(), *club2);
 
-	EXPECT_FALSE(tourney.AddParticipant(&j1));
+	EXPECT_FALSE(tourney.AddParticipant(j1));
 	tourney.SetOrganizer(club1);
 	EXPECT_EQ(*tourney.GetOrganizer(), *club1);
-	EXPECT_TRUE(tourney.AddParticipant(&j1));
+	EXPECT_TRUE(tourney.AddParticipant(j1));
 
 	//tourney gets saved now
 	tourney.EnableAutoSave(false);
@@ -515,8 +519,8 @@ TEST(Tournament, CanNotAddParticipantOfWrongAssociation)
 	Tournament t("deleteMe");
 	t.EnableAutoSave(false);
 	EXPECT_EQ(t.GetParticipants().size(), 1);
-	ASSERT_TRUE(t.FindParticipant(j1.GetUUID()));
-	EXPECT_EQ(j1.GetUUID(), t.FindParticipant(j1.GetUUID())->GetUUID());
+	ASSERT_TRUE(t.FindParticipant(j1->GetUUID()));
+	EXPECT_EQ(j1->GetUUID(), t.FindParticipant(j1->GetUUID())->GetUUID());
 	ASSERT_TRUE(t.GetOrganizer());
 	EXPECT_EQ(*t.GetOrganizer(), *club1);
 
@@ -638,33 +642,33 @@ TEST(Tournament, SaveAndLoad)
 
 		EXPECT_EQ(d.GetNumJudoka(), 0);
 
-		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
-		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
-		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
-		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
-		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
+		EXPECT_NE(j1->GetUUID(), j2->GetUUID());
 
-		d.AddJudoka(&j1);
-		d.AddJudoka(&j2);
-		d.AddJudoka(&j3);
-		d.AddJudoka(&j4);
+		d.AddJudoka(j1);
+		d.AddJudoka(j2);
+		d.AddJudoka(j3);
+		d.AddJudoka(j4);
 
 		Tournament* tourney = new Tournament("deleteMe", d.FindRuleSetByName("Default"));
 		tourney->Reset();
 
-		EXPECT_TRUE(tourney->AddParticipant(&j1));
-		EXPECT_TRUE(tourney->AddParticipant(&j2));
-		EXPECT_TRUE(tourney->AddParticipant(&j3));
-		EXPECT_TRUE(tourney->AddParticipant(&j4));
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+		EXPECT_TRUE(tourney->AddParticipant(j3));
+		EXPECT_TRUE(tourney->AddParticipant(j4));
 
 		tourney->AddMatchTable(new Weightclass(50, 55));
 		tourney->AddMatchTable(new Weightclass(60, 65));
-		tourney->AddMatch(new Match(&j1, &j3, tourney, 1));
-		tourney->AddMatch(new Match(&j1, &j4, tourney, 2));
+		tourney->AddMatch(new Match(j1, j3, tourney, 1));
+		tourney->AddMatch(new Match(j1, j4, tourney, 2));
 		tourney->GenerateSchedule();
 
-		tourney->Disqualify(j1);
+		tourney->Disqualify(*j1);
 
 		tourney->EnableAutoSave(false);
 
@@ -677,10 +681,10 @@ TEST(Tournament, SaveAndLoad)
 		EXPECT_EQ(t.GetMatchTables().size(), 4);
 		EXPECT_EQ(t.GetSchedule().size(), 4);
 
-		EXPECT_TRUE(t.IsDisqualified(j1));
-		EXPECT_FALSE(t.IsDisqualified(j2));
-		EXPECT_FALSE(t.IsDisqualified(j3));
-		EXPECT_FALSE(t.IsDisqualified(j4));
+		EXPECT_TRUE( t.IsDisqualified(*j1));
+		EXPECT_FALSE(t.IsDisqualified(*j2));
+		EXPECT_FALSE(t.IsDisqualified(*j3));
+		EXPECT_FALSE(t.IsDisqualified(*j4));
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
@@ -700,25 +704,25 @@ TEST(Tournament, SaveAndLoad_MatchTableConnection)
 
 		EXPECT_EQ(d.GetNumJudoka(), 0);
 
-		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
-		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
-		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
-		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
-		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
+		EXPECT_NE(j1->GetUUID(), j2->GetUUID());
 
-		d.AddJudoka(&j1);
-		d.AddJudoka(&j2);
-		d.AddJudoka(&j3);
-		d.AddJudoka(&j4);
+		d.AddJudoka(j1);
+		d.AddJudoka(j2);
+		d.AddJudoka(j3);
+		d.AddJudoka(j4);
 
 		Tournament* tourney = new Tournament("deleteMe", d.FindRuleSetByName("Default"));
 		tourney->Reset();
 
-		EXPECT_TRUE(tourney->AddParticipant(&j1));
-		EXPECT_TRUE(tourney->AddParticipant(&j2));
-		EXPECT_TRUE(tourney->AddParticipant(&j3));
-		EXPECT_TRUE(tourney->AddParticipant(&j4));
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+		EXPECT_TRUE(tourney->AddParticipant(j3));
+		EXPECT_TRUE(tourney->AddParticipant(j4));
 
 		tourney->AddMatchTable(new Weightclass(50, 155));
 		tourney->GenerateSchedule();
@@ -753,15 +757,15 @@ TEST(Tournament, SaveAndLoad_AgeGroups)
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
-		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
-		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
-		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
-		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
-		j1.SetBirthyear(2000);
-		j2.SetBirthyear(2000);
-		j3.SetBirthyear(2000);
-		j4.SetBirthyear(2000);
+		j1->SetBirthyear(2000);
+		j2->SetBirthyear(2000);
+		j3->SetBirthyear(2000);
+		j4->SetBirthyear(2000);
 
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 		Tournament tourney("deleteMe");
@@ -769,10 +773,10 @@ TEST(Tournament, SaveAndLoad_AgeGroups)
 		AgeGroup a("AgeGroup", 20, 1000, nullptr, tourney.GetDatabase());
 
 		tourney.AddAgeGroup(&a);
-		EXPECT_TRUE(tourney.AddParticipant(&j1));
-		EXPECT_TRUE(tourney.AddParticipant(&j2));
-		EXPECT_TRUE(tourney.AddParticipant(&j3));
-		EXPECT_TRUE(tourney.AddParticipant(&j4));
+		EXPECT_TRUE(tourney.AddParticipant(j1));
+		EXPECT_TRUE(tourney.AddParticipant(j2));
+		EXPECT_TRUE(tourney.AddParticipant(j3));
+		EXPECT_TRUE(tourney.AddParticipant(j4));
 
 
 		Tournament t("deleteMe");
@@ -855,30 +859,30 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 
 		EXPECT_EQ(d.GetNumJudoka(), 0);
 
-		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
-		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
-		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
-		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
-		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
+		EXPECT_NE(j1->GetUUID(), j2->GetUUID());
 
-		d.AddJudoka(&j1);
-		d.AddJudoka(&j2);
-		d.AddJudoka(&j3);
-		d.AddJudoka(&j4);
+		d.AddJudoka(j1);
+		d.AddJudoka(j2);
+		d.AddJudoka(j3);
+		d.AddJudoka(j4);
 
 		Tournament* tourney = new Tournament("deleteMe", d.FindRuleSetByName("Default"));
 		tourney->Reset();
 
-		EXPECT_TRUE(tourney->AddParticipant(&j1));
-		EXPECT_TRUE(tourney->AddParticipant(&j2));
-		EXPECT_TRUE(tourney->AddParticipant(&j3));
-		EXPECT_TRUE(tourney->AddParticipant(&j4));
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+		EXPECT_TRUE(tourney->AddParticipant(j3));
+		EXPECT_TRUE(tourney->AddParticipant(j4));
 
 		tourney->AddMatchTable(new Weightclass(50, 55));
 		tourney->AddMatchTable(new Weightclass(60, 65));
-		tourney->AddMatch(new Match(&j1, &j3, tourney, 2));
-		tourney->AddMatch(new Match(&j1, &j4, tourney, 2));
+		tourney->AddMatch(new Match(j1, j3, tourney, 2));
+		tourney->AddMatch(new Match(j1, j4, tourney, 2));
 		tourney->GenerateSchedule();
 
 		tourney->EnableAutoSave(false);
@@ -903,6 +907,8 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 			else
 				EXPECT_TRUE(match->IsAutoGenerated());
 		}
+
+		delete tourney;
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
@@ -923,26 +929,26 @@ TEST(Tournament, ChangeScheduleIndexAfterDeletion)
 
 		EXPECT_EQ(d.GetNumJudoka(), 0);
 
-		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
-		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
-		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
-		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
-		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
+		EXPECT_NE(j1->GetUUID(), j2->GetUUID());
 
-		d.AddJudoka(&j1);
-		d.AddJudoka(&j2);
-		d.AddJudoka(&j3);
-		d.AddJudoka(&j4);
+		d.AddJudoka(j1);
+		d.AddJudoka(j2);
+		d.AddJudoka(j3);
+		d.AddJudoka(j4);
 
 		Tournament* tourney = new Tournament("deleteMe", d.FindRuleSetByName("Default"));
 		tourney->Reset();
 		tourney->EnableAutoSave(false);
 
-		EXPECT_TRUE(tourney->AddParticipant(&j1));
-		EXPECT_TRUE(tourney->AddParticipant(&j2));
-		EXPECT_TRUE(tourney->AddParticipant(&j3));
-		EXPECT_TRUE(tourney->AddParticipant(&j4));
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+		EXPECT_TRUE(tourney->AddParticipant(j3));
+		EXPECT_TRUE(tourney->AddParticipant(j4));
 
 		auto w1 = new Weightclass(50, 55);
 		auto w2 = new Weightclass(60, 65);
@@ -975,26 +981,26 @@ TEST(Tournament, ChangeScheduleIndexAfterChangingMat)
 
 		EXPECT_EQ(d.GetNumJudoka(), 0);
 
-		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
-		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
-		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
-		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
-		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
+		EXPECT_NE(j1->GetUUID(), j2->GetUUID());
 
-		d.AddJudoka(&j1);
-		d.AddJudoka(&j2);
-		d.AddJudoka(&j3);
-		d.AddJudoka(&j4);
+		d.AddJudoka(j1);
+		d.AddJudoka(j2);
+		d.AddJudoka(j3);
+		d.AddJudoka(j4);
 
 		Tournament* tourney = new Tournament("deleteMe", d.FindRuleSetByName("Default"));
 		tourney->Reset();
 		tourney->EnableAutoSave(false);
 
-		EXPECT_TRUE(tourney->AddParticipant(&j1));
-		EXPECT_TRUE(tourney->AddParticipant(&j2));
-		EXPECT_TRUE(tourney->AddParticipant(&j3));
-		EXPECT_TRUE(tourney->AddParticipant(&j4));
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+		EXPECT_TRUE(tourney->AddParticipant(j3));
+		EXPECT_TRUE(tourney->AddParticipant(j4));
 
 		auto w1 = new Weightclass(50, 55);
 		auto w2 = new Weightclass(60, 65);
@@ -1040,25 +1046,25 @@ TEST(Tournament, SaveAndLoad_SingleElimination)
 
 		EXPECT_EQ(d.GetNumJudoka(), 0);
 
-		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
-		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
-		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
-		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
-		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
+		EXPECT_NE(j1->GetUUID(), j2->GetUUID());
 
-		d.AddJudoka(&j1);
-		d.AddJudoka(&j2);
-		d.AddJudoka(&j3);
-		d.AddJudoka(&j4);
+		d.AddJudoka(j1);
+		d.AddJudoka(j2);
+		d.AddJudoka(j3);
+		d.AddJudoka(j4);
 
 		Tournament* tourney = new Tournament("deleteMe", d.FindRuleSetByName("Default"));
 		tourney->Reset();
 
-		EXPECT_TRUE(tourney->AddParticipant(&j1));
-		EXPECT_TRUE(tourney->AddParticipant(&j2));
-		EXPECT_TRUE(tourney->AddParticipant(&j3));
-		EXPECT_TRUE(tourney->AddParticipant(&j4));
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+		EXPECT_TRUE(tourney->AddParticipant(j3));
+		EXPECT_TRUE(tourney->AddParticipant(j4));
 
 		tourney->AddMatchTable(new SingleElimination(10, 105));
 		tourney->GenerateSchedule();
@@ -1084,6 +1090,8 @@ TEST(Tournament, SaveAndLoad_SingleElimination)
 
 		EXPECT_EQ(t.GetSchedule()[2]->GetDependentMatches()[0]->GetUUID(), t.GetSchedule()[0]->GetUUID());
 		EXPECT_EQ(t.GetSchedule()[2]->GetDependentMatches()[1]->GetUUID(), t.GetSchedule()[1]->GetUUID());
+
+		delete tourney;
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
@@ -1102,27 +1110,27 @@ TEST(Tournament, AddMatchAfterConclusion)
 
 		EXPECT_TRUE(d.GetNumJudoka() == 0);
 
-		Judoka j1("Firstname", "Lastname", 50, Gender::Male);
-		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
-		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
-		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+		Judoka* j1 = new Judoka("Firstname", "Lastname", 50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
-		d.AddJudoka(&j1);
-		d.AddJudoka(&j2);
-		d.AddJudoka(&j3);
-		d.AddJudoka(&j4);
+		d.AddJudoka(j1);
+		d.AddJudoka(j2);
+		d.AddJudoka(j3);
+		d.AddJudoka(j4);
 
 		Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 		tourney.Reset();
 		tourney.EnableAutoSave(false);
 
-		EXPECT_TRUE(tourney.AddParticipant(&j1));
-		EXPECT_TRUE(tourney.AddParticipant(&j2));
-		EXPECT_TRUE(tourney.AddParticipant(&j3));
-		EXPECT_TRUE(tourney.AddParticipant(&j4));
+		EXPECT_TRUE(tourney.AddParticipant(j1));
+		EXPECT_TRUE(tourney.AddParticipant(j2));
+		EXPECT_TRUE(tourney.AddParticipant(j3));
+		EXPECT_TRUE(tourney.AddParticipant(j4));
 
-		auto match1 = new Match(&j1, &j3, &tourney, 1);
-		auto match2 = new Match(&j1, &j4, &tourney, 1);
+		auto match1 = new Match(j1, j3, &tourney, 1);
+		auto match2 = new Match(j1, j4, &tourney, 1);
 
 		EXPECT_TRUE(tourney.AddMatch(match1));
 
@@ -1150,27 +1158,27 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 
 	EXPECT_TRUE(d.GetNumJudoka() == 0);
 
-	Judoka j1("Firstname", "Lastname", 50, Gender::Male);
-	Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
-	Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
-	Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
+	Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+	Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+	Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+	Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
-	d.AddJudoka(&j1);
-	d.AddJudoka(&j2);
-	d.AddJudoka(&j3);
-	d.AddJudoka(&j4);
+	d.AddJudoka(j1);
+	d.AddJudoka(j2);
+	d.AddJudoka(j3);
+	d.AddJudoka(j4);
 
 	Tournament tourney("", d.FindRuleSetByName("Default"));//Temporary tournament
 	tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	EXPECT_TRUE(tourney.AddParticipant(&j1));
-	EXPECT_TRUE(tourney.AddParticipant(&j2));
-	EXPECT_TRUE(tourney.AddParticipant(&j3));
-	EXPECT_TRUE(tourney.AddParticipant(&j4));
+	EXPECT_TRUE(tourney.AddParticipant(j1));
+	EXPECT_TRUE(tourney.AddParticipant(j2));
+	EXPECT_TRUE(tourney.AddParticipant(j3));
+	EXPECT_TRUE(tourney.AddParticipant(j4));
 
-	auto match1 = new Match(&j1, &j3, &tourney, 1);
-	auto match2 = new Match(&j1, &j4, &tourney, 1);
+	auto match1 = new Match(j1, j3, &tourney, 1);
+	auto match2 = new Match(j1, j4, &tourney, 1);
 
 	EXPECT_TRUE(tourney.AddMatch(match1));
 
