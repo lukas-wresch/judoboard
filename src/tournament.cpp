@@ -270,19 +270,6 @@ bool Tournament::LoadYAML(const std::string& Filename)
 			}
 
 			MatchTable* new_table  = nullptr;
-			IFilter*    new_filter = nullptr;
-
-			if (node["filter"] && node["filter"].IsMap() && node["filter"]["type"])
-			{
-				switch ((IFilter::Type)node["filter"]["type"].as<int>())
-				{
-				case IFilter::Type::Weightclass:
-					new_filter = new Weightclass(node, this);
-					break;
-				default:
-					ZED::Log::Warn("Unknown filter!");
-				}
-			}
 
 			switch ((MatchTable::Type)node["type"].as<int>())
 			{
@@ -298,12 +285,7 @@ bool Tournament::LoadYAML(const std::string& Filename)
 			}
 
 			if (new_table)
-			{
-				//Connect match table with filter
-				new_table->SetFilter(new_filter);
-
 				m_MatchTables.push_back(new_table);
-			}
 		}
 	}
 

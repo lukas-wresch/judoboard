@@ -12,6 +12,9 @@ using namespace Judoboard;
 IFilter::IFilter(const YAML::Node& Yaml, const ITournament* Tournament)
 	: IFilter(Tournament)
 {
+	if (Yaml["age_group"] && Tournament)
+		SetAgeGroup(Tournament->FindAgeGroup(Yaml["age_group"].as<std::string>()));
+
 	if (Yaml["participants"] && Yaml["participants"].IsMap() && Tournament)
 	{
 		for (const auto& node : Yaml["participants"])
@@ -23,6 +26,9 @@ IFilter::IFilter(const YAML::Node& Yaml, const ITournament* Tournament)
 
 void IFilter::operator >> (YAML::Emitter& Yaml) const
 {
+	if (GetAgeGroup())
+		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)GetAgeGroup()->GetUUID();
+
 	Yaml << YAML::Key << "participants";
 
 	Yaml << YAML::BeginMap;

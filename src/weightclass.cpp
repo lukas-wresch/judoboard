@@ -85,22 +85,14 @@ void Weightclass::ToString(YAML::Emitter& Yaml) const
 
 std::string Weightclass::GetDescription() const
 {
-	/*std::string desc = GetName();
-
-	if (desc.length() > 0)
-	{
-		if (GetAgeGroup() && GetAgeGroup()->GetGender() != Gender::Unknown)
-			return GetAgeGroup()->GetName() + " " + desc;
-		else if (GetAgeGroup())
-			return GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender) + " " + desc;
-		return desc;
-	}*/
-
 	std::string desc;
 
 	if (GetAgeGroup())
 	{
-		desc = GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender);
+		if (GetAgeGroup()->GetGender() != Gender::Unknown)
+			desc = GetAgeGroup()->GetName();
+		else
+			desc = GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender);
 
 		if ((uint32_t)m_MaxWeight == 0)
 			desc += " +" + m_MinWeight.ToString() + " kg";
