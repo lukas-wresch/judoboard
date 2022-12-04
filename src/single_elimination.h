@@ -59,6 +59,12 @@ namespace Judoboard
 
 
 	private:
+		void FindFreeStartPos(const Judoka* NewParticipant);
+		size_t GetMaxStartPos() const {
+			const auto rounds = GetNumberOfRounds();
+			return (int)pow(2, rounds);
+		}
+
 		size_t GetNumberOfRounds() const {
 			if (GetParticipants().size() == 0)
 				return 0;
