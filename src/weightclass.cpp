@@ -28,7 +28,7 @@ Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, Gender Gender, cons
 
 
 
-Weightclass::Weightclass(const YAML::Node& Yaml, const ITournament* Tournament) : IFilter(Tournament)
+Weightclass::Weightclass(const YAML::Node& Yaml, const ITournament* Tournament) : IFilter(Yaml, Tournament)
 {
 	if (Yaml["min_weight"])
 		m_MinWeight = Weight(Yaml["min_weight"]);
@@ -55,18 +55,27 @@ Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament*
 
 void Weightclass::operator >> (YAML::Emitter& Yaml) const
 {
+	Yaml << YAML::BeginMap;
+
+	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
+
 	Yaml << YAML::Key << "min_weight" << YAML::Value;
 	m_MinWeight >> Yaml;
 	Yaml << YAML::Key << "max_weight" << YAML::Value;
 	m_MaxWeight >> Yaml;
 
 	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;
+
+	IFilter::operator>>(Yaml);
+
+	Yaml << YAML::EndMap;
 }
 
 
 
 void Weightclass::ToString(YAML::Emitter& Yaml) const
 {
+	Yaml << YAML::Key << "type"       << YAML::Value << (int)GetType();
 	Yaml << YAML::Key << "min_weight" << YAML::Value << m_MinWeight.ToString();
 	Yaml << YAML::Key << "max_weight" << YAML::Value << m_MaxWeight.ToString();
 	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;

@@ -82,24 +82,17 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add weightclasses
 	for (auto weightclass : File.GetWeightclasses())
 	{
-		/*auto new_weightclass = new Weightclass(*weightclass, this);
+		auto new_weightclass = new RoundRobin(*weightclass, this);
 
 		//Connect to age group
 		if (weightclass->AgeGroup)
 			new_weightclass->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
 
-		//Freeze the name
-		auto temp  = new_weightclass->GetGender();
-		auto temp2 = new_weightclass->GetAgeGroup();
-		new_weightclass->SetGender(Gender::Unknown);
-		new_weightclass->SetAgeGroup(nullptr);
-		new_weightclass->SetName(new_weightclass->GetDescription());
-		new_weightclass->SetGender(temp);
-		new_weightclass->SetAgeGroup(temp2);
+		new_weightclass->SetName(weightclass->Description);
 
 		weightclass->pUserData = new_weightclass;
 
-		m_MatchTables.emplace_back(new_weightclass);*/
+		m_MatchTables.emplace_back(new_weightclass);
 	}
 
 	//Add judoka
@@ -123,7 +116,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 			if (judoka->Weightclass)
 			{
-				auto match_table = (Weightclass*)judoka->Weightclass->pUserData;
+				auto match_table = (MatchTable*)judoka->Weightclass->pUserData;
 				if (match_table)
 					match_table->AddParticipant(new_judoka, true);//Add with force
 			}
@@ -158,7 +151,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (match.Weightclass && match.Weightclass->pUserData)
 		{
 			auto match_table = (MatchTable*)match.Weightclass->pUserData;
-			//match_table->AddMatch(new_match);//Add match to weightclass
+			match_table->AddMatch(new_match);//Add match to weightclass
 		}
 
 		m_Schedule.emplace_back(new_match);
@@ -279,9 +272,9 @@ bool Tournament::LoadYAML(const std::string& Filename)
 			MatchTable* new_table  = nullptr;
 			IFilter*    new_filter = nullptr;
 
-			if (node["filter"])
+			if (node["filter"] && node["filter"].IsMap() && node["filter"]["type"])
 			{
-				switch ((IFilter::Type)node["filter"].as<int>())
+				switch ((IFilter::Type)node["filter"]["type"].as<int>())
 				{
 				case IFilter::Type::Weightclass:
 					new_filter = new Weightclass(node, this);
@@ -297,7 +290,7 @@ bool Tournament::LoadYAML(const std::string& Filename)
 				new_table = new RoundRobin(node, this);
 				break;
 			case MatchTable::Type::Custom:
-				//new_table = new CustomTable(node, this);
+				new_table = new CustomTable(node, this);
 				break;
 			case MatchTable::Type::SingleElimination:
 				new_table = new SingleElimination(node, this);

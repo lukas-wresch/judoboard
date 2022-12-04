@@ -4,6 +4,7 @@
 #include "matchtable.h"
 #include "match.h"
 #include "filter.h"
+#include "weightclass.h"
 #include "tournament.h"
 
 
@@ -179,15 +180,10 @@ bool MatchTable::RemoveParticipant(const Judoka* Participant)
 
 std::string MatchTable::GetDescription() const
 {
-	std::string desc = GetName();
-
-	if (desc.length() > 0)
-		return desc;
-
 	if (m_Filter)
-		desc = m_Filter->GetDescription();
+		return m_Filter->GetDescription() + " " + GetName();
 
-	return desc;
+	return GetName();
 }
 
 
@@ -316,13 +312,15 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament) : 
 	if (Yaml["age_group"] && Tournament)
 		SetAgeGroup(Tournament->FindAgeGroup(Yaml["age_group"].as<std::string>()));
 
-	if (Yaml["participants"] && Yaml["participants"].IsSequence() && Tournament)
+	if (Yaml["filter"] && Yaml["filter"].IsMap())
 	{
-		for (const auto& node : Yaml["participants"])
+		switch ((IFilter::Type)Yaml["filter"]["type"].as<int>())
 		{
-			auto participant = Tournament->FindParticipant(node.as<std::string>());
-			if (participant)
-				AddParticipant(participant, true);
+			case IFilter::Type::Weightclass:
+				SetFilter(new Weightclass(Yaml["filter"], GetTournament()));
+				break;
+			default:
+				ZED::Log::Error("Unknown filter in match table");
 		}
 	}
 
@@ -403,13 +401,11 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 	if (GetAgeGroup())
 		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)GetAgeGroup()->GetUUID();
 
-	Yaml << YAML::Key << "participants";
-	Yaml << YAML::BeginSeq;
-
-	for (auto judoka : GetParticipants())
-		Yaml << (std::string)judoka->GetUUID();
-
-	Yaml << YAML::EndSeq;
+	if (GetFilter())
+	{
+		Yaml << YAML::Key << "filter" << YAML::Value;
+		*GetFilter() >> Yaml;
+	}
 
 	Yaml << YAML::Key << "matches";
 	Yaml << YAML::BeginSeq;
@@ -433,6 +429,8 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
 	Yaml << YAML::Key << "description" << YAML::Value << GetDescription();
 
+	Yaml << YAML::Key << "best_of_three" << YAML::Value << m_BestOfThree;
+
 	if (m_Rules)
 		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
 	if (GetAgeGroup())
@@ -452,8 +450,6 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 			Yaml << YAML::Key << "starting_pos" << YAML::Value << GetStartPosition(judoka);
 		Yaml << YAML::EndMap;
 	}
-
-	Yaml << YAML::Key << "best_of_three" << YAML::Value << m_BestOfThree;
 
 	Yaml << YAML::EndSeq;
 }

@@ -30,9 +30,6 @@ namespace Judoboard
 		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
 
-		virtual void operator >> (YAML::Emitter& Yaml) const = 0;
-		virtual void ToString(YAML::Emitter& Yaml) const = 0;
-
 		virtual size_t GetMaxStartPositions() const { return m_Participants.size(); }
 
 		//Age groups
@@ -55,6 +52,9 @@ namespace Judoboard
 		bool IsStartPositionTaken(size_t StartPosition) const {
 			return m_Participants.find(StartPosition) != m_Participants.end();
 		}
+
+		virtual void operator >> (YAML::Emitter& Yaml) const;
+		virtual void ToString(YAML::Emitter& Yaml) const;
 
 
 	protected:

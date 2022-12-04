@@ -45,15 +45,6 @@ void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "third_place_match" << YAML::Value << m_ThirdPlaceMatch;
 	if (m_FifthPlaceMatch)
 		Yaml << YAML::Key << "fifth_place_match" << YAML::Value << m_FifthPlaceMatch;
-
-	/*if (!m_StartPositions.empty())
-	{
-		Yaml << YAML::Key << "starting_positions" << YAML::Value;
-		Yaml << YAML::BeginMap;
-		for (const auto [starting_pos, judoka] : m_StartPositions)
-			Yaml << YAML::Key << starting_pos << YAML::Value << (std::string)judoka->GetUUID();
-		Yaml << YAML::EndMap;
-	}*/
 }
 
 

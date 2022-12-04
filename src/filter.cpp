@@ -12,11 +12,41 @@ using namespace Judoboard;
 IFilter::IFilter(const YAML::Node& Yaml, const ITournament* Tournament)
 	: IFilter(Tournament)
 {
-	if (Yaml["starting_positions"] && Yaml["starting_positions"].IsMap() && Tournament)
+	if (Yaml["participants"] && Yaml["participants"].IsMap() && Tournament)
 	{
-		for (const auto& node : Yaml["starting_positions"])
+		for (const auto& node : Yaml["participants"])
 			m_Participants.insert({ node.first.as<int>(), Tournament->FindParticipant(node.second.as<std::string>()) });
 	}
+}
+
+
+
+void IFilter::operator >> (YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::Key << "participants";
+
+	Yaml << YAML::BeginMap;
+	for (const auto [start_pos, judoka] : GetParticipants())
+	{
+		if (judoka.GetJudoka())//TODO handle other cases
+			Yaml << YAML::Key << start_pos << YAML::Value << (std::string)judoka.GetJudoka()->GetUUID();
+	}
+	Yaml << YAML::EndMap;
+}
+
+
+
+void IFilter::ToString(YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::Key << "participants";
+
+	Yaml << YAML::BeginMap;
+	for (const auto [start_pos, judoka] : GetParticipants())
+	{
+		if (judoka.GetJudoka())//TODO handle other cases
+			Yaml << YAML::Key << start_pos << YAML::Value << (std::string)judoka.GetJudoka()->GetUUID();
+	}
+	Yaml << YAML::EndMap;
 }
 
 
@@ -97,10 +127,12 @@ void IFilter::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
 
 		assert(judoka_on_slot);
 
+		auto copy = *judoka_on_slot;
+
 		m_Participants.erase(my_old_pos);
 		m_Participants.erase(NewStartPosition);
 		if (judoka_on_slot)
-			m_Participants.insert({ my_old_pos, *judoka_on_slot });
+			m_Participants.insert({ my_old_pos, copy });
 		m_Participants.insert({ NewStartPosition, Judoka });
 	}
 

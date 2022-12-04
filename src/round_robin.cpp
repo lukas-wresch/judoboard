@@ -202,7 +202,8 @@ const std::string RoundRobin::ToHTML() const
 
 	auto results = CalculateResults();
 
-	for (size_t i = 0; i < GetMaxStartPositions(); ++i)
+	if (GetFilter())
+		for (size_t i = 0; i < GetMaxStartPositions(); ++i)
 	{
 		auto fighter = GetJudokaByStartPosition(i);
 

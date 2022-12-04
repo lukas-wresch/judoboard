@@ -244,7 +244,7 @@ namespace Judoboard
 			class Iterator {
 			public:
 				Iterator(Result* Data) : m_Data(Data) {}
-				bool operator != (Iterator rhs) {return m_Data != rhs.m_Data; }
+				bool operator != (Iterator rhs) { return m_Data != rhs.m_Data; }
 				Result& operator*() { return *m_Data; }
 				void operator++() { ++m_Data; }
 
@@ -253,7 +253,7 @@ namespace Judoboard
 			};
 
 			Iterator begin() { return Iterator(&m_Results[0]); }
-			Iterator end() { return Iterator(&m_Results[GetSize()]); }
+			Iterator end()   { return Iterator(&m_Results[0] + GetSize()); }
 
 		private:
 			mutable std::vector<Result> m_Results;
