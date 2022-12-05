@@ -194,7 +194,7 @@ namespace Judoboard
 		private:
 			Animation() = default;
 
-			Type m_Type;
+			Type m_Type = Type::MoveConstantVelocity;
 			std::function<bool(const GraphicElement&)> m_AnimateTill;
 			std::function<void(Mat&)> m_onEnd = nullptr;//Will be executed when the animation ends
 
