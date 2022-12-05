@@ -1169,7 +1169,6 @@ void Mat::NextState(State NextState) const
 	if (m_State == State::TransitionToWaiting && NextState == State::TransitionToMatch)
 		this->NextState(State::Waiting);
 
-	m_State = NextState;
 	m_CurrentStateStarted = Timer::GetTimestamp();
 
 	auto width  = m_Window.GetRenderer().GetWidth();
@@ -1188,7 +1187,7 @@ void Mat::NextState(State NextState) const
 
 	auto& renderer = m_Window.GetRenderer();
 
-	switch (m_State)
+	switch (NextState)
 	{
 		case State::StartUp:
 			m_Graphics["mat_name"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -30.0, [](auto& g) { return g.m_a > 0.0; }));
@@ -1450,6 +1449,8 @@ void Mat::NextState(State NextState) const
 			m_Graphics["winner_white"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0));
 			break;
 	}
+
+	m_State = NextState;
 }
 
 
