@@ -57,6 +57,25 @@ void IFilter::ToString(YAML::Emitter& Yaml) const
 
 
 
+void IFilter::FindFreeStartPos(const DependentJudoka& NewParticipant)
+{
+	auto old_pos = GetStartPosition(NewParticipant);
+
+	if (old_pos != SIZE_MAX)
+		m_Participants.erase(old_pos);
+
+	for (size_t startPos = 0; true; startPos++)
+	{
+		if (!IsStartPositionTaken(startPos))
+		{
+			m_Participants.insert({ startPos, NewParticipant });
+			break;
+		}
+	}
+}
+
+
+
 bool IFilter::AddParticipant(const Judoka* NewParticipant, bool Force)
 {
 	if (!NewParticipant)
@@ -71,14 +90,7 @@ bool IFilter::AddParticipant(const Judoka* NewParticipant, bool Force)
 		if (judoka == NewParticipant)
 			return false;
 
-	for (size_t startPos = 0; true; startPos++)
-	{
-		if (!IsStartPositionTaken(startPos))
-		{
-			m_Participants.insert({ startPos, NewParticipant });
-			break;
-		}
-	}
+	FindFreeStartPos(NewParticipant);
 
 	SortParticipantsByStartPosition();
 	return true;
@@ -88,17 +100,49 @@ bool IFilter::AddParticipant(const Judoka* NewParticipant, bool Force)
 
 bool IFilter::RemoveParticipant(const Judoka* Participant)
 {
-	if (!Participant)
-		return false;
+	return RemoveParticipant(Participant);
+}
+
+
+
+bool IFilter::RemoveParticipant(const DependentJudoka& Participant)
+{
+	auto old_max = GetMaxStartPositions();
 
 	auto pos = GetStartPosition(Participant);
 	if (pos != SIZE_MAX)
 	{
 		m_Participants.erase(pos);
+
+		auto new_max = GetMaxStartPositions(); 
+
+		if (new_max < old_max)
+		{
+			for (size_t i = new_max; i < old_max; ++i)
+			{
+				auto judoka = GetJudokaByStartPosition(i);
+				if (judoka)
+					FindFreeStartPos(*judoka);
+			}
+		}
+
 		return true;
 	}
 
 	return false;
+}
+
+
+
+size_t IFilter::GetStartPosition(const DependentJudoka& Judoka) const
+{
+	for (auto [pos, participant] : m_Participants)
+	{
+		if (participant == Judoka)
+			return pos;
+	}
+
+	return SIZE_MAX;
 }
 
 

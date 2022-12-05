@@ -19,6 +19,21 @@ bool DependentJudoka::operator == (const Judoka* rhs) const
 
 
 
+bool DependentJudoka::operator == (const DependentJudoka& rhs) const
+{
+	if (m_Type != rhs.m_Type)
+		return false;
+	if (m_Judoka != rhs.m_Judoka)
+		return false;
+	if (m_DependentMatch != rhs.m_DependentMatch)
+		return false;
+	if (m_DependentMatchTable != rhs.m_DependentMatchTable)
+		return false;
+	return true;
+}
+
+
+
 JudokaData::JudokaData(const Judoka& Judoka)
 {
 	m_Firstname = Judoka.GetFirstname();

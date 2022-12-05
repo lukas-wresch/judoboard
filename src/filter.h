@@ -60,6 +60,10 @@ namespace Judoboard
 	protected:
 		IFilter(const ITournament* Tournament) : m_Tournament(Tournament) {}
 
+		void FindFreeStartPos(const DependentJudoka& NewParticipant);
+		size_t GetStartPosition(const DependentJudoka& Judoka) const;
+		bool RemoveParticipant(const DependentJudoka& Participant);
+
 		void SortParticipantsByStartPosition() {
 			//std::sort(m_Participants.begin(), m_Participants.end(), [this](const size_t a, const size_t b) {
 				//return a < b;

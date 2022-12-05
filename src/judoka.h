@@ -31,6 +31,7 @@ namespace Judoboard
 		const Judoka* GetJudoka() const { return m_Judoka; }
 
 		bool operator == (const Judoka* rhs) const;
+		bool operator == (const DependentJudoka& rhs) const;
 
 	private:
 		DependentJudoka() = default;
