@@ -82,7 +82,14 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add weightclasses
 	for (auto weightclass : File.GetWeightclasses())
 	{
-		auto new_table = new RoundRobin(*weightclass, this);
+		MatchTable* new_table = nullptr;
+
+		if (weightclass->FightSystemID == 16 || weightclass->FightSystemID == 13 || weightclass->FightSystemID == 14 || weightclass->FightSystemID == 15)//Round robin
+			new_table = new RoundRobin(*weightclass, this);
+		else if (weightclass->FightSystemID == 19)//Single elimination (single consulation bracket)
+			new_table = new SingleElimination(*weightclass, this);
+		else
+			continue;
 
 		//Connect to age group
 		if (weightclass->AgeGroup)
@@ -130,15 +137,18 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add matches
 	for (auto& match : File.GetMatches())
 	{
-		if (match.WhiteID == match.RedID)//Filter dummy matches
+		Judoka* white = nullptr;
+		if (match.White && match.White->pUserData)
+			white = (Judoka*)match.White->pUserData;
+
+		Judoka* blue = nullptr;
+		if (match.Red && match.Red->pUserData)
+			blue = (Judoka*)match.Red->pUserData;
+
+		if (white && blue && *white == *blue)//Filter dummy matches
 			continue;
 
-		if (!match.White || !match.Red)
-			continue;
-		if (!match.White->pUserData || !match.Red->pUserData)
-			continue;
-
-		Match* new_match = new Match((Judoka*)match.White->pUserData, (Judoka*)match.Red->pUserData, this);
+		Match* new_match = new Match(white, blue, this);
 
 		if (match.Status == 3)//Match completed?
 		{

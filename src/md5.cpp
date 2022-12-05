@@ -322,17 +322,20 @@ MD5::MD5(const Tournament& Tournament)
 
 	for (auto match : Tournament.GetSchedule())
 	{
-		if (!match->HasValidFighters())//TODO
-			continue;
-
 		Match new_match;
-		new_match.WhiteID = uuid2id(match->GetFighter(Fighter::White)->GetUUID());
-		new_match.RedID   = uuid2id(match->GetFighter(Fighter::Blue )->GetUUID());
+
+		if (match->GetFighter(Fighter::White))
+			new_match.WhiteID = uuid2id(match->GetFighter(Fighter::White)->GetUUID());
+		if (match->GetFighter(Fighter::Blue))
+			new_match.RedID = uuid2id(match->GetFighter(Fighter::Blue)->GetUUID());
 
 		new_match.White = (Participant*)id2ptr(new_match.WhiteID);
 		new_match.Red   = (Participant*)id2ptr(new_match.RedID);
 
 		auto match_table = match->GetMatchTable();
+
+		if (match_table)
+			new_match.MatchNo = (int)match_table->FindMatchIndex(*match) + 1;
 
 		if (match_table && match_table->GetAgeGroup())
 		{
@@ -343,8 +346,6 @@ MD5::MD5(const Tournament& Tournament)
 
 			new_match.AgeGroupID = uuid2id(match_table->GetAgeGroup()->GetUUID());
 			new_match.AgeGroup   = (AgeGroup*)id2ptr(new_match.AgeGroupID);
-
-			new_match.MatchNo = (int)match_table->FindMatchIndex(*match) + 1;
 
 			//Find start numbers
 			new_match.StartNoWhite = FindStartNo(new_match.AgeGroupID, new_match.WeightclassID, new_match.WhiteID);
@@ -1181,6 +1182,16 @@ MD5::Weightclass* MD5::FindWeightclass(int AgeGroupID, int WeightclassID)
 	for (auto weightclass : m_Weightclasses)
 		if (weightclass && weightclass->AgeGroupID == AgeGroupID && weightclass->ID == WeightclassID)
 			return weightclass;
+	return nullptr;
+}
+
+
+
+const MD5::Weightclass* MD5::FindWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const
+{
+	for (auto table : m_Weightclasses)
+		if (table->AgeGroup && table->AgeGroup->Name == AgeGroup && table->Description == Weightclass)
+			return table;
 	return nullptr;
 }
 

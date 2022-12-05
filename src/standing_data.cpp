@@ -609,6 +609,19 @@ const Judoka* StandingData::FindJudoka(const UUID& UUID) const
 
 
 
+const Judoka* StandingData::FindJudokaByName(const std::string& Name) const
+{
+	for (auto [id, judoka] : m_Judokas)
+	{
+		if (judoka && judoka->GetName(NameStyle::GivenName) == Name)
+			return judoka;
+	}
+
+	return nullptr;
+}
+
+
+
 Judoka* StandingData::FindJudoka_ExactMatch(const JudokaData& NewJudoka)
 {
 	Judoka* ret = nullptr;

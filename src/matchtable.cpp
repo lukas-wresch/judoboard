@@ -119,17 +119,18 @@ Status MatchTable::GetStatus() const
 		if (match->IsEmptyMatch() || match->IsBestOfThree())
 			continue;
 
-		if (!match->HasConcluded())
-			all_matches_finished = false;
+		if (match->IsRunning())
+			return Status::Running;
 
-		if (match->IsRunning() || match->HasConcluded())
+		if (match->HasConcluded())
 			one_match_finished = true;
+		else
+			all_matches_finished = false;
 	}
 
-	if (all_matches_finished)
+	if (all_matches_finished && one_match_finished)
 		return Status::Concluded;
-	if (one_match_finished)
-		return Status::Running;
+
 	return Status::Scheduled;
 }
 
@@ -581,7 +582,10 @@ const std::string MatchTable::ResultsToHTML() const
 		const auto& score = results[i];
 
 		ret += "<tr><td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
-		ret += "<td>" + score.Judoka->GetName(NameStyle::GivenName) + "</td>";
+		if (score.Judoka)
+			ret += "<td>" + score.Judoka->GetName(NameStyle::GivenName) + "</td>";
+		else
+			ret += "<td>- - -</td>";
 
 		ret += "<td>" + std::to_string(score.Wins)  + "</td>";
 		ret += "<td>" + std::to_string(score.Score) + "</td>";

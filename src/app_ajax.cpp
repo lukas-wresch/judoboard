@@ -2932,7 +2932,8 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	GetTournament()->AddMatchTable(new_table);
 
 	Request.m_Query = "id=" + (std::string)new_table->GetUUID();
-	Ajax_EditMatchTable(Request);
+	if (!Ajax_EditMatchTable(Request))
+		return Error::Type::OperationFailed;
 
 	GetTournament()->Save();
 	return Error();//OK

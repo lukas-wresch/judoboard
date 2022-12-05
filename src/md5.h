@@ -171,6 +171,7 @@ namespace Judoboard
 			//1  = double elimination (7 participants, 16 system)
 			//13 = 1 participant
 			//14 = 2 participants (best of 3?)
+			//15 = round robin?
 			//16 = round robin (5 participants)
 			//19 = Single elimination (single consulation bracket, 16 system)
 			//24 = pooled (6 participants) 3+3 pool
@@ -331,6 +332,7 @@ namespace Judoboard
 		[[nodiscard]] Participant*  FindParticipant(int ParticipantID);
 		[[nodiscard]] AgeGroup*     FindAgeGroup(int AgeGroupID);
 		[[nodiscard]] Weightclass*  FindWeightclass(int AgeGroupID, int WeightclassID);
+		[[nodiscard]] const Weightclass* FindWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const;
 		[[nodiscard]] const Result* FindResult(int AgeGroupID, int WeightclassID, int Rank) const;
 		[[nodiscard]] const Result* FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const;
 		[[nodiscard]] std::vector<const Result*> FindResults(int AgeGroupID, int WeightclassID) const;

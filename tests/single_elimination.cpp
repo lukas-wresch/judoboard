@@ -189,8 +189,8 @@ TEST(SingleElimination, Count3)
 	ASSERT_EQ(group.GetSchedule().size(), 3);
 
 	EXPECT_EQ(group.GetSchedule()[0]->GetFighter(Fighter::White)->GetUUID(), j1->GetUUID());
-	EXPECT_EQ(group.GetSchedule()[0]->GetFighter(Fighter::Blue )->GetUUID(), j2->GetUUID());
-	EXPECT_EQ(group.GetSchedule()[1]->GetFighter(Fighter::White)->GetUUID(), j3->GetUUID());
+	EXPECT_EQ(group.GetSchedule()[0]->GetFighter(Fighter::Blue )->GetUUID(), j3->GetUUID());
+	EXPECT_EQ(group.GetSchedule()[1]->GetFighter(Fighter::White)->GetUUID(), j2->GetUUID());
 	EXPECT_FALSE(group.GetSchedule()[1]->GetFighter(Fighter::Blue));
 	EXPECT_FALSE(group.GetSchedule()[2]->GetFighter(Fighter::White));
 	EXPECT_TRUE( group.GetSchedule()[2]->GetFighter(Fighter::Blue));
@@ -300,8 +300,8 @@ TEST(SingleElimination, Count3_BO3)
 	ASSERT_EQ(results.GetSize(), 2);
 	ASSERT_TRUE(results[0].Judoka);
 	ASSERT_TRUE(results[1].Judoka);
-	EXPECT_EQ(results[0].Judoka->GetUUID(), j2->GetUUID());
-	EXPECT_EQ(results[1].Judoka->GetUUID(), j3->GetUUID());
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j3->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 }
 
 
@@ -571,14 +571,11 @@ TEST(SingleElimination, Count10)
 
 	for (auto match : group.GetSchedule())
 	{
-		if (!match->HasValidFighters())
-			continue;
-
 		for (int i = 0; i < 10; ++i)
 		{
-			if (match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
+			if (match->GetFighter(Fighter::White) && match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
 				has_match[i] = true;
-			if (match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
+			if (match->GetFighter(Fighter::Blue ) && match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
 				has_match[i] = true;
 		}
 	}
@@ -636,14 +633,11 @@ TEST(SingleElimination, Count14)
 
 	for (auto match : group.GetSchedule())
 	{
-		if (!match->HasValidFighters())
-			continue;
-
 		for (int i = 0; i < 14; ++i)
 		{
-			if (match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
+			if (match->GetFighter(Fighter::White) && match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
 				has_match[i] = true;
-			if (match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
+			if (match->GetFighter(Fighter::Blue ) && match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
 				has_match[i] = true;
 		}
 	}
@@ -697,6 +691,26 @@ TEST(SingleElimination, Count16)
 	group.SetMatID(1);
 	t->AddMatchTable(&group);
 
+	for (int i = 0; i < 16; ++i)
+		group.SetStartPosition(j[i], i);
+
+	EXPECT_TRUE(group.GetMatch(0)->Contains(*j[0]));
+	EXPECT_TRUE(group.GetMatch(0)->Contains(*j[8]));
+	EXPECT_TRUE(group.GetMatch(1)->Contains(*j[4]));
+	EXPECT_TRUE(group.GetMatch(1)->Contains(*j[12]));
+	EXPECT_TRUE(group.GetMatch(2)->Contains(*j[2]));
+	EXPECT_TRUE(group.GetMatch(2)->Contains(*j[10]));
+	EXPECT_TRUE(group.GetMatch(3)->Contains(*j[6]));
+	EXPECT_TRUE(group.GetMatch(3)->Contains(*j[14]));
+	EXPECT_TRUE(group.GetMatch(4)->Contains(*j[1]));
+	EXPECT_TRUE(group.GetMatch(4)->Contains(*j[9]));
+	EXPECT_TRUE(group.GetMatch(5)->Contains(*j[5]));
+	EXPECT_TRUE(group.GetMatch(5)->Contains(*j[13]));
+	EXPECT_TRUE(group.GetMatch(6)->Contains(*j[3]));
+	EXPECT_TRUE(group.GetMatch(6)->Contains(*j[11]));
+	EXPECT_TRUE(group.GetMatch(7)->Contains(*j[7]));
+	EXPECT_TRUE(group.GetMatch(7)->Contains(*j[15]));
+
 	ASSERT_EQ(group.GetParticipants().size(), 16);
 
 	for (auto match : group.GetSchedule())
@@ -737,6 +751,164 @@ TEST(SingleElimination, Count16)
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[15]->GetUUID());
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
+}
+
+
+
+TEST(SingleElimination, Count32)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	Judoka* j[33];
+	bool has_match[33];
+
+	for (int i = 1; i <= 32; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		has_match[i] = false;
+		t->AddParticipant(j[i]);
+	}
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	t->AddMatchTable(&group);
+
+	for (int i = 0; i < 32; ++i)
+		group.SetStartPosition(j[i+1], i);
+
+	EXPECT_TRUE(group.GetMatch(0)->Contains(*j[1]));
+	EXPECT_TRUE(group.GetMatch(0)->Contains(*j[17]));
+	EXPECT_TRUE(group.GetMatch(1)->Contains(*j[9]));
+	EXPECT_TRUE(group.GetMatch(1)->Contains(*j[25]));
+	EXPECT_TRUE(group.GetMatch(2)->Contains(*j[5]));
+	EXPECT_TRUE(group.GetMatch(2)->Contains(*j[21]));
+	EXPECT_TRUE(group.GetMatch(3)->Contains(*j[13]));
+	EXPECT_TRUE(group.GetMatch(3)->Contains(*j[29]));
+	EXPECT_TRUE(group.GetMatch(4)->Contains(*j[3]));
+	EXPECT_TRUE(group.GetMatch(4)->Contains(*j[19]));
+	EXPECT_TRUE(group.GetMatch(5)->Contains(*j[11]));
+	EXPECT_TRUE(group.GetMatch(5)->Contains(*j[27]));
+	EXPECT_TRUE(group.GetMatch(6)->Contains(*j[7]));
+	EXPECT_TRUE(group.GetMatch(6)->Contains(*j[23]));
+	EXPECT_TRUE(group.GetMatch(7)->Contains(*j[15]));
+	EXPECT_TRUE(group.GetMatch(7)->Contains(*j[31]));
+	EXPECT_TRUE(group.GetMatch(8)->Contains(*j[2]));
+	EXPECT_TRUE(group.GetMatch(8)->Contains(*j[18]));
+	EXPECT_TRUE(group.GetMatch(9)->Contains(*j[10]));
+	EXPECT_TRUE(group.GetMatch(9)->Contains(*j[26]));
+	EXPECT_TRUE(group.GetMatch(10)->Contains(*j[6]));
+	EXPECT_TRUE(group.GetMatch(10)->Contains(*j[22]));
+	EXPECT_TRUE(group.GetMatch(11)->Contains(*j[14]));
+	EXPECT_TRUE(group.GetMatch(11)->Contains(*j[30]));
+	EXPECT_TRUE(group.GetMatch(12)->Contains(*j[4]));
+	EXPECT_TRUE(group.GetMatch(12)->Contains(*j[20]));
+	EXPECT_TRUE(group.GetMatch(13)->Contains(*j[12]));
+	EXPECT_TRUE(group.GetMatch(13)->Contains(*j[28]));
+	EXPECT_TRUE(group.GetMatch(14)->Contains(*j[8]));
+	EXPECT_TRUE(group.GetMatch(14)->Contains(*j[24]));
+	EXPECT_TRUE(group.GetMatch(15)->Contains(*j[16]));
+	EXPECT_TRUE(group.GetMatch(15)->Contains(*j[32]));
+
+	ASSERT_EQ(group.GetParticipants().size(), 32);
+	ASSERT_EQ(group.GetSchedule().size(),     31);
+}
+
+
+
+TEST(SingleElimination, Count64)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	Judoka* j[65];
+	bool has_match[65];
+
+	for (int i = 1; i <= 64; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		has_match[i] = false;
+		t->AddParticipant(j[i]);
+	}
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	t->AddMatchTable(&group);
+
+	for (int i = 0; i < 64; ++i)
+		group.SetStartPosition(j[i+1], i);
+
+	EXPECT_TRUE(group.GetMatch(0)->Contains(*j[1]));
+	EXPECT_TRUE(group.GetMatch(0)->Contains(*j[33]));
+	EXPECT_TRUE(group.GetMatch(1)->Contains(*j[17]));
+	EXPECT_TRUE(group.GetMatch(1)->Contains(*j[49]));
+	EXPECT_TRUE(group.GetMatch(2)->Contains(*j[9]));
+	EXPECT_TRUE(group.GetMatch(2)->Contains(*j[41]));
+	EXPECT_TRUE(group.GetMatch(3)->Contains(*j[25]));
+	EXPECT_TRUE(group.GetMatch(3)->Contains(*j[57]));
+	EXPECT_TRUE(group.GetMatch(4)->Contains(*j[5]));
+	EXPECT_TRUE(group.GetMatch(4)->Contains(*j[37]));
+	EXPECT_TRUE(group.GetMatch(5)->Contains(*j[21]));
+	EXPECT_TRUE(group.GetMatch(5)->Contains(*j[53]));
+	EXPECT_TRUE(group.GetMatch(6)->Contains(*j[13]));
+	EXPECT_TRUE(group.GetMatch(6)->Contains(*j[45]));
+	EXPECT_TRUE(group.GetMatch(7)->Contains(*j[29]));
+	EXPECT_TRUE(group.GetMatch(7)->Contains(*j[61]));
+	EXPECT_TRUE(group.GetMatch(8)->Contains(*j[3]));
+	EXPECT_TRUE(group.GetMatch(8)->Contains(*j[35]));
+	EXPECT_TRUE(group.GetMatch(9)->Contains(*j[19]));
+	EXPECT_TRUE(group.GetMatch(9)->Contains(*j[51]));
+	EXPECT_TRUE(group.GetMatch(10)->Contains(*j[11]));
+	EXPECT_TRUE(group.GetMatch(10)->Contains(*j[43]));
+	EXPECT_TRUE(group.GetMatch(11)->Contains(*j[27]));
+	EXPECT_TRUE(group.GetMatch(11)->Contains(*j[59]));
+	EXPECT_TRUE(group.GetMatch(12)->Contains(*j[7]));
+	EXPECT_TRUE(group.GetMatch(12)->Contains(*j[39]));
+	EXPECT_TRUE(group.GetMatch(13)->Contains(*j[23]));
+	EXPECT_TRUE(group.GetMatch(13)->Contains(*j[55]));
+	EXPECT_TRUE(group.GetMatch(14)->Contains(*j[15]));
+	EXPECT_TRUE(group.GetMatch(14)->Contains(*j[47]));
+	EXPECT_TRUE(group.GetMatch(15)->Contains(*j[31]));
+	EXPECT_TRUE(group.GetMatch(15)->Contains(*j[63]));
+	EXPECT_TRUE(group.GetMatch(16)->Contains(*j[2]));
+	EXPECT_TRUE(group.GetMatch(16)->Contains(*j[34]));
+	EXPECT_TRUE(group.GetMatch(17)->Contains(*j[18]));
+	EXPECT_TRUE(group.GetMatch(17)->Contains(*j[50]));
+	EXPECT_TRUE(group.GetMatch(18)->Contains(*j[10]));
+	EXPECT_TRUE(group.GetMatch(18)->Contains(*j[42]));
+	EXPECT_TRUE(group.GetMatch(19)->Contains(*j[26]));
+	EXPECT_TRUE(group.GetMatch(19)->Contains(*j[58]));
+	EXPECT_TRUE(group.GetMatch(20)->Contains(*j[6]));
+	EXPECT_TRUE(group.GetMatch(20)->Contains(*j[38]));
+	EXPECT_TRUE(group.GetMatch(21)->Contains(*j[22]));
+	EXPECT_TRUE(group.GetMatch(21)->Contains(*j[54]));
+	EXPECT_TRUE(group.GetMatch(22)->Contains(*j[14]));
+	EXPECT_TRUE(group.GetMatch(22)->Contains(*j[46]));
+	EXPECT_TRUE(group.GetMatch(23)->Contains(*j[30]));
+	EXPECT_TRUE(group.GetMatch(23)->Contains(*j[62]));
+	EXPECT_TRUE(group.GetMatch(24)->Contains(*j[4]));
+	EXPECT_TRUE(group.GetMatch(24)->Contains(*j[36]));
+	EXPECT_TRUE(group.GetMatch(25)->Contains(*j[20]));
+	EXPECT_TRUE(group.GetMatch(25)->Contains(*j[52]));
+	EXPECT_TRUE(group.GetMatch(26)->Contains(*j[12]));
+	EXPECT_TRUE(group.GetMatch(26)->Contains(*j[44]));
+	EXPECT_TRUE(group.GetMatch(27)->Contains(*j[28]));
+	EXPECT_TRUE(group.GetMatch(27)->Contains(*j[60]));
+	EXPECT_TRUE(group.GetMatch(28)->Contains(*j[8]));
+	EXPECT_TRUE(group.GetMatch(28)->Contains(*j[40]));
+	EXPECT_TRUE(group.GetMatch(29)->Contains(*j[24]));
+	EXPECT_TRUE(group.GetMatch(29)->Contains(*j[56]));
+	EXPECT_TRUE(group.GetMatch(30)->Contains(*j[16]));
+	EXPECT_TRUE(group.GetMatch(30)->Contains(*j[48]));
+	EXPECT_TRUE(group.GetMatch(31)->Contains(*j[32]));
+	EXPECT_TRUE(group.GetMatch(31)->Contains(*j[64]));
+		
+	ASSERT_EQ(group.GetParticipants().size(), 64);
+	ASSERT_EQ(group.GetSchedule().size(),     63);
 }
 
 
@@ -884,12 +1056,14 @@ TEST(SingleElimination, Count4_ThirdPlace)
 		EXPECT_TRUE(m.EndMatch());
 	}
 
+	//j1 vs j3, j2 vs j4
+
 	auto results = group.CalculateResults();
 
 	ASSERT_EQ(results.GetSize(), 4);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j4->GetUUID());
-	EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
-	EXPECT_EQ(results[2].Judoka->GetUUID(), j3->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j3->GetUUID());
+	EXPECT_EQ(results[2].Judoka->GetUUID(), j2->GetUUID());
 	EXPECT_EQ(results[3].Judoka->GetUUID(), j1->GetUUID());
 }
 
@@ -908,10 +1082,10 @@ TEST(SingleElimination, Count8_3rd_5th)
 	group.IsFifthPlaceMatch(true);
 	t->AddMatchTable(&group);
 
-	Judoka* j[8];
-	bool has_match[8];
+	Judoka* j[9];
+	bool has_match[9];
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 1; i <= 8; ++i)
 	{
 		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
 		t->AddParticipant(j[i]);
@@ -925,7 +1099,7 @@ TEST(SingleElimination, Count8_3rd_5th)
 		if (!match->HasValidFighters())
 			continue;
 
-		for (int i = 0; i < 8; ++i)
+		for (int i = 1; i <= 8; ++i)
 		{
 			if (match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
 				has_match[i] = true;
@@ -934,7 +1108,7 @@ TEST(SingleElimination, Count8_3rd_5th)
 		}
 	}
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 1; i <= 8; ++i)
 		EXPECT_TRUE(has_match[i]);
 
 	Mat m(1);
@@ -954,17 +1128,17 @@ TEST(SingleElimination, Count8_3rd_5th)
 
 	auto results = group.CalculateResults();
 
-	//j0 vs j1, j2 vs j3, j4 vs j5, j6 vs j7
-	//j1 vs j3, j5 vs j7
-	//j3 vs j7
+	//j1 vs j5, j3 vs j7, j2 vs j6, j4 vs j8
+	//j5 vs j7, j6 vs j8
+	//j7 vs j8
 
 	ASSERT_EQ(results.GetSize(), 6);
-	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());
-	EXPECT_EQ(results[1].Judoka->GetUUID(), j[3]->GetUUID());
-	EXPECT_EQ(results[2].Judoka->GetUUID(), j[5]->GetUUID());
-	EXPECT_EQ(results[3].Judoka->GetUUID(), j[1]->GetUUID());
-	EXPECT_EQ(results[4].Judoka->GetUUID(), j[6]->GetUUID());
-	EXPECT_EQ(results[5].Judoka->GetUUID(), j[2]->GetUUID());
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[8]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[7]->GetUUID());
+	EXPECT_EQ(results[2].Judoka->GetUUID(), j[6]->GetUUID());
+	EXPECT_EQ(results[3].Judoka->GetUUID(), j[5]->GetUUID());
+	EXPECT_EQ(results[4].Judoka->GetUUID(), j[4]->GetUUID());
+	EXPECT_EQ(results[5].Judoka->GetUUID(), j[3]->GetUUID());
 }
 
 
@@ -982,10 +1156,10 @@ TEST(SingleElimination, Count8_5th)
 	group.IsFifthPlaceMatch(true);
 	t->AddMatchTable(&group);
 
-	Judoka* j[8];
-	bool has_match[8];
+	Judoka* j[9];
+	bool has_match[9];
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 1; i <= 8; ++i)
 	{
 		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
 		t->AddParticipant(j[i]);
@@ -999,7 +1173,7 @@ TEST(SingleElimination, Count8_5th)
 		if (!match->HasValidFighters())
 			continue;
 
-		for (int i = 0; i < 8; ++i)
+		for (int i = 1; i <= 8; ++i)
 		{
 			if (match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
 				has_match[i] = true;
@@ -1008,7 +1182,7 @@ TEST(SingleElimination, Count8_5th)
 		}
 	}
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 1; i <= 8; ++i)
 		EXPECT_TRUE(has_match[i]);
 
 	Mat m(1);
@@ -1028,13 +1202,62 @@ TEST(SingleElimination, Count8_5th)
 
 	auto results = group.CalculateResults();
 
-	//j0 vs j1, j2 vs j3, j4 vs j5, j6 vs j7
-	//j1 vs j3, j5 vs j7
-	//j3 vs j7
+	//j1 vs j5, j3 vs j7, j2 vs j6, j4 vs j8
+	//j5 vs j7, j6 vs j8
+	//j7 vs j8
 
 	ASSERT_EQ(results.GetSize(), 2);
-	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());
-	EXPECT_EQ(results[1].Judoka->GetUUID(), j[3]->GetUUID());
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[8]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[7]->GetUUID());
+}
+
+
+
+TEST(SingleElimination, Render_3rd_5th)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	t->AddMatchTable(&group);
+
+	Judoka* j[8];
+	bool has_match[8];
+
+	for (int i = 0; i < 8; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		t->AddParticipant(j[i]);
+		has_match[i] = false;
+	}
+
+	ASSERT_EQ(group.GetParticipants().size(), 8);
+
+	auto none = group.ToHTML();
+
+	group.IsFifthPlaceMatch(true);
+
+	auto with_5th = group.ToHTML();
+
+	group.IsThirdPlaceMatch(true);
+
+	auto with_3rd_5th = group.ToHTML();
+
+	group.IsFifthPlaceMatch(false);
+
+	auto with_3rd = group.ToHTML();
+
+	EXPECT_NE(none, with_3rd);
+	EXPECT_NE(none, with_5th);
+	EXPECT_NE(none, with_3rd_5th);
+
+	EXPECT_NE(with_3rd, with_5th);
+	EXPECT_NE(with_3rd, with_3rd_5th);
+
+	EXPECT_NE(with_5th, with_3rd_5th);
 }
 
 
@@ -1060,10 +1283,10 @@ TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 
 	t->AddMatchTable(&group2);
 
-	Judoka* j[8];
-	bool has_match[8];
+	Judoka* j[9];
+	bool has_match[9];
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 1; i <= 8; ++i)
 	{
 		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
 		t->AddParticipant(j[i]);
@@ -1077,7 +1300,7 @@ TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 		if (!match->HasValidFighters())
 			continue;
 
-		for (int i = 0; i < 8; ++i)
+		for (int i = 1; i <= 8; ++i)
 		{
 			if (match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
 				has_match[i] = true;
@@ -1086,7 +1309,7 @@ TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 		}
 	}
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 1; i <= 8; ++i)
 		EXPECT_TRUE(has_match[i]);
 
 	Mat m(1);
@@ -1106,15 +1329,15 @@ TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 
 	auto results = group2.CalculateResults();
 
-	//j0 vs j1, j2 vs j3, j4 vs j5, j6 vs j7
-	//j1 vs j3, j5 vs j7
-	//j3 vs j7
+	//j1 vs j5, j3 vs j7, j2 vs j6, j4 vs j8
+	//j5 vs j7, j6 vs j8
+	//j7 vs j8
 
 	ASSERT_EQ(results.GetSize(), 6);
-	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());
-	EXPECT_EQ(results[1].Judoka->GetUUID(), j[3]->GetUUID());
-	EXPECT_EQ(results[2].Judoka->GetUUID(), j[5]->GetUUID());
-	EXPECT_EQ(results[3].Judoka->GetUUID(), j[1]->GetUUID());
-	EXPECT_EQ(results[4].Judoka->GetUUID(), j[6]->GetUUID());
-	EXPECT_EQ(results[5].Judoka->GetUUID(), j[2]->GetUUID());
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[8]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[7]->GetUUID());
+	EXPECT_EQ(results[2].Judoka->GetUUID(), j[6]->GetUUID());
+	EXPECT_EQ(results[3].Judoka->GetUUID(), j[5]->GetUUID());
+	EXPECT_EQ(results[4].Judoka->GetUUID(), j[4]->GetUUID());
+	EXPECT_EQ(results[5].Judoka->GetUUID(), j[3]->GetUUID());
 }
