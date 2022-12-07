@@ -636,6 +636,8 @@ TEST(SingleElimination, Count8_BO3)
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
+
+	delete t;
 }
 
 
@@ -698,6 +700,8 @@ TEST(SingleElimination, Count10)
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[9]->GetUUID());
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
+
+	delete t;
 }
 
 
@@ -1009,6 +1013,8 @@ TEST(SingleElimination, Count64)
 		
 	ASSERT_EQ(group->GetParticipants().size(), 64);
 	ASSERT_EQ(group->GetSchedule().size(),     63);
+
+	delete t;
 }
 
 
@@ -1165,6 +1171,8 @@ TEST(SingleElimination, Count4_ThirdPlace)
 	EXPECT_EQ(results[1].Judoka->GetUUID(), j3->GetUUID());
 	EXPECT_EQ(results[2].Judoka->GetUUID(), j2->GetUUID());
 	EXPECT_EQ(results[3].Judoka->GetUUID(), j1->GetUUID());
+
+	delete t;
 }
 
 
@@ -1239,6 +1247,8 @@ TEST(SingleElimination, Count8_3rd_5th)
 	EXPECT_EQ(results[3].Judoka->GetUUID(), j[5]->GetUUID());
 	EXPECT_EQ(results[4].Judoka->GetUUID(), j[4]->GetUUID());
 	EXPECT_EQ(results[5].Judoka->GetUUID(), j[3]->GetUUID());
+
+	delete t;
 }
 
 
@@ -1309,6 +1319,8 @@ TEST(SingleElimination, Count8_5th)
 	ASSERT_EQ(results.GetSize(), 2);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[8]->GetUUID());
 	EXPECT_EQ(results[1].Judoka->GetUUID(), j[7]->GetUUID());
+
+	delete t;
 }
 
 
@@ -1381,9 +1393,9 @@ TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 	*group >> yaml;
 	yaml << YAML::EndMap;
 
-	SingleElimination group2(YAML::Load(yaml.c_str()), t);
+	SingleElimination* group2 = new SingleElimination(YAML::Load(yaml.c_str()), t);
 
-	t->AddMatchTable(&group2);
+	t->AddMatchTable(group2);
 
 	Judoka* j[9];
 	bool has_match[9];
@@ -1395,9 +1407,9 @@ TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 		has_match[i] = false;
 	}
 
-	ASSERT_EQ(group2.GetParticipants().size(), 8);
+	ASSERT_EQ(group2->GetParticipants().size(), 8);
 
-	for (auto match : group2.GetSchedule())
+	for (auto match : group2->GetSchedule())
 	{
 		if (!match->HasValidFighters())
 			continue;
@@ -1416,7 +1428,7 @@ TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 
 	Mat m(1);
 
-	for (auto match : group2.GetSchedule())
+	for (auto match : group2->GetSchedule())
 	{
 		if (!match->HasValidFighters())
 			continue;
@@ -1429,7 +1441,7 @@ TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 		EXPECT_TRUE(m.EndMatch());
 	}
 
-	auto results = group2.CalculateResults();
+	auto results = group2->CalculateResults();
 
 	//j1 vs j5, j3 vs j7, j2 vs j6, j4 vs j8
 	//j5 vs j7, j6 vs j8
@@ -1442,4 +1454,6 @@ TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 	EXPECT_EQ(results[3].Judoka->GetUUID(), j[5]->GetUUID());
 	EXPECT_EQ(results[4].Judoka->GetUUID(), j[4]->GetUUID());
 	EXPECT_EQ(results[5].Judoka->GetUUID(), j[3]->GetUUID());
+
+	delete t;
 }

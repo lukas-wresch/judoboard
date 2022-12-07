@@ -331,7 +331,7 @@ namespace Judoboard
 		virtual size_t GetStartPosition(const Judoka* Judoka) const;
 		virtual const Judoka* GetJudokaByStartPosition(size_t StartPosition) const;
 		virtual void SetStartPosition(const Judoka* Judoka, size_t NewStartPosition);
-		virtual size_t GetMaxStartPositions() const;
+		virtual size_t GetMaxStartPositions() const = 0;
 
 		//Best of three
 		bool IsBestOfThree() const { return m_BestOfThree; }

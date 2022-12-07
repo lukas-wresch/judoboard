@@ -21,6 +21,8 @@ namespace Judoboard
 
 		virtual Type GetType() const override { return Type::RoundRobin; }
 
+		virtual size_t GetMaxStartPositions() const override { return GetParticipants().size(); }
+
 		virtual MatchTable::Results CalculateResults() const override;
 		virtual void GenerateSchedule() override;
 

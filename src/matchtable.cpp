@@ -356,17 +356,11 @@ const Judoka* MatchTable::GetJudokaByStartPosition(size_t StartPosition) const
 
 void MatchTable::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
 {
+	if (NewStartPosition >= GetMaxStartPositions())
+		return;
+
 	if (m_Filter)
 		m_Filter->SetStartPosition(Judoka, NewStartPosition);
-}
-
-
-
-size_t MatchTable::GetMaxStartPositions() const
-{
-	if (m_Filter)
-		return m_Filter->GetMaxStartPositions();
-	return SIZE_MAX;
 }
 
 

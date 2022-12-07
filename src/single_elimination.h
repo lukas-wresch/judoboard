@@ -20,8 +20,10 @@ namespace Judoboard
 
 		virtual Type GetType() const override { return Type::SingleElimination; }
 
-		//virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false) override;
-		//virtual bool RemoveParticipant(const Judoka* Participant) override;
+		virtual size_t GetMaxStartPositions() const override {
+			const auto rounds = GetNumberOfRounds();
+			return (int)pow(2, rounds);
+		}
 
 		virtual Results CalculateResults() const override;
 		virtual void GenerateSchedule() override;
@@ -41,10 +43,6 @@ namespace Judoboard
 
 	private:
 		void FindFreeStartPos(const Judoka* NewParticipant);
-		size_t GetMaxStartPos() const {
-			const auto rounds = GetNumberOfRounds();
-			return (int)pow(2, rounds);
-		}
 
 		size_t GetNumberOfRounds() const {
 			if (GetParticipants().size() == 0)
