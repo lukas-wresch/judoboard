@@ -120,7 +120,7 @@ void SingleElimination::GenerateSchedule()
 		return;
 
 	const auto rounds = GetNumberOfRounds();
-	const auto max_start_pos = (int)pow(2, rounds);
+	const auto max_start_pos = GetMaxStartPositions();
 	
 	//Round 1
 	std::vector<Match*> lastRound;

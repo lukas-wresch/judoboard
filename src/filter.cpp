@@ -109,25 +109,11 @@ bool IFilter::RemoveParticipant(const Judoka* Participant)
 
 bool IFilter::RemoveParticipant(const DependentJudoka Participant)
 {
-	auto old_max = GetMaxStartPositions();
-
 	auto pos = GetStartPosition(Participant);
+
 	if (pos != SIZE_MAX)
 	{
 		m_Participants.erase(pos);
-
-		auto new_max = GetMaxStartPositions(); 
-
-		if (new_max < old_max)
-		{
-			for (size_t i = new_max; i < old_max; ++i)
-			{
-				auto judoka = GetJudokaByStartPosition(i);
-				if (judoka)
-					FindFreeStartPos(*judoka);
-			}
-		}
-
 		return true;
 	}
 
@@ -136,7 +122,7 @@ bool IFilter::RemoveParticipant(const DependentJudoka Participant)
 
 
 
-size_t IFilter::GetStartPosition(const DependentJudoka& Judoka) const
+size_t IFilter::GetStartPosition(const DependentJudoka Judoka) const
 {
 	for (auto [pos, participant] : m_Participants)
 	{
@@ -177,14 +163,9 @@ void IFilter::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
 	{
 		auto judoka_on_slot = GetJudokaByStartPosition(NewStartPosition);
 
-		assert(judoka_on_slot);
-
-		auto copy = *judoka_on_slot;
-
 		m_Participants.erase(my_old_pos);
 		m_Participants.erase(NewStartPosition);
-		if (judoka_on_slot)
-			m_Participants.insert({ my_old_pos, copy });
+		m_Participants.insert({ my_old_pos, judoka_on_slot });
 		m_Participants.insert({ NewStartPosition, Judoka });
 	}
 

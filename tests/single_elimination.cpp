@@ -516,7 +516,7 @@ TEST(SingleElimination, Count8_Dont_allow_illegal_start_pos)
 	EXPECT_EQ(group->GetStartPosition(j[7]), 5);
 
 	for (int i = 0; i < 7; ++i)
-		group->RemoveParticipant(j[i]);
+		EXPECT_TRUE(group->RemoveParticipant(j[i]));
 
 	EXPECT_EQ(group->GetStartPosition(j[7]), 0);
 
@@ -793,6 +793,9 @@ TEST(SingleElimination, Count16)
 
 	for (int i = 0; i < 16; ++i)
 		group->SetStartPosition(j[i], i);
+
+	for (int i = 0; i < 16; ++i)
+		EXPECT_EQ(group->GetStartPosition(j[i]), i);
 
 	EXPECT_TRUE(group->GetMatch(0)->Contains(*j[0]));
 	EXPECT_TRUE(group->GetMatch(0)->Contains(*j[8]));

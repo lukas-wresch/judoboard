@@ -170,11 +170,29 @@ bool MatchTable::RemoveParticipant(const Judoka* Participant)
 	if (!Participant || !m_Filter)
 		return false;
 
-	if (!m_Filter->RemoveParticipant(Participant))
-		return false;
+	auto old_max = GetMaxStartPositions();
 
-	GenerateSchedule();
-	return true;
+	if (m_Filter->RemoveParticipant(Participant))
+	{
+		auto new_max = GetMaxStartPositions();
+
+		if (new_max < old_max)
+		{
+			for (size_t i = new_max; i < old_max; ++i)
+			{
+				if (m_Filter->IsStartPositionTaken(i))
+				{
+					auto judoka = m_Filter->GetJudokaByStartPosition(i);
+					m_Filter->FindFreeStartPos(judoka);
+				}
+			}
+		}
+
+		GenerateSchedule();
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -347,8 +365,8 @@ size_t MatchTable::GetStartPosition(const Judoka* Judoka) const
 
 const Judoka* MatchTable::GetJudokaByStartPosition(size_t StartPosition) const
 {
-	if (m_Filter && m_Filter->GetJudokaByStartPosition(StartPosition))
-		return m_Filter->GetJudokaByStartPosition(StartPosition)->GetJudoka();
+	if (m_Filter)
+		return m_Filter->GetJudokaByStartPosition(StartPosition).GetJudoka();
 	return nullptr;
 }
 
@@ -360,7 +378,10 @@ void MatchTable::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
 		return;
 
 	if (m_Filter)
+	{
 		m_Filter->SetStartPosition(Judoka, NewStartPosition);
+		GenerateSchedule();//Re-generate schedule
+	}
 }
 
 
