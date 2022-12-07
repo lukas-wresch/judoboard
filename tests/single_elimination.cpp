@@ -489,6 +489,8 @@ TEST(SingleElimination, Count8_Dont_allow_illegal_start_pos)
 {
 	initialize();
 
+	ZED::Core::RemoveFile("tournaments/Tournament Name.yml");
+
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
@@ -555,6 +557,8 @@ TEST(SingleElimination, Count8_Dont_allow_illegal_start_pos)
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
+
+	delete t;
 }
 
 
