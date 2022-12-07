@@ -494,9 +494,9 @@ TEST(SingleElimination, Count8_Dont_allow_illegal_start_pos)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination group(0, 200);
-	group.SetMatID(1);
-	t->AddMatchTable(&group);
+	SingleElimination* group = new SingleElimination(0, 200);
+	group->SetMatID(1);
+	t->AddMatchTable(group);
 
 	Judoka* j[8];
 	bool has_match[8];
@@ -508,22 +508,22 @@ TEST(SingleElimination, Count8_Dont_allow_illegal_start_pos)
 		has_match[i] = false;
 	}
 
-	ASSERT_EQ(group.GetParticipants().size(), 8);
+	ASSERT_EQ(group->GetParticipants().size(), 8);
 
-	group.SetStartPosition(j[7], 5);
-	EXPECT_EQ(group.GetStartPosition(j[7]), 5);
-	group.SetStartPosition(j[7], 8);
-	EXPECT_EQ(group.GetStartPosition(j[7]), 5);
+	group->SetStartPosition(j[7], 5);
+	EXPECT_EQ(group->GetStartPosition(j[7]), 5);
+	group->SetStartPosition(j[7], 8);
+	EXPECT_EQ(group->GetStartPosition(j[7]), 5);
 
 	for (int i = 0; i < 7; ++i)
-		group.RemoveParticipant(j[i]);
+		group->RemoveParticipant(j[i]);
 
-	EXPECT_EQ(group.GetStartPosition(j[7]), 0);
+	EXPECT_EQ(group->GetStartPosition(j[7]), 0);
 
 	for (int i = 0; i < 8; ++i)
-		group.AddParticipant(j[i]);
+		group->AddParticipant(j[i]);
 
-	for (auto match : group.GetSchedule())
+	for (auto match : group->GetSchedule())
 	{
 		if (!match->HasValidFighters())
 			continue;
@@ -542,7 +542,7 @@ TEST(SingleElimination, Count8_Dont_allow_illegal_start_pos)
 
 	Mat m(1);
 
-	for (auto match : group.GetSchedule())
+	for (auto match : group->GetSchedule())
 	{
 		if (!match->HasValidFighters())
 			continue;
@@ -555,7 +555,7 @@ TEST(SingleElimination, Count8_Dont_allow_illegal_start_pos)
 		EXPECT_TRUE(m.EndMatch());
 	}
 
-	auto results = group.CalculateResults();
+	auto results = group->CalculateResults();
 
 	ASSERT_EQ(results.GetSize(), 2);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());

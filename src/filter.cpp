@@ -57,7 +57,7 @@ void IFilter::ToString(YAML::Emitter& Yaml) const
 
 
 
-void IFilter::FindFreeStartPos(const DependentJudoka& NewParticipant)
+void IFilter::FindFreeStartPos(const DependentJudoka NewParticipant)
 {
 	auto old_pos = GetStartPosition(NewParticipant);
 
@@ -107,7 +107,7 @@ bool IFilter::RemoveParticipant(const Judoka* Participant)
 
 
 
-bool IFilter::RemoveParticipant(const DependentJudoka& Participant)
+bool IFilter::RemoveParticipant(const DependentJudoka Participant)
 {
 	auto old_max = GetMaxStartPositions();
 
