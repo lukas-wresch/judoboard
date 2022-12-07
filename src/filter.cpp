@@ -100,7 +100,9 @@ bool IFilter::AddParticipant(const Judoka* NewParticipant, bool Force)
 
 bool IFilter::RemoveParticipant(const Judoka* Participant)
 {
-	return RemoveParticipant(Participant);
+	if (!Participant)
+		return false;
+	return RemoveParticipant(DependentJudoka(Participant));
 }
 
 
