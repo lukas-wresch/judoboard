@@ -127,7 +127,7 @@ function DeleteJudoka()
   if (confirm(lang.delete_judoka_confirm))
   {
     Ajax('ajax/judoka/delete?id='+id);
-    navigate('schedule.html');
+    navigate('judoka_list.html');
   }
 
   return false;
