@@ -191,19 +191,26 @@ const std::string RoundRobin::ToHTML() const
 
 	ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 
+	if (!GetFilter())
+		return ret;
+
 	ret += R"(<table width="50%" border="1" rules="all"><tr><th style="text-align: center;">)" + Localizer::Translate("No.")
 		+ "</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name") + "</th>";
 
-	for (uint32_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
-		ret += "<th>vs " + GetParticipants()[j]->GetName(NameStyle::GivenName) + "</th>";
+	for (size_t i = 0; i < GetMaxStartPositions(); ++i)
+	{
+		auto fighter = GetJudokaByStartPosition(i);
+
+		if (fighter)
+			ret += "<th>vs " + fighter->GetName(NameStyle::GivenName) + "</th>";
+	}
 
 	ret += "<th style=\"text-align: center; width: 2.0cm;\">Total</th>";
 	ret += "</tr>";
 
 	auto results = CalculateResults();
 
-	if (GetFilter())
-		for (size_t i = 0; i < GetMaxStartPositions(); ++i)
+	for (size_t i = 0; i < GetMaxStartPositions(); ++i)
 	{
 		auto fighter = GetJudokaByStartPosition(i);
 
