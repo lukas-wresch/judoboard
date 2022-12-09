@@ -79,6 +79,8 @@ bool Application::LoadDataFromDisk()
 		if (last_tournament)
 			OpenTournament(*last_tournament);
 	}
+	else
+		CloseTournament();
 
 	return true;
 }
