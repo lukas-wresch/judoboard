@@ -39,7 +39,7 @@ namespace Judoboard
 		const auto& GetSchedule() const { return m_Schedule; }
 		Match* FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
-		const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
+		virtual const StandingData& GetDatabase() const override { return m_StandingData; }//Returns a database containing all participants
 		void SetYear(uint32_t NewYear) { m_StandingData.SetYear(NewYear); }
 
 		void SetName(const std::string& NewName) { m_Name = NewName; }
