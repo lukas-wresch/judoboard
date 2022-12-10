@@ -3,7 +3,7 @@ var lang_en = {
     age_groups: "Age groups",
     break_time: "Break Time",
     club: "Club",
-    description: "Beschreibung",
+    description: "Description",
     name: "Name",
     username: "Username",
     password: "Password",
