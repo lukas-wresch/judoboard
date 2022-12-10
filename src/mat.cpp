@@ -1164,6 +1164,9 @@ bool Mat::Animation::Process(GraphicElement& Graphic, double dt)
 
 void Mat::NextState(State NextState) const
 {
+	if (m_State == NextState)
+		return;
+
 	if (m_State == State::StartUp && NextState == State::TransitionToMatch)
 		this->NextState(State::TransitionToWaiting);
 	if (m_State == State::TransitionToWaiting && NextState == State::TransitionToMatch)
@@ -1941,9 +1944,9 @@ bool Mat::Render(double dt) const
 		if (text_time)
 			renderer.RenderTransformed(text_time, width - 250, height - 70);
 
-		//Render startup screen
+		//Is there a next match?
 		if (m_Application && m_Application->GetTournament() && m_Application->GetTournament()->GetNextMatch(GetMatID()))
-			NextState(State::TransitionToWaiting);
+			NextState(State::TransitionToWaiting);//Transition to waiting screen
 
 		break;
 	}
@@ -2204,6 +2207,9 @@ bool Mat::Mainloop()
 	if (m_State != State::Running && m_Application)
 	{
 		auto nextMatches = m_Application->GetNextMatches(GetMatID());
+
+		if (nextMatches.size() == 0 && m_State == State::Waiting)
+			NextState(State::StartUp);
 
 		m_mutex.lock();
 		m_NextMatches = std::move(nextMatches);
