@@ -60,6 +60,11 @@ bool Application::LoadDataFromDisk()
 		//return false;
 	}
 
+	//Has to be done here, otherwise it will be overwritten when loading tournament files
+	auto last_tournament_name = m_Database.GetLastTournamentName();
+	ZED::Log::Info("Last opened tournament was " + last_tournament_name);
+
+
 	ZED::Core::Indexer([this](auto Filename) {
 		Filename = Filename.substr(Filename.find_last_of(ZED::Core::Separator) + 1);
 		Filename = Filename.substr(0, Filename.length() - 4);//Remove .yml
@@ -67,8 +72,15 @@ bool Application::LoadDataFromDisk()
 		return true;
 		}, "tournaments");
 
-	if (FindTournamentByName(m_Database.GetLastTournamentName()))
-		OpenTournament(FindTournamentByName(m_Database.GetLastTournamentName())->GetUUID());
+
+	if (last_tournament_name.length() > 0)
+	{
+		auto last_tournament = FindTournamentByName(last_tournament_name);
+		if (last_tournament)
+			OpenTournament(*last_tournament);
+	}
+	else
+		CloseTournament();
 
 	return true;
 }
@@ -209,7 +221,10 @@ bool Application::OpenTournament(const UUID& UUID)
 	m_CurrentTournament = FindTournament(UUID);
 
 	if (m_CurrentTournament)
+	{
 		m_Database.SetLastTournamentName(m_CurrentTournament->GetName());
+		ZED::Log::Info("Opened tournament " + m_CurrentTournament->GetName());
+	}
 
 	return true;
 }
@@ -419,7 +434,7 @@ bool Application::AddTournament(Tournament* NewTournament)
 	if (NewTournament->GetStatus() == Status::Scheduled)//Fresh new tournament
 	{//Try to open right away
 		if (!m_CurrentTournament || m_CurrentTournament->CanCloseTournament())
-			m_CurrentTournament = m_Tournaments.back();
+			OpenTournament(*NewTournament);
 	}
 
 	return true;

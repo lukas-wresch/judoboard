@@ -132,6 +132,47 @@ TEST(App, Tournaments)
 
 
 
+TEST(App, Tournaments_OpenLastTournament)
+{
+	initialize();
+
+	{
+		Application app;
+
+		Tournament* t = new Tournament("deleteMe");
+		t->AddMatch(new Match(nullptr, nullptr, t));
+
+		EXPECT_TRUE(app.AddTournament(t));
+		t->Save();
+	}
+
+	{
+		Application app;
+
+		app.LoadDataFromDisk();
+
+		EXPECT_TRUE(app.FindTournamentByName("deleteMe"));
+		ASSERT_TRUE(app.GetTournament());
+		EXPECT_EQ(app.GetTournament()->GetName(), "deleteMe");
+
+		EXPECT_TRUE(app.CloseTournament());
+	}
+
+	{
+		Application app;
+
+		app.LoadDataFromDisk();
+
+		EXPECT_TRUE(app.FindTournamentByName("deleteMe"));
+		ASSERT_TRUE(app.GetTournament());
+		EXPECT_NE(app.GetTournament()->GetName(), "deleteMe");
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(App, DeleteTournament)
 {
 	initialize();
