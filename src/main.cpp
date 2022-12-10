@@ -327,7 +327,7 @@ int main(int argc, char** argv)
 #endif
 #endif
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 	if (app.GetDatabase().GetNumJudoka() < 5)
 	{
 		auto inter = new Judoboard::Association("International", nullptr);
@@ -369,7 +369,7 @@ int main(int argc, char** argv)
 
 		app.GetDatabase().Save();
 	}
-//#endif
+#endif
 
 	ZED::Log::Info("Application has started");
 	app.Run();
