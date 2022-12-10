@@ -176,10 +176,10 @@
   <tr id="row_decision" style="display: none;">
     <td colspan="2">
       <div id="div_decision" style="display: none; height: 0px;">
-        <button class="white"   style="width: 3.5cm;" onclick="SetScore('white', 'hantei'); ShowHantei(false);">White wins</button>
-        <button class="add"     style="width: 2.5cm;" onclick="SetScore('', '+draw'); ShowHantei(false);">Draw</button>
-        <button class="additional" style="width: 3.5cm;" onclick="SetScore('blue', 'hantei'); ShowHantei(false);">Blue wins</button>
-        <button class="neutral" style="width: 3.5cm;" onclick="SetScore('', '+golden_score'); ShowHantei(false);" id="golden_score">Golden Score</button>
+        <button class="white"   style="width: 3.5cm;" id="white_wins" onclick="SetScore('white', 'hantei'); ShowHantei(false);">White wins</button>
+        <button class="add"     style="width: 2.5cm;" id="draw" onclick="SetScore('', '+draw'); ShowHantei(false);">Draw</button>
+        <button class="additional" style="width: 3.5cm;" id="blue_wins" onclick="SetScore('blue', 'hantei'); ShowHantei(false);">Blue wins</button>
+        <button class="neutral" style="width: 3.5cm;" id="golden_score" onclick="SetScore('', '+golden_score'); ShowHantei(false);">Golden Score</button>
       </div>
     </td>
   </tr>
@@ -526,7 +526,10 @@ function GetScore()
       else
         document.getElementById("hajime").disabled = true;
 
-      document.getElementById("mate").disabled   = true;
+      document.getElementById("mate").disabled = true;
+
+      document.getElementById("draw").disabled = !res.draw_enabled;
+      document.getElementById("golden_score").disabled = !res.golden_score_enabled;
     }
 
 
