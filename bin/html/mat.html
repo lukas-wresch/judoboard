@@ -466,11 +466,6 @@ function GetScore()
     {
       document.getElementById("end_match").disabled = false;
       $('#end_match').show(1000);
-
-      //if (res.winner == 0)
-        //$("#winner_white").show();
-      //else if (res.winner == 1)
-        //$("#winner_blue").show();
     }
     else
     {
@@ -521,7 +516,7 @@ function GetScore()
       else
         document.getElementById("white_osaekomi").disabled = true;
 
-      if (res.are_fighters_on_mat && !res.has_concluded)
+      if (res.are_fighters_on_mat && !res.has_concluded && !res.is_out_of_time)
         document.getElementById("hajime").disabled = false;
       else
         document.getElementById("hajime").disabled = true;
@@ -554,6 +549,8 @@ function GetScore()
 
     if (!res.has_concluded && res.is_out_of_time && res.no_winner_yet)
       ShowHantei(true);
+    else
+      ShowHantei(false);
 
     if (res.is_goldenscore)
       document.getElementById("golden_score").disabled = true;
