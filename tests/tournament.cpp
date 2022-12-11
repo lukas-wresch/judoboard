@@ -1099,6 +1099,54 @@ TEST(Tournament, SaveAndLoad_SingleElimination)
 
 
 
+TEST(Tournament, PruneUnusedClubs)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
+
+		Club* c1 = new Club("Club 1");
+		Club* c2 = new Club("Club 1");
+
+		Tournament* tourney = new Tournament("deleteMe");
+		tourney->Reset();
+
+		j1->SetClub(c1);
+		j2->SetClub(c1);
+		j3->SetClub(c1);
+		j4->SetClub(c2);
+
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+		EXPECT_TRUE(tourney->AddParticipant(j3));
+		EXPECT_TRUE(tourney->AddParticipant(j4));
+
+		tourney->Save();
+
+		j4->SetClub(c1);
+
+		EXPECT_EQ(tourney->GetDatabase().GetAllClubs().size(), 2);
+
+		tourney->Save();
+
+		EXPECT_EQ(tourney->GetDatabase().GetAllClubs().size(), 1);
+
+		Tournament* tourney2 = new Tournament("deleteMe");
+
+		EXPECT_EQ(tourney2->GetDatabase().GetAllClubs().size(), 1);
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, AddMatchAfterConclusion)
 {
 	initialize();
