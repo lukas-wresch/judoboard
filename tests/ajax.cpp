@@ -459,7 +459,12 @@ TEST(Ajax, Judoka_Edit_Participant)
 		auto j1 = new Judoka("firstname", "lastname");
 		t->AddParticipant(j1);
 
-		EXPECT_EQ((std::string)app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID(), "firstname=first2&lastname=last2&weight=12,5&gender=1&birthyear=2001&number=A1234")), "ok");
+		auto j2 = new Judoka("firstname", "lastname");
+		auto c1 = new Club("Club 1");
+		j2->SetClub(c1);
+		t->AddParticipant(j2);
+
+		EXPECT_EQ((std::string)app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID(), "firstname=first2&lastname=last2&weight=12,5&gender=1&birthyear=2001&number=A1234&club=" + (std::string)c1->GetUUID())), "ok");
 
 		EXPECT_EQ(j1->GetFirstname(), "first2");
 		EXPECT_EQ(j1->GetLastname(),  "last2");
@@ -467,6 +472,8 @@ TEST(Ajax, Judoka_Edit_Participant)
 		EXPECT_EQ(j1->GetGender(),  Gender::Female);
 		EXPECT_EQ(j1->GetBirthyear(), 2001);
 		EXPECT_EQ(j1->GetNumber(), "A1234");
+		ASSERT_TRUE(j1->GetClub());
+		EXPECT_EQ(*j1->GetClub(), *c1);
 	}
 }
 

@@ -2707,7 +2707,10 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 	if (GetDatabase().FindClub(clubID))
 		judoka->SetClub(GetDatabase().FindClub(clubID));
 	else
-		judoka->SetClub(nullptr);
+	{
+		auto tour = (Tournament*)GetTournament();//TODO could be remote tournament
+		judoka->SetClub(tour->GetDatabase().FindClub(clubID));
+	}
 
 	return Error();//OK
 }
