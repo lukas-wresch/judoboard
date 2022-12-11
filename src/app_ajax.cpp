@@ -1040,15 +1040,12 @@ void Application::SetupHttpServer()
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 			if (id <= 0)
-				return "Invalid id";
+				return Error(Error::Type::InvalidID);
 
 			auto mat = FindMat(id);
 
 			if (mat)
-			{
 				mat->Hantei(fighter);
-				mat->EndMatch();
-			}
 
 			return Error();//OK
 		});
@@ -1066,10 +1063,7 @@ void Application::SetupHttpServer()
 			auto mat = FindMat(id);
 
 			if (mat)
-			{
 				mat->SetAsDraw();
-				mat->EndMatch();
-			}
 
 			return Error();//OK
 		});

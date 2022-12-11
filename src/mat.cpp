@@ -391,7 +391,15 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "winner"               << YAML::Value << (int)GetResult().m_Winner;
 	Yaml << YAML::Key << "is_out_of_time"       << YAML::Value << IsOutOfTime();
 	Yaml << YAML::Key << "no_winner_yet"        << YAML::Value << (GetResult().m_Winner == Winner::Draw);
-	Yaml << YAML::Key << "is_goldenscore"       << YAML::Value << IsGoldenScore();	
+	Yaml << YAML::Key << "is_goldenscore"       << YAML::Value << IsGoldenScore();
+
+	if (m_pMatch)
+	{
+		Yaml << YAML::Key << "yuko_enabled" << m_pMatch->GetRuleSet().IsYukoEnabled();
+		Yaml << YAML::Key << "koka_enabled" << m_pMatch->GetRuleSet().IsKokaEnabled();
+		Yaml << YAML::Key << "golden_score_enabled" << m_pMatch->GetRuleSet().IsGoldenScoreEnabled();
+		Yaml << YAML::Key << "draw_enabled" << m_pMatch->GetRuleSet().IsDrawAllowed();
+	}
 
 	Yaml << YAML::EndMap;
 }
