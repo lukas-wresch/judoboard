@@ -1139,18 +1139,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		auto judoka = m_Database.FindJudoka(id);
-
-		if (judoka)
-		{
-			YAML::Emitter ret;
-			judoka->ToString(ret);
-			return ret.c_str();
-		}
-
-		return std::string();
+		return Ajax_GetJudoka(Request);
 	});
 
 
@@ -2643,11 +2632,42 @@ Error Application::Ajax_AddJudoka(const HttpServer::Request& Request)
 
 
 
+std::string Application::Ajax_GetJudoka(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	LockTillScopeEnd();
+
+	auto judoka = m_Database.FindJudoka(id);
+
+	if (judoka)
+	{
+		YAML::Emitter ret;
+		judoka->ToString(ret);
+		return ret.c_str();
+	}
+
+	//Search for participant
+	if (!GetTournament())
+		return Error(Error::Type::ItemNotFound);
+	
+	judoka = GetTournament()->FindParticipant(id);
+
+	if (!judoka)
+		return Error(Error::Type::ItemNotFound);
+
+	YAML::Emitter ret;
+	judoka->ToString(ret);
+	return ret.c_str() + std::string("\nis_participant: true");
+}
+
+
+
 Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 {
 	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 	auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
-	auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
+	auto lastname  = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
 	auto weight = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
 	Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 	int  birthyear = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "birthyear"));

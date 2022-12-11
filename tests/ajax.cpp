@@ -360,6 +360,61 @@ TEST(Ajax, Judoka_Add)
 
 
 
+TEST(Ajax, Judoka_Get)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddJudoka(HttpServer::Request("", "firstname=first&lastname=last&weight=10,2&gender=0&birthyear=2000&number=A123")), "ok");
+
+		auto judokas = app.GetDatabase().GetAllJudokas();
+
+		ASSERT_EQ(judokas.size(), 1);
+		auto judoka = judokas.begin()->second;
+
+		auto yaml = app.Ajax_GetJudoka(HttpServer::Request("id="+(std::string)judoka->GetUUID()));
+
+		Judoka judoka2(YAML::Load(yaml), nullptr);
+
+		EXPECT_EQ(judoka->GetFirstname(), judoka2.GetFirstname());
+		EXPECT_EQ(judoka->GetLastname(),  judoka2.GetLastname());
+		EXPECT_EQ(judoka->GetWeight(),    judoka2.GetWeight());
+		EXPECT_EQ(judoka->GetGender(),    judoka2.GetGender());
+		EXPECT_EQ(judoka->GetBirthyear(), judoka2.GetBirthyear());
+		EXPECT_EQ(judoka->GetNumber(),    judoka2.GetNumber());
+
+
+
+		auto t = new Tournament("deleteMe");
+		t->EnableAutoSave(false);
+
+		app.AddTournament(t);
+
+		auto j1 = new Judoka("firstname", "lastname");
+		t->AddParticipant(j1);
+
+
+		yaml = app.Ajax_GetJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID()));
+
+		auto node = YAML::Load(yaml);
+		Judoka judoka3(node, nullptr);
+
+		ASSERT_TRUE(node["is_participant"]);
+		EXPECT_TRUE(node["is_participant"].as<bool>());
+
+		EXPECT_EQ(j1->GetFirstname(), judoka3.GetFirstname());
+		EXPECT_EQ(j1->GetLastname(),  judoka3.GetLastname());
+		EXPECT_EQ(j1->GetWeight(),    judoka3.GetWeight());
+		EXPECT_EQ(j1->GetGender(),    judoka3.GetGender());
+		EXPECT_EQ(j1->GetBirthyear(), judoka3.GetBirthyear());
+		EXPECT_EQ(j1->GetNumber(),    judoka3.GetNumber());
+	}
+}
+
+
+
 TEST(Ajax, Judoka_Edit)
 {
 	initialize();
