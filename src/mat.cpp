@@ -555,6 +555,8 @@ void Mat::RemoveIppon(Fighter Whom)
 	{
 		m_mutex.lock();
 		SetScoreboard(Whom).m_Ippon = 0;
+		if (GetScoreboard(Whom).m_WazaAri == 2)//If it was created via awasete ippon
+			SetScoreboard(Whom).m_WazaAri = 1;
 
 		AddEvent(Whom, MatchLog::BiasedEvent::RemoveIppon);
 
