@@ -389,6 +389,34 @@ TEST(Ajax, Judoka_Edit)
 
 
 
+TEST(Ajax, Judoka_Edit_Participant)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto t = new Tournament("deleteMe");
+		t->EnableAutoSave(false);
+
+		app.AddTournament(t);
+
+		auto j1 = new Judoka("firstname", "lastname");
+		t->AddParticipant(j1);
+
+		EXPECT_EQ((std::string)app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID(), "firstname=first2&lastname=last2&weight=12,5&gender=1&birthyear=2001&number=A1234")), "ok");
+
+		EXPECT_EQ(j1->GetFirstname(), "first2");
+		EXPECT_EQ(j1->GetLastname(),  "last2");
+		EXPECT_EQ(j1->GetWeight(),  Weight("12,5"));
+		EXPECT_EQ(j1->GetGender(),  Gender::Female);
+		EXPECT_EQ(j1->GetBirthyear(), 2001);
+		EXPECT_EQ(j1->GetNumber(), "A1234");
+	}
+}
+
+
+
 TEST(Ajax, GetNamesOnMat)
 {
 	initialize();
