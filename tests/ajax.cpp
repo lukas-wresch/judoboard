@@ -818,7 +818,7 @@ TEST(Ajax, Clubs_List)
 		c1->SetShortName("c1");
 		app.GetDatabase().AddClub(c1);
 
-		YAML::Node yaml = YAML::Load(app.Ajax_ListClubs());
+		YAML::Node yaml = YAML::Load(app.Ajax_ListClubs(HttpServer::Request("")));
 
 		ASSERT_EQ(yaml.size(), 1);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
@@ -826,12 +826,43 @@ TEST(Ajax, Clubs_List)
 
 		app.GetDatabase().AddClub(new Club("Club 2"));
 
-		yaml = YAML::Load(app.Ajax_ListClubs());
+		yaml = YAML::Load(app.Ajax_ListClubs(HttpServer::Request("")));
 
 		ASSERT_EQ(yaml.size(), 2);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
 		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c1");
 		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "Club 2");
+	}
+
+	ZED::Core::RemoveFile("database.yml");
+}
+
+
+
+TEST(Ajax, Clubs_List_All)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto c = new Club("Club 1");
+		c->SetShortName("c");
+
+		auto t = new Tournament("deleteMe");
+		t->EnableAutoSave(false);
+
+		app.AddTournament(t);
+
+		auto j = new Judoka("first", "last");
+		j->SetClub(c);
+		t->AddParticipant(j);
+
+		auto yaml = YAML::Load(app.Ajax_ListClubs(HttpServer::Request("all=true")));
+
+		ASSERT_EQ(yaml.size(), 1);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
+		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c");
 	}
 
 	ZED::Core::RemoveFile("database.yml");
@@ -863,7 +894,7 @@ TEST(Ajax, Clubs_Get)
 
 
 
-TEST(Ajax, Clubs_Get_All)
+TEST(Ajax, Clubs_Get_From_Tournament)
 {
 	initialize();
 
@@ -873,7 +904,7 @@ TEST(Ajax, Clubs_Get_All)
 
 		auto c = new Club("Club 1");
 		c->SetShortName("c");
-		
+
 		auto t = new Tournament("deleteMe");
 		t->EnableAutoSave(false);
 
@@ -883,14 +914,12 @@ TEST(Ajax, Clubs_Get_All)
 		j->SetClub(c);
 		t->AddParticipant(j);
 
-		YAML::Node yaml = YAML::Load(app.Ajax_GetClub(HttpServer::Request("all&id=" + (std::string)c->GetUUID())));
+		YAML::Node yaml = YAML::Load(app.Ajax_GetClub(HttpServer::Request("id=" + (std::string)c->GetUUID())));
 
 		EXPECT_EQ(yaml["uuid"].as<std::string>(), c->GetUUID());
 		EXPECT_EQ(yaml["name"].as<std::string>(), c->GetName());
 		EXPECT_EQ(yaml["short_name"].as<std::string>(), c->GetShortName());
 	}
-
-	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -909,7 +938,7 @@ TEST(Ajax, Clubs_Edit)
 		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)c->GetUUID(), "name=NewName&shortname=c")), "ok");
 
 
-		auto yaml = YAML::Load(app.Ajax_ListClubs());
+		auto yaml = YAML::Load(app.Ajax_ListClubs(HttpServer::Request("")));
 
 		ASSERT_EQ(yaml.size(), 1);
 		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), c->GetUUID());
@@ -935,7 +964,7 @@ TEST(Ajax, Clubs_Delete)
 
 		EXPECT_EQ((std::string)app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)c->GetUUID())), "ok");
 
-		auto yaml = YAML::Load(app.Ajax_ListClubs());
+		auto yaml = YAML::Load(app.Ajax_ListClubs(HttpServer::Request("")));
 
 		ASSERT_EQ(yaml.size(), 0);
 	}

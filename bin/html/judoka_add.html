@@ -96,7 +96,7 @@ function GetJudoka(id)
     if (res.is_participant)
     {
       document.getElementById("delete").style.display = "none";
-      query = "all";
+      query = "all=true";
     }
 
     GetClubs(function(response) {

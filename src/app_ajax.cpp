@@ -1226,7 +1226,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		return Ajax_ListClubs();
+		return Ajax_ListClubs(Request);
 	});
 
 
@@ -2759,18 +2759,27 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 
 std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
 {
-	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	UUID id  = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 	LockTillScopeEnd();
 
-	auto club = m_Database.FindAssociation(id);
+	const Association* club = m_Database.FindAssociation(id);
 
 	if (!club)
 	{
 		club = m_Database.FindClub(id);
 
 		if (!club)
-			return Error(Error::Type::ItemNotFound);
+		{
+			auto tour = (Tournament*)GetTournament();//TODO: could be remote tournament
+			club = tour->GetDatabase().FindAssociation(id);
+
+			if (!club)
+				club = tour->GetDatabase().FindClub(id);
+
+			if (!club)
+				return Error(Error::Type::ItemNotFound);
+		}
 	}
 
 	YAML::Emitter ret;
@@ -2852,12 +2861,27 @@ Error Application::Ajax_DeleteClub(const HttpServer::Request& Request)
 
 
 
-std::string Application::Ajax_ListClubs()
+std::string Application::Ajax_ListClubs(const HttpServer::Request& Request)
 {
+	bool all = HttpServer::DecodeURLEncoded(Request.m_Query, "all") == "true";
+
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
 
 	LockTillScopeEnd();
+
+	if (all && GetTournament())
+	{
+		Tournament* tour = (Tournament*)GetTournament();//TODO: could be remote tournament
+
+		tour->Lock();
+		for (auto club : tour->GetDatabase().GetAllClubs())
+		{
+			if (club)
+				*club >> ret;
+		}
+		tour->Unlock();
+	}
 
 	for (auto club : m_Database.GetAllClubs())
 	{
