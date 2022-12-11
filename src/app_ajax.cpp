@@ -2668,8 +2668,8 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 	auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
 	auto lastname  = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
-	auto weight = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
-	Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+	auto weight    = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
+	Gender gender  = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 	int  birthyear = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "birthyear"));
 	auto number = HttpServer::DecodeURLEncoded(Request.m_Body, "number");
 	UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");
@@ -2682,7 +2682,16 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 	auto judoka = m_Database.FindJudoka(id);
 
 	if (!judoka)
-		return Error::Type::ItemNotFound;
+	{
+		//Search for participant
+		if (!GetTournament())
+			return Error(Error::Type::ItemNotFound);
+
+		judoka = GetTournament()->FindParticipant(id);
+
+		if (!judoka)
+			return Error(Error::Type::ItemNotFound);
+	}
 
 	judoka->SetFirstname(firstname);
 	judoka->SetLastname(lastname);
@@ -2699,7 +2708,6 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 		judoka->SetClub(GetDatabase().FindClub(clubID));
 	else
 		judoka->SetClub(nullptr);
-
 
 	return Error();//OK
 }
