@@ -863,6 +863,38 @@ TEST(Ajax, Clubs_Get)
 
 
 
+TEST(Ajax, Clubs_Get_All)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("database.yml");
+		Application app;
+
+		auto c = new Club("Club 1");
+		c->SetShortName("c");
+		
+		auto t = new Tournament("deleteMe");
+		t->EnableAutoSave(false);
+
+		app.AddTournament(t);
+
+		auto j = new Judoka("first", "last");
+		j->SetClub(c);
+		t->AddParticipant(j);
+
+		YAML::Node yaml = YAML::Load(app.Ajax_GetClub(HttpServer::Request("all&id=" + (std::string)c->GetUUID())));
+
+		EXPECT_EQ(yaml["uuid"].as<std::string>(), c->GetUUID());
+		EXPECT_EQ(yaml["name"].as<std::string>(), c->GetName());
+		EXPECT_EQ(yaml["short_name"].as<std::string>(), c->GetShortName());
+	}
+
+	ZED::Core::RemoveFile("database.yml");
+}
+
+
+
 TEST(Ajax, Clubs_Edit)
 {
 	initialize();
