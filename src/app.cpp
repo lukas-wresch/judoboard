@@ -129,7 +129,7 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 		ret += "Judoka: " + dm4_judoka.Firstname + " " + dm4_judoka.Lastname + "<br/>";
 
 		//auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);
-		Judoka* new_judoka = new Judoka(JudokaData(dm4_judoka), nullptr);
+		Judoka* new_judoka = new Judoka(JudokaData(dm4_judoka), &GetDatabase());
 
 		//Judoka is now added/updated
 
@@ -184,13 +184,13 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 	{
 		ret += "Judoka: " + dmf_judoka.Firstname + " " + dmf_judoka.Lastname + "<br/>";
 
-		//auto new_judoka = GetDatabase().UpdateOrAdd(JudokaData(dmf_judoka), ParseOnly, ret);		
+		//auto new_judoka = GetDatabase().UpdateOrAdd(JudokaData(dmf_judoka), ParseOnly, ret);	
 
 		//Judoka is now added/updated
 
 		if (!ParseOnly)
 		{//Add to the current tournament
-			GetTournament()->AddParticipant(new Judoka(JudokaData(dmf_judoka), &GetTournament()->GetDatabase()));
+			GetTournament()->AddParticipant(new Judoka(JudokaData(dmf_judoka), &GetDatabase()));
 		}
 	}
 

@@ -403,7 +403,7 @@ void SingleElimination::GenerateSchedule()
 
 std::vector<MatchTable::Result> SingleElimination::CalculateResults() const
 {
-	std::vector<Result> ret(6);
+	std::vector<Result> ret;
 
 	if (GetParticipants().size() == 0)
 		return ret;
