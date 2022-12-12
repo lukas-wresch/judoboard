@@ -78,6 +78,8 @@ bool Database::Load(const std::string& Filename)
 		m_CurrentTournament = yaml["last_tournament_name"].as<std::string>();
 	if (yaml["language"])
 		Localizer::SetLanguage((Language)yaml["language"].as<int>());
+	if (yaml["port"])
+		SetServerPort(yaml["port"].as<int>());
 
 	//Read standing data
 	StandingData::operator <<(yaml);
@@ -113,6 +115,7 @@ bool Database::Save(const std::string& Filename) const
 
 	yaml << YAML::Key << "last_tournament_name" << YAML::Value << m_CurrentTournament;
 	yaml << YAML::Key << "language" << YAML::Value << (int)Localizer::GetLanguage();
+	yaml << YAML::Key << "port" << YAML::Value << GetServerPort();
 	
 	StandingData::operator >>(yaml);
 
