@@ -1192,6 +1192,7 @@ void Mat::NextState(State NextState) const
 	const int effect_row3 = effect_row2 + (int)(96.0 * m_ScalingFactor);
 
 	auto& renderer = m_Window.GetRenderer();
+	renderer.Lock();
 
 	switch (m_State)
 	{
@@ -1455,6 +1456,8 @@ void Mat::NextState(State NextState) const
 			m_Graphics["winner_white"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0));
 			break;
 	}
+
+	renderer.Unlock();
 }
 
 
