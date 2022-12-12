@@ -941,42 +941,6 @@ TEST(Ajax, ListAssociations)
 
 
 
-TEST(Ajax, Status)
-{
-	initialize();
-
-	{
-		Application app;
-
-		{
-			YAML::Node yaml = YAML::Load(app.Ajax_Status());
-			uint32_t uptime = yaml["uptime"].as<uint32_t>();
-			EXPECT_TRUE(uptime < 100);
-
-			auto version = yaml["version"].as<std::string>();
-			EXPECT_EQ(version, Application::Version);
-		}
-		
-		ZED::Core::Pause(1000);
-
-		{
-			YAML::Node yaml = YAML::Load(app.Ajax_Status());
-			uint32_t uptime = yaml["uptime"].as<uint32_t>();
-			EXPECT_TRUE(uptime < 1100);
-		}
-
-		ZED::Core::Pause(1000);
-
-		{
-			YAML::Node yaml = YAML::Load(app.Ajax_Status());
-			uint32_t uptime = yaml["uptime"].as<uint32_t>();
-			EXPECT_TRUE(uptime < 2100);
-		}
-	}
-}
-
-
-
 TEST(Ajax, AddDisqualification)
 {
 	initialize();

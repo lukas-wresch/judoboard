@@ -3199,21 +3199,6 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 
 
 
-std::string Application::Ajax_Status()
-{
-	YAML::Emitter ret;
-
-	ret << YAML::BeginMap;
-
-	ret << YAML::Key << "version" << YAML::Value << Version;
-	ret << YAML::Key << "uptime"  << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
-
-	ret << YAML::EndMap;
-	return ret.c_str();
-}
-
-
-
 Error Application::Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request)
 {
 	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));

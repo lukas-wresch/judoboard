@@ -112,7 +112,7 @@ function Update()
 
 function GetStatus()
 {
-  AjaxCallback("ajax/config/status", function(response) {
+  AjaxCallback("ajax/config/get_setup", function(response) {
     var res = YAML.parse(response);
 
     document.getElementById("version").innerHTML = res.version;
