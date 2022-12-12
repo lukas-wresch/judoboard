@@ -1286,6 +1286,7 @@ void Mat::NextState(State NextState) const
 			if (GetIpponStyle() == IpponStyle::SpelledOut)
 			{
 				m_Graphics["white_ippon"].m_x += (int)(100.0 * m_ScalingFactor);
+				m_Graphics["blue_ippon"].m_x  += (int)(100.0 * m_ScalingFactor);
 			}
 
 
@@ -1606,30 +1607,41 @@ void Mat::UpdateGraphics() const
 
 		case IpponStyle::SpelledOut:
 		{
-			if (GetScoreboard(Fighter::White).m_WazaAri == 2)
+			for (Fighter f = Fighter::White; f <= Fighter::Blue; ++f)
 			{
-				if (m_Graphics["white_wazari"].GetAnimations().size() == 0 && m_Graphics["white_ippon"].m_a < 1.0)
+				auto wazaari = &m_Graphics["white_wazari"];
+				auto ippon   = &m_Graphics["white_ippon"];
+				auto color   = ZED::Color(0, 0, 0);
+
+				if (f == Fighter::Blue)
 				{
-					m_Graphics["white_wazari"].SetAlpha(320.0).AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0, [](auto& g) { return g.m_a > 0.0; }));
-					m_Graphics["white_ippon" ].SetAlpha(-180.0).StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, 40.0, [](auto& g) { return g.m_a < 255.0; }));
+					wazaari = &m_Graphics["blue_wazari"];
+					ippon   = &m_Graphics["blue_ippon"];
+					color   = ZED::Color(255, 255, 255);
 				}
+
+				if (GetScoreboard(f).m_WazaAri == 2)
+				{
+					if (wazaari->GetAnimations().size() == 0 && ippon->m_a < 1.0)
+					{
+						wazaari->SetAlpha(320.0).AddAnimation(Animation::CreateLinear(0.0, 0.0, -60.0, [](auto& g) { return g.m_a > 0.0; }));
+						ippon->SetAlpha(-180.0).StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, 40.0, [](auto& g) { return g.m_a < 255.0; }));
+					}
+				}
+				else if (GetScoreboard(f).m_WazaAri == 1)
+					wazaari->SetAlpha(255.0);
+
+				if (GetScoreboard(f).m_WazaAri > 0)
+					wazaari->UpdateTexture(renderer, std::to_string(GetScoreboard(f).m_WazaAri) + " Wazaari", color, ZED::FontSize::Huge);
+				else
+					wazaari->UpdateTexture(renderer, "", color, ZED::FontSize::Huge);
+
+				if (GetScoreboard(f).m_Ippon == 1)
+					ippon->UpdateTexture(renderer, "Ippon", color, ZED::FontSize::Huge);
+				else
+					ippon->SetAlpha(0.0).UpdateTexture(renderer, "", color, ZED::FontSize::Huge);
 			}
-			else if (GetScoreboard(Fighter::White).m_WazaAri == 1)
-				m_Graphics["white_wazari"].SetAlpha(255.0);
 
-			if (GetScoreboard(Fighter::White).m_WazaAri > 0)
-				m_Graphics["white_wazari"].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::White).m_WazaAri) + " Wazaari", ZED::Color(0, 0, 0), ZED::FontSize::Huge);
-			else
-				m_Graphics["white_wazari"].UpdateTexture(renderer, "", ZED::Color(0, 0, 0), ZED::FontSize::Huge);
-
-			if (GetScoreboard(Fighter::White).m_Ippon == 1)
-				m_Graphics["white_ippon"].UpdateTexture(renderer, "Ippon", ZED::Color(0, 0, 0), ZED::FontSize::Huge);
-			else
-				m_Graphics["white_ippon"].SetAlpha(0.0);
-
-
-
-			m_Graphics["blue_wazari" ].UpdateTexture(renderer, std::to_string(GetScoreboard(Fighter::Blue).m_WazaAri)  + " Wazaari",  ZED::Color(255, 255, 255), ZED::FontSize::Huge);
 			break;
 		}
 		}//End of switch (GetIpponStyle())
