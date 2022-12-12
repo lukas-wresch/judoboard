@@ -14,13 +14,30 @@
 
 <div style="margin-top: 2cm;">
     <label style="width:150px;float:left;" id="label_version">Judoboard version</label>
-    <span  id="version">???</span>
+    <span  id="version"></span>
 </div>
 
 <div style="margin-top: 5mm;">
     <label style="width:150px;float:left;" id="label_uptime">Uptime</label>
-    <span  id="uptime">???</span>
+    <span  id="uptime"></span>
 </div>
+
+<div style="margin-top: 5mm;">
+  <label style="width:150px;float:left;" id="label_language">Language</label>
+  <select style="margin-bottom:0px;" id="language">
+    <option value="0" id="english">English</option>
+    <option value="1" id="german">German</option>
+  </select>
+</div>
+
+<div style="margin-top: 5mm;">
+  <label style="width:150px;float:left;" id="label_port">Server port</label>
+  <input style="margin-bottom:0px;" type="number" id="port" value="" min="1" max="65535" />
+</div>
+
+<br/>
+
+<button class="neutral" style="margin-right: 2cm;" onclick="return UpdateConfig()" id="update">Save</button>
 
 <br/>
 
@@ -109,14 +126,29 @@ function Update()
 }
 
 
+function UpdateConfig()
+{
+  var language = document.getElementById("language").value;
+  var port     = document.getElementById("port").value;
+  Ajax("ajax/config/set_setup?language=" + language + "&port=" + port);
+}
+
 
 function GetStatus()
 {
   AjaxCallback("ajax/config/get_setup", function(response) {
     var res = YAML.parse(response);
+    console.log(response);
 
-    document.getElementById("version").innerHTML = res.version;
-    document.getElementById("uptime").innerHTML  = NiceLargeTime(res.uptime);
+    if (document.getElementById("version").innerHTML == "")
+    {
+      document.getElementById("version").innerHTML = res.version;
+      document.getElementById("uptime").innerHTML  = NiceLargeTime(res.uptime);
+      document.getElementById("language").value = res.language;
+      document.getElementById("port").value = res.port;
+    }
+    else
+      document.getElementById("uptime").innerHTML = NiceLargeTime(res.uptime);
   });
 }
 
