@@ -193,7 +193,7 @@ TEST(Ajax, Setup_Get)
 		auto yaml = YAML::Load(app.Ajax_GetSetup());
 
 		EXPECT_EQ(yaml["language"].as<int>(), (int)Localizer::GetLanguage());
-		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetPort());
+		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetServerPort());
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
 
@@ -202,7 +202,7 @@ TEST(Ajax, Setup_Get)
 		yaml = YAML::Load(app.Ajax_GetSetup());
 
 		EXPECT_EQ(yaml["language"].as<int>(), (int)Localizer::GetLanguage());
-		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetPort());
+		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetServerPort());
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 1100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
 	}

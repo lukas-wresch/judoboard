@@ -3178,7 +3178,7 @@ std::string Application::Ajax_GetSetup()
 	ret << YAML::Key << "version"  << YAML::Value << Version;
 	ret << YAML::Key << "uptime"   << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
 	ret << YAML::Key << "language" << YAML::Value << (int)Localizer::GetLanguage();
-	ret << YAML::Key << "port"     << YAML::Value << GetDatabase().GetPort();
+	ret << YAML::Key << "port"     << YAML::Value << GetDatabase().GetServerPort();
 
 	ret << YAML::EndMap;
 	return ret.c_str();
@@ -3188,6 +3188,12 @@ std::string Application::Ajax_GetSetup()
 
 Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 {
+	int language = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "language"));
+	int port     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "port"));
+
+	Localizer::SetLanguage((Language)language);
+	GetDatabase().SetServerPort(port);
+
 	return Error::Type::NoError;
 }
 

@@ -32,8 +32,8 @@ namespace Judoboard
 		auto GetLastTournamentName() const { return m_CurrentTournament; }
 		void SetLastTournamentName(const std::string& Name) { m_CurrentTournament = Name; }
 
-		auto GetPort() const { return m_Port; }
-		void SetPort(uint16_t NewPort) { m_Port = NewPort; }
+		auto GetServerPort() const { return m_Port; }
+		void SetServerPort(uint16_t NewPort) { m_Port = NewPort; }
 
 		//Judoka
 		Judoka* UpdateOrAdd(const JudokaData& NewJudoka, bool ParseOnly, std::string& Output);
