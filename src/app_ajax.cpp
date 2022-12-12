@@ -261,14 +261,6 @@ void Application::SetupHttpServer()
 	});
 
 
-	m_Server.RegisterResource("/ajax/config/status", [this](auto& Request) -> std::string {
-		if (!IsLoggedIn(Request))
-			return Error(Error::Type::NotLoggedIn);
-
-		return Ajax_Status();
-	});
-
-
 	m_Server.RegisterResource("/ajax/colors/get", [this](auto& Request) -> std::string {
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
@@ -2191,6 +2183,22 @@ void Application::SetupHttpServer()
 		return Error(Error::Type::OperationFailed);
 	});
 
+	m_Server.RegisterResource("/ajax/config/get_setup", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_GetSetup();
+	});
+
+	m_Server.RegisterResource("/ajax/config/set_setup", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_SetSetup(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/config/shutdown", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
@@ -3157,6 +3165,30 @@ Error Application::Ajax_SetStartingPosition(const HttpServer::Request& Request)
 	GetTournament()->GenerateSchedule();
 
 	return Error::Type::NoError;//OK
+}
+
+
+
+std::string Application::Ajax_GetSetup()
+{
+	YAML::Emitter ret;
+
+	ret << YAML::BeginMap;
+
+	ret << YAML::Key << "version"  << YAML::Value << Version;
+	ret << YAML::Key << "uptime"   << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
+	ret << YAML::Key << "language" << YAML::Value << (int)Localizer::GetLanguage();
+	ret << YAML::Key << "port"     << YAML::Value << GetDatabase().GetPort();
+
+	ret << YAML::EndMap;
+	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
+{
+	return Error::Type::NoError;
 }
 
 

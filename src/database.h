@@ -32,6 +32,9 @@ namespace Judoboard
 		auto GetLastTournamentName() const { return m_CurrentTournament; }
 		void SetLastTournamentName(const std::string& Name) { m_CurrentTournament = Name; }
 
+		auto GetPort() const { return m_Port; }
+		void SetPort(uint16_t NewPort) { m_Port = NewPort; }
+
 		//Judoka
 		Judoka* UpdateOrAdd(const JudokaData& NewJudoka, bool ParseOnly, std::string& Output);
 
@@ -56,6 +59,7 @@ namespace Judoboard
 		bool m_AutoSave = true;
 
 		std::string m_CurrentTournament;//Name of tournament that is currently open
+		uint16_t m_Port = 8080;//Port of the webserver
 
 		std::vector<Account*> m_Accounts;
 		std::vector<Account::Nonce> m_OpenNonces;

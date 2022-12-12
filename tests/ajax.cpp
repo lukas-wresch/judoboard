@@ -183,6 +183,64 @@ TEST(Ajax, UpdatePassword)
 
 
 
+TEST(Ajax, Setup_Get)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto yaml = YAML::Load(app.Ajax_GetSetup());
+
+		EXPECT_EQ(yaml["language"].as<int>(), (int)Localizer::GetLanguage());
+		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetPort());
+		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
+		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+
+		ZED::Core::Pause(1000);
+
+		yaml = YAML::Load(app.Ajax_GetSetup());
+
+		EXPECT_EQ(yaml["language"].as<int>(), (int)Localizer::GetLanguage());
+		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetPort());
+		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 1100u);
+		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+	}
+
+}
+
+
+
+TEST(Ajax, Setup_Set)
+{
+	initialize();
+
+	{
+		Application app;
+		
+		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("port=1234&language=0")), "ok");
+
+		auto yaml = YAML::Load(app.Ajax_GetSetup());
+
+		EXPECT_EQ(yaml["language"].as<int>(), 0);
+		EXPECT_EQ(yaml["port"].as<int>(), 1234);
+		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
+		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+
+		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("port=567&language=1")), "ok");
+
+		yaml = YAML::Load(app.Ajax_GetSetup());
+
+		EXPECT_EQ(yaml["language"].as<int>(), 1);
+		EXPECT_EQ(yaml["port"].as<int>(), 567);
+		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
+		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+	}
+
+}
+
+
+
 TEST(Ajax, SetFullscreen)
 {
 	initialize();
