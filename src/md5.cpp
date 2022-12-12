@@ -213,7 +213,7 @@ MD5::MD5(const Tournament& Tournament)
 			new_weightclass->FightSystemID = 16;//Round robin
 		else if (match_table->GetType() == MatchTable::Type::SingleElimination)
 		{
-			const auto single_elimination = (Judoboard::SingleElimination*)filter;
+			const auto single_elimination = (Judoboard::SingleElimination*)match_table;
 
 			new_weightclass->FightSystemID = 19;
 
