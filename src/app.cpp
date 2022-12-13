@@ -345,11 +345,8 @@ bool Application::CloseMat(uint32_t ID)
 	{
 		if (*it && (*it)->GetMatID() == ID && (*it)->Close())
 		{
-			if ((*it)->GetType() == IMat::Type::VirtualMat)
-			{
-				delete *it;
-				it = m_Mats.erase(it);
-			}
+			delete *it;
+			it = m_Mats.erase(it);
 			return true;
 		}
 	}
@@ -392,6 +389,10 @@ bool Application::StartLocalMat(uint32_t ID)
 	m_Mats.emplace_back(new_mat);
 
 	ZED::Log::Info("New local mat has been created with ID=" + std::to_string(ID));
+
+	new_mat->SetIpponStyle(GetDatabase().GetIpponStyle());
+	new_mat->SetTimerStyle(GetDatabase().GetTimerStyle());
+	new_mat->SetNameStyle(GetDatabase().GetNameStyle());
 
 	if (IsSlave())
 		SendCommandToMaster("/ajax/master/mat_available?port=" + std::to_string(m_Server.GetPort()));
@@ -555,7 +556,7 @@ void Application::Run()
 		{
 			if (*it && !(*it)->IsConnected())
 			{
-				delete* it;
+				delete *it;
 				it = m_Mats.erase(it);
 			}
 			else

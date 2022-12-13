@@ -68,6 +68,7 @@ TEST(Mat, LoadConfig)
 	app.GetDatabase().SetTimerStyle(Mat::TimerStyle::HundredsMS);
 	app.GetDatabase().SetNameStyle(NameStyle::FamilyName);
 
+	app.CloseMat(1);
 	app.StartLocalMat(1);
 
 	mat = app.GetDefaultMat();

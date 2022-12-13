@@ -80,6 +80,12 @@ bool Database::Load(const std::string& Filename)
 		Localizer::SetLanguage((Language)yaml["language"].as<int>());
 	if (yaml["port"])
 		SetServerPort(yaml["port"].as<int>());
+	if (yaml["ippon_style"])
+		SetIpponStyle((Mat::IpponStyle)yaml["ippon_style"].as<int>());
+	if (yaml["timer_style"])
+		SetTimerStyle((Mat::TimerStyle)yaml["timer_style"].as<int>());
+	if (yaml["name_style"])
+		SetNameStyle((NameStyle)yaml["name_style"].as<int>());
 
 	//Read standing data
 	StandingData::operator <<(yaml);
@@ -116,6 +122,9 @@ bool Database::Save(const std::string& Filename) const
 	yaml << YAML::Key << "last_tournament_name" << YAML::Value << m_CurrentTournament;
 	yaml << YAML::Key << "language" << YAML::Value << (int)Localizer::GetLanguage();
 	yaml << YAML::Key << "port" << YAML::Value << GetServerPort();
+	yaml << YAML::Key << "ippon_style" << YAML::Value << (int)GetIpponStyle();
+	yaml << YAML::Key << "timer_style" << YAML::Value << (int)GetTimerStyle();
+	yaml << YAML::Key << "name_style"  << YAML::Value << (int)GetNameStyle();
 	
 	StandingData::operator >>(yaml);
 
