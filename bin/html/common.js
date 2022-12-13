@@ -521,9 +521,9 @@ function GetAgeGroups(callback)
 
 
 
-function GetClubs(callback)
+function GetClubs(callback, query = "")
 {
-  AjaxCallback("ajax/club/list", function(response) {
+  AjaxCallback("ajax/club/list?" + query, function(response) {
     console.log(response);
     var res = YAML.parse(response);
 
