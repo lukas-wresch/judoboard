@@ -191,14 +191,14 @@ bool Mat::StartMatch(Match* NewMatch)
 		return false;
 	}
 
-	m_mutex.lock();
-
 	if (!Reset())
 	{
 		ZED::Log::Warn("Could not reset mat");
 		m_mutex.unlock();
 		return false;
 	}
+
+	m_mutex.lock();
 
 	m_White = *NewMatch->GetFighter(Fighter::White);
 	m_Blue  = *NewMatch->GetFighter(Fighter::Blue);
@@ -207,9 +207,10 @@ bool Mat::StartMatch(Match* NewMatch)
 
 	NewMatch->StartMatch();
 	AddEvent(MatchLog::NeutralEvent::StartMatch);
-	NextState(State::TransitionToMatch);
 
 	m_mutex.unlock();
+
+	NextState(State::TransitionToMatch);
 
 	ZED::Log::Debug("New match started");
 	return true;
