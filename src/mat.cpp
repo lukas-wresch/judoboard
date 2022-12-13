@@ -126,6 +126,8 @@ bool Mat::Close()
 
 bool Mat::Reset()
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat())
 	{
 		ZED::Log::Warn("Can not reset match, the previous match is still ongoing");
@@ -146,6 +148,8 @@ bool Mat::Reset()
 	m_IsDraw = false;
 
 	m_pMatch = nullptr;
+
+	m_mutex.unlock();
 
 	ZED::Log::Info("Mat got resetted");
 	return true;
@@ -226,11 +230,12 @@ bool Mat::EndMatch()
 			m_pMatch->EndMatch();
 		}
 		
+		m_mutex.unlock();
+
 		//Reset mat
 		NextState(State::TransitionToWaiting);
 
 		Reset();
-		m_mutex.unlock();
 
 		ZED::Log::Debug("Match ended");
 
