@@ -242,7 +242,23 @@ TEST(Ajax, Setup_Set)
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
 	}
+}
 
+
+
+TEST(Ajax, ExecuteCommand)
+{
+	initialize();
+
+	{
+		Application app;
+
+		std::string result = app.Ajax_Execute(HttpServer::Request("dir"));
+
+		EXPECT_GE(result.length(), 500);
+
+		//TODO?!
+	}
 }
 
 

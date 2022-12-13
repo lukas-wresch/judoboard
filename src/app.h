@@ -150,6 +150,7 @@ namespace Judoboard
 		//Config
 		std::string Ajax_GetSetup();
 		Error Ajax_SetSetup(const HttpServer::Request& Request);
+		std::string Ajax_Execute(const HttpServer::Request& Request);
 
 		//Serialization
 		[[deprecated]]
