@@ -87,6 +87,9 @@ TEST(Database, SaveAndLoad)
 		d.AddJudoka(j3);
 
 		d.SetServerPort(rand());
+		d.SetIpponStyle(Mat::IpponStyle::SpelledOut);
+		d.SetTimerStyle(Mat::TimerStyle::Full);
+		d.SetNameStyle(NameStyle::GivenName);
 
 		EXPECT_TRUE(d.Save("temp.yml"));
 
@@ -95,6 +98,9 @@ TEST(Database, SaveAndLoad)
 		EXPECT_TRUE(d2.Load("temp.yml"));
 
 		EXPECT_EQ(d2.GetServerPort(), d.GetServerPort());
+		EXPECT_EQ(d2.GetIpponStyle(), d.GetIpponStyle());
+		EXPECT_EQ(d2.GetTimerStyle(), d.GetTimerStyle());
+		EXPECT_EQ(d2.GetNameStyle(),  d.GetNameStyle());
 
 		EXPECT_EQ(d2.GetNumJudoka(), 3);
 
