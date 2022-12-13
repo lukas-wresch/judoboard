@@ -3219,7 +3219,11 @@ std::string Application::Ajax_Execute(const HttpServer::Request& Request)
 {
 	auto command = Request.m_Query;
 
+#ifdef _WIN32
 	FILE* pipe = _popen(command.c_str(), "r");
+#else
+	FILE* pipe = popen(command.c_str(), "r");
+#endif
 	if (!pipe)
 		return "";
 
@@ -3230,7 +3234,11 @@ std::string Application::Ajax_Execute(const HttpServer::Request& Request)
 		result += buffer;
 	}
 
+#ifdef _WIN32
 	_pclose(pipe);
+#else
+	pclose(pipe);
+#endif
 	return result;
 }
 
