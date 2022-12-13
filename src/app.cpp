@@ -345,9 +345,12 @@ bool Application::CloseMat(uint32_t ID)
 	{
 		if (*it && (*it)->GetMatID() == ID && (*it)->Close())
 		{
-			delete *it;
-			it = m_Mats.erase(it);
-			return true;
+			if ((*it)->GetType() == IMat::Type::VirtualMat)
+			{
+				delete* it;
+				it = m_Mats.erase(it);
+				return true;
+			}
 		}
 	}
 

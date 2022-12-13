@@ -13,17 +13,17 @@
 <br/>
 
 <div style="margin-top: 2cm;">
-    <label style="width:150px;float:left;" id="label_version">Judoboard version</label>
+    <label style="width:200px;float:left;" id="label_version">Judoboard version</label>
     <span  id="version"></span>
 </div>
 
 <div style="margin-top: 5mm;">
-    <label style="width:150px;float:left;" id="label_uptime">Uptime</label>
+    <label style="width:200px;float:left;" id="label_uptime">Uptime</label>
     <span  id="uptime"></span>
 </div>
 
 <div style="margin-top: 5mm;">
-  <label style="width:150px;float:left;" id="label_language">Language</label>
+  <label style="width:200px;float:left;" id="label_language">Language</label>
   <select style="margin-bottom:0px;" id="language">
     <option value="0" id="english">English</option>
     <option value="1" id="german">German</option>
@@ -31,8 +31,34 @@
 </div>
 
 <div style="margin-top: 5mm;">
-  <label style="width:150px;float:left;" id="label_port">Server port</label>
+  <label style="width:200px;float:left;" id="label_port">Server port</label>
   <input style="margin-bottom:0px;" type="number" id="port" value="" min="1" max="65535" />
+</div>
+
+<div style="margin-top: 5mm;">
+  <label style="width:200px;float:left;" id="label_ipponStyle">Ippon/Waza-Ari Style</label>
+  <select id="ipponStyle">
+    <option selected value="0" id="two_digits">Two Digits</option>
+    <option value="1" id="single_digit">One Digit</option>
+    <option value="2" id="spelled_out">Spelled Out</option>
+  </select>
+</div>
+
+<div style="margin-top: 5mm;">
+  <label style="width:200px;float:left;" id="label_timerStyle">Timer Style</label>
+  <select id="timerStyle">
+    <option selected value="0" id="with_hundred">With Hundreds (1:23:4)</option>
+    <option value="1" id="only_seconds">Only seconds (1:23)</option>
+    <option value="2" id="full">Completely (1:23.456)</option>
+  </select>
+</div>
+
+<div style="margin-top: 5mm;">
+  <label style="width:200px;float:left;" id="label_nameStyle">Name Style</label>
+  <select id="nameStyle">
+    <option selected value="0" id="given_name_first">Give name first</option>
+    <option value="1" id="family_name_first">Family name first</option>
+  </select>
 </div>
 
 <br/>
@@ -128,9 +154,15 @@ function Update()
 
 function UpdateConfig()
 {
-  var language = document.getElementById("language").value;
-  var port     = document.getElementById("port").value;
-  Ajax("ajax/config/set_setup?language=" + language + "&port=" + port);
+  var params = URLEncode({
+    language:    document.getElementById("language").value,
+    port:        document.getElementById("port").value,
+    ipponStyle:  document.getElementById("ipponStyle").value,
+    timerStyle:  document.getElementById("timerStyle").value,
+    nameStyle:   document.getElementById("nameStyle").value,
+  });
+
+  AjaxPost("ajax/config/set_setup" + params);
 }
 
 
@@ -146,6 +178,9 @@ function GetStatus()
       document.getElementById("uptime").innerHTML  = NiceLargeTime(res.uptime);
       document.getElementById("language").value = res.language;
       document.getElementById("port").value = res.port;
+      document.getElementById("ipponStyle").value = res.ippon_style;
+      document.getElementById("timerStyle").value = res.timer_style;
+      document.getElementById("nameStyle").value  = res.name_style;
     }
     else
       document.getElementById("uptime").innerHTML = NiceLargeTime(res.uptime);

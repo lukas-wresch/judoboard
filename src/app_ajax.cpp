@@ -2488,7 +2488,6 @@ std::string Application::Ajax_GetMats() const
 			if (!mat)
 			{
 				std::string mat_name = Localizer::Translate("Mat") + " " + std::to_string(id);
-				//ret << id << IMat::Type::Unknown << false << mat_name << 0 << 0 << false;
 
 				ret << YAML::BeginMap;
 				ret << YAML::Key << "id"   << YAML::Value << id;
@@ -2497,7 +2496,6 @@ std::string Application::Ajax_GetMats() const
 			}
 			else
 			{
-				//ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponStyle() << mat->GetTimerStyle() << mat->IsFullscreen();
 				ret << YAML::BeginMap;
 				ret << YAML::Key << "id"      << YAML::Value << id;
 				ret << YAML::Key << "name"    << YAML::Value << mat->GetName();
@@ -2578,14 +2576,14 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 	auto name  = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
-	int nameStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
+	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
 
 	if (id <= 0 || new_id <= 0)
 		return Error::Type::InvalidID;
 	if (ipponStyle <= -1)
-		return Error::Type::InvalidID;
+		return Error::Type::InvalidInput;
 	if (timerStyle <= -1)
-		return Error::Type::InvalidID;
+		return Error::Type::InvalidInput;
 
 	if (id != new_id)//Check if new_id is an unused id
 	{
@@ -3175,10 +3173,13 @@ std::string Application::Ajax_GetSetup()
 
 	ret << YAML::BeginMap;
 
-	ret << YAML::Key << "version"  << YAML::Value << Version;
-	ret << YAML::Key << "uptime"   << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
-	ret << YAML::Key << "language" << YAML::Value << (int)Localizer::GetLanguage();
-	ret << YAML::Key << "port"     << YAML::Value << GetDatabase().GetServerPort();
+	ret << YAML::Key << "version"     << YAML::Value << Version;
+	ret << YAML::Key << "uptime"      << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
+	ret << YAML::Key << "language"    << YAML::Value << (int)Localizer::GetLanguage();
+	ret << YAML::Key << "port"        << YAML::Value << GetDatabase().GetServerPort();
+	ret << YAML::Key << "ippon_style" << YAML::Value << (int)GetDatabase().GetIpponStyle();
+	ret << YAML::Key << "timer_style" << YAML::Value << (int)GetDatabase().GetTimerStyle();
+	ret << YAML::Key << "name_style"  << YAML::Value << (int)GetDatabase().GetNameStyle();
 
 	ret << YAML::EndMap;
 	return ret.c_str();
@@ -3188,11 +3189,17 @@ std::string Application::Ajax_GetSetup()
 
 Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 {
-	int language = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "language"));
-	int port     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "port"));
+	int language   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "language"));
+	int port       = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "port"));
+	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
+	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
+	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
 
 	Localizer::SetLanguage((Language)language);
 	GetDatabase().SetServerPort(port);
+	GetDatabase().SetIpponStyle((Mat::IpponStyle)ipponStyle);
+	GetDatabase().SetTimerStyle((Mat::TimerStyle)timerStyle);
+	GetDatabase().SetNameStyle((NameStyle)nameStyle);
 
 	return Error::Type::NoError;
 }

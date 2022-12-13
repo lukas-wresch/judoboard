@@ -48,34 +48,40 @@ TEST(Mat, QuickClose)
 TEST(Mat, LoadConfig)
 {
 	initialize();
-	Application app;
 
-	app.GetDatabase().SetIpponStyle(Mat::IpponStyle::SpelledOut);
-	app.GetDatabase().SetTimerStyle(Mat::TimerStyle::Full);
-	app.GetDatabase().SetNameStyle(NameStyle::GivenName);
+	{
+		Application app;
 
-	app.StartLocalMat(1);
+		app.GetDatabase().SetIpponStyle(Mat::IpponStyle::SpelledOut);
+		app.GetDatabase().SetTimerStyle(Mat::TimerStyle::Full);
+		app.GetDatabase().SetNameStyle(NameStyle::GivenName);
 
-	auto mat = app.GetDefaultMat();
+		app.StartLocalMat(1);
 
-	EXPECT_EQ(mat->GetIpponStyle(), Mat::IpponStyle::SpelledOut);
-	EXPECT_EQ(mat->GetTimerStyle(), Mat::TimerStyle::Full);
-	EXPECT_EQ(mat->GetNameStyle(),  NameStyle::GivenName);
+		auto mat = app.GetDefaultMat();
 
-	mat->Close();
+		EXPECT_EQ(mat->GetIpponStyle(), Mat::IpponStyle::SpelledOut);
+		EXPECT_EQ(mat->GetTimerStyle(), Mat::TimerStyle::Full);
+		EXPECT_EQ(mat->GetNameStyle(), NameStyle::GivenName);
 
-	app.GetDatabase().SetIpponStyle(Mat::IpponStyle::SingleDigit);
-	app.GetDatabase().SetTimerStyle(Mat::TimerStyle::HundredsMS);
-	app.GetDatabase().SetNameStyle(NameStyle::FamilyName);
+		mat->Close();
+	}
 
-	app.CloseMat(1);
-	app.StartLocalMat(1);
+	{
+		Application app;
+		app.GetDatabase().SetIpponStyle(Mat::IpponStyle::SingleDigit);
+		app.GetDatabase().SetTimerStyle(Mat::TimerStyle::HundredsMS);
+		app.GetDatabase().SetNameStyle(NameStyle::FamilyName);
 
-	mat = app.GetDefaultMat();
+		app.CloseMat(1);
+		app.StartLocalMat(1);
 
-	EXPECT_EQ(mat->GetIpponStyle(), Mat::IpponStyle::SingleDigit);
-	EXPECT_EQ(mat->GetTimerStyle(), Mat::TimerStyle::HundredsMS);
-	EXPECT_EQ(mat->GetNameStyle(),  NameStyle::FamilyName);
+		auto mat = app.GetDefaultMat();
+
+		EXPECT_EQ(mat->GetIpponStyle(), Mat::IpponStyle::SingleDigit);
+		EXPECT_EQ(mat->GetTimerStyle(), Mat::TimerStyle::HundredsMS);
+		EXPECT_EQ(mat->GetNameStyle(), NameStyle::FamilyName);
+	}
 }
 
 
