@@ -75,6 +75,16 @@
 
 <button style="margin-top: 8mm;" class="remove" onclick="return Update()">Update</button>
 
+<div style="margin-top: 15mm;">
+    <label style="width:200px;float:left;margin-top:4px;" id="label_command">Command</label>
+    <input style="margin-bottom:20px;" type="text" id="command" value="" size="43" maxlength="64"/>
+</div>
+
+<button class="neutral" style="margin-right: 2cm;" onclick="return ExecuteCommand()" id="execute">Execute</button>
+<br/>
+
+<textarea style="margin-top: 5mm;" id="command_output" rows="10" cols="70"/>
+
 <script>
 
 
@@ -163,6 +173,15 @@ function UpdateConfig()
   });
 
   AjaxPost("ajax/config/set_setup" + params);
+}
+
+
+function ExecuteCommand()
+{
+  AjaxCallback("ajax/config/execute?cmd=" + document.getElementById("command").value, function(response) {
+    console.log(response);
+    document.getElementById("command_output").innerHTML = response;
+  });
 }
 
 

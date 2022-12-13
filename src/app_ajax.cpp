@@ -3217,7 +3217,7 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 
 std::string Application::Ajax_Execute(const HttpServer::Request& Request)
 {
-	auto command = Request.m_Query;
+	auto command = HttpServer::DecodeURLEncoded(Request.m_Query, "cmd");
 
 #ifdef _WIN32
 	FILE* pipe = _popen(command.c_str(), "r");
