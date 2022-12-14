@@ -349,8 +349,9 @@ bool Application::CloseMat(uint32_t ID)
 			{
 				delete* it;
 				it = m_Mats.erase(it);
-				return true;
 			}
+
+			return true;
 		}
 	}
 
