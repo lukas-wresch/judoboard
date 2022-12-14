@@ -432,60 +432,6 @@ Status Tournament::GetStatus() const
 
 
 
-void Tournament::ConnectToDatabase(Database& db)
-{
-	if (GetStatus() == Status::Concluded)
-		return;
-
-	std::vector<Judoka*> judoka_to_add;
-
-	for (auto it = m_StandingData.GetAllJudokas().begin(); it != m_StandingData.GetAllJudokas().end();)
-	{
-		auto db_ref = db.FindJudoka(it->second->GetUUID());
-		if (db_ref && it->second != db_ref)//Pointing to different objects
-		{
-			delete it->second;
-			it = m_StandingData.GetAllJudokas().erase(it);
-			judoka_to_add.push_back(db_ref);
-		}
-		else
-			++it;
-	}
-
-	for (auto judoka : judoka_to_add)
-		m_StandingData.AddJudoka(judoka);
-
-
-	//Do the same for rule sets
-
-	if (m_pDefaultRules)
-	{
-		auto db_ref = db.FindRuleSet(m_pDefaultRules->GetUUID());
-		if (db_ref)
-			m_pDefaultRules = db_ref;
-	}
-
-	std::vector<RuleSet*> rule_sets_to_add;
-
-	for (auto it = m_StandingData.GetRuleSets().begin(); it != m_StandingData.GetRuleSets().end();)
-	{
-		auto db_ref = db.FindRuleSet((*it)->GetUUID());
-		if (db_ref)
-		{
-			delete *it;
-			it = m_StandingData.GetRuleSets().erase(it);
-			rule_sets_to_add.push_back(db_ref);
-		}
-		else
-			++it;
-	}
-
-	for (auto rule : rule_sets_to_add)
-		m_StandingData.AddRuleSet(rule);
-}
-
-
-
 bool Tournament::CanCloseTournament() const
 {
 	for (auto match : m_Schedule)

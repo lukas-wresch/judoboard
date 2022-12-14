@@ -1163,7 +1163,7 @@ bool Mat::Animation::Process(GraphicElement& Graphic, double dt)
 			return false;
 
 		case Type::ScaleSinus:
-			Graphic->SetSize((float)((m_BaseSize + m_Amplitude * sin(m_Frequency * (double)Timer::GetTimestamp()))) );
+			Graphic->SetSize((float)(m_BaseSize + m_Amplitude * sin(m_Frequency * (double)Timer::GetTimestamp())) );
 			return false;
 	}
 
