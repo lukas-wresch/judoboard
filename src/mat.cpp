@@ -1193,6 +1193,8 @@ void Mat::NextState(State NextState) const
 
 	auto& renderer = m_Window.GetRenderer();
 
+	m_mutex.lock();
+
 	switch (m_State)
 	{
 		case State::StartUp:
@@ -1455,6 +1457,8 @@ void Mat::NextState(State NextState) const
 			m_Graphics["winner_white"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0));
 			break;
 	}
+
+	m_mutex.unlock();
 }
 
 
