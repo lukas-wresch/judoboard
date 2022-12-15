@@ -2395,7 +2395,7 @@ TEST(MD5, ImportSingleElimination)
 
 
 
-TEST(MD5, ExportSingleElimination)
+TEST(MD5, ExportSingleElimination16)
 {
 	initialize();
 
@@ -2445,19 +2445,19 @@ TEST(MD5, ExportSingleElimination)
 		t->AddParticipant(j[i]);
 	}
 
-	SingleElimination group(0, 200);
-	group.SetMatID(1);
-	group.SetAgeGroup(age);
-	t->AddMatchTable(&group);
+	SingleElimination* group = new SingleElimination(0, 200);
+	group->SetMatID(1);
+	group->SetAgeGroup(age);
+	t->AddMatchTable(group);
 
 	for (int i = 1; i <= 16; ++i)
-		group.SetStartingPosition(j[i], i-1);
+		group->SetStartingPosition(j[i], i-1);
 
-	ASSERT_EQ(group.GetParticipants().size(), 16);
+	ASSERT_EQ(group->GetParticipants().size(), 16);
 
 	Mat m(1);
 
-	for (auto match : group.GetSchedule())
+	for (auto match : group->GetSchedule())
 	{
 		if (!match->HasValidFighters())
 			continue;
@@ -2470,7 +2470,7 @@ TEST(MD5, ExportSingleElimination)
 		EXPECT_TRUE(m.EndMatch());
 	}
 
-	auto results = group.CalculateResults();
+	auto results = group->CalculateResults();
 
 	ASSERT_EQ(results.size(), 2);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[16]->GetUUID());
@@ -2487,9 +2487,16 @@ TEST(MD5, ExportSingleElimination)
 	EXPECT_EQ(results2[0]->RankNo, 1);
 	EXPECT_EQ(results2[0]->Participant->Firstname, j[16]->GetFirstname());
 
+	ASSERT_EQ(file.GetMatches().size(), 15);
+
 	EXPECT_EQ(file.GetMatches()[0].MatchNo, 1);
 	EXPECT_EQ(file.GetMatches()[1].MatchNo, 2);
+	EXPECT_EQ(file.GetMatches()[12].MatchNo, 13);
+	EXPECT_EQ(file.GetMatches()[13].MatchNo, 14);
+	EXPECT_EQ(file.GetMatches()[14].MatchNo, 19);
 
 	//MD5 file2("test-data/single-elimination(single-consulation-bracket).md5");
 	file.Save("output.md5");
+
+	delete t;
 }

@@ -333,8 +333,21 @@ MD5::MD5(const Tournament& Tournament)
 
 		auto match_table = match->GetMatchTable();
 
+		//Calculate match number
 		if (match_table)
+		{
 			new_match.MatchNo = (int)match_table->FindMatchIndex(*match) + 1;
+
+			if (match_table->GetType() == MatchTable::Type::SingleElimination)
+			{
+				//16 system
+				if (match_table->GetParticipants().size() > 8 && match_table->GetParticipants().size() <= 16)
+				{
+					if (new_match.MatchNo >= 15)
+						new_match.MatchNo = 19;
+				}
+			}
+		}
 
 		if (match_table && match_table->GetAgeGroup())
 		{
@@ -370,7 +383,9 @@ MD5::MD5(const Tournament& Tournament)
 				//TODO draw can not be converted
 			}
 
+			new_match.Result = 1;//Result is available
 			new_match.ScoreWinner = (int)match->GetResult().m_Score;
+			new_match.ScoreLoser  = 0;
 			new_match.Time        = match->GetResult().m_Time / 1000;
 		}
 		else//Not concluded
