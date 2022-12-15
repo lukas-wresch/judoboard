@@ -152,14 +152,14 @@ namespace Judoboard
 
 		void GenerateSchedule();
 
-		bool Save() const {
+		bool Save() {
 			if (!m_AutoSave) return true;
 			return SaveYAML("tournaments/" + m_Name + ".yml");
 		}
 
 	private:
 		bool LoadYAML(const std::string& Filename);
-		bool SaveYAML(const std::string& Filename) const;
+		bool SaveYAML(const std::string& Filename);
 
 		void FindAgeGroupForJudoka(const Judoka& Judoka);
 

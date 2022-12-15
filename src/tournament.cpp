@@ -328,7 +328,7 @@ bool Tournament::LoadYAML(const std::string& Filename)
 
 
 
-bool Tournament::SaveYAML(const std::string& Filename) const
+bool Tournament::SaveYAML(const std::string& Filename)
 {
 	if (m_Name.empty())
 		return false;
@@ -345,6 +345,21 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 	yaml << YAML::Value << m_Name;
 	yaml << YAML::Key << "version";
 	yaml << YAML::Value << "1";
+
+	//Prune unused clubs
+	std::set<UUID> used_clubs;
+	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
+		if (judoka->GetClub())
+			used_clubs.insert(*judoka->GetClub());
+
+	for (auto club : m_StandingData.GetAllClubs())
+	{
+		if (used_clubs.find(*club) == used_clubs.end())//Not found
+		{
+			m_StandingData.DeleteClub(*club);
+			break;//Have to stop since we have deleted while iterating
+		}
+	}
 
 	m_StandingData >> yaml;
 
