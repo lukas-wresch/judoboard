@@ -21,10 +21,9 @@ namespace Judoboard
 		virtual Type GetType() const override { return Type::Pool; }
 
 		virtual size_t GetMaxStartPositions() const override {
-			size_t sum = 0;
-			for (auto pool : m_Pools)
-				sum += pool->GetMaxStartPositions();
-			return sum;
+			if (!GetFilter())
+				return 0;
+			return ( (size_t)std::floor(GetFilter()->GetParticipants().size() / m_Pools.size()) ) * m_Pools.size();
 		}
 
 		virtual Results CalculateResults() const override {Results ret; return ret;};//DUMMY
@@ -44,8 +43,6 @@ namespace Judoboard
 
 
 	private:
-		int m_PoolCount = 2;
-
 		std::vector<RoundRobin*> m_Pools;
 		SingleElimination m_Finals;
 	};

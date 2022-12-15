@@ -7,6 +7,7 @@
 namespace Judoboard
 {
 	class AgeGroup;
+	class Tournament;
 
 
 	class IFilter : public ID
@@ -14,7 +15,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Weightclass, Custom
+			Weightclass, Custom, Splitter, Fuser
 		};
 
 		IFilter(const YAML::Node& Yaml, const ITournament* Tournament);
@@ -29,6 +30,8 @@ namespace Judoboard
 
 		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
+
+		const ITournament* GetTournament() const { return m_Tournament; }
 
 		//Age groups
 		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
@@ -68,8 +71,6 @@ namespace Judoboard
 				//return a < b;
 			//});
 		}
-
-		const ITournament* GetTournament() const { return m_Tournament; }
 
 
 	private:

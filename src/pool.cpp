@@ -1,8 +1,10 @@
 #include <algorithm>
 #include <random>
 #include "pool.h"
-#include "tournament.h"
 #include "round_robin.h"
+#include "weightclass.h"
+#include "splitter.h"
+#include "rule_set.h"
 #include "localizer.h"
 #include "match.h"
 
@@ -23,7 +25,7 @@ Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
 	: MatchTable(Yaml, Tournament), m_Finals(nullptr, Tournament)
 {
 	if (Yaml["pool_count"])
-		m_PoolCount = Yaml["pool_count"].as<bool>();
+		m_Pools.resize(Yaml["pool_count"].as<bool>());
 
 	if (Yaml["third_place_match"])
 		IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
@@ -105,29 +107,31 @@ void Pool::GenerateSchedule()
 	if (!GetFilter() || GetParticipants().size() <= 1)
 		return;
 
-	const auto max_start_pos = std::floor(GetParticipants().size() / m_PoolCount) * m_PoolCount;
+	const auto max_start_pos = GetMaxStartPositions();
+
+	const auto pool_count = m_Pools.size();
 
 	for (auto pool : m_Pools)
 		delete pool;
 
 	m_Pools.clear();
-	m_Pools.resize(m_PoolCount);
+	m_Pools.resize(pool_count);
 
-	for (int i = 0; i < m_PoolCount; ++i)
-		m_Pools[i] = new RoundRobin(nullptr, GetTournament());//TODO!!
+	for (int i = 0; i < pool_count; ++i)
+		m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
 
 	//Distribute participants to pools
-	for (int pos = 0; pos < max_start_pos; ++pos)
+	/*for (int pos = 0; pos < max_start_pos; ++pos)
 	{
 		auto judoka = GetJudokaByStartPosition(pos);
 
 		if (!judoka)
 			continue;
 
-		int pool = pos % m_PoolCount;
+		int pool = pos % pool_count;
 
 		m_Pools[pool]->AddParticipant(judoka, true);
-	}
+	}*/
 }
 
 
