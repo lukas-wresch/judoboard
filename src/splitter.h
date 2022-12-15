@@ -20,6 +20,10 @@ namespace Judoboard
 
 		virtual bool IsElgiable(const Judoka& Fighter) const override;
 
+		virtual std::unordered_map<size_t, const DependentJudoka> GetParticipants() const override;
+
+		virtual const DependentJudoka GetJudokaByStartPosition(size_t StartPosition) const override;
+
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
 		virtual void ToString(YAML::Emitter& Yaml) const override;

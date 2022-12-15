@@ -61,3 +61,23 @@ bool Splitter::IsElgiable(const Judoka& Fighter) const
 {
 	return m_pSource.IsElgiable(Fighter);
 }
+
+
+
+std::unordered_map<size_t, const DependentJudoka> Splitter::GetParticipants() const
+{
+	std::unordered_map<size_t, const DependentJudoka> ret;
+	for (auto [pos, judoka] : m_pSource.GetParticipants())
+	{
+		if (pos % m_Divisor == m_Remainder)
+			ret.insert({ (pos - m_Remainder) / m_Divisor, judoka });
+	}
+	return ret;
+}
+
+
+
+const DependentJudoka Splitter::GetJudokaByStartPosition(size_t StartPosition) const
+{
+	return m_pSource.GetJudokaByStartPosition(StartPosition * m_Divisor + m_Remainder);
+}

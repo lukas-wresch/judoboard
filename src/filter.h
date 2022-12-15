@@ -38,23 +38,23 @@ namespace Judoboard
 		void SetAgeGroup(const AgeGroup* NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
 
 		//Participants + Start Positions
-		auto& GetParticipants() const { return m_Participants; }
+		virtual std::unordered_map<size_t, const DependentJudoka> GetParticipants() const { return m_Participants; }
 
 		virtual size_t GetStartPosition(const Judoka* Judoka) const;
 		virtual void   SetStartPosition(const Judoka* Judoka, size_t NewStartPosition);
 
-		const DependentJudoka GetJudokaByStartPosition(size_t StartPosition) const {
+		virtual const DependentJudoka GetJudokaByStartPosition(size_t StartPosition) const {
 			auto result = m_Participants.find(StartPosition);
 			if (result == m_Participants.end())
 				return nullptr;
 			return result->second;
 		}
 
-		bool IsStartPositionTaken(size_t StartPosition) const {
+		virtual bool IsStartPositionTaken(size_t StartPosition) const {
 			return m_Participants.find(StartPosition) != m_Participants.end();
 		}
 
-		void FindFreeStartPos(const DependentJudoka NewParticipant);
+		virtual void FindFreeStartPos(const DependentJudoka NewParticipant);
 
 		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual void ToString(YAML::Emitter& Yaml) const;
