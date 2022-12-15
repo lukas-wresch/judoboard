@@ -126,6 +126,8 @@ bool Mat::Close()
 
 bool Mat::Reset()
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat())
 	{
 		ZED::Log::Warn("Can not reset match, the previous match is still ongoing");
@@ -146,6 +148,8 @@ bool Mat::Reset()
 	m_IsDraw = false;
 
 	m_pMatch = nullptr;
+
+	m_mutex.unlock();
 
 	ZED::Log::Info("Mat got resetted");
 	return true;
@@ -187,14 +191,14 @@ bool Mat::StartMatch(Match* NewMatch)
 		return false;
 	}
 
-	m_mutex.lock();
-
 	if (!Reset())
 	{
 		ZED::Log::Warn("Could not reset mat");
 		m_mutex.unlock();
 		return false;
 	}
+
+	m_mutex.lock();
 
 	m_White = *NewMatch->GetFighter(Fighter::White);
 	m_Blue  = *NewMatch->GetFighter(Fighter::Blue);
@@ -203,9 +207,10 @@ bool Mat::StartMatch(Match* NewMatch)
 
 	NewMatch->StartMatch();
 	AddEvent(MatchLog::NeutralEvent::StartMatch);
-	NextState(State::TransitionToMatch);
 
 	m_mutex.unlock();
+
+	NextState(State::TransitionToMatch);
 
 	ZED::Log::Debug("New match started");
 	return true;
@@ -226,11 +231,12 @@ bool Mat::EndMatch()
 			m_pMatch->EndMatch();
 		}
 		
+		m_mutex.unlock();
+
 		//Reset mat
 		NextState(State::TransitionToWaiting);
 
 		Reset();
-		m_mutex.unlock();
 
 		ZED::Log::Debug("Match ended");
 
@@ -1200,6 +1206,7 @@ void Mat::NextState(State NextState) const
 	const int effect_row3 = effect_row2 + (int)(96.0 * m_ScalingFactor);
 
 	auto& renderer = m_Window.GetRenderer();
+	renderer.Lock();
 
 	switch (m_State)
 	{
@@ -1463,6 +1470,8 @@ void Mat::NextState(State NextState) const
 			m_Graphics["winner_white"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0));
 			break;
 	}
+
+	renderer.Unlock();
 }
 
 

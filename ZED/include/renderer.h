@@ -276,7 +276,7 @@ namespace ZED
 	private:
 		DLLEXPORT static Renderer* s_pInstance;
 
-		mutable std::mutex m_mutex;
+		mutable std::recursive_mutex m_mutex;
 	};
 
 
