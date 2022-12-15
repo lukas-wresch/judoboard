@@ -2481,7 +2481,7 @@ TEST(MD5, ExportSingleElimination16)
 	ASSERT_EQ(file.GetWeightclasses().size(), 1);
 	auto& table = file.GetWeightclasses()[0];
 
-	auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+	const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
 	ASSERT_EQ(results2.size(), 2);
 
 	EXPECT_EQ(results2[0]->RankNo, 1);
@@ -2591,7 +2591,7 @@ TEST(MD5, ExportSingleElimination16_3rd_5th)
 	ASSERT_EQ(file.GetWeightclasses().size(), 1);
 	auto& table = file.GetWeightclasses()[0];
 
-	auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+	const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
 	ASSERT_EQ(results2.size(), 6);
 
 	EXPECT_EQ(results2[0]->RankNo, 1);
@@ -2699,7 +2699,7 @@ TEST(MD5, ExportSingleElimination32)
 	ASSERT_EQ(file.GetWeightclasses().size(), 1);
 	auto& table = file.GetWeightclasses()[0];
 
-	auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+	const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
 	ASSERT_EQ(results2.size(), 2);
 
 	EXPECT_EQ(results2[0]->RankNo, 1);
