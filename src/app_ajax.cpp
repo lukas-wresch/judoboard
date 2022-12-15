@@ -4,6 +4,7 @@
 #include "pause.h"
 #include "customtable.h"
 #include "single_elimination.h"
+#include "pool.h"
 #include "remote_mat.h"
 #include "tournament.h"
 #include "../ZED/include/log.h"
@@ -1476,7 +1477,7 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/matchtable/get_form", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		/*auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
 
@@ -1484,8 +1485,8 @@ void Application::SetupHttpServer()
 
 		switch ((MatchTable::Type)type)
 		{
-			case MatchTable::Type::Weightclass:
-				return Weightclass::GetHTMLForm();
+			case MatchTable::Type::RoundRobin:
+				return RoundRobin::GetHTMLForm();
 			case MatchTable::Type::Pause:
 				return Pause::GetHTMLForm();
 			case MatchTable::Type::Custom:
@@ -1493,18 +1494,10 @@ void Application::SetupHttpServer()
 			case MatchTable::Type::SingleElimination:
 				return SingleElimination::GetHTMLForm();
 
-			default:
+			default:*/
 				return std::string("Unknown form");
-		}
+		//}
 	});
-
-
-	/*m_Server.RegisterResource("/ajax/matchtable/get_participants", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-		return Ajax_GetParticipantsFromMatchTable(Request);
-	});*/
 
 
 	m_Server.RegisterResource("/ajax/matchtable/get_matches", [this](auto& Request) -> std::string {
@@ -1539,7 +1532,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		return Ajax_SetStartingPosition(Request);
+		return Ajax_SetStartPosition(Request);
 	});
 
 
@@ -2913,20 +2906,20 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 
 	switch (type)
 	{
-	case MatchTable::Type::Weightclass:
+	case MatchTable::Type::RoundRobin:
 	{
-		new_table = new Weightclass(0, 0);
+		new_table = new RoundRobin(new Weightclass(0, 0), GetTournament());
 		break;
 	}
 
 	case MatchTable::Type::SingleElimination:
 	{
-		new_table = new SingleElimination(0, 0);
+		new_table = new SingleElimination(new Weightclass(0, 0), GetTournament());
 		break;
 	}
 
-	case MatchTable::Type::Pause:
-		return Error::Type::InternalError;
+	case MatchTable::Type::Pool:
+		new_table = new Pool(new Weightclass(0, 0), GetTournament());
 		break;
 
 	case MatchTable::Type::Custom:
@@ -2940,7 +2933,8 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	GetTournament()->AddMatchTable(new_table);
 
 	Request.m_Query = "id=" + (std::string)new_table->GetUUID();
-	Ajax_EditMatchTable(Request);
+	if (!Ajax_EditMatchTable(Request))
+		return Error::Type::OperationFailed;
 
 	GetTournament()->Save();
 	return Error();//OK
@@ -2953,7 +2947,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	if (!GetTournament())
 		return Error::Type::TournamentNotOpen;
 
-	UUID id   = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int color = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "color"));
 	int mat   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
@@ -2994,19 +2988,23 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	int  gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 	bool bo3       = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
 
+	if (!table->GetFilter() || table->GetFilter()->GetType() != IFilter::Type::Weightclass)
+		return Error::Type::OperationFailed;
+
+	auto weightclass = (Weightclass*)table->GetFilter();
 
 	switch (table->GetType())
 	{
-	case MatchTable::Type::Weightclass:
+	case MatchTable::Type::RoundRobin:
 	{
-		Weightclass* weight_table = (Weightclass*)table;
+		RoundRobin* round_robin = (RoundRobin*)table;
 
 		GetTournament()->Lock();
 
-		weight_table->SetMinWeight(Weight(minWeight));
-		weight_table->SetMaxWeight(Weight(maxWeight));
-		weight_table->SetGender((Gender)gender);
-		weight_table->IsBestOfThree(bo3);
+		weightclass->SetMinWeight(Weight(minWeight));
+		weightclass->SetMaxWeight(Weight(maxWeight));
+		weightclass->SetGender((Gender)gender);
+		round_robin->IsBestOfThree(bo3);
 
 		GetTournament()->Unlock();
 		break;
@@ -3018,9 +3016,9 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		GetTournament()->Lock();
 
-		single_table->SetMinWeight(Weight(minWeight));
-		single_table->SetMaxWeight(Weight(maxWeight));
-		single_table->SetGender((Gender)gender);
+		weightclass->SetMinWeight(Weight(minWeight));
+		weightclass->SetMaxWeight(Weight(maxWeight));
+		weightclass->SetGender((Gender)gender);
 		single_table->IsBestOfThree(bo3);
 		single_table->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
 		single_table->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
@@ -3125,7 +3123,7 @@ std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request
 
 
 
-Error Application::Ajax_SetStartingPosition(const HttpServer::Request& Request)
+Error Application::Ajax_SetStartPosition(const HttpServer::Request& Request)
 {
 	UUID id        = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 	UUID judoka_id = HttpServer::DecodeURLEncoded(Request.m_Query, "judoka");
@@ -3152,7 +3150,7 @@ Error Application::Ajax_SetStartingPosition(const HttpServer::Request& Request)
 	if (!judoka)
 		return Error::Type::ItemNotFound;
 
-	table->SetStartingPosition(judoka, startpos);
+	table->SetStartPosition(judoka, startpos);
 	GetTournament()->GenerateSchedule();
 
 	return Error::Type::NoError;//OK

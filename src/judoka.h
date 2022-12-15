@@ -3,8 +3,6 @@
 #include "timer.h"
 #include "club.h"
 #include "judoboard.h"
-#include "match.h"
-#include "matchtable.h"
 #include "dm4.h"
 #include "md5.h"
 #include "dmf.h"
@@ -15,28 +13,33 @@ namespace Judoboard
 {
 	class StandingData;
 	class Judoka;
+	class Match;
+	class MatchTable;
 
 
 
-	class IJudoka : public ID
+	class DependentJudoka
 	{
+		friend class Match;
+
 	public:
-		virtual bool IsValid() const = 0;
-	private:
-	};
+		DependentJudoka(const Judoka* Judoka) {
+			m_Judoka = Judoka;
+			m_Type   = DependencyType::None;
+		}
 
+		const Judoka* GetJudoka() const { return m_Judoka; }
 
-
-	class DependentJudoka : public IJudoka
-	{
-	public:
-		DependentJudoka(Match::DependencyType Type, const MatchTable& Reference) : m_Type(Type), m_MatchTable(Reference) {}
-
-		virtual bool IsValid() const;
+		bool operator == (const Judoka* rhs) const;
+		bool operator == (const DependentJudoka& rhs) const;
 
 	private:
-		Match::DependencyType m_Type;
-		const MatchTable& m_MatchTable;
+		DependentJudoka() = default;
+
+		const Judoka* m_Judoka  = nullptr;
+		DependencyType m_Type   = DependencyType::None;
+		Match* m_DependentMatch = nullptr;
+		const MatchTable* m_DependentMatchTable = nullptr;
 	};
 
 
@@ -63,7 +66,7 @@ namespace Judoboard
 
 
 
-	class Judoka : public IJudoka
+	class Judoka : public ID
 	{
 		friend class StandingData;
 		friend class Database;
@@ -115,7 +118,15 @@ namespace Judoboard
 		void operator >> (YAML::Emitter& Yaml) const;
 		void ToString(YAML::Emitter& Yaml) const;
 
-		bool operator ==(const Judoka& cmp) const { return GetUUID() == cmp.GetUUID(); }
+		bool operator ==(const Judoka& rhs) const { return GetUUID() == rhs.GetUUID(); }
+		bool operator ==(const Judoka* rhs) const {
+			if (!rhs)
+				return false;
+			return GetUUID() == rhs->GetUUID();
+		}
+		bool operator ==(const UUID& rhs) const {
+			return GetUUID() == rhs;
+		}
 
 	private:
 		Judoka() = default;//Create empty judoka (for class Mat)

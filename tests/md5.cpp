@@ -354,7 +354,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		auto results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Laura");
 
 
@@ -362,7 +362,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Mila");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Amalia");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Julia");
@@ -371,7 +371,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Chiara");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Lina");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Narja");
@@ -380,7 +380,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Fabian");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Jonas");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Alexander");
@@ -389,7 +389,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Dominik");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Antonio");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Bjarne");
@@ -398,7 +398,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Diego");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Arthur");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Lenny");
@@ -407,7 +407,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Anton");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Janos");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Kemal");
@@ -417,7 +417,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Fabian");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Lemaliam");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Georg");
@@ -427,7 +427,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Philipp");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Timon");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Emil");
@@ -437,41 +437,41 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Leonard");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -10 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -33 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Paula");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -36 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Lisa");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -44 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Gloria");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -48 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Mia");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Kira");
 
@@ -479,41 +479,41 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Hannah");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -57 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -63 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Alina");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w +63 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Clara");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 m -34 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Lukas");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 m -37 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Luca");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Vincent");
 
@@ -521,14 +521,14 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Cedric");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 m -43 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Nico");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "David");
 
@@ -536,19 +536,19 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
 		table = tour.FindMatchTableByDescription("Jugend u15 m -50 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
-		table = tour.FindMatchTableByDescription("Jugend u15 m -55 kg");
+		/*table = tour.FindMatchTableByDescription("Jugend u15 m -55 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		/*ASSERT_EQ(results.size(), 5);//TODO renable when double elimination can be imported
+		ASSERT_EQ(results.size(), 5);//TODO renable when double elimination can be imported
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Sebastian");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Harry");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Marlon");
@@ -559,7 +559,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Mikail");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Maurice");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Robin");
@@ -569,7 +569,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Nikita");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Dimitri");
 
@@ -577,20 +577,20 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
 		table = tour.FindMatchTableByDescription("Frauen u18 -43,1 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Gina");
 
 		table = tour.FindMatchTableByDescription("Frauen u18 -57,7 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Maria-T");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Evelyne");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Fia");
@@ -599,7 +599,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Simon");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Justin");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Vakhtang");
@@ -609,7 +609,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Jason");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Ben-N");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Maximilian");
@@ -619,7 +619,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Tobias");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Nikita");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Ewan F");
@@ -629,7 +629,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Klara");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Marie");
 
@@ -637,7 +637,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Leonie");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Viktoria");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Diana");
@@ -646,7 +646,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Valentina");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Luisa");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Mariebelle");
@@ -655,7 +655,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Vanessa");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Hadisha");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Lentje");
@@ -665,7 +665,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Pia");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Rieke");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Vienna");
@@ -675,7 +675,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Nika");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Pia");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Sirpa");
@@ -685,7 +685,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Josephine");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Marijana");
 
@@ -693,14 +693,14 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Selim");
 
 		table = tour.FindMatchTableByDescription(u8"Jugend u13m -28,1 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Milo");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Arne");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Fabian");
@@ -709,7 +709,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Arthur");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Damir");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Maximilain");
@@ -719,7 +719,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Benjamin");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Maxim");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Kerwin");
@@ -729,7 +729,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Gregor");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Dominik");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Florian");
@@ -739,7 +739,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Silas");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Laurenz");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Amon");
@@ -749,7 +749,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Ewald");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Arvid");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Kai");
@@ -759,7 +759,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Benjamin");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Enrico");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Felix");
@@ -769,7 +769,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Matti");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Jan");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Jonas");
@@ -778,7 +778,7 @@ TEST(MD5, ImportIntoTournament)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Norwin");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Darian");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Luca");
@@ -812,7 +812,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		auto results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Laura");
 
 
@@ -820,7 +820,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Mila");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Amalia");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Julia");
@@ -829,7 +829,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Chiara");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Lina");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Narja");
@@ -838,7 +838,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Fabian");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Jonas");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Alexander");
@@ -847,7 +847,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Dominik");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Antonio");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Bjarne");
@@ -856,7 +856,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Diego");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Arthur");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Lenny");
@@ -865,7 +865,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Anton");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Janos");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Kemal");
@@ -875,7 +875,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Fabian");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Lemaliam");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Georg");
@@ -885,7 +885,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Philipp");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Timon");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Emil");
@@ -895,41 +895,41 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Leonard");
 
 		table = tour2.FindMatchTableByDescription("Jugend u15 w -10 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
 		table = tour2.FindMatchTableByDescription("Jugend u15 w -33 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Paula");
 
 		table = tour2.FindMatchTableByDescription("Jugend u15 w -36 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Lisa");
 
 		table = tour2.FindMatchTableByDescription("Jugend u15 w -44 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Gloria");
 
 		table = tour2.FindMatchTableByDescription("Jugend u15 w -48 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Mia");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Kira");
 
@@ -937,41 +937,41 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Hannah");
 
 		table = tour2.FindMatchTableByDescription("Jugend u15 w -57 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
 		table = tour2.FindMatchTableByDescription("Jugend u15 w -63 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Alina");
 
 		table = tour2.FindMatchTableByDescription("Jugend u15 w +63 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Clara");
 
 		table = tour2.FindMatchTableByDescription("Jugend u15 m -34 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Lukas");
 
 		table = tour2.FindMatchTableByDescription("Jugend u15 m -37 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Luca");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Vincent");
 
@@ -979,14 +979,14 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Cedric");
 
 		table = tour2.FindMatchTableByDescription("Jugend u15 m -43 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Nico");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "David");
 
@@ -994,15 +994,15 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
 		table = tour2.FindMatchTableByDescription("Jugend u15 m -50 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
-		table = tour2.FindMatchTableByDescription("Jugend u15 m -55 kg");
+		/*table = tour2.FindMatchTableByDescription("Jugend u15 m -55 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
@@ -1017,7 +1017,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Mikail");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Maurice");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Robin");
@@ -1027,7 +1027,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Nikita");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Dimitri");
 
@@ -1035,20 +1035,20 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
 		table = tour2.FindMatchTableByDescription("Frauen u18 -43,1 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Gina");
 
 		table = tour2.FindMatchTableByDescription("Frauen u18 -57,7 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Maria-T");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Evelyne");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Fia");
@@ -1057,7 +1057,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Simon");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Justin");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Vakhtang");
@@ -1067,7 +1067,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Jason");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Ben-N");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Maximilian");
@@ -1077,7 +1077,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Tobias");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Nikita");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Ewan F");
@@ -1087,7 +1087,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Klara");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Marie");
 
@@ -1095,7 +1095,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Leonie");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Viktoria");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Diana");
@@ -1104,7 +1104,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Valentina");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Luisa");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Mariebelle");
@@ -1113,7 +1113,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Vanessa");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Hadisha");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Lentje");
@@ -1123,7 +1123,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Pia");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Rieke");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Vienna");
@@ -1133,7 +1133,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Nika");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Pia");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Sirpa");
@@ -1143,7 +1143,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Josephine");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Marijana");
 
@@ -1151,14 +1151,14 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Selim");
 
 		table = tour2.FindMatchTableByDescription(u8"Jugend u13m -28,1 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Milo");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Arne");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Fabian");
@@ -1167,7 +1167,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Arthur");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Damir");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Maximilain");
@@ -1177,7 +1177,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Benjamin");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Maxim");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Kerwin");
@@ -1187,7 +1187,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Gregor");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Dominik");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Florian");
@@ -1197,7 +1197,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Silas");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Laurenz");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Amon");
@@ -1207,7 +1207,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Ewald");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Arvid");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Kai");
@@ -1217,7 +1217,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Benjamin");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Enrico");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Felix");
@@ -1227,7 +1227,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Matti");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Jan");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Jonas");
@@ -1236,7 +1236,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Norwin");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Darian");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Luca");
@@ -1296,6 +1296,9 @@ TEST(MD5, ConvertToMD5)
 
 		EXPECT_EQ(file.GetClubs().size(), 20);
 		EXPECT_EQ(file.GetParticipants().size(), 142);
+
+		ASSERT_TRUE(file1.FindResult("Jugend u10 w", "-20,7 kg", 1));
+		EXPECT_EQ(file1.FindResult("Jugend u10 w", "-20,7 kg", 1)->Participant->Firstname, "Laura");
 
 		ASSERT_TRUE(file.FindResult("Jugend u10 w", "-20,7 kg", 1));
 		EXPECT_EQ(file.FindResult("Jugend u10 w", "-20,7 kg", 1)->Participant->Firstname, "Laura");
@@ -1409,8 +1412,8 @@ TEST(MD5, ConvertToMD5)
 		EXPECT_EQ(file.FindResult("Jugend u15 m", "-55 kg", 2)->Participant->Firstname, "Harry");
 		EXPECT_EQ(file.FindResult("Jugend u15 m", "-55 kg", 3)->Participant->Firstname, "Marlon");
 		EXPECT_EQ(file.FindResult("Jugend u15 m", "-55 kg", 4)->Participant->Firstname, "Maximilian");
-		EXPECT_EQ(file.FindResult("Jugend u15 m", "-55 kg", 5)->Participant->Firstname, "Jan");*/
-		ASSERT_FALSE(file.FindResult("Jugend u15 m", "-55 kg", 6));
+		EXPECT_EQ(file.FindResult("Jugend u15 m", "-55 kg", 5)->Participant->Firstname, "Jan");
+		ASSERT_FALSE(file.FindResult("Jugend u15 m", "-55 kg", 6));*/
 
 		ASSERT_TRUE(file.FindResult("Jugend u15 m", "-60 kg", 1));
 		EXPECT_EQ(file.FindResult("Jugend u15 m", "-60 kg", 1)->Participant->Firstname, "Mikail");
@@ -1589,7 +1592,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		auto results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Laura");
 
 
@@ -1597,7 +1600,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Mila");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Amalia");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Julia");
@@ -1606,7 +1609,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Chiara");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Lina");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Narja");
@@ -1615,7 +1618,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Fabian");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Jonas");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Alexander");
@@ -1624,7 +1627,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Dominik");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Antonio");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Bjarne");
@@ -1633,7 +1636,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Diego");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Arthur");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Lenny");
@@ -1642,7 +1645,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Anton");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Janos");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Kemal");
@@ -1652,7 +1655,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Fabian");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Lemaliam");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Georg");
@@ -1662,7 +1665,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Philipp");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Timon");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Emil");
@@ -1672,41 +1675,41 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Leonard");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -10 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -33 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Paula");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -36 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Lisa");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -44 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Gloria");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -48 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Mia");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Kira");
 
@@ -1714,41 +1717,41 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Hannah");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -57 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w -63 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Alina");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 w +63 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Clara");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 m -34 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Lukas");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 m -37 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Luca");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Vincent");
 
@@ -1756,14 +1759,14 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Cedric");
 
 		table = tour.FindMatchTableByDescription("Jugend u15 m -43 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Nico");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "David");
 
@@ -1771,15 +1774,15 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
 		table = tour.FindMatchTableByDescription("Jugend u15 m -50 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
-		table = tour.FindMatchTableByDescription("Jugend u15 m -55 kg");
+		/*table = tour.FindMatchTableByDescription("Jugend u15 m -55 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
@@ -1794,7 +1797,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Mikail");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Maurice");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Robin");
@@ -1804,7 +1807,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Nikita");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Dimitri");
 
@@ -1812,20 +1815,20 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 0);
+		ASSERT_EQ(results.GetSize(), 0);
 
 		table = tour.FindMatchTableByDescription("Frauen u18 -43,1 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Gina");
 
 		table = tour.FindMatchTableByDescription("Frauen u18 -57,7 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Maria-T");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Evelyne");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Fia");
@@ -1834,7 +1837,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Simon");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Justin");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Vakhtang");
@@ -1844,7 +1847,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Jason");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Ben-N");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Maximilian");
@@ -1854,7 +1857,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Tobias");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Nikita");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Ewan F");
@@ -1864,7 +1867,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Klara");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Marie");
 
@@ -1872,7 +1875,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Leonie");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Viktoria");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Diana");
@@ -1881,7 +1884,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Valentina");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Luisa");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Mariebelle");
@@ -1890,7 +1893,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Vanessa");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Hadisha");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Lentje");
@@ -1900,7 +1903,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Pia");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Rieke");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Vienna");
@@ -1910,7 +1913,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Nika");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Pia");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Sirpa");
@@ -1920,7 +1923,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 2);
+		ASSERT_EQ(results.GetSize(), 2);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Josephine");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Marijana");
 
@@ -1928,14 +1931,14 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 1);
+		ASSERT_EQ(results.GetSize(), 1);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Selim");
 
 		table = tour.FindMatchTableByDescription(u8"Jugend u13m -28,1 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Milo");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Arne");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Fabian");
@@ -1944,7 +1947,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Arthur");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Damir");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Maximilain");
@@ -1954,7 +1957,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Benjamin");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Maxim");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Kerwin");
@@ -1964,7 +1967,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Gregor");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Dominik");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Florian");
@@ -1974,7 +1977,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Silas");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Laurenz");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Amon");
@@ -1984,7 +1987,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Ewald");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Arvid");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Kai");
@@ -1994,7 +1997,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Benjamin");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Enrico");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Felix");
@@ -2004,7 +2007,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 3);
+		ASSERT_EQ(results.GetSize(), 3);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Matti");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Jan");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Jonas");
@@ -2013,7 +2016,7 @@ TEST(MD5, ConvertToMD5AndBack)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 4);
+		ASSERT_EQ(results.GetSize(), 4);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Norwin");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Darian");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Luca");
@@ -2213,7 +2216,7 @@ TEST(MD5, ExportCompletedTournament)
 	tour.Save();
 	file.Save("demo-file.md5");
 
-	MD5 file_cmp("demo-file-fixed.md5");
+	//MD5 file_cmp("demo-file-fixed.md5");
 
 	ASSERT_TRUE(file.GetOrganizer());
 	auto organizer = file.GetOrganizer();
@@ -2324,5 +2327,169 @@ TEST(MD5, ReadSingleElimination)
 
 	file.Dump();
 
-	ASSERT_TRUE(file.GetOrganizer());
+	auto table = file.FindWeightclass("Jugend u10 m", "-10 kg");
+	ASSERT_TRUE(table);
+	EXPECT_EQ(table->FightSystemID, 19);
+	EXPECT_EQ(table->MatchForThirdPlace, true);
+	EXPECT_EQ(table->MatchForFifthPlace, true);
+
+	auto matches = file.GetMatches();
+	ASSERT_EQ(matches.size(), 21);
+
+	EXPECT_EQ(matches[0].Status, 2);
+	EXPECT_EQ(matches[0].Red->Firstname, "v1");
+}
+
+
+
+TEST(MD5, ImportSingleElimination)
+{
+	initialize();
+
+	MD5 file("test-data/single-elimination(single-consulation-bracket).md5");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	Database db;
+	Tournament tour(file, &db);
+
+	auto j1 = db.FindJudokaByName("v1 n1");
+	auto j2 = db.FindJudokaByName("v2 n2");
+	auto j3 = db.FindJudokaByName("v3 n3");
+	auto j4 = db.FindJudokaByName("v4 n4");
+	auto j5 = db.FindJudokaByName("v5 n5");
+	auto j6 = db.FindJudokaByName("v6 n6");
+
+	auto table = tour.FindMatchTableByDescription("Jugend u10 m -10 kg");
+	ASSERT_TRUE(table);
+	ASSERT_EQ(table->GetParticipants().size(), 6);
+
+	EXPECT_EQ(table->GetType(), MatchTable::Type::SingleElimination);
+
+	EXPECT_EQ(table->GetStartPosition(j1)+1, 1);
+	EXPECT_EQ(table->GetStartPosition(j2)+1, 2);
+	EXPECT_EQ(table->GetStartPosition(j3)+1, 3);
+	EXPECT_EQ(table->GetStartPosition(j4)+1, 4);
+	EXPECT_EQ(table->GetStartPosition(j5)+1, 5);
+	EXPECT_EQ(table->GetStartPosition(j6)+1, 6);
+
+	ASSERT_TRUE(table->GetMatch(11));
+
+	EXPECT_TRUE(table->GetMatch(0)->Contains(*j1));
+	EXPECT_TRUE(table->GetMatch(1)->Contains(*j5));
+	EXPECT_TRUE(table->GetMatch(2)->Contains(*j3));
+
+	EXPECT_TRUE(table->GetMatch(4)->Contains(*j2));
+	EXPECT_TRUE(table->GetMatch(5)->Contains(*j6));
+	EXPECT_TRUE(table->GetMatch(6)->Contains(*j4));
+
+	EXPECT_TRUE(table->GetMatch(8)->Contains(*j1));
+	EXPECT_TRUE(table->GetMatch(8)->Contains(*j5));
+	EXPECT_TRUE(table->GetMatch(9)->Contains(*j3));
+	EXPECT_TRUE(table->GetMatch(10)->Contains(*j2));
+	EXPECT_TRUE(table->GetMatch(10)->Contains(*j6));
+	EXPECT_TRUE(table->GetMatch(11)->Contains(*j4));
+}
+
+
+
+TEST(MD5, ExportSingleElimination)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	auto inter = new Judoboard::Association("International", nullptr);
+
+	auto de = new Judoboard::Association("Deutschland", inter);
+
+	auto dn = new Judoboard::Association("Deutschland-Nord", de);
+	auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+
+	auto nord  = new Judoboard::Association("Nord", dn);
+	auto west  = new Judoboard::Association("West", dn);
+	auto nost  = new Judoboard::Association("Nordost", dn);
+	auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
+	auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+
+	auto nieder  = new Judoboard::Association("Niedersachsen", nord);
+	auto hamburg = new Judoboard::Association("Hamburg", nord);
+	auto berlin  = new Judoboard::Association("Berlin", nost);
+	auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+	auto detmold = new Judoboard::Association("Detmold", nrw);
+
+	auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+
+	t->SetOrganizer(biegue);
+
+	std::vector<Club*> clubs;
+	clubs.push_back(new Judoboard::Club("Altenhagen", biegue));
+	clubs.push_back(new Judoboard::Club("Brackwede", biegue));
+	clubs.push_back(new Judoboard::Club("Senne", biegue));
+
+
+	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr, t->GetDatabase());
+	t->AddAgeGroup(age);
+
+	Judoka* j[17];
+
+	for (int i = 1; i <= 16; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i, Judoboard::Gender::Male);
+		j[i]->SetBirthyear(2000);
+		j[i]->SetClub(clubs[rand()%3]);
+		t->AddParticipant(j[i]);
+	}
+
+	SingleElimination group(0, 200);
+	group.SetMatID(1);
+	group.SetAgeGroup(age);
+	t->AddMatchTable(&group);
+
+	for (int i = 1; i <= 16; ++i)
+		group.SetStartPosition(j[i], i-1);
+
+	ASSERT_EQ(group.GetParticipants().size(), 16);
+
+	Mat m(1);
+
+	for (auto match : group.GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = group.CalculateResults();
+
+	ASSERT_EQ(results.GetSize(), 2);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[16]->GetUUID());
+
+
+	MD5 file(*t);
+
+	ASSERT_EQ(file.GetWeightclasses().size(), 1);
+	auto& table = file.GetWeightclasses()[0];
+
+	auto results2 = file.FindResults(table->AgeGroupID, table->ID);
+	ASSERT_EQ(results2.size(), 2);
+
+	EXPECT_EQ(results2[0]->RankNo, 1);
+	EXPECT_EQ(results2[0]->Participant->Firstname, j[16]->GetFirstname());
+
+	//EXPECT_EQ(file.GetMatches()[0].MatchNo, 1);
+	//EXPECT_EQ(file.GetMatches()[1].MatchNo, 2);
+
+	//MD5 file2("test-data/single-elimination(single-consulation-bracket).md5");
+	file.Save("output.md5");
 }

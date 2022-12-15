@@ -43,6 +43,7 @@ namespace Judoboard
 
 		[[nodiscard]] Judoka* FindJudoka(const UUID& UUID);
 		[[nodiscard]] const Judoka* FindJudoka(const UUID& UUID) const;
+		[[nodiscard]] const Judoka* FindJudokaByName(const std::string& Name) const;
 
 		[[nodiscard]] Judoka* FindJudoka_ExactMatch(const JudokaData& NewJudoka);
 		[[nodiscard]] Judoka* FindJudoka_SameName(const JudokaData& NewJudoka);

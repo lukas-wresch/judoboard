@@ -2,6 +2,7 @@
 #include <random>
 #include "pool.h"
 #include "tournament.h"
+#include "round_robin.h"
 #include "localizer.h"
 #include "match.h"
 
@@ -11,69 +12,52 @@ using namespace Judoboard;
 
 
 
-Pool::Pool(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
-	: Weightclass(MinWeight, MaxWeight, Tournament), m_Finals(MinWeight, MaxWeight, Tournament)
+Pool::Pool(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
+	: Pool(new Weightclass(MinWeight, MaxWeight, Gender, Tournament), Tournament)
 {
 }
 
 
 
 Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
-	: Weightclass(Yaml, Tournament), m_Finals(0, 0, Tournament)
+	: MatchTable(Yaml, Tournament), m_Finals(nullptr, Tournament)
 {
 	if (Yaml["pool_count"])
 		m_PoolCount = Yaml["pool_count"].as<bool>();
 
 	if (Yaml["third_place_match"])
-		m_Finals.IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
+		IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
 	if (Yaml["fifth_place_match"])
-		m_Finals.IsFifthPlaceMatch(Yaml["fifth_place_match"].as<bool>());
-
-	if (Yaml["starting_positions"] && Yaml["starting_positions"].IsMap() && Tournament)
-	{
-		for (const auto& node : Yaml["starting_positions"])
-			m_StartingPositions.insert({ node.first.as<int>(), Tournament->FindParticipant(node.second.as<std::string>())  });
-	}
+		IsFifthPlaceMatch(Yaml["fifth_place_match"].as<bool>());
 }
 
 
 
 void Pool::operator >> (YAML::Emitter& Yaml) const
 {
-	Weightclass::operator >>(Yaml);
+	MatchTable::operator >>(Yaml);
 
-	/*if (m_ThirdPlaceMatch)
-		Yaml << YAML::Key << "third_place_match" << YAML::Value << m_ThirdPlaceMatch;
-	if (m_FifthPlaceMatch)
-		Yaml << YAML::Key << "fifth_place_match" << YAML::Value << m_FifthPlaceMatch;*/
-
-	if (!m_StartingPositions.empty())
-	{
-		Yaml << YAML::Key << "starting_positions" << YAML::Value;
-		Yaml << YAML::BeginMap;
-		for (const auto [starting_pos, judoka] : m_StartingPositions)
-			Yaml << YAML::Key << starting_pos << YAML::Value << (std::string)judoka->GetUUID();
-		Yaml << YAML::EndMap;
-	}
+	if (IsThirdPlaceMatch())
+		Yaml << YAML::Key << "third_place_match" << YAML::Value << IsThirdPlaceMatch();
+	if (IsFifthPlaceMatch())
+		Yaml << YAML::Key << "fifth_place_match" << YAML::Value << IsFifthPlaceMatch();
 }
 
 
 
 void Pool::ToString(YAML::Emitter& Yaml) const
 {
-	Weightclass::ToString(Yaml);
+	MatchTable::ToString(Yaml);
 
-	//Yaml << YAML::Key << "third_place" << YAML::Value << IsThirdPlaceMatch();
-	//Yaml << YAML::Key << "fifth_place" << YAML::Value << IsFifthPlaceMatch();
+	Yaml << YAML::Key << "third_place" << YAML::Value << IsThirdPlaceMatch();
+	Yaml << YAML::Key << "fifth_place" << YAML::Value << IsFifthPlaceMatch();
 }
 
 
 
 std::string Pool::GetHTMLForm()
 {
-	auto ret = Weightclass::GetHTMLForm();
-
-	ret += R"(
+	std::string ret = R"(
 <div>
   <label style="width:150px;float:left;margin-top:5px;" id="label_pool">#Pools</label>
   <select style="margin-bottom:20px;" id="pool_count">
@@ -106,27 +90,6 @@ std::string Pool::GetHTMLForm()
 
 
 
-bool Pool::AddParticipant(const Judoka* NewParticipant, bool Force)
-{
-	if (!MatchTable::AddParticipant(NewParticipant, Force))
-		return false;
-
-	for (size_t startPos = 0; true; startPos++)
-	{
-		if (!IsStartPositionTaken(startPos))
-		{
-			m_StartingPositions.insert({ startPos, NewParticipant });
-			break;
-		}
-	}
-
-	SortParticipantsByStartingPosition();
-	GenerateSchedule();
-	return true;
-}
-
-
-
 void Pool::GenerateSchedule()
 {
 	for (auto it = m_Schedule.begin(); it != m_Schedule.end();)
@@ -139,7 +102,7 @@ void Pool::GenerateSchedule()
 
 	m_RecommendedNumMatches_Before_Break = 4;//TODO
 
-	if (GetParticipants().size() <= 1)
+	if (!GetFilter() || GetParticipants().size() <= 1)
 		return;
 
 	const auto max_start_pos = std::floor(GetParticipants().size() / m_PoolCount) * m_PoolCount;
@@ -151,7 +114,7 @@ void Pool::GenerateSchedule()
 	m_Pools.resize(m_PoolCount);
 
 	for (int i = 0; i < m_PoolCount; ++i)
-		m_Pools[i] = new Weightclass(GetMinWeight(), GetMaxWeight(), GetTournament());
+		m_Pools[i] = new RoundRobin(nullptr, GetTournament());//TODO!!
 
 	//Distribute participants to pools
 	for (int pos = 0; pos < max_start_pos; ++pos)
@@ -165,51 +128,6 @@ void Pool::GenerateSchedule()
 
 		m_Pools[pool]->AddParticipant(judoka, true);
 	}
-}
-
-
-
-size_t Pool::GetStartingPosition(const Judoka* Judoka) const
-{
-	if (!Judoka)
-		return 0;
-
-	for (auto [pos, participant] : m_StartingPositions)
-	{
-		if (participant && participant->GetUUID() == Judoka->GetUUID())
-			return pos;
-	}
-
-	return 0;
-}
-
-
-
-void Pool::SetStartingPosition(const Judoka* Judoka, size_t NewStartingPosition)
-{
-	if (!Judoka)
-		return;
-
-	auto my_old_pos = GetStartingPosition(Judoka);
-	m_StartingPositions.erase(my_old_pos);
-
-	if (IsStartPositionTaken(NewStartingPosition))
-	{
-		auto judoka_on_slot = GetJudokaByStartPosition(NewStartingPosition);
-
-		m_StartingPositions.erase(my_old_pos);
-		m_StartingPositions.erase(GetStartingPosition(judoka_on_slot));
-		m_StartingPositions.insert({ my_old_pos, judoka_on_slot });
-		m_StartingPositions.insert({ NewStartingPosition, Judoka });
-	}
-
-	else
-	{
-		m_StartingPositions.erase(GetStartingPosition(Judoka));
-		m_StartingPositions.insert({ NewStartingPosition, Judoka });
-	}
-
-	SortParticipantsByStartingPosition();
 }
 
 

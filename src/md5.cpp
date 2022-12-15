@@ -190,31 +190,32 @@ MD5::MD5(const Tournament& Tournament)
 
 	for (auto match_table : Tournament.GetMatchTables())
 	{
+		auto filter = match_table->GetFilter();
+		if (!filter)
+			continue;
+
 		Weightclass* new_weightclass = nullptr;		
 
-		if (match_table->GetType() == MatchTable::Type::Weightclass)
-		{
-			const auto weightclass = (Judoboard::Weightclass*)match_table;
-			new_weightclass = new Weightclass;
+		if (filter->GetType() != IFilter::Type::Weightclass)
+			continue;
 
+		
+		const auto weightclass = (Judoboard::Weightclass*)filter;
+		new_weightclass = new Weightclass;
+
+		new_weightclass->WeightLargerThan          = (uint32_t)weightclass->GetMinWeight() / 1000;
+		new_weightclass->WeightInGrammsLargerThan  = (uint32_t)weightclass->GetMinWeight() % 1000;
+		new_weightclass->WeightSmallerThan         = (uint32_t)weightclass->GetMaxWeight() / 1000;
+		new_weightclass->WeightInGrammsSmallerThan = (uint32_t)weightclass->GetMaxWeight() % 1000;
+		
+
+		if (match_table->GetType() == MatchTable::Type::RoundRobin)
 			new_weightclass->FightSystemID = 16;//Round robin
-
-			new_weightclass->WeightLargerThan          = (uint32_t)weightclass->GetMinWeight() / 1000;
-			new_weightclass->WeightInGrammsLargerThan  = (uint32_t)weightclass->GetMinWeight() % 1000;
-			new_weightclass->WeightSmallerThan         = (uint32_t)weightclass->GetMaxWeight() / 1000;
-			new_weightclass->WeightInGrammsSmallerThan = (uint32_t)weightclass->GetMaxWeight() % 1000;
-		}
 		else if (match_table->GetType() == MatchTable::Type::SingleElimination)
 		{
 			const auto single_elimination = (Judoboard::SingleElimination*)match_table;
-			new_weightclass = new Weightclass;
 
 			new_weightclass->FightSystemID = 19;
-
-			new_weightclass->WeightLargerThan          = (uint32_t)single_elimination->GetMinWeight() / 1000;
-			new_weightclass->WeightInGrammsLargerThan  = (uint32_t)single_elimination->GetMinWeight() % 1000;
-			new_weightclass->WeightSmallerThan         = (uint32_t)single_elimination->GetMaxWeight() / 1000;
-			new_weightclass->WeightInGrammsSmallerThan = (uint32_t)single_elimination->GetMaxWeight() % 1000;
 
 			new_weightclass->MatchForThirdPlace = single_elimination->IsThirdPlaceMatch();
 			new_weightclass->MatchForFifthPlace = single_elimination->IsFifthPlaceMatch();
@@ -222,7 +223,7 @@ MD5::MD5(const Tournament& Tournament)
 		else
 			continue;
 
-		new_weightclass->ID = id++;
+		new_weightclass->ID   = id++;
 		new_weightclass->Date = m_DateStart;
 
 		if (match_table->GetName().length() > 0)
@@ -321,17 +322,20 @@ MD5::MD5(const Tournament& Tournament)
 
 	for (auto match : Tournament.GetSchedule())
 	{
-		if (!match->HasValidFighters())//TODO
-			continue;
-
 		Match new_match;
-		new_match.WhiteID = uuid2id(match->GetFighter(Fighter::White)->GetUUID());
-		new_match.RedID   = uuid2id(match->GetFighter(Fighter::Blue )->GetUUID());
+
+		if (match->GetFighter(Fighter::White))
+			new_match.WhiteID = uuid2id(match->GetFighter(Fighter::White)->GetUUID());
+		if (match->GetFighter(Fighter::Blue))
+			new_match.RedID = uuid2id(match->GetFighter(Fighter::Blue)->GetUUID());
 
 		new_match.White = (Participant*)id2ptr(new_match.WhiteID);
 		new_match.Red   = (Participant*)id2ptr(new_match.RedID);
 
 		auto match_table = match->GetMatchTable();
+
+		if (match_table)
+			new_match.MatchNo = (int)match_table->FindMatchIndex(*match) + 1;
 
 		if (match_table && match_table->GetAgeGroup())
 		{
@@ -342,8 +346,6 @@ MD5::MD5(const Tournament& Tournament)
 
 			new_match.AgeGroupID = uuid2id(match_table->GetAgeGroup()->GetUUID());
 			new_match.AgeGroup   = (AgeGroup*)id2ptr(new_match.AgeGroupID);
-
-			new_match.MatchNo = (int)match_table->FindMatchIndex(*match) + 1;
 
 			//Find start numbers
 			new_match.StartNoWhite = FindStartNo(new_match.AgeGroupID, new_match.WeightclassID, new_match.WhiteID);
@@ -1180,6 +1182,16 @@ MD5::Weightclass* MD5::FindWeightclass(int AgeGroupID, int WeightclassID)
 	for (auto weightclass : m_Weightclasses)
 		if (weightclass && weightclass->AgeGroupID == AgeGroupID && weightclass->ID == WeightclassID)
 			return weightclass;
+	return nullptr;
+}
+
+
+
+const MD5::Weightclass* MD5::FindWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const
+{
+	for (auto table : m_Weightclasses)
+		if (table->AgeGroup && table->AgeGroup->Name == AgeGroup && table->Description == Weightclass)
+			return table;
 	return nullptr;
 }
 
