@@ -1,8 +1,8 @@
-<button class="add" id="new_participant" onclick="navigate('participant_add.html')">New Participant</button>
+<button class="add" style="width: 3.0cm;" id="new_participant" onclick="navigate('participant_add.html')">New Participant</button>
 
-<button class="add" id="new_match" onclick="navigate('add_match.html')">New Match</button>
-<button class="add" id="new_matchtable" onclick="navigate('matchtable_add.html')">New Match table</button>
-<button class="add" id="select_age_groups" onclick="navigate('age_groups_select.html')">Select Age Groups</button>
+<button class="add" style="width: 3.0cm;" id="new_match" onclick="navigate('add_match.html')">New Match</button>
+<button class="add" style="width: 3.3cm;" id="new_matchtable" onclick="navigate('matchtable_add.html')">New Match table</button>
+<button class="add" style="width: 3.3cm;" id="select_age_groups" onclick="navigate('age_groups_select.html')"></button>
 
 <h2 id="headline-master-schedule">Overview</h2>
 <table id="master-schedule" border="1" rules="all" style="margin-bottom: 1cm;">
@@ -217,7 +217,7 @@ function Update()
 
     var option = document.createElement("option");
     option.value = 0;
-    option.text = "All Mats";
+    option.text = translate("all_mats");
     mat_to_display.add(option);
 
     var table = document.getElementById("master-schedule");
@@ -699,5 +699,8 @@ document.getElementById("age_groups_participants").innerHTML = '#' + translate('
 document.getElementById("headline_age_groups").innerHTML = translate('age_groups');
 
 document.getElementById("break").innerHTML = translate('break_time');
+document.getElementById("age_groups_match_tables").innerHTML = '#' + translate('match_tables');
 
 document.getElementById("label_mat_display").innerHTML = translate('show_matches_on');
+
+document.getElementById("select_age_groups").innerHTML = translate('select_age_groups');
