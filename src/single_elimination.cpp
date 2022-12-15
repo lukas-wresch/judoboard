@@ -35,8 +35,8 @@ SingleElimination::SingleElimination(const YAML::Node& Yaml, ITournament* Tourna
 
 
 
-SingleElimination::SingleElimination(const MD5::Weightclass& Weightclass, const ITournament* Tournament)
-	: Weightclass(Weightclass, Tournament)
+SingleElimination::SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament)
+	: Weightclass(Weightclass_, Tournament)
 {
 	//TODO
 }
