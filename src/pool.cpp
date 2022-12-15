@@ -92,6 +92,18 @@ std::string Pool::GetHTMLForm()
 
 
 
+size_t Pool::GetMaxStartPositions() const
+{
+	if (!GetFilter())
+		return 0;
+
+	const size_t pool_count = CalculatePoolCount();
+
+	return ( (size_t)std::floor(GetFilter()->GetParticipants().size() / pool_count) ) * pool_count;
+}
+
+
+
 void Pool::GenerateSchedule()
 {
 	for (auto it = m_Schedule.begin(); it != m_Schedule.end();)
@@ -109,29 +121,46 @@ void Pool::GenerateSchedule()
 
 	const auto max_start_pos = GetMaxStartPositions();
 
-	const auto pool_count = m_Pools.size();
-
 	for (auto pool : m_Pools)
 		delete pool;
 
 	m_Pools.clear();
+
+	const auto pool_count = CalculatePoolCount();
 	m_Pools.resize(pool_count);
 
-	for (int i = 0; i < pool_count; ++i)
-		m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
-
 	//Distribute participants to pools
-	/*for (int pos = 0; pos < max_start_pos; ++pos)
+	for (int i = 0; i < pool_count; ++i)
 	{
-		auto judoka = GetJudokaByStartPosition(pos);
+		m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
+		m_Pools[i]->GenerateSchedule();
+	}
 
-		if (!judoka)
-			continue;
+	//TODO create filter for m_Finals
 
-		int pool = pos % pool_count;
+	//Add matches from pools
+	size_t index = 0;
+	bool added;
+	do
+	{
+		added = false;
+		for (int pool = 0; pool < pool_count; ++pool)
+		{
+			auto schedule = GetPool(pool)->GetSchedule();
 
-		m_Pools[pool]->AddParticipant(judoka, true);
-	}*/
+			if (index >= schedule.size())
+				continue;
+
+			AddMatch(schedule[index]);
+			added = true;
+		}
+
+		++index;
+	} while (added);//Still matches to add?
+
+	//Add matches for single elimination phase
+	for (auto match : m_Finals.GetSchedule())
+		AddMatch(match);
 }
 
 
