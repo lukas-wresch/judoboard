@@ -23,6 +23,7 @@
 #include "../src/weightclass_generator.h"
 #include "../src/round_robin.h"
 #include "../src/single_elimination.h"
+#include "../src/splitter.h"
 #include "../src/window.h"
 #include "../src/dm4.h"
 #include "../src/md5.h"

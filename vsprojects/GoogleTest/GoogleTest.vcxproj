@@ -79,10 +79,11 @@
     <ClCompile Include="..\..\tests\match.cpp" />
     <ClCompile Include="..\..\tests\md5.cpp" />
     <ClCompile Include="..\..\tests\remote_mat.cpp" />
+    <ClCompile Include="..\..\tests\round_robin.cpp" />
     <ClCompile Include="..\..\tests\single_elimination.cpp" />
+    <ClCompile Include="..\..\tests\splitter.cpp" />
     <ClCompile Include="..\..\tests\timer.cpp" />
     <ClCompile Include="..\..\tests\tournament.cpp" />
-    <ClCompile Include="..\..\tests\weightclass.cpp" />
     <ClCompile Include="..\..\tests\weightclass_generator.cpp" />
   </ItemGroup>
   <ItemGroup>
