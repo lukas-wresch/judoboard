@@ -26,6 +26,8 @@ IFilter::IFilter(const YAML::Node& Yaml, const ITournament* Tournament)
 
 void IFilter::operator >> (YAML::Emitter& Yaml) const
 {
+	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
+
 	if (GetAgeGroup())
 		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)GetAgeGroup()->GetUUID();
 
@@ -92,7 +94,6 @@ bool IFilter::AddParticipant(const Judoka* NewParticipant, bool Force)
 
 	FindFreeStartPos(NewParticipant);
 
-	SortParticipantsByStartPosition();
 	return true;
 }
 
@@ -174,6 +175,4 @@ void IFilter::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
 		m_Participants.erase(GetStartPosition(Judoka));
 		m_Participants.insert({ NewStartPosition, Judoka });
 	}
-
-	SortParticipantsByStartPosition();
 }

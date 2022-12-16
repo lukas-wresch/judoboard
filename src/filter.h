@@ -15,7 +15,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Weightclass, Custom, Splitter, Fuser
+			Weightclass, Custom, Splitter, TakeTopRanks, Fuser
 		};
 
 		IFilter(const YAML::Node& Yaml, const ITournament* Tournament);
@@ -66,15 +66,13 @@ namespace Judoboard
 		size_t GetStartPosition(const DependentJudoka Judoka) const;
 		bool RemoveParticipant(const DependentJudoka Participant);
 
-		void SortParticipantsByStartPosition() {
-			//std::sort(m_Participants.begin(), m_Participants.end(), [this](const size_t a, const size_t b) {
-				//return a < b;
-			//});
+		void SetParticipants(std::unordered_map<size_t, const DependentJudoka>&& NewParticipants) const {
+			m_Participants = std::move(NewParticipants);
 		}
 
 
 	private:
-		std::unordered_map<size_t, const DependentJudoka> m_Participants;//List of all participants that are in the match table
+		mutable std::unordered_map<size_t, const DependentJudoka> m_Participants;//List of all participants that are in the match table
 
 		const AgeGroup* m_pAgeGroup = nullptr;//Age group for the matches (if available)
 

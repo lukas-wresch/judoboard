@@ -16,6 +16,12 @@ namespace Judoboard
 		Pool(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
 		Pool(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
 
+		~Pool() {
+			SetSchedule().clear();
+			for (auto pool : m_Pools)
+				delete pool;
+		}
+
 		static std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::Pool; }
@@ -40,6 +46,9 @@ namespace Judoboard
 			return m_Pools[Index];
 		}
 
+		auto GetTakeTop() const { return m_TakeTop; }
+		void SetTakeTop(uint32_t NumJudoka) { m_TakeTop = NumJudoka; }
+
 		//Serialization
 		virtual const std::string ToHTML() const override;
 
@@ -60,6 +69,7 @@ namespace Judoboard
 		}
 
 		uint32_t m_PoolCount = 0;//0 for auto, otherwise number of pools
+		uint32_t m_TakeTop   = 2;//Number of judoka to go to the next round from each pool
 
 		std::vector<RoundRobin*> m_Pools;
 		SingleElimination m_Finals;

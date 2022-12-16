@@ -32,8 +32,6 @@ void Splitter::operator >> (YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginMap;
 
-	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
-
 	IFilter::operator>>(Yaml);
 
 	Yaml << YAML::EndMap;

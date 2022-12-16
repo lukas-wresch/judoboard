@@ -4,6 +4,8 @@
 #include "round_robin.h"
 #include "weightclass.h"
 #include "splitter.h"
+#include "take_top_ranks.h"
+#include "fuser.h"
 #include "rule_set.h"
 #include "localizer.h"
 #include "match.h"
@@ -25,7 +27,9 @@ Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
 	: MatchTable(Yaml, Tournament), m_Finals(nullptr, Tournament)
 {
 	if (Yaml["pool_count"])
-		m_Pools.resize(Yaml["pool_count"].as<bool>());
+		SetPoolCount(Yaml["pool_count"].as<uint32_t>());
+	if (Yaml["take_top"])
+		SetTakeTop(Yaml["take_top"].as<uint32_t>());
 
 	if (Yaml["third_place_match"])
 		IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
@@ -38,6 +42,9 @@ Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
 void Pool::operator >> (YAML::Emitter& Yaml) const
 {
 	MatchTable::operator >>(Yaml);
+
+	Yaml << YAML::Key << "pool_count" << YAML::Value << m_PoolCount;
+	Yaml << YAML::Key << "take_top"   << YAML::Value << m_TakeTop;
 
 	if (IsThirdPlaceMatch())
 		Yaml << YAML::Key << "third_place_match" << YAML::Value << IsThirdPlaceMatch();
@@ -119,8 +126,6 @@ void Pool::GenerateSchedule()
 	if (!GetFilter() || GetParticipants().size() <= 1)
 		return;
 
-	const auto max_start_pos = GetMaxStartPositions();
-
 	for (auto pool : m_Pools)
 		delete pool;
 
@@ -136,7 +141,16 @@ void Pool::GenerateSchedule()
 		m_Pools[i]->GenerateSchedule();
 	}
 
-	//TODO create filter for m_Finals
+	//Create filter(s) for final round
+	auto fuser = new Fuser(GetTournament());
+	for (auto pool : m_Pools)
+	{
+		auto take_top_placed = new TakeTopRanks(*pool, m_TakeTop);
+		fuser->AddSource(*take_top_placed);
+	}
+
+	m_Finals = SingleElimination(fuser);
+	m_Finals.GenerateSchedule();
 
 	//Add matches from pools
 	size_t index = 0;

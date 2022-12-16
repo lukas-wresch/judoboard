@@ -15,6 +15,8 @@ using namespace Judoboard;
 SingleElimination::SingleElimination(IFilter* Filter, const ITournament* Tournament)
 	: MatchTable(Filter, Tournament)
 {
+	if (Filter)
+		SetTournament(Filter->GetTournament());
 }
 
 

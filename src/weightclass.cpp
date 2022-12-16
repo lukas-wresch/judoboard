@@ -57,7 +57,7 @@ void Weightclass::operator >> (YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginMap;
 
-	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
+	IFilter::operator>>(Yaml);
 
 	Yaml << YAML::Key << "min_weight" << YAML::Value;
 	m_MinWeight >> Yaml;
@@ -65,8 +65,6 @@ void Weightclass::operator >> (YAML::Emitter& Yaml) const
 	m_MaxWeight >> Yaml;
 
 	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;
-
-	IFilter::operator>>(Yaml);
 
 	Yaml << YAML::EndMap;
 }

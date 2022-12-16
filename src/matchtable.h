@@ -313,6 +313,7 @@ namespace Judoboard
 		const std::vector<const Judoka*> GetParticipants() const;
 
 		const IFilter* GetFilter() const { return m_Filter; }
+		const ITournament* GetTournament() const { return m_Tournament; }
 
 		//Rule sets
 		const RuleSet& GetRuleSet() const;
@@ -355,24 +356,20 @@ namespace Judoboard
 
 		void AddMatchesForBestOfThree();
 
-		const ITournament* GetTournament() const { return m_Tournament; }
-
 		void DeleteSchedule() { m_Schedule.clear(); }
 
 		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
+		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
 
 		const std::string ResultsToHTML() const;
+
+		std::vector<Match*>&  SetSchedule() { return m_Schedule; }
 
 
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
 
 	private:
-		std::vector<Match*>&  SetSchedule() { return m_Schedule; }
-		
-		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
-
-
 		const RuleSet* m_Rules = nullptr;//Custom rule set for the matches (if available)
 
 		std::string m_Name;

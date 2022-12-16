@@ -184,6 +184,7 @@
     <ClCompile Include="..\..\src\dmf.cpp" />
     <ClCompile Include="..\..\src\error.cpp" />
     <ClCompile Include="..\..\src\filter.cpp" />
+    <ClCompile Include="..\..\src\fuser.cpp" />
     <ClCompile Include="..\..\src\HttpServer\HttpServer.cpp" />
     <ClCompile Include="..\..\src\id.cpp" />
     <ClCompile Include="..\..\src\judoka.cpp" />
@@ -202,6 +203,7 @@
     <ClCompile Include="..\..\src\single_elimination.cpp" />
     <ClCompile Include="..\..\src\splitter.cpp" />
     <ClCompile Include="..\..\src\standing_data.cpp" />
+    <ClCompile Include="..\..\src\take_top_ranks.cpp" />
     <ClCompile Include="..\..\src\timer.cpp" />
     <ClCompile Include="..\..\src\tournament.cpp" />
     <ClCompile Include="..\..\src\weightclass.cpp" />
@@ -226,6 +228,7 @@
     <ClInclude Include="..\..\src\dmf.h" />
     <ClInclude Include="..\..\src\error.h" />
     <ClInclude Include="..\..\src\filter.h" />
+    <ClInclude Include="..\..\src\fuser.h" />
     <ClInclude Include="..\..\src\id.h" />
     <ClInclude Include="..\..\src\imat.h" />
     <ClInclude Include="..\..\src\itournament.h" />
@@ -247,6 +250,7 @@
     <ClInclude Include="..\..\src\single_elimination.h" />
     <ClInclude Include="..\..\src\splitter.h" />
     <ClInclude Include="..\..\src\standing_data.h" />
+    <ClInclude Include="..\..\src\take_top_ranks.h" />
     <ClInclude Include="..\..\src\timer.h" />
     <ClInclude Include="..\..\src\tournament.h" />
     <ClInclude Include="..\..\src\virtual_mat.h" />
