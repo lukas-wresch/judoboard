@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "app.h"
 #include "database.h"
 #include "weightclass.h"
@@ -258,14 +259,6 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 		return Ajax_SetFullscreen(false, Request);
-	});
-
-
-	m_Server.RegisterResource("/ajax/config/status", [this](auto& Request) -> std::string {
-		if (!IsLoggedIn(Request))
-			return Error(Error::Type::NotLoggedIn);
-
-		return Ajax_Status();
 	});
 
 
@@ -2174,6 +2167,30 @@ void Application::SetupHttpServer()
 		return Error(Error::Type::OperationFailed);
 	});
 
+	m_Server.RegisterResource("/ajax/config/get_setup", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_GetSetup();
+	});
+
+	m_Server.RegisterResource("/ajax/config/set_setup", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_SetSetup(Request);
+	});
+
+	m_Server.RegisterResource("/ajax/config/execute", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_Execute(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/config/shutdown", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
@@ -2463,7 +2480,6 @@ std::string Application::Ajax_GetMats() const
 			if (!mat)
 			{
 				std::string mat_name = Localizer::Translate("Mat") + " " + std::to_string(id);
-				//ret << id << IMat::Type::Unknown << false << mat_name << 0 << 0 << false;
 
 				ret << YAML::BeginMap;
 				ret << YAML::Key << "id"   << YAML::Value << id;
@@ -2472,7 +2488,6 @@ std::string Application::Ajax_GetMats() const
 			}
 			else
 			{
-				//ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponStyle() << mat->GetTimerStyle() << mat->IsFullscreen();
 				ret << YAML::BeginMap;
 				ret << YAML::Key << "id"      << YAML::Value << id;
 				ret << YAML::Key << "name"    << YAML::Value << mat->GetName();
@@ -2553,14 +2568,14 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 	auto name  = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
-	int nameStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
+	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
 
 	if (id <= 0 || new_id <= 0)
 		return Error::Type::InvalidID;
 	if (ipponStyle <= -1)
-		return Error::Type::InvalidID;
+		return Error::Type::InvalidInput;
 	if (timerStyle <= -1)
-		return Error::Type::InvalidID;
+		return Error::Type::InvalidInput;
 
 	if (id != new_id)//Check if new_id is an unused id
 	{
@@ -3210,17 +3225,70 @@ Error Application::Ajax_SetStartingPosition(const HttpServer::Request& Request)
 
 
 
-std::string Application::Ajax_Status()
+std::string Application::Ajax_GetSetup()
 {
 	YAML::Emitter ret;
 
 	ret << YAML::BeginMap;
 
-	ret << YAML::Key << "version" << YAML::Value << Version;
-	ret << YAML::Key << "uptime"  << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
+	ret << YAML::Key << "version"     << YAML::Value << Version;
+	ret << YAML::Key << "uptime"      << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
+	ret << YAML::Key << "language"    << YAML::Value << (int)Localizer::GetLanguage();
+	ret << YAML::Key << "port"        << YAML::Value << GetDatabase().GetServerPort();
+	ret << YAML::Key << "ippon_style" << YAML::Value << (int)GetDatabase().GetIpponStyle();
+	ret << YAML::Key << "timer_style" << YAML::Value << (int)GetDatabase().GetTimerStyle();
+	ret << YAML::Key << "name_style"  << YAML::Value << (int)GetDatabase().GetNameStyle();
 
 	ret << YAML::EndMap;
 	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
+{
+	int language   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "language"));
+	int port       = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "port"));
+	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
+	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
+	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
+
+	Localizer::SetLanguage((Language)language);
+	GetDatabase().SetServerPort(port);
+	GetDatabase().SetIpponStyle((Mat::IpponStyle)ipponStyle);
+	GetDatabase().SetTimerStyle((Mat::TimerStyle)timerStyle);
+	GetDatabase().SetNameStyle((NameStyle)nameStyle);
+
+	return Error::Type::NoError;
+}
+
+
+
+std::string Application::Ajax_Execute(const HttpServer::Request& Request)
+{
+	auto command = HttpServer::DecodeURLEncoded(Request.m_Query, "cmd");
+
+#ifdef _WIN32
+	FILE* pipe = _popen(command.c_str(), "r");
+#else
+	FILE* pipe = popen(command.c_str(), "r");
+#endif
+	if (!pipe)
+		return "";
+
+	std::string result;
+	char buffer[128];
+	while (fgets(buffer, sizeof buffer, pipe) != NULL)
+	{
+		result += buffer;
+	}
+
+#ifdef _WIN32
+	_pclose(pipe);
+#else
+	pclose(pipe);
+#endif
+	return result;
 }
 
 
