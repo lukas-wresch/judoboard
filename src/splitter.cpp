@@ -13,7 +13,7 @@ Splitter::Splitter(const IFilter& pSource, size_t Divisor, size_t Remainder) :
 	m_Remainder = Remainder;
 
 	assert(Remainder < Divisor);
-	Remainder %= Divisor;
+	m_Remainder %= Divisor;
 }
 
 
