@@ -141,8 +141,10 @@ bool MatchTable::AddMatch(Match* NewMatch)
 	if (!NewMatch)
 		return false;
 
-	AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)), true);
-	AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
+	if (NewMatch->GetFighter(Fighter::White))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)), true);
+	if (NewMatch->GetFighter(Fighter::Blue))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
 
 	NewMatch->SetMatchTable(this);
 	m_Schedule.emplace_back(NewMatch);
