@@ -146,7 +146,7 @@ void Pool::GenerateSchedule()
 		fuser->AddSource(*take_top_placed);
 	}
 
-	m_Finals = SingleElimination(fuser);
+	m_Finals = std::move(SingleElimination(fuser));
 
 	//Add matches from pools
 	size_t index = 0;

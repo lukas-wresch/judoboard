@@ -16,6 +16,21 @@ namespace Judoboard
 		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament = nullptr);
 		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 
+		void operator =(const SingleElimination& rhs) = delete;
+		void operator =(SingleElimination&& rhs) noexcept {
+			m_ThirdPlaceMatch = rhs.m_ThirdPlaceMatch;
+			m_FifthPlaceMatch = rhs.m_FifthPlaceMatch;
+			SetRuleSet(rhs.GetOwnRuleSet());
+			/*SetName(rhs.GetName());
+			SetFilter(rhs.GetFilter());
+			SetTournament(rhs.GetTournament());
+			SetScheduleIndex(rhs.GetScheduleIndex());
+			SetMatID(rhs.GeMatID());
+			SetColor(rhs.GetColor());
+			IsBestOfThree(rhs.IsBestOfThree());*/
+			SetSchedule() = std::move(rhs.SetSchedule());
+		}
+
 		std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::SingleElimination; }

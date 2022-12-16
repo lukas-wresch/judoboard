@@ -17,6 +17,8 @@ namespace Judoboard
 		RoundRobin(const YAML::Node& Yaml, const ITournament* Tournament = nullptr);
 		RoundRobin(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 
+		void operator =(const RoundRobin& rhs) = delete;
+
 		std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::RoundRobin; }
