@@ -132,6 +132,47 @@ TEST(App, Tournaments)
 
 
 
+TEST(App, Tournaments_OpenLastTournament)
+{
+	initialize();
+
+	{
+		Application app;
+
+		Tournament* t = new Tournament("deleteMe");
+		t->AddMatch(new Match(nullptr, nullptr, t));
+
+		EXPECT_TRUE(app.AddTournament(t));
+		t->Save();
+	}
+
+	{
+		Application app;
+
+		app.LoadDataFromDisk();
+
+		EXPECT_TRUE(app.FindTournamentByName("deleteMe"));
+		ASSERT_TRUE(app.GetTournament());
+		EXPECT_EQ(app.GetTournament()->GetName(), "deleteMe");
+
+		EXPECT_TRUE(app.CloseTournament());
+	}
+
+	{
+		Application app;
+
+		app.LoadDataFromDisk();
+
+		EXPECT_TRUE(app.FindTournamentByName("deleteMe"));
+		ASSERT_TRUE(app.GetTournament());
+		EXPECT_NE(app.GetTournament()->GetName(), "deleteMe");
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(App, DeleteTournament)
 {
 	initialize();
@@ -232,6 +273,13 @@ TEST(App, FullTournament)
 
 		ASSERT_TRUE(app.FindTournamentByName(tournament_name));
 		EXPECT_TRUE(app.OpenTournament(app.FindTournamentByName(tournament_name)->GetUUID()));
+
+		EXPECT_GE(j1.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j2.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j3.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j4.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j5.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j6.GetLengthOfBreak(), 60u);
 
 		tourney->AddParticipant(&j1);
 		tourney->AddParticipant(&j2);
@@ -483,7 +531,7 @@ TEST(App, VeryLongNameTest)
 	Judoka j1("Very-Long-Firstname", "Very-Long-Lastname", rand() % 50);
 	Judoka j2("Very-Long-Firstname", "Very-Long-Lastname", rand() % 50);
 
-	Match match(nullptr, &j1, &j2);
+	Match match(&j1, &j2, nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 25, 0, 30, 20, true, true, true, 0));
 
@@ -559,14 +607,14 @@ TEST(App, MatchOnSlave)
 
 	Judoka j1("White", "LastnameW");
 	Judoka j2("Blue",  "LastnameB");
-	Match* match = new Match(nullptr, &j1, &j2);
+	Match* match = new Match(&j1, &j2, nullptr);
 	match->SetMatID(2);
 
 	master.GetTournament()->AddMatch(match);
 
 	auto mat = master.FindMat(2);
 
-	ASSERT_TRUE(mat != nullptr);
+	ASSERT_TRUE(mat);
 	ASSERT_TRUE(mat->StartMatch(match));
 
 	ZED::Core::Pause(2000);

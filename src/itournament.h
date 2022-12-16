@@ -27,6 +27,9 @@ namespace Judoboard
 		virtual bool CanCloseTournament() const { return false; }
 		//void DeleteAllMatchResults();
 
+		[[nodiscard]]
+		virtual const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
+
 		virtual bool AddMatch(Match* NewMatch) { return false; }
 		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
 		virtual Match* GetNextMatch(int32_t MatID = -1) const { return nullptr; }//Returns the next match for a given mat if available, otherwise null pointer is returned
@@ -35,8 +38,8 @@ namespace Judoboard
 		virtual std::vector<Match> GetNextMatches(uint32_t MatID) const = 0;
 
 		virtual bool RemoveMatch(const UUID& MatchID) { return false; }
-		virtual bool MoveMatchUp(const UUID& MatchID) { return false; }
-		virtual bool MoveMatchDown(const UUID& MatchID) { return false; }
+		virtual bool MoveMatchUp(const UUID& MatchID, uint32_t MatID = 0) { return false; }
+		virtual bool MoveMatchDown(const UUID& MatchID, uint32_t MatID = 0) { return false; }
 
 		//Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;

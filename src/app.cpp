@@ -16,7 +16,7 @@ using namespace Judoboard;
 
 
 const std::string Application::Name = "Judoboard";
-const std::string Application::Version = "0.4";
+const std::string Application::Version = "0.4.1";
 bool Application::NoWindow = false;
 
 
@@ -60,6 +60,11 @@ bool Application::LoadDataFromDisk()
 		//return false;
 	}
 
+	//Has to be done here, otherwise it will be overwritten when loading tournament files
+	auto last_tournament_name = m_Database.GetLastTournamentName();
+	ZED::Log::Info("Last opened tournament was " + last_tournament_name);
+
+
 	ZED::Core::Indexer([this](auto Filename) {
 		Filename = Filename.substr(Filename.find_last_of(ZED::Core::Separator) + 1);
 		Filename = Filename.substr(0, Filename.length() - 4);//Remove .yml
@@ -67,8 +72,15 @@ bool Application::LoadDataFromDisk()
 		return true;
 		}, "tournaments");
 
-	if (FindTournamentByName(m_Database.GetLastTournamentName()))
-		OpenTournament(FindTournamentByName(m_Database.GetLastTournamentName())->GetUUID());
+
+	if (last_tournament_name.length() > 0)
+	{
+		auto last_tournament = FindTournamentByName(last_tournament_name);
+		if (last_tournament)
+			OpenTournament(*last_tournament);
+	}
+	else
+		CloseTournament();
 
 	return true;
 }
@@ -128,7 +140,8 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 	{
 		ret += "Judoka: " + dm4_judoka.Firstname + " " + dm4_judoka.Lastname + "<br/>";
 
-		auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);		
+		//auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);
+		Judoka* new_judoka = new Judoka(JudokaData(dm4_judoka), &GetDatabase());
 
 		//Judoka is now added/updated
 
@@ -183,13 +196,13 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 	{
 		ret += "Judoka: " + dmf_judoka.Firstname + " " + dmf_judoka.Lastname + "<br/>";
 
-		auto new_judoka = GetDatabase().UpdateOrAdd(JudokaData(dmf_judoka), ParseOnly, ret);		
+		//auto new_judoka = GetDatabase().UpdateOrAdd(JudokaData(dmf_judoka), ParseOnly, ret);	
 
 		//Judoka is now added/updated
 
-		if (!ParseOnly && new_judoka)
+		if (!ParseOnly)
 		{//Add to the current tournament
-			GetTournament()->AddParticipant(new_judoka);
+			GetTournament()->AddParticipant(new Judoka(JudokaData(dmf_judoka), &GetDatabase()));
 		}
 	}
 
@@ -207,8 +220,13 @@ bool Application::OpenTournament(const UUID& UUID)
 		return false;
 
 	m_CurrentTournament = FindTournament(UUID);
+
 	if (m_CurrentTournament)
+	{
 		m_Database.SetLastTournamentName(m_CurrentTournament->GetName());
+		ZED::Log::Info("Opened tournament " + m_CurrentTournament->GetName());
+	}
+
 	return true;
 }
 
@@ -417,7 +435,7 @@ bool Application::AddTournament(Tournament* NewTournament)
 	if (NewTournament->GetStatus() == Status::Scheduled)//Fresh new tournament
 	{//Try to open right away
 		if (!m_CurrentTournament || m_CurrentTournament->CanCloseTournament())
-			m_CurrentTournament = m_Tournaments.back();
+			OpenTournament(*NewTournament);
 	}
 
 	return true;

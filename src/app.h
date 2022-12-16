@@ -106,6 +106,8 @@ namespace Judoboard
 		Error Ajax_UpdateMat(const HttpServer::Request& Request);
 		Error Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request);
 
+		std::string Ajax_GetNamesOnMat(const HttpServer::Request& Request);
+
 		//Commands
 		Error Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request);
 		Error Ajax_RemoveDisqualification(Fighter Whom, const HttpServer::Request& Request);
@@ -113,17 +115,20 @@ namespace Judoboard
 		Error Ajax_RemoveNoDisqualification(Fighter Whom, const HttpServer::Request& Request);
 
 		//Schedule
+		Error Ajax_MoveMatchUp(const HttpServer::Request& Request);
+		Error Ajax_MoveMatchDown(const HttpServer::Request& Request);
 		std::string Ajax_GetHansokumake() const;//Returns matches that are in progress and have a direct hansokumake
 
 		//Judoka
 		Error Ajax_AddJudoka(const HttpServer::Request& Request);
+		std::string Ajax_GetJudoka(const HttpServer::Request& Request);
 		Error Ajax_EditJudoka(const HttpServer::Request& Request);
 
 		//Clubs
 		Error Ajax_AddClub(const HttpServer::Request& Request);
 		std::string Ajax_GetClub(const HttpServer::Request& Request);
 		Error Ajax_EditClub(const HttpServer::Request& Request);
-		std::string Ajax_ListClubs();
+		std::string Ajax_ListClubs(const HttpServer::Request& Request);
 		Error Ajax_DeleteClub(const HttpServer::Request& Request);
 
 		//Associations
@@ -135,6 +140,9 @@ namespace Judoboard
 		std::string Ajax_ListAllAgeGroups() const;
 
 		//Match tables
+		Error Ajax_AddMatchTable(HttpServer::Request Request);
+		Error Ajax_EditMatchTable(const HttpServer::Request& Request);
+		std::string Ajax_GetMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_ListAllMatchTables(const HttpServer::Request& Request);
 		std::string Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_GetMatchesFromMatchTable(const HttpServer::Request& Request);

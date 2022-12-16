@@ -15,7 +15,7 @@ RuleSet s_default_rules;
 
 
 
-Match::Match(const ITournament* Tournament, const Judoka* White, const Judoka* Blue, uint32_t MatID) : m_Tournament(Tournament)
+Match::Match(const Judoka* White, const Judoka* Blue, const ITournament* Tournament, uint32_t MatID) : m_Tournament(Tournament)
 {
 	m_White.m_Judoka = White;
 	m_Blue.m_Judoka  = Blue;
@@ -142,9 +142,14 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::BeginMap;
 
 	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "current_breaktime" << YAML::Value << GetCurrentBreaktime();
+	Yaml << YAML::Key << "breaktime"         << YAML::Value << GetRuleSet().GetBreakTime();
 
 	if (GetFighter(Fighter::White))
+	{
 		Yaml << YAML::Key << "white_name" << YAML::Value << GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+		Yaml << YAML::Key << "white_uuid" << YAML::Value << (std::string)GetFighter(Fighter::White)->GetUUID();
+	}
 	else
 	{
 		Yaml << YAML::Key << "white_dependency_type" << YAML::Value << (int)m_White.m_Dependency;
@@ -153,7 +158,10 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	}
 
 	if (GetFighter(Fighter::Blue))
-		Yaml << YAML::Key << "blue_name"  << YAML::Value << GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+	{
+		Yaml << YAML::Key << "blue_name" << YAML::Value << GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+		Yaml << YAML::Key << "blue_uuid" << YAML::Value << (std::string)GetFighter(Fighter::Blue)->GetUUID();
+	}
 	else
 	{
 		Yaml << YAML::Key << "blue_dependency_type" << YAML::Value << (int)m_Blue.m_Dependency;
@@ -251,6 +259,78 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 	}
 
 	return nullptr;
+}
+
+
+
+std::vector<const Judoka*> Match::GetPotentialFighters() const
+{
+	std::vector<const Judoka*> ret;
+
+	if (m_White.m_Judoka)
+		ret.emplace_back(m_White.m_Judoka);
+
+	else if (m_White.m_Dependency == DependencyType::TakeWinner || m_White.m_Dependency == DependencyType::TakeLoser)
+	{
+		if (m_White.m_DependentMatch)
+		{
+			auto list = m_White.m_DependentMatch->GetPotentialFighters();
+			ret.insert(ret.end(), list.begin(), list.end());
+		}
+	}
+
+	if (m_Blue.m_Judoka)
+		ret.emplace_back(m_Blue.m_Judoka);
+
+	else if (m_Blue.m_Dependency == DependencyType::TakeWinner || m_Blue.m_Dependency == DependencyType::TakeLoser)
+	{
+		if (m_Blue.m_DependentMatch)
+		{
+			auto list = m_Blue.m_DependentMatch->GetPotentialFighters();
+			ret.insert(ret.end(), list.begin(), list.end());
+		}
+	}
+
+	return ret;
+}
+
+
+
+std::vector<const Judoka*> Match::GetPotentialFighters(Fighter Fighter) const
+{
+	std::vector<const Judoka*> ret;
+
+	if (Fighter == Fighter::White)
+	{
+		if (m_White.m_Judoka)
+			ret.emplace_back(m_White.m_Judoka);
+
+		else if (m_White.m_Dependency == DependencyType::TakeWinner || m_White.m_Dependency == DependencyType::TakeLoser)
+		{
+			if (m_White.m_DependentMatch)
+			{
+				auto list = m_White.m_DependentMatch->GetPotentialFighters();
+				ret.insert(ret.end(), list.begin(), list.end());
+			}
+		}
+	}
+
+	else
+	{
+		if (m_Blue.m_Judoka)
+			ret.emplace_back(m_White.m_Judoka);
+
+		else if (m_Blue.m_Dependency == DependencyType::TakeWinner || m_Blue.m_Dependency == DependencyType::TakeLoser)
+		{
+			if (m_Blue.m_DependentMatch)
+			{
+				auto list = m_Blue.m_DependentMatch->GetPotentialFighters();
+				ret.insert(ret.end(), list.begin(), list.end());
+			}
+		}
+	}
+
+	return ret;
 }
 
 
@@ -449,6 +529,24 @@ const RuleSet& Match::GetRuleSet() const
 	ZED::Log::Debug("Could not find rule set, using the default rule set");
 
 	return s_default_rules;
+}
+
+
+
+uint32_t Match::GetCurrentBreaktime() const
+{
+	uint32_t break1 = 0, break2 = 0;
+	if (m_White.m_Judoka)
+		break1 = m_White.m_Judoka->GetLengthOfBreak();
+	if (m_Blue.m_Judoka)
+		break2 = m_Blue.m_Judoka->GetLengthOfBreak();
+
+	if (break1 == 0)
+		return break2;
+	if (break2 == 0)
+		return break1;
+
+	return std::min(break1, break2);
 }
 
 

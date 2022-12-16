@@ -133,7 +133,7 @@ int main(int argc, char** argv)
 		srand(ZED::Core::CurrentTimestamp());
 		auto j1 = CreateRandomJudoka(&app.GetDatabase());
 		auto j2 = CreateRandomJudoka(&app.GetDatabase());
-		Judoboard::Match match(nullptr, &j1, &j2, mat->GetMatID());
+		Judoboard::Match match(&j1, &j2, nullptr, mat->GetMatID());
 		//Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, true, true);
 		Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, false, false);
 		Judoboard::AgeGroup age_group("U18", 15, 18, &rules, app.GetDatabase());
@@ -327,7 +327,7 @@ int main(int argc, char** argv)
 #endif
 #endif
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 	if (app.GetDatabase().GetNumJudoka() < 5)
 	{
 		auto inter = new Judoboard::Association("International", nullptr);
@@ -369,7 +369,7 @@ int main(int argc, char** argv)
 
 		app.GetDatabase().Save();
 	}
-//#endif
+#endif
 
 	ZED::Log::Info("Application has started");
 	app.Run();

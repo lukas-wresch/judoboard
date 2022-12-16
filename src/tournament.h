@@ -33,15 +33,13 @@ namespace Judoboard
 		~Tournament();
 
 		void Reset();
-		[[deprecated]]
-		void ConnectToDatabase(Database& db);//Replaces all local references to judoka with reference to the database (as long as the tournament is not finalized)
 
 		[[nodiscard]]
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
 		const auto& GetSchedule() const { return m_Schedule; }
 		Match* FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
-		const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
+		virtual const StandingData& GetDatabase() const override { return m_StandingData; }//Returns a database containing all participants
 		void SetYear(uint32_t NewYear) { m_StandingData.SetYear(NewYear); }
 
 		void SetName(const std::string& NewName) { m_Name = NewName; }
@@ -68,9 +66,9 @@ namespace Judoboard
 		Match* GetNextMatch(int32_t MatID = -1) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 		const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 
-		bool RemoveMatch(const UUID& MatchID);
-		bool MoveMatchUp(const UUID&  MatchID);
-		bool MoveMatchDown(const UUID&  MatchID);
+		virtual bool RemoveMatch(const UUID& MatchID) override;
+		virtual bool MoveMatchUp(const UUID&  MatchID, uint32_t MatID = 0) override;
+		virtual bool MoveMatchDown(const UUID&  MatchID, uint32_t MatID = 0) override;
 
 		std::vector<Match> GetNextMatches(uint32_t MatID) const;
 
@@ -154,14 +152,14 @@ namespace Judoboard
 
 		void GenerateSchedule();
 
-		bool Save() const {
+		bool Save() {
 			if (!m_AutoSave) return true;
 			return SaveYAML("tournaments/" + m_Name + ".yml");
 		}
 
 	private:
 		bool LoadYAML(const std::string& Filename);
-		bool SaveYAML(const std::string& Filename) const;
+		bool SaveYAML(const std::string& Filename);
 
 		void FindAgeGroupForJudoka(const Judoka& Judoka);
 

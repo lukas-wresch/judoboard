@@ -161,7 +161,7 @@ TEST(MD5, ReadTestData)
 	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-54 kg", 2)->Participant->Firstname, "Justin");
 	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-54 kg", 3)->Participant->Firstname, "Vakhtang");
 	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-54 kg", 4)->Participant->Firstname, "Vincenzo");
-	ASSERT_FALSE(file.FindResult(u8"\u00e4änner u18", "-54 kg", 5));
+	ASSERT_FALSE(file.FindResult(u8"\u00e4Ã¤nner u18", "-54 kg", 5));
 
 	ASSERT_TRUE( file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 1));
 	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 1)->Participant->Firstname, "Jason");
@@ -299,7 +299,7 @@ TEST(MD5, CreateTournamentFromTestData)
 	Tournament tour(file);
 
 	EXPECT_EQ(tour.GetDatabase().GetNumJudoka(), 142);
-	EXPECT_EQ(tour.GetDatabase().GetNumClubs(),   20);
+	EXPECT_EQ(tour.GetDatabase().GetNumClubs(),   19);
 }
 
 
@@ -1294,7 +1294,7 @@ TEST(MD5, ConvertToMD5)
 		ASSERT_TRUE(file1.GetOrganizer());
 		EXPECT_EQ(file.GetOrganizer()->Description, file1.GetOrganizer()->Description);
 
-		EXPECT_EQ(file.GetClubs().size(), 20);
+		EXPECT_EQ(file.GetClubs().size(), 19);
 		EXPECT_EQ(file.GetParticipants().size(), 142);
 
 		ASSERT_TRUE(file1.FindResult("Jugend u10 w", "-20,7 kg", 1));
@@ -1442,7 +1442,7 @@ TEST(MD5, ConvertToMD5)
 		EXPECT_EQ(file.FindResult(u8"M\u00e4nner u18", "-54 kg", 2)->Participant->Firstname, "Justin");
 		EXPECT_EQ(file.FindResult(u8"M\u00e4nner u18", "-54 kg", 3)->Participant->Firstname, "Vakhtang");
 		EXPECT_EQ(file.FindResult(u8"M\u00e4nner u18", "-54 kg", 4)->Participant->Firstname, "Vincenzo");
-		ASSERT_FALSE(file.FindResult(u8"\u00e4änner u18", "-54 kg", 5));
+		ASSERT_FALSE(file.FindResult(u8"\u00e4Ã¤nner u18", "-54 kg", 5));
 
 		ASSERT_TRUE(file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 1));
 		EXPECT_EQ(file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 1)->Participant->Firstname, "Jason");
@@ -2216,7 +2216,7 @@ TEST(MD5, ExportCompletedTournament)
 	tour.Save();
 	file.Save("demo-file.md5");
 
-	MD5 file_cmp("demo-file-fixed.md5");
+	//MD5 file_cmp("demo-file-fixed.md5");
 
 	ASSERT_TRUE(file.GetOrganizer());
 	auto organizer = file.GetOrganizer();
@@ -2439,7 +2439,7 @@ TEST(MD5, ExportSingleElimination16)
 
 	for (int i = 1; i <= 16; ++i)
 	{
-		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i, Judoboard::Gender::Male);
 		j[i]->SetBirthyear(2000);
 		j[i]->SetClub(clubs[rand()%3]);
 		t->AddParticipant(j[i]);

@@ -114,6 +114,11 @@ namespace ZED
 			New.data = nullptr;
 		}*/
 
+		void Reset(T* NewReference = nullptr)\
+		{
+			data = NewReference;
+		}
+
 		void operator =(Ref<T>&& New) noexcept
 		{
 			if (this != &New)
@@ -271,7 +276,7 @@ namespace ZED
 	private:
 		DLLEXPORT static Renderer* s_pInstance;
 
-		mutable std::mutex m_mutex;
+		mutable std::recursive_mutex m_mutex;
 	};
 
 

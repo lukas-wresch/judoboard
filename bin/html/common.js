@@ -1,7 +1,9 @@
 var lang_en = {
     age_group: "Age group",
     age_groups: "Age groups",
+    break_time: "Break Time",
     club: "Club",
+    description: "Description",
     name: "Name",
     username: "Username",
     password: "Password",
@@ -10,6 +12,8 @@ var lang_en = {
     moderator: "Moderator",
     admin: "Admin",
     schedule: "Schedule",
+    matchtable: "Match Table",
+    matchtables: "Match Tables",
     match_tables: "Match Tables",
     add: "Add",
     add_match: "Add Match",
@@ -17,8 +21,6 @@ var lang_en = {
     generate_matchtables: "Generate Match Tables",
     update_matchtable: "Update Match Table",
     delete_matchtable: "Delete Match Table",
-    matchtable: "Match Table",
-    matchtables: "Match Tables",
     new_club: "New Club",
     new_match: "New Match",
     num_matches: "#Matches",
@@ -94,7 +96,7 @@ var lang_en = {
     no_disqualification: "No Disqualification",
     osaekomi_time_ippon:   "Osaekomi Time (Ippon)",
     osaekomi_time_wazaari: "Osaekomi Time (Waza-Ari)",
-    break_time: "Break Time",
+    push_up: "Push Up",
     start_next_match: "Start Next Match",
     end_match: "End Match",
     more: "More",
@@ -120,7 +122,9 @@ var lang_en = {
 var lang_de = {
     age_group: "Altersklasse",
     age_groups: "Altersklassen",
+    break_time: "Ruhepause",
     club: "Verein",
+    description: "Beschreibung",
     name: "Name",
     username: "Benutzername",
     password: "Passwort",
@@ -214,7 +218,7 @@ var lang_de = {
     no_disqualification: "Nicht disqualifiziert",
     osaekomi_time_ippon:   "Osaekomi Zeit (Ippon)",
     osaekomi_time_wazaari: "Osaekomi Zeit (Waza-Ari)",
-    break_time: "Ruhepause",
+    push_up: "Vorziehen",
     start_next_match: "Kampf starten",
     end_match: "Kampf beenden",
     more: "Mehr",
@@ -517,9 +521,9 @@ function GetAgeGroups(callback)
 
 
 
-function GetClubs(callback)
+function GetClubs(callback, query = "")
 {
-  AjaxCallback("ajax/club/list", function(response) {
+  AjaxCallback("ajax/club/list?" + query, function(response) {
     console.log(response);
     var res = YAML.parse(response);
 

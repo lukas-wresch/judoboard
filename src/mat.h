@@ -48,8 +48,8 @@ namespace Judoboard
 		bool IsIppon() const { return GetScoreboard(Fighter::White).m_Ippon >= 1 || GetScoreboard(Fighter::Blue).m_Ippon >= 1; }
 		bool IsHajime() const override { return m_HajimeTimer.IsRunning(); }
 		bool IsOsaekomiRunning() const override { return m_OsaekomiTimer[0].IsRunning() || m_OsaekomiTimer[1].IsRunning(); }//Returns true during an osaekomi situation
-		bool IsOsaekomi() const override { return IsOsaekomiRunning() || m_OsaekomiTimer[0].GetElapsedTime() > 0 || m_OsaekomiTimer[1].GetElapsedTime() > 0; }//Returns true during an osaekomi situation (even during yoshi!)
-		Fighter GetOsaekomiHolder() const { if (m_OsaekomiTimer[(int)Fighter::White].GetElapsedTime() > 0) return Fighter::White; return Fighter::Blue; }
+		bool IsOsaekomi() const override { return m_IsOsaekomi; }//Returns true during an osaekomi situation (even during sonomama!)
+		Fighter GetOsaekomiHolder() const { return m_OsaekomiHolder; }
 		bool CanNextMatchStart() const override { return m_State == State::Waiting; }
 		bool IsDoingAnimation() const { return m_State == State::TransitionToMatch || m_State == State::TransitionToWaiting; }
 		bool AreFightersOnMat() const override { return m_State == State::TransitionToMatch || m_State == State::Running; }
@@ -109,8 +109,7 @@ namespace Judoboard
 		virtual void Tokeda() override;
 
 		//Serialization
-		ZED::CSV Scoreboard2String() const override;
-		ZED::CSV Osaekomi2String(Fighter Who) const override;
+		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 		virtual const Scoreboard& GetScoreboard(Fighter Whom) const override
 		{
@@ -124,6 +123,13 @@ namespace Judoboard
 		{
 			m_Window.Fullscreen(Enabled);
 			IMat::SetIsFullscreen(Enabled);
+		}
+
+		virtual void SetName(const std::string& NewName) override
+		{
+			m_mutex.lock();
+			IMat::SetName(NewName);
+			m_mutex.unlock();
 		}
 
 
@@ -149,31 +155,61 @@ namespace Judoboard
 
 		struct GraphicElement;
 
-		struct Animation
+		class Animation
 		{
+		public:
 			enum class Type
 			{
-				MoveConstantVelocity
+				MoveConstantVelocity,
+				ScaleSinus
 			};
 
-			Animation(double vx, double vy, double va = 0.0f, std::function<bool(const GraphicElement&)> AnimateTill = nullptr) : m_AnimateTill(AnimateTill)
+			static Animation CreateLinear(double vx, double vy, double va = 0.0f, std::function<bool(const GraphicElement&)> AnimateTill = nullptr)
 			{
-				m_Type = Type::MoveConstantVelocity;
-				m_vx = vx;
-				m_vy = vy;
-				m_va = va;
+				Animation ret;
+				ret.m_Type = Type::MoveConstantVelocity;
+				ret.m_AnimateTill = AnimateTill;
+				ret.m_vx = vx;
+				ret.m_vy = vy;
+				ret.m_va = va;
+				return ret;
 			}
 
-			bool Process(GraphicElement& Graphic, double dt);
+			static Animation CreateScaleSinus(double Amplitude, double Frequency, double BaseSize = 1.0, std::function<bool(const GraphicElement&)> AnimateTill = nullptr)
+			{
+				Animation ret;
+				ret.m_Type = Type::ScaleSinus;
+				ret.m_AnimateTill = AnimateTill;
+				ret.m_Amplitude = Amplitude;
+				ret.m_Frequency = Frequency;
+				ret.m_BaseSize  = BaseSize;
+				return ret;
+			}
 
-			Type m_Type;
+			bool Process(GraphicElement& Graphic, double dt);//Returns true when the animation ends
+
+			bool IsRunInParallel() const { return m_RunInParallelToNextAnimation; }
+			void RunInParallel(bool Enable = true) { m_RunInParallelToNextAnimation = Enable; }
+
+		private:
+			Animation() = default;
+
+			Type m_Type = Type::MoveConstantVelocity;
 			std::function<bool(const GraphicElement&)> m_AnimateTill;
 			std::function<void(Mat&)> m_onEnd = nullptr;//Will be executed when the animation ends
 
-			uint32_t m_sx = 0, m_sy = 0;
-			uint32_t m_ex = 0, m_ey = 0;
+			bool m_RunInParallelToNextAnimation = false;//If true the next animation will be executed at the same time
 
-			double m_vx, m_vy, m_va;
+			union
+			{
+				struct {//For linear move animation
+					double m_vx, m_vy, m_va;
+				};
+
+				struct {//For scale animation
+					double m_Amplitude, m_Frequency, m_BaseSize;
+				};
+			};
 		};
 
 
@@ -181,6 +217,11 @@ namespace Judoboard
 		{
 			GraphicElement() = default;
 			//GraphicElement(ZED::Texture* Tex) : m_Texture(Tex) {}
+
+			void Reset()
+			{
+				m_Texture.Reset();
+			}
 
 			void Clear()
 			{
@@ -212,9 +253,18 @@ namespace Judoboard
 
 			void Render(const ZED::Renderer& Renderer, double dt)
 			{
-				if (m_Animations.size() > 0)
-					if (m_Animations.front().Process(*this, dt))
-						m_Animations.erase(m_Animations.begin());
+				for (size_t i = 0; i < m_Animations.size(); ++i)
+				{
+					if (m_Animations[i].Process(*this, dt))
+					{
+						//Animation has finished
+						m_Animations.erase(m_Animations.begin() + i);
+						i--;
+					}
+
+					else if (!m_Animations[i].IsRunInParallel())//Run next animations as well?
+						break;
+				}
 
 				if (m_CustomRenderRoutine)
 					m_CustomRenderRoutine(Renderer);
@@ -241,11 +291,11 @@ namespace Judoboard
 						m_Texture->SetAlpha((unsigned char)m_a);
 
 					if (m_Aligment == Aligment::Left)
-						Renderer.RenderTransformed(*m_Texture.data, (int)m_x, (int)m_y);
+						Renderer.RenderTransformed(m_Texture, (int)m_x, (int)m_y);
 					else if (m_Aligment == Aligment::Center)
-						Renderer.RenderTransformed(*m_Texture.data, (int)m_x - m_Texture->GetWidth()/2, (int)m_y-m_Texture->GetHeight()/2);
+						Renderer.RenderTransformed(m_Texture, (int)m_x - (int)(m_Texture->GetWidth()*m_Texture->GetSizeX()/2.0f), (int)m_y - (int)(m_Texture->GetHeight()*m_Texture->GetSizeY()/2.0f));
 					else if (m_Aligment == Aligment::Right)
-						Renderer.RenderTransformed(*m_Texture.data, (int)m_x - m_Texture->GetWidth(), (int)m_y);
+						Renderer.RenderTransformed(m_Texture, (int)m_x - (int)(m_Texture->GetWidth()*m_Texture->GetSizeX()), (int)m_y);
 				}
 			}
 
@@ -261,6 +311,12 @@ namespace Judoboard
 			{
 				m_x = X;
 				m_y = Y;
+				return *this;
+			}
+
+			GraphicElement& SetTexture(ZED::Texture* NewTexture)
+			{
+				m_Texture = NewTexture;
 				return *this;
 			}
 
@@ -300,11 +356,15 @@ namespace Judoboard
 				return *this;
 			}
 
+			auto& GetAnimations() { return m_Animations; }
+
 			ZED::Texture* operator->() { return m_Texture; }
 			const ZED::Texture* operator->() const { return m_Texture; }
-			operator ZED::Texture* () { return m_Texture; }
+			//operator ZED::Texture* () { return m_Texture; }
+			operator bool () { return m_Texture && m_Texture->IsLoaded(); }
 
 			ZED::Ref<ZED::Texture> m_Texture;
+			//ZED::Texture* m_Texture = nullptr;
 
 			ZED::FontSize m_Size = ZED::FontSize::Huge;
 			std::string m_Name;
@@ -323,13 +383,6 @@ namespace Judoboard
 			} m_Aligment = Aligment::Left;
 		};
 
-
-		void SetName(const std::string& NewName) override
-		{
-			m_mutex.lock();
-			IMat::SetName(NewName);
-			m_mutex.unlock();
-		}
 
 		//Processing
 		void Process();
@@ -361,6 +414,8 @@ namespace Judoboard
 		Timer m_HajimeTimer;
 		Timer m_OsaekomiTimer[2];
 		std::vector<OsaekomiEntry> m_OsaekomiList;
+		bool m_IsOsaekomi = false;
+		Fighter m_OsaekomiHolder = Fighter::White;
 
 		bool m_GoldenScore = false;
 		bool m_IsDraw = false;
@@ -374,13 +429,14 @@ namespace Judoboard
 		uint32_t m_LastFrameTime = 40;
 
 		std::thread m_Thread;//Thread for running the main loop
-		mutable std::mutex m_mutex;
+		mutable std::recursive_mutex m_mutex;
 
 		//Graphics
 		mutable std::unordered_map<std::string, GraphicElement> m_Graphics;
 
 		mutable ZED::Ref<ZED::Texture> m_Background;
 		mutable ZED::Ref<ZED::Texture> m_Logo;
+		mutable ZED::Ref<ZED::Texture> m_Winner;
 
 		double m_ScalingFactor = 1.0;//Should be 1.0 for 1080p screen, smaller for smaller screen and > 1.0 for larger screens
 	};
