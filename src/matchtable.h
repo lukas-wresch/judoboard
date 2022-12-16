@@ -313,6 +313,7 @@ namespace Judoboard
 		const std::vector<const Judoka*> GetParticipants() const;
 
 		const IFilter* GetFilter() const { return m_Filter; }
+		IFilter* GetFilter() { return m_Filter; }
 		const ITournament* GetTournament() const { return m_Tournament; }
 
 		//Rule sets

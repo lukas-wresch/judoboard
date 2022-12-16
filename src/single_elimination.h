@@ -21,13 +21,13 @@ namespace Judoboard
 			m_ThirdPlaceMatch = rhs.m_ThirdPlaceMatch;
 			m_FifthPlaceMatch = rhs.m_FifthPlaceMatch;
 			SetRuleSet(rhs.GetOwnRuleSet());
-			/*SetName(rhs.GetName());
+			SetName(rhs.GetName());
 			SetFilter(rhs.GetFilter());
 			SetTournament(rhs.GetTournament());
 			SetScheduleIndex(rhs.GetScheduleIndex());
-			SetMatID(rhs.GeMatID());
+			SetMatID(rhs.GetMatID());
 			SetColor(rhs.GetColor());
-			IsBestOfThree(rhs.IsBestOfThree());*/
+			IsBestOfThree(rhs.IsBestOfThree());
 			SetSchedule() = std::move(rhs.SetSchedule());
 		}
 
