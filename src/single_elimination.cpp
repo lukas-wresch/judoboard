@@ -17,6 +17,7 @@ SingleElimination::SingleElimination(IFilter* Filter, const ITournament* Tournam
 {
 	if (Filter)
 		SetTournament(Filter->GetTournament());
+	GenerateSchedule();
 }
 
 

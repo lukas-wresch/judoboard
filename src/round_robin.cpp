@@ -16,6 +16,9 @@ using namespace Judoboard;
 RoundRobin::RoundRobin(IFilter* Filter, const ITournament* Tournament)
 	: MatchTable(Filter, Tournament)
 {
+	if (Filter)
+		SetTournament(Filter->GetTournament());
+	GenerateSchedule();
 }
 
 

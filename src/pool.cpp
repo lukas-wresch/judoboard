@@ -136,10 +136,7 @@ void Pool::GenerateSchedule()
 
 	//Distribute participants to pools
 	for (int i = 0; i < pool_count; ++i)
-	{
 		m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
-		m_Pools[i]->GenerateSchedule();
-	}
 
 	//Create filter(s) for final round
 	auto fuser = new Fuser(GetTournament());
@@ -150,7 +147,6 @@ void Pool::GenerateSchedule()
 	}
 
 	m_Finals = SingleElimination(fuser);
-	m_Finals.GenerateSchedule();
 
 	//Add matches from pools
 	size_t index = 0;
