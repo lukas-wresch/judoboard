@@ -126,6 +126,8 @@ bool Mat::Close()
 
 bool Mat::Reset()
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat())
 	{
 		ZED::Log::Warn("Can not reset match, the previous match is still ongoing");
@@ -146,6 +148,8 @@ bool Mat::Reset()
 	m_IsDraw = false;
 
 	m_pMatch = nullptr;
+
+	m_mutex.unlock();
 
 	ZED::Log::Info("Mat got resetted");
 	return true;
@@ -187,14 +191,14 @@ bool Mat::StartMatch(Match* NewMatch)
 		return false;
 	}
 
-	m_mutex.lock();
-
 	if (!Reset())
 	{
 		ZED::Log::Warn("Could not reset mat");
 		m_mutex.unlock();
 		return false;
 	}
+
+	m_mutex.lock();
 
 	m_White = *NewMatch->GetFighter(Fighter::White);
 	m_Blue  = *NewMatch->GetFighter(Fighter::Blue);
@@ -203,9 +207,10 @@ bool Mat::StartMatch(Match* NewMatch)
 
 	NewMatch->StartMatch();
 	AddEvent(MatchLog::NeutralEvent::StartMatch);
-	NextState(State::TransitionToMatch);
 
 	m_mutex.unlock();
+
+	NextState(State::TransitionToMatch);
 
 	ZED::Log::Debug("New match started");
 	return true;
@@ -226,11 +231,12 @@ bool Mat::EndMatch()
 			m_pMatch->EndMatch();
 		}
 		
+		m_mutex.unlock();
+
 		//Reset mat
 		NextState(State::TransitionToWaiting);
 
 		Reset();
-		m_mutex.unlock();
 
 		ZED::Log::Debug("Match ended");
 
@@ -391,7 +397,15 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "winner"               << YAML::Value << (int)GetResult().m_Winner;
 	Yaml << YAML::Key << "is_out_of_time"       << YAML::Value << IsOutOfTime();
 	Yaml << YAML::Key << "no_winner_yet"        << YAML::Value << (GetResult().m_Winner == Winner::Draw);
-	Yaml << YAML::Key << "is_goldenscore"       << YAML::Value << IsGoldenScore();	
+	Yaml << YAML::Key << "is_goldenscore"       << YAML::Value << IsGoldenScore();
+
+	if (m_pMatch)
+	{
+		Yaml << YAML::Key << "yuko_enabled" << m_pMatch->GetRuleSet().IsYukoEnabled();
+		Yaml << YAML::Key << "koka_enabled" << m_pMatch->GetRuleSet().IsKokaEnabled();
+		Yaml << YAML::Key << "golden_score_enabled" << m_pMatch->GetRuleSet().IsGoldenScoreEnabled();
+		Yaml << YAML::Key << "draw_enabled" << m_pMatch->GetRuleSet().IsDrawAllowed();
+	}
 
 	Yaml << YAML::EndMap;
 }
@@ -1155,7 +1169,7 @@ bool Mat::Animation::Process(GraphicElement& Graphic, double dt)
 			return false;
 
 		case Type::ScaleSinus:
-			Graphic->SetSize((float)((m_BaseSize + m_Amplitude * sin(m_Frequency * (double)Timer::GetTimestamp()))) );
+			Graphic->SetSize((float)(m_BaseSize + m_Amplitude * sin(m_Frequency * (double)Timer::GetTimestamp())) );
 			return false;
 	}
 
@@ -1192,6 +1206,7 @@ void Mat::NextState(State NextState) const
 	const int effect_row3 = effect_row2 + (int)(96.0 * m_ScalingFactor);
 
 	auto& renderer = m_Window.GetRenderer();
+	renderer.Lock();
 
 	m_mutex.lock();
 
@@ -1459,6 +1474,8 @@ void Mat::NextState(State NextState) const
 	}
 
 	m_mutex.unlock();
+
+	renderer.Unlock();
 }
 
 

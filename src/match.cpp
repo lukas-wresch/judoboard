@@ -146,7 +146,10 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "breaktime"         << YAML::Value << GetRuleSet().GetBreakTime();
 
 	if (GetFighter(Fighter::White))
+	{
 		Yaml << YAML::Key << "white_name" << YAML::Value << GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+		Yaml << YAML::Key << "white_uuid" << YAML::Value << (std::string)GetFighter(Fighter::White)->GetUUID();
+	}
 	else
 	{
 		Yaml << YAML::Key << "white_dependency_type" << YAML::Value << (int)m_White.m_Dependency;
@@ -155,7 +158,10 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	}
 
 	if (GetFighter(Fighter::Blue))
-		Yaml << YAML::Key << "blue_name"  << YAML::Value << GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+	{
+		Yaml << YAML::Key << "blue_name" << YAML::Value << GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+		Yaml << YAML::Key << "blue_uuid" << YAML::Value << (std::string)GetFighter(Fighter::Blue)->GetUUID();
+	}
 	else
 	{
 		Yaml << YAML::Key << "blue_dependency_type" << YAML::Value << (int)m_Blue.m_Dependency;

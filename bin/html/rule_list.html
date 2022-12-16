@@ -12,7 +12,7 @@
 
 <script>
 
-function GetRuleSets()
+function ListRuleSets()
 {
   AjaxCallback("ajax/rule/list", function(response) {
     console.log(response);
@@ -33,7 +33,6 @@ function GetRuleSets()
       cell1.innerHTML = rule.name;
       cell2.innerHTML = rule.desc;
 
-      //cell3.innerHTML = "<a href=\"#rule_add.html?id="+i/2+"\">Edit Rule Set</a>";
       cell3.innerHTML = "<button class=\"white\" style=\"width: 3.3cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"rule_add.html?id="+rule.uuid+"\");>Edit Rule Set</button>" + "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return DeleteRuleSet("+rule.uuid+")\">" + lang.remove + "</button>";;
     }
   });
@@ -45,7 +44,7 @@ function DeleteRuleSet(id)
   if (confirm(lang.delete_rules_confirm))
   {
     AjaxCallback('ajax/rule/delete?id='+id, function() {
-      GetRuleSets();
+      ListRuleSets();
     });
   }
 
@@ -53,9 +52,10 @@ function DeleteRuleSet(id)
 }
 
 
-GetRuleSets();
+ListRuleSets();
 
 document.getElementById("new_rule_set").innerHTML = lang.new_rule_set;
 document.getElementById("headline").innerHTML     = lang.rule_sets;
+document.getElementById("desc").innerHTML         = lang.description;
 
 </script>

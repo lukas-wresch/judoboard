@@ -1033,15 +1033,12 @@ void Application::SetupHttpServer()
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 			if (id <= 0)
-				return "Invalid id";
+				return Error(Error::Type::InvalidID);
 
 			auto mat = FindMat(id);
 
 			if (mat)
-			{
 				mat->Hantei(fighter);
-				mat->EndMatch();
-			}
 
 			return Error();//OK
 		});
@@ -1059,10 +1056,7 @@ void Application::SetupHttpServer()
 			auto mat = FindMat(id);
 
 			if (mat)
-			{
 				mat->SetAsDraw();
-				mat->EndMatch();
-			}
 
 			return Error();//OK
 		});
@@ -1132,18 +1126,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		auto judoka = m_Database.FindJudoka(id);
-
-		if (judoka)
-		{
-			YAML::Emitter ret;
-			judoka->ToString(ret);
-			return ret.c_str();
-		}
-
-		return std::string();
+		return Ajax_GetJudoka(Request);
 	});
 
 
@@ -1230,7 +1213,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		return Ajax_ListClubs();
+		return Ajax_ListClubs(Request);
 	});
 
 
@@ -2658,13 +2641,44 @@ Error Application::Ajax_AddJudoka(const HttpServer::Request& Request)
 
 
 
+std::string Application::Ajax_GetJudoka(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	LockTillScopeEnd();
+
+	auto judoka = m_Database.FindJudoka(id);
+
+	if (judoka)
+	{
+		YAML::Emitter ret;
+		judoka->ToString(ret);
+		return ret.c_str();
+	}
+
+	//Search for participant
+	if (!GetTournament())
+		return Error(Error::Type::ItemNotFound);
+	
+	judoka = GetTournament()->FindParticipant(id);
+
+	if (!judoka)
+		return Error(Error::Type::ItemNotFound);
+
+	YAML::Emitter ret;
+	judoka->ToString(ret);
+	return ret.c_str() + std::string("\nis_participant: true");
+}
+
+
+
 Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 {
 	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 	auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
-	auto lastname = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
-	auto weight = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
-	Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+	auto lastname  = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
+	auto weight    = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
+	Gender gender  = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 	int  birthyear = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "birthyear"));
 	auto number = HttpServer::DecodeURLEncoded(Request.m_Body, "number");
 	UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");
@@ -2677,7 +2691,16 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 	auto judoka = m_Database.FindJudoka(id);
 
 	if (!judoka)
-		return Error::Type::ItemNotFound;
+	{
+		//Search for participant
+		if (!GetTournament())
+			return Error(Error::Type::ItemNotFound);
+
+		judoka = GetTournament()->FindParticipant(id);
+
+		if (!judoka)
+			return Error(Error::Type::ItemNotFound);
+	}
 
 	judoka->SetFirstname(firstname);
 	judoka->SetLastname(lastname);
@@ -2693,8 +2716,10 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 	if (GetDatabase().FindClub(clubID))
 		judoka->SetClub(GetDatabase().FindClub(clubID));
 	else
-		judoka->SetClub(nullptr);
-
+	{
+		auto tour = (Tournament*)GetTournament();//TODO could be remote tournament
+		judoka->SetClub(tour->GetDatabase().FindClub(clubID));
+	}
 
 	return Error();//OK
 }
@@ -2746,18 +2771,27 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 
 std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
 {
-	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	UUID id  = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
 	LockTillScopeEnd();
 
-	auto club = m_Database.FindAssociation(id);
+	const Association* club = m_Database.FindAssociation(id);
 
 	if (!club)
 	{
 		club = m_Database.FindClub(id);
 
 		if (!club)
-			return Error(Error::Type::ItemNotFound);
+		{
+			auto tour = (Tournament*)GetTournament();//TODO: could be remote tournament
+			club = tour->GetDatabase().FindAssociation(id);
+
+			if (!club)
+				club = tour->GetDatabase().FindClub(id);
+
+			if (!club)
+				return Error(Error::Type::ItemNotFound);
+		}
 	}
 
 	YAML::Emitter ret;
@@ -2839,12 +2873,27 @@ Error Application::Ajax_DeleteClub(const HttpServer::Request& Request)
 
 
 
-std::string Application::Ajax_ListClubs()
+std::string Application::Ajax_ListClubs(const HttpServer::Request& Request)
 {
+	bool all = HttpServer::DecodeURLEncoded(Request.m_Query, "all") == "true";
+
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
 
 	LockTillScopeEnd();
+
+	if (all && GetTournament())
+	{
+		Tournament* tour = (Tournament*)GetTournament();//TODO: could be remote tournament
+
+		tour->Lock();
+		for (auto club : tour->GetDatabase().GetAllClubs())
+		{
+			if (club)
+				*club >> ret;
+		}
+		tour->Unlock();
+	}
 
 	for (auto club : m_Database.GetAllClubs())
 	{
