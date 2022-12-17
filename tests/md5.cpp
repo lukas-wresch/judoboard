@@ -161,7 +161,7 @@ TEST(MD5, ReadTestData)
 	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-54 kg", 2)->Participant->Firstname, "Justin");
 	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-54 kg", 3)->Participant->Firstname, "Vakhtang");
 	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-54 kg", 4)->Participant->Firstname, "Vincenzo");
-	ASSERT_FALSE(file.FindResult(u8"\u00e4änner u18", "-54 kg", 5));
+	ASSERT_FALSE(file.FindResult(u8"\u00e4Ã¤nner u18", "-54 kg", 5));
 
 	ASSERT_TRUE( file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 1));
 	EXPECT_EQ(   file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 1)->Participant->Firstname, "Jason");
@@ -1442,7 +1442,7 @@ TEST(MD5, ConvertToMD5)
 		EXPECT_EQ(file.FindResult(u8"M\u00e4nner u18", "-54 kg", 2)->Participant->Firstname, "Justin");
 		EXPECT_EQ(file.FindResult(u8"M\u00e4nner u18", "-54 kg", 3)->Participant->Firstname, "Vakhtang");
 		EXPECT_EQ(file.FindResult(u8"M\u00e4nner u18", "-54 kg", 4)->Participant->Firstname, "Vincenzo");
-		ASSERT_FALSE(file.FindResult(u8"\u00e4änner u18", "-54 kg", 5));
+		ASSERT_FALSE(file.FindResult(u8"\u00e4Ã¤nner u18", "-54 kg", 5));
 
 		ASSERT_TRUE(file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 1));
 		EXPECT_EQ(file.FindResult(u8"M\u00e4nner u18", "-65,5 kg", 1)->Participant->Firstname, "Jason");
@@ -2395,11 +2395,12 @@ TEST(MD5, ImportSingleElimination)
 
 
 
-TEST(MD5, ExportSingleElimination)
+TEST(MD5, ExportSingleElimination16)
 {
 	initialize();
 
-	Tournament* t = new Tournament("Tournament Name");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
 	t->EnableAutoSave(false);
 
 	auto inter = new Judoboard::Association("International", nullptr);
@@ -2445,19 +2446,21 @@ TEST(MD5, ExportSingleElimination)
 		t->AddParticipant(j[i]);
 	}
 
-	SingleElimination group(0, 200);
-	group.SetMatID(1);
-	group.SetAgeGroup(age);
-	t->AddMatchTable(&group);
+	SingleElimination* group = new SingleElimination(0, 200);
+	group->SetMatID(1);
+	group->SetAgeGroup(age);
+	t->AddMatchTable(group);
 
 	for (int i = 1; i <= 16; ++i)
-		group.SetStartingPosition(j[i], i-1);
+		group->SetStartingPosition(j[i], i-1);
 
-	ASSERT_EQ(group.GetParticipants().size(), 16);
+	t->GenerateSchedule();
+
+	ASSERT_EQ(group->GetParticipants().size(), 16);
 
 	Mat m(1);
 
-	for (auto match : group.GetSchedule())
+	for (auto match : group->GetSchedule())
 	{
 		if (!match->HasValidFighters())
 			continue;
@@ -2470,7 +2473,7 @@ TEST(MD5, ExportSingleElimination)
 		EXPECT_TRUE(m.EndMatch());
 	}
 
-	auto results = group.CalculateResults();
+	auto results = group->CalculateResults();
 
 	ASSERT_EQ(results.size(), 2);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[16]->GetUUID());
@@ -2481,15 +2484,246 @@ TEST(MD5, ExportSingleElimination)
 	ASSERT_EQ(file.GetWeightclasses().size(), 1);
 	auto& table = file.GetWeightclasses()[0];
 
-	auto results2 = file.FindResults(table->AgeGroupID, table->ID);
+	const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
 	ASSERT_EQ(results2.size(), 2);
 
 	EXPECT_EQ(results2[0]->RankNo, 1);
 	EXPECT_EQ(results2[0]->Participant->Firstname, j[16]->GetFirstname());
 
-	//EXPECT_EQ(file.GetMatches()[0].MatchNo, 1);
-	//EXPECT_EQ(file.GetMatches()[1].MatchNo, 2);
+	ASSERT_EQ(file.GetMatches().size(), 15);
+
+	EXPECT_EQ(file.GetMatches()[0].MatchNo, 1);
+	EXPECT_EQ(file.GetMatches()[1].MatchNo, 2);
+	EXPECT_EQ(file.GetMatches()[12].MatchNo, 13);
+	EXPECT_EQ(file.GetMatches()[13].MatchNo, 14);
+	EXPECT_EQ(file.GetMatches()[14].MatchNo, 19);
 
 	//MD5 file2("test-data/single-elimination(single-consulation-bracket).md5");
 	file.Save("output.md5");
+
+	delete t;
+}
+
+
+
+TEST(MD5, ExportSingleElimination16_3rd_5th)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
+	t->EnableAutoSave(false);
+
+	auto inter = new Judoboard::Association("International", nullptr);
+
+	auto de = new Judoboard::Association("Deutschland", inter);
+
+	auto dn = new Judoboard::Association("Deutschland-Nord", de);
+	auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+
+	auto nord  = new Judoboard::Association("Nord", dn);
+	auto west  = new Judoboard::Association("West", dn);
+	auto nost  = new Judoboard::Association("Nordost", dn);
+	auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
+	auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+
+	auto nieder  = new Judoboard::Association("Niedersachsen", nord);
+	auto hamburg = new Judoboard::Association("Hamburg", nord);
+	auto berlin  = new Judoboard::Association("Berlin", nost);
+	auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+	auto detmold = new Judoboard::Association("Detmold", nrw);
+
+	auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+
+	t->SetOrganizer(biegue);
+
+	std::vector<Club*> clubs;
+	clubs.push_back(new Judoboard::Club("Altenhagen", biegue));
+	clubs.push_back(new Judoboard::Club("Brackwede", biegue));
+	clubs.push_back(new Judoboard::Club("Senne", biegue));
+
+
+	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr, t->GetDatabase());
+	t->AddAgeGroup(age);
+
+	Judoka* j[17];
+
+	for (int i = 1; i <= 16; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		j[i]->SetBirthyear(2000);
+		j[i]->SetClub(clubs[rand()%3]);
+		t->AddParticipant(j[i]);
+	}
+
+	SingleElimination* group = new SingleElimination(0, 200);
+	group->SetMatID(1);
+	group->SetAgeGroup(age);
+	group->IsThirdPlaceMatch(true);
+	group->IsFifthPlaceMatch(true);
+	t->AddMatchTable(group);
+
+	for (int i = 1; i <= 16; ++i)
+		group->SetStartingPosition(j[i], i-1);
+
+	t->GenerateSchedule();
+
+	ASSERT_EQ(group->GetParticipants().size(), 16);
+
+	Mat m(1);
+
+	for (auto match : group->GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = group->CalculateResults();
+
+	ASSERT_EQ(results.size(), 6);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[16]->GetUUID());
+
+
+	MD5 file(*t);
+
+	ASSERT_EQ(file.GetWeightclasses().size(), 1);
+	auto& table = file.GetWeightclasses()[0];
+
+	const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+	ASSERT_EQ(results2.size(), 6);
+
+	EXPECT_EQ(results2[0]->RankNo, 1);
+	EXPECT_EQ(results2[0]->Participant->Firstname, j[16]->GetFirstname());
+
+	ASSERT_EQ(file.GetMatches().size(), 15 + 4);
+
+	EXPECT_EQ(file.GetMatches()[0].MatchNo, 1);
+	EXPECT_EQ(file.GetMatches()[1].MatchNo, 2);
+	EXPECT_EQ(file.GetMatches()[14 + 2].MatchNo, 21);
+	EXPECT_EQ(file.GetMatches()[14 + 3].MatchNo, 20);
+	EXPECT_EQ(file.GetMatches()[14 + 4].MatchNo, 19);
+
+	//MD5 file2("test-data/single-elimination(single-consulation-bracket).md5");
+	file.Save("output.md5");
+
+	delete t;
+}
+
+
+
+TEST(MD5, ExportSingleElimination32)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
+	t->EnableAutoSave(false);
+
+	auto inter = new Judoboard::Association("International", nullptr);
+
+	auto de = new Judoboard::Association("Deutschland", inter);
+
+	auto dn = new Judoboard::Association("Deutschland-Nord", de);
+	auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+
+	auto nord  = new Judoboard::Association("Nord", dn);
+	auto west  = new Judoboard::Association("West", dn);
+	auto nost  = new Judoboard::Association("Nordost", dn);
+	auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
+	auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+
+	auto nieder  = new Judoboard::Association("Niedersachsen", nord);
+	auto hamburg = new Judoboard::Association("Hamburg", nord);
+	auto berlin  = new Judoboard::Association("Berlin", nost);
+	auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+	auto detmold = new Judoboard::Association("Detmold", nrw);
+
+	auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+
+	t->SetOrganizer(biegue);
+
+	std::vector<Club*> clubs;
+	clubs.push_back(new Judoboard::Club("Altenhagen", biegue));
+	clubs.push_back(new Judoboard::Club("Brackwede", biegue));
+	clubs.push_back(new Judoboard::Club("Senne", biegue));
+
+
+	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr, t->GetDatabase());
+	t->AddAgeGroup(age);
+
+	Judoka* j[33];
+
+	for (int i = 1; i <= 32; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		j[i]->SetBirthyear(2000);
+		j[i]->SetClub(clubs[rand()%3]);
+		t->AddParticipant(j[i]);
+	}
+
+	SingleElimination* group = new SingleElimination(0, 200);
+	group->SetMatID(1);
+	group->SetAgeGroup(age);
+	t->AddMatchTable(group);
+
+	for (int i = 1; i <= 32; ++i)
+		group->SetStartingPosition(j[i], i-1);
+
+	t->GenerateSchedule();
+
+	ASSERT_EQ(group->GetParticipants().size(), 32);
+
+	Mat m(1);
+
+	for (auto match : group->GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = group->CalculateResults();
+
+	ASSERT_EQ(results.size(), 2);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[32]->GetUUID());
+
+
+	MD5 file(*t);
+
+	ASSERT_EQ(file.GetWeightclasses().size(), 1);
+	auto& table = file.GetWeightclasses()[0];
+
+	const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+	ASSERT_EQ(results2.size(), 2);
+
+	EXPECT_EQ(results2[0]->RankNo, 1);
+	EXPECT_EQ(results2[0]->Participant->Firstname, j[32]->GetFirstname());
+
+	ASSERT_EQ(file.GetMatches().size(), 31);
+
+	EXPECT_EQ(file.GetMatches()[0].MatchNo, 1);
+	EXPECT_EQ(file.GetMatches()[1].MatchNo, 2);
+	EXPECT_EQ(file.GetMatches()[12].MatchNo, 13);
+	EXPECT_EQ(file.GetMatches()[13].MatchNo, 14);
+	EXPECT_EQ(file.GetMatches()[30].MatchNo, 37);
+
+	//MD5 file2("test-data/single-elimination(single-consulation-bracket).md5");
+	file.Save("output.md5");
+
+	delete t;
 }
