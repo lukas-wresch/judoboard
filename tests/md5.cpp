@@ -2454,6 +2454,8 @@ TEST(MD5, ExportSingleElimination16)
 	for (int i = 1; i <= 16; ++i)
 		group->SetStartingPosition(j[i], i-1);
 
+	t->GenerateSchedule();
+
 	ASSERT_EQ(group->GetParticipants().size(), 16);
 
 	Mat m(1);
@@ -2565,6 +2567,8 @@ TEST(MD5, ExportSingleElimination16_3rd_5th)
 	for (int i = 1; i <= 16; ++i)
 		group->SetStartingPosition(j[i], i-1);
 
+	t->GenerateSchedule();
+
 	ASSERT_EQ(group->GetParticipants().size(), 16);
 
 	Mat m(1);
@@ -2673,6 +2677,8 @@ TEST(MD5, ExportSingleElimination32)
 
 	for (int i = 1; i <= 32; ++i)
 		group->SetStartingPosition(j[i], i-1);
+
+	t->GenerateSchedule();
 
 	ASSERT_EQ(group->GetParticipants().size(), 32);
 
