@@ -2399,7 +2399,8 @@ TEST(MD5, ExportSingleElimination16)
 {
 	initialize();
 
-	Tournament* t = new Tournament("Tournament Name");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
 	t->EnableAutoSave(false);
 
 	auto inter = new Judoboard::Association("International", nullptr);
@@ -2507,7 +2508,8 @@ TEST(MD5, ExportSingleElimination16_3rd_5th)
 {
 	initialize();
 
-	Tournament* t = new Tournament("Tournament Name");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
 	t->EnableAutoSave(false);
 
 	auto inter = new Judoboard::Association("International", nullptr);
@@ -2617,7 +2619,8 @@ TEST(MD5, ExportSingleElimination32)
 {
 	initialize();
 
-	Tournament* t = new Tournament("Tournament Name");
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
 	t->EnableAutoSave(false);
 
 	auto inter = new Judoboard::Association("International", nullptr);
