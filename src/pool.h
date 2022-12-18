@@ -28,7 +28,7 @@ namespace Judoboard
 
 		virtual size_t GetMaxStartPositions() const override;
 
-		virtual Results CalculateResults() const override {Results ret; return ret;};//DUMMY
+		virtual Results CalculateResults() const override { return m_Finals.CalculateResults(); }
 		virtual void GenerateSchedule() override;
 
 		bool IsThirdPlaceMatch() const { return m_Finals.IsThirdPlaceMatch(); }

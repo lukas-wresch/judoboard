@@ -8,6 +8,7 @@
 #include "customtable.h"
 #include "round_robin.h"
 #include "single_elimination.h"
+#include "pool.h"
 #include "weightclass_generator.h"
 #include "md5.h"
 #define YAML_CPP_STATIC_DEFINE
@@ -291,6 +292,9 @@ bool Tournament::LoadYAML(const std::string& Filename)
 				break;
 			case MatchTable::Type::SingleElimination:
 				new_table = new SingleElimination(node, this);
+				break;
+			case MatchTable::Type::Pool:
+				new_table = new Pool(node, this);
 				break;
 			}
 

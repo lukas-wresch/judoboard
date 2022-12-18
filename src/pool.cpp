@@ -183,13 +183,12 @@ const std::string Pool::ToHTML() const
 
 	ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 
-	ret += "<table border='1' rules='all'>";
+	for (auto pool : m_Pools)
+		ret += pool->ToHTML();
 
-	//TODO
+	ret += m_Finals.ToHTML();
 
-	ret += "</table>";
-
-	ret += ResultsToHTML();	
+	//ret += ResultsToHTML();	
 
 	return ret;
 }

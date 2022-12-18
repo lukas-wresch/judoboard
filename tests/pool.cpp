@@ -7,13 +7,14 @@ TEST(Pool, Count6)
 	initialize();
 
 	Judoka j1(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
-	Judoka j2(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
-	Judoka j3(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
-	Judoka j4(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
-	Judoka j5(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
-	Judoka j6(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
+	Judoka j2(GetFakeFirstname(), GetFakeLastname(), 51, Gender::Male);
+	Judoka j3(GetFakeFirstname(), GetFakeLastname(), 52, Gender::Male);
+	Judoka j4(GetFakeFirstname(), GetFakeLastname(), 53, Gender::Male);
+	Judoka j5(GetFakeFirstname(), GetFakeLastname(), 54, Gender::Male);
+	Judoka j6(GetFakeFirstname(), GetFakeLastname(), 55, Gender::Male);
 
 	Pool w(Weight(10), Weight(100));
+	w.SetMatID(1);
 
 	EXPECT_TRUE(w.AddParticipant(&j1));
 	EXPECT_TRUE(w.AddParticipant(&j2));
@@ -41,4 +42,25 @@ TEST(Pool, Count6)
 	EXPECT_EQ(*w.GetPool(1)->GetJudokaByStartPosition(2), j6);
 
 	EXPECT_EQ(w.GetSchedule().size(), 3 + 3 + 3);
+
+	Mat m(1);
+
+	for (auto match : w.GetSchedule())
+	{
+		if (match->IsEmptyMatch())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = w.CalculateResults();
+
+	ASSERT_EQ(results.GetSize(), 2);
+	EXPECT_EQ(*results[0].Judoka, j6);
+	EXPECT_EQ(*results[1].Judoka, j5);
 }
