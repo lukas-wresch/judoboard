@@ -9,7 +9,7 @@ using namespace Judoboard;
 
 
 
-Error::operator std::string ()
+Error::operator std::string () const
 {
 	switch (m_Type)
 	{

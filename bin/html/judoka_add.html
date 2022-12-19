@@ -14,7 +14,7 @@
 
 <div>
     <label style="width:200px;float:left;margin-top:4px;" id="label_weight">Weight</label>
-    <input style="margin-bottom:20px;" type="number" id="weight" value="" min="10" max="500" />
+    <input style="margin-bottom:20px;" type="text" id="weight" value="" min="10" max="500" />
 </div>
 
 <div>
@@ -92,10 +92,17 @@ function GetJudoka(id)
     document.getElementById("birthyear").value = res.birthyear;
     document.getElementById("number").value    = res.number;
 
+    var query = "";
+    if (res.is_participant)
+    {
+      document.getElementById("delete").style.display = "none";
+      query = "all=true";
+    }
+
     GetClubs(function(response) {
       if (typeof res.club_uuid != 'undefined')
         document.getElementById("clubs").value = res.club_uuid;
-    });
+    }, query);
   });
 }
 
@@ -127,7 +134,7 @@ function DeleteJudoka()
   if (confirm(lang.delete_judoka_confirm))
   {
     Ajax('ajax/judoka/delete?id='+id);
-    navigate('schedule.html');
+    navigate('judoka_list.html');
   }
 
   return false;
@@ -148,6 +155,7 @@ else
     document.getElementById("headline").innerHTML = lang.new_judoka;
     document.getElementById("update").style.display = "none";
     document.getElementById("delete").style.display = "none";
+    GetClubs();
 }
 
 

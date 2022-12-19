@@ -45,6 +45,47 @@ TEST(Mat, QuickClose)
 
 
 
+TEST(Mat, LoadConfig)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.GetDatabase().SetIpponStyle(Mat::IpponStyle::SpelledOut);
+		app.GetDatabase().SetTimerStyle(Mat::TimerStyle::Full);
+		app.GetDatabase().SetNameStyle(NameStyle::GivenName);
+
+		app.StartLocalMat(1);
+
+		auto mat = app.GetDefaultMat();
+
+		EXPECT_EQ(mat->GetIpponStyle(), Mat::IpponStyle::SpelledOut);
+		EXPECT_EQ(mat->GetTimerStyle(), Mat::TimerStyle::Full);
+		EXPECT_EQ(mat->GetNameStyle(), NameStyle::GivenName);
+
+		mat->Close();
+	}
+
+	{
+		Application app;
+		app.GetDatabase().SetIpponStyle(Mat::IpponStyle::SingleDigit);
+		app.GetDatabase().SetTimerStyle(Mat::TimerStyle::HundredsMS);
+		app.GetDatabase().SetNameStyle(NameStyle::FamilyName);
+
+		app.CloseMat(1);
+		app.StartLocalMat(1);
+
+		auto mat = app.GetDefaultMat();
+
+		EXPECT_EQ(mat->GetIpponStyle(), Mat::IpponStyle::SingleDigit);
+		EXPECT_EQ(mat->GetTimerStyle(), Mat::TimerStyle::HundredsMS);
+		EXPECT_EQ(mat->GetNameStyle(), NameStyle::FamilyName);
+	}
+}
+
+
+
 TEST(Mat, ForcedCloseDuringMatch)
 {
 	initialize();
@@ -234,6 +275,40 @@ TEST(Mat, RemoveIpponShouldRecoverPreviousWazaari)
 
 		m.AddWazaAri(f);
 		m.AddIppon(f);
+
+		m.RemoveIppon(f);
+
+		EXPECT_FALSE(m.HasConcluded());
+
+		EXPECT_FALSE(m.IsHajime());
+
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon,   0);
+		EXPECT_EQ(m.GetScoreboard(f).m_WazaAri, 1);
+
+		m.AddIppon(f);
+
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
+TEST(Mat, RemoveIpponShouldRecoverPreviousWazaari2)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.AddWazaAri(f);
+		m.AddWazaAri(f);
 
 		m.RemoveIppon(f);
 

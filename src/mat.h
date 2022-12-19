@@ -429,7 +429,7 @@ namespace Judoboard
 		uint32_t m_LastFrameTime = 40;
 
 		std::thread m_Thread;//Thread for running the main loop
-		mutable std::mutex m_mutex;
+		mutable std::recursive_mutex m_mutex;
 
 		//Graphics
 		mutable std::unordered_map<std::string, GraphicElement> m_Graphics;

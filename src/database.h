@@ -4,6 +4,7 @@
 #include "judoka.h"
 #include "account.h"
 #include "standing_data.h"
+#include "mat.h"
 
 
 
@@ -32,6 +33,9 @@ namespace Judoboard
 		auto GetLastTournamentName() const { return m_CurrentTournament; }
 		void SetLastTournamentName(const std::string& Name) { m_CurrentTournament = Name; }
 
+		auto GetServerPort() const { return m_Port; }
+		void SetServerPort(uint16_t NewPort) { m_Port = NewPort; }
+
 		//Judoka
 		Judoka* UpdateOrAdd(const JudokaData& NewJudoka, bool ParseOnly, std::string& Output);
 
@@ -51,11 +55,26 @@ namespace Judoboard
 		const Account* IsLoggedIn(uint32_t IP, const std::string& Response) const;
 		const std::vector<std::pair<Account::Nonce, const Account*>> GetNonces();
 
+		//Config
+		Mat::IpponStyle GetIpponStyle() const { return m_DefaultIpponStyle; }
+		Mat::TimerStyle GetTimerStyle() const { return m_DefaultTimerStyle; }
+		NameStyle       GetNameStyle()  const { return m_DefaultNameStyle; }
+
+		void SetIpponStyle(Mat::IpponStyle NewStyle) { m_DefaultIpponStyle = NewStyle; }
+		void SetTimerStyle(Mat::TimerStyle NewStyle) { m_DefaultTimerStyle = NewStyle; }
+		void SetNameStyle(NameStyle NewStyle) { m_DefaultNameStyle = NewStyle; }
+
 	private:
 		mutable std::string m_Filename;
 		bool m_AutoSave = true;
 
 		std::string m_CurrentTournament;//Name of tournament that is currently open
+		uint16_t m_Port = 8080;//Port of the webserver
+
+		//Mat default settings
+		Mat::IpponStyle m_DefaultIpponStyle = Mat::IpponStyle::DoubleDigit;
+		Mat::TimerStyle m_DefaultTimerStyle = Mat::TimerStyle::OnlySeconds;
+		NameStyle       m_DefaultNameStyle  = NameStyle::FamilyName;
 
 		std::vector<Account*> m_Accounts;
 		std::vector<Account::Nonce> m_OpenNonces;

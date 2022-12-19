@@ -322,7 +322,7 @@ bool Tournament::LoadYAML(const std::string& Filename)
 
 
 
-bool Tournament::SaveYAML(const std::string& Filename) const
+bool Tournament::SaveYAML(const std::string& Filename)
 {
 	if (m_Name.empty())
 		return false;
@@ -339,6 +339,21 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 	yaml << YAML::Value << m_Name;
 	yaml << YAML::Key << "version";
 	yaml << YAML::Value << "1";
+
+	//Prune unused clubs
+	std::set<UUID> used_clubs;
+	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
+		if (judoka->GetClub())
+			used_clubs.insert(*judoka->GetClub());
+
+	for (auto club : m_StandingData.GetAllClubs())
+	{
+		if (used_clubs.find(*club) == used_clubs.end())//Not found
+		{
+			m_StandingData.DeleteClub(*club);
+			break;//Have to stop since we have deleted while iterating
+		}
+	}
 
 	m_StandingData >> yaml;
 
@@ -422,60 +437,6 @@ Status Tournament::GetStatus() const
 	if (one_match_finished)
 		return Status::Running;
 	return Status::Scheduled;
-}
-
-
-
-void Tournament::ConnectToDatabase(Database& db)
-{
-	if (GetStatus() == Status::Concluded)
-		return;
-
-	std::vector<Judoka*> judoka_to_add;
-
-	for (auto it = m_StandingData.GetAllJudokas().begin(); it != m_StandingData.GetAllJudokas().end();)
-	{
-		auto db_ref = db.FindJudoka(it->second->GetUUID());
-		if (db_ref && it->second != db_ref)//Pointing to different objects
-		{
-			delete it->second;
-			it = m_StandingData.GetAllJudokas().erase(it);
-			judoka_to_add.push_back(db_ref);
-		}
-		else
-			++it;
-	}
-
-	for (auto judoka : judoka_to_add)
-		m_StandingData.AddJudoka(judoka);
-
-
-	//Do the same for rule sets
-
-	if (m_pDefaultRules)
-	{
-		auto db_ref = db.FindRuleSet(m_pDefaultRules->GetUUID());
-		if (db_ref)
-			m_pDefaultRules = db_ref;
-	}
-
-	std::vector<RuleSet*> rule_sets_to_add;
-
-	for (auto it = m_StandingData.GetRuleSets().begin(); it != m_StandingData.GetRuleSets().end();)
-	{
-		auto db_ref = db.FindRuleSet((*it)->GetUUID());
-		if (db_ref)
-		{
-			delete *it;
-			it = m_StandingData.GetRuleSets().erase(it);
-			rule_sets_to_add.push_back(db_ref);
-		}
-		else
-			++it;
-	}
-
-	for (auto rule : rule_sets_to_add)
-		m_StandingData.AddRuleSet(rule);
 }
 
 
