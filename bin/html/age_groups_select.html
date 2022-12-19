@@ -47,9 +47,9 @@ function GetAgeGroups()
       cell2.innerHTML = age.desc;
 
       if (!age.is_used)
-        cell3.innerHTML = "<button class=\"add\" onclick=\"Add('" + age.uuid + "');\">" + lang.add + "</button>";
+        cell3.innerHTML = "<button class=\"add\" onclick=\"Add('" + age.uuid + "');\">" + translate('add') + "</button>";
       else
-        cell3.innerHTML = "<button class=\"remove\" onclick=\"Remove('" + age.uuid + "');\">" + lang.remove + "</button>";
+        cell3.innerHTML = "<button class=\"remove\" onclick=\"Remove('" + age.uuid + "');\">" + translate('remove') + "</button>";
     }
   });
 }

@@ -372,26 +372,26 @@ function Update()
       cell4.style.fontSize  = "16pt";
 
       if (match.state == 0)
-        cell5.innerHTML = lang.scheduled;
+        cell5.innerHTML = translate('scheduled');
       else if (match.state == 1)
       {
         cell5.style.color = "red";
-        cell5.innerHTML = lang.running;
+        cell5.innerHTML = translate('running');
       }
       else if (match.state == 2)
       {
         cell5.style.color = "green";
-        cell5.innerHTML = lang.concluded;
+        cell5.innerHTML = translate('concluded');
       }
       else if (match.state == 3)
       {
         cell5.style.color = "blue";
-        cell5.innerHTML = lang.optional;
+        cell5.innerHTML = translate('optional');
       }
       else if (match.state == 4)
       {
         cell5.style.color = "blue";
-        cell5.innerHTML = lang.skipped;
+        cell5.innerHTML = translate('skipped');
       }
       else
         cell5.innerHTML = "Unknown";
@@ -619,14 +619,14 @@ function Update()
       if (hansoku.disqualification_state == 0)
         cell5.innerHTML = "Hansokumake " + lang.for + " ";
       else if (hansoku.disqualification_state == 1)
-        cell5.innerHTML = lang.disqualification + " " + lang.for + " ";
+        cell5.innerHTML = translate('disqualification') + " " + translate('for') + " ";
       else if (hansoku.disqualification_state == 2)
-        cell5.innerHTML = lang.no_disqualification + " " + lang.for + " ";
+        cell5.innerHTML = translate('no_disqualification') + " " + translate('for') + " ";
 
       if (hansoku.fighter == 0)
-        cell5.innerHTML += lang.white;
+        cell5.innerHTML += translate('white');
       else
-        cell5.innerHTML += lang.blue;
+        cell5.innerHTML += translate('blue');
 
       cell5.style.fontSize  = "16pt";
 

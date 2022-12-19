@@ -30,7 +30,7 @@ function GetClubList()
 
       cell1.innerHTML = club.name;
 
-      cell2.innerHTML = "<button class=\"white\" style=\"width: 3.3cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"club_add.html?id="+club.uuid+"\");>Edit Club</button>";
+      cell2.innerHTML = "<button class=\"white\" style=\"width: 3.5cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"club_add.html?id="+club.uuid+"\");>"+ translate('edit_club') +"</button>";
     }
   });
 }
@@ -38,8 +38,8 @@ function GetClubList()
 
 GetClubList();
 
-document.getElementById("headline").innerHTML = lang.list_of_all_clubs;
-document.getElementById("add").innerHTML      = lang.new_club;
-document.getElementById("name").innerHTML     = lang.name;
+document.getElementById("headline").innerHTML = translate('list_of_all_clubs');
+document.getElementById("add").innerHTML      = translate('new_club');
+document.getElementById("name").innerHTML     = translate('name');
 
 </script>

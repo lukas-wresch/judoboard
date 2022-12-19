@@ -78,7 +78,7 @@ function Update()
 
 function Delete()
 {
-  if (confirm(lang.delete_age_group_confirm))
+  if (confirm(translate('delete_age_group_confirm')))
   {
     Ajax('ajax/age_groups/delete?id='+id);
     navigate('age_groups_list.html');
@@ -94,12 +94,12 @@ var id = URLDecode(URL, "id");
 if (id)
 {
     document.getElementById("add").style.display  = "none";
-    document.getElementById("headline").innerHTML = lang.edit_age_group;
+    document.getElementById("headline").innerHTML = translate('edit_age_group');
     GetAgeGroup(id);
 }
 else
 {
-    document.getElementById("headline").innerHTML = lang.new_age_group;
+    document.getElementById("headline").innerHTML = translate('new_age_group');
     document.getElementById("update").style.display = "none";
     document.getElementById("delete").style.display = "none";
 }

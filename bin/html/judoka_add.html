@@ -147,25 +147,25 @@ var id = URLDecode(URL, "id");
 if (id)
 {
     document.getElementById("add").style.display  = "none";
-    document.getElementById("headline").innerHTML = lang.edit_judoka;
+    document.getElementById("headline").innerHTML = translate('edit_judoka');
     GetJudoka(id);
 }
 else
 {
-    document.getElementById("headline").innerHTML = lang.new_judoka;
+    document.getElementById("headline").innerHTML = translate('new_judoka');
     document.getElementById("update").style.display = "none";
     document.getElementById("delete").style.display = "none";
     GetClubs();
 }
 
 
-document.getElementById("label_firstname").innerHTML = lang.firstname;
-document.getElementById("label_lastname").innerHTML  = lang.lastname;
-document.getElementById("label_weight").innerHTML  = lang.weight;
-document.getElementById("label_gender").innerHTML  = lang.gender;
-document.getElementById("label_club").innerHTML    = lang.club;
-document.getElementById("male").innerHTML  = lang.male;
-document.getElementById("female").innerHTML  = lang.female;
-document.getElementById("add").innerHTML     = lang.new_judoka;
+document.getElementById("label_firstname").innerHTML = translate('firstname');
+document.getElementById("label_lastname").innerHTML  = translate('lastname');
+document.getElementById("label_weight").innerHTML  = translate('weight');
+document.getElementById("label_gender").innerHTML  = translate('gender');
+document.getElementById("label_club").innerHTML    = translate('club');
+document.getElementById("male").innerHTML    = translate('male');
+document.getElementById("female").innerHTML  = translate('female');
+document.getElementById("add").innerHTML     = translate('new_judoka');
 
 </script>

@@ -114,12 +114,12 @@ function ShowMats()
   if (Streaming)
   {
     StreamTimer = window.setInterval(Stream, 800);
-    $("#navi_show_mats").text(lang.hide_mats);
+    $("#navi_show_mats").text(translate('hide_mats'));
   }
   else
   {
     window.clearInterval(StreamTimer);
-    $("#navi_show_mats").text(lang.show_mats);
+    $("#navi_show_mats").text(translate('show_mats'));
   }
 
   return false;
@@ -139,7 +139,7 @@ function Update_MatCount()
     for (const mat of res.mats)
     {
       if (typeof mat.is_open !== 'undefined' && mat.is_open)
-        matlist.innerHTML += "<li><a href=\"#mat.html?id=" + mat.id + "\">" + lang.mat + " " + mat.id + "</a></li>"
+        matlist.innerHTML += "<li><a href=\"#mat.html?id=" + mat.id + "\">" + translate('mat') + " " + mat.id + "</a></li>"
     }
   });
 }

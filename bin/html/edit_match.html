@@ -96,22 +96,22 @@ function GetMatch()
 
     if (res.state == 0)
     {
-      document.getElementById("status").innerHTML = lang.scheduled;
+      document.getElementById("status").innerHTML = translate('scheduled');
       $('#div_delete').show();
     }
     else if (res.state == 1)
-      document.getElementById("status").innerHTML = lang.running;
+      document.getElementById("status").innerHTML = translate('running');
     else if (res.state == 2)
-      document.getElementById("status").innerHTML = lang.concluded;
+      document.getElementById("status").innerHTML = translate('concluded');
 
     document.getElementById("class").innerHTML = res.match_table_name;
 
     if (res.winner == 0)
-      document.getElementById("winner").innerHTML = lang.white;
+      document.getElementById("winner").innerHTML = translate('white');
     else if (res.winner == 1)
-      document.getElementById("winner").innerHTML = lang.blue;
+      document.getElementById("winner").innerHTML = translate('blue');
     else if (res.winner == 2 && status == 2)
-      document.getElementById("winner").innerHTML = lang.draw;
+      document.getElementById("winner").innerHTML = translate('draw');
 
     document.getElementById("score").innerHTML = res.score;
     document.getElementById("time").innerHTML  = NiceTimeMS(res.time);
@@ -180,11 +180,11 @@ function GetLog()
       if (res[i+1] == 2)
         cell2.innerHTML = "- - -";
       else if (res[i+1] == 0)
-        cell2.innerHTML = lang.white;
+        cell2.innerHTML = translate('white');
       else if (res[i+1] == 1)
       {
         cell2.style.color = "blue";
-        cell2.innerHTML = lang.blue;
+        cell2.innerHTML = translate('blue');
       }
 
 
@@ -268,7 +268,7 @@ function GetLog()
 
 function DeleteMatch()
 {
-  if (confirm(lang.delete_match_confirm))
+  if (confirm(translate('delete_match_confirm')))
   {
     Ajax('ajax/match/delete?id='+id);
     navigate('schedule.html');
@@ -282,15 +282,15 @@ var id = URLDecode(URL, "id");
 
 GetMatch();
 
-document.getElementById("label_white").innerHTML  = lang.name_white;
-document.getElementById("label_blue").innerHTML   = lang.name_blue;
-document.getElementById("label_mat").innerHTML    = lang.mat;
-document.getElementById("label_rule").innerHTML   = lang.rule_set;
-document.getElementById("label_status").innerHTML = lang.status;
-document.getElementById("label_winner").innerHTML = lang.winner;
-document.getElementById("label_score").innerHTML  = lang.score;
-document.getElementById("label_time").innerHTML   = lang.time;
-document.getElementById("delete").innerHTML       = lang.delete_match;
+document.getElementById("label_white").innerHTML  = translate('name_white');
+document.getElementById("label_blue").innerHTML   = translate('name_blue');
+document.getElementById("label_mat").innerHTML    = translate('mat');
+document.getElementById("label_rule").innerHTML   = translate('rule_set');
+document.getElementById("label_status").innerHTML = translate('status');
+document.getElementById("label_winner").innerHTML = translate('winner');
+document.getElementById("label_score").innerHTML  = translate('score');
+document.getElementById("label_time").innerHTML   = translate('time');
+document.getElementById("delete").innerHTML       = translate('delete_match');
 
 GetLog();
 
