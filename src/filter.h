@@ -23,8 +23,6 @@ namespace Judoboard
 
 		virtual std::string GetDescription() const { return ""; }
 
-		virtual std::string GetHTMLForm() const = 0;
-
 		virtual bool IsElgiable(const Judoka& Fighter) const = 0;
 
 		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);

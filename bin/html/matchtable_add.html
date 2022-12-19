@@ -1,11 +1,17 @@
 <h1 id="headline">New Matchtable</h1>
 
 
-<div id="div_type">
+<div>
   <label style="width:100px;float:left;margin-top:4px;" id="label_type">Type</label>
-  <select style="margin-bottom:20px; width: 5.5cm;" id="type" onchange="GetForm();">
-    <option selected value="1" id="label_weightclass">Weightclass</option>
-    <option value="2" id="label_pause">Pause</option>
+  <select style="margin-bottom:20px; width: 5.5cm;" id="type" onchange="GetFilterForm();">
+    <option selected value="0" id="label_weightclass">Weightclass</option>
+  </select>
+</div>
+
+<div id="div_type">
+  <label style="width:100px;float:left;margin-top:4px;" id="label_fight_system">Fight System</label>
+  <select style="margin-bottom:20px; width: 5.5cm;" id="fight_system" onchange="GetFightSystemForm();">
+    <option selected value="1" id="label_weightclass">Round Robin</option>
     <option value="3" id="label_custom">Custom</option>
     <option value="4" id="label_single_elimination">Single Elimination</option>
   </select>
@@ -44,7 +50,12 @@
 
 
 <div style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
-  <form id="form">
+  <form id="form_filter">
+  </form>
+</div>
+
+<div style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
+  <form id="form_fight_system">
   </form>
 </div>
 
@@ -91,10 +102,10 @@ var g_yaml;
 
 
 
-function GetForm(callback)
+function GetFilterForm(callback)
 {
-  AjaxCallback('ajax/matchtable/get_form?type=' + document.getElementById("type").value, function(response) {
-    document.getElementById("form").innerHTML = response;
+  AjaxCallback('ajax/filter/get_form?type=' + document.getElementById("type").value, function(response) {
+    document.getElementById("form_filter").innerHTML = response;
 
     document.getElementById("label_min_weight").innerHTML = lang.min_weight;
     document.getElementById("label_max_weight").innerHTML = lang.max_weight;
@@ -109,6 +120,22 @@ function GetForm(callback)
       document.getElementById("maxWeight").value = g_yaml.max_weight;
     if (g_yaml && typeof g_yaml.gender !== 'undefined')
       document.getElementById("gender").value = g_yaml.gender;
+    if (g_yaml && typeof g_yaml.best_of_three !== 'undefined')
+      document.getElementById("bo3").checked = g_yaml.best_of_three;
+      
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+
+  return false;
+}
+
+
+function GetFightSystemForm(callback)
+{
+  AjaxCallback('ajax/fight_system/get_form?type=' + document.getElementById("fight_system").value, function(response) {
+    document.getElementById("form_fight_system").innerHTML = response;
+
     if (g_yaml && typeof g_yaml.best_of_three !== 'undefined')
       document.getElementById("bo3").checked = g_yaml.best_of_three;
     if (g_yaml && typeof g_yaml.third_place !== 'undefined')
@@ -126,8 +153,19 @@ function GetForm(callback)
 
 function AddMatchtable()
 {
-  var elements = document.getElementById("form").elements;
   var data = [];
+
+  var elements = document.getElementById("form_filter").elements;
+
+  for (var i = 0, element; element = elements[i++];)
+  {
+    if (element.type == 'checkbox')
+      data[element.id] = element.checked;
+    else
+      data[element.id] = element.value;
+  }
+
+  elements = document.getElementById("form_fight_system").elements;
 
   for (var i = 0, element; element = elements[i++];)
   {
@@ -394,7 +432,8 @@ else
   document.getElementById("div_name").style.display = "none";
   document.getElementById("div_color").style.display = "none";
 
-  GetForm();
+  GetFilterForm();
+  GetFightSystemForm();
   GetMats();
   GetRuleSets();
   GetAgeGroups();

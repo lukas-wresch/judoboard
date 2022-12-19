@@ -13,7 +13,7 @@ namespace Judoboard
 		CustomTable(const ITournament* Tournament);
 		CustomTable(const YAML::Node& Yaml, const ITournament* Tournament) : RoundRobin(Yaml, Tournament) {}
 
-		std::string GetHTMLForm();
+		static std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::Custom; }
 		virtual std::string GetDescription() const override { return GetName() + " Custom"; }

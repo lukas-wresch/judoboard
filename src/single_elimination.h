@@ -16,7 +16,7 @@ namespace Judoboard
 		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament = nullptr);
 		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 
-		std::string GetHTMLForm();
+		static std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::SingleElimination; }
 

@@ -44,14 +44,7 @@ RoundRobin::RoundRobin(const MD5::Weightclass& Weightclass_, const ITournament* 
 
 std::string RoundRobin::GetHTMLForm()
 {
-	std::string ret;
-
-	if (GetFilter())
-		ret += GetFilter()->GetHTMLForm();
-
-	ret += MatchTable::GetHTMLForm();
-
-	return ret;
+	return MatchTable::GetHTMLForm();
 }
 
 

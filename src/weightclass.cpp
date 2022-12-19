@@ -116,7 +116,7 @@ std::string Weightclass::GetDescription() const
 
 
 
-std::string Weightclass::GetHTMLForm() const
+std::string Weightclass::GetHTMLForm()
 {
 	std::string ret = R"(
 <div>

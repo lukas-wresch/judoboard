@@ -472,7 +472,7 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 
 
 
-std::string MatchTable::GetHTMLForm() const
+std::string MatchTable::GetHTMLForm()
 {
 	std::string ret = R"(
 <div>
