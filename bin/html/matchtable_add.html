@@ -106,22 +106,20 @@ function GetFilterForm(callback)
 {
   AjaxCallback('ajax/filter/get_form?type=' + document.getElementById("type").value, function(response) {
     document.getElementById("form_filter").innerHTML = response;
-
+    
     document.getElementById("label_min_weight").innerHTML = lang.min_weight;
     document.getElementById("label_max_weight").innerHTML = lang.max_weight;
     document.getElementById("label_gender").innerHTML     = lang.gender;
     document.getElementById("all").innerHTML    = lang.all;
     document.getElementById("male").innerHTML   = lang.male;
     document.getElementById("female").innerHTML = lang.female;
-
+    
     if (g_yaml && typeof g_yaml.min_weight !== 'undefined')
       document.getElementById("minWeight").value = g_yaml.min_weight;
     if (g_yaml && typeof g_yaml.max_weight !== 'undefined')
       document.getElementById("maxWeight").value = g_yaml.max_weight;
     if (g_yaml && typeof g_yaml.gender !== 'undefined')
       document.getElementById("gender").value = g_yaml.gender;
-    if (g_yaml && typeof g_yaml.best_of_three !== 'undefined')
-      document.getElementById("bo3").checked = g_yaml.best_of_three;
       
     if (typeof callback !== 'undefined')
       callback();
@@ -138,6 +136,7 @@ function GetFightSystemForm(callback)
 
     if (g_yaml && typeof g_yaml.best_of_three !== 'undefined')
       document.getElementById("bo3").checked = g_yaml.best_of_three;
+
     if (g_yaml && typeof g_yaml.third_place !== 'undefined')
       document.getElementById("mf3").checked = g_yaml.third_place;
     if (g_yaml && typeof g_yaml.fifth_place !== 'undefined')
@@ -195,8 +194,19 @@ function AddMatchtable()
 
 function UpdateMatchtable()
 {
-  var elements = document.getElementById("form").elements;
   var data = [];
+
+  var elements = document.getElementById("form_filter").elements;
+
+  for (var i = 0, element; element = elements[i++];)
+  {
+    if (element.type == 'checkbox')
+      data[element.id] = element.checked;
+    else
+      data[element.id] = element.value;
+  }
+
+  elements = document.getElementById("form_fight_system").elements;
 
   for (var i = 0, element; element = elements[i++];)
   {
@@ -254,13 +264,15 @@ function GetMatchTable(id)
     console.log(response);
     var res = YAML.parse(response);
     g_yaml = res;
-
-    var elements = document.getElementById("form").elements;
-
+    
+    //var elements = document.getElementById("form_fight_system").elements;
+    
     document.getElementById("name").value = res.name;
-    document.getElementById("type").value = res.type;
+    document.getElementById("type").value = res.filter_type;
     document.getElementById("type").onchange();
-
+    document.getElementById("fight_system").value = res.type;
+    document.getElementById("fight_system").onchange();
+    
     GetMats(function() {
       document.getElementById("mat").value = res.mat_id;
     });
@@ -278,7 +290,7 @@ function GetMatchTable(id)
       document.getElementById("color").value = res.color;
       document.getElementById("color").onchange();
     });
-        
+     
 
     if (typeof res.participants !== 'undefined')
     {

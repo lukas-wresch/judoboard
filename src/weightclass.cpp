@@ -75,7 +75,7 @@ void Weightclass::operator >> (YAML::Emitter& Yaml) const
 
 void Weightclass::ToString(YAML::Emitter& Yaml) const
 {
-	Yaml << YAML::Key << "type"       << YAML::Value << (int)GetType();
+	IFilter::ToString(Yaml);
 	Yaml << YAML::Key << "min_weight" << YAML::Value << m_MinWeight.ToString();
 	Yaml << YAML::Key << "max_weight" << YAML::Value << m_MaxWeight.ToString();
 	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;

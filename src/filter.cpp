@@ -44,6 +44,8 @@ void IFilter::operator >> (YAML::Emitter& Yaml) const
 
 void IFilter::ToString(YAML::Emitter& Yaml) const
 {
+	Yaml << YAML::Key << "filter_type" << YAML::Value << (int)GetType();
+
 	Yaml << YAML::Key << "participants";
 
 	Yaml << YAML::BeginMap;

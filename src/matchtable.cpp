@@ -442,6 +442,9 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "color"  << YAML::Value << (int)m_Color;
 
 	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
+	if (GetFilter())
+		GetFilter()->ToString(Yaml);
+
 	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
 	Yaml << YAML::Key << "description" << YAML::Value << GetDescription();
 
