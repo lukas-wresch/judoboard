@@ -153,10 +153,6 @@ namespace Judoboard
 		Error Ajax_SetSetup(const HttpServer::Request& Request);
 		std::string Ajax_Execute(const HttpServer::Request& Request);
 
-		//Serialization
-		[[deprecated]]
-		ZED::CSV Mats2String() const;
-
 		static const std::string Name;
 		static const std::string Version;
 		static constexpr uint16_t DefaultPort = 8080;

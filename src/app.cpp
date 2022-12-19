@@ -580,17 +580,3 @@ void Application::Run()
 
 	ZED::Log::Info("Closing application");
 }
-
-
-
-ZED::CSV Application::Mats2String() const
-{
-	ZED::CSV ret;
-	ret << (uint32_t)m_Mats.size();
-
-	for (auto mat : m_Mats)
-		if (mat)
-			ret << mat->GetMatID();
-
-	return ret;
-}
