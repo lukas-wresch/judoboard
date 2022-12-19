@@ -3457,7 +3457,12 @@ std::string Application::Ajax_GetHansokumake() const
 
 	for (auto mat : GetMats())
 	{
-		if (!mat || !mat->GetMatch()) continue;
+		if (!mat)
+			continue;
+
+		const auto match = mat->GetMatch();
+		if (!match)
+			continue;
 
 		for (Fighter fighter = Fighter::White; fighter <= Fighter::Blue; ++fighter)
 		{
@@ -3466,7 +3471,7 @@ std::string Application::Ajax_GetHansokumake() const
 				ret << YAML::BeginMap;
 
 				ret << YAML::Key << "match" << YAML::Value;
-				mat->GetMatch()->ToString(ret);
+				match->ToString(ret);
 				ret << YAML::Key << "fighter" << YAML::Value << (int)fighter;
 				ret << YAML::Key << "disqualification_state" << YAML::Value << (int)mat->GetScoreboard(fighter).m_Disqualification;
 
