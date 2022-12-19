@@ -2452,7 +2452,7 @@ TEST(MD5, ExportSingleElimination16)
 	t->AddMatchTable(group);
 
 	for (int i = 1; i <= 16; ++i)
-		group->SetStartingPosition(j[i], i-1);
+		group->SetStartPosition(j[i], i-1);
 
 	t->GenerateSchedule();
 
@@ -2565,7 +2565,7 @@ TEST(MD5, ExportSingleElimination16_3rd_5th)
 	t->AddMatchTable(group);
 
 	for (int i = 1; i <= 16; ++i)
-		group->SetStartingPosition(j[i], i-1);
+		group->SetStartPosition(j[i], i-1);
 
 	t->GenerateSchedule();
 
@@ -2588,7 +2588,7 @@ TEST(MD5, ExportSingleElimination16_3rd_5th)
 
 	auto results = group->CalculateResults();
 
-	ASSERT_EQ(results.size(), 6);
+	ASSERT_EQ(results.GetSize(), 6);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[16]->GetUUID());
 
 
@@ -2676,7 +2676,7 @@ TEST(MD5, ExportSingleElimination32)
 	t->AddMatchTable(group);
 
 	for (int i = 1; i <= 32; ++i)
-		group->SetStartingPosition(j[i], i-1);
+		group->SetStartPosition(j[i], i-1);
 
 	t->GenerateSchedule();
 
@@ -2699,7 +2699,7 @@ TEST(MD5, ExportSingleElimination32)
 
 	auto results = group->CalculateResults();
 
-	ASSERT_EQ(results.size(), 2);
+	ASSERT_EQ(results.GetSize(), 2);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[32]->GetUUID());
 
 
