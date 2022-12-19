@@ -323,6 +323,8 @@ TEST(Ajax, GetHansokumake)
 		
 		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
 
+		ASSERT_TRUE(ret2[0]["match"].IsDefined());
+		ASSERT_TRUE(ret2[0]["match"].IsMap());
 		EXPECT_EQ(ret2[0]["match"]["uuid"].as<std::string>(), (std::string)match.GetUUID());
 		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName));
 		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName(NameStyle::GivenName));
@@ -349,6 +351,8 @@ TEST(Ajax, GetHansokumake)
 
 		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
 
+		ASSERT_TRUE(ret2[0]["match"].IsDefined());
+		ASSERT_TRUE(ret2[0]["match"].IsMap());
 		EXPECT_EQ(ret2[0]["match"]["uuid"].as<std::string>(), (std::string)match.GetUUID());
 		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName));
 		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName(NameStyle::GivenName));
@@ -375,6 +379,8 @@ TEST(Ajax, GetHansokumake)
 
 		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
 
+		ASSERT_TRUE(ret2[0]["match"].IsDefined());
+		ASSERT_TRUE(ret2[0]["match"].IsMap());
 		EXPECT_EQ(ret2[0]["match"]["uuid"].as<std::string>(), (std::string)match.GetUUID());
 		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName));
 		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName(NameStyle::GivenName));
