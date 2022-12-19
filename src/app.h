@@ -171,11 +171,11 @@ namespace Judoboard
 		class ScopedLock
 		{
 		public:
-			ScopedLock(std::mutex& Mutex) : m_Mutex(Mutex) { Mutex.lock(); }
+			ScopedLock(std::recursive_mutex& Mutex) : m_Mutex(Mutex) { Mutex.lock(); }
 			~ScopedLock() { m_Mutex.unlock(); }
 
 		private:
-			std::mutex& m_Mutex;
+			std::recursive_mutex& m_Mutex;
 		};
 
 		ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
@@ -200,7 +200,7 @@ namespace Judoboard
 
 		std::vector<IMat*> m_Mats;//List of all mats this application is aware of
 
-		mutable std::mutex m_mutex;
+		mutable std::recursive_mutex m_mutex;
 
 		mutable bool m_Running = true;
 		const uint32_t m_StartupTimestamp;

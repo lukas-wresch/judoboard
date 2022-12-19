@@ -2910,7 +2910,9 @@ std::string Application::Ajax_ListAllAgeGroups() const
 
 Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 {
-	MatchTable::Type type = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "type"));
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	IFilter::Type type = (IFilter::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "type"));
+	MatchTable::Type fight_system = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "fight_system"));
 
 	LockTillScopeEnd();
 
@@ -2919,7 +2921,7 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 
 	MatchTable* new_table = nullptr;
 
-	switch (type)
+	switch (fight_system)
 	{
 	case MatchTable::Type::RoundRobin:
 	{
@@ -2945,6 +2947,9 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 		return Error::Type::InvalidInput;
 	}
 
+	if (id)
+		new_table->SetUUID(std::move(id));
+
 	GetTournament()->AddMatchTable(new_table);
 
 	Request.m_Query = "id=" + (std::string)new_table->GetUUID();
@@ -2963,6 +2968,8 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 		return Error::Type::TournamentNotOpen;
 
 	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	IFilter::Type type = (IFilter::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "type"));
+	MatchTable::Type fight_system = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "fight_system"));
 	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int color = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "color"));
 	int mat   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
@@ -2975,6 +2982,23 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 	if (!table)
 		return Error(Error::Type::ItemNotFound);
+
+	if (table->GetType() != fight_system)
+	{
+		//Re-create match table
+
+		if (!GetTournament()->RemoveMatchTable(*table))
+			return Error::Type::OperationFailed;
+
+		auto error = Ajax_AddMatchTable(Request);
+		if (!error)
+			return error;
+
+		table = GetTournament()->FindMatchTable(id);
+
+		if (!table)
+			return Error(Error::Type::ItemNotFound);
+	}
 
 	auto age_group = m_Database.FindAgeGroup(age_group_id);
 	auto rule_set  = m_Database.FindRuleSet(rule_set_id);
@@ -3008,6 +3032,10 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 	auto weightclass = (Weightclass*)table->GetFilter();
 
+	weightclass->SetMinWeight(Weight(minWeight));
+	weightclass->SetMaxWeight(Weight(maxWeight));
+	weightclass->SetGender((Gender)gender);
+
 	switch (table->GetType())
 	{
 	case MatchTable::Type::RoundRobin:
@@ -3016,9 +3044,6 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		GetTournament()->Lock();
 
-		weightclass->SetMinWeight(Weight(minWeight));
-		weightclass->SetMaxWeight(Weight(maxWeight));
-		weightclass->SetGender((Gender)gender);
 		round_robin->IsBestOfThree(bo3);
 
 		GetTournament()->Unlock();
@@ -3031,9 +3056,6 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		GetTournament()->Lock();
 
-		weightclass->SetMinWeight(Weight(minWeight));
-		weightclass->SetMaxWeight(Weight(maxWeight));
-		weightclass->SetGender((Gender)gender);
 		single_table->IsBestOfThree(bo3);
 		single_table->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
 		single_table->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");

@@ -46,7 +46,7 @@ void IFilter::ToString(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::Key << "filter_type" << YAML::Value << (int)GetType();
 
-	Yaml << YAML::Key << "participants";
+	/*Yaml << YAML::Key << "participants";
 
 	Yaml << YAML::BeginMap;
 	for (const auto [start_pos, judoka] : GetParticipants())
@@ -54,7 +54,7 @@ void IFilter::ToString(YAML::Emitter& Yaml) const
 		if (judoka.GetJudoka())//TODO handle other cases
 			Yaml << YAML::Key << start_pos << YAML::Value << (std::string)judoka.GetJudoka()->GetUUID();
 	}
-	Yaml << YAML::EndMap;
+	Yaml << YAML::EndMap;*/
 }
 
 

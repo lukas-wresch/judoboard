@@ -104,6 +104,8 @@ std::string Weightclass::GetDescription() const
 	{
 		if ((uint32_t)m_MaxWeight == 0)
 			desc = "+" + m_MinWeight.ToString() + " kg";
+		else if ((uint32_t)m_MinWeight == 0)
+			desc = "- " + m_MaxWeight.ToString() + " kg";
 		else
 			desc = m_MinWeight.ToString() + " - " + m_MaxWeight.ToString() + " kg";
 

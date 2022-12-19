@@ -90,9 +90,11 @@ const std::vector<const Judoka*> MatchTable::GetParticipants() const
 	std::vector<const Judoka*> ret;
 
 	if (m_Filter)
+	{
 		for (auto [pos, judoka] : m_Filter->GetParticipants())
 			if (judoka.GetJudoka())
 				ret.emplace_back(judoka.GetJudoka());
+	}
 
 	return ret;
 }
@@ -458,16 +460,20 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "participants";
 	Yaml << YAML::BeginSeq;
 
-	for (auto judoka : GetParticipants())
+	auto max = GetMaxStartPositions();
+	for (size_t start_pos = 0; start_pos <= max; ++start_pos)
 	{
-		Yaml << YAML::BeginMap;
-		Yaml << YAML::Key << "uuid"      << YAML::Value << (std::string)judoka->GetUUID();
-		Yaml << YAML::Key << "firstname" << YAML::Value << judoka->GetFirstname();
-		Yaml << YAML::Key << "lastname"  << YAML::Value << judoka->GetLastname();
-		Yaml << YAML::Key << "weight"    << YAML::Value << judoka->GetWeight().ToString();
-		if (GetStartPosition(judoka) != -1)
-			Yaml << YAML::Key << "starting_pos" << YAML::Value << GetStartPosition(judoka);
-		Yaml << YAML::EndMap;
+		auto judoka = GetJudokaByStartPosition(start_pos);
+		if (judoka)
+		{
+			Yaml << YAML::BeginMap;
+			Yaml << YAML::Key << "uuid"      << YAML::Value << (std::string)judoka->GetUUID();
+			Yaml << YAML::Key << "firstname" << YAML::Value << judoka->GetFirstname();
+			Yaml << YAML::Key << "lastname"  << YAML::Value << judoka->GetLastname();
+			Yaml << YAML::Key << "weight"    << YAML::Value << judoka->GetWeight().ToString();
+			Yaml << YAML::Key << "start_pos" << YAML::Value << start_pos;
+			Yaml << YAML::EndMap;
+		}
 	}
 
 	Yaml << YAML::EndSeq;
@@ -479,7 +485,7 @@ std::string MatchTable::GetHTMLForm()
 {
 	std::string ret = R"(
 <div>
-	<label style="width:150px;float:left;margin-top:5px;" id="label_bo3">Best Of Three</label>
+	<label style="width:150px;float:left;margin-top:5px;" id="label_bo3">Best of Three</label>
 		<input type="checkbox" id="bo3" class="switch-input">
 		<label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="bo3">
 		<span class="toggle-on" id="bo3_enabled"></span><span class="toggle-off" id="bo3_disabled"></span>
