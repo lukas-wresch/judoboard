@@ -1766,4 +1766,5 @@ TEST(Ajax, EditTournament)
 	}
 
 	ZED::Core::RemoveFile("tournaments/test.yml");
+	ZED::Core::RemoveFile("tournaments/test2.yml");
 }
