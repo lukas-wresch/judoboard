@@ -186,7 +186,7 @@ function AddMatchtable()
   var params = URLEncode(data);
   console.log(params);
 
-  AjaxPost('ajax/matchtable/add' params, function() {
+  AjaxPost('ajax/matchtable/add', params, function() {
     navigate("matchtable_list.html");
   });
 
@@ -280,7 +280,7 @@ function GetMatchTable(id)
     GetMats(function() {
       document.getElementById("mat").value = res.mat_id;
     });
-
+    
     GetAgeGroups(function() {
       if (typeof res.age_group !== 'undefined')
         document.getElementById("age_group").value = res.age_group;
@@ -297,7 +297,7 @@ function GetMatchTable(id)
      
 
     if (typeof res.participants !== 'undefined')
-    {console.log(res.participants);
+    {
       var table = document.getElementById("participants");
 
       while (table.rows.length > 1)

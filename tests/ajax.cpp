@@ -1261,12 +1261,17 @@ TEST(Ajax, MatchTable_Edit)
 		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetGender(), Gender::Male);
 		EXPECT_EQ(((RoundRobin*)tables[0])->IsBestOfThree(), true);
 
+		tables[0]->SetColor(Color::Name::Purple);
+		tables[0]->SetScheduleIndex(10);
+
 		auto old_uuid = tables[0]->GetUUID();
 
 		EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&fight_system=4&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
 
 		ASSERT_EQ(tables.size(), 1);
-		ASSERT_EQ(tables[0]->GetUUID(), old_uuid);
+		EXPECT_EQ(tables[0]->GetUUID(), old_uuid);
+		EXPECT_EQ(tables[0]->GetColor(), Color::Name::Purple);
+		EXPECT_EQ(tables[0]->GetScheduleIndex(), 9);//Gets changed since 9 is unused
 		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::SingleElimination);
 		EXPECT_EQ(tables[0]->GetName(), "Test2");
 		EXPECT_EQ(tables[0]->GetMatID(), 5);

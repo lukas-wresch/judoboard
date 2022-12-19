@@ -3051,6 +3051,9 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	{
 		//Re-create match table
 
+		auto color          = table->GetColor();
+		auto schedule_index = table->GetScheduleIndex();
+
 		if (!GetTournament()->RemoveMatchTable(*table))
 			return Error::Type::OperationFailed;
 
@@ -3062,6 +3065,9 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		if (!table)
 			return Error(Error::Type::ItemNotFound);
+
+		table->SetColor(color);
+		table->SetScheduleIndex(schedule_index);
 	}
 
 	auto age_group = m_Database.FindAgeGroup(age_group_id);
