@@ -146,6 +146,7 @@ namespace Judoboard
 
 		//Lottery
 		void PerformLottery();
+		size_t GetLotOfAssociation(const UUID& UUID) const;
 
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const override {}

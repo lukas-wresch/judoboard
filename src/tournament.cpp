@@ -1569,7 +1569,7 @@ void Tournament::RevokeDisqualification(const Judoka& Judoka)
 
 void Tournament::PerformLottery()
 {
-	if (!m_Organizer)
+	if (!m_Organizer || GetStatus() != Status::Scheduled)
 		return;
 
 	Lock();
@@ -1609,6 +1609,16 @@ void Tournament::PerformLottery()
 
 	Unlock();
 	Save();
+}
+
+
+
+size_t Tournament::GetLotOfAssociation(const UUID& UUID) const
+{
+	auto it = m_AssociationToLotNumber.find(UUID);
+	if (it == m_AssociationToLotNumber.end())
+		return SIZE_MAX;
+	return it->second;
 }
 
 
