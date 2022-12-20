@@ -313,6 +313,8 @@ TEST(Ajax, GetHansokumake)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
+		ZED::Core::Pause(100);
+
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		auto ret = app.Ajax_GetHansokumake();
@@ -1160,6 +1162,8 @@ TEST(Ajax, RemoveDisqualification)
 
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
+
+		ZED::Core::Pause(100);
 
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 

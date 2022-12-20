@@ -657,6 +657,8 @@ void Mat::AddYuko(Fighter Whom)
 		if (m_GoldenScore)
 			Mate();
 	}
+
+	ZED::Log::Debug("Yuko");
 }
 
 
@@ -694,6 +696,8 @@ void Mat::AddKoka(Fighter Whom)
 		if (m_GoldenScore)
 			Mate();
 	}
+
+	ZED::Log::Debug("Koka");
 }
 
 
@@ -727,6 +731,8 @@ void Mat::Hantei(Fighter Whom)
 
 		m_mutex.unlock();
 	}
+
+	ZED::Log::Debug("Hantei");
 }
 
 
@@ -751,6 +757,8 @@ void Mat::SetAsDraw(bool Enable)
 		}
 		m_mutex.unlock();
 	}
+
+	ZED::Log::Debug("Draw");
 }
 
 
@@ -771,6 +779,8 @@ void Mat::AddShido(Fighter Whom)
 		if (GetScoreboard(Whom).m_Shido == 3)//Hansoku-make
 			AddHansokuMake(Whom, false);//Add indirect hansokumake
 	}
+
+	ZED::Log::Debug("Shido");
 }
 
 
@@ -822,6 +832,8 @@ void Mat::AddHansokuMake(Fighter Whom, bool Direct)
 
 		AddIppon(!Whom);
 	}
+
+	ZED::Log::Debug("Hansokumake");
 }
 
 
