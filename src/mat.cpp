@@ -806,7 +806,10 @@ void Mat::AddHansokuMake(Fighter Whom, bool Direct)
 		SetScoreboard(Whom).m_HansokuMake_Direct = Direct;
 
 		if (Direct)
+		{
+			SetScoreboard(Whom).m_Disqualification = Scoreboard::DisqualificationState::Unknown;
 			AddEvent(Whom, MatchLog::BiasedEvent::AddHansokuMake_Direct);
+		}
 		else
 		{
 			SetScoreboard(Whom).m_Disqualification = Scoreboard::DisqualificationState::NotDisqualified;

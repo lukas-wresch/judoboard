@@ -1140,7 +1140,7 @@ TEST(Ajax, AddDisqualification)
 		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
 		EXPECT_TRUE(mat->GetScoreboard(f).IsUnknownDisqualification());
 
-		app.Ajax_AddDisqualification(f, HttpServer::Request("id=1"));
+		EXPECT_TRUE(app.Ajax_AddDisqualification(f, HttpServer::Request("id=1")));
 
 		EXPECT_TRUE(mat->GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
@@ -1170,19 +1170,19 @@ TEST(Ajax, RemoveDisqualification)
 		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
 		EXPECT_TRUE(mat->GetScoreboard(f).IsUnknownDisqualification());
 
-		app.Ajax_AddDisqualification(f, HttpServer::Request("id=1"));
+		EXPECT_TRUE(app.Ajax_AddDisqualification(f, HttpServer::Request("id=1")));
 
 		EXPECT_TRUE(mat->GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsUnknownDisqualification());
 
-		app.Ajax_RemoveDisqualification(f, HttpServer::Request("id=2"));
+		EXPECT_FALSE(app.Ajax_RemoveDisqualification(f, HttpServer::Request("id=2")));
 
 		EXPECT_TRUE(mat->GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsUnknownDisqualification());
 
-		app.Ajax_RemoveDisqualification(f, HttpServer::Request("id=1"));
+		EXPECT_TRUE(app.Ajax_RemoveDisqualification(f, HttpServer::Request("id=1")));
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
