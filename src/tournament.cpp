@@ -1,5 +1,6 @@
 #include <fstream>
 #include <algorithm>
+#include <random>
 #include <cassert>
 #include "../ZED/include/log.h"
 #include "tournament.h"
@@ -1558,6 +1559,52 @@ void Tournament::RevokeDisqualification(const Judoka& Judoka)
 			else
 				match->SetState(Status::Scheduled);//Reset match result
 		}
+	}
+
+	Unlock();
+	Save();
+}
+
+
+
+void Tournament::PerformLottery()
+{
+	if (!m_Organizer)
+		return;
+
+	Lock();
+
+	std::unordered_set<UUID> clubforlottery;
+	const auto organizer_level = m_Organizer->GetLevel();
+	const auto lottery_level   = organizer_level + 1;
+
+	for (auto [id, judoka] : GetDatabase().GetAllJudokas())
+	{
+		const Association* club = judoka->GetClub();
+
+		//Move up the tree till we are on the right level
+		while (club && club->GetLevel() < lottery_level)
+			club = club->GetParent();
+
+		if (club && club->GetLevel() == lottery_level)
+			clubforlottery.insert(*club);
+	}
+
+	m_AssociationToLotNumber.clear();
+	auto max_lot = clubforlottery.size();
+	std::random_device rd;
+
+	for (size_t lot = 0; lot < max_lot; ++lot)
+	{
+		auto index = rd() % clubforlottery.size();
+
+		auto it = clubforlottery.cbegin();
+		for (size_t i = 0; i < index; ++i)
+			++it;
+
+		auto assoc = *it;
+		m_AssociationToLotNumber.insert({ assoc, lot });
+		clubforlottery.erase(it);
 	}
 
 	Unlock();

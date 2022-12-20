@@ -144,6 +144,9 @@ namespace Judoboard
 		void Disqualify(const Judoka& Judoka) override;
 		void RevokeDisqualification(const Judoka& Judoka) override;
 
+		//Lottery
+		void PerformLottery();
+
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const override {}
 
@@ -184,5 +187,6 @@ namespace Judoboard
 		std::unordered_set<UUID> m_DisqualifiedJudoka;
 
 		std::unordered_map<UUID, UUID> m_JudokaToAgeGroup;//Maps judoka to the age group he/she is starting in
+		std::unordered_map<UUID, size_t> m_AssociationToLotNumber;//Maps associations to the lot number
 	};
 }
