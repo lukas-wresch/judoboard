@@ -2127,6 +2127,8 @@ TEST(Mat, GoldenScoreKeepsShidosAndMedicalExaminations)
 	Application app;
 	Mat m(1);
 
+	ZED::Core::Pause(100);
+
 	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 5, 5, 30, 20, false, false, true, 0));

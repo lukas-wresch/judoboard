@@ -604,6 +604,7 @@ TEST(App, MatchOnSlave)
 
 	slave.StartLocalMat(2);
 
+	ZED::Core::Pause(100);
 
 	Judoka j1("White", "LastnameW");
 	Judoka j2("Blue",  "LastnameB");

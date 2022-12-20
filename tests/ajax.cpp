@@ -1133,9 +1133,11 @@ TEST(Ajax, AddDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
+		ZED::Core::Pause(100);
+
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
@@ -1463,9 +1465,11 @@ TEST(Ajax, RemoveNoDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
+		ZED::Core::Pause(100);
+
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
