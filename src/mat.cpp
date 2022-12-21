@@ -131,6 +131,7 @@ bool Mat::Reset()
 	if (AreFightersOnMat())
 	{
 		ZED::Log::Warn("Can not reset match, the previous match is still ongoing");
+		m_mutex.unlock();
 		return false;
 	}
 
@@ -194,7 +195,6 @@ bool Mat::StartMatch(Match* NewMatch)
 	if (!Reset())
 	{
 		ZED::Log::Warn("Could not reset mat");
-		m_mutex.unlock();
 		return false;
 	}
 
@@ -212,7 +212,7 @@ bool Mat::StartMatch(Match* NewMatch)
 
 	NextState(State::TransitionToMatch);
 
-	ZED::Log::Debug("New match started");
+	ZED::Log::Info("New match started");
 	return true;
 }
 
@@ -732,7 +732,7 @@ void Mat::Hantei(Fighter Whom)
 		m_mutex.unlock();
 	}
 
-	ZED::Log::Debug("Hantei");
+	ZED::Log::Info("Hantei");
 }
 
 
