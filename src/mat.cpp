@@ -504,7 +504,7 @@ void Mat::Mate()
 		m_mutex.unlock();
 	}
 
-	ZED::Log::Debug("Mate");
+	ZED::Log::Info("Mate");
 }
 
 
@@ -558,7 +558,7 @@ void Mat::AddIppon(Fighter Whom)
 		Mate();
 	}
 
-	ZED::Log::Debug("Ippon");
+	ZED::Log::Info("Ippon");
 }
 
 
@@ -833,7 +833,7 @@ void Mat::AddHansokuMake(Fighter Whom, bool Direct)
 		AddIppon(!Whom);
 	}
 
-	ZED::Log::Debug("Hansokumake");
+	ZED::Log::Info("Hansokumake");
 }
 
 
