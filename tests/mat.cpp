@@ -2204,6 +2204,7 @@ TEST(Mat, Draw2)
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
+	ZED::Core::Pause(100);
 
 	m.Hajime();
 
