@@ -1443,6 +1443,8 @@ TEST(Ajax, NoDisqualification)
 
 		mat->StartMatch(&match);
 		ZED::Core::Pause(1000);
+
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
@@ -1476,6 +1478,8 @@ TEST(Ajax, RemoveNoDisqualification)
 
 		EXPECT_TRUE(mat->StartMatch(&match));
 		ZED::Core::Pause(1000);
+
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());

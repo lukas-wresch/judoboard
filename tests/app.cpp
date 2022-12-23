@@ -620,6 +620,8 @@ TEST(App, MatchOnSlave)
 
 	ZED::Core::Pause(2000);
 
+	EXPECT_TRUE(mat->AreFightersOnMat());
+
 	mat->Hajime();
 
 	mat->AddIppon(Fighter::White);
