@@ -1290,6 +1290,13 @@ TEST(MD5, ConvertToMD5)
 
 		MD5 file(tour_temp);//Convert back to MD5
 
+		ASSERT_EQ(file.GetLottery().size(), file1.GetLottery().size());
+		for (int i = 0; i < file1.GetLottery().size(); ++i)
+		{
+			EXPECT_EQ(file.GetLottery()[i].AssociationID, file1.GetLottery()[i].AssociationID);
+			EXPECT_EQ(file.GetLottery()[i].StartNo,       file1.GetLottery()[i].StartNo);
+		}
+
 		ASSERT_TRUE(file.GetOrganizer());
 		ASSERT_TRUE(file1.GetOrganizer());
 		EXPECT_EQ(file.GetOrganizer()->Description, file1.GetOrganizer()->Description);
@@ -1587,6 +1594,17 @@ TEST(MD5, ConvertToMD5AndBack)
 		MD5 md5_tournament(tour_temp);//Convert back to MD5
 
 		Tournament tour(md5_tournament, &db);//Convert back to native
+
+		for (int i = 0; i < file.GetLottery().size(); ++i)
+		{
+			auto assoc = file.FindAssociation(file.GetLottery()[i].AssociationID);
+			ASSERT_TRUE(assoc);
+
+			auto assoc2 = tour.GetDatabase().FindAssociationByName(assoc->Description);
+
+			auto lot = tour.GetLotOfAssociation(*assoc2);
+			EXPECT_EQ(lot, file.GetLottery()[i].StartNo);
+		}
 
 		auto table = tour.FindMatchTableByDescription("Jugend u10 w -20,7 kg");
 		ASSERT_TRUE(table);

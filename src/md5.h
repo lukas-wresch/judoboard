@@ -347,6 +347,7 @@ namespace Judoboard
 		const std::vector<Participant*>& GetParticipants()  const { return m_Participants; }
 		const std::vector<Match>&		 GetMatches()	    const { return m_Matches; }
 		const std::vector<Result>&       GetResults()	    const { return m_Results; }
+		const std::vector<Lottery>&      GetLottery()       const { return m_Lottery; }
 
 		int GetNumAssociations()  const { return m_NumAssociations; }//Returns the number of associations that should be in the file according to the header, not the actual number of associations read
 		int GetNumClubs()		  const { return m_NumClubs; }//Returns the number of clubs that should be in the file according to the header, not the actual number of clubs read
