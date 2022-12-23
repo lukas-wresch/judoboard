@@ -208,9 +208,11 @@ bool Mat::StartMatch(Match* NewMatch)
 	NewMatch->StartMatch();
 	AddEvent(MatchLog::NeutralEvent::StartMatch);
 
-	m_mutex.unlock();
-
 	NextState(State::TransitionToMatch);
+	assert(m_State == State::TransitionToMatch);
+	assert(AreFightersOnMat());
+
+	m_mutex.unlock();
 
 	ZED::Log::Info("New match started");
 	return true;
@@ -1200,6 +1202,8 @@ void Mat::NextState(State NextState) const
 	if (m_State == NextState)
 		return;
 
+	m_mutex.lock();
+
 	if (m_State == State::StartUp && NextState == State::TransitionToMatch)
 		this->NextState(State::TransitionToWaiting);
 	if (m_State == State::TransitionToWaiting && NextState == State::TransitionToMatch)
@@ -1223,8 +1227,6 @@ void Mat::NextState(State NextState) const
 
 	auto& renderer = m_Window.GetRenderer();
 	renderer.Lock();
-
-	m_mutex.lock();
 
 	switch (NextState)
 	{
@@ -2280,10 +2282,10 @@ bool Mat::Mainloop()
 	{
 		auto nextMatches = m_Application->GetNextMatches(GetMatID());
 
+		m_mutex.lock();
 		if (nextMatches.size() == 0 && m_State == State::Waiting)
 			NextState(State::StartUp);
 
-		m_mutex.lock();
 		m_NextMatches = std::move(nextMatches);
 		m_mutex.unlock();
 	}

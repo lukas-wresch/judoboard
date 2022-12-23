@@ -305,15 +305,13 @@ TEST(Ajax, SetFullscreen)
 TEST(Ajax, GetHansokumake)
 {
 	initialize();
-
+	
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		Application app;
 
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
-
-		ZED::Core::Pause(100);
 
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
@@ -322,7 +320,6 @@ TEST(Ajax, GetHansokumake)
 
 		EXPECT_TRUE(mat->StartMatch(&match));
 		EXPECT_TRUE(mat->AreFightersOnMat());
-		ZED::Core::Pause(1000);
 		mat->AddHansokuMake(f);
 		
 		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
@@ -349,7 +346,8 @@ TEST(Ajax, GetHansokumake)
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		mat->AddHansokuMake(f);
 		mat->AddDisqualification(f);
 
