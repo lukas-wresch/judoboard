@@ -1574,7 +1574,7 @@ void Tournament::PerformLottery()
 
 	Lock();
 
-	std::unordered_set<UUID> clubforlottery;
+	std::unordered_set<UUID> clubsforlottery;
 	const auto organizer_level = m_Organizer->GetLevel();
 	const auto lottery_level   = organizer_level + 1;
 
@@ -1587,24 +1587,24 @@ void Tournament::PerformLottery()
 			club = club->GetParent();
 
 		if (club && club->GetLevel() == lottery_level)
-			clubforlottery.insert(*club);
+			clubsforlottery.insert(*club);
 	}
 
 	m_AssociationToLotNumber.clear();
-	auto max_lot = clubforlottery.size();
+	auto max_lot = clubsforlottery.size();
 	std::random_device rd;
 
 	for (size_t lot = 0; lot < max_lot; ++lot)
 	{
-		auto index = rd() % clubforlottery.size();
+		auto index = rd() % clubsforlottery.size();
 
-		auto it = clubforlottery.cbegin();
+		auto it = clubsforlottery.cbegin();
 		for (size_t i = 0; i < index; ++i)
 			++it;
 
 		auto assoc = *it;
 		m_AssociationToLotNumber.insert({ assoc, lot });
-		clubforlottery.erase(it);
+		clubsforlottery.erase(it);
 	}
 
 	Unlock();

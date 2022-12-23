@@ -488,6 +488,51 @@ TEST(Tournament, ParticipantHasSameIDAsInDatabase)
 
 
 
+TEST(Tournament, Lottery)
+{
+	initialize();	
+
+	for (int i = 0; i < 100; ++i)
+	{
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+		Tournament tourney("deleteMe");
+
+		Association* assoc = new Association(GetRandomName(), nullptr);
+		Club* c1 = new Club(GetRandomName());
+		c1->SetParent(assoc);
+		Club* c2 = new Club(GetRandomName());
+		c2->SetParent(assoc);
+
+		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
+		j1->SetClub(c1);
+		Judoka* j2 = new Judoka(GetRandomName(), GetRandomName());
+		j2->SetClub(c2);
+
+		tourney.SetOrganizer(assoc);
+
+		EXPECT_TRUE(tourney.AddParticipant(j1));
+		EXPECT_TRUE(tourney.AddParticipant(j2));
+
+		tourney.PerformLottery();
+
+		auto lot1 = tourney.GetLotOfAssociation(*c1);
+		auto lot2 = tourney.GetLotOfAssociation(*c2);
+		EXPECT_GE(lot1, 0);
+		EXPECT_GE(lot2, 0);
+		EXPECT_LE(lot1, 1);
+		EXPECT_LE(lot2, 1);
+		EXPECT_NE(lot1, lot2);
+
+		Tournament tourney2("deleteMe");
+		EXPECT_EQ(tourney.GetLotOfAssociation(*c1), tourney2.GetLotOfAssociation(*c1));
+		EXPECT_EQ(tourney.GetLotOfAssociation(*c2), tourney2.GetLotOfAssociation(*c2));
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, CanNotAddParticipantOfWrongAssociation)
 {
 	initialize();
