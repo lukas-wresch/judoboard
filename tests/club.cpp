@@ -10,8 +10,8 @@ TEST(Club, Basic)
 	c.SetShortName("short");
 
 	EXPECT_EQ(c.GetName(), "name");
-  EXPECT_EQ(c.GetShortName(), "short");
-	EXPECT_EQ(c.GetLevel(), -1);
+	EXPECT_EQ(c.GetShortName(), "short");
+	//EXPECT_EQ(c.GetLevel(), -1);
 	EXPECT_EQ(c.GetParent(), nullptr);
 }
 
