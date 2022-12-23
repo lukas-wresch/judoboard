@@ -320,7 +320,8 @@ TEST(Ajax, GetHansokumake)
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		ZED::Core::Pause(1000);
 		mat->AddHansokuMake(f);
 		
@@ -376,7 +377,8 @@ TEST(Ajax, GetHansokumake)
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		mat->AddHansokuMake(f);
 		mat->AddNoDisqualification(f);
 
@@ -410,7 +412,8 @@ TEST(Ajax, GetHansokumake2)
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		for (int i = 0;i < 5; i++)
 			mat->AddShido(f);
 
@@ -1139,6 +1142,7 @@ TEST(Ajax, AddDisqualification)
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		ZED::Core::Pause(1000);
 		mat->AddHansokuMake(f);
 
@@ -1171,7 +1175,8 @@ TEST(Ajax, RemoveDisqualification)
 
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		ZED::Core::Pause(1000);
 		mat->AddHansokuMake(f);
 
