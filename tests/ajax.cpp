@@ -321,7 +321,7 @@ TEST(Ajax, GetHansokumake)
 		EXPECT_EQ(ret, "[]");
 
 		mat->StartMatch(&match);
-		ZED::Core::Pause(100);
+		ZED::Core::Pause(1000);
 		mat->AddHansokuMake(f);
 		
 		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
@@ -1139,7 +1139,7 @@ TEST(Ajax, AddDisqualification)
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		EXPECT_TRUE(mat->StartMatch(&match));
-		ZED::Core::Pause(100);
+		ZED::Core::Pause(1000);
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
@@ -1172,7 +1172,7 @@ TEST(Ajax, RemoveDisqualification)
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		mat->StartMatch(&match);
-		ZED::Core::Pause(100);
+		ZED::Core::Pause(1000);
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
@@ -1442,7 +1442,7 @@ TEST(Ajax, NoDisqualification)
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		mat->StartMatch(&match);
-		ZED::Core::Pause(200);
+		ZED::Core::Pause(1000);
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
@@ -1475,7 +1475,7 @@ TEST(Ajax, RemoveNoDisqualification)
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		EXPECT_TRUE(mat->StartMatch(&match));
-		ZED::Core::Pause(100);
+		ZED::Core::Pause(1000);
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
