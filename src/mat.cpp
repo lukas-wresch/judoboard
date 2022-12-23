@@ -69,14 +69,6 @@ bool Mat::Open()
 		if (!renderer.InitFonts("assets/fonts/arial.ttf", (int)tiny, (int)middle, (int)large, (int)huge, (int)gigantic, (int)gigantic2))
 			ZED::Log::Error("Could not load font");
 
-		if (!m_Background)
-		{
-			m_Background = m_Window.GetRenderer().CreateTexture(100, 100);
-			m_Background->CreateGradient(0, 0, 255, 255, 255, 255);
-		}
-
-		ZED::Log::Info("Background created");
-
 		if (!m_Logo)
 			m_Logo = m_Window.GetRenderer().CreateTexture("assets/logo.png");
 		if (!m_Winner)
@@ -86,6 +78,14 @@ bool Mat::Open()
 		m_Graphics["winner_white"].SetTexture(m_Winner);
 
 		ZED::Log::Info("Logo loaded");
+
+		if (!m_Background)
+		{
+			m_Background = m_Window.GetRenderer().CreateTexture(100, 100);
+			m_Background->CreateGradient(0, 0, 255, 255, 255, 255);
+		}
+
+		ZED::Log::Info("Background created");
 
 		while (m_Window.IsRunning())
 			Mainloop();
