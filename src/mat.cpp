@@ -866,6 +866,8 @@ void Mat::AddDisqualification(Fighter Whom)
 
 		m_mutex.unlock();
 	}
+
+	ZED::Log::Info("Disqualification");
 }
 
 
@@ -894,6 +896,8 @@ void Mat::AddNoDisqualification(Fighter Whom)
 
 		m_mutex.unlock();
 	}
+
+	ZED::Log::Info("No Disqualification");
 }
 
 
