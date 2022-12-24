@@ -533,6 +533,54 @@ TEST(Tournament, Lottery)
 
 
 
+TEST(Tournament, Lottery_Histogram)
+{
+	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	size_t c1_count = 0;
+	size_t c2_count = 0;
+
+	for (int i = 0; i < 100; ++i)
+	{
+		Tournament tourney("deleteMe");
+		tourney.EnableAutoSave(false);
+
+		Association* assoc = new Association(GetRandomName(), nullptr);
+		Club* c1 = new Club(GetRandomName());
+		c1->SetParent(assoc);
+		Club* c2 = new Club(GetRandomName());
+		c2->SetParent(assoc);
+
+		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
+		j1->SetClub(c1);
+		Judoka* j2 = new Judoka(GetRandomName(), GetRandomName());
+		j2->SetClub(c2);
+
+		tourney.SetOrganizer(assoc);
+
+		EXPECT_TRUE(tourney.AddParticipant(j1));
+		EXPECT_TRUE(tourney.AddParticipant(j2));
+
+		tourney.PerformLottery();
+
+		auto lot1 = tourney.GetLotOfAssociation(*c1);
+		auto lot2 = tourney.GetLotOfAssociation(*c2);
+
+		c1_count += lot1;
+		c2_count += lot2;
+	}
+
+	EXPECT_GE(c1_count, 40);
+	EXPECT_LE(c1_count, 60);
+	EXPECT_GE(c2_count, 40);
+	EXPECT_LE(c2_count, 60);
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, CanNotAddParticipantOfWrongAssociation)
 {
 	initialize();
