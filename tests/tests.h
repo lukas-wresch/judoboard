@@ -57,6 +57,7 @@ inline void initialize() noexcept
 
 	Judoboard::ID::Reset();
 	Application::NoWindow = true;
+	Localizer::SetLanguage(Language::English);
 }
 
 

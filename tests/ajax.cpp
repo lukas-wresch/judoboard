@@ -81,7 +81,7 @@ TEST(Ajax, CloseMat)
 
 		app.Ajax_CloseMat(HttpServer::Request("id=1"));
 
-		EXPECT_TRUE(app.GetDefaultMat());
+		ASSERT_TRUE(app.GetDefaultMat());
 		EXPECT_FALSE(app.GetDefaultMat()->IsOpen());
 	}
 
@@ -178,6 +178,86 @@ TEST(Ajax, UpdatePassword)
 
 		EXPECT_EQ(acc->GetPassword(), "pwd3");
 		EXPECT_EQ(acc->GetAccessLevel(), Account::AccessLevel::User);
+	}
+}
+
+
+
+TEST(Ajax, Setup_Get)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto yaml = YAML::Load(app.Ajax_GetSetup());
+
+		EXPECT_EQ(yaml["language"].as<int>(), (int)Localizer::GetLanguage());
+		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetServerPort());
+		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
+		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+
+		ZED::Core::Pause(1000);
+
+		yaml = YAML::Load(app.Ajax_GetSetup());
+
+		EXPECT_EQ(yaml["language"].as<int>(), (int)Localizer::GetLanguage());
+		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetServerPort());
+		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 1100u);
+		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+	}
+
+}
+
+
+
+TEST(Ajax, Setup_Set)
+{
+	initialize();
+
+	{
+		Application app;
+		
+		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=1234&language=0&ipponStyle=1&timerStyle=2&nameStyle=0")), "ok");
+
+		auto yaml = YAML::Load(app.Ajax_GetSetup());
+
+		EXPECT_EQ(yaml["language"].as<int>(), 0);
+		EXPECT_EQ(yaml["port"].as<int>(), 1234);
+		EXPECT_EQ(yaml["ippon_style"].as<int>(), 1);
+		EXPECT_EQ(yaml["timer_style"].as<int>(), 2);
+		EXPECT_EQ(yaml["name_style"].as<int>(),  0);
+		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
+		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+
+		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&ipponStyle=0&timerStyle=1&nameStyle=1")), "ok");
+
+		yaml = YAML::Load(app.Ajax_GetSetup());
+
+		EXPECT_EQ(yaml["language"].as<int>(), 1);
+		EXPECT_EQ(yaml["port"].as<int>(), 567);
+		EXPECT_EQ(yaml["ippon_style"].as<int>(), 0);
+		EXPECT_EQ(yaml["timer_style"].as<int>(), 1);
+		EXPECT_EQ(yaml["name_style"].as<int>(),  1);
+		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
+		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+	}
+}
+
+
+
+TEST(Ajax, ExecuteCommand)
+{
+	initialize();
+
+	{
+		Application app;
+
+		std::string result = app.Ajax_Execute(HttpServer::Request("cmd=dir"));
+
+		EXPECT_GE(result.length(), 170);
+
+		//TODO?!
 	}
 }
 
@@ -1150,42 +1230,6 @@ TEST(Ajax, ListLots)
 
 
 
-TEST(Ajax, Status)
-{
-	initialize();
-
-	{
-		Application app;
-
-		{
-			YAML::Node yaml = YAML::Load(app.Ajax_Status());
-			uint32_t uptime = yaml["uptime"].as<uint32_t>();
-			EXPECT_TRUE(uptime < 100);
-
-			auto version = yaml["version"].as<std::string>();
-			EXPECT_EQ(version, Application::Version);
-		}
-		
-		ZED::Core::Pause(1000);
-
-		{
-			YAML::Node yaml = YAML::Load(app.Ajax_Status());
-			uint32_t uptime = yaml["uptime"].as<uint32_t>();
-			EXPECT_TRUE(uptime < 1100);
-		}
-
-		ZED::Core::Pause(1000);
-
-		{
-			YAML::Node yaml = YAML::Load(app.Ajax_Status());
-			uint32_t uptime = yaml["uptime"].as<uint32_t>();
-			EXPECT_TRUE(uptime < 2100);
-		}
-	}
-}
-
-
-
 TEST(Ajax, AddDisqualification)
 {
 	initialize();
@@ -1772,38 +1816,43 @@ TEST(Ajax, AddTournament)
 TEST(Ajax, EditTournament)
 {
 	initialize();
-
+	ZED::Core::RemoveFile("tournaments/test.yml");
 	ZED::Core::RemoveFile("database.yml");
-	Application app;
 
-	auto rules1 = new RuleSet("Test Rules1", 100, 100, 20, 10);
-	auto rules2 = new RuleSet("Test Rules2", 100, 100, 20, 10);
-	app.GetDatabase().AddRuleSet(rules1);
-	app.GetDatabase().AddRuleSet(rules2);
+	{
+		Application app;
 
-	auto assoc1 = new Association("Organizer1", nullptr);
-	auto assoc2 = new Association("Organizer2", nullptr);
-	app.GetDatabase().AddAssociation(assoc1);
-	app.GetDatabase().AddAssociation(assoc2);
+		auto rules1 = new RuleSet("Test Rules1", 100, 100, 20, 10);
+		auto rules2 = new RuleSet("Test Rules2", 100, 100, 20, 10);
+		app.GetDatabase().AddRuleSet(rules1);
+		app.GetDatabase().AddRuleSet(rules2);
 
-	EXPECT_TRUE(app.Ajax_AddTournament(HttpServer::Request("", "name=test&year=2000&rules=" + (std::string)rules1->GetUUID() + "&organizer=" + (std::string)assoc1->GetUUID())));
+		auto assoc1 = new Association("Organizer1", nullptr);
+		auto assoc2 = new Association("Organizer2", nullptr);
+		app.GetDatabase().AddAssociation(assoc1);
+		app.GetDatabase().AddAssociation(assoc2);
 
-	EXPECT_FALSE(app.Ajax_EditTournament(HttpServer::Request("", "name=test2&year=2001&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
+		EXPECT_TRUE(app.Ajax_AddTournament(HttpServer::Request("", "name=test&year=2000&rules=" + (std::string)rules1->GetUUID() + "&organizer=" + (std::string)assoc1->GetUUID())));
 
-	auto tour1 = app.FindTournamentByName("test");
-	ASSERT_TRUE(tour1);
+		EXPECT_FALSE(app.Ajax_EditTournament(HttpServer::Request("", "name=test2&year=2001&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
 
-	EXPECT_FALSE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test2&year=2001&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
+		auto tour1 = app.FindTournamentByName("test");
+		ASSERT_TRUE(tour1);
 
-	EXPECT_TRUE(app.CloseTournament());
+		EXPECT_FALSE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test2&year=2001&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
 
-	EXPECT_TRUE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test2&year=2001&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
+		EXPECT_TRUE(app.CloseTournament());
 
-	auto tour = app.FindTournamentByName("test2");
-	ASSERT_TRUE(tour);
-	ASSERT_TRUE(tour->GetDefaultRuleSet());
-	EXPECT_EQ(*tour->GetDefaultRuleSet(), *rules2);
-	EXPECT_EQ(tour->GetDatabase().GetYear(), 2001);
-	ASSERT_TRUE(tour->GetOrganizer());
-	EXPECT_EQ(*tour->GetOrganizer(), *assoc2);
+		EXPECT_TRUE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test2&year=2001&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
+
+		auto tour = app.FindTournamentByName("test2");
+		ASSERT_TRUE(tour);
+		ASSERT_TRUE(tour->GetDefaultRuleSet());
+		EXPECT_EQ(*tour->GetDefaultRuleSet(), *rules2);
+		EXPECT_EQ(tour->GetDatabase().GetYear(), 2001);
+		ASSERT_TRUE(tour->GetOrganizer());
+		EXPECT_EQ(*tour->GetOrganizer(), *assoc2);
+	}
+
+	ZED::Core::RemoveFile("tournaments/test.yml");
 }

@@ -210,6 +210,8 @@ MD5::MD5(const Tournament& Tournament)
 			new_weightclass = new Weightclass;
 
 			new_weightclass->FightSystemID = 19;
+			if (match_table->GetParticipants().size() > 16)
+				new_weightclass->FightSystemID = 20;
 
 			new_weightclass->WeightLargerThan          = (uint32_t)single_elimination->GetMinWeight() / 1000;
 			new_weightclass->WeightInGrammsLargerThan  = (uint32_t)single_elimination->GetMinWeight() % 1000;
@@ -342,8 +344,46 @@ MD5::MD5(const Tournament& Tournament)
 
 		auto match_table = match->GetMatchTable();
 
+		//Calculate match number
 		if (match_table)
+		{
 			new_match.MatchNo = (int)match_table->FindMatchIndex(*match) + 1;
+
+			if (match_table->GetType() == MatchTable::Type::SingleElimination)
+			{
+				auto table = (SingleElimination*)match_table;
+				//16 system
+				if (match_table->GetParticipants().size() > 8 && match_table->GetParticipants().size() <= 16)
+				{
+					if (!table->IsThirdPlaceMatch() && !table->IsFifthPlaceMatch())
+					{
+						if (new_match.MatchNo == 15)
+							new_match.MatchNo = 19;
+					}
+
+					else if (table->IsThirdPlaceMatch() && table->IsFifthPlaceMatch())
+					{
+						//if (new_match.MatchNo == 15)
+							//;//wrong export
+						//if (new_match.MatchNo == 16)
+							//;//wrong export
+						if (new_match.MatchNo == 17)//Fifth
+							new_match.MatchNo = 21;
+						if (new_match.MatchNo == 18)//Third
+							new_match.MatchNo = 20;
+						if (new_match.MatchNo == 19)//Final
+							new_match.MatchNo = 19;
+					}
+				}
+
+				//32 system
+				if (match_table->GetParticipants().size() > 16 && match_table->GetParticipants().size() <= 32)
+				{
+					if (new_match.MatchNo >= 31)
+						new_match.MatchNo = 37;
+				}
+			}
+		}
 
 		if (match_table && match_table->GetAgeGroup())
 		{
@@ -379,7 +419,9 @@ MD5::MD5(const Tournament& Tournament)
 				//TODO draw can not be converted
 			}
 
+			new_match.Result = 1;//Result is available
 			new_match.ScoreWinner = (int)match->GetResult().m_Score;
+			new_match.ScoreLoser  = 0;
 			new_match.Time        = match->GetResult().m_Time / 1000;
 		}
 		else//Not concluded

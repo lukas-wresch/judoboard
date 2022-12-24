@@ -33,15 +33,13 @@ namespace Judoboard
 		~Tournament();
 
 		void Reset();
-		[[deprecated]]
-		void ConnectToDatabase(Database& db);//Replaces all local references to judoka with reference to the database (as long as the tournament is not finalized)
 
 		[[nodiscard]]
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
 		const auto& GetSchedule() const { return m_Schedule; }
 		Match* FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
-		const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
+		virtual const StandingData& GetDatabase() const override { return m_StandingData; }//Returns a database containing all participants
 		void SetYear(uint32_t NewYear) { m_StandingData.SetYear(NewYear); }
 
 		void SetName(const std::string& NewName) { m_Name = NewName; }
@@ -161,14 +159,14 @@ namespace Judoboard
 
 		void GenerateSchedule();
 
-		bool Save() const {
+		bool Save() {
 			if (!m_AutoSave) return true;
 			return SaveYAML("tournaments/" + m_Name + ".yml");
 		}
 
 	private:
 		bool LoadYAML(const std::string& Filename);
-		bool SaveYAML(const std::string& Filename) const;
+		bool SaveYAML(const std::string& Filename);
 
 		void FindAgeGroupForJudoka(const Judoka& Judoka);
 

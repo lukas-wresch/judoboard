@@ -174,6 +174,7 @@ namespace Judoboard
 			//15 = round robin?
 			//16 = round robin (5 participants)
 			//19 = Single elimination (single consulation bracket, 16 system)
+			//20 = Single elimination (single consulation bracket, 32 system)
 			//24 = pooled (6 participants) 3+3 pool
 			int FightSystemTypeID = 1;//Unknown field, always 1
 

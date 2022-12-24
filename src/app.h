@@ -152,7 +152,10 @@ namespace Judoboard
 		Error Ajax_PerformLottery();
 		std::string Ajax_ListLots();
 
-		std::string Ajax_Status();
+		//Config
+		std::string Ajax_GetSetup();
+		Error Ajax_SetSetup(const HttpServer::Request& Request);
+		std::string Ajax_Execute(const HttpServer::Request& Request);
 
 		//Serialization
 		[[deprecated]]
