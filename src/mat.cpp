@@ -418,18 +418,16 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 
 void Mat::Hajime()
 {
+	m_mutex.lock();
+
 	//Double ippons during golden score?
 	if (AreFightersOnMat() && IsGoldenScore() && GetScoreboard(Fighter::White).m_Ippon == 1 && GetScoreboard(Fighter::Blue).m_Ippon == 1)
 	{
-		m_mutex.lock();
 		SetScoreboard(Fighter::White).m_Ippon = SetScoreboard(Fighter::Blue).m_Ippon = 0;//Remove ippons
-		m_mutex.unlock();
 	}
 
 	if (AreFightersOnMat() && !IsIppon())
 	{
-		m_mutex.lock();
-
 		if (IsOsaekomi())//Yoshi
 		{
 			m_OsaekomiTimer[(int)GetOsaekomiHolder()].Start();
@@ -457,11 +455,11 @@ void Mat::Hajime()
 			m_Graphics["osaekomi_bar_border"].StopAllAnimations().SetPosition(0, 0, 0);
 			m_Graphics["osaekomi_bar"].StopAllAnimations().SetPosition(0, 0, 0);
 		}
-
-		m_mutex.unlock();
 	}
 
-	ZED::Log::Debug("Hajime");
+	m_mutex.unlock();
+
+	ZED::Log::Info("Hajime");
 }
 
 
@@ -771,20 +769,20 @@ void Mat::SetAsDraw(bool Enable)
 
 void Mat::AddShido(Fighter Whom)
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat() && GetScoreboard(Whom).m_Shido < 3)
 	{
-		m_mutex.lock();
-
 		SetScoreboard(Whom).m_Shido++;
 
 		AddEvent(Whom, MatchLog::BiasedEvent::AddShido);
 		m_Graphics["effect_shido_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -20.0, [](auto& g) { return g.m_a > 0.0; }));
 
-		m_mutex.unlock();
-
 		if (GetScoreboard(Whom).m_Shido == 3)//Hansoku-make
 			AddHansokuMake(Whom, false);//Add indirect hansokumake
 	}
+
+	m_mutex.unlock();
 
 	ZED::Log::Debug("Shido");
 }
@@ -793,10 +791,10 @@ void Mat::AddShido(Fighter Whom)
 
 void Mat::RemoveShido(Fighter Whom)
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat() && GetScoreboard(Whom).m_Shido > 0)
 	{
-		m_mutex.lock();
-
 		AddEvent(Whom, MatchLog::BiasedEvent::RemoveShido);
 		m_Graphics["effect_shido_" + Fighter2String(Whom)].StopAllAnimations().SetAlpha(0);
 
@@ -804,17 +802,19 @@ void Mat::RemoveShido(Fighter Whom)
 			RemoveHansokuMake(Whom);
 
 		SetScoreboard(Whom).m_Shido--;
-		m_mutex.unlock();
 	}
+
+	m_mutex.unlock();
 }
 
 
 
 void Mat::AddHansokuMake(Fighter Whom, bool Direct)
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat() && !GetScoreboard(Whom).m_HansokuMake)
 	{
-		m_mutex.lock();
 		SetScoreboard(Whom).m_HansokuMake = true;
 		SetScoreboard(Whom).m_HansokuMake_Direct = Direct;
 
@@ -831,10 +831,10 @@ void Mat::AddHansokuMake(Fighter Whom, bool Direct)
 
 		m_Graphics["effect_hansokumake_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -10.0, [](auto& g) { return g.m_a > 0.0; }));
 
-		m_mutex.unlock();
-
 		AddIppon(!Whom);
 	}
+
+	m_mutex.unlock();
 
 	ZED::Log::Info("Hansokumake");
 }
@@ -843,32 +843,34 @@ void Mat::AddHansokuMake(Fighter Whom, bool Direct)
 
 void Mat::RemoveHansokuMake(Fighter Whom)
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake)
 	{
-		m_mutex.lock();
 		SetScoreboard(Whom).m_HansokuMake = false;
 		SetScoreboard(Whom).m_HansokuMake_Direct = false;
 
 		AddEvent(Whom, MatchLog::BiasedEvent::RemoveHansokuMake);
 		m_Graphics["effect_hansokumake_" + Fighter2String(Whom)].StopAllAnimations().SetAlpha(0);
-
-		m_mutex.unlock();
 	}
+
+	m_mutex.unlock();
 }
 
 
 
 void Mat::AddDisqualification(Fighter Whom)
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat() && GetScoreboard(Whom).m_HansokuMake && GetScoreboard(Whom).m_HansokuMake_Direct && !GetScoreboard(Whom).IsDisqualified())
 	{
-		m_mutex.lock();
 		SetScoreboard(Whom).m_Disqualification = Scoreboard::DisqualificationState::Disqualified;
 
 		AddEvent(Whom, MatchLog::BiasedEvent::AddDisqualification);
-
-		m_mutex.unlock();
 	}
+
+	m_mutex.unlock();
 
 	ZED::Log::Info("Disqualification");
 }
@@ -1936,6 +1938,7 @@ bool Mat::Render(double dt) const
 	UpdateGraphics();
 	
 	auto& renderer = m_Window.GetRenderer();
+	m_mutex.lock();
 	renderer.Lock();
 	renderer.ClearDisplay();
 	
@@ -2265,6 +2268,7 @@ bool Mat::Render(double dt) const
 	}
 
 	renderer.Unlock();
+	m_mutex.unlock();
 
 	return true;
 }
