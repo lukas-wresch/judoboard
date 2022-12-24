@@ -1,18 +1,18 @@
-<h2>List of Tournaments</h2>
+<h2 id="headline"></h2>
 
-<button class="add" style="margin-bottom: 1cm;" onclick="navigate('tournament_add.html')" id="new_tournament">New Tournament</button>
+<button class="add" style="margin-bottom: 1cm;" onclick="navigate('tournament_add.html')" id="new_tournament"></button>
 
 <form style="display: inline;" action="/upload/md5" method="post" id="upload_form" enctype="multipart/form-data">
     <input id="file" name="file" type="file" accept="text/*.*" onchange="document.getElementById('upload_form').submit();" hidden/>
-    <button class="add" id="add" onclick="document.getElementById('file').click(); return false;">Upload MD5 File</button>
+    <button class="add" id="upload_md5_file" onclick="document.getElementById('file').click(); return false;"></button>
 </form>
 
 <table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
-    <th style="width: 4cm;" id="name">Name</th>
-    <th style="width: 4cm;" id="description">Description</th>
-    <th style="width: 4cm;" id="status">Status</th>
-    <th style="width: 3cm;" id="options">Options</th>
+    <th style="width: 4cm;" id="name"></th>
+    <th style="width: 4cm;" id="description"></th>
+    <th style="width: 4cm;" id="status"></th>
+    <th style="width: 3cm;" id="options"></th>
   </tr>
 </table>
 
@@ -93,5 +93,15 @@ function CloseTournament(id)
 }
 
 GetTournaments();
+
+document.getElementById("headline").innerHTML        = translate('list_of_tournaments');
+
+document.getElementById("new_tournament").innerHTML  = translate('new_tournament');
+document.getElementById("upload_md5_file").innerHTML = translate('upload_md5_file');
+
+document.getElementById("name").innerHTML        = translate('name');
+document.getElementById("description").innerHTML = translate('description');
+document.getElementById("status").innerHTML      = translate('status');
+document.getElementById("options").innerHTML     = translate('options');
 
 </script>

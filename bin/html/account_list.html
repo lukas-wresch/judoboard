@@ -1,6 +1,6 @@
-<h2>List of Accounts</h2>
+<h2 id="headline"></h2>
 
-<button class="add" style="margin-bottom: 1cm;" onclick="navigate('account_add.html')">New Account</button> 
+<button class="add" style="margin-bottom: 1cm; width: 4cm;" id="new_account" onclick="navigate('account_add.html')"></button> 
 
 <table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
@@ -110,5 +110,10 @@ function DeleteAccount(id)
 GetAccountList();
 GetNonceList();
 
+document.getElementById("headline").innerHTML = translate('list_of_accounts');
+document.getElementById("new_account").innerHTML = translate('new_account');
+document.getElementById("username").innerHTML = translate('username');
+document.getElementById("password").innerHTML = translate('password');
+document.getElementById("permissions").innerHTML = translate('access_level');
 
 </script>
