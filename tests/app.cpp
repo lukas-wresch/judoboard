@@ -248,7 +248,7 @@ TEST(App, FullTournament)
 		Account acc("admin", "1234", Account::AccessLevel::Admin);
 		app.GetDatabase().AddAccount(acc);
 
-		ZED::Core::Pause(5000);
+		ZED::Core::Pause(1000);
 
 		Judoka j1(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
 		Judoka j2(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
@@ -305,7 +305,7 @@ TEST(App, FullTournament)
 			ASSERT_TRUE(match);
 			EXPECT_TRUE(mat->StartMatch(match));
 
-			ZED::Core::Pause(8000);
+			ZED::Core::Pause(5000);
 
 			mat->Hajime();
 
@@ -344,8 +344,6 @@ TEST(App, FullTournament)
 			ZED::Core::Pause(8000);
 		}
 	}
-
-	ZED::Core::Pause(5000);
 }
 
 

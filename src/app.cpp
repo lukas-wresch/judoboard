@@ -145,7 +145,7 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 
 		//Judoka is now added/updated
 
-		if (!ParseOnly && new_judoka)
+		if (!ParseOnly)
 		{//Add to the current tournament
 			if (File.GetClubs().size() == 1)//If there is only one
 				new_judoka->SetClub(GetDatabase().FindClubByName(File.GetClubs()[0]->Name));
@@ -363,7 +363,10 @@ bool Application::CloseMat(uint32_t ID)
 
 bool Application::StartLocalMat(uint32_t ID)
 {
-	ZED::Log::Debug("Starting local mat");
+	ZED::Log::Info("Starting local mat");
+
+	LockTillScopeEnd();
+
 	for (; true; ID++)
 	{
 		bool is_ok = true;
@@ -389,7 +392,6 @@ bool Application::StartLocalMat(uint32_t ID)
 			break;
 	}
 
-	LockTillScopeEnd();
 	Mat* new_mat = new Mat(ID, this);
 	m_Mats.emplace_back(new_mat);
 

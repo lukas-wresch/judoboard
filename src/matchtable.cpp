@@ -454,8 +454,10 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 
 	if (m_Rules)
 		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
-	if (GetAgeGroup())
-		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)GetAgeGroup()->GetUUID();
+
+	auto age_group = GetAgeGroup();
+	if (age_group)
+		Yaml << YAML::Key << "age_group" << YAML::Value << (std::string)age_group->GetUUID();
 
 	Yaml << YAML::Key << "participants";
 	Yaml << YAML::BeginSeq;

@@ -796,12 +796,9 @@ void Mat::RemoveShido(Fighter Whom)
 		AddEvent(Whom, MatchLog::BiasedEvent::RemoveShido);
 		m_Graphics["effect_shido_" + Fighter2String(Whom)].StopAllAnimations().SetAlpha(0);
 
-		m_mutex.unlock();
-
 		if (GetScoreboard(Whom).m_HansokuMake)
 			RemoveHansokuMake(Whom);
 
-		m_mutex.lock();
 		SetScoreboard(Whom).m_Shido--;
 		m_mutex.unlock();
 	}
@@ -1036,10 +1033,10 @@ void Mat::Osaekomi(Fighter Whom)
 
 void Mat::Tokeda()
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat() && IsOsaekomi())
 	{
-		m_mutex.lock();
-
 		const auto osaekomi_holder = GetOsaekomiHolder();
 
 		m_OsaekomiList.emplace_back(OsaekomiEntry(osaekomi_holder, m_OsaekomiTimer[(int)osaekomi_holder].GetElapsedTime()));
@@ -1055,9 +1052,9 @@ void Mat::Tokeda()
 
 		m_Graphics["effect_osaekomi_" + Fighter2String(osaekomi_holder)].AddAnimation(Animation::CreateLinear(0.0, 0.0, -55.0, [](auto& g) { return g.m_a > 0.0; }));
 		m_Graphics["effect_tokeda_"   + Fighter2String(osaekomi_holder)].StopAllAnimations().SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
-	
-		m_mutex.unlock();
 	}
+
+	m_mutex.unlock();
 }
 
 

@@ -130,7 +130,7 @@ namespace Judoboard
 
 		virtual void GenerateSchedule() {}
 
-		virtual bool Save() const { return false; }
+		virtual bool Save() { return false; }
 
 		void Lock()   const { m_mutex.lock(); }
 		void Unlock() const { m_mutex.unlock(); }
