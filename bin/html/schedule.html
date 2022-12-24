@@ -248,6 +248,9 @@ function Update()
       cell.style.height = "1.3cm";
     }
     
+    if (typeof res.master_schedule.length == "undefined")
+      return;
+
     //For each index
     for (const per_index of res.master_schedule)
     {

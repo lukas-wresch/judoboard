@@ -157,9 +157,9 @@ namespace Judoboard
 		const std::string Participants2String() const override;
 		const std::string MasterSchedule2String() const override;
 
-		void GenerateSchedule();
+		virtual void GenerateSchedule() override;
 
-		bool Save() {
+		virtual bool Save() override {
 			if (!m_AutoSave) return true;
 			return SaveYAML("tournaments/" + m_Name + ".yml");
 		}

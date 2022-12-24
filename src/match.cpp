@@ -24,7 +24,16 @@ Match::Match(const Judoka* White, const Judoka* Blue, const ITournament* Tournam
 
 
 
-Match::Match(const YAML::Node& Yaml, MatchTable* MatchTable, ITournament* Tournament) : m_Tournament(Tournament)
+Match::Match(const DependentJudoka& White, const DependentJudoka& Blue, const ITournament* Tournament, uint32_t MatID)
+{
+	m_White = White;
+	m_Blue  = Blue;
+	SetMatID(MatID);
+}
+
+
+
+Match::Match(const YAML::Node& Yaml, MatchTable* MatchTable, const ITournament* Tournament) : m_Tournament(Tournament)
 {
 	if (!Yaml.IsMap())
 		return;
@@ -57,9 +66,9 @@ Match::Match(const YAML::Node& Yaml, MatchTable* MatchTable, ITournament* Tourna
 		m_Table = Tournament->FindMatchTable(Yaml["match_table"].as<std::string>());
 
 	if (Yaml["dependency_white"])
-		m_White.m_Dependency = (DependencyType)Yaml["dependency_white"].as<int>();
+		m_White.m_Type = (DependencyType)Yaml["dependency_white"].as<int>();
 	if (Yaml["dependency_blue"])
-		m_Blue.m_Dependency = (DependencyType)Yaml["dependency_blue"].as<int>();
+		m_Blue.m_Type = (DependencyType)Yaml["dependency_blue"].as<int>();
 
 	if (Yaml["dependent_match_white"])
 	{
@@ -113,10 +122,10 @@ void Match::operator >>(YAML::Emitter& Yaml) const
 	if (m_Table)
 		Yaml << YAML::Key << "match_table" << YAML::Value << (std::string)m_Table->GetUUID();
 
-	if (m_White.m_Dependency != DependencyType::None)
-		Yaml << YAML::Key << "dependency_white" << YAML::Value << (int)m_White.m_Dependency;
-	if (m_Blue.m_Dependency != DependencyType::None)
-		Yaml << YAML::Key << "dependency_blue"  << YAML::Value << (int)m_Blue.m_Dependency;
+	if (m_White.m_Type != DependencyType::None)
+		Yaml << YAML::Key << "dependency_white" << YAML::Value << (int)m_White.m_Type;
+	if (m_Blue.m_Type != DependencyType::None)
+		Yaml << YAML::Key << "dependency_blue"  << YAML::Value << (int)m_Blue.m_Type;
 
 	if (m_White.m_DependentMatch)
 		Yaml << YAML::Key << "dependent_match_white" << YAML::Value << (std::string)m_White.m_DependentMatch->GetUUID();
@@ -152,7 +161,7 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	}
 	else
 	{
-		Yaml << YAML::Key << "white_dependency_type" << YAML::Value << (int)m_White.m_Dependency;
+		Yaml << YAML::Key << "white_dependency_type" << YAML::Value << (int)m_White.m_Type;
 		if (m_White.m_DependentMatch)
 			Yaml << YAML::Key << "white_dependency_uuid" << YAML::Value << (std::string)m_White.m_DependentMatch->GetUUID();
 	}
@@ -164,7 +173,7 @@ void Match::ToString(YAML::Emitter& Yaml) const
 	}
 	else
 	{
-		Yaml << YAML::Key << "blue_dependency_type" << YAML::Value << (int)m_Blue.m_Dependency;
+		Yaml << YAML::Key << "blue_dependency_type" << YAML::Value << (int)m_Blue.m_Type;
 		if (m_Blue.m_DependentMatch)
 			Yaml << YAML::Key << "blue_dependency_uuid" << YAML::Value << (std::string)m_Blue.m_DependentMatch->GetUUID();
 	}
@@ -214,6 +223,38 @@ Status Match::GetStatus() const
 
 
 
+bool Match::HasConcluded() const
+{
+	if (IsEmptyMatch())
+		return true;
+
+	if (IsBestOfThree() && m_White.m_DependentMatch && m_Blue.m_DependentMatch)
+	{
+		if (m_White.m_DependentMatch->HasConcluded() && m_Blue.m_DependentMatch->HasConcluded())
+		{
+			if (!m_White.m_DependentMatch->GetWinner())
+				return true;
+			if (!m_Blue.m_DependentMatch->GetWinner())
+				return true;
+			if (*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())
+				return true;
+		}
+	}
+
+	return m_State == Status::Concluded;
+}
+
+
+
+uint32_t Match::GetMatID() const
+{
+	if (m_MatID <= 0 && m_Table)//No override specified and associated to a match table
+		return m_Table->GetMatID();//Take the mat of the match table
+	return m_MatID;
+}
+
+
+
 const Judoka* Match::GetFighter(Fighter Fighter) const
 {
 	if (Fighter == Fighter::White)
@@ -221,16 +262,16 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 		if (m_White.m_Judoka)
 			return m_White.m_Judoka;
 
-		else if (m_White.m_Dependency == DependencyType::BestOfThree && m_White.m_DependentMatch)
+		else if (m_White.m_Type == DependencyType::BestOfThree && m_White.m_DependentMatch)
 			return m_White.m_DependentMatch->GetFighter(Fighter::White);
 
-		else if (m_White.m_Dependency == DependencyType::TakeWinner)
+		else if (m_White.m_Type == DependencyType::TakeWinner)
 		{
 			if (m_White.m_DependentMatch && m_White.m_DependentMatch->HasConcluded())
 				return m_White.m_DependentMatch->GetWinner();
 		}
 
-		else if (m_White.m_Dependency == DependencyType::TakeLoser)
+		else if (m_White.m_Type == DependencyType::TakeLoser)
 		{
 			if (m_White.m_DependentMatch && m_White.m_DependentMatch->HasConcluded())
 				return m_White.m_DependentMatch->GetLoser();
@@ -243,16 +284,16 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 	if (m_Blue.m_Judoka)
 		return m_Blue.m_Judoka;
 
-	else if (m_Blue.m_Dependency == DependencyType::BestOfThree && m_Blue.m_DependentMatch)
+	else if (m_Blue.m_Type == DependencyType::BestOfThree && m_Blue.m_DependentMatch)
 		return m_Blue.m_DependentMatch->GetFighter(Fighter::Blue);
 
-	else if (m_Blue.m_Dependency == DependencyType::TakeWinner)
+	else if (m_Blue.m_Type == DependencyType::TakeWinner)
 	{
 		if (m_Blue.m_DependentMatch && m_Blue.m_DependentMatch->HasConcluded())
 			return m_Blue.m_DependentMatch->GetWinner();
 	}
 
-	else if (m_Blue.m_Dependency == DependencyType::TakeLoser)
+	else if (m_Blue.m_Type == DependencyType::TakeLoser)
 	{
 		if (m_Blue.m_DependentMatch && m_Blue.m_DependentMatch->HasConcluded())
 			return m_Blue.m_DependentMatch->GetLoser();
@@ -270,7 +311,7 @@ std::vector<const Judoka*> Match::GetPotentialFighters() const
 	if (m_White.m_Judoka)
 		ret.emplace_back(m_White.m_Judoka);
 
-	else if (m_White.m_Dependency == DependencyType::TakeWinner || m_White.m_Dependency == DependencyType::TakeLoser)
+	else if (m_White.m_Type == DependencyType::TakeWinner || m_White.m_Type == DependencyType::TakeLoser)
 	{
 		if (m_White.m_DependentMatch)
 		{
@@ -282,7 +323,7 @@ std::vector<const Judoka*> Match::GetPotentialFighters() const
 	if (m_Blue.m_Judoka)
 		ret.emplace_back(m_Blue.m_Judoka);
 
-	else if (m_Blue.m_Dependency == DependencyType::TakeWinner || m_Blue.m_Dependency == DependencyType::TakeLoser)
+	else if (m_Blue.m_Type == DependencyType::TakeWinner || m_Blue.m_Type == DependencyType::TakeLoser)
 	{
 		if (m_Blue.m_DependentMatch)
 		{
@@ -305,7 +346,7 @@ std::vector<const Judoka*> Match::GetPotentialFighters(Fighter Fighter) const
 		if (m_White.m_Judoka)
 			ret.emplace_back(m_White.m_Judoka);
 
-		else if (m_White.m_Dependency == DependencyType::TakeWinner || m_White.m_Dependency == DependencyType::TakeLoser)
+		else if (m_White.m_Type == DependencyType::TakeWinner || m_White.m_Type == DependencyType::TakeLoser)
 		{
 			if (m_White.m_DependentMatch)
 			{
@@ -320,7 +361,7 @@ std::vector<const Judoka*> Match::GetPotentialFighters(Fighter Fighter) const
 		if (m_Blue.m_Judoka)
 			ret.emplace_back(m_White.m_Judoka);
 
-		else if (m_Blue.m_Dependency == DependencyType::TakeWinner || m_Blue.m_Dependency == DependencyType::TakeLoser)
+		else if (m_Blue.m_Type == DependencyType::TakeWinner || m_Blue.m_Type == DependencyType::TakeLoser)
 		{
 			if (m_Blue.m_DependentMatch)
 			{
@@ -448,12 +489,12 @@ void Match::SetDependency(Fighter Fighter, DependencyType Type, Match* Reference
 {
 	if (Fighter == Fighter::White)
 	{
-		m_White.m_Dependency = Type;
+		m_White.m_Type = Type;
 		m_White.m_DependentMatch = Reference;
 	}
 	else
 	{
-		m_Blue.m_Dependency = Type;
+		m_Blue.m_Type = Type;
 		m_Blue.m_DependentMatch = Reference;
 	}
 }

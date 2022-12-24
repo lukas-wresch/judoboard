@@ -10,7 +10,7 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		Pause(const ITournament* Tournament) : MatchTable(Tournament) {}
+		Pause(const ITournament* Tournament) : MatchTable(nullptr, Tournament) {}
 		Pause(const YAML::Node& Yaml, ITournament* Tournament) : MatchTable(Yaml, Tournament) {}
 
 		static std::string GetHTMLForm() { return ""; }
@@ -18,7 +18,7 @@ namespace Judoboard
 		virtual Type GetType() const { return Type::Pause; }
 		virtual std::string GetDescription() const override { return "Pause"; }
 
-		virtual bool IsElgiable(const Judoka& Fighter) const override { return false; }
+		//virtual bool IsElgiable(const Judoka& Fighter) const override { return false; }
 		virtual void GenerateSchedule() override {}
 
 		//Serialization
