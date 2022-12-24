@@ -513,8 +513,6 @@ TEST(Tournament, Lottery)
 		EXPECT_TRUE(tourney.AddParticipant(j1));
 		EXPECT_TRUE(tourney.AddParticipant(j2));
 
-		tourney.PerformLottery();
-
 		auto lot1 = tourney.GetLotOfAssociation(*c1);
 		auto lot2 = tourney.GetLotOfAssociation(*c2);
 		EXPECT_GE(lot1, 0);
@@ -561,8 +559,6 @@ TEST(Tournament, Lottery_Histogram)
 
 		EXPECT_TRUE(tourney.AddParticipant(j1));
 		EXPECT_TRUE(tourney.AddParticipant(j2));
-
-		tourney.PerformLottery();
 
 		auto lot1 = tourney.GetLotOfAssociation(*c1);
 		auto lot2 = tourney.GetLotOfAssociation(*c2);

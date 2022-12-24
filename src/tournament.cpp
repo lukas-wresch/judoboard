@@ -819,7 +819,9 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 	}
 
 	m_StandingData.AddJudoka(Judoka);
-	m_StandingData.AddClub(const_cast<Club*>(Judoka->GetClub()));
+	bool club_added = false;
+	if (m_StandingData.AddClub(const_cast<Club*>(Judoka->GetClub())))
+		club_added = true;
 
 	FindAgeGroupForJudoka(*Judoka);
 
@@ -834,6 +836,9 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 	}
 
 	Unlock();
+
+	if (club_added)//New club got added
+		PerformLottery();//Redo lottery
 
 	if (added)
 		GenerateSchedule();
