@@ -222,28 +222,30 @@ bool Mat::StartMatch(Match* NewMatch)
 
 bool Mat::EndMatch()
 {
+	m_mutex.lock();
+
 	if (HasConcluded())
 	{
-		m_mutex.lock();
-
 		if (m_pMatch)//Save result in match
 		{
 			AddEvent(MatchLog::NeutralEvent::EndMatch);
 			m_pMatch->SetResult(GetResult());
 			m_pMatch->EndMatch();
 		}
-		
-		m_mutex.unlock();
 
 		//Reset mat
 		NextState(State::TransitionToWaiting);
 
 		Reset();
 
-		ZED::Log::Debug("Match ended");
+		m_mutex.unlock();
+
+		ZED::Log::Info("Match ended");
 
 		return true;
 	}
+
+	m_mutex.unlock();
 
 	ZED::Log::Warn("Could not end match");
 	return false;
@@ -466,10 +468,10 @@ void Mat::Hajime()
 
 void Mat::Mate()
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat() && (IsHajime() || IsOsaekomi()) )//Mate can also be called during sonomama
 	{
-		m_mutex.lock();
-
 		m_HajimeTimer.Pause();
 
 		if (IsOsaekomi())//Mate during osaekomi?
@@ -502,9 +504,9 @@ void Mat::Mate()
 		m_Graphics["effect_osaekomi_blue" ].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
 		m_Graphics["effect_tokeda_white"  ].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
 		m_Graphics["effect_tokeda_blue"   ].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -80.0, [](auto& g) { return g.m_a > 0.0; }));
-
-		m_mutex.unlock();
 	}
+
+	m_mutex.unlock();
 
 	ZED::Log::Info("Mate");
 }
@@ -513,10 +515,10 @@ void Mat::Mate()
 
 void Mat::Sonomama()
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat() && IsHajime() && IsOsaekomiRunning())
 	{
-		m_mutex.lock();
-
 		m_HajimeTimer.Pause();
 		m_OsaekomiTimer[0].Pause();
 		m_OsaekomiTimer[1].Pause();
@@ -524,19 +526,19 @@ void Mat::Sonomama()
 		AddEvent(MatchLog::NeutralEvent::Sonomama);
 
 		m_Graphics["sonomama"].SetAlpha(255).StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -10.0, [](auto& g) { return g.m_a > 0.0; }));
-
-		m_mutex.unlock();
 	}
+
+	m_mutex.unlock();
 }
 
 
 
 void Mat::AddIppon(Fighter Whom)
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat() && GetScoreboard(Whom).m_Ippon == 0)
 	{
-		m_mutex.lock();
-
 		SetScoreboard(Whom).m_Ippon   = 1;
 		//SetScoreboard(Whom).m_WazaAri = 0;
 
@@ -555,10 +557,10 @@ void Mat::AddIppon(Fighter Whom)
 		if (!GetScoreboard(!Whom).m_HansokuMake)//Don't show ippon effect if its due to an hansokumake
 			m_Graphics["effect_ippon_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0, [](auto& g) { return g.m_a > 0.0; }));
 
-		m_mutex.unlock();
-
 		Mate();
 	}
+
+	m_mutex.unlock();
 
 	ZED::Log::Info("Ippon");
 }
@@ -567,9 +569,10 @@ void Mat::AddIppon(Fighter Whom)
 
 void Mat::RemoveIppon(Fighter Whom)
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat() && GetScoreboard(Whom).m_Ippon >= 1)
 	{
-		m_mutex.lock();
 		SetScoreboard(Whom).m_Ippon = 0;
 		if (GetScoreboard(Whom).m_WazaAri == 2)//If it was created via awasete ippon
 			SetScoreboard(Whom).m_WazaAri = 1;
@@ -577,25 +580,24 @@ void Mat::RemoveIppon(Fighter Whom)
 		AddEvent(Whom, MatchLog::BiasedEvent::RemoveIppon);
 
 		m_Graphics["effect_ippon_" + Fighter2String(Whom)].SetAlpha(0);
-
-		m_mutex.unlock();
 	}
+
+	m_mutex.unlock();
 }
 
 
 
 void Mat::AddWazaAri(Fighter Whom)
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat() && GetScoreboard(Whom).m_Ippon == 0)
 	{
-		m_mutex.lock();
 		SetScoreboard(Whom).m_WazaAri++;
 
 		AddEvent(Whom, MatchLog::BiasedEvent::AddWazaari);
 
 		m_Graphics["effect_wazaari_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -20.0, [](auto& g) { return g.m_a > 0.0; }));
-
-		m_mutex.unlock();
 
 		if (GetScoreboard(Whom).m_WazaAri >= 2)//Waza-Ari awasete ippon?
 		{
@@ -607,6 +609,8 @@ void Mat::AddWazaAri(Fighter Whom)
 			Mate();
 	}
 
+	m_mutex.unlock();
+
 	ZED::Log::Debug("Wazaari");
 }
 
@@ -614,10 +618,10 @@ void Mat::AddWazaAri(Fighter Whom)
 
 void Mat::RemoveWazaAri(Fighter Whom)
 {
+	m_mutex.lock();
+
 	if (AreFightersOnMat() && (GetScoreboard(Whom).m_WazaAri > 0 || GetScoreboard(Whom).m_Ippon > 0) )
 	{
-		m_mutex.lock();
-
 		if (GetScoreboard(Whom).m_Ippon > 0)
 		{
 			RemoveIppon(Whom);
@@ -636,9 +640,9 @@ void Mat::RemoveWazaAri(Fighter Whom)
 
 		if (IsOsaekomi() && GetOsaekomiHolder() == Whom)
 			m_Graphics["osaekomi_bar"].m_width = 0;//We have to reset and recalculate the osaekomi bar
-
-		m_mutex.unlock();
 	}
+
+	m_mutex.unlock();
 }
 
 
