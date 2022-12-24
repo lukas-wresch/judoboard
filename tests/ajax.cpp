@@ -1034,6 +1034,122 @@ TEST(Ajax, ListAssociations)
 
 
 
+TEST(Ajax, Lottery)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+		size_t c1_count = 0;
+		size_t c2_count = 0;
+
+		for (int i = 0; i < 100; ++i)
+		{
+			Application app;
+			Tournament* tourney = new Tournament("deleteMe");
+			tourney->EnableAutoSave(false);
+
+			app.AddTournament(tourney);
+
+			Association* assoc = new Association(GetRandomName(), nullptr);
+			Club* c1 = new Club(GetRandomName());
+			c1->SetParent(assoc);
+			Club* c2 = new Club(GetRandomName());
+			c2->SetParent(assoc);
+
+			Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
+			j1->SetClub(c1);
+			Judoka* j2 = new Judoka(GetRandomName(), GetRandomName());
+			j2->SetClub(c2);
+
+			tourney->SetOrganizer(assoc);
+
+			EXPECT_TRUE(tourney->AddParticipant(j1));
+			EXPECT_TRUE(tourney->AddParticipant(j2));
+
+			EXPECT_TRUE(app.Ajax_PerformLottery());
+
+			auto lot1 = tourney->GetLotOfAssociation(*c1);
+			auto lot2 = tourney->GetLotOfAssociation(*c2);
+
+			c1_count += lot1;
+			c2_count += lot2;
+		}
+
+		EXPECT_GE(c1_count, 40);
+		EXPECT_LE(c1_count, 60);
+		EXPECT_GE(c2_count, 40);
+		EXPECT_LE(c2_count, 60);
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Ajax, ListLots)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+		Application app;
+		Tournament* tourney = new Tournament("deleteMe");
+		tourney->EnableAutoSave(false);
+
+		app.AddTournament(tourney);
+
+		Association* assoc = new Association(GetRandomName(), nullptr);
+		Club* c1 = new Club(GetRandomName());
+		c1->SetParent(assoc);
+		Club* c2 = new Club(GetRandomName());
+		c2->SetParent(assoc);
+
+		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
+		j1->SetClub(c1);
+		Judoka* j2 = new Judoka(GetRandomName(), GetRandomName());
+		j2->SetClub(c2);
+
+		tourney->SetOrganizer(assoc);
+
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+
+		EXPECT_TRUE(app.Ajax_PerformLottery());
+
+		YAML::Node lots = YAML::Load(app.Ajax_ListLots());
+
+		auto lot1 = tourney->GetLotOfAssociation(*c1);
+		auto lot2 = tourney->GetLotOfAssociation(*c2);
+
+		ASSERT_TRUE(lots["0"]["uuid"].IsDefined());
+		ASSERT_TRUE(lots["1"]["uuid"].IsDefined());
+
+		if (lot1 == 0)
+		{
+			EXPECT_EQ(lots["0"]["uuid"].as<std::string>(), *c1);
+			EXPECT_EQ(lots["0"]["name"].as<std::string>(), c1->GetName());
+
+			EXPECT_EQ(lots["1"]["uuid"].as<std::string>(), *c2);
+			EXPECT_EQ(lots["1"]["name"].as<std::string>(), c2->GetName());
+		}
+		else
+		{
+			EXPECT_EQ(lots["1"]["uuid"].as<std::string>(), *c1);
+			EXPECT_EQ(lots["1"]["name"].as<std::string>(), c1->GetName());
+
+			EXPECT_EQ(lots["1"]["uuid"].as<std::string>(), *c1);
+			EXPECT_EQ(lots["1"]["name"].as<std::string>(), c1->GetName());
+		}
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Ajax, Status)
 {
 	initialize();

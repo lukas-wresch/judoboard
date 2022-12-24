@@ -1,8 +1,8 @@
 <h1 id="headline"></h1>
 
-<button class="add" id="perform_lottery" style="margin-bottom: 1cm;" onclick="PerformLottery">Perform Lottery</button>
+<button class="add" id="perform_lottery" style="margin-bottom: 1cm;" onclick="PerformLottery();">Perform Lottery</button>
 
-<table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
+<table id="list" border="1" rules="all" style="margin-bottom: 1cm; font-size: 16pt;">
   <tr>
     <th style="width: 4cm;" id="name">Name</th>
     <th style="width: 1cm;" id="lot">Lot</th>
@@ -12,25 +12,38 @@
 
 <script>
 
+function PerformLottery()
+{
+  AjaxCallback("ajax/lots/perform_lottery", function(response) {
+    GetLots();
+  });
+}
+
+
 function GetLots()
 {
   AjaxCallback("ajax/lots/list", function(response) {
     var res = YAML.parse(response);
+    console.log(response);
+    console.log(res);
 
     var table = document.getElementById("list");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    for (const club of res)
+    for (const lot of res)
     {
       var row = table.insertRow(-1);
       var cell1 = row.insertCell(0);
       var cell2 = row.insertCell(1);
 
-      cell1.innerHTML = club.name;
+      cell1.innerHTML = lot.name;
+      cell1.style.fontSize  = "14pt";
 
-      cell2.innerHTML = club.lot;
+      cell2.innerHTML = lot.lot;
+      cell2.style.fontSize  = "16pt";
+      cell2.style.textAlign = "center";
     }
   });
 }
@@ -39,5 +52,7 @@ function GetLots()
 GetLots();
 
 document.getElementById("headline").innerHTML = lang.lots;
+document.getElementById("name").innerHTML     = lang.name;
+document.getElementById("lot").innerHTML      = lang.lot;
 
 </script>

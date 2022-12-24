@@ -1636,7 +1636,7 @@ bool Tournament::PerformLottery()
 	}
 
 	Unlock();
-	Save();
+	GenerateSchedule();
 
 	return true;
 }

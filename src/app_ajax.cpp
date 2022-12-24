@@ -3253,18 +3253,27 @@ std::string Application::Ajax_ListLots()
 	auto lots = GetTournament()->GetLots();
 
 	YAML::Emitter ret;
-	ret << YAML::BeginMap;
+	ret << YAML::BeginSeq;
 
 	for (auto [assoc_id, lot] : lots)
 	{
-		ret << YAML::Key << lot << YAML::Value;
+		//ret << YAML::Key << lot << YAML::Value;
 		ret << YAML::BeginMap;
+		//ret << YAML::Key << (std::string)assoc_id << YAML::Value;
 		ret << YAML::Key << "uuid" << YAML::Value << (std::string)assoc_id;
-		//TODO find name of association / club
+		ret << YAML::Key << "lot" << YAML::Value << lot;
+
+		auto assoc = GetTournament()->FindAssociation(assoc_id);
+		if (!assoc)
+			assoc = GetTournament()->FindClub(assoc_id);
+
+		if (assoc)
+			ret << YAML::Key << "name" << YAML::Value << assoc->GetName();
+
 		ret << YAML::EndMap;
 	}
 
-	ret << YAML::EndMap;
+	ret << YAML::EndSeq;
 	return ret.c_str();
 }
 
