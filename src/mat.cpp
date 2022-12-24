@@ -1229,7 +1229,6 @@ void Mat::NextState(State NextState) const
 	const int effect_row3 = effect_row2 + (int)(96.0 * m_ScalingFactor);
 
 	auto& renderer = m_Window.GetRenderer();
-	renderer.Lock();
 
 	switch (NextState)
 	{
@@ -1508,7 +1507,6 @@ void Mat::NextState(State NextState) const
 	m_State = NextState;
 
 	m_mutex.unlock();
-	renderer.Unlock();
 }
 
 
@@ -1516,7 +1514,6 @@ void Mat::NextState(State NextState) const
 void Mat::UpdateGraphics() const
 {
 	auto& renderer = m_Window.GetRenderer();
-	renderer.Lock();
 
 	const unsigned int width  = renderer.GetWidth();
 	const unsigned int height = renderer.GetHeight();
@@ -1779,7 +1776,6 @@ void Mat::UpdateGraphics() const
 	break;
 	}
 
-	renderer.Unlock();
 	m_mutex.unlock();
 }
 
