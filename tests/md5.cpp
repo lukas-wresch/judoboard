@@ -2079,7 +2079,70 @@ TEST(MD5, CalculateStartPosBasedOnLots)
 
 	auto table = tour.GetMatchTables()[0];
 
-	//table->GetJudokaByStartPos(0);
+	auto j1 = table->GetJudokaByStartPosition(0);
+	auto j2 = table->GetJudokaByStartPosition(1);
+	auto j3 = table->GetJudokaByStartPosition(2);
+	auto j4 = table->GetJudokaByStartPosition(3);
+	auto j5 = table->GetJudokaByStartPosition(4);
+	auto j6 = table->GetJudokaByStartPosition(5);
+	auto j7 = table->GetJudokaByStartPosition(6);
+	auto j8 = table->GetJudokaByStartPosition(7);
+
+	ASSERT_TRUE(j1);
+	ASSERT_TRUE(j2);
+	ASSERT_TRUE(j3);
+	ASSERT_TRUE(j4);
+	ASSERT_TRUE(j5);
+	ASSERT_TRUE(j6);
+	ASSERT_TRUE(j7);
+	ASSERT_TRUE(j8);
+
+	EXPECT_EQ(j1->GetFirstname(), "v5");
+	EXPECT_EQ(j2->GetFirstname(), "v6");
+	EXPECT_EQ(j3->GetFirstname(), "v7");
+	EXPECT_EQ(j4->GetFirstname(), "v8");
+	EXPECT_EQ(j5->GetFirstname(), "v1");
+	EXPECT_EQ(j6->GetFirstname(), "v2");
+	EXPECT_EQ(j7->GetFirstname(), "v3");
+	EXPECT_EQ(j8->GetFirstname(), "v4");
+
+	auto c1 = tour.FindClubByName("club1");
+	auto c2 = tour.FindClubByName("club2");
+	ASSERT_TRUE(c1);
+	ASSERT_TRUE(c2);
+
+
+	table->SetStartPosition(j4, 4);
+	table->SetStartPosition(j3, 5);
+	table->SetStartPosition(j2, 6);
+	table->SetStartPosition(j1, 7);
+
+	tour.PerformLottery();
+
+	while (tour.GetLotOfAssociation(*c1) != 1)
+		tour.PerformLottery();
+
+	tour.GenerateSchedule();
+
+	table = tour.GetMatchTables()[0];
+
+	j1 = table->GetJudokaByStartPosition(0);
+	j2 = table->GetJudokaByStartPosition(1);
+	j3 = table->GetJudokaByStartPosition(2);
+	j4 = table->GetJudokaByStartPosition(3);
+	j5 = table->GetJudokaByStartPosition(4);
+	j6 = table->GetJudokaByStartPosition(5);
+	j7 = table->GetJudokaByStartPosition(6);
+	j8 = table->GetJudokaByStartPosition(7);
+
+	EXPECT_EQ(j1->GetFirstname(), "v5");
+	EXPECT_EQ(j2->GetFirstname(), "v6");
+	EXPECT_EQ(j3->GetFirstname(), "v7");
+	EXPECT_EQ(j4->GetFirstname(), "v8");
+	EXPECT_EQ(j5->GetFirstname(), "v1");
+	EXPECT_EQ(j6->GetFirstname(), "v2");
+	EXPECT_EQ(j7->GetFirstname(), "v3");
+	EXPECT_EQ(j8->GetFirstname(), "v4");
 }
 
 

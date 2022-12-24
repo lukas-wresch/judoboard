@@ -96,6 +96,7 @@ namespace Judoboard
 
 		//Clubs
 		virtual Club* FindClub(const UUID& UUID) override { return m_StandingData.FindClub(UUID); }
+		virtual Club* FindClubByName(const std::string& Name) override { return m_StandingData.FindClubByName(Name); }
 		virtual bool RemoveClub(const UUID& UUID) override { return m_StandingData.DeleteClub(UUID); }
 
 		//Associations
@@ -180,6 +181,7 @@ namespace Judoboard
 		bool m_AutoSave = true;
 
 		const Association* m_Organizer = nullptr;//Tournament is organized by this association, only childen of this association can participate
+		int m_LotteryTier = 0;//Tier for performing lottery (usually organizer tier + 1)
 
 		std::vector<MatchTable*> m_MatchTables;
 		std::vector<Match*> m_Schedule;

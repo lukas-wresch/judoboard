@@ -44,6 +44,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	if (sscanf_s(File.GetDateStart().c_str(), "D%d-%d-%d", &year, &month, &day) == 3)
 		m_StandingData.SetYear(year);
 
+	m_LotteryTier = File.GetLotteryTierID() - 2;
+
 	//Add clubs
 	for (auto club : File.GetClubs())
 	{
@@ -87,7 +89,9 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		if (weightclass->FightSystemID == 16 || weightclass->FightSystemID == 13 || weightclass->FightSystemID == 14 || weightclass->FightSystemID == 15)//Round robin
 			new_table = new RoundRobin(*weightclass, this);
-		else if (weightclass->FightSystemID == 19)//Single elimination (single consulation bracket)
+		else if (weightclass->FightSystemID == 19 ||//Single elimination (single consulation bracket)
+				 weightclass->FightSystemID == 20 ||//Single elimination (single consulation bracket)
+				 weightclass->FightSystemID == 1)//Double elimination (16 system)
 			new_table = new SingleElimination(*weightclass, this);
 		else
 			continue;
@@ -129,6 +133,20 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 					match_table->AddParticipant(new_judoka, true);//Add with force
 			}
 		}
+	}
+
+	//Convert start positions
+	for (auto judoka : File.GetParticipants())
+	{
+		if (!judoka->pUserData || !judoka->Weightclass)
+			continue;
+
+		Judoka* native_judoka = (Judoka*)judoka->pUserData;
+		auto match_table = (MatchTable*)judoka->Weightclass->pUserData;
+
+		int pos = File.FindStartNo(judoka->Weightclass->AgeGroupID, judoka->Weightclass->ID, judoka->ID);
+		if (pos > 0)
+			match_table->SetStartPosition(native_judoka, pos - 1);
 	}
 
 	//Convert lots
@@ -454,6 +472,9 @@ Status Tournament::GetStatus() const
 
 	for (auto match : m_Schedule)
 	{
+		if (!match->HasValidFighters())
+			continue;
+
 		if (!match->HasConcluded())
 			all_matches_finished = false;
 			
@@ -1552,15 +1573,18 @@ bool Tournament::PerformLottery()
 	Lock();
 
 	std::unordered_set<UUID> clubsforlottery;
-	const auto organizer_level = m_Organizer->GetLevel();
-	const auto lottery_level   = organizer_level + 1;
+	auto organizer_level = m_Organizer->GetLevel();
+	auto lottery_level   = organizer_level + 1;//Default
+
+	if (m_LotteryTier > 0 && m_LotteryTier > organizer_level)//Is valid?
+		lottery_level = m_LotteryTier;
 
 	for (auto [id, judoka] : GetDatabase().GetAllJudokas())
 	{
 		const Association* club = judoka->GetClub();
 
 		//Move up the tree till we are on the right level
-		while (club && club->GetLevel() < lottery_level)
+		while (club && club->GetLevel() > lottery_level)
 			club = club->GetParent();
 
 		if (club && club->GetLevel() == lottery_level)

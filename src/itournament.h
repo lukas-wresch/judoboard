@@ -75,6 +75,7 @@ namespace Judoboard
 
 		//Clubs
 		virtual Club* FindClub(const UUID& UUID) { return nullptr; }
+		virtual Club* FindClubByName(const std::string& Name) { return nullptr; }
 		virtual bool RemoveClub(const UUID& UUID) { return false; }
 
 		//Associations

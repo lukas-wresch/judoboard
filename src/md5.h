@@ -357,10 +357,11 @@ namespace Judoboard
 		int GetNumClubs()		  const { return m_NumClubs; }//Returns the number of clubs that should be in the file according to the header, not the actual number of clubs read
 		int GetNumParticipants()  const { return m_NumParticipants; }//Returns the number of participants that should be in the file according to the header, not the actual number of participants read
 
-		std::string GetFileDate()    const { return m_FileDate; }
-		std::string GetDateStart()   const { return m_DateStart; }
-		std::string GetDateEnd()     const { return m_DateEnd; }
-		std::string GetDescription() const { return m_Description; }
+		std::string GetFileDate()      const { return m_FileDate; }
+		std::string GetDateStart()     const { return m_DateStart; }
+		std::string GetDateEnd()       const { return m_DateEnd; }
+		std::string GetDescription()   const { return m_Description; }
+		auto        GetLotteryTierID() const { return m_LotteryTierID; }
 
 		const Association* GetOrganizer() const {
 			return FindAssociation(m_AssociationID);
