@@ -259,6 +259,7 @@
     <None Include="..\..\bin\html\association_add.html" />
     <None Include="..\..\bin\html\association_list.html" />
     <None Include="..\..\bin\html\judoka_add.html" />
+    <None Include="..\..\bin\html\lots.html" />
     <None Include="..\..\bin\html\matchtable_creator.html" />
     <None Include="..\..\bin\html\matchtable_list.html" />
     <None Include="..\..\bin\html\club_add.html" />

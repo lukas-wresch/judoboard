@@ -145,9 +145,9 @@ namespace Judoboard
 		void RevokeDisqualification(const Judoka& Judoka) override;
 
 		//Lottery
-		void PerformLottery();
+		virtual bool PerformLottery() override;
 		size_t GetLotOfAssociation(const UUID& UUID) const;
-		auto& GetLots() const { return m_AssociationToLotNumber; }
+		virtual std::unordered_map<UUID, size_t> GetLots() const override { return m_AssociationToLotNumber; }
 
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const override {}

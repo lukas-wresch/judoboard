@@ -1,0 +1,43 @@
+<h1 id="headline"></h1>
+
+<button class="add" id="perform_lottery" style="margin-bottom: 1cm;" onclick="PerformLottery">Perform Lottery</button>
+
+<table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
+  <tr>
+    <th style="width: 4cm;" id="name">Name</th>
+    <th style="width: 1cm;" id="lot">Lot</th>
+  </tr>
+</table>
+
+
+<script>
+
+function GetLots()
+{
+  AjaxCallback("ajax/lots/list", function(response) {
+    var res = YAML.parse(response);
+
+    var table = document.getElementById("list");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    for (const club of res)
+    {
+      var row = table.insertRow(-1);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+
+      cell1.innerHTML = club.name;
+
+      cell2.innerHTML = club.lot;
+    }
+  });
+}
+
+
+GetLots();
+
+document.getElementById("headline").innerHTML = lang.lots;
+
+</script>

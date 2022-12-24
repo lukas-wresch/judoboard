@@ -148,6 +148,10 @@ namespace Judoboard
 		std::string Ajax_GetMatchesFromMatchTable(const HttpServer::Request& Request);
 		Error Ajax_SetStartingPosition(const HttpServer::Request& Request);
 
+		//Lots
+		Error Ajax_PerformLottery();
+		std::string Ajax_ListLots();
+
 		std::string Ajax_Status();
 
 		//Serialization

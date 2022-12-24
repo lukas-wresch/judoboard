@@ -1595,10 +1595,10 @@ void Tournament::RevokeDisqualification(const Judoka& Judoka)
 
 
 
-void Tournament::PerformLottery()
+bool Tournament::PerformLottery()
 {
 	if (!m_Organizer || GetStatus() != Status::Scheduled)
-		return;
+		return false;
 
 	Lock();
 
@@ -1637,6 +1637,8 @@ void Tournament::PerformLottery()
 
 	Unlock();
 	Save();
+
+	return true;
 }
 
 

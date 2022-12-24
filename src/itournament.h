@@ -117,6 +117,10 @@ namespace Judoboard
 		virtual void Disqualify(const Judoka& Judoka) {}
 		virtual void RevokeDisqualification(const Judoka& Judoka) {}
 
+		//Lots
+		virtual bool PerformLottery() { return false; }
+		virtual std::unordered_map<UUID, size_t> GetLots() const { std::unordered_map<UUID, size_t> ret; return ret; }
+
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const = 0;
 
