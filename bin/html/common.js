@@ -40,6 +40,8 @@ var lang_en = {
     list_of_all_clubs:  [ "List of all Clubs", "Liste aller Vereine" ],
     list_of_all_associations:  [ "List of all Associations", "Liste aller Verb&auml;nde" ],
     list_of_all_judokas:  [ "List of all Judokas", "Liste aller Judokas" ],
+    lot:   [ "Lot", "Los" ],
+    lots:  [ "Lots", "Lose" ],
     new_account:  [ "New Account", "Neues Benutzerkonto" ],
     list_accounts:  [ "List Accounts", "Benutzerkonten anzeigen" ],
     rule_set:   [ "Rule Set", "Regelwerk" ],
