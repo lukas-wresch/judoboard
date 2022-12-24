@@ -259,6 +259,12 @@ bool Tournament::LoadYAML(const std::string& Filename)
 			ZED::Log::Error("Could not resolve organizer in tournament data");
 	}
 
+	if (yaml["lots"] && yaml["lots"].IsMap())
+	{
+		for (const auto& node : yaml["lots"])
+			m_AssociationToLotNumber.insert({ node.first.as<std::string>(), node.second.as<size_t>() });
+	}
+
 	if (yaml["judoka_to_age_group"] && yaml["judoka_to_age_group"].IsMap())
 	{
 		for (const auto& node : yaml["judoka_to_age_group"])
@@ -351,6 +357,15 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 
 	if (m_Organizer)
 		yaml << YAML::Key << "organizer" << YAML::Value << (std::string)m_Organizer->GetUUID();
+
+	yaml << YAML::Key << "lots";
+	yaml << YAML::Value;
+	yaml << YAML::BeginMap;
+
+	for (auto [assoc, lot] : m_AssociationToLotNumber)
+		yaml << YAML::Key << (std::string)assoc << YAML::Value << lot;
+
+	yaml << YAML::EndMap;
 
 	yaml << YAML::Key << "judoka_to_age_group";
 	yaml << YAML::Value;
