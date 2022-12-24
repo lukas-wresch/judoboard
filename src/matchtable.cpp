@@ -483,6 +483,36 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 
 
 
+void MatchTable::OnLotteryPerformed()
+{
+	if (!m_Filter || !GetTournament())
+		return;
+
+	auto participants = m_Filter->GetParticipants();
+	auto lots = GetTournament()->GetLots();
+
+	size_t current_pos = 0;
+
+	for (auto [club_uuid, lot] : lots)//For every lot
+		for (auto [pos, participant] : participants)//Find participants for this lot
+	{
+		auto judoka = participant.GetJudoka();
+
+		if (!judoka)
+			continue;
+
+		auto club = judoka->GetClub();
+
+		if (!club)
+			continue;
+
+		if (club->IsChildOf(club_uuid))//Does the club belong to this lot?
+			m_Filter->SetStartPosition(participant, current_pos++);//Assign start position
+	}
+}
+
+
+
 std::string MatchTable::GetHTMLForm()
 {
 	std::string ret = R"(

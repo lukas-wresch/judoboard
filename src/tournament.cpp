@@ -1609,6 +1609,10 @@ bool Tournament::PerformLottery()
 	}
 
 	Unlock();
+
+	for (auto table : m_MatchTables)
+		table->OnLotteryPerformed();
+
 	GenerateSchedule();
 
 	return true;

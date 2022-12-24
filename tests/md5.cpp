@@ -2135,14 +2135,43 @@ TEST(MD5, CalculateStartPosBasedOnLots)
 	j7 = table->GetJudokaByStartPosition(6);
 	j8 = table->GetJudokaByStartPosition(7);
 
-	EXPECT_EQ(j1->GetFirstname(), "v5");
-	EXPECT_EQ(j2->GetFirstname(), "v6");
-	EXPECT_EQ(j3->GetFirstname(), "v7");
-	EXPECT_EQ(j4->GetFirstname(), "v8");
-	EXPECT_EQ(j5->GetFirstname(), "v1");
-	EXPECT_EQ(j6->GetFirstname(), "v2");
-	EXPECT_EQ(j7->GetFirstname(), "v3");
-	EXPECT_EQ(j8->GetFirstname(), "v4");
+	EXPECT_EQ(j1->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j2->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j3->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j4->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j5->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j6->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j7->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j8->GetClub()->GetName(), "club1");
+
+
+
+	tour.PerformLottery();
+
+	while (tour.GetLotOfAssociation(*c1) != 0)
+		tour.PerformLottery();
+
+	tour.GenerateSchedule();
+
+	table = tour.GetMatchTables()[0];
+
+	j1 = table->GetJudokaByStartPosition(0);
+	j2 = table->GetJudokaByStartPosition(1);
+	j3 = table->GetJudokaByStartPosition(2);
+	j4 = table->GetJudokaByStartPosition(3);
+	j5 = table->GetJudokaByStartPosition(4);
+	j6 = table->GetJudokaByStartPosition(5);
+	j7 = table->GetJudokaByStartPosition(6);
+	j8 = table->GetJudokaByStartPosition(7);
+
+	EXPECT_EQ(j1->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j2->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j3->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j4->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j5->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j6->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j7->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j8->GetClub()->GetName(), "club2");
 }
 
 
