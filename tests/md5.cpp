@@ -2065,6 +2065,25 @@ TEST(MD5, ConvertToMD5AndBack)
 
 
 
+TEST(MD5, CalculateStartPosBasedOnLots)
+{
+	initialize();
+
+	MD5 file("test-data/lot-to-startpos.md5");
+
+	ASSERT_TRUE(file);
+
+	Tournament tour(file);
+
+	file.Dump();
+
+	auto table = tour.GetMatchTables()[0];
+
+	//table->GetJudokaByStartPos(0);
+}
+
+
+
 TEST(MD5, ReadStructureData1)
 {
 	initialize();
