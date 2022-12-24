@@ -137,6 +137,19 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		}
 	}
 
+	//Convert lots
+	for (auto lot : File.GetLottery())
+	{
+		auto assoc = File.FindAssociation(lot.AssociationID);
+		
+		if (assoc)
+		{
+			auto native_assoc = m_StandingData.FindAssociationByName(assoc->Description);
+			if (native_assoc)
+				m_AssociationToLotNumber.insert({ *native_assoc, lot.StartNo });
+		}
+	}
+
 	//Clear all matches (these got added when the participants got added)
 	for (auto table : m_MatchTables)
 		table->DeleteSchedule();

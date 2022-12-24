@@ -328,7 +328,9 @@ namespace Judoboard
 
 		[[nodiscard]] Association*  FindAssociation(int AssociationID);
 		[[nodiscard]] Association*  FindAssociation(int AssociationID) const;
+		[[nodiscard]] Association*  FindAssociationByName(const std::string& Name) const;
 		[[nodiscard]] Club*         FindClub(int ClubID);
+		[[nodiscard]] Club*         FindClubByName(const std::string& Name) const;
 		[[nodiscard]] Participant*  FindParticipant(int ParticipantID);
 		[[nodiscard]] AgeGroup*     FindAgeGroup(int AgeGroupID);
 		[[nodiscard]] Weightclass*  FindWeightclass(int AgeGroupID, int WeightclassID);
@@ -337,6 +339,7 @@ namespace Judoboard
 		[[nodiscard]] const Result* FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const;
 		[[nodiscard]] std::vector<const Result*> FindResults(int AgeGroupID, int WeightclassID) const;
 		[[nodiscard]] int FindStartNo(int AgeGroupID, int WeightclassID, int ParticipantID) const;
+		[[nodiscard]] int FindLotOfAssociation(int AssociationID) const;
 
 		void Dump() const;
 

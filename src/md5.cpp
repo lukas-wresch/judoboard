@@ -317,6 +317,15 @@ MD5::MD5(const Tournament& Tournament)
 		}
 	}
 
+	//Convert lots
+	for (auto [assoc_id, lot] : Tournament.GetLots())
+	{
+		Lottery new_lot;
+		new_lot.AssociationID = uuid2id(assoc_id);
+		new_lot.StartNo       = (int)lot;
+		m_Lottery.push_back(new_lot);
+	}
+
 	//Convert matches
 
 	for (auto match : Tournament.GetSchedule())
@@ -1121,6 +1130,16 @@ MD5::Association* MD5::FindAssociation(int AssociationID) const
 
 
 
+MD5::Association* MD5::FindAssociationByName(const std::string& Name) const
+{
+	for (auto association : m_Associations)
+		if (association && association->Description == Name)
+			return association;
+	return nullptr;
+}
+
+
+
 MD5::Club* MD5::FindClub(int ClubID)
 {
 	if (ClubID <= -1)
@@ -1128,6 +1147,16 @@ MD5::Club* MD5::FindClub(int ClubID)
 
 	for (auto club : m_Clubs)
 		if (club && club->ID == ClubID)
+			return club;
+	return nullptr;
+}
+
+
+
+MD5::Club* MD5::FindClubByName(const std::string& Name) const
+{
+	for (auto club : m_Clubs)
+		if (club && club->Name == Name)
 			return club;
 	return nullptr;
 }
@@ -1233,6 +1262,19 @@ int MD5::FindStartNo(int AgeGroupID, int WeightclassID, int ParticipantID) const
 		if (relation.AgeGroupID == AgeGroupID && relation.WeightclassID == WeightclassID &&
 			relation.ParticipantID == ParticipantID)
 			return relation.StartNo;
+	}
+
+	return -1;
+}
+
+
+
+int MD5::FindLotOfAssociation(int AssociationID) const
+{
+	for (auto lot : m_Lottery)
+	{
+		if (lot.AssociationID == AssociationID)
+			return lot.StartNo;
 	}
 
 	return -1;
