@@ -126,6 +126,11 @@ namespace Judoboard
 				return m_White.m_DependentMatch;
 			return m_Blue.m_DependentMatch;
 		}
+		const MatchTable* GetDependentMatchTableOf(Fighter Fighter) const {
+			if (Fighter == Fighter::White)
+				return m_White.m_DependentMatchTable;
+			return m_Blue.m_DependentMatchTable;
+		}
 
 		const RuleSet& GetRuleSet() const;
 		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }

@@ -67,15 +67,24 @@ std::unordered_map<size_t, const DependentJudoka> Fuser::GetParticipants() const
 
 	for (size_t i = 0; i < count; ++i)
 		for (auto [pos, judoka] : m_pSources[i]->GetParticipants())
-		ret.insert({ count*pos + i, judoka });
+			ret.insert({ count*pos + i, judoka });
+
+	//size_t i = 0;
+	//for (auto source : m_pSources)
+		//for (auto [pos, judoka] : source->GetParticipants())
+			//ret.insert({ i++, judoka });
 	
-	return ret;
+	SetParticipants(std::move(ret));//Save to cache
+
+	return IFilter::GetParticipants();//Return the cache
 }
 
 
 
 const DependentJudoka Fuser::GetJudokaByStartPosition(size_t StartPosition) const
 {
-	const auto index = StartPosition % m_pSources.size();
-	return m_pSources[index]->GetJudokaByStartPosition((StartPosition - index) / m_pSources.size());
+	//const auto index = StartPosition % m_pSources.size();
+	//return m_pSources[index]->GetJudokaByStartPosition((StartPosition - index) / m_pSources.size());
+	GetParticipants();//Re-calculates the participants
+	return IFilter::GetJudokaByStartPosition(StartPosition);
 }

@@ -111,7 +111,7 @@ void Pool::GenerateSchedule()
 
 	if (!GetFilter() || GetParticipants().size() <= 1)
 		return;
-	if (GetParticipants().size() < 8) return;//DEBUG
+	
 	for (auto pool : m_Pools)
 		delete pool;
 
@@ -176,6 +176,8 @@ const std::string Pool::ToHTML() const
 	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
 
 	ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
+
+	ret += "<br/>";
 
 	for (auto pool : m_Pools)
 		ret += pool->ToHTML() + "<br/><br/>";

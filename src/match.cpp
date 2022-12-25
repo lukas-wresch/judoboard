@@ -164,6 +164,8 @@ void Match::ToString(YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "white_dependency_type" << YAML::Value << (int)m_White.m_Type;
 		if (m_White.m_DependentMatch)
 			Yaml << YAML::Key << "white_dependency_uuid" << YAML::Value << (std::string)m_White.m_DependentMatch->GetUUID();
+		else if (m_White.m_DependentMatchTable)
+			Yaml << YAML::Key << "white_dependency_uuid" << YAML::Value << (std::string)m_White.m_DependentMatchTable->GetUUID();
 	}
 
 	if (GetFighter(Fighter::Blue))
@@ -176,6 +178,8 @@ void Match::ToString(YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "blue_dependency_type" << YAML::Value << (int)m_Blue.m_Type;
 		if (m_Blue.m_DependentMatch)
 			Yaml << YAML::Key << "blue_dependency_uuid" << YAML::Value << (std::string)m_Blue.m_DependentMatch->GetUUID();
+		else if (m_Blue.m_DependentMatchTable)
+			Yaml << YAML::Key << "blue_dependency_uuid" << YAML::Value << (std::string)m_Blue.m_DependentMatchTable->GetUUID();
 	}
 
 	Yaml << YAML::Key << "mat_id" << YAML::Value << GetMatID();
