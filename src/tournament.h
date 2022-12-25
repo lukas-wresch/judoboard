@@ -169,6 +169,18 @@ namespace Judoboard
 
 		std::vector<MatchTable*>& SetMatchTables() { return m_MatchTables; }
 
+		class ScopedLock
+		{
+		public:
+			ScopedLock(std::recursive_mutex& Mutex) : m_Mutex(Mutex) { Mutex.lock(); }
+			~ScopedLock() { m_Mutex.unlock(); }
+
+		private:
+			std::recursive_mutex& m_Mutex;
+		};
+
+		ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
+
 		std::string m_Name;
 		bool m_AutoSave = true;
 
