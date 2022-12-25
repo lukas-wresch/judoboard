@@ -188,7 +188,8 @@ const std::string RoundRobin::ToHTML() const
 
 	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
 
-	ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
+	if (GetMatID() != 0)
+		ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 
 	if (!GetFilter())
 		return ret;

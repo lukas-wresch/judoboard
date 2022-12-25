@@ -69,6 +69,16 @@ void SingleElimination::ToString(YAML::Emitter& Yaml) const
 
 
 
+size_t SingleElimination::GetNumberOfRounds() const
+{
+	if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
+		return 0;
+
+	return (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size()));
+}
+
+
+
 std::string SingleElimination::GetHTMLForm()
 {
 	std::string ret = R"(
@@ -109,12 +119,15 @@ void SingleElimination::GenerateSchedule()
 			++it;
 	}
 
-	if (GetParticipants().size() <= 3)
+	if (!GetFilter())
+		return;
+
+	if (GetFilter()->GetParticipants().size() <= 3)
 		m_RecommendedNumMatches_Before_Break = 1;
 	else
 		m_RecommendedNumMatches_Before_Break = 2;
 
-	if (GetParticipants().size() <= 1)
+	if (GetFilter()->GetParticipants().size() <= 1)
 		return;
 
 	const auto rounds = GetNumberOfRounds();
@@ -125,8 +138,8 @@ void SingleElimination::GenerateSchedule()
 	std::vector<Match*> nextRound;
 
 	auto create_pair = [&](int i) {
-		auto new_match = CreateAutoMatch(GetJudokaByStartPosition(i-1),
-										 GetJudokaByStartPosition(i-1 + max_start_pos/2));
+		auto new_match = CreateAutoMatch(GetFilter()->GetJudokaByStartPosition(i-1),
+										 GetFilter()->GetJudokaByStartPosition(i-1 + max_start_pos/2));
 		nextRound.emplace_back(new_match);
 	};
 
@@ -341,7 +354,8 @@ const std::string SingleElimination::ToHTML() const
 
 	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
 
-	ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
+	if (GetMatID() != 0)
+		ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 
 	ret += "<table border='1' rules='all'>";
 
@@ -364,7 +378,9 @@ const std::string SingleElimination::ToHTML() const
 		//Output name of fighters
 		if (match->GetFighter(Fighter::White))
 			ret += match->GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
-		else if (match->HasDependentMatches())
+		//else if (match->HasDependentMatches() || match->GetDependencyTypeOf(Fighter::White))
+		else if ((match->GetDependencyTypeOf(Fighter::White) != DependencyType::None) &&
+				 (match->GetDependencyTypeOf(Fighter::White) != DependencyType::BestOfThree))
 			ret += "???";
 		else
 			ret += "- - -";
@@ -373,7 +389,9 @@ const std::string SingleElimination::ToHTML() const
 
 		if (match->GetFighter(Fighter::Blue))
 			ret += match->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
-		else if (match->HasDependentMatches())
+		//else if (match->HasDependentMatches())
+		else if ((match->GetDependencyTypeOf(Fighter::Blue) != DependencyType::None) &&
+				 (match->GetDependencyTypeOf(Fighter::Blue) != DependencyType::BestOfThree))
 			ret += "???";
 		else
 			ret += "- - -";

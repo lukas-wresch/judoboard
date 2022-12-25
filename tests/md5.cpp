@@ -2456,6 +2456,7 @@ TEST(MD5, ExportSingleElimination16)
 
 	t->GenerateSchedule();
 
+	ASSERT_EQ(t->GetSchedule().size(), 15);
 	ASSERT_EQ(group->GetParticipants().size(), 16);
 
 	Mat m(1);

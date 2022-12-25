@@ -277,6 +277,15 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 				return m_White.m_DependentMatch->GetLoser();
 		}
 
+		else if (m_White.m_DependentMatchTable)
+		{
+			if (!m_White.m_DependentMatchTable->HasConcluded())
+				return nullptr;
+
+			auto results = m_White.m_DependentMatchTable->CalculateResults();
+			return results.Get(m_White.m_Type);
+		}
+
 		return nullptr;
 	}
 
@@ -297,6 +306,15 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 	{
 		if (m_Blue.m_DependentMatch && m_Blue.m_DependentMatch->HasConcluded())
 			return m_Blue.m_DependentMatch->GetLoser();
+	}
+
+	else if (m_Blue.m_DependentMatchTable)
+	{
+		if (!m_Blue.m_DependentMatchTable->HasConcluded())
+			return nullptr;
+
+		auto results = m_Blue.m_DependentMatchTable->CalculateResults();
+		return results.Get(m_Blue.m_Type);
 	}
 
 	return nullptr;
@@ -540,8 +558,15 @@ const std::vector<const Match*> Match::GetDependentMatches() const
 
 bool Match::IsEmptyMatch() const
 {
-	if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
-		return m_White.m_DependentMatch->IsCompletelyEmptyMatch() || m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
+	if (m_White.m_DependentMatchTable && !m_White.m_DependentMatchTable->HasConcluded())
+		return false;
+	if (m_Blue.m_DependentMatchTable  && !m_Blue.m_DependentMatchTable->HasConcluded())
+		return false;
+
+	if (m_White.m_DependentMatch)
+		return m_White.m_DependentMatch->IsCompletelyEmptyMatch();
+	if (m_Blue.m_DependentMatch)
+		return m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
 
 	return !GetFighter(Fighter::White) || !GetFighter(Fighter::Blue);
 }
@@ -550,6 +575,11 @@ bool Match::IsEmptyMatch() const
 
 bool Match::IsCompletelyEmptyMatch() const
 {
+	if (m_White.m_DependentMatchTable && !m_White.m_DependentMatchTable->HasConcluded())
+		return false;
+	if (m_Blue.m_DependentMatchTable  && !m_Blue.m_DependentMatchTable->HasConcluded())
+		return false;
+
 	if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
 		return m_White.m_DependentMatch->IsCompletelyEmptyMatch() && m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
 

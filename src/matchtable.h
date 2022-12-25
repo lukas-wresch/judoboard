@@ -226,6 +226,17 @@ namespace Judoboard
 				return nullptr;
 			}
 
+			const Judoka* Get(DependencyType Type)
+			{
+				if ((int)DependencyType::TakeRank1 <= (int)Type && (int)Type <= (int)DependencyType::TakeRank10)
+				{
+					int pos = (int)Type - (int)DependencyType::TakeRank1;
+					if (pos < m_Results.size())
+						return m_Results[pos].Judoka;
+				}
+				return nullptr;
+			}
+
 			void Sort() const
 			{
 				std::sort(m_Results.begin(), m_Results.end());

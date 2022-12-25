@@ -322,7 +322,8 @@ MD5::MD5(const Tournament& Tournament)
 
 	//Convert matches
 
-	for (auto match : Tournament.GetSchedule())
+	const auto schedule = Tournament.GetSchedule();
+	for (auto match : schedule)
 	{
 		Match new_match;
 

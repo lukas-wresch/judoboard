@@ -27,8 +27,13 @@ namespace Judoboard
 			m_Judoka = Judoka;
 			m_Type   = DependencyType::None;
 		}
-		DependentJudoka(DependencyType DependencyType) {
+		DependentJudoka(DependencyType DependencyType, Match& DependentMatch) {
 			m_Type = DependencyType;
+			m_DependentMatch = &DependentMatch;
+		}
+		DependentJudoka(DependencyType DependencyType, const MatchTable& DependentMatchTable) {
+			m_Type = DependencyType;
+			m_DependentMatchTable = &DependentMatchTable;
 		}
 
 		const Judoka* GetJudoka() const { return m_Judoka; }

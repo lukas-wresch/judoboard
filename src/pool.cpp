@@ -111,7 +111,7 @@ void Pool::GenerateSchedule()
 
 	if (!GetFilter() || GetParticipants().size() <= 1)
 		return;
-
+	if (GetParticipants().size() < 8) return;//DEBUG
 	for (auto pool : m_Pools)
 		delete pool;
 
@@ -120,9 +120,16 @@ void Pool::GenerateSchedule()
 	const auto pool_count = CalculatePoolCount();
 	m_Pools.resize(pool_count);
 
+	const char letters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 	//Distribute participants to pools
 	for (int i = 0; i < pool_count; ++i)
+	{
 		m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
+		std::string name = "Pool ";
+		name.append(&letters[i], 1);
+		m_Pools[i]->SetName(name);
+	}
 
 	//Create filter(s) for final round
 	auto fuser = new Fuser(GetTournament());
@@ -133,6 +140,7 @@ void Pool::GenerateSchedule()
 	}
 
 	m_Finals = std::move(SingleElimination(fuser));
+	m_Finals.SetName("Finals");
 
 	//Add matches from pools
 	size_t index = 0;
@@ -144,11 +152,11 @@ void Pool::GenerateSchedule()
 		{
 			auto schedule = GetPool(pool)->GetSchedule();
 
-			if (index >= schedule.size())
-				continue;
-
-			AddMatch(schedule[index]);
-			added = true;
+			if (index < schedule.size())
+			{
+				AddMatch(schedule[index]);
+				added = true;
+			}
 		}
 
 		++index;
@@ -170,11 +178,11 @@ const std::string Pool::ToHTML() const
 	ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 
 	for (auto pool : m_Pools)
-		ret += pool->ToHTML();
+		ret += pool->ToHTML() + "<br/><br/>";
 
 	ret += m_Finals.ToHTML();
 
-	//ret += ResultsToHTML();	
+	//ret += ResultsToHTML();
 
 	return ret;
 }

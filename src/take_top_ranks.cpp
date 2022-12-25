@@ -71,18 +71,19 @@ std::unordered_map<size_t, const DependentJudoka> TakeTopRanks::GetParticipants(
 	if (!m_pSource.HasConcluded())
 	{
 		for (int i = 0; i < m_NumRanks; ++i)
-			ret.insert({ i, DependentJudoka( (DependencyType)((int)DependencyType::TakeRank1 + i) ) });
-
-		return ret;
+			ret.insert({ i, DependentJudoka( (DependencyType)((int)DependencyType::TakeRank1 + i), m_pSource ) });
 	}
 
-	auto results = m_pSource.CalculateResults();
-	for (int i = 0; i < m_NumRanks; ++i)
+	else
 	{
-		if (i < results.GetSize())
-			ret.insert({ i, results[i].Judoka });
-		else
-			ret.insert({ i, DependentJudoka( (DependencyType)((int)DependencyType::TakeRank1 + i) ) });
+		auto results = m_pSource.CalculateResults();
+		for (int i = 0; i < m_NumRanks; ++i)
+		{
+			if (i < results.GetSize())
+				ret.insert({ i, results[i].Judoka });
+			else
+				ret.insert({ i, DependentJudoka( (DependencyType)((int)DependencyType::TakeRank1 + i), m_pSource ) });
+		}
 	}
 
 	SetParticipants(std::move(ret));//Save to cache

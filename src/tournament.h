@@ -36,7 +36,8 @@ namespace Judoboard
 
 		[[nodiscard]]
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
-		const auto& GetSchedule() const { return m_Schedule; }
+		[[nodiscard]]
+		std::vector<Match*> GetSchedule() const;
 		Match* FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
 		virtual const StandingData& GetDatabase() const override { return m_StandingData; }//Returns a database containing all participants
@@ -188,7 +189,8 @@ namespace Judoboard
 		const Association* m_Organizer = nullptr;//Tournament is organized by this association, only childen of this association can participate
 
 		std::vector<MatchTable*> m_MatchTables;
-		std::vector<Match*> m_Schedule;
+		//std::vector<Match*> m_Schedule;
+		std::vector<std::pair<MatchTable*, size_t>> m_Schedule;
 
 		const RuleSet* m_pDefaultRules = nullptr;//Default rule set of the tournament
 

@@ -27,8 +27,8 @@ namespace Judoboard
 			SetScheduleIndex(rhs.GetScheduleIndex());
 			SetMatID(rhs.GetMatID());
 			SetColor(rhs.GetColor());
-			IsBestOfThree(rhs.IsBestOfThree());
 			SetSchedule() = std::move(rhs.SetSchedule());
+			IsBestOfThree(rhs.IsBestOfThree());
 		}
 
 		static std::string GetHTMLForm();
@@ -57,12 +57,7 @@ namespace Judoboard
 
 
 	private:
-		size_t GetNumberOfRounds() const {
-			if (GetParticipants().size() == 0)
-				return 0;
-
-			return (size_t)std::ceil(std::log2(GetParticipants().size()));
-		}
+		size_t GetNumberOfRounds() const;
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;
