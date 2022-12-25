@@ -578,6 +578,8 @@ Match* Tournament::GetNextMatch(int32_t MatID) const
 
 const Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
 {
+	Lock();
+
 	for (; StartIndex < m_Schedule.size(); StartIndex++)
 	{
 		if (m_Schedule[StartIndex]->HasConcluded() || m_Schedule[StartIndex]->IsRunning())
@@ -586,10 +588,13 @@ const Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
 		if (MatID < 0 || m_Schedule[StartIndex]->GetMatID() == MatID)
 		{
 			StartIndex++;
-			return m_Schedule[StartIndex-1];
+			auto ret = m_Schedule[StartIndex-1];
+			Unlock();
+			return ret;
 		}
 	}
 
+	Unlock();
 	return nullptr;
 }
 
@@ -599,6 +604,8 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
 {
 	if (GetStatus() == Status::Concluded)
 		return false;
+
+	Lock();
 
 	for (auto it = m_MatchTables.begin(); it != m_MatchTables.end(); ++it)
 	{
@@ -621,6 +628,8 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
 		}
 	}
 
+	Unlock();
+
 	Save();
 	return true;
 }
@@ -629,13 +638,21 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
 
 Match* Tournament::FindMatch(const UUID& UUID) const
 {
+	Lock();
+
 	for (auto table : m_MatchTables)
 		for (auto match : table->GetSchedule())
 			if (match->GetUUID() == UUID)
+			{
+				auto ret = match;
+				Unlock();
 				return match;
+			}
 	/*for (auto match : m_Schedule)
 		if (match && match->GetUUID() == UUID)
 			return match;*/
+
+	Unlock();
 	return nullptr;
 }
 
@@ -645,6 +662,9 @@ bool Tournament::MoveMatchUp(const UUID& MatchID, uint32_t MatID)
 {
 	size_t prev_match_index = 0;
 	size_t current_index = 0;
+
+	Lock();
+
 	for (; current_index < m_Schedule.size(); current_index++)
 	{
 		if (MatID != 0 && m_Schedule[current_index]->GetMatID() != MatID)
@@ -655,20 +675,28 @@ bool Tournament::MoveMatchUp(const UUID& MatchID, uint32_t MatID)
 	}
 
 	if (current_index == 0 || current_index == m_Schedule.size())
+	{
+		Unlock();
 		return false;
+	}
 
 	auto prev_match = m_Schedule[prev_match_index];
 	auto curr_match = m_Schedule[current_index];
 
 	if (!prev_match || !curr_match)
+	{
+		Unlock();
 		return false;
+	}
 
 	//Is either match running?
 	if (!prev_match->IsScheduled() || !curr_match->IsScheduled())
+	{
+		Unlock();
 		return false;
+	}
 
 	//Swap matches
-	Lock();
 
 	m_Schedule[prev_match_index] = curr_match;
 	m_Schedule[current_index]    = prev_match;
@@ -686,6 +714,9 @@ bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 	size_t next_match_index = 0;
 	size_t curr_match_index = 0;
 	bool found = false;
+
+	Lock();
+
 	for (size_t index = 0; index < m_Schedule.size(); index++)
 	{
 		if (MatID != 0 && m_Schedule[index]->GetMatID() != MatID)
@@ -704,20 +735,28 @@ bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 	}
 
 	if (!found || curr_match_index >= m_Schedule.size() || next_match_index >= m_Schedule.size() || next_match_index < curr_match_index)
+	{
+		Unlock();
 		return false;
+	}
 
 	auto curr_match = m_Schedule[curr_match_index];
 	auto next_match = m_Schedule[next_match_index];
 
 	if (!curr_match || !next_match)
+	{
+		Unlock();
 		return false;
+	}
 
 	//Is either match running?
 	if (!curr_match->IsScheduled() || !next_match->IsScheduled())
+	{
+		Unlock();
 		return false;
+	}
 
 	//Swap matches
-	Lock();
 	m_Schedule[curr_match_index]   = next_match;
 	m_Schedule[next_match_index] = curr_match;
 
@@ -840,9 +879,13 @@ uint32_t Tournament::GetHighestMatIDUsed() const
 {
 	uint32_t max = 0;
 
+	Lock();
+
 	for (auto match : m_Schedule)
 		if (match && match->GetMatID() > max)
 			max = match->GetMatID();
+
+	Unlock();
 
 	return max;
 }
@@ -851,10 +894,16 @@ uint32_t Tournament::GetHighestMatIDUsed() const
 
 bool Tournament::IsMatUsed(uint32_t ID) const
 {
+	Lock();
+
 	for (const auto match : m_Schedule)
 		if (match && match->GetMatID() == ID)
+		{
+			Unlock();
 			return true;
+		}
 
+	Unlock();
 	return false;
 }
 
@@ -862,9 +911,17 @@ bool Tournament::IsMatUsed(uint32_t ID) const
 
 MatchTable* Tournament::FindMatchTable(const UUID& ID)
 {
+	Lock();
+
 	for (auto table : m_MatchTables)
 		if (table && table->GetUUID() == ID)
-			return table;
+		{
+			auto ret = table;
+			Unlock();
+			return ret;
+		}
+
+	Unlock();
 	return nullptr;
 }
 
@@ -872,9 +929,17 @@ MatchTable* Tournament::FindMatchTable(const UUID& ID)
 
 const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 {
+	Lock();
+
 	for (auto table : m_MatchTables)
 		if (table && table->GetUUID() == ID)
-			return table;
+		{
+			auto ret = table;
+			Unlock();
+			return ret;
+		}
+
+	Unlock();
 	return nullptr;
 }
 
@@ -882,11 +947,19 @@ const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 
 MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
 {
+	Lock();
+
 	for (auto table : m_MatchTables)
 	{
 		if (table && table->GetName() == Name)
-			return table;
+		{
+			auto ret = table;
+			Unlock();
+			return ret;
+		}
 	}
+
+	Unlock();
 	return nullptr;
 }
 
@@ -894,11 +967,19 @@ MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
 
 MatchTable* Tournament::FindMatchTableByDescription(const std::string& Description)
 {
+	Lock();
+
 	for (auto table : m_MatchTables)
 	{
 		if (table && table->GetDescription() == Description)
-			return table;
+		{
+			auto ret = table;
+			Unlock();
+			return ret;
+		}
 	}
+
+	Unlock();
 	return nullptr;
 }
 
