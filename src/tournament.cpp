@@ -555,15 +555,22 @@ bool Tournament::AddMatch(Match* NewMatch)
 
 Match* Tournament::GetNextMatch(int32_t MatID) const
 {
+	Lock();
+
 	for (auto match : m_Schedule)
 	{
 		if (!match || match->HasConcluded() || match->IsRunning())
 			continue;
 
 		if (MatID < 0 || match->GetMatID() == MatID)
-			return match;
+		{
+			auto ret = match;
+			Unlock();
+			return ret;
+		}
 	}
 
+	Unlock();
 	return nullptr;
 }
 
