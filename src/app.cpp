@@ -117,7 +117,7 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 	ret += "Tournament date: " + File.GetTournamentDate() + "<br/>";
 	ret += "<br/>";
 
-	LockTillScopeEnd();
+	auto guard = LockTillScopeEnd();
 
 	for (auto club : File.GetClubs())
 	{
@@ -278,7 +278,7 @@ Error Application::CheckPermission(const HttpServer::Request& Request, Account::
 
 	auto value = HttpServer::DecodeURLEncoded(header->Value, "session");
 
-	LockTillScopeEnd();
+	auto guard = LockTillScopeEnd();
 	auto account = m_Database.IsLoggedIn(Request.m_RequestInfo.RemoteIP, value);
 
 	if (!account || account->GetAccessLevel() < AccessLevel)
@@ -340,7 +340,7 @@ uint32_t Application::GetHighestMatID() const
 
 bool Application::CloseMat(uint32_t ID)
 {
-	LockTillScopeEnd();
+	auto guard = LockTillScopeEnd();
 
 	for (auto it = m_Mats.begin(); it != m_Mats.end(); ++it)
 	{
@@ -365,7 +365,7 @@ bool Application::StartLocalMat(uint32_t ID)
 {
 	ZED::Log::Info("Starting local mat");
 
-	LockTillScopeEnd();
+	auto guard = LockTillScopeEnd();
 
 	for (; true; ID++)
 	{
@@ -411,7 +411,7 @@ bool Application::StartLocalMat(uint32_t ID)
 
 std::vector<Match> Application::GetNextMatches(uint32_t MatID) const
 {
-	LockTillScopeEnd();
+	auto guard = LockTillScopeEnd();
 
 	if (!GetTournament())
 	{
