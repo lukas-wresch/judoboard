@@ -3,6 +3,7 @@ var lang_en = {
     age_groups: "Age groups",
     break_time: "Break Time",
     club: "Club",
+    description: "Description",
     name: "Name",
     username: "Username",
     password: "Password",
@@ -123,6 +124,7 @@ var lang_de = {
     age_groups: "Altersklassen",
     break_time: "Ruhepause",
     club: "Verein",
+    description: "Beschreibung",
     name: "Name",
     username: "Benutzername",
     password: "Passwort",
@@ -358,7 +360,7 @@ function AjaxPost(url, params, callback)
   {
     if (this.readyState == 4 && this.status == 200)
     {
-        if (this.response == "ok")
+        if (this.response == "ok" && typeof callback !== 'undefined')
           callback();
         else
           alert("Error: " + this.response);
@@ -519,9 +521,9 @@ function GetAgeGroups(callback)
 
 
 
-function GetClubs(callback)
+function GetClubs(callback, query = "")
 {
-  AjaxCallback("ajax/club/list", function(response) {
+  AjaxCallback("ajax/club/list?" + query, function(response) {
     console.log(response);
     var res = YAML.parse(response);
 

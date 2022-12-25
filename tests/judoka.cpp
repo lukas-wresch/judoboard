@@ -33,6 +33,8 @@ TEST(Judoka, ImportExport)
 	for (int i = 0; i < 1000; i++)
 	{
 		Judoka j(GetRandomName(), GetRandomName(), rand()%200, (Gender)(rand()%2));
+		if (rand()%2 == 0)
+			j.SetWeight(Weight( std::to_string(rand() % 100) + "," + std::to_string(rand() % 100) ));
 		j.SetNumber("ABC123");
 
 		YAML::Emitter yaml;
@@ -40,13 +42,13 @@ TEST(Judoka, ImportExport)
 
 		Judoka j2(YAML::Load(yaml.c_str()), nullptr);
 
-		EXPECT_EQ(j.GetName(NameStyle::GivenName), j2.GetName(NameStyle::GivenName));
-		EXPECT_EQ(j.GetGender(), j2.GetGender());
-		EXPECT_EQ(j.GetWeight(), j2.GetWeight());
-		EXPECT_EQ(j.GetAge(),  j2.GetAge());
-		EXPECT_EQ(j.GetUUID(), j2.GetUUID());
-		EXPECT_EQ(j.GetLengthOfBreak(), j2.GetLengthOfBreak());
-		EXPECT_EQ(j.GetNumber(), j2.GetNumber());
+		ASSERT_EQ(j.GetName(NameStyle::GivenName), j2.GetName(NameStyle::GivenName));
+		ASSERT_EQ(j.GetGender(), j2.GetGender());
+		ASSERT_EQ(j.GetWeight(), j2.GetWeight());
+		ASSERT_EQ(j.GetAge(),  j2.GetAge());
+		ASSERT_EQ(j.GetUUID(), j2.GetUUID());
+		ASSERT_EQ(j.GetLengthOfBreak(), j2.GetLengthOfBreak());
+		ASSERT_EQ(j.GetNumber(), j2.GetNumber());
 	}
 }
 
@@ -104,6 +106,10 @@ TEST(Judoka, Weight)
 	w2 = Weight(YAML::Load(yaml.c_str()));
 	EXPECT_EQ((uint32_t)w2, 12 * 1000 + 300);
 	EXPECT_EQ(w2.ToString(), "12,3 ");
+
+	Weight w5("10,3 ");
+	EXPECT_EQ((uint32_t)w5, 10 * 1000 + 300);
+	EXPECT_EQ(w5.ToString(), "10,3 ");
 }
 
 

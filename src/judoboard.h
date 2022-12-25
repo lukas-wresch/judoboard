@@ -55,7 +55,7 @@ namespace Judoboard
 			{
 				if (c == ',' || c == '.')
 					commaFound = true;
-				else
+				else if (c != ' ')
 				{
 					m_InGrams *= 10;
 					m_InGrams += (int)c - '0';
@@ -72,7 +72,9 @@ namespace Judoboard
 				m_InGrams *= 10;
 		}
 		Weight(const YAML::Node& Yaml) {
-			m_InGrams = Yaml.as<uint32_t>();
+			//Convertable to uint32_t?
+			if (!YAML::convert<uint32_t>::decode(Yaml, m_InGrams))
+				*this = Weight(Yaml.as<std::string>());
 		}
 
 		void SetWeightInGrams(int Grams) { m_InGrams = Grams; }

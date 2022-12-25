@@ -18,7 +18,7 @@ namespace Judoboard
 
 		virtual Type GetType() const override { return Type::Weightclass; }
 
-		virtual std::string GetHTMLForm() const;
+		static std::string GetHTMLForm();
 
 		virtual bool IsElgiable(const Judoka& Fighter) const override;
 

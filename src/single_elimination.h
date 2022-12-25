@@ -31,7 +31,7 @@ namespace Judoboard
 			SetSchedule() = std::move(rhs.SetSchedule());
 		}
 
-		std::string GetHTMLForm();
+		static std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::SingleElimination; }
 

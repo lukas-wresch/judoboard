@@ -71,12 +71,7 @@ void SingleElimination::ToString(YAML::Emitter& Yaml) const
 
 std::string SingleElimination::GetHTMLForm()
 {
-	std::string ret;
-
-	if (GetFilter())
-		ret += GetFilter()->GetHTMLForm();
-
-	ret += R"(
+	std::string ret = R"(
 <div>
 	<label style="width:150px;float:left;margin-top:5px;" id="label_mf3">Match for 3rd place</label>
 		<input type="checkbox" id="mf3" class="switch-input">

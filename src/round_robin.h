@@ -19,7 +19,7 @@ namespace Judoboard
 
 		void operator =(const RoundRobin& rhs) = delete;
 
-		std::string GetHTMLForm();
+		static std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::RoundRobin; }
 

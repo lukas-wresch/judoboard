@@ -349,7 +349,7 @@ namespace Judoboard
 
 		virtual void GenerateSchedule() = 0;
 
-		std::string GetHTMLForm() const;
+		static std::string GetHTMLForm();
 
 		Match* AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosition);
 		Match* CreateAutoMatch(const DependentJudoka& White, const DependentJudoka& Blue);

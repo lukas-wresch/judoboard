@@ -176,10 +176,10 @@
   <tr id="row_decision" style="display: none;">
     <td colspan="2">
       <div id="div_decision" style="display: none; height: 0px;">
-        <button class="white"   style="width: 3.5cm;" onclick="SetScore('white', 'hantei'); ShowHantei(false);">White wins</button>
-        <button class="add"     style="width: 2.5cm;" onclick="SetScore('', '+draw'); ShowHantei(false);">Draw</button>
-        <button class="additional" style="width: 3.5cm;" onclick="SetScore('blue', 'hantei'); ShowHantei(false);">Blue wins</button>
-        <button class="neutral" style="width: 3.5cm;" onclick="SetScore('', '+golden_score'); ShowHantei(false);" id="golden_score">Golden Score</button>
+        <button class="white"   style="width: 3.5cm;" id="white_wins" onclick="SetScore('white', 'hantei'); ShowHantei(false);">White wins</button>
+        <button class="add"     style="width: 2.5cm;" id="draw" onclick="SetScore('', '+draw'); ShowHantei(false);">Draw</button>
+        <button class="additional" style="width: 3.5cm;" id="blue_wins" onclick="SetScore('blue', 'hantei'); ShowHantei(false);">Blue wins</button>
+        <button class="neutral" style="width: 3.5cm;" id="golden_score" onclick="SetScore('', '+golden_score'); ShowHantei(false);">Golden Score</button>
       </div>
     </td>
   </tr>
@@ -466,11 +466,6 @@ function GetScore()
     {
       document.getElementById("end_match").disabled = false;
       $('#end_match').show(1000);
-
-      //if (res.winner == 0)
-        //$("#winner_white").show();
-      //else if (res.winner == 1)
-        //$("#winner_blue").show();
     }
     else
     {
@@ -521,12 +516,15 @@ function GetScore()
       else
         document.getElementById("white_osaekomi").disabled = true;
 
-      if (res.are_fighters_on_mat && !res.has_concluded)
+      if (res.are_fighters_on_mat && !res.has_concluded && !res.is_out_of_time)
         document.getElementById("hajime").disabled = false;
       else
         document.getElementById("hajime").disabled = true;
 
-      document.getElementById("mate").disabled   = true;
+      document.getElementById("mate").disabled = true;
+
+      document.getElementById("draw").disabled = !res.draw_enabled;
+      document.getElementById("golden_score").disabled = !res.golden_score_enabled;
     }
 
 
@@ -551,6 +549,8 @@ function GetScore()
 
     if (!res.has_concluded && res.is_out_of_time && res.no_winner_yet)
       ShowHantei(true);
+    else
+      ShowHantei(false);
 
     if (res.is_goldenscore)
       document.getElementById("golden_score").disabled = true;

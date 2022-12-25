@@ -40,7 +40,7 @@ namespace Judoboard
 			int Birthyear = -1;//< 0 if no value is known
 
 			//The two fields are derived from DMF meta data:
-			Gender Gender;
+			Gender Gender = Gender::Unknown;
 			std::string ClubName;
 		};
 

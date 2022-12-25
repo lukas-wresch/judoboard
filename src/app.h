@@ -121,13 +121,14 @@ namespace Judoboard
 
 		//Judoka
 		Error Ajax_AddJudoka(const HttpServer::Request& Request);
+		std::string Ajax_GetJudoka(const HttpServer::Request& Request);
 		Error Ajax_EditJudoka(const HttpServer::Request& Request);
 
 		//Clubs
 		Error Ajax_AddClub(const HttpServer::Request& Request);
 		std::string Ajax_GetClub(const HttpServer::Request& Request);
 		Error Ajax_EditClub(const HttpServer::Request& Request);
-		std::string Ajax_ListClubs();
+		std::string Ajax_ListClubs(const HttpServer::Request& Request);
 		Error Ajax_DeleteClub(const HttpServer::Request& Request);
 
 		//Associations
@@ -147,11 +148,10 @@ namespace Judoboard
 		std::string Ajax_GetMatchesFromMatchTable(const HttpServer::Request& Request);
 		Error Ajax_SetStartPosition(const HttpServer::Request& Request);
 
-		std::string Ajax_Status();
-
-		//Serialization
-		[[deprecated]]
-		ZED::CSV Mats2String() const;
+		//Config
+		std::string Ajax_GetSetup();
+		Error Ajax_SetSetup(const HttpServer::Request& Request);
+		std::string Ajax_Execute(const HttpServer::Request& Request);
 
 		static const std::string Name;
 		static const std::string Version;
@@ -171,11 +171,11 @@ namespace Judoboard
 		class ScopedLock
 		{
 		public:
-			ScopedLock(std::mutex& Mutex) : m_Mutex(Mutex) { Mutex.lock(); }
+			ScopedLock(std::recursive_mutex& Mutex) : m_Mutex(Mutex) { Mutex.lock(); }
 			~ScopedLock() { m_Mutex.unlock(); }
 
 		private:
-			std::mutex& m_Mutex;
+			std::recursive_mutex& m_Mutex;
 		};
 
 		ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
@@ -200,7 +200,7 @@ namespace Judoboard
 
 		std::vector<IMat*> m_Mats;//List of all mats this application is aware of
 
-		mutable std::mutex m_mutex;
+		mutable std::recursive_mutex m_mutex;
 
 		mutable bool m_Running = true;
 		const uint32_t m_StartupTimestamp;

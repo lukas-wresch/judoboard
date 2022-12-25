@@ -60,6 +60,11 @@ bool Application::LoadDataFromDisk()
 		//return false;
 	}
 
+	//Has to be done here, otherwise it will be overwritten when loading tournament files
+	auto last_tournament_name = m_Database.GetLastTournamentName();
+	ZED::Log::Info("Last opened tournament was " + last_tournament_name);
+
+
 	ZED::Core::Indexer([this](auto Filename) {
 		Filename = Filename.substr(Filename.find_last_of(ZED::Core::Separator) + 1);
 		Filename = Filename.substr(0, Filename.length() - 4);//Remove .yml
@@ -67,8 +72,15 @@ bool Application::LoadDataFromDisk()
 		return true;
 		}, "tournaments");
 
-	if (FindTournamentByName(m_Database.GetLastTournamentName()))
-		OpenTournament(FindTournamentByName(m_Database.GetLastTournamentName())->GetUUID());
+
+	if (last_tournament_name.length() > 0)
+	{
+		auto last_tournament = FindTournamentByName(last_tournament_name);
+		if (last_tournament)
+			OpenTournament(*last_tournament);
+	}
+	else
+		CloseTournament();
 
 	return true;
 }
@@ -128,11 +140,12 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 	{
 		ret += "Judoka: " + dm4_judoka.Firstname + " " + dm4_judoka.Lastname + "<br/>";
 
-		auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);		
+		//auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);
+		Judoka* new_judoka = new Judoka(JudokaData(dm4_judoka), &GetDatabase());
 
 		//Judoka is now added/updated
 
-		if (!ParseOnly && new_judoka)
+		if (!ParseOnly)
 		{//Add to the current tournament
 			if (File.GetClubs().size() == 1)//If there is only one
 				new_judoka->SetClub(GetDatabase().FindClubByName(File.GetClubs()[0]->Name));
@@ -183,13 +196,13 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 	{
 		ret += "Judoka: " + dmf_judoka.Firstname + " " + dmf_judoka.Lastname + "<br/>";
 
-		auto new_judoka = GetDatabase().UpdateOrAdd(JudokaData(dmf_judoka), ParseOnly, ret);		
+		//auto new_judoka = GetDatabase().UpdateOrAdd(JudokaData(dmf_judoka), ParseOnly, ret);	
 
 		//Judoka is now added/updated
 
-		if (!ParseOnly && new_judoka)
+		if (!ParseOnly)
 		{//Add to the current tournament
-			GetTournament()->AddParticipant(new_judoka);
+			GetTournament()->AddParticipant(new Judoka(JudokaData(dmf_judoka), &GetDatabase()));
 		}
 	}
 
@@ -209,7 +222,10 @@ bool Application::OpenTournament(const UUID& UUID)
 	m_CurrentTournament = FindTournament(UUID);
 
 	if (m_CurrentTournament)
+	{
 		m_Database.SetLastTournamentName(m_CurrentTournament->GetName());
+		ZED::Log::Info("Opened tournament " + m_CurrentTournament->GetName());
+	}
 
 	return true;
 }
@@ -332,9 +348,10 @@ bool Application::CloseMat(uint32_t ID)
 		{
 			if ((*it)->GetType() == IMat::Type::VirtualMat)
 			{
-				delete *it;
+				delete* it;
 				it = m_Mats.erase(it);
 			}
+
 			return true;
 		}
 	}
@@ -346,7 +363,10 @@ bool Application::CloseMat(uint32_t ID)
 
 bool Application::StartLocalMat(uint32_t ID)
 {
-	ZED::Log::Debug("Starting local mat");
+	ZED::Log::Info("Starting local mat");
+
+	LockTillScopeEnd();
+
 	for (; true; ID++)
 	{
 		bool is_ok = true;
@@ -372,11 +392,14 @@ bool Application::StartLocalMat(uint32_t ID)
 			break;
 	}
 
-	LockTillScopeEnd();
 	Mat* new_mat = new Mat(ID, this);
 	m_Mats.emplace_back(new_mat);
 
 	ZED::Log::Info("New local mat has been created with ID=" + std::to_string(ID));
+
+	new_mat->SetIpponStyle(GetDatabase().GetIpponStyle());
+	new_mat->SetTimerStyle(GetDatabase().GetTimerStyle());
+	new_mat->SetNameStyle(GetDatabase().GetNameStyle());
 
 	if (IsSlave())
 		SendCommandToMaster("/ajax/master/mat_available?port=" + std::to_string(m_Server.GetPort()));
@@ -419,7 +442,7 @@ bool Application::AddTournament(Tournament* NewTournament)
 	if (NewTournament->GetStatus() == Status::Scheduled)//Fresh new tournament
 	{//Try to open right away
 		if (!m_CurrentTournament || m_CurrentTournament->CanCloseTournament())
-			m_CurrentTournament = m_Tournaments.back();
+			OpenTournament(*NewTournament);
 	}
 
 	return true;
@@ -540,7 +563,7 @@ void Application::Run()
 		{
 			if (*it && !(*it)->IsConnected())
 			{
-				delete* it;
+				delete *it;
 				it = m_Mats.erase(it);
 			}
 			else
@@ -558,18 +581,4 @@ void Application::Run()
 	}
 
 	ZED::Log::Info("Closing application");
-}
-
-
-
-ZED::CSV Application::Mats2String() const
-{
-	ZED::CSV ret;
-	ret << (uint32_t)m_Mats.size();
-
-	for (auto mat : m_Mats)
-		if (mat)
-			ret << mat->GetMatID();
-
-	return ret;
 }

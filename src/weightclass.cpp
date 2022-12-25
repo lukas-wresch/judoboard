@@ -73,7 +73,7 @@ void Weightclass::operator >> (YAML::Emitter& Yaml) const
 
 void Weightclass::ToString(YAML::Emitter& Yaml) const
 {
-	Yaml << YAML::Key << "type"       << YAML::Value << (int)GetType();
+	IFilter::ToString(Yaml);
 	Yaml << YAML::Key << "min_weight" << YAML::Value << m_MinWeight.ToString();
 	Yaml << YAML::Key << "max_weight" << YAML::Value << m_MaxWeight.ToString();
 	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;
@@ -102,6 +102,8 @@ std::string Weightclass::GetDescription() const
 	{
 		if ((uint32_t)m_MaxWeight == 0)
 			desc = "+" + m_MinWeight.ToString() + " kg";
+		else if ((uint32_t)m_MinWeight == 0)
+			desc = "- " + m_MaxWeight.ToString() + " kg";
 		else
 			desc = m_MinWeight.ToString() + " - " + m_MaxWeight.ToString() + " kg";
 
@@ -114,7 +116,7 @@ std::string Weightclass::GetDescription() const
 
 
 
-std::string Weightclass::GetHTMLForm() const
+std::string Weightclass::GetHTMLForm()
 {
 	std::string ret = R"(
 <div>

@@ -1,7 +1,7 @@
 <h1 id="headline">New Matchtable</h1>
 
 
-<div id="div_type">
+<div>
   <label style="width:100px;float:left;margin-top:4px;" id="label_type">Type</label>
   <select style="margin-bottom:20px; width: 5.5cm;" id="type" onchange="GetForm();">
     <option selected value="1" id="label_weightclass">Round Robin</option>
@@ -44,7 +44,12 @@
 
 
 <div style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
-  <form id="form">
+  <form id="form_filter">
+  </form>
+</div>
+
+<div style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
+  <form id="form_fight_system">
   </form>
 </div>
 
@@ -91,26 +96,41 @@ var g_yaml;
 
 
 
-function GetForm(callback)
+function GetFilterForm(callback)
 {
-  AjaxCallback('ajax/matchtable/get_form?type=' + document.getElementById("type").value, function(response) {
-    document.getElementById("form").innerHTML = response;
-
+  AjaxCallback('ajax/filter/get_form?type=' + document.getElementById("type").value, function(response) {
+    document.getElementById("form_filter").innerHTML = response;
+    
     document.getElementById("label_min_weight").innerHTML = lang.min_weight;
     document.getElementById("label_max_weight").innerHTML = lang.max_weight;
     document.getElementById("label_gender").innerHTML     = lang.gender;
     document.getElementById("all").innerHTML    = lang.all;
     document.getElementById("male").innerHTML   = lang.male;
     document.getElementById("female").innerHTML = lang.female;
-
+    
     if (g_yaml && typeof g_yaml.min_weight !== 'undefined')
       document.getElementById("minWeight").value = g_yaml.min_weight;
     if (g_yaml && typeof g_yaml.max_weight !== 'undefined')
       document.getElementById("maxWeight").value = g_yaml.max_weight;
     if (g_yaml && typeof g_yaml.gender !== 'undefined')
       document.getElementById("gender").value = g_yaml.gender;
+      
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+
+  return false;
+}
+
+
+function GetFightSystemForm(callback)
+{
+  AjaxCallback('ajax/fight_system/get_form?type=' + document.getElementById("fight_system").value, function(response) {
+    document.getElementById("form_fight_system").innerHTML = response;
+
     if (g_yaml && typeof g_yaml.best_of_three !== 'undefined')
       document.getElementById("bo3").checked = g_yaml.best_of_three;
+
     if (g_yaml && typeof g_yaml.third_place !== 'undefined')
       document.getElementById("mf3").checked = g_yaml.third_place;
     if (g_yaml && typeof g_yaml.fifth_place !== 'undefined')
@@ -126,8 +146,19 @@ function GetForm(callback)
 
 function AddMatchtable()
 {
-  var elements = document.getElementById("form").elements;
   var data = [];
+
+  var elements = document.getElementById("form_filter").elements;
+
+  for (var i = 0, element; element = elements[i++];)
+  {
+    if (element.type == 'checkbox')
+      data[element.id] = element.checked;
+    else
+      data[element.id] = element.value;
+  }
+
+  elements = document.getElementById("form_fight_system").elements;
 
   for (var i = 0, element; element = elements[i++];)
   {
@@ -141,12 +172,15 @@ function AddMatchtable()
   data["rule"] = document.getElementById("rule").value;
   data["age_group"] = document.getElementById("age_group").value;
 
+  data["type"] = document.getElementById("type").value;
+  data["fight_system"] = document.getElementById("fight_system").value;
+
   console.log(data);
 
   var params = URLEncode(data);
   console.log(params);
 
-  AjaxPost('ajax/matchtable/add?type=' + document.getElementById("type").value, params, function() {
+  AjaxPost('ajax/matchtable/add', params, function() {
     navigate("matchtable_list.html");
   });
 
@@ -157,8 +191,19 @@ function AddMatchtable()
 
 function UpdateMatchtable()
 {
-  var elements = document.getElementById("form").elements;
   var data = [];
+
+  var elements = document.getElementById("form_filter").elements;
+
+  for (var i = 0, element; element = elements[i++];)
+  {
+    if (element.type == 'checkbox')
+      data[element.id] = element.checked;
+    else
+      data[element.id] = element.value;
+  }
+
+  elements = document.getElementById("form_fight_system").elements;
 
   for (var i = 0, element; element = elements[i++];)
   {
@@ -173,6 +218,9 @@ function UpdateMatchtable()
   data["mat"]   = document.getElementById("mat").value;
   data["age_group"] = document.getElementById("age_group").value;
   data["rule"]  = document.getElementById("rule").value;
+
+  data["type"] = document.getElementById("type").value;
+  data["fight_system"] = document.getElementById("fight_system").value;
 
   var params = URLEncode(data);
 
@@ -216,17 +264,17 @@ function GetMatchTable(id)
     console.log(response);
     var res = YAML.parse(response);
     g_yaml = res;
-
-    var elements = document.getElementById("form").elements;
-
+    
     document.getElementById("name").value = res.name;
-    document.getElementById("type").value = res.type;
+    document.getElementById("type").value = res.filter_type;
     document.getElementById("type").onchange();
-
+    document.getElementById("fight_system").value = res.type;
+    document.getElementById("fight_system").onchange();
+    
     GetMats(function() {
       document.getElementById("mat").value = res.mat_id;
     });
-
+    
     GetAgeGroups(function() {
       if (typeof res.age_group !== 'undefined')
         document.getElementById("age_group").value = res.age_group;
@@ -240,7 +288,7 @@ function GetMatchTable(id)
       document.getElementById("color").value = res.color;
       document.getElementById("color").onchange();
     });
-        
+     
 
     if (typeof res.participants !== 'undefined')
     {
@@ -263,10 +311,10 @@ function GetMatchTable(id)
          if (no%2 == 0)
            row.style.backgroundColor = "#eee";
 
-         if (typeof judoka.starting_pos == 'undefined')
+         if (typeof judoka.start_pos == 'undefined')
            cell0.innerHTML = no;
          else
-           cell0.innerHTML = judoka.starting_pos + 1;
+           cell0.innerHTML = judoka.start_pos + 1;
          cell0.style.textAlign = "center";
          cell0.style.fontSize  = "14pt";
 
@@ -281,8 +329,8 @@ function GetMatchTable(id)
          var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
 
          var options = "<table><tr><td rowspan=\"2\"><button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+judoka.uuid+")\">" + lang.remove + "</button></td>";
-         if (typeof judoka.starting_pos !== 'undefined')
-           options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+"','"+(judoka.starting_pos-1)+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+"','"+(judoka.starting_pos+1)+"');\"></a></td></tr></table>";
+         if (typeof judoka.start_pos !== 'undefined')
+           options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+"','"+(judoka.start_pos-1)+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+"','"+(judoka.start_pos+1)+"');\"></a></td></tr></table>";
          else
            options += "<td></td></tr><tr><td></td></tr></table>";
 
@@ -384,7 +432,6 @@ if (id)
  
   document.getElementById("headline").innerHTML = lang.update_matchtable; 
   document.getElementById("add").style.display = "none";
-  document.getElementById("div_type").style.display = "none";
 }
 else
 {
@@ -394,7 +441,8 @@ else
   document.getElementById("div_name").style.display = "none";
   document.getElementById("div_color").style.display = "none";
 
-  GetForm();
+  GetFilterForm();
+  GetFightSystemForm();
   GetMats();
   GetRuleSets();
   GetAgeGroups();
