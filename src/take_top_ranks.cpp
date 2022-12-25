@@ -68,13 +68,13 @@ std::unordered_map<size_t, const DependentJudoka> TakeTopRanks::GetParticipants(
 {
 	std::unordered_map<size_t, const DependentJudoka> ret;
 
-	/*if (!m_pSource.HasConcluded())
+	if (!m_pSource.HasConcluded())
 	{
 		for (int i = 0; i < m_NumRanks; ++i)
 			ret.insert({ i, DependentJudoka( (DependencyType)((int)DependencyType::TakeRank1 + i) ) });
 
 		return ret;
-	}*/
+	}
 
 	auto results = m_pSource.CalculateResults();
 	for (int i = 0; i < m_NumRanks; ++i)

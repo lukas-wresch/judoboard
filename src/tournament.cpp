@@ -982,6 +982,8 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 	if (GetStatus() != Status::Scheduled)
 		return false;
 
+	LockTillScopeEnd();
+
 	auto matchTable = FindMatchTable(UUID);
 
 	if (!matchTable)
@@ -1011,6 +1013,8 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 
 bool Tournament::RemoveMatchTable(const UUID& UUID)
 {
+	LockTillScopeEnd();
+
 	auto matchTable = FindMatchTable(UUID);
 
 	if (!matchTable)
@@ -1018,8 +1022,6 @@ bool Tournament::RemoveMatchTable(const UUID& UUID)
 
 	if (matchTable->GetStatus() != Status::Scheduled)//Can safely delete the match table
 		return false;
-
-	Lock();
 
 	//Remove match table
 	for (auto table = m_MatchTables.begin(); table != m_MatchTables.end(); ++table)
@@ -1032,7 +1034,6 @@ bool Tournament::RemoveMatchTable(const UUID& UUID)
 	}
 
 	GenerateSchedule();
-	Unlock();
 
 	return true;
 }
@@ -1044,6 +1045,8 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 	if (!NewAgeGroup)
 		return false;
 
+	LockTillScopeEnd();
+
 	if (m_StandingData.FindAgeGroup(NewAgeGroup->GetUUID()))
 		return false;
 
@@ -1053,7 +1056,6 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 	if (NewAgeGroup->GetRuleSet())
 		m_StandingData.AddRuleSet(const_cast<RuleSet*>(NewAgeGroup->GetRuleSet()));
 
-	Lock();
 	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
 	{
 		auto age_group = GetAgeGroupOfJudoka(judoka);
@@ -1065,7 +1067,6 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 			m_JudokaToAgeGroup.insert({ judoka->GetUUID(), NewAgeGroup->GetUUID() });
 		}
 	}
-	Unlock();
 
 	Save();
 	return true;
@@ -1075,6 +1076,8 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 
 bool Tournament::RemoveAgeGroup(const UUID& UUID)
 {
+	LockTillScopeEnd();
+
 	auto age_group_to_remove = m_StandingData.FindAgeGroup(UUID);
 
 	if (!age_group_to_remove)
@@ -1082,8 +1085,6 @@ bool Tournament::RemoveAgeGroup(const UUID& UUID)
 
 	if (!m_StandingData.RemoveAgeGroup(UUID))
 		return false;
-
-	Lock();
 
 	//Remove all assignments from this age group
 	for (auto it = m_JudokaToAgeGroup.begin(); it != m_JudokaToAgeGroup.end();)
@@ -1102,8 +1103,6 @@ bool Tournament::RemoveAgeGroup(const UUID& UUID)
 			FindAgeGroupForJudoka(*judoka);
 	}
 
-	Unlock();
-
 	Save();
 	return true;
 }
@@ -1115,21 +1114,19 @@ bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* Ag
 	if (!Judoka || !AgeGroup)
 		return false;
 
+	LockTillScopeEnd();
+
 	if (!IsParticipant(*Judoka))
 		return false;
 
 	if (!m_StandingData.FindAgeGroup(AgeGroup->GetUUID()))
 		return false;
 
-	Lock();
-
 	//Remove judoka to the age group he currently belongs to
 	m_JudokaToAgeGroup.erase(Judoka->GetUUID());
 
 	//Add him to his new age group
 	m_JudokaToAgeGroup.insert({ Judoka->GetUUID(), AgeGroup->GetUUID() });
-
-	Unlock();
 
 	Save();
 	return true;
@@ -1141,15 +1138,13 @@ std::vector<const AgeGroup*> Tournament::GetEligableAgeGroupsOfJudoka(const Judo
 {
 	std::vector<const AgeGroup*> ret;
 
-	Lock();
+	LockTillScopeEnd();
 
 	for (auto age_group : m_StandingData.GetAgeGroups())
 	{
 		if (Judoka && age_group->IsElgiable(*Judoka))
 			ret.emplace_back(age_group);
 	}
-
-	Unlock();
 
 	return ret;
 }
@@ -1160,12 +1155,10 @@ std::vector<const AgeGroup*> Tournament::GetAgeGroups() const
 {
 	std::vector<const AgeGroup*> ret;
 
-	Lock();
+	LockTillScopeEnd();
 
 	for (auto age_group : m_StandingData.GetAgeGroups())
 		ret.emplace_back(age_group);
-
-	Unlock();
 
 	return ret;
 }
@@ -1174,7 +1167,7 @@ std::vector<const AgeGroup*> Tournament::GetAgeGroups() const
 
 void Tournament::ListAgeGroups(YAML::Emitter& Yaml) const
 {
-	Lock();
+	LockTillScopeEnd();
 
 	Yaml << YAML::BeginSeq;
 
@@ -1211,13 +1204,14 @@ void Tournament::ListAgeGroups(YAML::Emitter& Yaml) const
 	}
 
 	Yaml << YAML::EndSeq;
-	Unlock();
 }
 
 
 
 MatchTable* Tournament::GetScheduleEntry(const UUID& UUID)
 {
+	LockTillScopeEnd();
+
 	for (auto entry : m_MatchTables)
 		if (entry->GetUUID() == UUID)
 			return entry;
@@ -1231,12 +1225,12 @@ bool Tournament::MoveScheduleEntryUp(const UUID& UUID)
 	if (GetStatus() == Status::Concluded)
 		return false;
 
-	Lock();
+	LockTillScopeEnd();
+
 	uint32_t index = 0;
 	for (; index < m_MatchTables.size(); ++index)
 		if (m_MatchTables[index]->GetUUID() == UUID)
 			break;
-	Unlock();
 
 	if (index >= m_MatchTables.size() || !m_MatchTables[index])
 		return false;
@@ -1247,11 +1241,9 @@ bool Tournament::MoveScheduleEntryUp(const UUID& UUID)
 	if (m_MatchTables[index]->GetStatus() != Status::Scheduled)//Don't move if already started
 		return false;
 
-	Lock();
 	m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() - 1);
 
 	GenerateSchedule();
-	Unlock();
 	return true;
 }
 
@@ -1262,12 +1254,12 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 	if (GetStatus() == Status::Concluded)
 		return false;
 
-	Lock();
+	LockTillScopeEnd();
+
 	uint32_t index = 0;
 	for (; index < m_MatchTables.size(); ++index)
 		if (m_MatchTables[index]->GetUUID() == UUID)
 			break;
-	Unlock();
 
 	if (index >= m_MatchTables.size() || !m_MatchTables[index])
 		return false;
@@ -1285,7 +1277,6 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 	m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() + 1);
 
 	GenerateSchedule();
-	Unlock();
 	return true;
 }
 
@@ -1294,6 +1285,8 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) const
 {
 	std::vector<WeightclassDescCollection> ret;
+
+	LockTillScopeEnd();
 
 	if (AgeGroups.empty())
 	{
@@ -1409,7 +1402,7 @@ std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min
 
 bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>& Descriptors)
 {
-	Lock();
+	LockTillScopeEnd();
 
 	bool temp_auto_save = IsAutoSave();
 	EnableAutoSave(false);//Disable temporarily for performance reasons
@@ -1457,8 +1450,6 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 
 	EnableAutoSave(temp_auto_save);
 	Save();
-
-	Unlock();
 
 	return true;
 }
