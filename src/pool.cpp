@@ -76,23 +76,9 @@ std::string Pool::GetHTMLForm()
 	<option value="8">8</option>
   </select>
 </div>
-
-<div>
-	<label style="width:150px;float:left;margin-top:5px;" id="label_mf3">Match for 3rd place</label>
-		<input type="checkbox" id="mf3" class="switch-input">
-		<label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="mf3">
-		<span class="toggle-on" id="mf3_enabled"></span><span class="toggle-off" id="mf3_disabled"></span>
-	</label>
-</div>
-
-<div>
-	<label style="width:150px;float:left;margin-top:5px;" id="label_mf5">Match for 5th place</label>
-		<input type="checkbox" id="mf5" class="switch-input">
-		<label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="mf5">
-		<span class="toggle-on" id="mf5_enabled"></span><span class="toggle-off" id="mf5_disabled"></span>
-	</label>
-</div>
 )";
+
+	ret += SingleElimination::GetHTMLForm();
 
 	return ret;
 }

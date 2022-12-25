@@ -3,7 +3,14 @@
 
 <div>
   <label style="width:100px;float:left;margin-top:4px;" id="label_type">Type</label>
-  <select style="margin-bottom:20px; width: 5.5cm;" id="type" onchange="GetForm();">
+  <select style="margin-bottom:20px; width: 5.5cm;" id="type" onchange="GetFilterForm();">
+    <option selected value="0" id="label_weightclass">Weightclass</option>
+  </select>
+</div>
+
+<div>
+  <label style="width:100px;float:left;margin-top:4px;" id="label_fight_system">Fight System</label>
+  <select style="margin-bottom:20px; width: 5.5cm;" id="fight_system" onchange="GetFightSystemForm();">
     <option selected value="1" id="label_weightclass">Round Robin</option>
     <option value="2" id="label_custom">Custom</option>
     <option value="3" id="label_single_elimination">Single Elimination</option>

@@ -1485,6 +1485,8 @@ void Application::SetupHttpServer()
 				return CustomTable::GetHTMLForm();
 			case MatchTable::Type::SingleElimination:
 				return SingleElimination::GetHTMLForm();
+			case MatchTable::Type::Pool:
+				return Pool::GetHTMLForm();
 
 			default:
 				return std::string("Unknown form");
@@ -3130,6 +3132,20 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 		single_table->IsBestOfThree(bo3);
 		single_table->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
 		single_table->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
+
+		GetTournament()->Unlock();
+		break;
+	}
+
+	case MatchTable::Type::Pool:
+	{
+		Pool* pool = (Pool*)table;
+
+		GetTournament()->Lock();
+
+		pool->IsBestOfThree(bo3);
+		pool->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
+		pool->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
 
 		GetTournament()->Unlock();
 		break;
