@@ -1,6 +1,6 @@
-<h2>List of Age Groups</h2>
+<h2 id="headline"></h2>
 
-<button class="add" style="margin-bottom: 1cm;" onclick="navigate('age_groups_add.html')" id="new_age_group">New Age Group</button>
+<button class="add" style="margin-bottom: 1cm;" onclick="navigate('age_groups_add.html')" id="new_age_group"></button>
 
 <table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
@@ -55,5 +55,11 @@ function GetAgeGroups()
 }
 
 GetAgeGroups();
+
+document.getElementById("headline").innerHTML = translate('list_of_age_groups');
+document.getElementById("name").innerHTML     = translate('name');
+document.getElementById("description").innerHTML = translate('description');
+document.getElementById("options").innerHTML  = translate('options');
+document.getElementById("new_age_group").innerHTML = translate('new_age_group');
 
 </script>
