@@ -147,7 +147,7 @@ function GetTournament(id)
     GetAssociations(function() {
       if (typeof res.organizer_uuid !== 'undefined')
         document.getElementById("clubs").value = res.organizer_uuid;
-    });
+    }, 'also_clubs=true');
   });
 }
 
@@ -179,7 +179,7 @@ else
   document.getElementById("delete").style.display = "none";
 
   GetRuleSets();
-  GetAssociations();
+  GetAssociations(undefined, 'also_clubs=true');
 }
 
 </script>

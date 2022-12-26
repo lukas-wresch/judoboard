@@ -2918,6 +2918,7 @@ std::string Application::Ajax_ListClubs(const HttpServer::Request& Request)
 std::string Application::Ajax_ListAssociations(const HttpServer::Request& Request)
 {
 	bool only_children = HttpServer::DecodeURLEncoded(Request.m_Query, "only_children") == "true";
+	bool also_clubs    = HttpServer::DecodeURLEncoded(Request.m_Query, "also_clubs")    == "true";
 
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
@@ -2934,6 +2935,11 @@ std::string Application::Ajax_ListAssociations(const HttpServer::Request& Reques
 			assoc->ToString(ret);
 		}
 	}
+
+	if (also_clubs)
+		for (auto club : m_Database.GetAllClubs())
+			if (club)
+				club->ToString(ret);
 
 	ret << YAML::EndSeq;
 	return ret.c_str();
