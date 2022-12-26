@@ -114,7 +114,7 @@ void Pool::GenerateSchedule()
 
 	if (!GetFilter() || GetParticipants().size() <= 1)
 		return;
-	if (GetParticipants().size() != 4) return;//DEBUG
+	
 	for (auto pool : m_Pools)
 		delete pool;
 
@@ -140,13 +140,13 @@ void Pool::GenerateSchedule()
 
 	if (pool_count == 2)
 	{
-		auto topA = new TakeTopRanks(*m_Pools[0], m_TakeTop);
-		auto topB = new TakeTopRanks(*m_Pools[1], m_TakeTop);
+		TakeTopRanks topA(*m_Pools[0], m_TakeTop);
+		TakeTopRanks topB(*m_Pools[1], m_TakeTop);
 
 		Mixer mixer(GetTournament());
 
-		mixer.AddSource(*topA);
-		mixer.AddSource(*topB);
+		mixer.AddSource(topA);
+		mixer.AddSource(topB);
 
 		final_input = new Fixed(mixer);
 
@@ -156,27 +156,34 @@ void Pool::GenerateSchedule()
 		final_input->Dump();*/
 		
 		//Swap the two incorrect positions manually
-		auto last = final_input->GetJudokaByStartPosition(2);
-		final_input->SetStartPosition(last, 3);
+		auto temp = final_input->GetJudokaByStartPosition(2);
+		final_input->SetStartPosition(temp, 3);
 
 		//final_input->Dump();
 	}
 
 	else if (pool_count == 4)
 	{
-		auto mixer = new Mixer(GetTournament());
+		Mixer mixer(GetTournament());
 
-		auto topA = new TakeTopRanks(*m_Pools[0], m_TakeTop);
-		auto topB = new TakeTopRanks(*m_Pools[1], m_TakeTop);
-		auto topC = new TakeTopRanks(*m_Pools[2], m_TakeTop);
-		auto topD = new TakeTopRanks(*m_Pools[3], m_TakeTop);
+		TakeTopRanks topA(*m_Pools[0], m_TakeTop);
+		TakeTopRanks topB(*m_Pools[1], m_TakeTop);
+		TakeTopRanks topC(*m_Pools[2], m_TakeTop);
+		TakeTopRanks topD(*m_Pools[3], m_TakeTop);
 
-		mixer->AddSource(*topA);
-		mixer->AddSource(*topC);
-		mixer->AddSource(*topB);
-		mixer->AddSource(*topD);
+		mixer.AddSource(topA);
+		mixer.AddSource(topB);
+		mixer.AddSource(topC);
+		mixer.AddSource(topD);
 
-		final_input = mixer;
+		final_input = new Fixed(mixer);
+
+		auto temp = final_input->GetJudokaByStartPosition(4);
+		final_input->SetStartPosition(temp, 5);
+		temp = final_input->GetJudokaByStartPosition(6);
+		final_input->SetStartPosition(temp, 7);
+
+		//final_input->Dump();
 	}
 
 	else

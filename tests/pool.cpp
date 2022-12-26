@@ -193,12 +193,26 @@ TEST(Pool, Count8)
 	EXPECT_EQ(quater1->GetDependencyTypeOf(Fighter::White), DependencyType::TakeRank1);
 	EXPECT_EQ(*quater1->GetDependentMatchTableOf(Fighter::White), *w.GetPool(0));
 	EXPECT_EQ(quater1->GetDependencyTypeOf(Fighter::Blue),  DependencyType::TakeRank2);
-	EXPECT_EQ(*quater1->GetDependentMatchTableOf(Fighter::Blue),  *w.GetPool(1));
+	EXPECT_NE(*quater1->GetDependentMatchTableOf(Fighter::Blue),  *w.GetPool(0));
+	EXPECT_NE(*quater1->GetDependentMatchTableOf(Fighter::Blue),  *w.GetPool(2));
 
-	EXPECT_EQ(quater2->GetDependencyTypeOf(Fighter::White), DependencyType::TakeRank2);
-	EXPECT_EQ(*quater2->GetDependentMatchTableOf(Fighter::White), *w.GetPool(0));
-	EXPECT_EQ(quater2->GetDependencyTypeOf(Fighter::Blue),  DependencyType::TakeRank1);
-	EXPECT_EQ(*quater2->GetDependentMatchTableOf(Fighter::Blue),  *w.GetPool(1));
+	EXPECT_EQ(quater2->GetDependencyTypeOf(Fighter::White), DependencyType::TakeRank1);
+	EXPECT_EQ(*quater2->GetDependentMatchTableOf(Fighter::White), *w.GetPool(2));
+	EXPECT_EQ(quater2->GetDependencyTypeOf(Fighter::Blue),  DependencyType::TakeRank2);
+	EXPECT_NE(*quater2->GetDependentMatchTableOf(Fighter::Blue),  *w.GetPool(0));
+	EXPECT_NE(*quater2->GetDependentMatchTableOf(Fighter::Blue),  *w.GetPool(2));
+
+	EXPECT_EQ(quater3->GetDependencyTypeOf(Fighter::White), DependencyType::TakeRank1);
+	EXPECT_EQ(*quater3->GetDependentMatchTableOf(Fighter::White), *w.GetPool(1));
+	EXPECT_EQ(quater3->GetDependencyTypeOf(Fighter::Blue),  DependencyType::TakeRank2);
+	EXPECT_NE(*quater3->GetDependentMatchTableOf(Fighter::Blue),  *w.GetPool(1));
+	EXPECT_NE(*quater3->GetDependentMatchTableOf(Fighter::Blue),  *w.GetPool(3));
+
+	EXPECT_EQ(quater4->GetDependencyTypeOf(Fighter::White), DependencyType::TakeRank1);
+	EXPECT_EQ(*quater4->GetDependentMatchTableOf(Fighter::White), *w.GetPool(3));
+	EXPECT_EQ(quater4->GetDependencyTypeOf(Fighter::Blue),  DependencyType::TakeRank2);
+	EXPECT_NE(*quater4->GetDependentMatchTableOf(Fighter::Blue),  *w.GetPool(1));
+	EXPECT_NE(*quater4->GetDependentMatchTableOf(Fighter::Blue),  *w.GetPool(3));
 
 	Mat m(1);
 

@@ -24,6 +24,7 @@ namespace Judoboard
 		bool operator != (const UUID& rhs) const noexcept { return m_UUID != rhs.m_UUID; }
 
 		bool operator == (const std::string& rhs) const noexcept { return m_UUID == rhs; }
+		bool operator != (const std::string& rhs) const noexcept { return m_UUID != rhs; }
 
 		bool operator < (const UUID& rhs) const noexcept { return m_UUID < rhs.m_UUID; }
 		bool operator < (const std::string& rhs) const noexcept { return m_UUID < rhs; }
@@ -63,6 +64,7 @@ namespace Judoboard
 		const UUID& GetUUID() const { return m_UUID; }
 
 		bool operator == (const UUID& rhs) const noexcept { return m_UUID == rhs.m_UUID; }
+		bool operator != (const UUID& rhs) const noexcept { return m_UUID != rhs.m_UUID; }
 
 		operator const UUID& () const { return m_UUID; }
 

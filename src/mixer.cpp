@@ -11,6 +11,7 @@ Mixer::Mixer(const IFilter& pSource1, const IFilter& pSource2) :
 {
 	m_pSources.push_back(&pSource1);
 	m_pSources.push_back(&pSource2);
+	Recalculate();
 	assert(pSource1.GetTournament() == pSource2.GetTournament());
 }
 
@@ -52,7 +53,7 @@ bool Mixer::IsElgiable(const Judoka& Fighter) const
 
 
 
-std::unordered_map<size_t, const DependentJudoka> Mixer::GetParticipants() const
+void Mixer::Recalculate()
 {
 	std::unordered_map<size_t, const DependentJudoka> ret;
 
@@ -63,16 +64,14 @@ std::unordered_map<size_t, const DependentJudoka> Mixer::GetParticipants() const
 			ret.insert({ count*pos + i, judoka });
 	
 	SetParticipants(std::move(ret));//Save to cache
-
-	return IFilter::GetParticipants();//Return the cache
 }
 
 
 
-const DependentJudoka Mixer::GetJudokaByStartPosition(size_t StartPosition) const
+/*const DependentJudoka Mixer::GetJudokaByStartPosition(size_t StartPosition) const
 {
 	//const auto index = StartPosition % m_pSources.size();
 	//return m_pSources[index]->GetJudokaByStartPosition((StartPosition - index) / m_pSources.size());
 	GetParticipants();//Re-calculates the participants
 	return IFilter::GetJudokaByStartPosition(StartPosition);
-}
+}*/
