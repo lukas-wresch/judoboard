@@ -5,14 +5,13 @@
 
 namespace Judoboard
 {
-	class Fuser : public IFilter
+	class Reverser : public IFilter
 	{
 	public:
-		Fuser(const ITournament* Tournament) : IFilter(Tournament) {}
-		Fuser(const IFilter& pSource1, const IFilter& pSource2);
-		Fuser(const YAML::Node& Yaml, const ITournament* Tournament);
+		Reverser(const IFilter& pSource);
+		Reverser(const YAML::Node& Yaml, const ITournament* Tournament);
 
-		virtual Type GetType() const override { return Type::Fuser; }
+		virtual Type GetType() const override { return Type::Reverser; }
 
 		virtual std::string GetHTMLForm() const;
 
@@ -22,15 +21,10 @@ namespace Judoboard
 
 		virtual const DependentJudoka GetJudokaByStartPosition(size_t StartPosition) const override;
 
-		void AddSource(const IFilter& Source) {
-			m_pSources.emplace_back(&Source);
-		}
-
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
-		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	private:
-		std::vector<const IFilter*> m_pSources;
+		const IFilter& m_pSource;
 	};
 }

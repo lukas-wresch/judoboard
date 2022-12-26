@@ -5,14 +5,14 @@
 
 namespace Judoboard
 {
-	class Fuser : public IFilter
+	class Mixer : public IFilter
 	{
 	public:
-		Fuser(const ITournament* Tournament) : IFilter(Tournament) {}
-		Fuser(const IFilter& pSource1, const IFilter& pSource2);
-		Fuser(const YAML::Node& Yaml, const ITournament* Tournament);
+		Mixer(const ITournament* Tournament) : IFilter(Tournament) {}
+		Mixer(const IFilter& pSource1, const IFilter& pSource2);
+		Mixer(const YAML::Node& Yaml, const ITournament* Tournament);
 
-		virtual Type GetType() const override { return Type::Fuser; }
+		virtual Type GetType() const override { return Type::Mixer; }
 
 		virtual std::string GetHTMLForm() const;
 
@@ -28,7 +28,7 @@ namespace Judoboard
 
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
-		virtual void ToString(YAML::Emitter& Yaml) const override;
+		//virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	private:
 		std::vector<const IFilter*> m_pSources;

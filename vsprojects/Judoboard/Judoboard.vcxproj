@@ -195,9 +195,11 @@
     <ClCompile Include="..\..\src\matchlog.cpp" />
     <ClCompile Include="..\..\src\matchtable.cpp" />
     <ClCompile Include="..\..\src\md5.cpp" />
+    <ClCompile Include="..\..\src\mixer.cpp" />
     <ClCompile Include="..\..\src\pool.cpp" />
     <ClCompile Include="..\..\src\remote_mat.cpp" />
     <ClCompile Include="..\..\src\remote_tournament.cpp" />
+    <ClCompile Include="..\..\src\reverser.cpp" />
     <ClCompile Include="..\..\src\round_robin.cpp" />
     <ClCompile Include="..\..\src\rule_set.cpp" />
     <ClCompile Include="..\..\src\single_elimination.cpp" />
@@ -240,10 +242,12 @@
     <ClInclude Include="..\..\src\matchlog.h" />
     <ClInclude Include="..\..\src\matchtable.h" />
     <ClInclude Include="..\..\src\md5.h" />
+    <ClInclude Include="..\..\src\mixer.h" />
     <ClInclude Include="..\..\src\pause.h" />
     <ClInclude Include="..\..\src\pool.h" />
     <ClInclude Include="..\..\src\remote_mat.h" />
     <ClInclude Include="..\..\src\remote_tournament.h" />
+    <ClInclude Include="..\..\src\reverser.h" />
     <ClInclude Include="..\..\src\round_robin.h" />
     <ClInclude Include="..\..\src\rule_set.h" />
     <ClInclude Include="..\..\src\schedule_entry.h" />

@@ -5,7 +5,9 @@
 #include "weightclass.h"
 #include "splitter.h"
 #include "take_top_ranks.h"
+#include "reverser.h"
 #include "fuser.h"
+#include "mixer.h"
 #include "rule_set.h"
 #include "localizer.h"
 #include "match.h"
@@ -131,16 +133,62 @@ void Pool::GenerateSchedule()
 		m_Pools[i]->SetName(name);
 	}
 
+
 	//Create filter(s) for final round
-	auto fuser = new Fuser(GetTournament());
-	for (auto pool : m_Pools)
+	IFilter* final_input = nullptr;
+
+	if (pool_count == 2)
 	{
-		auto take_top_placed = new TakeTopRanks(*pool, m_TakeTop);
-		fuser->AddSource(*take_top_placed);
+		auto mixer = new Mixer(GetTournament());
+
+		for (int i = 0; i < pool_count; ++i)
+		{
+			IFilter* take_top_placed = new TakeTopRanks(*m_Pools[i], m_TakeTop);
+
+			if (i%2 == 1)//Reverse order
+				take_top_placed = new Reverser(*take_top_placed);
+
+			mixer->AddSource(*take_top_placed);
+		}
+
+		final_input = mixer;
 	}
 
-	m_Finals = std::move(SingleElimination(fuser));
+	else if (pool_count == 4)
+	{
+		auto mixer = new Mixer(GetTournament());
+
+		auto topA = new TakeTopRanks(*m_Pools[0], m_TakeTop);
+		auto topB = new TakeTopRanks(*m_Pools[1], m_TakeTop);
+		auto topC = new TakeTopRanks(*m_Pools[2], m_TakeTop);
+		auto topD = new TakeTopRanks(*m_Pools[3], m_TakeTop);
+
+		mixer->AddSource(*topA);
+		mixer->AddSource(*topC);
+		mixer->AddSource(*topB);
+		mixer->AddSource(*topD);
+
+		final_input = mixer;
+	}
+
+	else
+	{
+		auto mixer = new Mixer(GetTournament());
+
+		for (int i = 0; i < pool_count; ++i)
+		{
+			IFilter* take_top_placed = new TakeTopRanks(*m_Pools[i], m_TakeTop);
+			mixer->AddSource(*take_top_placed);
+		}
+
+		final_input = mixer;
+	}
+
+
+	assert(final_input);
+	m_Finals = std::move(SingleElimination(final_input));
 	m_Finals.SetName("Finals");
+
 
 	//Add matches from pools
 	size_t index = 0;
@@ -161,6 +209,7 @@ void Pool::GenerateSchedule()
 
 		++index;
 	} while (added);//Still matches to add?
+
 
 	//Add matches for single elimination phase
 	for (auto match : m_Finals.GetSchedule())
