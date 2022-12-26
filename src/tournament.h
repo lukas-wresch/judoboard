@@ -147,6 +147,8 @@ namespace Judoboard
 
 		//Lottery
 		virtual bool PerformLottery() override;
+		auto GetLotteryTier() const { return m_LotteryTier; }
+		void SetLotteryTier(uint32_t NewLotteryTier) { m_LotteryTier = NewLotteryTier; PerformLottery(); }
 		size_t GetLotOfAssociation(const UUID& UUID) const;
 		virtual std::vector<std::pair<UUID, size_t>> GetLots() const override { return m_AssociationToLotNumber; }
 
@@ -181,7 +183,7 @@ namespace Judoboard
 		bool m_AutoSave = true;
 
 		const Association* m_Organizer = nullptr;//Tournament is organized by this association, only childen of this association can participate
-		int m_LotteryTier = 0;//Tier for performing lottery (usually organizer tier + 1)
+		uint32_t m_LotteryTier = 0;//Tier for performing lottery (usually organizer tier + 1)
 
 		std::vector<MatchTable*> m_MatchTables;
 		std::vector<Match*> m_Schedule;

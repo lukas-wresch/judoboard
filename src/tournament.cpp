@@ -284,6 +284,9 @@ bool Tournament::LoadYAML(const std::string& Filename)
 			ZED::Log::Error("Could not resolve organizer in tournament data");
 	}
 
+	if (yaml["lottery_tier"] && yaml["lottery_tier"].IsScalar())
+		m_LotteryTier = yaml["lottery_tier"].as<uint32_t>();
+
 	if (yaml["lots"] && yaml["lots"].IsMap())
 	{
 		for (const auto& node : yaml["lots"])
@@ -397,6 +400,8 @@ bool Tournament::SaveYAML(const std::string& Filename)
 
 	if (m_Organizer)
 		yaml << YAML::Key << "organizer" << YAML::Value << (std::string)m_Organizer->GetUUID();
+	if (m_LotteryTier > 0)
+		yaml << YAML::Key << "lottery_tier" << YAML::Value << m_LotteryTier;
 
 	yaml << YAML::Key << "lots";
 	yaml << YAML::Value;
@@ -1572,15 +1577,17 @@ void Tournament::RevokeDisqualification(const Judoka& Judoka)
 
 bool Tournament::PerformLottery()
 {
-	if (!m_Organizer || GetStatus() != Status::Scheduled)
+	if (GetStatus() != Status::Scheduled)
 		return false;
 
 	Lock();
 
 	std::unordered_set<UUID> clubsforlottery;
-	auto organizer_level = m_Organizer->GetLevel();
-	auto lottery_level   = organizer_level + 1;//Default
+	auto organizer_level = 5;//Default organizer level
+	if (m_Organizer)
+		organizer_level = m_Organizer->GetLevel();
 
+	auto lottery_level = organizer_level + 1;//Default
 	if (m_LotteryTier > 0 && m_LotteryTier > organizer_level)//Is valid?
 		lottery_level = m_LotteryTier;
 

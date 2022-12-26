@@ -531,6 +531,61 @@ TEST(Tournament, Lottery)
 
 
 
+TEST(Tournament, LotteryTier)
+{
+	initialize();	
+
+	for (int tier = 0; tier < 10; ++tier)
+	{
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+		Tournament tourney("deleteMe");
+
+		auto inter = new Judoboard::Association("International", nullptr);
+
+		auto de = new Judoboard::Association("Deutschland", inter);
+
+		auto dn = new Judoboard::Association("Deutschland-Nord", de);
+		auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+
+		auto nord  = new Judoboard::Association("Nord", dn);
+		auto west  = new Judoboard::Association("West", dn);
+		auto nost  = new Judoboard::Association("Nordost", dn);
+		auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
+		auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+
+		auto nieder  = new Judoboard::Association("Niedersachsen", nord);
+		auto hamburg = new Judoboard::Association("Hamburg", nord);
+		auto berlin  = new Judoboard::Association("Berlin", nost);
+		auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+		auto detmold = new Judoboard::Association("Detmold", nrw);
+
+		auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+
+		Club* c1 = new Club("club1", biegue);
+		Club* c2 = new Club("club2", biegue);
+
+		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
+		j1->SetClub(c1);
+		Judoka* j2 = new Judoka(GetRandomName(), GetRandomName());
+		j2->SetClub(c2);
+
+		tourney.SetOrganizer(de);
+		tourney.SetLotteryTier(tier);
+		EXPECT_EQ(tourney.GetLotteryTier(), tier);
+
+		EXPECT_TRUE(tourney.AddParticipant(j1));
+		EXPECT_TRUE(tourney.AddParticipant(j2));
+
+		Tournament tourney2("deleteMe");
+		EXPECT_EQ(tourney2.GetLotteryTier(), tier);
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, Lottery_Histogram)
 {
 	initialize();
