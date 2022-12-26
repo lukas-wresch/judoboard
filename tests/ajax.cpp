@@ -305,7 +305,7 @@ TEST(Ajax, SetFullscreen)
 TEST(Ajax, GetHansokumake)
 {
 	initialize();
-
+	
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		Application app;
@@ -318,11 +318,14 @@ TEST(Ajax, GetHansokumake)
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		mat->AddHansokuMake(f);
 		
 		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
 
+		ASSERT_TRUE(ret2[0]["match"].IsDefined());
+		ASSERT_TRUE(ret2[0]["match"].IsMap());
 		EXPECT_EQ(ret2[0]["match"]["uuid"].as<std::string>(), (std::string)match.GetUUID());
 		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName));
 		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName(NameStyle::GivenName));
@@ -343,12 +346,15 @@ TEST(Ajax, GetHansokumake)
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		mat->AddHansokuMake(f);
 		mat->AddDisqualification(f);
 
 		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
 
+		ASSERT_TRUE(ret2[0]["match"].IsDefined());
+		ASSERT_TRUE(ret2[0]["match"].IsMap());
 		EXPECT_EQ(ret2[0]["match"]["uuid"].as<std::string>(), (std::string)match.GetUUID());
 		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName));
 		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName(NameStyle::GivenName));
@@ -369,12 +375,15 @@ TEST(Ajax, GetHansokumake)
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		mat->AddHansokuMake(f);
 		mat->AddNoDisqualification(f);
 
 		YAML::Node ret2 = YAML::Load(app.Ajax_GetHansokumake());
 
+		ASSERT_TRUE(ret2[0]["match"].IsDefined());
+		ASSERT_TRUE(ret2[0]["match"].IsMap());
 		EXPECT_EQ(ret2[0]["match"]["uuid"].as<std::string>(), (std::string)match.GetUUID());
 		EXPECT_EQ(ret2[0]["match"]["white_name"].as<std::string>(), match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName));
 		EXPECT_EQ(ret2[0]["match"]["blue_name"].as<std::string>(),  match.GetFighter(Fighter::Blue )->GetName(NameStyle::GivenName));
@@ -401,7 +410,8 @@ TEST(Ajax, GetHansokumake2)
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		for (int i = 0;i < 5; i++)
 			mat->AddShido(f);
 
@@ -1125,16 +1135,20 @@ TEST(Ajax, AddDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
+		ZED::Core::Pause(100);
+
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->AreFightersOnMat());
+		ZED::Core::Pause(1000);
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
 		EXPECT_TRUE(mat->GetScoreboard(f).IsUnknownDisqualification());
 
-		app.Ajax_AddDisqualification(f, HttpServer::Request("id=1"));
+		EXPECT_TRUE(app.Ajax_AddDisqualification(f, HttpServer::Request("id=1")));
 
 		EXPECT_TRUE(mat->GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
@@ -1155,28 +1169,32 @@ TEST(Ajax, RemoveDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
+		ZED::Core::Pause(100);
+
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->AreFightersOnMat());
+		ZED::Core::Pause(1000);
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
 		EXPECT_TRUE(mat->GetScoreboard(f).IsUnknownDisqualification());
 
-		app.Ajax_AddDisqualification(f, HttpServer::Request("id=1"));
+		EXPECT_TRUE(app.Ajax_AddDisqualification(f, HttpServer::Request("id=1")));
 
 		EXPECT_TRUE(mat->GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsUnknownDisqualification());
 
-		app.Ajax_RemoveDisqualification(f, HttpServer::Request("id=2"));
+		EXPECT_FALSE(app.Ajax_RemoveDisqualification(f, HttpServer::Request("id=2")));
 
 		EXPECT_TRUE(mat->GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsUnknownDisqualification());
 
-		app.Ajax_RemoveDisqualification(f, HttpServer::Request("id=1"));
+		EXPECT_TRUE(app.Ajax_RemoveDisqualification(f, HttpServer::Request("id=1")));
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(mat->GetScoreboard(f).IsNotDisqualified());
@@ -1195,34 +1213,36 @@ TEST(Ajax, MatchTable_Add)
 
 		auto& tables = app.GetTournament()->GetMatchTables();
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test&mat=7")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7")), "ok");
 
 		ASSERT_EQ(tables.size(), 1);
-		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::Weightclass);
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[0]->GetName(), "Test");
 		EXPECT_EQ(tables[0]->GetMatID(), 7);
+		ASSERT_TRUE(tables[0]->GetFilter());
 
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
 
 		ASSERT_EQ(tables.size(), 2);
-		ASSERT_EQ(tables[1]->GetType(), MatchTable::Type::Weightclass);
+		ASSERT_EQ(tables[1]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[1]->GetName(), "Test2");
 		EXPECT_EQ(tables[1]->GetMatID(), 5);
-		EXPECT_EQ(((Weightclass*)tables[1])->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ(((Weightclass*)tables[1])->GetMaxWeight(), Weight("20.3"));
-		EXPECT_EQ(((Weightclass*)tables[1])->GetGender(), Gender::Male);
-		EXPECT_EQ(((Weightclass*)tables[1])->IsBestOfThree(), true);
+		ASSERT_TRUE(tables[1]->GetFilter());
+		EXPECT_EQ( ((Weightclass*) tables[1]->GetFilter())->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ( ((Weightclass*) tables[1]->GetFilter())->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ( ((Weightclass*) tables[1]->GetFilter())->GetGender(), Gender::Male);
+		EXPECT_EQ(((RoundRobin*)tables[1])->IsBestOfThree(), true);
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=4", "name=Test3&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=4&name=Test3&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
 
 		ASSERT_EQ(tables.size(), 3);
 		ASSERT_EQ(tables[2]->GetType(), MatchTable::Type::SingleElimination);
 		EXPECT_EQ(tables[2]->GetName(), "Test3");
 		EXPECT_EQ(tables[2]->GetMatID(), 5);
-		EXPECT_EQ(((SingleElimination*)tables[2])->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ(((SingleElimination*)tables[2])->GetMaxWeight(), Weight("20.3"));
-		EXPECT_EQ(((SingleElimination*)tables[2])->GetGender(), Gender::Female);
+		EXPECT_EQ( ((Weightclass*) tables[2]->GetFilter())->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ( ((Weightclass*) tables[2]->GetFilter())->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ( ((Weightclass*) tables[2]->GetFilter())->GetGender(), Gender::Female);
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsBestOfThree(), true);
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsThirdPlaceMatch(), true);
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsFifthPlaceMatch(), true);
@@ -1240,24 +1260,43 @@ TEST(Ajax, MatchTable_Edit)
 
 		auto& tables = app.GetTournament()->GetMatchTables();
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test&mat=7")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7")), "ok");
 
 		ASSERT_EQ(tables.size(), 1);
-		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::Weightclass);
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[0]->GetName(), "Test");
 		EXPECT_EQ(tables[0]->GetMatID(), 7);
 
 
-		EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&fight_system=1&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
 
 		ASSERT_EQ(tables.size(), 1);
-		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::Weightclass);
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[0]->GetName(), "Test2");
 		EXPECT_EQ(tables[0]->GetMatID(), 5);
-		EXPECT_EQ(((Weightclass*)tables[0])->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ(((Weightclass*)tables[0])->GetMaxWeight(), Weight("20.3"));
-		EXPECT_EQ(((Weightclass*)tables[0])->GetGender(), Gender::Male);
-		EXPECT_EQ(((Weightclass*)tables[0])->IsBestOfThree(), true);
+		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetGender(), Gender::Male);
+		EXPECT_EQ(((RoundRobin*)tables[0])->IsBestOfThree(), true);
+
+		tables[0]->SetColor(Color::Name::Purple);
+		tables[0]->SetScheduleIndex(10);
+
+		auto old_uuid = tables[0]->GetUUID();
+
+		EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&fight_system=4&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+
+		ASSERT_EQ(tables.size(), 1);
+		EXPECT_EQ(tables[0]->GetUUID(), old_uuid);
+		EXPECT_EQ(tables[0]->GetColor(), Color::Name::Purple);
+		EXPECT_EQ(tables[0]->GetScheduleIndex(), 9);//Gets changed since 9 is unused
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::SingleElimination);
+		EXPECT_EQ(tables[0]->GetName(), "Test2");
+		EXPECT_EQ(tables[0]->GetMatID(), 5);
+		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetMinWeight(), Weight("10,7"));
+		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetGender(), Gender::Male);
+		EXPECT_EQ(((RoundRobin*)tables[0])->IsBestOfThree(), true);
 	}
 }
 
@@ -1272,7 +1311,7 @@ TEST(Ajax, MatchTable_Get)
 
 		auto& tables = app.GetTournament()->GetMatchTables();
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test&mat=7")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7")), "ok");
 
 		ASSERT_EQ(tables.size(), 1);
 
@@ -1285,7 +1324,7 @@ TEST(Ajax, MatchTable_Get)
 		EXPECT_EQ(yaml1.c_str(), output);
 
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=1", "name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
 
 		ASSERT_EQ(tables.size(), 2);
 
@@ -1297,7 +1336,7 @@ TEST(Ajax, MatchTable_Get)
 		yaml2 << YAML::EndMap;
 		EXPECT_EQ(yaml2.c_str(), output);
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("type=4", "name=Test3&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=4&name=Test3&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
 
 		ASSERT_EQ(tables.size(), 3);
 
@@ -1323,7 +1362,7 @@ TEST(Ajax, MatchTable_Get)
 
 
 
-TEST(Ajax, MatchTable_StartingPositionsAfterUpdate)
+TEST(Ajax, MatchTable_StartPositionsAfterUpdate)
 {
 	initialize();
 
@@ -1338,7 +1377,7 @@ TEST(Ajax, MatchTable_StartingPositionsAfterUpdate)
 
 			ASSERT_TRUE(app.AddTournament(t));
 
-			auto group = new SingleElimination(0, 200);
+			auto group = new SingleElimination(Weight(0), Weight(200));
 			t->AddMatchTable(group);
 
 			auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
@@ -1363,26 +1402,26 @@ TEST(Ajax, MatchTable_StartingPositionsAfterUpdate)
 			size_t start_j4 = rand() % 8;
 			size_t start_j5 = rand() % 8;
 
-			group->SetStartingPosition(j1, start_j1);
-			group->SetStartingPosition(j2, start_j2);
-			group->SetStartingPosition(j3, start_j3);
-			group->SetStartingPosition(j4, start_j4);
-			group->SetStartingPosition(j5, start_j5);
+			group->SetStartPosition(j1, start_j1);
+			group->SetStartPosition(j2, start_j2);
+			group->SetStartPosition(j3, start_j3);
+			group->SetStartPosition(j4, start_j4);
+			group->SetStartPosition(j5, start_j5);
 
-			start_j1 = group->GetStartingPosition(j1);
-			start_j2 = group->GetStartingPosition(j2);
-			start_j3 = group->GetStartingPosition(j3);
-			start_j4 = group->GetStartingPosition(j4);
-			start_j5 = group->GetStartingPosition(j5);
+			start_j1 = group->GetStartPosition(j1);
+			start_j2 = group->GetStartPosition(j2);
+			start_j3 = group->GetStartPosition(j3);
+			start_j4 = group->GetStartPosition(j4);
+			start_j5 = group->GetStartPosition(j5);
 
-			EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)group->GetUUID(), "name=Test2&mat=5&minWeight=0,7&maxWeight=200.3&bo3=true")), "ok");
+			EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)group->GetUUID(), "type=1&fight_system=4&name=Test2&mat=5&minWeight=0,7&maxWeight=200.3&bo3=true")), "ok");
 
 
-			ASSERT_EQ(group->GetStartingPosition(j1), start_j1);
-			ASSERT_EQ(group->GetStartingPosition(j2), start_j2);
-			ASSERT_EQ(group->GetStartingPosition(j3), start_j3);
-			ASSERT_EQ(group->GetStartingPosition(j4), start_j4);
-			ASSERT_EQ(group->GetStartingPosition(j5), start_j5);
+			ASSERT_EQ(group->GetStartPosition(j1), start_j1);
+			ASSERT_EQ(group->GetStartPosition(j2), start_j2);
+			ASSERT_EQ(group->GetStartPosition(j3), start_j3);
+			ASSERT_EQ(group->GetStartPosition(j4), start_j4);
+			ASSERT_EQ(group->GetStartPosition(j5), start_j5);
 
 			app.CloseTournament();
 		}
@@ -1401,10 +1440,14 @@ TEST(Ajax, NoDisqualification)
 
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
+		ZED::Core::Pause(100);
 
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		mat->StartMatch(&match);
+		ZED::Core::Pause(1000);
+
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
@@ -1432,9 +1475,14 @@ TEST(Ajax, RemoveNoDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
+		ZED::Core::Pause(100);
+
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
-		mat->StartMatch(&match);
+		EXPECT_TRUE(mat->StartMatch(&match));
+		ZED::Core::Pause(1000);
+
+		EXPECT_TRUE(mat->AreFightersOnMat());
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
@@ -1471,7 +1519,7 @@ TEST(Ajax, GetParticipantsFromMatchTable)
 	//app.GetTournament()->AddParticipant(j2);
 	//app.GetTournament()->AddParticipant(j3);
 
-	auto table = new Weightclass(10, 100);
+	auto table = new RoundRobin(Weight(10), Weight(100));
 	app.GetTournament()->AddMatchTable(table);
 
 	YAML::Node yaml = YAML::Load(app.Ajax_GetParticipantsFromMatchTable(HttpServer::Request("id=" + (std::string)table->GetUUID())));
@@ -1508,7 +1556,7 @@ TEST(Ajax, GetMatchesFromMatchTable)
 	app.GetTournament()->AddParticipant(j2);
 	app.GetTournament()->AddParticipant(j3);
 
-	auto table = new Weightclass(10, 100);
+	auto table = new RoundRobin(Weight(10), Weight(100));
 	app.GetTournament()->AddMatchTable(table);
 
 	YAML::Node yaml = YAML::Load(app.Ajax_GetMatchesFromMatchTable(HttpServer::Request("id=" + (std::string)table->GetUUID())));
@@ -1528,7 +1576,7 @@ TEST(Ajax, GetMatchesFromMatchTable)
 
 
 
-TEST(Ajax, SetStartingPosition)
+TEST(Ajax, SetStartPosition)
 {
 	initialize();
 
@@ -1542,23 +1590,23 @@ TEST(Ajax, SetStartingPosition)
 	app.GetTournament()->AddParticipant(j2);
 	app.GetTournament()->AddParticipant(j3);
 
-	auto table = new SingleElimination(10, 100);
+	auto table = new SingleElimination(Weight(10), Weight(100));
 	app.GetTournament()->AddMatchTable(table);
 
 	for (int i = 0; i < 100; ++i)
 	{
 		int startpos = rand() % 4;
-		EXPECT_EQ((std::string)app.Ajax_SetStartingPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j1->GetUUID() + "&startpos=" + std::to_string(startpos) )), "ok");
+		EXPECT_EQ((std::string)app.Ajax_SetStartPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j1->GetUUID() + "&startpos=" + std::to_string(startpos) )), "ok");
 
-		EXPECT_EQ(table->GetStartingPosition(j1), startpos);
+		EXPECT_EQ(table->GetStartPosition(j1), startpos);
 	}
 
 	for (int i = 0; i < 100; ++i)
 	{
 		int startpos = rand() % 4;
-		EXPECT_EQ((std::string)app.Ajax_SetStartingPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j2->GetUUID() + "&startpos=" + std::to_string(startpos) )), "ok");
+		EXPECT_EQ((std::string)app.Ajax_SetStartPosition(HttpServer::Request( "id=" + (std::string)table->GetUUID() + "&judoka=" + (std::string)j2->GetUUID() + "&startpos=" + std::to_string(startpos) )), "ok");
 
-		EXPECT_EQ(table->GetStartingPosition(j2), startpos);
+		EXPECT_EQ(table->GetStartPosition(j2), startpos);
 	}
 }
 
@@ -1739,4 +1787,5 @@ TEST(Ajax, EditTournament)
 	}
 
 	ZED::Core::RemoveFile("tournaments/test.yml");
+	ZED::Core::RemoveFile("tournaments/test2.yml");
 }

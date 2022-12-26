@@ -21,6 +21,7 @@
 //#include "../src/virtual_mat.h"
 #include "../src/weightclass.h"
 #include "../src/weightclass_generator.h"
+#include "../src/round_robin.h"
 #include "../src/single_elimination.h"
 #include "../src/window.h"
 #include "../src/dm4.h"
