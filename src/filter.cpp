@@ -1,5 +1,6 @@
 #define YAML_CPP_STATIC_DEFINE
 #include "yaml-cpp/yaml.h"
+#include "../ZED/include/log.h"
 #include "filter.h"
 #include "tournament.h"
 
@@ -154,11 +155,8 @@ size_t IFilter::GetStartPosition(const Judoka* Judoka) const
 
 
 
-void IFilter::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
+void IFilter::SetStartPosition(const DependentJudoka Judoka, size_t NewStartPosition)
 {
-	if (!Judoka)
-		return;
-
 	auto my_old_pos = GetStartPosition(Judoka);
 	m_Participants.erase(my_old_pos);
 
@@ -177,4 +175,41 @@ void IFilter::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
 		m_Participants.erase(GetStartPosition(Judoka));
 		m_Participants.insert({ NewStartPosition, Judoka });
 	}
+}
+
+
+
+void IFilter::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
+{
+	if (!Judoka)
+		return;
+
+	SetStartPosition(DependentJudoka(Judoka), NewStartPosition);
+}
+
+
+
+void IFilter::Dump() const
+{
+	ZED::Log::Info("- - -");
+	
+	//for (auto [pos, participant] : m_Participants)
+	for (size_t pos = 0; pos < m_Participants.size()*2; ++pos)
+	{
+		if (!IsStartPositionTaken(pos))
+			continue;
+
+		auto participant = GetJudokaByStartPosition(pos);
+
+		if (participant.GetJudoka())
+			ZED::Log::Info(std::to_string(pos) + " - " + participant.GetJudoka()->GetFirstname());
+		else if (participant.GetDependency() == DependencyType::TakeRank1)
+			ZED::Log::Info(std::to_string(pos) + " - Rank1 of " + participant.GetDependentMatchTable()->GetName());
+		else if (participant.GetDependency() == DependencyType::TakeRank2)
+			ZED::Log::Info(std::to_string(pos) + " - Rank2 of " + participant.GetDependentMatchTable()->GetName());
+		else
+			ZED::Log::Info(std::to_string(pos) + " - ???");
+	}
+
+	ZED::Log::Info("- - -");
 }

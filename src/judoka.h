@@ -37,6 +37,9 @@ namespace Judoboard
 		}
 
 		const Judoka* GetJudoka() const { return m_Judoka; }
+		auto GetDependency() const { return m_Type; }
+		const Match* GetDependentMatch() const { return m_DependentMatch; }
+		auto GetDependentMatchTable() const { return m_DependentMatchTable; }
 
 		bool operator == (const Judoka* rhs) const;
 		bool operator == (const DependentJudoka& rhs) const;

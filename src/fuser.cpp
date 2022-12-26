@@ -11,6 +11,7 @@ Fuser::Fuser(const IFilter& pSource1, const IFilter& pSource2) :
 {
 	m_pSources.push_back(&pSource1);
 	m_pSources.push_back(&pSource2);
+	Recalculate();
 	assert(pSource1.GetTournament() == pSource2.GetTournament());
 }
 
@@ -59,7 +60,7 @@ bool Fuser::IsElgiable(const Judoka& Fighter) const
 
 
 
-std::unordered_map<size_t, const DependentJudoka> Fuser::GetParticipants() const
+void Fuser::Recalculate()
 {
 	std::unordered_map<size_t, const DependentJudoka> ret;
 
@@ -72,14 +73,12 @@ std::unordered_map<size_t, const DependentJudoka> Fuser::GetParticipants() const
 	}
 	
 	SetParticipants(std::move(ret));//Save to cache
-
-	return IFilter::GetParticipants();//Return the cache
 }
 
 
 
-const DependentJudoka Fuser::GetJudokaByStartPosition(size_t StartPosition) const
+/*const DependentJudoka Fuser::GetJudokaByStartPosition(size_t StartPosition) const
 {
 	GetParticipants();//Re-calculates the participants
 	return IFilter::GetJudokaByStartPosition(StartPosition);
-}
+}*/

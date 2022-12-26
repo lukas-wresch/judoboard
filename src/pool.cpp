@@ -8,6 +8,7 @@
 #include "reverser.h"
 #include "fuser.h"
 #include "mixer.h"
+#include "fixed.h"
 #include "rule_set.h"
 #include "localizer.h"
 #include "match.h"
@@ -113,7 +114,7 @@ void Pool::GenerateSchedule()
 
 	if (!GetFilter() || GetParticipants().size() <= 1)
 		return;
-	
+	if (GetParticipants().size() != 4) return;//DEBUG
 	for (auto pool : m_Pools)
 		delete pool;
 
@@ -139,19 +140,26 @@ void Pool::GenerateSchedule()
 
 	if (pool_count == 2)
 	{
-		auto mixer = new Mixer(GetTournament());
+		auto topA = new TakeTopRanks(*m_Pools[0], m_TakeTop);
+		auto topB = new TakeTopRanks(*m_Pools[1], m_TakeTop);
 
-		for (int i = 0; i < pool_count; ++i)
-		{
-			IFilter* take_top_placed = new TakeTopRanks(*m_Pools[i], m_TakeTop);
+		Mixer mixer(GetTournament());
 
-			if (i%2 == 1)//Reverse order
-				take_top_placed = new Reverser(*take_top_placed);
+		mixer.AddSource(*topA);
+		mixer.AddSource(*topB);
 
-			mixer->AddSource(*take_top_placed);
-		}
+		final_input = new Fixed(mixer);
 
-		final_input = mixer;
+		/*topA->Dump();
+		topB->Dump();
+		mixer.Dump();
+		final_input->Dump();*/
+		
+		//Swap the two incorrect positions manually
+		auto last = final_input->GetJudokaByStartPosition(2);
+		final_input->SetStartPosition(last, 3);
+
+		//final_input->Dump();
 	}
 
 	else if (pool_count == 4)

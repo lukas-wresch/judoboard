@@ -15,7 +15,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Weightclass, Custom, Splitter, TakeTopRanks, Fuser, Mixer, Reverser
+			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser
 		};
 
 		IFilter(const YAML::Node& Yaml, const ITournament* Tournament);
@@ -40,6 +40,7 @@ namespace Judoboard
 
 		virtual size_t GetStartPosition(const Judoka* Judoka) const;
 		virtual void   SetStartPosition(const Judoka* Judoka, size_t NewStartPosition);
+		virtual void   SetStartPosition(const DependentJudoka Judoka, size_t NewStartPosition);
 
 		virtual const DependentJudoka GetJudokaByStartPosition(size_t StartPosition) const {
 			auto result = m_Participants.find(StartPosition);
@@ -56,6 +57,8 @@ namespace Judoboard
 
 		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual void ToString(YAML::Emitter& Yaml) const;
+
+		void Dump() const;
 
 
 	protected:

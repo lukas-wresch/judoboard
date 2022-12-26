@@ -184,6 +184,7 @@
     <ClCompile Include="..\..\src\dmf.cpp" />
     <ClCompile Include="..\..\src\error.cpp" />
     <ClCompile Include="..\..\src\filter.cpp" />
+    <ClCompile Include="..\..\src\fixed.cpp" />
     <ClCompile Include="..\..\src\fuser.cpp" />
     <ClCompile Include="..\..\src\HttpServer\HttpServer.cpp" />
     <ClCompile Include="..\..\src\id.cpp" />
@@ -230,6 +231,7 @@
     <ClInclude Include="..\..\src\dmf.h" />
     <ClInclude Include="..\..\src\error.h" />
     <ClInclude Include="..\..\src\filter.h" />
+    <ClInclude Include="..\..\src\fixed.h" />
     <ClInclude Include="..\..\src\fuser.h" />
     <ClInclude Include="..\..\src\id.h" />
     <ClInclude Include="..\..\src\imat.h" />
