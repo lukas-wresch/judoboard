@@ -24,7 +24,7 @@ function GetAgeGroups()
 
     for (const age of res)
     {
-      if (!res.in_db)
+      if (!age.in_db)
         continue;
 
       var row = table.insertRow(-1);
