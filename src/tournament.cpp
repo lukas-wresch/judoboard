@@ -158,7 +158,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		{
 			auto native_assoc = m_StandingData.FindAssociationByName(assoc->Description);
 			if (native_assoc)
-				m_AssociationToLotNumber.insert({ *native_assoc, lot.StartNo });
+				m_AssociationToLotNumber.emplace_back(*native_assoc, lot.StartNo);
 		}
 	}
 
@@ -287,7 +287,7 @@ bool Tournament::LoadYAML(const std::string& Filename)
 	if (yaml["lots"] && yaml["lots"].IsMap())
 	{
 		for (const auto& node : yaml["lots"])
-			m_AssociationToLotNumber.insert({ node.first.as<std::string>(), node.second.as<size_t>() });
+			m_AssociationToLotNumber.emplace_back(node.first.as<std::string>(), node.second.as<size_t>());
 	}
 
 	if (yaml["judoka_to_age_group"] && yaml["judoka_to_age_group"].IsMap())
@@ -1609,9 +1609,12 @@ bool Tournament::PerformLottery()
 			++it;
 
 		auto assoc = *it;
-		m_AssociationToLotNumber.insert({ assoc, lot });
+		m_AssociationToLotNumber.emplace_back(assoc, lot);
 		clubsforlottery.erase(it);
 	}
+
+	std::sort(m_AssociationToLotNumber.begin(), m_AssociationToLotNumber.end(),
+		[](const auto& a, const auto& b) { return a.second < b.second; });
 
 	Unlock();
 
@@ -1627,10 +1630,11 @@ bool Tournament::PerformLottery()
 
 size_t Tournament::GetLotOfAssociation(const UUID& UUID) const
 {
-	auto it = m_AssociationToLotNumber.find(UUID);
-	if (it == m_AssociationToLotNumber.end())
-		return SIZE_MAX;
-	return it->second;
+	for (auto [assoc, lot] : m_AssociationToLotNumber)
+		if (assoc == UUID)
+			return lot;
+
+	return SIZE_MAX;
 }
 
 

@@ -148,7 +148,7 @@ namespace Judoboard
 		//Lottery
 		virtual bool PerformLottery() override;
 		size_t GetLotOfAssociation(const UUID& UUID) const;
-		virtual std::unordered_map<UUID, size_t> GetLots() const override { return m_AssociationToLotNumber; }
+		virtual std::vector<std::pair<UUID, size_t>> GetLots() const override { return m_AssociationToLotNumber; }
 
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const override {}
@@ -191,6 +191,6 @@ namespace Judoboard
 		std::unordered_set<UUID> m_DisqualifiedJudoka;
 
 		std::unordered_map<UUID, UUID> m_JudokaToAgeGroup;//Maps judoka to the age group he/she is starting in
-		std::unordered_map<UUID, size_t> m_AssociationToLotNumber;//Maps associations to the lot number
+		std::vector<std::pair<UUID, size_t>> m_AssociationToLotNumber;//Maps associations to the lot number
 	};
 }

@@ -125,7 +125,7 @@ namespace Judoboard
 
 		//Lots
 		virtual bool PerformLottery() { return false; }
-		virtual std::unordered_map<UUID, size_t> GetLots() const { std::unordered_map<UUID, size_t> ret; return ret; }
+		virtual std::vector<std::pair<UUID, size_t>> GetLots() const { std::vector<std::pair<UUID, size_t>> ret; return ret; }
 
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const = 0;
