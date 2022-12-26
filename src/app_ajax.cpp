@@ -1784,12 +1784,12 @@ void Application::SetupHttpServer()
 
 		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();//In case the tournament gets closed at the same time
+
 		auto age_group = m_Database.FindAgeGroup(age_group_id);
 
 		if (!age_group)
 			return Error(Error::Type::ItemNotFound);
-
-		LockTillScopeEnd();//In case the tournament gets closed at the same time
 
 		if (!GetTournament()->AddAgeGroup(age_group))
 			return Error(Error::Type::OperationFailed);
