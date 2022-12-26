@@ -2951,7 +2951,11 @@ std::string Application::Ajax_GetAgeGroup(const HttpServer::Request& Request) co
 		age_group = GetTournament()->FindAgeGroup(id);
 
 	if (age_group)
+	{
+		ret << YAML::BeginMap;
 		age_group->ToString(ret);
+		ret << YAML::EndMap;
+	}
 
 	return ret.c_str();
 }

@@ -2,6 +2,37 @@
 
 
 
+TEST(Ajax, AgeGroup_Get)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto a1 = new AgeGroup("age 1", 10, 20, nullptr, app.GetDatabase());
+		auto a2 = new AgeGroup("age 2", 30, 40, nullptr, app.GetDatabase());
+
+		app.GetDatabase().AddAgeGroup(a1);
+		app.GetTournament()->AddAgeGroup(a2);
+
+		YAML::Node yaml = YAML::Load(app.Ajax_GetAgeGroup(HttpServer::Request("id=" + (std::string)a1->GetUUID())));
+
+		EXPECT_EQ(yaml["uuid"].as<std::string>(), a1->GetUUID());
+		EXPECT_EQ(yaml["name"].as<std::string>(), a1->GetName());
+		EXPECT_EQ(yaml["min_age"].as<int>(), a1->GetMinAge());
+		EXPECT_EQ(yaml["max_age"].as<int>(), a1->GetMaxAge());
+
+		yaml = YAML::Load(app.Ajax_GetAgeGroup(HttpServer::Request("id=" + (std::string)a2->GetUUID())));
+
+		EXPECT_EQ(yaml["uuid"].as<std::string>(), a2->GetUUID());
+		EXPECT_EQ(yaml["name"].as<std::string>(), a2->GetName());
+		EXPECT_EQ(yaml["min_age"].as<int>(), a2->GetMinAge());
+		EXPECT_EQ(yaml["max_age"].as<int>(), a2->GetMaxAge());
+	}
+}
+
+
+
 TEST(Ajax, AgeGroup_List)
 {
 	initialize();
