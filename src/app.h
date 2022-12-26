@@ -137,6 +137,7 @@ namespace Judoboard
 		//Rule sets
 
 		//Age groups
+		std::string Ajax_GetAgeGroup(const HttpServer::Request& Request) const;
 		std::string Ajax_ListAllAgeGroups() const;
 
 		//Match tables

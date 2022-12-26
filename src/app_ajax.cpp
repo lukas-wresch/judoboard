@@ -1770,15 +1770,11 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/age_groups/get", [this](auto& Request) -> std::string {
-		if (!IsLoggedIn(Request))
-			return (std::string)Error(Error::Type::NotLoggedIn);
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
 
-		LockTillScopeEnd();//In case the tournament gets closed at the same time
-
-		YAML::Emitter yaml;
-		if (GetTournament())
-			GetTournament()->ListAgeGroups(yaml);
-		return yaml.c_str();
+		return Ajax_GetAgeGroup(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/age_groups/select", [this](auto& Request) -> std::string {
@@ -2936,6 +2932,27 @@ std::string Application::Ajax_ListAssociations(const HttpServer::Request& Reques
 	}
 
 	ret << YAML::EndSeq;
+	return ret.c_str();
+}
+
+
+
+std::string Application::Ajax_GetAgeGroup(const HttpServer::Request& Request) const
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	YAML::Emitter ret;
+
+	LockTillScopeEnd();
+
+	auto age_group = GetDatabase().FindAgeGroup(id);
+
+	if (!age_group)
+		age_group = GetTournament()->FindAgeGroup(id);
+
+	if (age_group)
+		age_group->ToString(ret);
+
 	return ret.c_str();
 }
 
