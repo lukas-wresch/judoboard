@@ -3329,6 +3329,7 @@ std::string Application::Ajax_GetLotteryTier()
 	if (GetTournament()->GetOrganizer())
 	{
 		ret << YAML::Key << "organizer"      << YAML::Value << (std::string)GetTournament()->GetOrganizer()->GetUUID();
+		ret << YAML::Key << "organizer_name" << YAML::Value << (std::string)GetTournament()->GetOrganizer()->GetName();
 		ret << YAML::Key << "organizer_tier" << YAML::Value << GetTournament()->GetOrganizer()->GetLevel();
 	}
 	ret << YAML::Key << "tier" << YAML::Value << GetTournament()->GetLotteryTier();
@@ -3351,7 +3352,7 @@ Error Application::Ajax_SetLotteryTier(const HttpServer::Request& Request)
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
 
-	//TODO
+	GetTournament()->SetLotteryTier(tier);
 
 	return Error::Type::NoError;
 }
