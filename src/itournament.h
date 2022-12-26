@@ -30,6 +30,8 @@ namespace Judoboard
 		[[nodiscard]]
 		virtual const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
 
+		virtual const Association* GetOrganizer() const { return nullptr; }
+
 		virtual bool AddMatch(Match* NewMatch) { return false; }
 		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
 		virtual Match* GetNextMatch(int32_t MatID = -1) const { return nullptr; }//Returns the next match for a given mat if available, otherwise null pointer is returned
@@ -125,6 +127,8 @@ namespace Judoboard
 
 		//Lots
 		virtual bool PerformLottery() { return false; }
+		virtual uint32_t GetLotteryTier() const { return 0; }
+		virtual void SetLotteryTier(uint32_t NewLotteryTier) {}
 		virtual std::vector<std::pair<UUID, size_t>> GetLots() const { std::vector<std::pair<UUID, size_t>> ret; return ret; }
 
 		//Events

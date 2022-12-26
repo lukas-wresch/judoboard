@@ -1235,6 +1235,24 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/lots/get_tier", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_GetLotteryTier();
+	});
+
+
+	m_Server.RegisterResource("/ajax/lots/set_tier", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_SetLotteryTier(Request);
+	});
+
+
 	m_Server.RegisterResource("/ajax/lots/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -3294,6 +3312,48 @@ Error Application::Ajax_PerformLottery()
 		return Error::Type::OperationFailed;
 
 	return Error::Type::NoError;//OK
+}
+
+
+
+std::string Application::Ajax_GetLotteryTier()
+{
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	YAML::Emitter ret;
+
+	ret << YAML::BeginMap;
+	if (GetTournament()->GetOrganizer())
+	{
+		ret << YAML::Key << "organizer"      << YAML::Value << (std::string)GetTournament()->GetOrganizer()->GetUUID();
+		ret << YAML::Key << "organizer_tier" << YAML::Value << GetTournament()->GetOrganizer()->GetLevel();
+	}
+	ret << YAML::Key << "tier" << YAML::Value << GetTournament()->GetLotteryTier();
+	ret << YAML::EndMap;
+
+	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_SetLotteryTier(const HttpServer::Request& Request)
+{
+	int tier = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "tier"));
+
+	if (tier < 0)
+		return Error::Type::InvalidInput;
+
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	//TODO
+
+	return Error::Type::NoError;
 }
 
 

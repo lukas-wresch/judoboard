@@ -46,7 +46,7 @@ namespace Judoboard
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 		bool IsAutoSave() const { return m_AutoSave; }
 
-		const Association* GetOrganizer() const { return m_Organizer; }
+		virtual const Association* GetOrganizer() const override { return m_Organizer; }
 		void SetOrganizer(Association* NewOrganizer) {
 			if (!NewOrganizer)
 				return;
@@ -147,8 +147,14 @@ namespace Judoboard
 
 		//Lottery
 		virtual bool PerformLottery() override;
-		auto GetLotteryTier() const { return m_LotteryTier; }
-		void SetLotteryTier(uint32_t NewLotteryTier) { m_LotteryTier = NewLotteryTier; PerformLottery(); }
+		virtual uint32_t GetLotteryTier() const override { return m_LotteryTier; }
+		virtual void SetLotteryTier(uint32_t NewLotteryTier) override {
+			if (GetStatus() == Status::Scheduled)
+			{
+				m_LotteryTier = NewLotteryTier;
+				PerformLottery();
+			}
+		}
 		size_t GetLotOfAssociation(const UUID& UUID) const;
 		virtual std::vector<std::pair<UUID, size_t>> GetLots() const override { return m_AssociationToLotNumber; }
 

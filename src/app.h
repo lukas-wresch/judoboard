@@ -150,6 +150,8 @@ namespace Judoboard
 
 		//Lots
 		Error Ajax_PerformLottery();
+		std::string Ajax_GetLotteryTier();
+		Error Ajax_SetLotteryTier(const HttpServer::Request& Request);
 		std::string Ajax_ListLots();
 
 		//Config
