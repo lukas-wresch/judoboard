@@ -140,11 +140,12 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 	{
 		ret += "Judoka: " + dm4_judoka.Firstname + " " + dm4_judoka.Lastname + "<br/>";
 
-		auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);		
+		//auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);
+		Judoka* new_judoka = new Judoka(JudokaData(dm4_judoka), &GetDatabase());
 
 		//Judoka is now added/updated
 
-		if (!ParseOnly && new_judoka)
+		if (!ParseOnly)
 		{//Add to the current tournament
 			if (File.GetClubs().size() == 1)//If there is only one
 				new_judoka->SetClub(GetDatabase().FindClubByName(File.GetClubs()[0]->Name));
@@ -195,13 +196,13 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 	{
 		ret += "Judoka: " + dmf_judoka.Firstname + " " + dmf_judoka.Lastname + "<br/>";
 
-		auto new_judoka = GetDatabase().UpdateOrAdd(JudokaData(dmf_judoka), ParseOnly, ret);		
+		//auto new_judoka = GetDatabase().UpdateOrAdd(JudokaData(dmf_judoka), ParseOnly, ret);	
 
 		//Judoka is now added/updated
 
-		if (!ParseOnly && new_judoka)
+		if (!ParseOnly)
 		{//Add to the current tournament
-			GetTournament()->AddParticipant(new_judoka);
+			GetTournament()->AddParticipant(new Judoka(JudokaData(dmf_judoka), &GetDatabase()));
 		}
 	}
 
@@ -347,9 +348,10 @@ bool Application::CloseMat(uint32_t ID)
 		{
 			if ((*it)->GetType() == IMat::Type::VirtualMat)
 			{
-				delete *it;
+				delete* it;
 				it = m_Mats.erase(it);
 			}
+
 			return true;
 		}
 	}
@@ -361,7 +363,10 @@ bool Application::CloseMat(uint32_t ID)
 
 bool Application::StartLocalMat(uint32_t ID)
 {
-	ZED::Log::Debug("Starting local mat");
+	ZED::Log::Info("Starting local mat");
+
+	LockTillScopeEnd();
+
 	for (; true; ID++)
 	{
 		bool is_ok = true;
@@ -387,11 +392,14 @@ bool Application::StartLocalMat(uint32_t ID)
 			break;
 	}
 
-	LockTillScopeEnd();
 	Mat* new_mat = new Mat(ID, this);
 	m_Mats.emplace_back(new_mat);
 
 	ZED::Log::Info("New local mat has been created with ID=" + std::to_string(ID));
+
+	new_mat->SetIpponStyle(GetDatabase().GetIpponStyle());
+	new_mat->SetTimerStyle(GetDatabase().GetTimerStyle());
+	new_mat->SetNameStyle(GetDatabase().GetNameStyle());
 
 	if (IsSlave())
 		SendCommandToMaster("/ajax/master/mat_available?port=" + std::to_string(m_Server.GetPort()));
@@ -555,7 +563,7 @@ void Application::Run()
 		{
 			if (*it && !(*it)->IsConnected())
 			{
-				delete* it;
+				delete *it;
 				it = m_Mats.erase(it);
 			}
 			else
@@ -573,18 +581,4 @@ void Application::Run()
 	}
 
 	ZED::Log::Info("Closing application");
-}
-
-
-
-ZED::CSV Application::Mats2String() const
-{
-	ZED::CSV ret;
-	ret << (uint32_t)m_Mats.size();
-
-	for (auto mat : m_Mats)
-		if (mat)
-			ret << mat->GetMatID();
-
-	return ret;
 }

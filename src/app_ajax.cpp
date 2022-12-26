@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "app.h"
 #include "database.h"
 #include "weightclass.h"
@@ -258,14 +259,6 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 		return Ajax_SetFullscreen(false, Request);
-	});
-
-
-	m_Server.RegisterResource("/ajax/config/status", [this](auto& Request) -> std::string {
-		if (!IsLoggedIn(Request))
-			return Error(Error::Type::NotLoggedIn);
-
-		return Ajax_Status();
 	});
 
 
@@ -1458,7 +1451,25 @@ void Application::SetupHttpServer()
 	});
 
 
-	m_Server.RegisterResource("/ajax/matchtable/get_form", [this](auto& Request) -> std::string {
+	m_Server.RegisterResource("/ajax/filter/get_form", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		int type = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "type"));
+
+		switch ((IFilter::Type)type)
+		{
+		case IFilter::Type::Weightclass:
+			return Weightclass::GetHTMLForm();
+
+		default:
+			return std::string("Unknown form");
+		}
+	});
+
+
+	m_Server.RegisterResource("/ajax/fight_system/get_form", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1467,10 +1478,8 @@ void Application::SetupHttpServer()
 
 		switch ((MatchTable::Type)type)
 		{
-			case MatchTable::Type::Weightclass:
-				return Weightclass::GetHTMLForm();
-			case MatchTable::Type::Pause:
-				return Pause::GetHTMLForm();
+			case MatchTable::Type::RoundRobin:
+				return RoundRobin::GetHTMLForm();			
 			case MatchTable::Type::Custom:
 				return CustomTable::GetHTMLForm();
 			case MatchTable::Type::SingleElimination:
@@ -1480,14 +1489,6 @@ void Application::SetupHttpServer()
 				return std::string("Unknown form");
 		}
 	});
-
-
-	/*m_Server.RegisterResource("/ajax/matchtable/get_participants", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-		return Ajax_GetParticipantsFromMatchTable(Request);
-	});*/
 
 
 	m_Server.RegisterResource("/ajax/matchtable/get_matches", [this](auto& Request) -> std::string {
@@ -1522,7 +1523,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		return Ajax_SetStartingPosition(Request);
+		return Ajax_SetStartPosition(Request);
 	});
 
 
@@ -2174,6 +2175,30 @@ void Application::SetupHttpServer()
 		return Error(Error::Type::OperationFailed);
 	});
 
+	m_Server.RegisterResource("/ajax/config/get_setup", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_GetSetup();
+	});
+
+	m_Server.RegisterResource("/ajax/config/set_setup", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_SetSetup(Request);
+	});
+
+	m_Server.RegisterResource("/ajax/config/execute", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_Execute(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/config/shutdown", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
@@ -2463,7 +2488,6 @@ std::string Application::Ajax_GetMats() const
 			if (!mat)
 			{
 				std::string mat_name = Localizer::Translate("Mat") + " " + std::to_string(id);
-				//ret << id << IMat::Type::Unknown << false << mat_name << 0 << 0 << false;
 
 				ret << YAML::BeginMap;
 				ret << YAML::Key << "id"   << YAML::Value << id;
@@ -2472,7 +2496,6 @@ std::string Application::Ajax_GetMats() const
 			}
 			else
 			{
-				//ret << mat->GetMatID() << mat->GetType() << mat->IsOpen() << mat->GetName() << mat->GetIpponStyle() << mat->GetTimerStyle() << mat->IsFullscreen();
 				ret << YAML::BeginMap;
 				ret << YAML::Key << "id"      << YAML::Value << id;
 				ret << YAML::Key << "name"    << YAML::Value << mat->GetName();
@@ -2553,14 +2576,14 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 	auto name  = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
-	int nameStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
+	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
 
 	if (id <= 0 || new_id <= 0)
 		return Error::Type::InvalidID;
 	if (ipponStyle <= -1)
-		return Error::Type::InvalidID;
+		return Error::Type::InvalidInput;
 	if (timerStyle <= -1)
-		return Error::Type::InvalidID;
+		return Error::Type::InvalidInput;
 
 	if (id != new_id)//Check if new_id is an unused id
 	{
@@ -2951,7 +2974,9 @@ std::string Application::Ajax_ListAllAgeGroups() const
 
 Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 {
-	MatchTable::Type type = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "type"));
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	IFilter::Type type = (IFilter::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "type"));
+	MatchTable::Type fight_system = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "fight_system"));
 
 	LockTillScopeEnd();
 
@@ -2960,17 +2985,17 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 
 	MatchTable* new_table = nullptr;
 
-	switch (type)
+	switch (fight_system)
 	{
-	case MatchTable::Type::Weightclass:
+	case MatchTable::Type::RoundRobin:
 	{
-		new_table = new Weightclass(0, 0);
+		new_table = new RoundRobin(new Weightclass(0, 0), GetTournament());
 		break;
 	}
 
 	case MatchTable::Type::SingleElimination:
 	{
-		new_table = new SingleElimination(0, 0);
+		new_table = new SingleElimination(new Weightclass(0, 0), GetTournament());
 		break;
 	}
 
@@ -2985,6 +3010,9 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	default:
 		return Error::Type::InvalidInput;
 	}
+
+	if (id)
+		new_table->SetUUID(std::move(id));
 
 	GetTournament()->AddMatchTable(new_table);
 
@@ -3003,7 +3031,9 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	if (!GetTournament())
 		return Error::Type::TournamentNotOpen;
 
-	UUID id   = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	IFilter::Type type = (IFilter::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "type"));
+	MatchTable::Type fight_system = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "fight_system"));
 	auto name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int color = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "color"));
 	int mat   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
@@ -3016,6 +3046,29 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 	if (!table)
 		return Error(Error::Type::ItemNotFound);
+
+	if (table->GetType() != fight_system)
+	{
+		//Re-create match table
+
+		auto color          = table->GetColor();
+		auto schedule_index = table->GetScheduleIndex();
+
+		if (!GetTournament()->RemoveMatchTable(*table))
+			return Error::Type::OperationFailed;
+
+		auto error = Ajax_AddMatchTable(Request);
+		if (!error)
+			return error;
+
+		table = GetTournament()->FindMatchTable(id);
+
+		if (!table)
+			return Error(Error::Type::ItemNotFound);
+
+		table->SetColor(color);
+		table->SetScheduleIndex(schedule_index);
+	}
 
 	auto age_group = m_Database.FindAgeGroup(age_group_id);
 	auto rule_set  = m_Database.FindRuleSet(rule_set_id);
@@ -3044,19 +3097,24 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	int  gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 	bool bo3       = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
 
+	if (!table->GetFilter() || table->GetFilter()->GetType() != IFilter::Type::Weightclass)
+		return Error::Type::OperationFailed;
+
+	auto weightclass = (Weightclass*)table->GetFilter();
+
+	weightclass->SetMinWeight(Weight(minWeight));
+	weightclass->SetMaxWeight(Weight(maxWeight));
+	weightclass->SetGender((Gender)gender);
 
 	switch (table->GetType())
 	{
-	case MatchTable::Type::Weightclass:
+	case MatchTable::Type::RoundRobin:
 	{
-		Weightclass* weight_table = (Weightclass*)table;
+		RoundRobin* round_robin = (RoundRobin*)table;
 
 		GetTournament()->Lock();
 
-		weight_table->SetMinWeight(Weight(minWeight));
-		weight_table->SetMaxWeight(Weight(maxWeight));
-		weight_table->SetGender((Gender)gender);
-		weight_table->IsBestOfThree(bo3);
+		round_robin->IsBestOfThree(bo3);
 
 		GetTournament()->Unlock();
 		break;
@@ -3068,9 +3126,6 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		GetTournament()->Lock();
 
-		single_table->SetMinWeight(Weight(minWeight));
-		single_table->SetMaxWeight(Weight(maxWeight));
-		single_table->SetGender((Gender)gender);
 		single_table->IsBestOfThree(bo3);
 		single_table->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
 		single_table->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
@@ -3175,7 +3230,7 @@ std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request
 
 
 
-Error Application::Ajax_SetStartingPosition(const HttpServer::Request& Request)
+Error Application::Ajax_SetStartPosition(const HttpServer::Request& Request)
 {
 	UUID id        = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 	UUID judoka_id = HttpServer::DecodeURLEncoded(Request.m_Query, "judoka");
@@ -3202,7 +3257,7 @@ Error Application::Ajax_SetStartingPosition(const HttpServer::Request& Request)
 	if (!judoka)
 		return Error::Type::ItemNotFound;
 
-	table->SetStartingPosition(judoka, startpos);
+	table->SetStartPosition(judoka, startpos);
 	GetTournament()->GenerateSchedule();
 
 	return Error::Type::NoError;//OK
@@ -3210,17 +3265,70 @@ Error Application::Ajax_SetStartingPosition(const HttpServer::Request& Request)
 
 
 
-std::string Application::Ajax_Status()
+std::string Application::Ajax_GetSetup()
 {
 	YAML::Emitter ret;
 
 	ret << YAML::BeginMap;
 
-	ret << YAML::Key << "version" << YAML::Value << Version;
-	ret << YAML::Key << "uptime"  << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
+	ret << YAML::Key << "version"     << YAML::Value << Version;
+	ret << YAML::Key << "uptime"      << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
+	ret << YAML::Key << "language"    << YAML::Value << (int)Localizer::GetLanguage();
+	ret << YAML::Key << "port"        << YAML::Value << GetDatabase().GetServerPort();
+	ret << YAML::Key << "ippon_style" << YAML::Value << (int)GetDatabase().GetIpponStyle();
+	ret << YAML::Key << "timer_style" << YAML::Value << (int)GetDatabase().GetTimerStyle();
+	ret << YAML::Key << "name_style"  << YAML::Value << (int)GetDatabase().GetNameStyle();
 
 	ret << YAML::EndMap;
 	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
+{
+	int language   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "language"));
+	int port       = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "port"));
+	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
+	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
+	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
+
+	Localizer::SetLanguage((Language)language);
+	GetDatabase().SetServerPort(port);
+	GetDatabase().SetIpponStyle((Mat::IpponStyle)ipponStyle);
+	GetDatabase().SetTimerStyle((Mat::TimerStyle)timerStyle);
+	GetDatabase().SetNameStyle((NameStyle)nameStyle);
+
+	return Error::Type::NoError;
+}
+
+
+
+std::string Application::Ajax_Execute(const HttpServer::Request& Request)
+{
+	auto command = HttpServer::DecodeURLEncoded(Request.m_Query, "cmd");
+
+#ifdef _WIN32
+	FILE* pipe = _popen(command.c_str(), "r");
+#else
+	FILE* pipe = popen(command.c_str(), "r");
+#endif
+	if (!pipe)
+		return "";
+
+	std::string result;
+	char buffer[128];
+	while (fgets(buffer, sizeof buffer, pipe) != NULL)
+	{
+		result += buffer;
+	}
+
+#ifdef _WIN32
+	_pclose(pipe);
+#else
+	pclose(pipe);
+#endif
+	return result;
 }
 
 
@@ -3355,7 +3463,12 @@ std::string Application::Ajax_GetHansokumake() const
 
 	for (auto mat : GetMats())
 	{
-		if (!mat || !mat->GetMatch()) continue;
+		if (!mat)
+			continue;
+
+		const auto match = mat->GetMatch();
+		if (!match)
+			continue;
 
 		for (Fighter fighter = Fighter::White; fighter <= Fighter::Blue; ++fighter)
 		{
@@ -3364,7 +3477,7 @@ std::string Application::Ajax_GetHansokumake() const
 				ret << YAML::BeginMap;
 
 				ret << YAML::Key << "match" << YAML::Value;
-				mat->GetMatch()->ToString(ret);
+				match->ToString(ret);
 				ret << YAML::Key << "fighter" << YAML::Value << (int)fighter;
 				ret << YAML::Key << "disqualification_state" << YAML::Value << (int)mat->GetScoreboard(fighter).m_Disqualification;
 

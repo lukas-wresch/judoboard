@@ -6,6 +6,7 @@
 #include "database.h"
 #include "weightclass.h"
 #include "customtable.h"
+#include "round_robin.h"
 #include "single_elimination.h"
 #include "weightclass_generator.h"
 #include "md5.h"
@@ -81,10 +82,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add weightclasses
 	for (auto weightclass : File.GetWeightclasses())
 	{
-		Weightclass* new_table = nullptr;
+		MatchTable* new_table = nullptr;
 
 		if (weightclass->FightSystemID == 16 || weightclass->FightSystemID == 13 || weightclass->FightSystemID == 14 || weightclass->FightSystemID == 15)//Round robin
-			new_table = new Weightclass(*weightclass, this);
+			new_table = new RoundRobin(*weightclass, this);
 		else if (weightclass->FightSystemID == 19)//Single elimination (single consulation bracket)
 			new_table = new SingleElimination(*weightclass, this);
 		else
@@ -94,14 +95,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (weightclass->AgeGroup)
 			new_table->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
 
-		//Freeze the name
-		auto temp  = new_table->GetGender();
-		auto temp2 = new_table->GetAgeGroup();
-		new_table->SetGender(Gender::Unknown);
-		new_table->SetAgeGroup(nullptr);
-		new_table->SetName(new_table->GetDescription());
-		new_table->SetGender(temp);
-		new_table->SetAgeGroup(temp2);
+		new_table->SetName(weightclass->Description);
 
 		weightclass->pUserData = new_table;
 
@@ -129,7 +123,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 			if (judoka->Weightclass)
 			{
-				auto match_table = (Weightclass*)judoka->Weightclass->pUserData;
+				auto match_table = (MatchTable*)judoka->Weightclass->pUserData;
 				if (match_table)
 					match_table->AddParticipant(new_judoka, true);//Add with force
 			}
@@ -166,7 +160,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		if (match.Weightclass && match.Weightclass->pUserData)
 		{
-			auto match_table = (Weightclass*)match.Weightclass->pUserData;
+			auto match_table = (MatchTable*)match.Weightclass->pUserData;
 			match_table->AddMatch(new_match);//Add match to weightclass
 		}
 
@@ -285,12 +279,12 @@ bool Tournament::LoadYAML(const std::string& Filename)
 				continue;
 			}
 
-			MatchTable* new_table = nullptr;
+			MatchTable* new_table  = nullptr;
 
 			switch ((MatchTable::Type)node["type"].as<int>())
 			{
-			case MatchTable::Type::Weightclass:
-				new_table = new Weightclass(node, this);
+			case MatchTable::Type::RoundRobin:
+				new_table = new RoundRobin(node, this);
 				break;
 			case MatchTable::Type::Custom:
 				new_table = new CustomTable(node, this);
@@ -328,7 +322,7 @@ bool Tournament::LoadYAML(const std::string& Filename)
 
 
 
-bool Tournament::SaveYAML(const std::string& Filename) const
+bool Tournament::SaveYAML(const std::string& Filename)
 {
 	if (m_Name.empty())
 		return false;
@@ -345,6 +339,21 @@ bool Tournament::SaveYAML(const std::string& Filename) const
 	yaml << YAML::Value << m_Name;
 	yaml << YAML::Key << "version";
 	yaml << YAML::Value << "1";
+
+	//Prune unused clubs
+	std::set<UUID> used_clubs;
+	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
+		if (judoka->GetClub())
+			used_clubs.insert(*judoka->GetClub());
+
+	for (auto club : m_StandingData.GetAllClubs())
+	{
+		if (used_clubs.find(*club) == used_clubs.end())//Not found
+		{
+			m_StandingData.DeleteClub(*club);
+			break;//Have to stop since we have deleted while iterating
+		}
+	}
 
 	m_StandingData >> yaml;
 
@@ -428,60 +437,6 @@ Status Tournament::GetStatus() const
 	if (one_match_finished)
 		return Status::Running;
 	return Status::Scheduled;
-}
-
-
-
-void Tournament::ConnectToDatabase(Database& db)
-{
-	if (GetStatus() == Status::Concluded)
-		return;
-
-	std::vector<Judoka*> judoka_to_add;
-
-	for (auto it = m_StandingData.GetAllJudokas().begin(); it != m_StandingData.GetAllJudokas().end();)
-	{
-		auto db_ref = db.FindJudoka(it->second->GetUUID());
-		if (db_ref && it->second != db_ref)//Pointing to different objects
-		{
-			delete it->second;
-			it = m_StandingData.GetAllJudokas().erase(it);
-			judoka_to_add.push_back(db_ref);
-		}
-		else
-			++it;
-	}
-
-	for (auto judoka : judoka_to_add)
-		m_StandingData.AddJudoka(judoka);
-
-
-	//Do the same for rule sets
-
-	if (m_pDefaultRules)
-	{
-		auto db_ref = db.FindRuleSet(m_pDefaultRules->GetUUID());
-		if (db_ref)
-			m_pDefaultRules = db_ref;
-	}
-
-	std::vector<RuleSet*> rule_sets_to_add;
-
-	for (auto it = m_StandingData.GetRuleSets().begin(); it != m_StandingData.GetRuleSets().end();)
-	{
-		auto db_ref = db.FindRuleSet((*it)->GetUUID());
-		if (db_ref)
-		{
-			delete *it;
-			it = m_StandingData.GetRuleSets().erase(it);
-			rule_sets_to_add.push_back(db_ref);
-		}
-		else
-			++it;
-	}
-
-	for (auto rule : rule_sets_to_add)
-		m_StandingData.AddRuleSet(rule);
 }
 
 
@@ -824,7 +779,6 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		if (table && table->IsElgiable(*Judoka))
 		{
 			table->AddParticipant(Judoka);
-			table->GenerateSchedule();
 			added = true;
 		}
 	}
@@ -852,18 +806,13 @@ bool Tournament::RemoveParticipant(const UUID& UUID)
 
 	for (auto table : m_MatchTables)
 	{
-		if (!table->Contains(deleted_judoka))
+		if (!table->IsIncluded(*deleted_judoka))
 			continue;
-
-		table->RemoveAllParticipants();
 
 		for (auto& [id, judoka] : m_StandingData.GetAllJudokas())
 		{
 			if (table->IsElgiable(*judoka))
-			{
 				table->AddParticipant(judoka);
-				table->GenerateSchedule();
-			}
 		}
 	}
 
@@ -955,7 +904,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 	//Add all judoka of the match table to the tournament
 	for (auto judoka : NewMatchTable->GetParticipants())
-		AddParticipant(judoka);
+		AddParticipant(const_cast<Judoka*>(judoka));
 
 	if (NewMatchTable->GetAgeGroup())
 		AddAgeGroup(const_cast<AgeGroup*>(NewMatchTable->GetAgeGroup()));
@@ -1442,7 +1391,7 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 			auto temp_copy = m_MatchTables;//We are iterating while removing
 			for (auto match_table : temp_copy)
 			{
-				if (match_table->GetType() == MatchTable::Type::Weightclass &&
+				if (match_table->GetType() == MatchTable::Type::RoundRobin &&
 					match_table->GetAgeGroup() &&
 					*match_table->GetAgeGroup() == *desc.m_AgeGroup)
 					RemoveMatchTable(match_table->GetUUID());
@@ -1454,7 +1403,7 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 			auto temp_copy = m_MatchTables;//We are iterating while removing
 			for (auto match_table : temp_copy)
 			{
-				if (match_table->GetType() == MatchTable::Type::Weightclass)
+				if (match_table->GetType() == MatchTable::Type::RoundRobin)
 					RemoveMatchTable(match_table->GetUUID());
 			}
 		}
@@ -1465,7 +1414,7 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 	{	
 		for (auto weight_desc : desc.m_Collection)
 		{
-			auto new_weightclass = new Weightclass(weight_desc.m_Min, weight_desc.m_Max, desc.m_Gender, this);
+			auto new_weightclass = new RoundRobin(weight_desc.m_Min, weight_desc.m_Max, desc.m_Gender, this);
 
 			new_weightclass->SetAgeGroup(desc.m_AgeGroup);
 			new_weightclass->SetMatID(1);

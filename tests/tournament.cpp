@@ -228,7 +228,7 @@ TEST(Tournament, AddAgeGroup)
 	auto rule_set  = Judoboard::RuleSet("Demo", 180, 60, 20, 10);
 	auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set, app.GetDatabase());
 
-	auto m1 = new Judoboard::Weightclass(0, 120);
+	auto m1 = new Judoboard::RoundRobin(Weight(0), Weight(120));
 	m1->SetMatID(1);
 	m1->SetAgeGroup(&age_group);
 	tourney->AddMatchTable(m1);
@@ -394,7 +394,7 @@ TEST(Tournament, BestOf3_Matchtable)
 		EXPECT_TRUE(tourney.AddParticipant(&j3));
 		EXPECT_TRUE(tourney.AddParticipant(&j4));
 
-		auto matchtable = new Weightclass(50, 60);
+		auto matchtable = new RoundRobin(Weight(50), Weight(60));
 		matchtable->IsBestOfThree(true);
 		tourney.AddMatchTable(matchtable);
 		tourney.GenerateSchedule();
@@ -440,8 +440,8 @@ TEST(Tournament, ColorsForMatchTables)
 		EXPECT_TRUE(tourney.AddParticipant(j3));
 		EXPECT_TRUE(tourney.AddParticipant(j4));
 
-		tourney.AddMatchTable(new Weightclass(50, 55));
-		tourney.AddMatchTable(new Weightclass(60, 65));
+		tourney.AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
+		tourney.AddMatchTable(new RoundRobin(Weight(60), Weight(65)));
 
 		ASSERT_EQ(tourney.GetMatchTables().size(), 2);
 		EXPECT_EQ(tourney.GetMatchTables()[0]->GetColor(), Color::Name::Blue);
@@ -662,8 +662,8 @@ TEST(Tournament, SaveAndLoad)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		tourney->AddMatchTable(new Weightclass(50, 55));
-		tourney->AddMatchTable(new Weightclass(60, 65));
+		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
+		tourney->AddMatchTable(new RoundRobin(Weight(60), Weight(65)));
 		tourney->AddMatch(new Match(j1, j3, tourney, 1));
 		tourney->AddMatch(new Match(j1, j4, tourney, 2));
 		tourney->GenerateSchedule();
@@ -724,7 +724,7 @@ TEST(Tournament, SaveAndLoad_MatchTableConnection)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		tourney->AddMatchTable(new Weightclass(50, 155));
+		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(155)));
 		tourney->GenerateSchedule();
 
 		tourney->EnableAutoSave(false);
@@ -879,8 +879,8 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		tourney->AddMatchTable(new Weightclass(50, 55));
-		tourney->AddMatchTable(new Weightclass(60, 65));
+		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
+		tourney->AddMatchTable(new RoundRobin(Weight(60), Weight(65)));
 		tourney->AddMatch(new Match(j1, j3, tourney, 2));
 		tourney->AddMatch(new Match(j1, j4, tourney, 2));
 		tourney->GenerateSchedule();
@@ -950,9 +950,9 @@ TEST(Tournament, ChangeScheduleIndexAfterDeletion)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		auto w1 = new Weightclass(50, 55);
-		auto w2 = new Weightclass(60, 65);
-		auto w3 = new Weightclass(70, 80);
+		auto w1 = new RoundRobin(Weight(50), Weight(55));
+		auto w2 = new RoundRobin(Weight(60), Weight(65));
+		auto w3 = new RoundRobin(Weight(70), Weight(80));
 		tourney->AddMatchTable(w1);
 		tourney->AddMatchTable(w2);
 		tourney->AddMatchTable(w3);
@@ -1002,9 +1002,9 @@ TEST(Tournament, ChangeScheduleIndexAfterChangingMat)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		auto w1 = new Weightclass(50, 55);
-		auto w2 = new Weightclass(60, 65);
-		auto w3 = new Weightclass(70, 80);
+		auto w1 = new RoundRobin(Weight(50), Weight(55));
+		auto w2 = new RoundRobin(Weight(60), Weight(65));
+		auto w3 = new RoundRobin(Weight(70), Weight(80));
 		tourney->AddMatchTable(w1);
 		tourney->AddMatchTable(w2);
 		tourney->AddMatchTable(w3);
@@ -1066,7 +1066,7 @@ TEST(Tournament, SaveAndLoad_SingleElimination)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		tourney->AddMatchTable(new SingleElimination(10, 105));
+		tourney->AddMatchTable(new SingleElimination(Weight(10), Weight(105)));
 		tourney->GenerateSchedule();
 
 		EXPECT_EQ(tourney->GetParticipants().size(), 4);
@@ -1092,6 +1092,54 @@ TEST(Tournament, SaveAndLoad_SingleElimination)
 		EXPECT_EQ(t.GetSchedule()[2]->GetDependentMatches()[1]->GetUUID(), t.GetSchedule()[1]->GetUUID());
 
 		delete tourney;
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Tournament, PruneUnusedClubs)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
+
+		Club* c1 = new Club("Club 1");
+		Club* c2 = new Club("Club 1");
+
+		Tournament* tourney = new Tournament("deleteMe");
+		tourney->Reset();
+
+		j1->SetClub(c1);
+		j2->SetClub(c1);
+		j3->SetClub(c1);
+		j4->SetClub(c2);
+
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+		EXPECT_TRUE(tourney->AddParticipant(j3));
+		EXPECT_TRUE(tourney->AddParticipant(j4));
+
+		tourney->Save();
+
+		j4->SetClub(c1);
+
+		EXPECT_EQ(tourney->GetDatabase().GetAllClubs().size(), 2);
+
+		tourney->Save();
+
+		EXPECT_EQ(tourney->GetDatabase().GetAllClubs().size(), 1);
+
+		Tournament* tourney2 = new Tournament("deleteMe");
+
+		EXPECT_EQ(tourney2->GetDatabase().GetAllClubs().size(), 1);
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
@@ -1206,12 +1254,11 @@ TEST(Tournament, AddParticpantsWhenAddingMatchTable)
 	Judoka j1(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 	Judoka j2(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 
-	auto w = new Weightclass(10, 100);
+	auto w = new RoundRobin(Weight(10), Weight(100));
 
 	EXPECT_TRUE(w->AddParticipant(&j1));
 	EXPECT_TRUE(w->AddParticipant(&j2));
 
-	w->GenerateSchedule();
 	EXPECT_EQ(w->GetSchedule().size(), 1);
 
 	t.AddMatchTable(w);

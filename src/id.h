@@ -25,6 +25,9 @@ namespace Judoboard
 
 		bool operator == (const std::string& rhs) const noexcept { return m_UUID == rhs; }
 
+		bool operator < (const UUID& rhs) const noexcept { return m_UUID < rhs.m_UUID; }
+		bool operator < (const std::string& rhs) const noexcept { return m_UUID < rhs; }
+
 		void operator = (UUID&& NewUUID) noexcept { m_UUID = std::move(NewUUID.m_UUID); }
 
 	protected:
@@ -48,6 +51,8 @@ namespace Judoboard
 
 	class ID
 	{
+		friend class Application;
+
 	public:
 		ID();
 		~ID();
@@ -65,7 +70,7 @@ namespace Judoboard
 
 	protected:
 		void SetUUID(std::string&& UUID) { m_UUID = std::move(UUID); }
-		//void SetUUID(const std::string& UUID) { m_UUID = UUID; }
+		void SetUUID(UUID&& UUID)        { m_UUID = std::move(UUID); }
 
 	private:
 		UUID m_UUID;

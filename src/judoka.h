@@ -13,6 +13,34 @@ namespace Judoboard
 {
 	class StandingData;
 	class Judoka;
+	class Match;
+	class MatchTable;
+
+
+
+	class DependentJudoka
+	{
+		friend class Match;
+
+	public:
+		DependentJudoka(const Judoka* Judoka) {
+			m_Judoka = Judoka;
+			m_Type   = DependencyType::None;
+		}
+
+		const Judoka* GetJudoka() const { return m_Judoka; }
+
+		bool operator == (const Judoka* rhs) const;
+		bool operator == (const DependentJudoka& rhs) const;
+
+	private:
+		DependentJudoka() = default;
+
+		const Judoka* m_Judoka  = nullptr;
+		DependencyType m_Type   = DependencyType::None;
+		Match* m_DependentMatch = nullptr;
+		const MatchTable* m_DependentMatchTable = nullptr;
+	};
 
 
 
@@ -88,7 +116,15 @@ namespace Judoboard
 		void operator >> (YAML::Emitter& Yaml) const;
 		void ToString(YAML::Emitter& Yaml) const;
 
-		bool operator ==(const Judoka& cmp) const { return GetUUID() == cmp.GetUUID(); }
+		bool operator ==(const Judoka& rhs) const { return GetUUID() == rhs.GetUUID(); }
+		bool operator ==(const Judoka* rhs) const {
+			if (!rhs)
+				return false;
+			return GetUUID() == rhs->GetUUID();
+		}
+		bool operator ==(const UUID& rhs) const {
+			return GetUUID() == rhs;
+		}
 
 	private:
 		Judoka() = default;//Create empty judoka (for class Mat)

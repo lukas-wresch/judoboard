@@ -210,15 +210,15 @@ TEST(App, Mats)
 
 		EXPECT_EQ(app.GetMats().size(), 0);
 		EXPECT_EQ(app.FindDefaultMatID(), 0);
-		EXPECT_TRUE(app.GetDefaultMat() == nullptr);
-		EXPECT_TRUE(app.FindMat(1) == nullptr);
+		EXPECT_FALSE(app.GetDefaultMat());
+		EXPECT_FALSE(app.FindMat(1));
 
 		EXPECT_TRUE(app.StartLocalMat(1));
 
 		EXPECT_EQ(app.GetMats().size(), 1);
 		EXPECT_EQ(app.FindDefaultMatID(), 1);
-		EXPECT_TRUE(app.GetDefaultMat() != nullptr);
-		EXPECT_TRUE(app.FindMat(1) != nullptr);
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.FindMat(1));
 
 		EXPECT_TRUE(app.CloseMat(1));
 
@@ -248,7 +248,7 @@ TEST(App, FullTournament)
 		Account acc("admin", "1234", Account::AccessLevel::Admin);
 		app.GetDatabase().AddAccount(acc);
 
-		ZED::Core::Pause(5000);
+		ZED::Core::Pause(1000);
 
 		Judoka j1(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
 		Judoka j2(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
@@ -288,8 +288,8 @@ TEST(App, FullTournament)
 		tourney->AddParticipant(&j5);
 		tourney->AddParticipant(&j6);
 
-		MatchTable* m1 = new Weightclass(0, 49);
-		MatchTable* m2 = new Weightclass(50, 100);
+		MatchTable* m1 = new RoundRobin(Weight(0), Weight(49));
+		MatchTable* m2 = new RoundRobin(Weight(0), Weight(49));
 		m1->SetMatID(1);
 		m2->SetMatID(1);
 		tourney->AddMatchTable(m1);
@@ -305,7 +305,7 @@ TEST(App, FullTournament)
 			ASSERT_TRUE(match);
 			EXPECT_TRUE(mat->StartMatch(match));
 
-			ZED::Core::Pause(8000);
+			ZED::Core::Pause(5000);
 
 			mat->Hajime();
 
@@ -344,8 +344,6 @@ TEST(App, FullTournament)
 			ZED::Core::Pause(8000);
 		}
 	}
-
-	ZED::Core::Pause(5000);
 }
 
 
@@ -604,6 +602,7 @@ TEST(App, MatchOnSlave)
 
 	slave.StartLocalMat(2);
 
+	ZED::Core::Pause(100);
 
 	Judoka j1("White", "LastnameW");
 	Judoka j2("Blue",  "LastnameB");
@@ -618,6 +617,8 @@ TEST(App, MatchOnSlave)
 	ASSERT_TRUE(mat->StartMatch(match));
 
 	ZED::Core::Pause(2000);
+
+	EXPECT_TRUE(mat->AreFightersOnMat());
 
 	mat->Hajime();
 
