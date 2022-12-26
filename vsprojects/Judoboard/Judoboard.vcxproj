@@ -183,6 +183,7 @@
     <ClCompile Include="..\..\src\dm4.cpp" />
     <ClCompile Include="..\..\src\dmf.cpp" />
     <ClCompile Include="..\..\src\error.cpp" />
+    <ClCompile Include="..\..\src\filter.cpp" />
     <ClCompile Include="..\..\src\HttpServer\HttpServer.cpp" />
     <ClCompile Include="..\..\src\id.cpp" />
     <ClCompile Include="..\..\src\judoka.cpp" />
@@ -195,6 +196,7 @@
     <ClCompile Include="..\..\src\md5.cpp" />
     <ClCompile Include="..\..\src\remote_mat.cpp" />
     <ClCompile Include="..\..\src\remote_tournament.cpp" />
+    <ClCompile Include="..\..\src\round_robin.cpp" />
     <ClCompile Include="..\..\src\rule_set.cpp" />
     <ClCompile Include="..\..\src\single_elimination.cpp" />
     <ClCompile Include="..\..\src\standing_data.cpp" />
@@ -221,6 +223,7 @@
     <ClInclude Include="..\..\src\dm4.h" />
     <ClInclude Include="..\..\src\dmf.h" />
     <ClInclude Include="..\..\src\error.h" />
+    <ClInclude Include="..\..\src\filter.h" />
     <ClInclude Include="..\..\src\id.h" />
     <ClInclude Include="..\..\src\imat.h" />
     <ClInclude Include="..\..\src\itournament.h" />
@@ -235,6 +238,7 @@
     <ClInclude Include="..\..\src\pause.h" />
     <ClInclude Include="..\..\src\remote_mat.h" />
     <ClInclude Include="..\..\src\remote_tournament.h" />
+    <ClInclude Include="..\..\src\round_robin.h" />
     <ClInclude Include="..\..\src\rule_set.h" />
     <ClInclude Include="..\..\src\schedule_entry.h" />
     <ClInclude Include="..\..\src\single_elimination.h" />

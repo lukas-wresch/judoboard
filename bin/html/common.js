@@ -264,7 +264,7 @@ function AjaxPost(url, params, callback)
   {
     if (this.readyState == 4 && this.status == 200)
     {
-        if (this.response == "ok")
+        if (this.response == "ok" && typeof callback !== 'undefined')
           callback();
         else
           alert("Error: " + this.response);

@@ -27,6 +27,9 @@ namespace Judoboard
 		virtual bool CanCloseTournament() const { return false; }
 		//void DeleteAllMatchResults();
 
+		[[nodiscard]]
+		virtual const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
+
 		virtual bool AddMatch(Match* NewMatch) { return false; }
 		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
 		virtual Match* GetNextMatch(int32_t MatID = -1) const { return nullptr; }//Returns the next match for a given mat if available, otherwise null pointer is returned
@@ -127,7 +130,7 @@ namespace Judoboard
 
 		virtual void GenerateSchedule() {}
 
-		virtual bool Save() const { return false; }
+		virtual bool Save() { return false; }
 
 		void Lock()   const { m_mutex.lock(); }
 		void Unlock() const { m_mutex.unlock(); }

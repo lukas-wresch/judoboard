@@ -27,9 +27,12 @@ namespace Judoboard
 		bool operator == (const Error& rhs) const {
 			return m_Type == rhs.m_Type;
 		}
+		bool operator == (const std::string& rhs) const {
+			return ((std::string)*this) == rhs;
+		}
 		operator bool () const { return m_Type == Type::NoError; }
 
-		operator std::string ();
+		operator std::string () const;
 
 	private:
 		Type m_Type = Type::NoError;
