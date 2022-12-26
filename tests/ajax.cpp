@@ -2,6 +2,51 @@
 
 
 
+TEST(Ajax, AgeGroup_List)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto a1 = new AgeGroup("age 1", 10, 20, nullptr, app.GetDatabase());
+		auto a2 = new AgeGroup("age 2", 30, 40, nullptr, app.GetDatabase());
+
+		app.GetDatabase().AddAgeGroup(a1);
+		app.GetTournament()->AddAgeGroup(a2);
+
+		YAML::Node yaml = YAML::Load(app.Ajax_ListAllAgeGroups());
+
+		ASSERT_EQ(yaml.size(), 8);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "U11");
+		EXPECT_EQ(yaml[0]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[0]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "U13");
+		EXPECT_EQ(yaml[1]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[1]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[2]["name"].as<std::string>(), "U15");
+		EXPECT_EQ(yaml[2]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[2]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[3]["name"].as<std::string>(), "U18");
+		EXPECT_EQ(yaml[3]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[3]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[4]["name"].as<std::string>(), "U21");
+		EXPECT_EQ(yaml[4]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[4]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[5]["name"].as<std::string>(), "Seniors");
+		EXPECT_EQ(yaml[5]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[5]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[6]["name"].as<std::string>(), "age 1");
+		EXPECT_EQ(yaml[6]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[6]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[7]["name"].as<std::string>(), "age 2");
+		EXPECT_EQ(yaml[7]["is_used"].as<bool>(), true);
+		EXPECT_EQ(yaml[7]["in_db"].as<bool>(), false);
+	}
+}
+
+
+
 TEST(Ajax, GetMats)
 {
 	initialize();

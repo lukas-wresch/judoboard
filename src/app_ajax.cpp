@@ -2978,6 +2978,23 @@ std::string Application::Ajax_ListAllAgeGroups() const
 				is_used = GetTournament()->FindAgeGroup(age_group->GetUUID());
 
 			ret << YAML::Key << "is_used" << YAML::Value << is_used;
+			ret << YAML::Key << "in_db"   << YAML::Value << true;
+
+			ret << YAML::EndMap;
+		}
+	}
+
+	//Get all age groups that are exclusive to the tournament
+	for (const auto age_group : GetTournament()->GetDatabase().GetAgeGroups())
+	{
+		if (age_group && !GetDatabase().FindAgeGroup(*age_group))
+		{
+			ret << YAML::BeginMap;
+
+			age_group->ToString(ret);
+
+			ret << YAML::Key << "is_used" << YAML::Value << true;
+			ret << YAML::Key << "in_db"   << YAML::Value << false;
 
 			ret << YAML::EndMap;
 		}
