@@ -1219,18 +1219,18 @@ TEST(Ajax, ListLots)
 
 		if (lot1 == 0)
 		{
-			EXPECT_EQ(lots["0"]["uuid"].as<std::string>(), *c1);
+			EXPECT_EQ(lots["0"]["uuid"].as<std::string>(), c1->GetUUID());
 			EXPECT_EQ(lots["0"]["name"].as<std::string>(), c1->GetName());
 
-			EXPECT_EQ(lots["1"]["uuid"].as<std::string>(), *c2);
+			EXPECT_EQ(lots["1"]["uuid"].as<std::string>(), c2->GetUUID());
 			EXPECT_EQ(lots["1"]["name"].as<std::string>(), c2->GetName());
 		}
 		else
 		{
-			EXPECT_EQ(lots["1"]["uuid"].as<std::string>(), *c1);
+			EXPECT_EQ(lots["1"]["uuid"].as<std::string>(), c1->GetUUID());
 			EXPECT_EQ(lots["1"]["name"].as<std::string>(), c1->GetName());
 
-			EXPECT_EQ(lots["1"]["uuid"].as<std::string>(), *c1);
+			EXPECT_EQ(lots["1"]["uuid"].as<std::string>(), c1->GetUUID());
 			EXPECT_EQ(lots["1"]["name"].as<std::string>(), c1->GetName());
 		}
 	}
