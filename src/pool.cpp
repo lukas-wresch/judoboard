@@ -129,8 +129,8 @@ void Pool::GenerateSchedule()
 	for (int i = 0; i < pool_count; ++i)
 	{
 		m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
-		std::string name = "Pool ";
-		name.append(&letters[i], 1);
+		std::string name = Localizer::Translate("Pool") + " ";
+		name.append(&letters[i%26], 1);
 		m_Pools[i]->SetName(name);
 	}
 
@@ -149,11 +149,6 @@ void Pool::GenerateSchedule()
 		mixer.AddSource(topB);
 
 		final_input = new Fixed(mixer);
-
-		/*topA->Dump();
-		topB->Dump();
-		mixer.Dump();
-		final_input->Dump();*/
 		
 		//Swap the two incorrect positions manually
 		auto temp = final_input->GetJudokaByStartPosition(2);
@@ -202,7 +197,7 @@ void Pool::GenerateSchedule()
 
 	assert(final_input);
 	m_Finals = std::move(SingleElimination(final_input));
-	m_Finals.SetName("Finals");
+	m_Finals.SetName(Localizer::Translate("Finals"));
 
 
 	//Add matches from pools
