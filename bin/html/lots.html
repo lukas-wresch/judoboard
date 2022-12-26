@@ -2,6 +2,12 @@
 
 <button class="add" id="perform_lottery" style="margin-bottom: 1cm;" onclick="PerformLottery();">Perform Lottery</button>
 
+<div>
+  <label style="width:100px; float:left; margin-top:4px;" id="label_tier">Tier</label>
+  <select style="margin-bottom:20px; width: 5.0cm;" id="tiers" onchange="return SetTier();">
+  </select>
+</div>
+
 <table id="list" border="1" rules="all" style="margin-bottom: 1cm; font-size: 16pt;">
   <tr>
     <th style="width: 4cm;" id="name">Name</th>
@@ -25,7 +31,6 @@ function GetLots()
   AjaxCallback("ajax/lots/list", function(response) {
     var res = YAML.parse(response);
     console.log(response);
-    console.log(res);
 
     var table = document.getElementById("list");
 
@@ -49,7 +54,65 @@ function GetLots()
 }
 
 
+function SetTier()
+{
+  var tier = document.getElementById("tiers").value;
+
+  AjaxCallback("ajax/lots/set_tier?tier=" + tier, function(response) {
+    var res = YAML.parse(response);
+    console.log(response);
+
+    GetLots();
+  });
+  return false;
+}
+
+
+function GetTiers()
+{
+  AjaxCallback("ajax/lots/get_tier", function(response) {
+    var res = YAML.parse(response);
+    console.log(response);
+
+    var table = document.getElementById("tiers");
+
+    while (table.length > 1)
+      table.remove(table.length-1);
+
+    var start_tier = 0;
+    if (typeof res.organizer_tier !== 'undefined')
+      start_tier = res.organizer_tier;
+
+    for (let tier = start_tier; tier <= 6; tier++)
+    {
+      var option = document.createElement("option");
+      option.value = tier + 1;
+
+      var text = tier + " - ";
+      if (tier == 0)
+        text += "International";
+      else if (tier == 1)
+        text += "Nation";
+      else if (tier == 2)
+        text += "Local";
+      else if (tier == 3)
+        text += "Group";
+      else if (tier == 4)
+        text += "Land";
+      else if (tier == 5)
+        text += "Bezirk";
+      else if (tier == 6)
+        text += "Kreis";
+
+      option.text = text;
+      table.add(option);
+    }
+  });
+}
+
+
 GetLots();
+GetTiers();
 
 document.getElementById("headline").innerHTML = lang.lots;
 document.getElementById("name").innerHTML     = lang.name;
