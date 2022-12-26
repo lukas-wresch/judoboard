@@ -1216,22 +1216,28 @@ TEST(Ajax, ListLots)
 
 		ASSERT_TRUE(lots["0"]["uuid"].IsDefined());
 		ASSERT_TRUE(lots["1"]["uuid"].IsDefined());
+		ASSERT_TRUE(lots["0"]["lot"].IsDefined());
+		ASSERT_TRUE(lots["1"]["lot"].IsDefined());
 
-		if (lot1 == 0)
+		if (lot1 == lots["0"]["lot"].as<int>())
 		{
 			EXPECT_EQ(lots["0"]["uuid"].as<std::string>(), c1->GetUUID());
 			EXPECT_EQ(lots["0"]["name"].as<std::string>(), c1->GetName());
+			EXPECT_EQ(lots["0"]["lot"].as<int>(), lot1);
 
 			EXPECT_EQ(lots["1"]["uuid"].as<std::string>(), c2->GetUUID());
 			EXPECT_EQ(lots["1"]["name"].as<std::string>(), c2->GetName());
+			EXPECT_EQ(lots["1"]["lot"].as<int>(), lot2);
 		}
 		else
 		{
-			EXPECT_EQ(lots["1"]["uuid"].as<std::string>(), c1->GetUUID());
-			EXPECT_EQ(lots["1"]["name"].as<std::string>(), c1->GetName());
+			EXPECT_EQ(lots["0"]["uuid"].as<std::string>(), c2->GetUUID());
+			EXPECT_EQ(lots["0"]["name"].as<std::string>(), c2->GetName());
+			EXPECT_EQ(lots["0"]["lot"].as<int>(), lot2);
 
 			EXPECT_EQ(lots["1"]["uuid"].as<std::string>(), c1->GetUUID());
 			EXPECT_EQ(lots["1"]["name"].as<std::string>(), c1->GetName());
+			EXPECT_EQ(lots["1"]["lot"].as<int>(), lot1);
 		}
 	}
 
