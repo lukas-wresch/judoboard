@@ -36,7 +36,7 @@ namespace Judoboard
 			m_DependentMatchTable = &DependentMatchTable;
 		}
 
-		const Judoka* GetJudoka() const { return m_Judoka; }
+		const Judoka* GetJudoka() const;
 		auto GetDependency() const { return m_Type; }
 		const Match* GetDependentMatch() const { return m_DependentMatch; }
 		auto GetDependentMatchTable() const { return m_DependentMatchTable; }
