@@ -196,8 +196,13 @@ void Pool::GenerateSchedule()
 
 
 	assert(final_input);
+	bool third_place = m_Finals.IsThirdPlaceMatch();
+	bool fifth_place = m_Finals.IsFifthPlaceMatch();
+
 	m_Finals = std::move(SingleElimination(final_input));
 	m_Finals.SetName(Localizer::Translate("Finals"));
+	m_Finals.IsThirdPlaceMatch(third_place);
+	m_Finals.IsFifthPlaceMatch(fifth_place);
 
 
 	//Add matches from pools
