@@ -1719,7 +1719,7 @@ TEST(Ajax, MoveSchedule)
 
 
 
-TEST(Ajax, AddTournament)
+TEST(Ajax, Tournament_Add)
 {
 	initialize();
 
@@ -1745,11 +1745,36 @@ TEST(Ajax, AddTournament)
 
 
 
-TEST(Ajax, EditTournament)
+TEST(Ajax, Tournament_Get)
+{
+	initialize();
+
+	Application app;
+
+	auto rules = new RuleSet("Test Rules", 100, 100, 20, 10);
+	app.GetDatabase().AddRuleSet(rules);
+
+	auto assoc = new Association("Organizer", nullptr);
+	app.GetDatabase().AddAssociation(assoc);
+
+	EXPECT_TRUE(app.Ajax_AddTournament(HttpServer::Request("", "name=test&year=2000&rules=" + (std::string)rules->GetUUID() + "&organizer=" + (std::string)assoc->GetUUID())));
+
+	auto tour = app.FindTournamentByName("test");
+	ASSERT_TRUE(tour);
+
+	YAML::Node yaml = YAML::Load( app.Ajax_GetTournament(HttpServer::Request("id=" + (std::string)tour->GetUUID()) ) );
+
+	EXPECT_EQ(yaml["name"].as<std::string>(), tour->GetName());
+	EXPECT_EQ(yaml["rule_set_uuid"].as<std::string>(),  *rules);
+	EXPECT_EQ(yaml["organizer_uuid"].as<std::string>(), *assoc);
+}
+
+
+
+TEST(Ajax, Tournament_Edit)
 {
 	initialize();
 	ZED::Core::RemoveFile("tournaments/test.yml");
-	ZED::Core::RemoveFile("database.yml");
 
 	{
 		Application app;

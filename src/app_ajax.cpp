@@ -1840,27 +1840,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		auto tournament = FindTournament(id);
-		if (!tournament)
-			return std::string("Could not find tournament");
-
-		YAML::Emitter yaml;
-		yaml << YAML::BeginMap;
-
-		yaml << YAML::Key << "name" << YAML::Value << tournament->GetName();
-		yaml << YAML::Key << "year" << YAML::Value << tournament->GetDatabase().GetYear();
-		yaml << YAML::Key << "num_participants" << YAML::Value << tournament->GetParticipants().size();
-		yaml << YAML::Key << "schedule_size" << YAML::Value << tournament->GetSchedule().size();
-		yaml << YAML::Key << "status" << YAML::Value << (int)tournament->GetStatus();
-
-		if (tournament->GetDefaultRuleSet())
-			yaml << YAML::Key << "rule_set_uuid" << YAML::Value << (std::string)tournament->GetDefaultRuleSet()->GetUUID();
-
-		yaml << YAML::EndMap;
-		
-		return yaml.c_str();
+		return Ajax_GetTournament(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/assign_age_group", [this](auto& Request) -> std::string {
@@ -2463,6 +2443,38 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 	//TODO delete the old tournament file in case the name changed
 
 	return Error();//OK
+}
+
+
+
+std::string Application::Ajax_GetTournament(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockTillScopeEnd();
+
+	auto tournament = FindTournament(id);
+	if (!tournament)
+		return (Error)Error::Type::TournamentNotOpen;
+
+	YAML::Emitter yaml;
+	yaml << YAML::BeginMap;
+
+	yaml << YAML::Key << "name" << YAML::Value << tournament->GetName();
+	yaml << YAML::Key << "year" << YAML::Value << tournament->GetDatabase().GetYear();
+	yaml << YAML::Key << "num_participants" << YAML::Value << tournament->GetParticipants().size();
+	yaml << YAML::Key << "schedule_size" << YAML::Value    << tournament->GetSchedule().size();
+	yaml << YAML::Key << "status" << YAML::Value << (int)tournament->GetStatus();
+
+	if (tournament->GetDefaultRuleSet())
+		yaml << YAML::Key << "rule_set_uuid" << YAML::Value << (std::string)tournament->GetDefaultRuleSet()->GetUUID();
+
+	if (tournament->GetOrganizer())
+		yaml << YAML::Key << "organizer_uuid" << YAML::Value << (std::string)tournament->GetOrganizer()->GetUUID();
+
+	yaml << YAML::EndMap;
+
+	return yaml.c_str();
 }
 
 
