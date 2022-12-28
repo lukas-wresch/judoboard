@@ -180,6 +180,8 @@ namespace Judoboard
 
 		[[nodiscard]]
 		ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
+		void Lock()   const { m_mutex.lock(); }
+		void Unlock() const { m_mutex.unlock(); }
 
 
 		enum class Mode

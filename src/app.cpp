@@ -340,17 +340,23 @@ uint32_t Application::GetHighestMatID() const
 
 bool Application::CloseMat(uint32_t ID)
 {
-	auto guard = LockTillScopeEnd();
+	Lock();
+	auto mats_copy = m_Mats;
+	Unlock();
 
-	for (auto it = m_Mats.begin(); it != m_Mats.end(); ++it)
+	for (auto it = mats_copy.begin(); it != mats_copy.end(); ++it)
 	{
-		if (*it && (*it)->GetMatID() == ID && (*it)->Close())
+		if (*it && (*it)->GetMatID() == ID && (*it)->Close())//This also requires an application lock
 		{
 			if ((*it)->GetType() == IMat::Type::VirtualMat)
 			{
-				delete* it;
+				delete *it;
 				it = m_Mats.erase(it);
 			}
+
+			Lock();
+			m_Mats = std::move(mats_copy);
+			Unlock();
 
 			return true;
 		}
