@@ -2,6 +2,104 @@
 
 
 
+TEST(Ajax, AgeGroup_Get)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto a1 = new AgeGroup("age 1", 10, 20, nullptr, app.GetDatabase());
+		auto a2 = new AgeGroup("age 2", 30, 40, nullptr, app.GetDatabase());
+
+		app.GetDatabase().AddAgeGroup(a1);
+		app.GetTournament()->AddAgeGroup(a2);
+
+		YAML::Node yaml = YAML::Load(app.Ajax_GetAgeGroup(HttpServer::Request("id=" + (std::string)a1->GetUUID())));
+
+		EXPECT_EQ(yaml["uuid"].as<std::string>(), a1->GetUUID());
+		EXPECT_EQ(yaml["name"].as<std::string>(), a1->GetName());
+		EXPECT_EQ(yaml["min_age"].as<int>(), a1->GetMinAge());
+		EXPECT_EQ(yaml["max_age"].as<int>(), a1->GetMaxAge());
+
+		yaml = YAML::Load(app.Ajax_GetAgeGroup(HttpServer::Request("id=" + (std::string)a2->GetUUID())));
+
+		EXPECT_EQ(yaml["uuid"].as<std::string>(), a2->GetUUID());
+		EXPECT_EQ(yaml["name"].as<std::string>(), a2->GetName());
+		EXPECT_EQ(yaml["min_age"].as<int>(), a2->GetMinAge());
+		EXPECT_EQ(yaml["max_age"].as<int>(), a2->GetMaxAge());
+	}
+}
+
+
+
+TEST(Ajax, AgeGroup_List)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto a1 = new AgeGroup("age 1", 10, 20, nullptr, app.GetDatabase());
+		auto a2 = new AgeGroup("age 2", 30, 40, nullptr, app.GetDatabase());
+
+		app.GetDatabase().AddAgeGroup(a1);
+		app.GetTournament()->AddAgeGroup(a2);
+
+		YAML::Node yaml = YAML::Load(app.Ajax_ListAllAgeGroups());
+
+		ASSERT_EQ(yaml.size(), 8);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "U11");
+		EXPECT_EQ(yaml[0]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[0]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "U13");
+		EXPECT_EQ(yaml[1]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[1]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[2]["name"].as<std::string>(), "U15");
+		EXPECT_EQ(yaml[2]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[2]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[3]["name"].as<std::string>(), "U18");
+		EXPECT_EQ(yaml[3]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[3]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[4]["name"].as<std::string>(), "U21");
+		EXPECT_EQ(yaml[4]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[4]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[5]["name"].as<std::string>(), "Seniors");
+		EXPECT_EQ(yaml[5]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[5]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[6]["name"].as<std::string>(), "age 1");
+		EXPECT_EQ(yaml[6]["is_used"].as<bool>(), false);
+		EXPECT_EQ(yaml[6]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[7]["name"].as<std::string>(), "age 2");
+		EXPECT_EQ(yaml[7]["is_used"].as<bool>(), true);
+		EXPECT_EQ(yaml[7]["in_db"].as<bool>(), false);
+	}
+}
+
+
+
+TEST(Ajax, AgeGroups_List2)
+{
+	initialize();
+
+	Application app;
+
+	YAML::Node result = YAML::Load(app.Ajax_ListAllAgeGroups());
+
+	ASSERT_TRUE(result);
+	ASSERT_TRUE(result.IsSequence());
+	ASSERT_EQ(result.size(), 6);
+
+	EXPECT_EQ(result[0]["name"].as<std::string>(), "U11");
+	EXPECT_EQ(result[1]["name"].as<std::string>(), "U13");
+	EXPECT_EQ(result[2]["name"].as<std::string>(), "U15");
+	EXPECT_EQ(result[3]["name"].as<std::string>(), "U18");
+	EXPECT_EQ(result[4]["name"].as<std::string>(), "U21");
+	EXPECT_EQ(result[5]["name"].as<std::string>(), "Seniors");
+}
+
+
+
 TEST(Ajax, GetMats)
 {
 	initialize();
@@ -444,8 +542,6 @@ TEST(Ajax, Judoka_Add)
 		EXPECT_EQ(judoka->GetBirthyear(), 2000);
 		EXPECT_EQ(judoka->GetNumber(), "A123");
 	}
-
-	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -528,8 +624,6 @@ TEST(Ajax, Judoka_Edit)
 		EXPECT_EQ(judoka->GetBirthyear(), 2001);
 		EXPECT_EQ(judoka->GetNumber(), "A1234");
 	}
-
-	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -897,8 +991,6 @@ TEST(Ajax, EditAssociation)
 		EXPECT_EQ(nieder->GetLevel(), 2);
 		EXPECT_EQ(*nieder->GetParent(), *de);
 	}
-
-	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -908,7 +1000,6 @@ TEST(Ajax, Clubs_List)
 	initialize();
 
 	{
-		ZED::Core::RemoveFile("database.yml");
 		Application app;
 
 		auto c1 = new Club("Club 1");
@@ -930,8 +1021,6 @@ TEST(Ajax, Clubs_List)
 		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c1");
 		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "Club 2");
 	}
-
-	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -961,8 +1050,6 @@ TEST(Ajax, Clubs_List_All)
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
 		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c");
 	}
-
-	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -972,7 +1059,6 @@ TEST(Ajax, Clubs_Get)
 	initialize();
 
 	{
-		ZED::Core::RemoveFile("database.yml");
 		Application app;
 
 		auto c = new Club("Club 1");
@@ -985,8 +1071,6 @@ TEST(Ajax, Clubs_Get)
 		EXPECT_EQ(yaml["name"].as<std::string>(), c->GetName());
 		EXPECT_EQ(yaml["short_name"].as<std::string>(), c->GetShortName());
 	}
-
-	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -996,7 +1080,6 @@ TEST(Ajax, Clubs_Get_From_Tournament)
 	initialize();
 
 	{
-		ZED::Core::RemoveFile("database.yml");
 		Application app;
 
 		auto c = new Club("Club 1");
@@ -1026,7 +1109,6 @@ TEST(Ajax, Clubs_Edit)
 	initialize();
 
 	{
-		ZED::Core::RemoveFile("database.yml");
 		Application app;
 
 		auto c = new Club("Club 1");
@@ -1042,8 +1124,6 @@ TEST(Ajax, Clubs_Edit)
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "NewName");
 		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c");
 	}
-
-	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -1053,7 +1133,6 @@ TEST(Ajax, Clubs_Delete)
 	initialize();
 
 	{
-		ZED::Core::RemoveFile("database.yml");
 		Application app;
 
 		auto c = new Club("Club 1");
@@ -1065,8 +1144,6 @@ TEST(Ajax, Clubs_Delete)
 
 		ASSERT_EQ(yaml.size(), 0);
 	}
-
-	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -1076,7 +1153,6 @@ TEST(Ajax, ListAssociations)
 	initialize();
 
 	{
-		ZED::Core::RemoveFile("database.yml");
 		Application app;
 
 		auto assoc1 = new Association("Assoc 1", nullptr);
@@ -1118,8 +1194,6 @@ TEST(Ajax, ListAssociations)
 		EXPECT_EQ(yaml[0]["parent_name"].as<std::string>(), "Assoc 1");
 		EXPECT_EQ(yaml[0]["parent_uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
 	}
-
-	ZED::Core::RemoveFile("database.yml");
 }
 
 
@@ -1169,13 +1243,10 @@ TEST(Ajax, RemoveDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		ZED::Core::Pause(100);
-
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		EXPECT_TRUE(mat->StartMatch(&match));
 		EXPECT_TRUE(mat->AreFightersOnMat());
-		ZED::Core::Pause(1000);
 		mat->AddHansokuMake(f);
 
 		EXPECT_FALSE(mat->GetScoreboard(f).IsDisqualified());
@@ -1475,13 +1546,9 @@ TEST(Ajax, RemoveNoDisqualification)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		ZED::Core::Pause(100);
-
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		EXPECT_TRUE(mat->StartMatch(&match));
-		ZED::Core::Pause(1000);
-
 		EXPECT_TRUE(mat->AreFightersOnMat());
 		mat->AddHansokuMake(f);
 
@@ -1612,29 +1679,6 @@ TEST(Ajax, SetStartPosition)
 
 
 
-TEST(Ajax, ListAgeGroups)
-{
-	initialize();
-
-	ZED::Core::RemoveFile("database.yml");
-	Application app;
-
-	YAML::Node result = YAML::Load(app.Ajax_ListAllAgeGroups());
-
-	ASSERT_TRUE(result);
-	ASSERT_TRUE(result.IsSequence());
-	ASSERT_EQ(result.size(), 6);
-
-	EXPECT_EQ(result[0]["name"].as<std::string>(), "U11");
-	EXPECT_EQ(result[1]["name"].as<std::string>(), "U13");
-	EXPECT_EQ(result[2]["name"].as<std::string>(), "U15");
-	EXPECT_EQ(result[3]["name"].as<std::string>(), "U18");
-	EXPECT_EQ(result[4]["name"].as<std::string>(), "U21");
-	EXPECT_EQ(result[5]["name"].as<std::string>(), "Seniors");
-}
-
-
-
 TEST(Ajax, MoveSchedule)
 {
 	initialize();
@@ -1723,7 +1767,6 @@ TEST(Ajax, AddTournament)
 {
 	initialize();
 
-	ZED::Core::RemoveFile("database.yml");
 	Application app;
 
 	auto rules = new RuleSet("Test Rules", 100, 100, 20, 10);
@@ -1749,7 +1792,6 @@ TEST(Ajax, EditTournament)
 {
 	initialize();
 	ZED::Core::RemoveFile("tournaments/test.yml");
-	ZED::Core::RemoveFile("database.yml");
 
 	{
 		Application app;

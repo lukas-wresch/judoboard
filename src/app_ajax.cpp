@@ -1770,15 +1770,11 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/age_groups/get", [this](auto& Request) -> std::string {
-		if (!IsLoggedIn(Request))
-			return (std::string)Error(Error::Type::NotLoggedIn);
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
 
-		LockTillScopeEnd();//In case the tournament gets closed at the same time
-
-		YAML::Emitter yaml;
-		if (GetTournament())
-			GetTournament()->ListAgeGroups(yaml);
-		return yaml.c_str();
+		return Ajax_GetAgeGroup(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/age_groups/select", [this](auto& Request) -> std::string {
@@ -1788,12 +1784,12 @@ void Application::SetupHttpServer()
 
 		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		LockTillScopeEnd();//In case the tournament gets closed at the same time
+
 		auto age_group = m_Database.FindAgeGroup(age_group_id);
 
 		if (!age_group)
 			return Error(Error::Type::ItemNotFound);
-
-		LockTillScopeEnd();//In case the tournament gets closed at the same time
 
 		if (!GetTournament()->AddAgeGroup(age_group))
 			return Error(Error::Type::OperationFailed);
@@ -2941,6 +2937,31 @@ std::string Application::Ajax_ListAssociations(const HttpServer::Request& Reques
 
 
 
+std::string Application::Ajax_GetAgeGroup(const HttpServer::Request& Request) const
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	YAML::Emitter ret;
+
+	LockTillScopeEnd();
+
+	auto age_group = GetDatabase().FindAgeGroup(id);
+
+	if (!age_group)
+		age_group = GetTournament()->FindAgeGroup(id);
+
+	if (age_group)
+	{
+		ret << YAML::BeginMap;
+		age_group->ToString(ret);
+		ret << YAML::EndMap;
+	}
+
+	return ret.c_str();
+}
+
+
+
 std::string Application::Ajax_ListAllAgeGroups() const
 {
 	YAML::Emitter ret;
@@ -2961,6 +2982,23 @@ std::string Application::Ajax_ListAllAgeGroups() const
 				is_used = GetTournament()->FindAgeGroup(age_group->GetUUID());
 
 			ret << YAML::Key << "is_used" << YAML::Value << is_used;
+			ret << YAML::Key << "in_db"   << YAML::Value << true;
+
+			ret << YAML::EndMap;
+		}
+	}
+
+	//Get all age groups that are exclusive to the tournament
+	for (const auto age_group : GetTournament()->GetDatabase().GetAgeGroups())
+	{
+		if (age_group && !GetDatabase().FindAgeGroup(*age_group))
+		{
+			ret << YAML::BeginMap;
+
+			age_group->ToString(ret);
+
+			ret << YAML::Key << "is_used" << YAML::Value << true;
+			ret << YAML::Key << "in_db"   << YAML::Value << false;
 
 			ret << YAML::EndMap;
 		}
