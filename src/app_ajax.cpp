@@ -2581,7 +2581,7 @@ Error Application::Ajax_CloseMat(const HttpServer::Request& Request)
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
-	auto guard = LockTillScopeEnd();
+	//CloseMat() is thread-safe, so no need to lock
 
 	if (CloseMat(id))
 		return Error::Type::NoError;//OK

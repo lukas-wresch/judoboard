@@ -417,14 +417,25 @@ bool Application::StartLocalMat(uint32_t ID)
 
 std::vector<Match> Application::GetNextMatches(uint32_t MatID) const
 {
-	auto guard = LockTillScopeEnd();
-
-	if (!GetTournament())
+	if (!TryLock())//Can we get a lock?
 	{
 		std::vector<Match> empty;
 		return empty;
 	}
-	return GetTournament()->GetNextMatches(MatID);
+
+	//Mutex is now locked
+
+	if (!GetTournament())
+	{
+		std::vector<Match> empty;
+		Unlock();
+		return empty;
+	}
+
+	auto ret = GetTournament()->GetNextMatches(MatID);
+	Unlock();
+
+	return ret;
 }
 
 
