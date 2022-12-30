@@ -1488,7 +1488,7 @@ TEST(Mat, Tokeda)
 
 		ASSERT_EQ(m.GetOsaekomiList().size(), 1);
 		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, f);
-		EXPECT_TRUE(std::abs((int)m.GetOsaekomiList()[0].m_Time - 5000) < 20);
+		EXPECT_LE(std::abs((int)m.GetOsaekomiList()[0].m_Time - 5000), 25);
 
 		ZED::Core::Pause(5000);
 		m.Osaekomi(f);
@@ -1502,7 +1502,7 @@ TEST(Mat, Tokeda)
 
 		ASSERT_EQ(m.GetOsaekomiList().size(), 2);
 		EXPECT_EQ(m.GetOsaekomiList()[1].m_Who, f);
-		EXPECT_TRUE(std::abs((int)m.GetOsaekomiList()[1].m_Time - 5000) < 20);
+		EXPECT_LE(std::abs((int)m.GetOsaekomiList()[1].m_Time - 5000), 25);
 
 		ZED::Core::Pause(10 * 1000);
 
@@ -2274,7 +2274,7 @@ TEST(Mat, BreakTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 55; time <= 3 * 60; time += 60 + rand() % 60)
+	for (int time = 55; time <= 180; time += 95 + rand() % 30)
 	{
 		Application app;
 		Mat m(1);
@@ -2299,13 +2299,13 @@ TEST(Mat, BreakTime)
 		Match match2(j1, j3, nullptr, 1);
 		match2.SetRuleSet(rule_set);
 
-		for (int k = 0; k < time-1; k++)
+		for (int k = 0; k < time-2; k++)
 		{
 			EXPECT_FALSE(m.StartMatch(&match2));
 			ZED::Core::Pause(1000);
 		}
 
-		ZED::Core::Pause(2500);
+		ZED::Core::Pause(3800);
 
 		EXPECT_TRUE(m.StartMatch(&match2));
 	}
