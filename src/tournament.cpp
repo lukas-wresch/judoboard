@@ -982,6 +982,9 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	if (NewMatchTable->GetScheduleIndex() < 0)//No schedule index?
 		NewMatchTable->SetScheduleIndex(GetFreeScheduleIndex());//Take the first empty slot
 
+	//Inform new match table about the lottery result
+	NewMatchTable->OnLotteryPerformed();
+
 	//Find a new color for this match table
 	Color match_table_color = Color::Name::Blue;
 	for (auto table : m_MatchTables)

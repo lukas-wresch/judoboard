@@ -531,6 +531,79 @@ TEST(Tournament, Lottery)
 
 
 
+TEST(Tournament, CorrectLotInSingleElimination)
+{
+	initialize();	
+
+	for (int i = 0; i < 100; ++i)
+	{
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+		Tournament tourney("deleteMe");
+		tourney.EnableAutoSave(false);
+
+		Association* assoc = new Association(GetRandomName(), nullptr);
+		Club* c1 = new Club(GetRandomName());
+		c1->SetParent(assoc);
+		Club* c2 = new Club(GetRandomName());
+		c2->SetParent(assoc);
+
+		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
+		j1->SetClub(c1);
+		Judoka* j2 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
+		j2->SetClub(c1);
+		Judoka* j3 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
+		j3->SetClub(c1);
+
+		Judoka* j4 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
+		j4->SetClub(c2);
+		Judoka* j5 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
+		j5->SetClub(c2);
+		Judoka* j6 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
+		j6->SetClub(c2);
+
+		tourney.SetOrganizer(assoc);
+
+		EXPECT_TRUE(tourney.AddParticipant(j1));
+		EXPECT_TRUE(tourney.AddParticipant(j4));
+		EXPECT_TRUE(tourney.AddParticipant(j2));
+		EXPECT_TRUE(tourney.AddParticipant(j5));
+		EXPECT_TRUE(tourney.AddParticipant(j3));
+		EXPECT_TRUE(tourney.AddParticipant(j6));
+
+		tourney.AddMatchTable(new SingleElimination(Weight(10), Weight(200)));
+		auto table = tourney.GetMatchTables()[0];
+
+		auto lot1 = tourney.GetLotOfAssociation(*c1);
+		auto lot2 = tourney.GetLotOfAssociation(*c2);
+		
+		if (lot1 == 0)
+		{
+			EXPECT_LE(table->GetStartPosition(j1), 2);
+			EXPECT_LE(table->GetStartPosition(j2), 2);
+			EXPECT_LE(table->GetStartPosition(j3), 2);
+
+			EXPECT_GE(table->GetStartPosition(j4), 3);
+			EXPECT_GE(table->GetStartPosition(j5), 3);
+			EXPECT_GE(table->GetStartPosition(j6), 3);
+		}
+
+		else
+		{
+			EXPECT_LE(table->GetStartPosition(j4), 2);
+			EXPECT_LE(table->GetStartPosition(j5), 2);
+			EXPECT_LE(table->GetStartPosition(j6), 2);
+
+			EXPECT_GE(table->GetStartPosition(j1), 3);
+			EXPECT_GE(table->GetStartPosition(j2), 3);
+			EXPECT_GE(table->GetStartPosition(j3), 3);
+		}
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, LotteryTier)
 {
 	initialize();	
