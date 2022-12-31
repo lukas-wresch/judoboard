@@ -16,7 +16,7 @@ var lang_en = {
     close:  [ "Close",  "Schlie&szlig;en" ],
     concluded:  [ "Concluded", "Beendet" ],
     change_password:  [ "Change Password", "Passwort &auml;ndern" ],
-    club: [ "Club", "Verein"],
+    club: [ "Club", "Verein" ],
     configuration: [ "Configuration", "Konfiguration" ],
     database:  [ "Database", "Stammdaten" ],
     details:  [ "Details", "Details" ],
