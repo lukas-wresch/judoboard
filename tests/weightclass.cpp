@@ -62,6 +62,52 @@ TEST(Weightclass, CorrectOrder2_BO3)
 
 
 
+TEST(Weightclass, BO3_CorrectResult)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Judoka j1(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
+		Judoka j2(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
+
+		RoundRobin w(Weight(10), Weight(100));
+		w.SetMatID(1);
+		w.IsBestOfThree(true);
+
+		EXPECT_TRUE(w.AddParticipant(&j1));
+		EXPECT_TRUE(w.AddParticipant(&j2));
+
+		ASSERT_EQ(w.GetSchedule().size(), 3);
+
+		EXPECT_EQ(w.GetSchedule()[0]->GetFighter(Fighter::White)->GetUUID(), j2.GetUUID());
+		EXPECT_EQ(w.GetSchedule()[0]->GetFighter(Fighter::Blue)->GetUUID(),  j1.GetUUID());
+
+		EXPECT_EQ(w.GetSchedule()[1]->GetFighter(Fighter::White)->GetUUID(), j1.GetUUID());
+		EXPECT_EQ(w.GetSchedule()[1]->GetFighter(Fighter::Blue)->GetUUID(),  j2.GetUUID());
+
+		EXPECT_EQ(w.GetSchedule()[2]->GetFighter(Fighter::White)->GetUUID(), j2.GetUUID());
+		EXPECT_EQ(w.GetSchedule()[2]->GetFighter(Fighter::Blue)->GetUUID(),  j1.GetUUID());
+
+		Mat mat(1);
+
+		mat.StartMatch(w.GetSchedule()[0]);
+		mat.AddIppon(f);
+		mat.EndMatch();
+
+		mat.StartMatch(w.GetSchedule()[1]);
+		mat.AddIppon(!f);
+		mat.EndMatch();
+
+		EXPECT_TRUE(w.HasConcluded());
+		auto results = w.CalculateResults();
+
+		EXPECT_EQ(results[0].Wins, 2);
+	}
+}
+
+
+
 TEST(Weightclass, CorrectOrder3)
 {
 	initialize();

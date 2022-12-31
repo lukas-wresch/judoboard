@@ -154,6 +154,9 @@ MatchTable::Results RoundRobin::CalculateResults() const
 
 	for (auto match : GetSchedule())
 	{
+		//Don't count skipped matches (they still count as concluded)
+		if (match->GetStatus() == Status::Skipped)
+			continue;
 		if (!match->HasConcluded())
 			continue;
 
