@@ -21,9 +21,9 @@
   </select>
 </div>
 
-<button class="add" onclick="return AddAccount()" id="add">New Account</button> 
+<button class="add" style="width: 4cm;" onclick="return AddAccount()" id="add">New Account</button> 
 
-<button class="neutral" onclick="return UpdateAccount()" id="update">Update Account</button>
+<button class="neutral" style="width: 4cm;" onclick="return UpdateAccount()" id="update">Update Account</button>
 
 </form>
 
@@ -77,19 +77,22 @@ var id = URLDecode(URL, "id");
 
 if (id)
 {
-  document.getElementById("headline").innerHTML = lang.update_account;
+  document.getElementById("headline").innerHTML = translate('update_account');
+  document.getElementById("update").innerHTML   = translate('update_account');
   document.getElementById("add").style.display  = "none";
   document.getElementById("div_username").style.display = "none";
   GetAccount(id);
 }
 else
 {
-  document.getElementById("headline").innerHTML   = lang.new_account;
+  document.getElementById("headline").innerHTML = translate('new_account');
+  document.getElementById("add").innerHTML      = translate('new_account');
   document.getElementById("update").style.display = "none";
 }
 
 
-document.getElementById("label_username").innerHTML = lang.username;
-document.getElementById("label_password").innerHTML = lang.password;
+document.getElementById("label_username").innerHTML = translate('username');
+document.getElementById("label_password").innerHTML = translate('password');
+document.getElementById("label_permissions").innerHTML    = translate('access_level');
 
 </script>
