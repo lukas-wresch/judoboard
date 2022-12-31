@@ -463,9 +463,9 @@ function GetClubs(callback, query = "")
 
 
 
-function GetAssociations(callback)
+function GetAssociations(callback, query = "")
 {
-  AjaxCallback("ajax/association/list", function(response) {
+  AjaxCallback("ajax/association/list?" + query, function(response) {
     console.log(response);
     var res = YAML.parse(response);
 
@@ -478,32 +478,6 @@ function GetAssociations(callback)
     option.value = 0;
     option.text  = "(None)";
     clubs.add(option);
-
-    for (const club of res)
-    {
-      var option = document.createElement("option");
-      option.value = club.uuid;
-      option.text  = club.name;
-      clubs.add(option);
-    }
-
-    if (typeof callback !== 'undefined')
-      callback();
-  });
-}
-
-
-
-function GetAssociationsWithoutParents(callback)
-{
-  AjaxCallback("ajax/association/list?only_children=true", function(response) {
-    console.log(response);
-    var res = YAML.parse(response);
-
-    var clubs = document.getElementById("clubs");
-
-    while (clubs.length >= 1)
-      clubs.remove(clubs.length-1);
 
     for (const club of res)
     {

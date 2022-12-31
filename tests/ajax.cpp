@@ -1171,6 +1171,27 @@ TEST(Ajax, ListAssociations)
 		assoc2->SetShortName("assoc2");
 		app.GetDatabase().AddAssociation(assoc2);
 
+		auto club1 = new Club("Club 1", assoc1);
+		app.GetDatabase().AddClub(club1);
+
+		yaml = YAML::Load(app.Ajax_ListAssociations(HttpServer::Request("also_clubs=true")));
+
+		ASSERT_EQ(yaml.size(), 3);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Assoc 1");
+		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "assoc1");
+		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
+
+		EXPECT_EQ(yaml[1]["name"].as<std::string>(), "Assoc 2");
+		EXPECT_EQ(yaml[1]["short_name"].as<std::string>(), "assoc2");
+		EXPECT_EQ(yaml[1]["uuid"].as<std::string>(), (std::string)assoc2->GetUUID());
+		EXPECT_EQ(yaml[1]["parent_name"].as<std::string>(), "Assoc 1");
+		EXPECT_EQ(yaml[1]["parent_uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
+
+		EXPECT_EQ(yaml[2]["name"].as<std::string>(), "Club 1");
+		EXPECT_EQ(yaml[2]["uuid"].as<std::string>(), (std::string)club1->GetUUID());
+		EXPECT_EQ(yaml[2]["parent_name"].as<std::string>(), "Assoc 1");
+		EXPECT_EQ(yaml[2]["parent_uuid"].as<std::string>(), (std::string)assoc1->GetUUID());
+
 		yaml = YAML::Load(app.Ajax_ListAssociations(HttpServer::Request("")));
 
 		ASSERT_EQ(yaml.size(), 2);

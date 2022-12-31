@@ -78,10 +78,10 @@ function GetClub(id)
     document.getElementById("name").value      = res.name;
     document.getElementById("shortname").value = res.short_name;
 
-    GetAssociationsWithoutParents(function(response) {
+    GetAssociations(function(response) {
       if (typeof res.parent_uuid != 'undefined')
         document.getElementById("clubs").value = res.parent_uuid;
-    });
+    }, 'only_children=true');
   });
 }
 
@@ -117,7 +117,7 @@ else
   document.getElementById("update").style.display = "none";
   document.getElementById("delete").style.display = "none";
 
-  GetAssociationsWithoutParents();
+  GetAssociations(undefined, 'only_children=true');
 }
 
 </script>
