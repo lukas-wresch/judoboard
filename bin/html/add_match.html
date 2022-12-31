@@ -151,7 +151,7 @@ function Update(color)
       cell4.style.textAlign = "center";
       cell4.style.fontSize  = "16pt";
 
-      cell5.innerHTML = "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return Add('"+ color + "','" + judoka.name + "','"+judoka.uuid+"')\">" + lang.add + "</button>";
+      cell5.innerHTML = "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return Add('"+ color + "','" + judoka.name + "','"+judoka.uuid+"')\">" + translate('add') + "</button>";
       cell5.style.textAlign = "right";
     }
   });
@@ -171,10 +171,10 @@ var filter = false;
 
 
 
-document.getElementById("headline").innerHTML    = lang.new_match;
-document.getElementById("label_white").innerHTML = lang.name_white;
-document.getElementById("label_blue").innerHTML  = lang.name_blue;
-document.getElementById("add").innerHTML         = lang.add_match;
+document.getElementById("headline").innerHTML    = translate('new_match');
+document.getElementById("label_white").innerHTML = translate('name_white');
+document.getElementById("label_blue").innerHTML  = translate('name_blue');
+document.getElementById("add").innerHTML         = translate('add_match');
 
 
 </script>

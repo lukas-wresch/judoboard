@@ -1,13 +1,13 @@
-<h2>List of Accounts</h2>
+<h2 id="headline"></h2>
 
-<button class="add" style="margin-bottom: 1cm;" onclick="navigate('account_add.html')">New Account</button> 
+<button class="add" style="margin-bottom: 1cm; width: 4cm;" id="new_account" onclick="navigate('account_add.html')"></button> 
 
 <table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
     <th style="width: 4cm;" id="username">Username</th>
     <th style="width: 4cm;" id="password">Password</th>
     <th style="width: 3cm;" id="permissions">Access Level</th>
-    <th style="width: 7cm;"></th>
+    <th style="width: 9cm;"></th>
   </tr>
 </table>
 
@@ -52,14 +52,13 @@ function GetAccountList()
       cell2.innerHTML = res[i+1];
 
       if (res[i+2] == 1)
-        cell3.innerHTML = lang.user;
+        cell3.innerHTML = translate('user');
       else if (res[i+2] == 2)
-        cell3.innerHTML = lang.moderator;
+        cell3.innerHTML = translate('moderator');
       else if (res[i+2] == 3)
-        cell3.innerHTML = lang.admin;
+        cell3.innerHTML = translate('admin');
 
-      //cell4.innerHTML = "<a href=\"#account_edit.html?id="+i/3+"\">Edit Account</a>";
-      cell4.innerHTML = "<button class=\"white\" style=\"width: 3.3cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"account_add.html?id="+i/3+"\");>Edit Account</button>" + "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return DeleteAccount("+i/3+")\">" + lang.remove + "</button>";;
+      cell4.innerHTML = "<button class=\"white\" style=\"width: 5.2cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"account_add.html?id="+i/3+"\");>" + translate('edit_account') + "</button>" + "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return DeleteAccount("+i/3+")\">" + translate('remove') + "</button>";;
     }
   });
 }
@@ -98,7 +97,7 @@ function GetNonceList()
 
 function DeleteAccount(id)
 {
-  if (confirm(lang.delete_account_confirm))
+  if (confirm(translate('delete_account_confirm')))
   {
     AjaxCallback('/ajax/account/delete?id=' + id, function() {
       GetAccountList();
@@ -111,5 +110,10 @@ function DeleteAccount(id)
 GetAccountList();
 GetNonceList();
 
+document.getElementById("headline").innerHTML = translate('list_of_accounts');
+document.getElementById("new_account").innerHTML = translate('new_account');
+document.getElementById("username").innerHTML = translate('username');
+document.getElementById("password").innerHTML = translate('password');
+document.getElementById("permissions").innerHTML = translate('access_level');
 
 </script>

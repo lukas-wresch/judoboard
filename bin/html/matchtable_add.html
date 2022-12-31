@@ -400,16 +400,16 @@ function GetMatchTable(id)
       cell4.style.fontSize  = "16pt";
 
       if (match.state == 0)
-        cell5.innerHTML = lang.scheduled;
+        cell5.innerHTML = translate('scheduled');
       else if (match.state == 1)
       {
         cell5.style.color = "red";
-        cell5.innerHTML = lang.running;
+        cell5.innerHTML = translate('running');
       }
       else if (match.state == 2)
       {
         cell5.style.color = "green";
-        cell5.innerHTML = lang.concluded;
+        cell5.innerHTML = translate('concluded');
       }
       else
         cell5.innerHTML = "Unknown";
@@ -442,7 +442,7 @@ if (id)
 }
 else
 {
-  document.getElementById("headline").innerHTML = lang.add_matchtable;
+  document.getElementById("headline").innerHTML = translate('add_matchtable');
   document.getElementById("update").style.display = "none";
   document.getElementById("delete").style.display = "none";
   document.getElementById("div_name").style.display = "none";
@@ -455,12 +455,12 @@ else
   GetAgeGroups();
 }
 
-document.getElementById("add").innerHTML = lang.add_matchtable;
-document.getElementById("update").innerHTML = lang.update_matchtable;
-document.getElementById("delete").innerHTML = lang.delete_matchtable;
-document.getElementById("label_type").innerHTML = lang.type;
-document.getElementById("label_mat").innerHTML  = lang.mat;
-document.getElementById("label_rule_set").innerHTML = lang.rule_set;
-document.getElementById("label_weightclass").innerHTML = lang.weightclass;
+document.getElementById("add").innerHTML = translate('add_matchtable');
+document.getElementById("update").innerHTML = translate('update_matchtable');
+document.getElementById("delete").innerHTML = translate('delete_matchtable');
+document.getElementById("label_type").innerHTML = translate('type');
+document.getElementById("label_mat").innerHTML  = translate('mat');
+document.getElementById("label_rule_set").innerHTML = translate('rule_set');
+document.getElementById("label_weightclass").innerHTML = translate('weightclass');
 
 </script>

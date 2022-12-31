@@ -1790,15 +1790,11 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/age_groups/get", [this](auto& Request) -> std::string {
-		if (!IsLoggedIn(Request))
-			return (std::string)Error(Error::Type::NotLoggedIn);
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
 
-		auto guard = LockTillScopeEnd();//In case the tournament gets closed at the same time
-
-		YAML::Emitter yaml;
-		if (GetTournament())
-			GetTournament()->ListAgeGroups(yaml);
-		return yaml.c_str();
+		return Ajax_GetAgeGroup(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/age_groups/select", [this](auto& Request) -> std::string {
@@ -1808,12 +1804,12 @@ void Application::SetupHttpServer()
 
 		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		auto guard = LockTillScopeEnd();//In case the tournament gets closed at the same time
+
 		auto age_group = m_Database.FindAgeGroup(age_group_id);
 
 		if (!age_group)
 			return Error(Error::Type::ItemNotFound);
-
-		auto guard = LockTillScopeEnd();//In case the tournament gets closed at the same time
 
 		if (!GetTournament()->AddAgeGroup(age_group))
 			return Error(Error::Type::OperationFailed);
@@ -1860,27 +1856,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		auto tournament = FindTournament(id);
-		if (!tournament)
-			return std::string("Could not find tournament");
-
-		YAML::Emitter yaml;
-		yaml << YAML::BeginMap;
-
-		yaml << YAML::Key << "name" << YAML::Value << tournament->GetName();
-		yaml << YAML::Key << "year" << YAML::Value << tournament->GetDatabase().GetYear();
-		yaml << YAML::Key << "num_participants" << YAML::Value << tournament->GetParticipants().size();
-		yaml << YAML::Key << "schedule_size" << YAML::Value << tournament->GetSchedule().size();
-		yaml << YAML::Key << "status" << YAML::Value << (int)tournament->GetStatus();
-
-		if (tournament->GetDefaultRuleSet())
-			yaml << YAML::Key << "rule_set_uuid" << YAML::Value << (std::string)tournament->GetDefaultRuleSet()->GetUUID();
-
-		yaml << YAML::EndMap;
-		
-		return yaml.c_str();
+		return Ajax_GetTournament(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/assign_age_group", [this](auto& Request) -> std::string {
@@ -1897,7 +1873,7 @@ void Application::SetupHttpServer()
 		if (!judoka || !age_group)
 			return Error(Error::Type::ItemNotFound);
 
-		;//In case the tournament gets closed at the same time
+		auto guard = LockTillScopeEnd();//In case the tournament gets closed at the same time
 
 		if (!GetTournament()->AssignJudokaToAgeGroup(judoka, age_group))
 			return Error(Error::Type::OperationFailed);
@@ -2488,6 +2464,38 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 
 
 
+std::string Application::Ajax_GetTournament(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockTillScopeEnd();
+
+	auto tournament = FindTournament(id);
+	if (!tournament)
+		return (Error)Error::Type::TournamentNotOpen;
+
+	YAML::Emitter yaml;
+	yaml << YAML::BeginMap;
+
+	yaml << YAML::Key << "name" << YAML::Value << tournament->GetName();
+	yaml << YAML::Key << "year" << YAML::Value << tournament->GetDatabase().GetYear();
+	yaml << YAML::Key << "num_participants" << YAML::Value << tournament->GetParticipants().size();
+	yaml << YAML::Key << "schedule_size" << YAML::Value    << tournament->GetSchedule().size();
+	yaml << YAML::Key << "status" << YAML::Value << (int)tournament->GetStatus();
+
+	if (tournament->GetDefaultRuleSet())
+		yaml << YAML::Key << "rule_set_uuid" << YAML::Value << (std::string)tournament->GetDefaultRuleSet()->GetUUID();
+
+	if (tournament->GetOrganizer())
+		yaml << YAML::Key << "organizer_uuid" << YAML::Value << (std::string)tournament->GetOrganizer()->GetUUID();
+
+	yaml << YAML::EndMap;
+
+	return yaml.c_str();
+}
+
+
+
 std::string Application::Ajax_GetMats() const
 {
 	YAML::Emitter ret;
@@ -2940,6 +2948,7 @@ std::string Application::Ajax_ListClubs(const HttpServer::Request& Request)
 std::string Application::Ajax_ListAssociations(const HttpServer::Request& Request)
 {
 	bool only_children = HttpServer::DecodeURLEncoded(Request.m_Query, "only_children") == "true";
+	bool also_clubs    = HttpServer::DecodeURLEncoded(Request.m_Query, "also_clubs")    == "true";
 
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
@@ -2957,7 +2966,37 @@ std::string Application::Ajax_ListAssociations(const HttpServer::Request& Reques
 		}
 	}
 
+	if (also_clubs)
+		for (auto club : m_Database.GetAllClubs())
+			if (club)
+				club->ToString(ret);
+
 	ret << YAML::EndSeq;
+	return ret.c_str();
+}
+
+
+
+std::string Application::Ajax_GetAgeGroup(const HttpServer::Request& Request) const
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	YAML::Emitter ret;
+
+	auto guard = LockTillScopeEnd();
+
+	auto age_group = GetDatabase().FindAgeGroup(id);
+
+	if (!age_group)
+		age_group = GetTournament()->FindAgeGroup(id);
+
+	if (age_group)
+	{
+		ret << YAML::BeginMap;
+		age_group->ToString(ret);
+		ret << YAML::EndMap;
+	}
+
 	return ret.c_str();
 }
 
@@ -2983,6 +3022,23 @@ std::string Application::Ajax_ListAllAgeGroups() const
 				is_used = GetTournament()->FindAgeGroup(age_group->GetUUID());
 
 			ret << YAML::Key << "is_used" << YAML::Value << is_used;
+			ret << YAML::Key << "in_db"   << YAML::Value << true;
+
+			ret << YAML::EndMap;
+		}
+	}
+
+	//Get all age groups that are exclusive to the tournament
+	for (const auto age_group : GetTournament()->GetDatabase().GetAgeGroups())
+	{
+		if (age_group && !GetDatabase().FindAgeGroup(*age_group))
+		{
+			ret << YAML::BeginMap;
+
+			age_group->ToString(ret);
+
+			ret << YAML::Key << "is_used" << YAML::Value << true;
+			ret << YAML::Key << "in_db"   << YAML::Value << false;
 
 			ret << YAML::EndMap;
 		}

@@ -175,9 +175,9 @@
 
   <tr id="row_decision" style="display: none;">
     <td colspan="2">
-      <div id="div_decision" style="display: none; height: 0px;">
+      <div id="div_decision" style="display: none; height: 0px; text-align: center; margin-top: 2mm;">
         <button class="white"   style="width: 3.5cm;" id="white_wins" onclick="SetScore('white', 'hantei'); ShowHantei(false);">White wins</button>
-        <button class="add"     style="width: 2.5cm;" id="draw" onclick="SetScore('', '+draw'); ShowHantei(false);">Draw</button>
+        <button class="add"     style="width: 3.5cm;" id="draw" onclick="SetScore('', '+draw'); ShowHantei(false);">Draw</button>
         <button class="additional" style="width: 3.5cm;" id="blue_wins" onclick="SetScore('blue', 'hantei'); ShowHantei(false);">Blue wins</button>
         <button class="neutral" style="width: 3.5cm;" id="golden_score" onclick="SetScore('', '+golden_score'); ShowHantei(false);">Golden Score</button>
       </div>
@@ -312,7 +312,7 @@ function ToggleMore()
     $("#row_additional1").hide(1000);
     $("#row_additional2").hide(1000);
 
-    $("#more").text(lang.more);
+    $("#more").text(translate('more'));
   }
   else
   {
@@ -324,7 +324,7 @@ function ToggleMore()
     $("#additional3").show().animate({height: '120px', opacity: 100}, 1000);
     $("#additional4").show().animate({height: '120px', opacity: 100}, 1000);
 
-    $("#more").text(lang.less);
+    $("#more").text(translate('less'));
   }
 
   more = !more;
@@ -367,7 +367,7 @@ function ShowHantei(show)
   if (show)
   {
     $("#row_decision").show();
-    $("#div_decision").show().animate({height: '80px', opacity: 100}, 1000);
+    $("#div_decision").show().animate({height: '60px', opacity: 100}, 1000);
   }
   else
   {
@@ -639,10 +639,10 @@ function GetJudokaName()
         if (CurrentScore.can_next_match_start && match.current_breaktime >= match.breaktime)
           dis = '';
 
-        cell4.innerHTML = '<button ' + dis + ' class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="StartNextMatch()">' + lang.start_next_match + '</button>';
+        cell4.innerHTML = '<button ' + dis + ' class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="StartNextMatch()">' + translate('start_next_match') + '</button>';
       }
       else
-        cell4.innerHTML = '<button class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="MoveUp(\'' + match.uuid + '\')">' + lang.push_up + '</button>';
+        cell4.innerHTML = '<button class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="MoveUp(\'' + match.uuid + '\')">' + translate('push_up') + '</button>';
 
       i++;
     }
@@ -697,9 +697,9 @@ function GetOsaekomiList()
       var cell2 = row.insertCell(1);
 
       if (res[i] == 0)
-        cell1.innerHTML = lang.white; 
+        cell1.innerHTML = translate('white'); 
       else
-        cell1.innerHTML = lang.blue;
+        cell1.innerHTML = translate('blue');
       
       cell2.innerHTML = Math.floor((res[i+1]/1000)) + '.' + Math.floor((res[i+1]%1000)/100);
     }
@@ -783,31 +783,34 @@ var showHantei = false;
 var showHansokumakeDecisionWhite = false;
 var showHansokumakeDecisionBlue  = false;
 
-document.getElementById("time").innerHTML = lang.time;
-document.getElementById("mat").innerHTML  = lang.mat + ' ' + id;
+document.getElementById("time").innerHTML = translate('time');
+document.getElementById("mat").innerHTML  = translate('mat') + ' ' + id;
 
-//document.getElementById("next_fight").innerHTML = lang.start_next_match;
-document.getElementById("end_match").innerHTML  = lang.end_match;
+document.getElementById("end_match").innerHTML  = translate('end_match');
 
-document.getElementById("label_break").innerHTML = lang.break_time;
+document.getElementById("label_break").innerHTML = translate('break_time');
 
-document.getElementById("more").innerHTML = lang.more;
+document.getElementById("more").innerHTML = translate('more');
 
-document.getElementById("next_matches").innerHTML  = lang.next_matches;
+document.getElementById("next_matches").innerHTML  = translate('next_matches');
 
-document.getElementById("osaekomi_time").innerHTML = lang.time;
-document.getElementById("osaekomi_for").innerHTML  = lang.for;
+document.getElementById("osaekomi_time").innerHTML = translate('time');
+document.getElementById("osaekomi_for").innerHTML  = translate('for');
 
-document.getElementById("matchtable_label").innerHTML  = lang.matchtable;
+document.getElementById("matchtable_label").innerHTML  = translate('match_table');
 
-document.getElementById("label_hansokumake_desc_white").innerHTML = lang.white;
-document.getElementById("label_hansokumake_desc_blue" ).innerHTML = lang.blue;
+document.getElementById("label_hansokumake_desc_white").innerHTML = translate('white');
+document.getElementById("label_hansokumake_desc_blue" ).innerHTML = translate('blue');
 
 for (const el of document.getElementsByClassName("medical_examiniations"))
-    el.innerHTML = lang.medical_examiniations;
+    el.innerHTML = translate('medical_examiniations');
 for (const el of document.getElementsByClassName("add_medical_examiniations"))
-    el.innerHTML = "+" + lang.medical_examiniations;
+    el.innerHTML = "+" + translate('medical_examiniations');
 for (const el of document.getElementsByClassName("remove_medical_examiniations"))
-    el.innerHTML = "-" + lang.medical_examiniations;
+    el.innerHTML = "-" + translate('medical_examiniations');
+
+document.getElementById("white_wins").innerHTML = translate('white_wins');
+document.getElementById("blue_wins").innerHTML  = translate('blue_wins');
+document.getElementById("draw").innerHTML  = translate('draw');
 
 </script>

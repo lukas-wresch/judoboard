@@ -1,8 +1,8 @@
-<button class="add" id="new_participant" onclick="navigate('participant_add.html')">New Participant</button>
+<button class="add" style="width: 3.0cm;" id="new_participant" onclick="navigate('participant_add.html')">New Participant</button>
 
-<button class="add" id="new_match" onclick="navigate('add_match.html')">New Match</button>
-<button class="add" id="new_matchtable" onclick="navigate('matchtable_add.html')">New Match table</button>
-<button class="add" id="select_age_groups" onclick="navigate('age_groups_select.html')">Select Age Groups</button>
+<button class="add" style="width: 3.0cm;" id="new_match" onclick="navigate('add_match.html')">New Match</button>
+<button class="add" style="width: 3.3cm;" id="new_matchtable" onclick="navigate('matchtable_add.html')">New Match table</button>
+<button class="add" style="width: 3.3cm;" id="select_age_groups" onclick="navigate('age_groups_select.html')"></button>
 
 <h2 id="headline-master-schedule">Overview</h2>
 <table id="master-schedule" border="1" rules="all" style="margin-bottom: 1cm;">
@@ -207,8 +207,8 @@ function Update()
 {
   AjaxCallback("ajax/get_masterschedule", function(response) {
     console.log(response);
-
     var res = YAML.parse(response);
+    //console.log(res);
 
     var mat_to_display = document.getElementById("display_mat");
     var mat_to_display_selected = mat_to_display.value;
@@ -217,7 +217,7 @@ function Update()
 
     var option = document.createElement("option");
     option.value = 0;
-    option.text = "All Mats";
+    option.text = translate("all_mats");
     mat_to_display.add(option);
 
     var table = document.getElementById("master-schedule");
@@ -247,8 +247,8 @@ function Update()
       cell.style.fontSize  = "16pt";
       cell.style.height = "1.3cm";
     }
-    
-    if (typeof res.master_schedule.length == "undefined")
+
+    if (typeof res.master_schedule.length === 'undefined')
       return;
 
     //For each index
@@ -372,26 +372,26 @@ function Update()
       cell4.style.fontSize  = "16pt";
 
       if (match.state == 0)
-        cell5.innerHTML = lang.scheduled;
+        cell5.innerHTML = translate('scheduled');
       else if (match.state == 1)
       {
         cell5.style.color = "red";
-        cell5.innerHTML = lang.running;
+        cell5.innerHTML = translate('running');
       }
       else if (match.state == 2)
       {
         cell5.style.color = "green";
-        cell5.innerHTML = lang.concluded;
+        cell5.innerHTML = translate('concluded');
       }
       else if (match.state == 3)
       {
         cell5.style.color = "blue";
-        cell5.innerHTML = lang.optional;
+        cell5.innerHTML = translate('optional');
       }
       else if (match.state == 4)
       {
         cell5.style.color = "blue";
-        cell5.innerHTML = lang.skipped;
+        cell5.innerHTML = translate('skipped');
       }
       else
         cell5.innerHTML = "Unknown";
@@ -619,14 +619,14 @@ function Update()
       if (hansoku.disqualification_state == 0)
         cell5.innerHTML = "Hansokumake " + lang.for + " ";
       else if (hansoku.disqualification_state == 1)
-        cell5.innerHTML = lang.disqualification + " " + lang.for + " ";
+        cell5.innerHTML = translate('disqualification') + " " + translate('for') + " ";
       else if (hansoku.disqualification_state == 2)
-        cell5.innerHTML = lang.no_disqualification + " " + lang.for + " ";
+        cell5.innerHTML = translate('no_disqualification') + " " + translate('for') + " ";
 
       if (hansoku.fighter == 0)
-        cell5.innerHTML += lang.white;
+        cell5.innerHTML += translate('white');
       else
-        cell5.innerHTML += lang.blue;
+        cell5.innerHTML += translate('blue');
 
       cell5.style.fontSize  = "16pt";
 
@@ -663,43 +663,44 @@ Update();
 TimerID = window.setInterval(Update, 5000);
 
 
-document.getElementById("headline").innerHTML = lang.schedule;
+document.getElementById("headline").innerHTML = translate('schedule');
 
-document.getElementById("headline-master-schedule").innerHTML = lang.overview;
-document.getElementById("headline-participants").innerHTML = lang.participants;
+document.getElementById("headline-master-schedule").innerHTML = translate('overview');
+document.getElementById("headline-participants").innerHTML = translate('participants');
 
-document.getElementById("new_participant").innerHTML = lang.new_participant;
-document.getElementById("new_match").innerHTML = lang.new_match;
-document.getElementById("new_matchtable").innerHTML = lang.add_matchtable;
-
-//document.getElementById("white").innerHTML = lang.white;
-//document.getElementById("blue").innerHTML  = lang.blue;
-//document.getElementById("mat").innerHTML   = lang.mat;
+document.getElementById("new_participant").innerHTML = translate('new_participant');
+document.getElementById("new_match").innerHTML = translate('new_match');
+document.getElementById("new_matchtable").innerHTML = translate('add_matchtable');
 
 for (const el of document.getElementsByClassName("no"))
-    el.innerHTML = lang.no;
+    el.innerHTML = translate('no');
 for (const el of document.getElementsByClassName("white"))
-    el.innerHTML = lang.white;
+    el.innerHTML = translate('white');
 for (const el of document.getElementsByClassName("blue"))
-    el.innerHTML = lang.blue;
+    el.innerHTML = translate('blue');
 for (const el of document.getElementsByClassName("class"))
-    el.innerHTML = lang.matchtable;
+    el.innerHTML = translate('match_table');
 for (const el of document.getElementsByClassName("mat"))
-    el.innerHTML = lang.mat;
+    el.innerHTML = translate('mat');
 for (const el of document.getElementsByClassName("options"))
-    el.innerHTML = lang.options;
+    el.innerHTML = translate('options');
 for (const el of document.getElementsByClassName("weight"))
-    el.innerHTML = lang.weight;
+    el.innerHTML = translate('weight');
 for (const el of document.getElementsByClassName("num_matches"))
-    el.innerHTML = lang.num_matches;
+    el.innerHTML = '#' + translate('matches');
 for (const el of document.getElementsByClassName("club"))
-    el.innerHTML = lang.club;
+    el.innerHTML = translate('club');
 for (const el of document.getElementsByClassName("age_group"))
-    el.innerHTML = lang.age_group;
+    el.innerHTML = translate('age_group');
 
-document.getElementById("new_participant").innerHTML  = lang.new_participant;
-document.getElementById("new_match").innerHTML  = lang.new_match;
-document.getElementById("age_groups_participants").innerHTML = lang.num_participants;
-document.getElementById("headline_age_groups").innerHTML = lang.age_groups;
+document.getElementById("new_participant").innerHTML = translate('new_participant');
+document.getElementById("new_match").innerHTML = translate('new_match');
+document.getElementById("age_groups_participants").innerHTML = '#' + translate('participants');
+document.getElementById("headline_age_groups").innerHTML = translate('age_groups');
 
-document.getElementById("break").innerHTML = lang.break_time;
+document.getElementById("break").innerHTML = translate('break_time');
+document.getElementById("age_groups_match_tables").innerHTML = '#' + translate('match_tables');
+
+document.getElementById("label_mat_display").innerHTML = translate('show_matches_on');
+
+document.getElementById("select_age_groups").innerHTML = translate('select_age_groups');
