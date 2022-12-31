@@ -18,13 +18,13 @@
 </div>
 
 <div>
-  <label style="width:200px; float:left; margin-top:4px;" id="label_rules">Default Rule Set</label>
+  <label style="width:200px; float:left; margin-top:4px;" id="label_rules"></label>
   <select style="margin-bottom:20px; width: 3.5cm;" id="rule">
   </select>
 </div>
 
 <div>
-  <label style="width:200px;float:left;margin-top:5px;" id="label_parent">Organizer</label>
+  <label style="width:200px;float:left;margin-top:5px;" id="label_organizer">Organizer</label>
   <select style="margin-bottom:20px;" id="clubs">
   </select>
 </div>
@@ -147,15 +147,10 @@ function GetTournament(id)
     GetAssociations(function() {
       if (typeof res.organizer_uuid !== 'undefined')
         document.getElementById("clubs").value = res.organizer_uuid;
-    });
+    }, 'also_clubs=true');
   });
 }
 
-
-
-document.getElementById("add").innerHTML    = lang.new_tournament;
-document.getElementById("label_name").innerHTML = lang.name;
-document.getElementById("label_year").innerHTML = lang.year;
 
 document.getElementById("year").value = new Date().getFullYear();
 
@@ -163,14 +158,16 @@ var id = URLDecode(URL, "id");
 
 if (id)
 {
-  document.getElementById("headline").innerHTML = lang.update_tournament;
-  document.getElementById("update").innerHTML = lang.save;
+  document.getElementById("headline").innerHTML = translate('update_tournament');
+  document.getElementById("update").innerHTML = translate('save');
   document.getElementById("add").style.display = "none";
   GetTournament(id);
 }
 else
 {
-  document.getElementById("headline").innerHTML = lang.new_tournament;
+  document.getElementById("headline").innerHTML = translate('new_tournament');
+  document.getElementById("add").innerHTML    = translate('new_tournament');
+
   document.getElementById("update").style.display = "none";
   document.getElementById("div_status").style.display = "none";
   document.getElementById("download").style.display = "none";
@@ -179,7 +176,13 @@ else
   document.getElementById("delete").style.display = "none";
 
   GetRuleSets();
-  GetAssociations();
+  GetAssociations(undefined, 'also_clubs=true');
 }
+
+document.getElementById("label_organizer").innerHTML = translate('organizer');
+document.getElementById("label_rules").innerHTML = translate('default_rule_set');
+
+document.getElementById("label_name").innerHTML = translate('name');
+document.getElementById("label_year").innerHTML = translate('year');
 
 </script>

@@ -4,10 +4,10 @@
 
 <table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
-    <th style="width: 4cm;" id="name"></th>
-    <th style="width: 1.5cm;" id="level">Level</th>
-    <th style="width: 4cm;" id="parent">Parent</th>
-    <th style="width: 2cm;">Options</th>
+    <th style="width: 5cm;" id="name"></th>
+    <th style="width: 1.5cm;" id="level"></th>
+    <th style="width: 5cm;" id="parent"></th>
+    <th style="width: 3cm;" id="options"></th>
   </tr>
 </table>
 
@@ -48,8 +48,11 @@ function GetAssociationList()
 
 GetAssociationList();
 
-document.getElementById("headline").innerHTML = lang.list_of_all_clubs;
-document.getElementById("add").innerHTML      = lang.new_club;
-document.getElementById("name").innerHTML     = lang.name;
+document.getElementById("headline").innerHTML = translate('list_of_all_associations');
+document.getElementById("add").innerHTML      = translate('new_club');
+document.getElementById("name").innerHTML     = translate('name');
+document.getElementById("level").innerHTML    = translate('level');
+document.getElementById("parent").innerHTML   = translate('parent_association');
+document.getElementById("options").innerHTML  = translate('options');
 
 </script>

@@ -12,7 +12,7 @@
     <th style="width: 6.2cm;" id="club">Club</th>
     <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
     <th style="width: 2cm; text-align: center;" id="birthyear">Birthyear</th>
-    <th style="width: 5.1cm; text-align: center;" class="options">Options</th>
+    <th style="width: 5.1cm; text-align: center;" id="options">Options</th>
   </tr>
 </table>
 
@@ -149,8 +149,11 @@ document.getElementById("name").oninput = function(e)
 };
 
 
-document.getElementById("headline").innerHTML = lang.new_participant;
-document.getElementById("no").innerHTML   = lang.no;
-document.getElementById("club").innerHTML = lang.club;
+document.getElementById("headline").innerHTML = translate('new_participant');
+document.getElementById("no").innerHTML   = translate('no');
+document.getElementById("club").innerHTML = translate('club');
+document.getElementById("weight").innerHTML = translate('weight');
+document.getElementById("birthyear").innerHTML = translate('birthyear');
+document.getElementById("options").innerHTML = translate('options');
 
 </script>

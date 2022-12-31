@@ -80,7 +80,7 @@ function GetClub(id)
 
 function DeleteClub()
 {
-  if (confirm(lang.delete_club_confirm))
+  if (confirm(translate('delete_club_confirm')))
   {
     Ajax('ajax/club/delete?id='+id);
     navigate('association_list.html');
@@ -91,21 +91,21 @@ function DeleteClub()
 
 
 
-document.getElementById("add").innerHTML    = lang.new_club;
-document.getElementById("update").innerHTML = lang.update_club;
-document.getElementById("label_name").innerHTML = lang.name;
+document.getElementById("add").innerHTML    = translate('new_club');
+document.getElementById("update").innerHTML = translate('update_club');
+document.getElementById("label_name").innerHTML = translate('name');
 
 var id = URLDecode(URL, "id");
 
 if (id)
 {
-  document.getElementById("headline").innerHTML = lang.update_club;
+  document.getElementById("headline").innerHTML = translate('update_club');
   document.getElementById("add").style.display = "none";
   GetClub(id);
 }
 else
 {
-  document.getElementById("headline").innerHTML = lang.new_club;
+  document.getElementById("headline").innerHTML = translate('new_club');
   document.getElementById("update").style.display = "none";
   document.getElementById("delete").style.display = "none";
 }
