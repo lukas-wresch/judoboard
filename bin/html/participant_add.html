@@ -107,7 +107,7 @@ function Update()
       cell4.style.fontSize  = "16pt";
 
       if (judoka.is_participant)
-        cell5.innerHTML = "<button class=\"remove\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + lang.remove + "</button>";
+        cell5.innerHTML = "<button class=\"remove\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + translate('remove') + "</button>";
       else
       {
         if (judoka.age_groups.length > 1)
@@ -134,7 +134,7 @@ function Update()
           cell5.appendChild(select);
         }
 
-        cell5.innerHTML += "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return AddParticipant('"+judoka.uuid+"')\">" + lang.add + "</button>";
+        cell5.innerHTML += "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return AddParticipant('"+judoka.uuid+"')\">" + translate('add') + "</button>";
       }
       cell5.style.textAlign = "right";
     }

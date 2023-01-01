@@ -135,7 +135,7 @@ function ConnectToMaster()
 
 function Shutdown()
 {
-  if (confirm(lang.shutdown_confirm))
+  if (confirm(translate('shutdown_confirm')))
   {
     Ajax("ajax/config/shutdown");
   }
