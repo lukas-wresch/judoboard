@@ -354,6 +354,9 @@ namespace Judoboard
 		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual void ToString(YAML::Emitter& Yaml) const;
 
+		//Events
+		virtual void OnLotteryPerformed();//Called when a lottery draw was performed
+
 	protected:
 		MatchTable(IFilter* Filter, const ITournament* Tournament) : m_Filter(Filter), m_Tournament(Tournament) {}
 		MatchTable(const YAML::Node& Yaml, const ITournament* Tournament);

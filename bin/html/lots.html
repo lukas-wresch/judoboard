@@ -1,0 +1,121 @@
+<h1 id="headline"></h1>
+
+<button class="add" id="perform_lottery" style="margin-bottom: 1cm;" onclick="PerformLottery();">Perform Lottery</button>
+
+<div>
+  <label style="width:100px; float:left; margin-top:4px;" id="label_tier">Tier</label>
+  <select style="margin-bottom:20px; width: 5.0cm;" id="tiers" onchange="return SetTier();">
+  </select>
+</div>
+
+<table id="list" border="1" rules="all" style="margin-bottom: 1cm; font-size: 16pt;">
+  <tr>
+    <th style="width: 4cm;" id="name">Name</th>
+    <th style="width: 1cm;" id="lot">Lot</th>
+  </tr>
+</table>
+
+
+<script>
+
+function PerformLottery()
+{
+  AjaxCallback("ajax/lots/perform_lottery", function(response) {
+    GetLots();
+  });
+}
+
+
+function GetLots()
+{
+  AjaxCallback("ajax/lots/list", function(response) {
+    var res = YAML.parse(response);
+    console.log(response);
+
+    var table = document.getElementById("list");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    for (const lot of res)
+    {
+      var row = table.insertRow(-1);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+
+      cell1.innerHTML = lot.name;
+      cell1.style.fontSize  = "14pt";
+
+      cell2.innerHTML = lot.lot;
+      cell2.style.fontSize  = "16pt";
+      cell2.style.textAlign = "center";
+    }
+  });
+}
+
+
+function SetTier()
+{
+  var tier = document.getElementById("tiers").value;
+
+  AjaxCallback("ajax/lots/set_tier?tier=" + tier, function(response) {
+    var res = YAML.parse(response);
+    console.log(response);
+
+    GetLots();
+  });
+  return false;
+}
+
+
+function GetTiers()
+{
+  AjaxCallback("ajax/lots/get_tier", function(response) {
+    var res = YAML.parse(response);
+    console.log(response);
+
+    var table = document.getElementById("tiers");
+
+    while (table.length > 1)
+      table.remove(table.length-1);
+
+    var start_tier = 0;
+    if (typeof res.organizer_tier !== 'undefined')
+      start_tier = res.organizer_tier;
+
+    for (let tier = start_tier; tier <= 6; tier++)
+    {
+      var option = document.createElement("option");
+      option.value = tier + 1;
+
+      var text = tier + " - ";
+      if (tier == 0)
+        text += "International";
+      else if (tier == 1)
+        text += "Nation";
+      else if (tier == 2)
+        text += "Local";
+      else if (tier == 3)
+        text += "Group";
+      else if (tier == 4)
+        text += "Land";
+      else if (tier == 5)
+        text += "Bezirk";
+      else if (tier == 6)
+        text += "Kreis";
+
+      option.text = text;
+      table.add(option);
+    }
+  });
+}
+
+
+GetLots();
+GetTiers();
+
+document.getElementById("headline").innerHTML = translate('lots');
+document.getElementById("name").innerHTML     = translate('name');
+document.getElementById("lot").innerHTML      = translate('lot');
+
+</script>

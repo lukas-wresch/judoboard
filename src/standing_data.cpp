@@ -422,6 +422,17 @@ const Association* StandingData::FindAssociation(const UUID& UUID) const
 
 
 
+const Association* StandingData::FindAssociationByName(const std::string& Name) const
+{
+	for (auto assoc : m_Associations)
+		if (assoc && assoc->GetName() == Name)
+			return assoc;
+
+	return nullptr;
+}
+
+
+
 bool StandingData::DeleteAssociation(const UUID& UUID)
 {
 	for (auto assoc = m_Associations.begin(); assoc != m_Associations.end(); ++assoc)

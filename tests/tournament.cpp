@@ -488,6 +488,223 @@ TEST(Tournament, ParticipantHasSameIDAsInDatabase)
 
 
 
+TEST(Tournament, Lottery)
+{
+	initialize();	
+
+	for (int i = 0; i < 100; ++i)
+	{
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+		Tournament tourney("deleteMe");
+
+		Association* assoc = new Association(GetRandomName(), nullptr);
+		Club* c1 = new Club(GetRandomName());
+		c1->SetParent(assoc);
+		Club* c2 = new Club(GetRandomName());
+		c2->SetParent(assoc);
+
+		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
+		j1->SetClub(c1);
+		Judoka* j2 = new Judoka(GetRandomName(), GetRandomName());
+		j2->SetClub(c2);
+
+		tourney.SetOrganizer(assoc);
+
+		EXPECT_TRUE(tourney.AddParticipant(j1));
+		EXPECT_TRUE(tourney.AddParticipant(j2));
+
+		auto lot1 = tourney.GetLotOfAssociation(*c1);
+		auto lot2 = tourney.GetLotOfAssociation(*c2);
+		EXPECT_GE(lot1, 0);
+		EXPECT_GE(lot2, 0);
+		EXPECT_LE(lot1, 1);
+		EXPECT_LE(lot2, 1);
+		EXPECT_NE(lot1, lot2);
+
+		Tournament tourney2("deleteMe");
+		EXPECT_EQ(tourney.GetLotOfAssociation(*c1), tourney2.GetLotOfAssociation(*c1));
+		EXPECT_EQ(tourney.GetLotOfAssociation(*c2), tourney2.GetLotOfAssociation(*c2));
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Tournament, CorrectLotInSingleElimination)
+{
+	initialize();	
+
+	for (int i = 0; i < 100; ++i)
+	{
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+		Tournament tourney("deleteMe");
+		tourney.EnableAutoSave(false);
+
+		Association* assoc = new Association(GetRandomName(), nullptr);
+		Club* c1 = new Club(GetRandomName());
+		c1->SetParent(assoc);
+		Club* c2 = new Club(GetRandomName());
+		c2->SetParent(assoc);
+
+		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
+		j1->SetClub(c1);
+		Judoka* j2 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
+		j2->SetClub(c1);
+		Judoka* j3 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
+		j3->SetClub(c1);
+
+		Judoka* j4 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
+		j4->SetClub(c2);
+		Judoka* j5 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
+		j5->SetClub(c2);
+		Judoka* j6 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
+		j6->SetClub(c2);
+
+		tourney.SetOrganizer(assoc);
+
+		EXPECT_TRUE(tourney.AddParticipant(j1));
+		EXPECT_TRUE(tourney.AddParticipant(j4));
+		EXPECT_TRUE(tourney.AddParticipant(j2));
+		EXPECT_TRUE(tourney.AddParticipant(j5));
+		EXPECT_TRUE(tourney.AddParticipant(j3));
+		EXPECT_TRUE(tourney.AddParticipant(j6));
+
+		tourney.AddMatchTable(new SingleElimination(Weight(10), Weight(200)));
+		auto table = tourney.GetMatchTables()[0];
+
+		auto lot1 = tourney.GetLotOfAssociation(*c1);
+		auto lot2 = tourney.GetLotOfAssociation(*c2);
+		
+		if (lot1 == 0)
+		{
+			EXPECT_LE(table->GetStartPosition(j1), 2);
+			EXPECT_LE(table->GetStartPosition(j2), 2);
+			EXPECT_LE(table->GetStartPosition(j3), 2);
+
+			EXPECT_GE(table->GetStartPosition(j4), 3);
+			EXPECT_GE(table->GetStartPosition(j5), 3);
+			EXPECT_GE(table->GetStartPosition(j6), 3);
+		}
+
+		else
+		{
+			EXPECT_LE(table->GetStartPosition(j4), 2);
+			EXPECT_LE(table->GetStartPosition(j5), 2);
+			EXPECT_LE(table->GetStartPosition(j6), 2);
+
+			EXPECT_GE(table->GetStartPosition(j1), 3);
+			EXPECT_GE(table->GetStartPosition(j2), 3);
+			EXPECT_GE(table->GetStartPosition(j3), 3);
+		}
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Tournament, LotteryTier)
+{
+	initialize();	
+
+	for (int tier = 0; tier < 10; ++tier)
+	{
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+		Tournament tourney("deleteMe");
+
+		auto inter = new Judoboard::Association("International", nullptr);
+
+		auto de = new Judoboard::Association("Deutschland", inter);
+
+		auto dn = new Judoboard::Association("Deutschland-Nord", de);
+		auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+
+		auto nord  = new Judoboard::Association("Nord", dn);
+		auto west  = new Judoboard::Association("West", dn);
+		auto nost  = new Judoboard::Association("Nordost", dn);
+		auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
+		auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+
+		auto nieder  = new Judoboard::Association("Niedersachsen", nord);
+		auto hamburg = new Judoboard::Association("Hamburg", nord);
+		auto berlin  = new Judoboard::Association("Berlin", nost);
+		auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+		auto detmold = new Judoboard::Association("Detmold", nrw);
+
+		auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+
+		Club* c1 = new Club("club1", biegue);
+		Club* c2 = new Club("club2", biegue);
+
+		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
+		j1->SetClub(c1);
+		Judoka* j2 = new Judoka(GetRandomName(), GetRandomName());
+		j2->SetClub(c2);
+
+		tourney.SetOrganizer(de);
+		tourney.SetLotteryTier(tier);
+		EXPECT_EQ(tourney.GetLotteryTier(), tier);
+
+		EXPECT_TRUE(tourney.AddParticipant(j1));
+		EXPECT_TRUE(tourney.AddParticipant(j2));
+
+		Tournament tourney2("deleteMe");
+		EXPECT_EQ(tourney2.GetLotteryTier(), tier);
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Tournament, Lottery_Histogram)
+{
+	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	size_t c1_count = 0;
+	size_t c2_count = 0;
+
+	for (int i = 0; i < 100; ++i)
+	{
+		Tournament tourney("deleteMe");
+		tourney.EnableAutoSave(false);
+
+		Association* assoc = new Association(GetRandomName(), nullptr);
+		Club* c1 = new Club(GetRandomName());
+		c1->SetParent(assoc);
+		Club* c2 = new Club(GetRandomName());
+		c2->SetParent(assoc);
+
+		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
+		j1->SetClub(c1);
+		Judoka* j2 = new Judoka(GetRandomName(), GetRandomName());
+		j2->SetClub(c2);
+
+		tourney.SetOrganizer(assoc);
+
+		EXPECT_TRUE(tourney.AddParticipant(j1));
+		EXPECT_TRUE(tourney.AddParticipant(j2));
+
+		auto lot1 = tourney.GetLotOfAssociation(*c1);
+		auto lot2 = tourney.GetLotOfAssociation(*c2);
+
+		c1_count += lot1;
+		c2_count += lot2;
+	}
+
+	EXPECT_GE(c1_count, 40);
+	EXPECT_LE(c1_count, 60);
+	EXPECT_GE(c2_count, 40);
+	EXPECT_LE(c2_count, 60);
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, CanNotAddParticipantOfWrongAssociation)
 {
 	initialize();

@@ -329,7 +329,9 @@ namespace Judoboard
 
 		[[nodiscard]] Association*  FindAssociation(int AssociationID);
 		[[nodiscard]] Association*  FindAssociation(int AssociationID) const;
+		[[nodiscard]] Association*  FindAssociationByName(const std::string& Name) const;
 		[[nodiscard]] Club*         FindClub(int ClubID);
+		[[nodiscard]] Club*         FindClubByName(const std::string& Name) const;
 		[[nodiscard]] Participant*  FindParticipant(int ParticipantID);
 		[[nodiscard]] AgeGroup*     FindAgeGroup(int AgeGroupID);
 		[[nodiscard]] Weightclass*  FindWeightclass(int AgeGroupID, int WeightclassID);
@@ -338,6 +340,7 @@ namespace Judoboard
 		[[nodiscard]] const Result* FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const;
 		[[nodiscard]] std::vector<const Result*> FindResults(int AgeGroupID, int WeightclassID) const;
 		[[nodiscard]] int FindStartNo(int AgeGroupID, int WeightclassID, int ParticipantID) const;
+		[[nodiscard]] int FindLotOfAssociation(int AssociationID) const;
 
 		void Dump() const;
 
@@ -348,15 +351,17 @@ namespace Judoboard
 		const std::vector<Participant*>& GetParticipants()  const { return m_Participants; }
 		const std::vector<Match>&		 GetMatches()	    const { return m_Matches; }
 		const std::vector<Result>&       GetResults()	    const { return m_Results; }
+		const std::vector<Lottery>&      GetLottery()       const { return m_Lottery; }
 
 		int GetNumAssociations()  const { return m_NumAssociations; }//Returns the number of associations that should be in the file according to the header, not the actual number of associations read
 		int GetNumClubs()		  const { return m_NumClubs; }//Returns the number of clubs that should be in the file according to the header, not the actual number of clubs read
 		int GetNumParticipants()  const { return m_NumParticipants; }//Returns the number of participants that should be in the file according to the header, not the actual number of participants read
 
-		std::string GetFileDate()    const { return m_FileDate; }
-		std::string GetDateStart()   const { return m_DateStart; }
-		std::string GetDateEnd()     const { return m_DateEnd; }
-		std::string GetDescription() const { return m_Description; }
+		std::string GetFileDate()      const { return m_FileDate; }
+		std::string GetDateStart()     const { return m_DateStart; }
+		std::string GetDateEnd()       const { return m_DateEnd; }
+		std::string GetDescription()   const { return m_Description; }
+		auto        GetLotteryTierID() const { return m_LotteryTierID; }
 
 		const Association* GetOrganizer() const {
 			return FindAssociation(m_AssociationID);

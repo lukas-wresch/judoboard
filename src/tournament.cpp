@@ -1,5 +1,6 @@
 #include <fstream>
 #include <algorithm>
+#include <random>
 #include <cassert>
 #include "../ZED/include/log.h"
 #include "tournament.h"
@@ -44,6 +45,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	if (sscanf_s(File.GetDateStart().c_str(), "D%d-%d-%d", &year, &month, &day) == 3)
 		m_StandingData.SetYear(year);
 
+	m_LotteryTier = File.GetLotteryTierID() - 2;
+
 	//Add clubs
 	for (auto club : File.GetClubs())
 	{
@@ -87,7 +90,9 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		if (weightclass->FightSystemID == 16 || weightclass->FightSystemID == 13 || weightclass->FightSystemID == 14 || weightclass->FightSystemID == 15)//Round robin
 			new_table = new RoundRobin(*weightclass, this);
-		else if (weightclass->FightSystemID == 19)//Single elimination (single consulation bracket)
+		else if (weightclass->FightSystemID == 19 ||//Single elimination (single consulation bracket)
+				 weightclass->FightSystemID == 20 ||//Single elimination (single consulation bracket)
+				 weightclass->FightSystemID == 1)//Double elimination (16 system)
 			new_table = new SingleElimination(*weightclass, this);
 		else
 			continue;
@@ -128,6 +133,33 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 				if (match_table)
 					match_table->AddParticipant(new_judoka, true);//Add with force
 			}
+		}
+	}
+
+	//Convert start positions
+	for (auto judoka : File.GetParticipants())
+	{
+		if (!judoka->pUserData || !judoka->Weightclass)
+			continue;
+
+		Judoka* native_judoka = (Judoka*)judoka->pUserData;
+		auto match_table = (MatchTable*)judoka->Weightclass->pUserData;
+
+		int pos = File.FindStartNo(judoka->Weightclass->AgeGroupID, judoka->Weightclass->ID, judoka->ID);
+		if (pos > 0)
+			match_table->SetStartPosition(native_judoka, pos - 1);
+	}
+
+	//Convert lots
+	for (auto lot : File.GetLottery())
+	{
+		auto assoc = File.FindAssociation(lot.AssociationID);
+		
+		if (assoc)
+		{
+			auto native_assoc = m_StandingData.FindAssociationByName(assoc->Description);
+			if (native_assoc)
+				m_AssociationToLotNumber.emplace_back(*native_assoc, lot.StartNo);
 		}
 	}
 
@@ -255,6 +287,15 @@ bool Tournament::LoadYAML(const std::string& Filename)
 			ZED::Log::Error("Could not resolve organizer in tournament data");
 	}
 
+	if (yaml["lottery_tier"] && yaml["lottery_tier"].IsScalar())
+		m_LotteryTier = yaml["lottery_tier"].as<uint32_t>();
+
+	if (yaml["lots"] && yaml["lots"].IsMap())
+	{
+		for (const auto& node : yaml["lots"])
+			m_AssociationToLotNumber.emplace_back(node.first.as<std::string>(), node.second.as<size_t>());
+	}
+
 	if (yaml["judoka_to_age_group"] && yaml["judoka_to_age_group"].IsMap())
 	{
 		for (const auto& node : yaml["judoka_to_age_group"])
@@ -372,6 +413,17 @@ bool Tournament::SaveYAML(const std::string& Filename)
 
 	if (m_Organizer)
 		yaml << YAML::Key << "organizer" << YAML::Value << (std::string)m_Organizer->GetUUID();
+	if (m_LotteryTier > 0)
+		yaml << YAML::Key << "lottery_tier" << YAML::Value << m_LotteryTier;
+
+	yaml << YAML::Key << "lots";
+	yaml << YAML::Value;
+	yaml << YAML::BeginMap;
+
+	for (auto [assoc, lot] : m_AssociationToLotNumber)
+		yaml << YAML::Key << (std::string)assoc << YAML::Value << lot;
+
+	yaml << YAML::EndMap;
 
 	yaml << YAML::Key << "judoka_to_age_group";
 	yaml << YAML::Value;
@@ -823,7 +875,9 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 	}
 
 	m_StandingData.AddJudoka(Judoka);
-	m_StandingData.AddClub(const_cast<Club*>(Judoka->GetClub()));
+	bool club_added = false;
+	if (m_StandingData.AddClub(const_cast<Club*>(Judoka->GetClub())))
+		club_added = true;
 
 	FindAgeGroupForJudoka(*Judoka);
 
@@ -836,6 +890,9 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 			added = true;
 		}
 	}
+
+	if (club_added)//New club got added
+		PerformLottery();//Redo lottery
 
 	if (added)
 		GenerateSchedule();
@@ -993,6 +1050,9 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 	if (NewMatchTable->GetScheduleIndex() < 0)//No schedule index?
 		NewMatchTable->SetScheduleIndex(GetFreeScheduleIndex());//Take the first empty slot
+
+	//Inform new match table about the lottery result
+	NewMatchTable->OnLotteryPerformed();
 
 	//Find a new color for this match table
 	Color match_table_color = Color::Name::Blue;
@@ -1575,6 +1635,77 @@ void Tournament::RevokeDisqualification(const Judoka& Judoka)
 
 	Unlock();
 	Save();
+}
+
+
+
+bool Tournament::PerformLottery()
+{
+	if (GetStatus() != Status::Scheduled)
+		return false;
+
+	Lock();
+
+	std::unordered_set<UUID> clubsforlottery;
+	auto organizer_level = 5;//Default organizer level
+	if (m_Organizer)
+		organizer_level = m_Organizer->GetLevel();
+
+	auto lottery_level = organizer_level + 1;//Default
+	if (m_LotteryTier > 0 && m_LotteryTier > organizer_level)//Is valid?
+		lottery_level = m_LotteryTier;
+
+	for (auto [id, judoka] : GetDatabase().GetAllJudokas())
+	{
+		const Association* club = judoka->GetClub();
+
+		//Move up the tree till we are on the right level
+		while (club && club->GetLevel() > lottery_level)
+			club = club->GetParent();
+
+		if (club && club->GetLevel() == lottery_level)
+			clubsforlottery.insert(*club);
+	}
+
+	m_AssociationToLotNumber.clear();
+	auto max_lot = clubsforlottery.size();
+	std::random_device rd;
+
+	for (size_t lot = 0; lot < max_lot; ++lot)
+	{
+		auto index = rd() % clubsforlottery.size();
+
+		auto it = clubsforlottery.cbegin();
+		for (size_t i = 0; i < index; ++i)
+			++it;
+
+		auto assoc = *it;
+		m_AssociationToLotNumber.emplace_back(assoc, lot);
+		clubsforlottery.erase(it);
+	}
+
+	std::sort(m_AssociationToLotNumber.begin(), m_AssociationToLotNumber.end(),
+		[](const auto& a, const auto& b) { return a.second < b.second; });
+
+	Unlock();
+
+	for (auto table : m_MatchTables)
+		table->OnLotteryPerformed();
+
+	GenerateSchedule();
+
+	return true;
+}
+
+
+
+size_t Tournament::GetLotOfAssociation(const UUID& UUID) const
+{
+	for (auto [assoc, lot] : m_AssociationToLotNumber)
+		if (assoc == UUID)
+			return lot;
+
+	return SIZE_MAX;
 }
 
 

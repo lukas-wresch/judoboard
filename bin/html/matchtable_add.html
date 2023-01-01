@@ -74,6 +74,7 @@
     <tr>
       <th style="width: 0.5cm;" id="no">No.</th>
       <th style="width: 4cm;" id="name">Name</th>
+      <th style="width: 4cm;" id="club"></th>
       <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
       <th style="width: 2cm; text-align: center;" id="matches">#Matches</th>
       <th style="width: 3.5cm; text-align: center;">Options</th>
@@ -108,12 +109,12 @@ function GetFilterForm(callback)
   AjaxCallback('ajax/filter/get_form?type=' + document.getElementById("type").value, function(response) {
     document.getElementById("form_filter").innerHTML = response;
     
-    document.getElementById("label_min_weight").innerHTML = lang.min_weight;
-    document.getElementById("label_max_weight").innerHTML = lang.max_weight;
-    document.getElementById("label_gender").innerHTML     = lang.gender;
-    document.getElementById("all").innerHTML    = lang.all;
-    document.getElementById("male").innerHTML   = lang.male;
-    document.getElementById("female").innerHTML = lang.female;
+    document.getElementById("label_min_weight").innerHTML = translate('min_weight');
+    document.getElementById("label_max_weight").innerHTML = translate('max_weight');
+    document.getElementById("label_gender").innerHTML     = translate('gender');
+    document.getElementById("all").innerHTML    = translate('all');
+    document.getElementById("male").innerHTML   = translate('male');
+    document.getElementById("female").innerHTML = translate('female');
     
     if (g_yaml && typeof g_yaml.min_weight !== 'undefined')
       document.getElementById("minWeight").value = g_yaml.min_weight;
@@ -242,7 +243,7 @@ function UpdateMatchtable()
 
 function DeleteMatchtable()
 {
-  if (confirm(lang.delete_matchtable_confirm))
+  if (confirm(translate('delete_matchtable_confirm')))
   {
     AjaxCallback('ajax/matchtable/delete?id=' + id, function() {
       navigate("matchtable_list.html");
@@ -313,6 +314,7 @@ function GetMatchTable(id)
          var cell2 = row.insertCell(2);
          var cell3 = row.insertCell(3);
          var cell4 = row.insertCell(4);
+         var cell5 = row.insertCell(5);
 
          no++;
          if (no%2 == 0)
@@ -325,24 +327,27 @@ function GetMatchTable(id)
          cell0.style.textAlign = "center";
          cell0.style.fontSize  = "14pt";
 
-         cell1.innerHTML = "<a href=\"#judoka_edit.html?id=" + judoka.uuid + "\">" + judoka.firstname + " " + judoka.lastname + "</a>";
-         cell2.innerHTML = judoka.weight + " kg";
-         cell2.style.textAlign = "center";
-         cell2.style.fontSize  = "16pt";
+         cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.firstname + " " + judoka.lastname + "</a>";
+         cell2.innerHTML = "<a href=\"#club_add.html?id=" + judoka.club_uuid + "\">" + judoka.club_name + "</a>";
 
+         cell3.innerHTML = judoka.weight + " kg";
          cell3.style.textAlign = "center";
          cell3.style.fontSize  = "16pt";
 
+         cell4.style.textAlign = "center";
+         cell4.style.fontSize  = "16pt";
+
          var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
 
-         var options = "<table><tr><td rowspan=\"2\"><button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+judoka.uuid+")\">" + lang.remove + "</button></td>";
+         var options = "<table><tr><td rowspan=\"2\"><button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+judoka.uuid+")\">" + translate('remove') + "</button></td>";
          if (typeof judoka.start_pos !== 'undefined')
            options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+"','"+(judoka.start_pos-1)+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return SetStartPos('"+judoka.uuid+"','"+(judoka.start_pos+1)+"');\"></a></td></tr></table>";
          else
            options += "<td></td></tr><tr><td></td></tr></table>";
 
-         cell4.innerHTML = options;
-         cell4.style.textAlign = "center";
+         cell5.innerHTML = options;
+
+         cell5.style.textAlign = "center";
        }
      }
   });
@@ -419,7 +424,7 @@ function GetMatchTable(id)
       var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
 
 
-      var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 2.2cm; margin-right: 0mm;\" onclick=navigate(\"edit_match.html?id="+match.uuid+"\");>" + lang.details + "</button></td>";
+      var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 2.2cm; margin-right: 0mm;\" onclick=navigate(\"edit_match.html?id="+match.uuid+"\");>" + translate('details') + "</button></td>";
 
       options += "<td></td></tr><tr><td></td></tr></table>";
 
@@ -437,7 +442,7 @@ if (id)
 {
   GetMatchTable(id);
  
-  document.getElementById("headline").innerHTML = lang.update_matchtable; 
+  document.getElementById("headline").innerHTML = translate('update_matchtable');
   document.getElementById("add").style.display = "none";
 }
 else
@@ -462,5 +467,10 @@ document.getElementById("label_type").innerHTML = translate('type');
 document.getElementById("label_mat").innerHTML  = translate('mat');
 document.getElementById("label_rule_set").innerHTML = translate('rule_set');
 document.getElementById("label_weightclass").innerHTML = translate('weightclass');
+
+document.getElementById("no").innerHTML   = translate('no');
+document.getElementById("name").innerHTML = translate('name');
+document.getElementById("club").innerHTML = translate('club');
+document.getElementById("weight").innerHTML = translate('weight');
 
 </script>

@@ -41,7 +41,7 @@ void Application::SetupHttpServer()
 	m_Server.RegisterResource("/winner.png", [](auto& Request) { return HttpServer::LoadFile("assets/winner.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
 
 
-	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit",
+	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit", "lots",
 		"club_list", "club_add", "association_list", "association_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
 		"matchtable_list", "matchtable_add", "matchtable_creator", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add",
 		"server_config"
@@ -1241,6 +1241,42 @@ void Application::SetupHttpServer()
 			return error;
 
 		return Ajax_ListAssociations(Request);
+	});
+
+
+	m_Server.RegisterResource("/ajax/lots/perform_lottery", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_PerformLottery();
+	});
+
+
+	m_Server.RegisterResource("/ajax/lots/get_tier", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_GetLotteryTier();
+	});
+
+
+	m_Server.RegisterResource("/ajax/lots/set_tier", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_SetLotteryTier(Request);
+	});
+
+
+	m_Server.RegisterResource("/ajax/lots/list", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_ListLots();
 	});
 
 
@@ -3353,6 +3389,100 @@ Error Application::Ajax_SetStartPosition(const HttpServer::Request& Request)
 	GetTournament()->GenerateSchedule();
 
 	return Error::Type::NoError;//OK
+}
+
+
+
+Error Application::Ajax_PerformLottery()
+{
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	if (!GetTournament()->PerformLottery())
+		return Error::Type::OperationFailed;
+
+	return Error::Type::NoError;//OK
+}
+
+
+
+std::string Application::Ajax_GetLotteryTier()
+{
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	YAML::Emitter ret;
+
+	ret << YAML::BeginMap;
+	if (GetTournament()->GetOrganizer())
+	{
+		ret << YAML::Key << "organizer"      << YAML::Value << (std::string)GetTournament()->GetOrganizer()->GetUUID();
+		ret << YAML::Key << "organizer_name" << YAML::Value << (std::string)GetTournament()->GetOrganizer()->GetName();
+		ret << YAML::Key << "organizer_tier" << YAML::Value << GetTournament()->GetOrganizer()->GetLevel();
+	}
+	ret << YAML::Key << "tier" << YAML::Value << GetTournament()->GetLotteryTier();
+	ret << YAML::EndMap;
+
+	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_SetLotteryTier(const HttpServer::Request& Request)
+{
+	int tier = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "tier"));
+
+	if (tier < 0)
+		return Error::Type::InvalidInput;
+
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	GetTournament()->SetLotteryTier(tier);
+
+	return Error::Type::NoError;
+}
+
+
+
+std::string Application::Ajax_ListLots()
+{
+	LockTillScopeEnd();
+
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	auto lots = GetTournament()->GetLots();
+
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
+	for (auto [assoc_id, lot] : lots)
+	{
+		//ret << YAML::Key << lot << YAML::Value;
+		ret << YAML::BeginMap;
+		//ret << YAML::Key << (std::string)assoc_id << YAML::Value;
+		ret << YAML::Key << "uuid" << YAML::Value << (std::string)assoc_id;
+		ret << YAML::Key << "lot" << YAML::Value << lot;
+
+		auto assoc = GetTournament()->FindAssociation(assoc_id);
+		if (!assoc)
+			assoc = GetTournament()->FindClub(assoc_id);
+
+		if (assoc)
+			ret << YAML::Key << "name" << YAML::Value << assoc->GetName();
+
+		ret << YAML::EndMap;
+	}
+
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 

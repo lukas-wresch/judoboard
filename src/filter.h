@@ -39,6 +39,7 @@ namespace Judoboard
 		virtual std::unordered_map<size_t, const DependentJudoka> GetParticipants() const { return m_Participants; }
 
 		virtual size_t GetStartPosition(const Judoka* Judoka) const;
+		virtual void   SetStartPosition(const DependentJudoka Judoka, size_t NewStartPosition);
 		virtual void   SetStartPosition(const Judoka* Judoka, size_t NewStartPosition);
 		virtual void   SetStartPosition(const DependentJudoka Judoka, size_t NewStartPosition);
 
@@ -70,6 +71,8 @@ namespace Judoboard
 		void SetParticipants(std::unordered_map<size_t, const DependentJudoka>&& NewParticipants) const {
 			m_Participants = std::move(NewParticipants);
 		}
+    
+		const ITournament* GetTournament() const { return m_Tournament; }
 
 
 	private:

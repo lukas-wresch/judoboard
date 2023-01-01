@@ -47,7 +47,7 @@ namespace Judoboard
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 		bool IsAutoSave() const { return m_AutoSave; }
 
-		const Association* GetOrganizer() const { return m_Organizer; }
+		virtual const Association* GetOrganizer() const override { return m_Organizer; }
 		void SetOrganizer(Association* NewOrganizer) {
 			if (!NewOrganizer)
 				return;
@@ -96,9 +96,12 @@ namespace Judoboard
 		MatchTable* FindMatchTableByDescription(const std::string& Description);
 
 		//Clubs
+		virtual Club* FindClub(const UUID& UUID) override { return m_StandingData.FindClub(UUID); }
+		virtual Club* FindClubByName(const std::string& Name) override { return m_StandingData.FindClubByName(Name); }
 		virtual bool RemoveClub(const UUID& UUID) override { return m_StandingData.DeleteClub(UUID); }
 
 		//Associations
+		virtual Association* FindAssociation(const UUID& UUID) override { return m_StandingData.FindAssociation(UUID); }
 		virtual bool RemoveAssociation(const UUID& UUID) override { return m_StandingData.DeleteAssociation(UUID); }
 
 		//Rule Sets
@@ -142,6 +145,19 @@ namespace Judoboard
 		bool IsDisqualified(const Judoka& Judoka) const;
 		void Disqualify(const Judoka& Judoka) override;
 		void RevokeDisqualification(const Judoka& Judoka) override;
+
+		//Lottery
+		virtual bool PerformLottery() override;
+		virtual uint32_t GetLotteryTier() const override { return m_LotteryTier; }
+		virtual void SetLotteryTier(uint32_t NewLotteryTier) override {
+			if (GetStatus() == Status::Scheduled)
+			{
+				m_LotteryTier = NewLotteryTier;
+				PerformLottery();
+			}
+		}
+		size_t GetLotOfAssociation(const UUID& UUID) const;
+		virtual std::vector<std::pair<UUID, size_t>> GetLots() const override { return m_AssociationToLotNumber; }
 
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const override {}
@@ -187,6 +203,7 @@ namespace Judoboard
 		bool m_AutoSave = true;
 
 		const Association* m_Organizer = nullptr;//Tournament is organized by this association, only childen of this association can participate
+		uint32_t m_LotteryTier = 0;//Tier for performing lottery (usually organizer tier + 1)
 
 		std::vector<MatchTable*> m_MatchTables;
 		//std::vector<Match*> m_Schedule;
@@ -197,5 +214,6 @@ namespace Judoboard
 		std::unordered_set<UUID> m_DisqualifiedJudoka;
 
 		std::unordered_map<UUID, UUID> m_JudokaToAgeGroup;//Maps judoka to the age group he/she is starting in
+		std::vector<std::pair<UUID, size_t>> m_AssociationToLotNumber;//Maps associations to the lot number
 	};
 }
