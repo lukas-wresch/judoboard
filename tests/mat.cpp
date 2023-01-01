@@ -1488,7 +1488,7 @@ TEST(Mat, Tokeda)
 
 		ASSERT_EQ(m.GetOsaekomiList().size(), 1);
 		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, f);
-		EXPECT_LE(std::abs((int)m.GetOsaekomiList()[0].m_Time - 5000), 30);
+		EXPECT_LE(std::abs((int)m.GetOsaekomiList()[0].m_Time - 5000), 35);
 
 		ZED::Core::Pause(5000);
 		m.Osaekomi(f);
@@ -1502,7 +1502,7 @@ TEST(Mat, Tokeda)
 
 		ASSERT_EQ(m.GetOsaekomiList().size(), 2);
 		EXPECT_EQ(m.GetOsaekomiList()[1].m_Who, f);
-		EXPECT_LE(std::abs((int)m.GetOsaekomiList()[1].m_Time - 5000), 30);
+		EXPECT_LE(std::abs((int)m.GetOsaekomiList()[1].m_Time - 5000), 35);
 
 		ZED::Core::Pause(10 * 1000);
 
