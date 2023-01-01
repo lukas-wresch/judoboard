@@ -72,7 +72,7 @@ bool Mat::Open()
 		if (!m_Logo)
 			m_Logo = m_Window.GetRenderer().CreateTexture("assets/logo.png");
 		if (!m_Winner)
-			m_Winner = m_Window.GetRenderer().CreateTexture("assets/winner2.png");
+			m_Winner = m_Window.GetRenderer().CreateTexture("assets/winner.png");
 
 		m_Graphics["winner_blue" ].SetTexture(m_Winner);
 		m_Graphics["winner_white"].SetTexture(m_Winner);
