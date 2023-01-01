@@ -361,5 +361,8 @@
     <None Include="..\..\bin\html\association_list.html">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\bin\html\lots.html">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

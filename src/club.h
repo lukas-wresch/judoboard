@@ -16,7 +16,7 @@ namespace Judoboard
 				SetParent(new Association(*Club.Association));
 		}
 
-		virtual int GetLevel() const override { return -1; }
+		//virtual int GetLevel() const override { return -1; }
 
 	private:
 	};

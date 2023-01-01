@@ -36,6 +36,7 @@ namespace Judoboard
 		auto& GetParticipants() const { return m_Participants; }
 
 		virtual size_t GetStartPosition(const Judoka* Judoka) const;
+		virtual void   SetStartPosition(const DependentJudoka Judoka, size_t NewStartPosition);
 		virtual void   SetStartPosition(const Judoka* Judoka, size_t NewStartPosition);
 
 		const DependentJudoka GetJudokaByStartPosition(size_t StartPosition) const {
@@ -60,12 +61,6 @@ namespace Judoboard
 
 		size_t GetStartPosition(const DependentJudoka Judoka) const;
 		bool RemoveParticipant(const DependentJudoka Participant);
-
-		void SortParticipantsByStartPosition() {
-			//std::sort(m_Participants.begin(), m_Participants.end(), [this](const size_t a, const size_t b) {
-				//return a < b;
-			//});
-		}
 
 		const ITournament* GetTournament() const { return m_Tournament; }
 

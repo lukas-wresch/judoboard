@@ -30,6 +30,8 @@ namespace Judoboard
 		[[nodiscard]]
 		virtual const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
 
+		virtual const Association* GetOrganizer() const { return nullptr; }
+
 		virtual bool AddMatch(Match* NewMatch) { return false; }
 		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
 		virtual Match* GetNextMatch(int32_t MatID = -1) const { return nullptr; }//Returns the next match for a given mat if available, otherwise null pointer is returned
@@ -74,9 +76,12 @@ namespace Judoboard
 		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
 
 		//Clubs
+		virtual Club* FindClub(const UUID& UUID) { return nullptr; }
+		virtual Club* FindClubByName(const std::string& Name) { return nullptr; }
 		virtual bool RemoveClub(const UUID& UUID) { return false; }
 
 		//Associations
+		virtual Association* FindAssociation(const UUID& UUID) { return nullptr; }
 		virtual bool RemoveAssociation(const UUID& UUID) { return false; }
 
 		//Rule Sets
@@ -119,6 +124,12 @@ namespace Judoboard
 		//Disqualifications
 		virtual void Disqualify(const Judoka& Judoka) {}
 		virtual void RevokeDisqualification(const Judoka& Judoka) {}
+
+		//Lots
+		virtual bool PerformLottery() { return false; }
+		virtual uint32_t GetLotteryTier() const { return 0; }
+		virtual void SetLotteryTier(uint32_t NewLotteryTier) {}
+		virtual std::vector<std::pair<UUID, size_t>> GetLots() const { std::vector<std::pair<UUID, size_t>> ret; return ret; }
 
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const = 0;

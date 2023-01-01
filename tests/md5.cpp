@@ -1290,6 +1290,19 @@ TEST(MD5, ConvertToMD5)
 
 		MD5 file(tour_temp);//Convert back to MD5
 
+		//ASSERT_EQ(file.GetLottery().size(), file1.GetLottery().size());
+		for (int i = 0; i < file.GetLottery().size(); ++i)
+		{
+			auto assoc = file.FindAssociation(file.GetLottery()[i].AssociationID);
+			ASSERT_TRUE(assoc);
+
+			auto assoc1 = file1.FindAssociationByName(assoc->Description);
+			ASSERT_TRUE(assoc1);
+			auto file1_lot = file1.FindLotOfAssociation(assoc1->ID);
+
+			EXPECT_EQ(file.GetLottery()[i].StartNo, file1_lot);
+		}
+
 		ASSERT_TRUE(file.GetOrganizer());
 		ASSERT_TRUE(file1.GetOrganizer());
 		EXPECT_EQ(file.GetOrganizer()->Description, file1.GetOrganizer()->Description);
@@ -1587,6 +1600,30 @@ TEST(MD5, ConvertToMD5AndBack)
 		MD5 md5_tournament(tour_temp);//Convert back to MD5
 
 		Tournament tour(md5_tournament, &db);//Convert back to native
+
+		for (auto [assoc_id, lot] : tour.GetLots())
+		{
+			auto assoc_native = tour.GetDatabase().FindAssociation(assoc_id);
+
+			if (assoc_native)
+			{
+				auto assoc = file.FindAssociationByName(assoc_native->GetName());
+				ASSERT_TRUE(assoc);
+
+				EXPECT_EQ(lot, file.FindLotOfAssociation(assoc->ID));
+			}
+
+			else
+			{
+				auto club_native = tour.GetDatabase().FindClub(assoc_id);
+				ASSERT_TRUE(club_native);
+
+				auto club = file.FindClubByName(club_native->GetName());
+				ASSERT_TRUE(club);
+
+				EXPECT_EQ(lot, file.FindLotOfAssociation(club->ID));
+			}
+		}
 
 		auto table = tour.FindMatchTableByDescription("Jugend u10 w -20,7 kg");
 		ASSERT_TRUE(table);
@@ -2028,6 +2065,117 @@ TEST(MD5, ConvertToMD5AndBack)
 
 
 
+TEST(MD5, CalculateStartPosBasedOnLots)
+{
+	initialize();
+
+	MD5 file("test-data/lot-to-startpos.md5");
+
+	ASSERT_TRUE(file);
+
+	Tournament tour(file);
+
+	file.Dump();
+
+	auto table = tour.GetMatchTables()[0];
+
+	auto j1 = table->GetJudokaByStartPosition(0);
+	auto j2 = table->GetJudokaByStartPosition(1);
+	auto j3 = table->GetJudokaByStartPosition(2);
+	auto j4 = table->GetJudokaByStartPosition(3);
+	auto j5 = table->GetJudokaByStartPosition(4);
+	auto j6 = table->GetJudokaByStartPosition(5);
+	auto j7 = table->GetJudokaByStartPosition(6);
+	auto j8 = table->GetJudokaByStartPosition(7);
+
+	ASSERT_TRUE(j1);
+	ASSERT_TRUE(j2);
+	ASSERT_TRUE(j3);
+	ASSERT_TRUE(j4);
+	ASSERT_TRUE(j5);
+	ASSERT_TRUE(j6);
+	ASSERT_TRUE(j7);
+	ASSERT_TRUE(j8);
+
+	EXPECT_EQ(j1->GetFirstname(), "v5");
+	EXPECT_EQ(j2->GetFirstname(), "v6");
+	EXPECT_EQ(j3->GetFirstname(), "v7");
+	EXPECT_EQ(j4->GetFirstname(), "v8");
+	EXPECT_EQ(j5->GetFirstname(), "v1");
+	EXPECT_EQ(j6->GetFirstname(), "v2");
+	EXPECT_EQ(j7->GetFirstname(), "v3");
+	EXPECT_EQ(j8->GetFirstname(), "v4");
+
+	auto c1 = tour.FindClubByName("club1");
+	auto c2 = tour.FindClubByName("club2");
+	ASSERT_TRUE(c1);
+	ASSERT_TRUE(c2);
+
+
+	table->SetStartPosition(j4, 4);
+	table->SetStartPosition(j3, 5);
+	table->SetStartPosition(j2, 6);
+	table->SetStartPosition(j1, 7);
+
+	tour.PerformLottery();
+
+	while (tour.GetLotOfAssociation(*c1) != 1)
+		tour.PerformLottery();
+
+	tour.GenerateSchedule();
+
+	table = tour.GetMatchTables()[0];
+
+	j1 = table->GetJudokaByStartPosition(0);
+	j2 = table->GetJudokaByStartPosition(1);
+	j3 = table->GetJudokaByStartPosition(2);
+	j4 = table->GetJudokaByStartPosition(3);
+	j5 = table->GetJudokaByStartPosition(4);
+	j6 = table->GetJudokaByStartPosition(5);
+	j7 = table->GetJudokaByStartPosition(6);
+	j8 = table->GetJudokaByStartPosition(7);
+
+	EXPECT_EQ(j1->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j2->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j3->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j4->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j5->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j6->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j7->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j8->GetClub()->GetName(), "club1");
+
+
+
+	tour.PerformLottery();
+
+	while (tour.GetLotOfAssociation(*c1) != 0)
+		tour.PerformLottery();
+
+	tour.GenerateSchedule();
+
+	table = tour.GetMatchTables()[0];
+
+	j1 = table->GetJudokaByStartPosition(0);
+	j2 = table->GetJudokaByStartPosition(1);
+	j3 = table->GetJudokaByStartPosition(2);
+	j4 = table->GetJudokaByStartPosition(3);
+	j5 = table->GetJudokaByStartPosition(4);
+	j6 = table->GetJudokaByStartPosition(5);
+	j7 = table->GetJudokaByStartPosition(6);
+	j8 = table->GetJudokaByStartPosition(7);
+
+	EXPECT_EQ(j1->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j2->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j3->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j4->GetClub()->GetName(), "club1");
+	EXPECT_EQ(j5->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j6->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j7->GetClub()->GetName(), "club2");
+	EXPECT_EQ(j8->GetClub()->GetName(), "club2");
+}
+
+
+
 TEST(MD5, ReadStructureData1)
 {
 	initialize();
@@ -2192,6 +2340,8 @@ TEST(MD5, ExportCompletedTournament)
 
 	EXPECT_TRUE(tour.ApplyWeightclasses(descriptors));
 
+	tour.PerformLottery();
+
 	Mat mat(1);
 
 	while (auto match = tour.GetNextMatch(-1))
@@ -2210,6 +2360,34 @@ TEST(MD5, ExportCompletedTournament)
 	MD5 file(tour);
 
 	ASSERT_TRUE(file);
+
+	ASSERT_EQ(file.GetLottery().size(), 3);
+
+	for (int i = 0; i < file.GetLottery().size(); ++i)
+	{
+		auto assoc = file.FindAssociation(file.GetLottery()[i].AssociationID);
+
+		if (assoc)
+		{
+			auto assoc_native = tour.GetDatabase().FindAssociationByName(assoc->Description);
+			ASSERT_TRUE(assoc_native);
+
+			auto native_lot = tour.GetLotOfAssociation(*assoc_native);
+			EXPECT_EQ(native_lot, file.GetLottery()[i].StartNo);
+		}
+
+		else
+		{
+			auto club = file.FindClub(file.GetLottery()[i].AssociationID);
+
+			ASSERT_TRUE(club);
+			auto club_native = tour.GetDatabase().FindClubByName(club->Name);
+			ASSERT_TRUE(club_native);
+
+			auto native_lot = tour.GetLotOfAssociation(*club_native);
+			EXPECT_EQ(native_lot, file.GetLottery()[i].StartNo);
+		}
+	}
 
 	file.Dump();
 

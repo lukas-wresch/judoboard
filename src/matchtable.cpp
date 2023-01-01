@@ -466,6 +466,7 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 	for (size_t start_pos = 0; start_pos <= max; ++start_pos)
 	{
 		auto judoka = GetJudokaByStartPosition(start_pos);
+		
 		if (judoka)
 		{
 			Yaml << YAML::BeginMap;
@@ -473,12 +474,49 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 			Yaml << YAML::Key << "firstname" << YAML::Value << judoka->GetFirstname();
 			Yaml << YAML::Key << "lastname"  << YAML::Value << judoka->GetLastname();
 			Yaml << YAML::Key << "weight"    << YAML::Value << judoka->GetWeight().ToString();
+
+			if (judoka->GetClub())
+			{
+				Yaml << YAML::Key << "club_uuid" << YAML::Value << (std::string)judoka->GetClub()->GetUUID();
+				Yaml << YAML::Key << "club_name" << YAML::Value << judoka->GetClub()->GetName();
+			}
+
 			Yaml << YAML::Key << "start_pos" << YAML::Value << start_pos;
 			Yaml << YAML::EndMap;
 		}
 	}
 
 	Yaml << YAML::EndSeq;
+}
+
+
+
+void MatchTable::OnLotteryPerformed()
+{
+	if (!m_Filter || !GetTournament())
+		return;
+
+	auto participants = m_Filter->GetParticipants();
+	auto lots = GetTournament()->GetLots();
+
+	size_t current_pos = 0;
+
+	for (auto [club_uuid, lot] : lots)//For every lot
+		for (auto [pos, participant] : participants)//Find participants for this lot
+	{
+		auto judoka = participant.GetJudoka();
+
+		if (!judoka)
+			continue;
+
+		auto club = judoka->GetClub();
+
+		if (!club)
+			continue;
+
+		if (club->IsChildOf(club_uuid))//Does the club belong to this lot?
+			m_Filter->SetStartPosition(participant, current_pos++);//Assign start position
+	}
 }
 
 

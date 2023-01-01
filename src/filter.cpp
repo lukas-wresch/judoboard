@@ -94,7 +94,6 @@ bool IFilter::AddParticipant(const Judoka* NewParticipant, bool Force)
 
 	FindFreeStartPos(NewParticipant);
 
-	SortParticipantsByStartPosition();
 	return true;
 }
 
@@ -153,11 +152,8 @@ size_t IFilter::GetStartPosition(const Judoka* Judoka) const
 
 
 
-void IFilter::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
+void IFilter::SetStartPosition(const DependentJudoka Judoka, size_t NewStartPosition)
 {
-	if (!Judoka)
-		return;
-
 	auto my_old_pos = GetStartPosition(Judoka);
 	m_Participants.erase(my_old_pos);
 
@@ -176,6 +172,14 @@ void IFilter::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
 		m_Participants.erase(GetStartPosition(Judoka));
 		m_Participants.insert({ NewStartPosition, Judoka });
 	}
+}
 
-	SortParticipantsByStartPosition();
+
+
+void IFilter::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
+{
+	if (!Judoka)
+		return;
+
+	return SetStartPosition(DependentJudoka(Judoka), NewStartPosition);
 }
