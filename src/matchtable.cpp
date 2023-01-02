@@ -237,6 +237,8 @@ const RuleSet& MatchTable::GetRuleSet() const
 {
 	if (m_Rules)
 		return *m_Rules;
+	if (GetFilter() && GetFilter()->GetAgeGroup() && GetFilter()->GetAgeGroup()->GetRuleSet())
+		return *GetFilter()->GetAgeGroup()->GetRuleSet();
 	if (GetTournament() && GetTournament()->GetDefaultRuleSet())
 		return *GetTournament()->GetDefaultRuleSet();
 
