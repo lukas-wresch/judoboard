@@ -31,11 +31,11 @@
 
   <tr>
     <td style="width: 65mm; text-align: center; background-color: rgba(255, 255, 255, 0.9)">
-      <span class="score" id="white_ippon">0</span> <span class="score" id="white_wazaari">0</span>
+      <span class="score" id="white_ippon">0</span> <span class="score" id="white_wazaari">0</span> <span class="score" id="white_yuko">0</span> <span class="score" id="white_koka">0</span>
     </td>
 
     <td style="width: 65mm; text-align: center; background-color: rgba(30, 30, 255, 1.0); color: white;">
-      <span class="score" id="blue_ippon">0</span> <span class="score" id="blue_wazaari">0</span>
+      <span class="score" id="blue_ippon">0</span> <span class="score" id="blue_wazaari">0</span> <span class="score" id="blue_yuko">0</span> <span class="score" id="blue_koka">0</span>
     </td>
 
     <td style="text-align: center; font-size: 18pt; width: 6.9cm; border-right-style: hidden; border-bottom-style: hidden;">
@@ -75,6 +75,24 @@
           <tr><th style="width: 50%;" id="osaekomi_for"></th><th style="width: 50%;" id="osaekomi_time"></th></tr>
         </table>
       </div>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="text-align: center;">
+      <button class="add" id="add_yuko_white" onclick="SetScore('white', '+yuko');">+Yuka</button>
+      <button class="add" id="add_koka_white" style="margin-left: 5mm;" onclick="SetScore('white', '+koka');">+Koka</button>
+      <br/>
+      <button class="remove" id="rem_yuko_white" onclick="SetScore('white', '-yuko');">-Yuka</button>
+      <button class="remove" id="rem_koka_white" style="margin-left: 5mm;" onclick="SetScore('white', '-koka');">-Koka</button>
+    </td>
+
+    <td style="text-align: center;">
+      <button class="add" id="add_yuko_blue" onclick="SetScore('blue', '+yuko');">+Yuka</button>
+      <button class="add" id="add_koka_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '+koka');">+Koka</button>
+      <br/>
+      <button class="remove" id="rem_yuko_blue" onclick="SetScore('blue', '-yuko');">-Yuka</button>
+      <button class="remove" id="rem_koka_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '-koka');">-Koka</button>
     </td>
   </tr>
 
@@ -420,10 +438,16 @@ function GetScore()
     document.getElementById("blue_ippon").innerHTML    = res.blue.ippon;
     document.getElementById("blue_wazaari").innerHTML  = res.blue.wazaari;
 
-    /*var white_yuko = res[i++];
-    var blue_yuko  = res[i++];
-    var white_koka = res[i++];
-    var blue_koka  = res[i++];*/
+    if (res.yuko_enabled)
+    {
+      document.getElementById("white_yuko").innerHTML = res.white.yuko;
+      document.getElementById("white_koka").innerHTML = res.white.koka;
+    }
+    if (res.koka_enabled)
+    {
+      document.getElementById("blue_yuko").innerHTML  = res.blue.yuko;
+      document.getElementById("blue_koka").innerHTML  = res.blue.koka;
+    }
 
     document.getElementById("white_shidos").innerHTML = res.white.shido;
     document.getElementById("blue_shidos").innerHTML  = res.blue.shido;
@@ -434,13 +458,21 @@ function GetScore()
 
     document.getElementById("add_ippon_white").disabled   = !res.are_fighters_on_mat;
     document.getElementById("add_wazaari_white").disabled = !res.are_fighters_on_mat;
+    document.getElementById("add_yuko_white").disabled    = !res.are_fighters_on_mat && !res.yuko_enabled;
+    document.getElementById("add_koka_white").disabled    = !res.are_fighters_on_mat && !res.koka_enabled;
     document.getElementById("rem_ippon_white").disabled   = !res.are_fighters_on_mat;
     document.getElementById("rem_wazaari_white").disabled = !res.are_fighters_on_mat;
+    document.getElementById("rem_yuko_white").disabled    = !res.are_fighters_on_mat && !res.yuko_enabled;
+    document.getElementById("rem_koka_white").disabled    = !res.are_fighters_on_mat && !res.koka_enabled;
 
     document.getElementById("add_ippon_blue").disabled   = !res.are_fighters_on_mat;
     document.getElementById("add_wazaari_blue").disabled = !res.are_fighters_on_mat;
+    document.getElementById("add_yuko_blue").disabled    = !res.are_fighters_on_mat && !res.yuko_enabled;
+    document.getElementById("add_koka_blue").disabled    = !res.are_fighters_on_mat && !res.koka_enabled;
     document.getElementById("rem_ippon_blue").disabled   = !res.are_fighters_on_mat;
     document.getElementById("rem_wazaari_blue").disabled = !res.are_fighters_on_mat;
+    document.getElementById("rem_yuko_blue").disabled    = !res.are_fighters_on_mat && !res.yuko_enabled;
+    document.getElementById("rem_koka_blue").disabled    = !res.are_fighters_on_mat && !res.koka_enabled;
 
     HajimeTimer = parseInt(res.hajime_time);
 
