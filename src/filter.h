@@ -14,7 +14,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Weightclass, Custom
+			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser
 		};
 
 		IFilter(const YAML::Node& Yaml, const ITournament* Tournament);

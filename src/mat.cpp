@@ -2027,12 +2027,12 @@ bool Mat::Render(double dt) const
 
 	case State::Waiting:
 
-		if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetType() == MatchTable::Type::Pause)
+		/*if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetType() == MatchTable::Type::Pause)
 		{
 			auto font = renderer.RenderFont(ZED::FontSize::Gigantic, "Pause", ZED::Color(0, 0, 0));
 			renderer.RenderTransformed(*font.data, width/2 - 100, height/2 - 50);
 		}
-		else
+		else*/
 		{
 			for (int i = 0; i < 2; i++)
 			{

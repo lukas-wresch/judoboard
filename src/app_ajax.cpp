@@ -3091,10 +3091,6 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 		break;
 	}
 
-	case MatchTable::Type::Pause:
-		return Error::Type::InternalError;
-		break;
-
 	case MatchTable::Type::Custom:
 		new_table = new CustomTable(GetTournament());
 		break;
