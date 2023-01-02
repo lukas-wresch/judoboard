@@ -207,6 +207,10 @@ void IFilter::Dump() const
 			ZED::Log::Info(std::to_string(pos) + " - Rank1 of " + participant.GetDependentMatchTable()->GetName());
 		else if (participant.GetDependency() == DependencyType::TakeRank2)
 			ZED::Log::Info(std::to_string(pos) + " - Rank2 of " + participant.GetDependentMatchTable()->GetName());
+		else if (participant.GetDependency() == DependencyType::TakeRank3)
+			ZED::Log::Info(std::to_string(pos) + " - Rank3 of " + participant.GetDependentMatchTable()->GetName());
+		else if (participant.GetDependency() == DependencyType::TakeRank4)
+			ZED::Log::Info(std::to_string(pos) + " - Rank4 of " + participant.GetDependentMatchTable()->GetName());
 		else
 			ZED::Log::Info(std::to_string(pos) + " - ???");
 	}

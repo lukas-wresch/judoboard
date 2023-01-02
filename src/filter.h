@@ -41,7 +41,6 @@ namespace Judoboard
 		virtual size_t GetStartPosition(const Judoka* Judoka) const;
 		virtual void   SetStartPosition(const DependentJudoka Judoka, size_t NewStartPosition);
 		virtual void   SetStartPosition(const Judoka* Judoka, size_t NewStartPosition);
-		virtual void   SetStartPosition(const DependentJudoka Judoka, size_t NewStartPosition);
 
 		virtual const DependentJudoka GetJudokaByStartPosition(size_t StartPosition) const {
 			auto result = m_Participants.find(StartPosition);
@@ -71,8 +70,6 @@ namespace Judoboard
 		void SetParticipants(std::unordered_map<size_t, const DependentJudoka>&& NewParticipants) const {
 			m_Participants = std::move(NewParticipants);
 		}
-    
-		const ITournament* GetTournament() const { return m_Tournament; }
 
 
 	private:

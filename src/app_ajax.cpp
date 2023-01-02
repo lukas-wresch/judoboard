@@ -3395,7 +3395,7 @@ Error Application::Ajax_SetStartPosition(const HttpServer::Request& Request)
 
 Error Application::Ajax_PerformLottery()
 {
-	LockTillScopeEnd();
+	auto guard = LockTillScopeEnd();
 
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
@@ -3410,7 +3410,7 @@ Error Application::Ajax_PerformLottery()
 
 std::string Application::Ajax_GetLotteryTier()
 {
-	LockTillScopeEnd();
+	auto guard = LockTillScopeEnd();
 
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
@@ -3439,7 +3439,7 @@ Error Application::Ajax_SetLotteryTier(const HttpServer::Request& Request)
 	if (tier < 0)
 		return Error::Type::InvalidInput;
 
-	LockTillScopeEnd();
+	auto guard = LockTillScopeEnd();
 
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
@@ -3453,7 +3453,7 @@ Error Application::Ajax_SetLotteryTier(const HttpServer::Request& Request)
 
 std::string Application::Ajax_ListLots()
 {
-	LockTillScopeEnd();
+	auto guard = LockTillScopeEnd();
 
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
@@ -3465,9 +3465,7 @@ std::string Application::Ajax_ListLots()
 
 	for (auto [assoc_id, lot] : lots)
 	{
-		//ret << YAML::Key << lot << YAML::Value;
 		ret << YAML::BeginMap;
-		//ret << YAML::Key << (std::string)assoc_id << YAML::Value;
 		ret << YAML::Key << "uuid" << YAML::Value << (std::string)assoc_id;
 		ret << YAML::Key << "lot" << YAML::Value << lot;
 
