@@ -1344,6 +1344,9 @@ std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min
 					weights.emplace_back(judoka->GetWeight());
 			}
 
+			if (weights.empty())
+				continue;
+
 			std::sort(weights.begin(), weights.end());
 
 			Generator gen;
