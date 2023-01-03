@@ -201,13 +201,13 @@ var id = URLDecode(URL, "id");
 
 if (id)
 {
-  document.getElementById("headline").innerHTML = lang.update_rule_set;
+  document.getElementById("headline").innerHTML = translate('update_rule_set');
   document.getElementById("add").style.display = "none";
   GetRuleSet(id);
 }
 else
 {
-  document.getElementById("headline").innerHTML = lang.new_rule_set;
+  document.getElementById("headline").innerHTML = translate('new_rule_set');
   document.getElementById("update").style.display = "none";
 }
 

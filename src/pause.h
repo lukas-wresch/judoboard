@@ -15,7 +15,7 @@ namespace Judoboard
 
 		static std::string GetHTMLForm() { return ""; }
 
-		virtual Type GetType() const { return Type::Pause; }
+		virtual Type GetType() const { return Type::Unknown; }
 		virtual std::string GetDescription() const override { return "Pause"; }
 
 		//virtual bool IsElgiable(const Judoka& Fighter) const override { return false; }

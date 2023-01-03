@@ -79,7 +79,7 @@ function UpdateTournament()
 
 function EmptyTournament()
 {
-  if (confirm(lang.empty_tournament_confirm))
+  if (confirm(translate('empty_tournament_confirm')))
   {
     AjaxCallback('ajax/tournament/empty?id='+id, function(response) {
       if (response == "ok")
@@ -95,7 +95,7 @@ function EmptyTournament()
 
 function DeleteTournament()
 {
-  if (confirm(lang.delete_tournament_confirm))
+  if (confirm(translate('delete_tournament_confirm')))
   {
     AjaxCallback('ajax/tournament/delete?id='+id, function(response) {
       if (response == "ok")
@@ -130,11 +130,11 @@ function GetTournament(id)
     console.log(response);
 
     if (res.status == 0)
-      document.getElementById("status").innerHTML = lang.scheduled;
+      document.getElementById("status").innerHTML = translate('scheduled');
     else if (res.status == 1)
-      document.getElementById("status").innerHTML = lang.running;
+      document.getElementById("status").innerHTML = translate('running');
     else if (res.status == 2)
-      document.getElementById("status").innerHTML = lang.concluded;
+      document.getElementById("status").innerHTML = translate('concluded');
 
     document.getElementById("name").value = res.name;
     document.getElementById("year").value = res.year;
