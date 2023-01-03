@@ -1597,6 +1597,13 @@ TEST(Ajax, MatchTable_Edit)
 		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetMaxWeight(), Weight("20.3"));
 		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetGender(), Gender::Male);
 		EXPECT_EQ(((RoundRobin*)tables[0])->IsBestOfThree(), true);
+
+		auto& finals = ((Pool*)tables[0])->GetFinals();
+
+		EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)finals.GetUUID(), "name=Test4&fight_system=4&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+
+		ASSERT_EQ(finals.GetName(), "Test4");
+		ASSERT_EQ(finals.IsBestOfThree(), true);
 	}
 }
 
