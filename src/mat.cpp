@@ -72,7 +72,7 @@ bool Mat::Open()
 		if (!m_Logo)
 			m_Logo = m_Window.GetRenderer().CreateTexture("assets/logo.png");
 		if (!m_Winner)
-			m_Winner = m_Window.GetRenderer().CreateTexture("assets/winner2.png");
+			m_Winner = m_Window.GetRenderer().CreateTexture("assets/winner.png");
 
 		m_Graphics["winner_blue" ].SetTexture(m_Winner);
 		m_Graphics["winner_white"].SetTexture(m_Winner);
@@ -2027,13 +2027,12 @@ bool Mat::Render(double dt) const
 
 	case State::Waiting:
 
-		//if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetType() == MatchTable::Type::Pause)
-		if (false)//TODO
+		/*if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetType() == MatchTable::Type::Pause)
 		{
 			auto font = renderer.RenderFont(ZED::FontSize::Gigantic, "Pause", ZED::Color(0, 0, 0));
 			renderer.RenderTransformed(*font.data, width/2 - 100, height/2 - 50);
 		}
-		else
+		else*/
 		{
 			for (int i = 0; i < 2; i++)
 			{

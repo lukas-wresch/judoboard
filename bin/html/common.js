@@ -275,7 +275,7 @@ function AjaxPost(url, params, callback)
     {
         if (this.response == "ok" && typeof callback !== 'undefined')
           callback();
-        else
+        else if (this.response != "ok")
           alert("Error: " + this.response);
       }
   };
