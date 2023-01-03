@@ -40,12 +40,19 @@ namespace Judoboard
 		void SetPoolCount(uint32_t PoolCount) { m_PoolCount = PoolCount; GenerateSchedule(); }
 		size_t GetPoolCount() const { return m_Pools.size(); }
 
+		RoundRobin* GetPool(size_t Index) {
+			if (Index >= m_Pools.size())
+				return nullptr;
+			return m_Pools[Index];
+		}
+
 		const RoundRobin* GetPool(size_t Index) const {
 			if (Index >= m_Pools.size())
 				return nullptr;
 			return m_Pools[Index];
 		}
 
+		SingleElimination& GetFinals() { return m_Finals; }
 		const SingleElimination& GetFinals() const { return m_Finals; }
 
 		auto GetTakeTop() const { return m_TakeTop; }
