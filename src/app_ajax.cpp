@@ -3159,9 +3159,10 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	auto table = GetTournament()->FindMatchTable(id);
 
 	if (!table)
-		return Error(Error::Type::ItemNotFound);
+		return Error::Type::ItemNotFound;
 
-	if (table->GetType() != fight_system)
+	//Change fight system?
+	if (!table->IsSubMatchTable() && table->GetType() != fight_system)//Don't support sub match tables
 	{
 		//Re-create match table
 
@@ -3206,19 +3207,28 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	GetTournament()->Unlock();
 
 
-	auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
-	auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
-	int  gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
-	bool bo3       = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
+	//Update filter
 
-	if (!table->GetFilter() || table->GetFilter()->GetType() != IFilter::Type::Weightclass)
-		return Error::Type::OperationFailed;
+	if (!table->IsSubMatchTable())
+	{
+		if (!table->GetFilter() || table->GetFilter()->GetType() != IFilter::Type::Weightclass)
+			return Error::Type::OperationFailed;
 
-	auto weightclass = (Weightclass*)table->GetFilter();
+		auto weightclass = (Weightclass*)table->GetFilter();
 
-	weightclass->SetMinWeight(Weight(minWeight));
-	weightclass->SetMaxWeight(Weight(maxWeight));
-	weightclass->SetGender((Gender)gender);
+		auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
+		auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
+		int  gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+
+		weightclass->SetMinWeight(Weight(minWeight));
+		weightclass->SetMaxWeight(Weight(maxWeight));
+		weightclass->SetGender((Gender)gender);
+	}
+
+
+	//Update fight system
+
+	bool bo3 = HttpServer::DecodeURLEncoded(Request.m_Body, "bo3") == "true";
 
 	switch (table->GetType())
 	{

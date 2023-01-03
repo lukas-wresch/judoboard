@@ -12,7 +12,7 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		Pool(IFilter* Filter, const ITournament* Tournament = nullptr) : MatchTable(Filter, Tournament), m_Finals(nullptr, Tournament) { GenerateSchedule(); }
+		Pool(IFilter* Filter, const ITournament* Tournament = nullptr);
 		Pool(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
 		Pool(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
 

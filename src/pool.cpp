@@ -19,6 +19,15 @@ using namespace Judoboard;
 
 
 
+Pool::Pool(IFilter* Filter, const ITournament* Tournament)
+	: MatchTable(Filter, Tournament), m_Finals(nullptr, Tournament)
+{
+	m_Finals.IsSubMatchTable(true);
+	GenerateSchedule();
+}
+
+
+
 Pool::Pool(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
 	: Pool(new Weightclass(MinWeight, MaxWeight, Gender, Tournament), Tournament)
 {
@@ -29,6 +38,8 @@ Pool::Pool(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament*
 Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
 	: MatchTable(Yaml, Tournament), m_Finals(nullptr, Tournament)
 {
+	m_Finals.IsSubMatchTable(true);
+
 	if (Yaml["pool_count"])
 		SetPoolCount(Yaml["pool_count"].as<uint32_t>());
 	if (Yaml["take_top"])
