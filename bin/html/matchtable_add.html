@@ -50,12 +50,12 @@
 </div>
 
 
-<div style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
+<div id="div_filter" style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
   <form id="form_filter">
   </form>
 </div>
 
-<div style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
+<div id="div_fight_system" style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
   <form id="form_fight_system">
   </form>
 </div>
@@ -281,6 +281,11 @@ function GetMatchTable(id)
       document.getElementById("type").onchange();
       document.getElementById("fight_system").value = res.type;
       document.getElementById("fight_system").onchange();
+    }
+    else
+    {
+      document.getElementById("div_filter").style.display = "none";
+      document.getElementById("div_fight_system").style.display = "none";
     }
     
     GetMats(function() {
