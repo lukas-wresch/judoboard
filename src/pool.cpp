@@ -126,10 +126,8 @@ void Pool::GenerateSchedule()
 	if (!GetFilter() || GetParticipants().size() <= 1)
 		return;
 	
-	for (auto pool : m_Pools)
-		delete pool;
-
-	m_Pools.clear();
+	auto old_pools = std::move(m_Pools);
+	assert(m_Pools.empty());
 
 	const auto pool_count = CalculatePoolCount();
 	m_Pools.resize(pool_count);
@@ -145,8 +143,19 @@ void Pool::GenerateSchedule()
 		name.append(&letters[i%26], 1);
 		m_Pools[i]->SetName(name);
 		m_Pools[i]->IsSubMatchTable(true);
+
+		//Convert from old pools
+		if (i < old_pools.size())
+		{
+			m_Pools[i]->SetName(old_pools[i]->GetName());
+			m_Pools[i]->SetColor(old_pools[i]->GetColor());
+			m_Pools[i]->SetMatID(old_pools[i]->GetMatID());
+			m_Pools[i]->IsBestOfThree(old_pools[i]->IsBestOfThree());
+		}
 	}
 
+	for (auto old_pools : old_pools)
+		delete old_pools;
 
 	//Create filter(s) for final round
 	IFilter* final_input = nullptr;
@@ -211,12 +220,19 @@ void Pool::GenerateSchedule()
 	assert(final_input);
 	bool third_place = m_Finals.IsThirdPlaceMatch();
 	bool fifth_place = m_Finals.IsFifthPlaceMatch();
+	auto color       = m_Finals.GetColor();
+	auto name        = m_Finals.GetName();
+	auto mat_id      = m_Finals.GetMatID();
 
 	m_Finals = std::move(SingleElimination(final_input));
 	m_Finals.SetName(Localizer::Translate("Finals"));
 	m_Finals.IsSubMatchTable(true);
 	m_Finals.IsThirdPlaceMatch(third_place);
 	m_Finals.IsFifthPlaceMatch(fifth_place);
+	m_Finals.SetColor(color);
+	if (!name.empty())
+		m_Finals.SetName(name);
+	m_Finals.SetMatID(mat_id);
 
 
 	//Add matches from pools
