@@ -1712,12 +1712,10 @@ TEST(Ajax, NoDisqualification)
 
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
-		ZED::Core::Pause(100);
 
 		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		mat->StartMatch(&match);
-		ZED::Core::Pause(1000);
 
 		EXPECT_TRUE(mat->AreFightersOnMat());
 		mat->AddHansokuMake(f);
