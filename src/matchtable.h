@@ -350,6 +350,10 @@ namespace Judoboard
 		bool IsBestOfThree() const { return m_BestOfThree; }
 		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; GenerateSchedule(); }
 
+		//Sub match tables
+		bool IsSubMatchTable() const { return m_IsSubMatchTable; }
+		void IsSubMatchTable(bool SetFlag) { m_IsSubMatchTable = SetFlag; }
+
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual void ToString(YAML::Emitter& Yaml) const;
@@ -396,6 +400,8 @@ namespace Judoboard
 		int32_t m_ScheduleIndex = -1;//Index when this entry should be in the schedule
 		uint32_t m_MatID = 0;
 		Color m_Color;
+
+		bool m_IsSubMatchTable = false;//Is this a match table that is purely used by another match table?
 
 		bool m_BestOfThree = false;
 	};

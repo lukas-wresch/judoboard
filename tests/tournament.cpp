@@ -807,6 +807,45 @@ TEST(Tournament, HasDefaultRuleSet2)
 
 
 
+TEST(Tournament, FindSubMatchTable)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+		Tournament tourney("deleteMe");
+		tourney.EnableAutoSave(false);
+
+		for (int i = 0; i < 16; i++)
+		{
+			Judoka* j = new Judoka(GetRandomName(), GetRandomName(), 50, Gender::Male);
+			tourney.AddParticipant(j);
+		}
+
+		Pool* pool = new Pool(Weight(10), Weight(100));
+		tourney.AddMatchTable(pool);
+
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetUUID()));
+		ASSERT_TRUE(pool->GetPool(0));
+
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetPool(0)->GetUUID()));
+		EXPECT_TRUE(tourney.FindMatchTable(pool->GetPool(0)->GetUUID())->IsSubMatchTable());
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetPool(1)->GetUUID()));
+		EXPECT_TRUE(tourney.FindMatchTable(pool->GetPool(1)->GetUUID())->IsSubMatchTable());
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetPool(2)->GetUUID()));
+		EXPECT_TRUE(tourney.FindMatchTable(pool->GetPool(2)->GetUUID())->IsSubMatchTable());
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetPool(3)->GetUUID()));
+		EXPECT_TRUE(tourney.FindMatchTable(pool->GetPool(3)->GetUUID())->IsSubMatchTable());
+
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetFinals().GetUUID()));
+		EXPECT_TRUE(tourney.FindMatchTable(pool->GetFinals().GetUUID())->IsSubMatchTable());
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 {
 	initialize();

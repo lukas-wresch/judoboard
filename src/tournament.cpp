@@ -971,8 +971,26 @@ MatchTable* Tournament::FindMatchTable(const UUID& ID)
 	auto guard = LockTillScopeEnd();
 
 	for (auto table : m_MatchTables)
-		if (table && table->GetUUID() == ID)
+	{
+		if (!table)
+			continue;
+
+		if (table->GetUUID() == ID)
 			return table;
+
+		//Check sub table of pool
+		if (table->GetType() == MatchTable::Type::Pool)
+		{
+			Pool* pool = (Pool*)table;
+
+			for (size_t i = 0; i < pool->GetPoolCount(); ++i)
+				if (*pool->GetPool(i) == ID)
+					return (MatchTable*)pool->GetPool(i);
+
+			if (pool->GetFinals() == ID)
+				return (MatchTable*)&pool->GetFinals();
+		}
+	}
 
 	return nullptr;
 }
@@ -984,8 +1002,26 @@ const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 	auto guard = LockTillScopeEnd();
 
 	for (auto table : m_MatchTables)
-		if (table && table->GetUUID() == ID)
+	{
+		if (!table)
+			continue;
+
+		if (table->GetUUID() == ID)
 			return table;
+
+		//Check sub table of pool
+		if (table->GetType() == MatchTable::Type::Pool)
+		{
+			const Pool* pool = (const Pool*)table;
+
+			for (size_t i = 0; i < pool->GetPoolCount(); ++i)
+				if (*pool->GetPool(i) == ID)
+					return pool->GetPool(i);
+
+			if (pool->GetFinals() == ID)
+				return &pool->GetFinals();
+		}
+	}
 
 	return nullptr;
 }

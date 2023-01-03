@@ -129,9 +129,11 @@ void Pool::GenerateSchedule()
 	for (int i = 0; i < pool_count; ++i)
 	{
 		m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
+
 		std::string name = Localizer::Translate("Pool") + " ";
 		name.append(&letters[i%26], 1);
 		m_Pools[i]->SetName(name);
+		m_Pools[i]->IsSubMatchTable(true);
 	}
 
 
@@ -201,6 +203,7 @@ void Pool::GenerateSchedule()
 
 	m_Finals = std::move(SingleElimination(final_input));
 	m_Finals.SetName(Localizer::Translate("Finals"));
+	m_Finals.IsSubMatchTable(true);
 	m_Finals.IsThirdPlaceMatch(third_place);
 	m_Finals.IsFifthPlaceMatch(fifth_place);
 

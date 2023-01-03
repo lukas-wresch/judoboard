@@ -1657,6 +1657,32 @@ TEST(Ajax, MatchTable_Get)
 		EXPECT_EQ(node["best_of_three"].as<bool>(), true);
 		EXPECT_EQ(node["third_place"].as<bool>(), true);
 		EXPECT_EQ(node["fifth_place"].as<bool>(), true);
+
+
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=4&name=Test4&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
+
+		ASSERT_EQ(tables.size(), 4);
+
+		output = app.Ajax_GetMatchTable(HttpServer::Request("id=" + (std::string)tables[3]->GetUUID()));
+
+		YAML::Emitter yaml4;
+		yaml4 << YAML::BeginMap;
+		tables[3]->ToString(yaml4);
+		yaml4 << YAML::EndMap;
+		EXPECT_EQ(yaml4.c_str(), output);
+
+		node = YAML::Load(output);
+
+		ASSERT_EQ(tables[3]->GetType(), MatchTable::Type::Pool);
+		Pool* pool = (Pool*)tables[3];
+
+		output = app.Ajax_GetMatchTable(HttpServer::Request("id=" + (std::string)pool->GetFinals().GetUUID()));
+
+		YAML::Emitter yaml5;
+		yaml5 << YAML::BeginMap;
+		pool->GetFinals().ToString(yaml5);
+		yaml5 << YAML::EndMap;
+		EXPECT_EQ(yaml5.c_str(), output);
 	}
 }
 

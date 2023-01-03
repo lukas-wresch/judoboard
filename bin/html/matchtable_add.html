@@ -274,10 +274,14 @@ function GetMatchTable(id)
     g_yaml = res;
     
     document.getElementById("name").value = res.name;
-    document.getElementById("type").value = res.filter_type;
-    document.getElementById("type").onchange();
-    document.getElementById("fight_system").value = res.type;
-    document.getElementById("fight_system").onchange();
+
+    if (!res.is_sub_match_table)
+    {
+      document.getElementById("type").value = res.filter_type;
+      document.getElementById("type").onchange();
+      document.getElementById("fight_system").value = res.type;
+      document.getElementById("fight_system").onchange();
+    }
     
     GetMats(function() {
       document.getElementById("mat").value = res.mat_id;

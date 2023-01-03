@@ -46,6 +46,8 @@ namespace Judoboard
 			return m_Pools[Index];
 		}
 
+		const SingleElimination& GetFinals() const { return m_Finals; }
+
 		auto GetTakeTop() const { return m_TakeTop; }
 		void SetTakeTop(uint32_t NumJudoka) { m_TakeTop = NumJudoka; }
 

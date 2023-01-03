@@ -452,7 +452,10 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
 	Yaml << YAML::Key << "description" << YAML::Value << GetDescription();
 
-	Yaml << YAML::Key << "best_of_three" << YAML::Value << m_BestOfThree;
+	Yaml << YAML::Key << "best_of_three" << YAML::Value << IsBestOfThree();
+
+	if (IsSubMatchTable())
+		Yaml << YAML::Key << "is_sub_match_table" << YAML::Value << IsSubMatchTable();
 
 	if (m_Rules)
 		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
