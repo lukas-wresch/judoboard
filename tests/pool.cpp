@@ -347,6 +347,7 @@ TEST(Pool, PoolsOnDifferentMats)
 	w.GenerateSchedule();
 
 	Mat m(1);
+	int count[5] = {0, 0, 0, 0, 0};
 
 	for (auto match : w.GetSchedule())
 	{
@@ -354,6 +355,8 @@ TEST(Pool, PoolsOnDifferentMats)
 
 		//Check if match is on the right mat
 		auto mat_id = match->GetMatID();
+
+		count[mat_id-1]++;
 
 		if (1 <= mat_id && mat_id <= 4)
 			EXPECT_TRUE(w.GetPool(mat_id-1)->FindMatch(*match));
@@ -370,6 +373,12 @@ TEST(Pool, PoolsOnDifferentMats)
 
 		EXPECT_TRUE(m.EndMatch());
 	}
+
+	EXPECT_EQ(count[0], 6);
+	EXPECT_EQ(count[1], 6);
+	EXPECT_EQ(count[2], 6);
+	EXPECT_EQ(count[3], 6);
+	EXPECT_EQ(count[4], 7);
 }
 
 
@@ -407,7 +416,10 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 
 	Pool w2(YAML::Load(yaml.c_str()));
 
+	w2.GenerateSchedule();
+
 	Mat m(1);
+	int count[5] = {0, 0, 0, 0, 0};
 
 	for (auto match : w2.GetSchedule())
 	{
@@ -416,10 +428,12 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 		//Check if match is on the right mat
 		auto mat_id = match->GetMatID();
 
+		count[mat_id-1]++;
+
 		if (1 <= mat_id && mat_id <= 4)
-			EXPECT_TRUE(w.GetPool(mat_id-1)->FindMatch(*match));
+			EXPECT_TRUE(w2.GetPool(mat_id-1)->FindMatch(*match));
 		else
-			EXPECT_TRUE(w.GetFinals().FindMatch(*match));
+			EXPECT_TRUE(w2.GetFinals().FindMatch(*match));
 
 		m.SetMatID(match->GetMatID());
 		EXPECT_TRUE(m.StartMatch(match));
@@ -431,4 +445,10 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 
 		EXPECT_TRUE(m.EndMatch());
 	}
+
+	EXPECT_EQ(count[0], 6);
+	EXPECT_EQ(count[1], 6);
+	EXPECT_EQ(count[2], 6);
+	EXPECT_EQ(count[3], 6);
+	EXPECT_EQ(count[4], 7);
 }
