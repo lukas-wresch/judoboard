@@ -371,3 +371,64 @@ TEST(Pool, PoolsOnDifferentMats)
 		EXPECT_TRUE(m.EndMatch());
 	}
 }
+
+
+
+TEST(Pool, PoolsOnDifferentMats_ExportImport)
+{
+	initialize();
+
+	Pool w(Weight(10), Weight(100));
+	w.SetMatID(1);
+
+	for (int i = 0; i < 16; i++)
+	{
+		Judoka* j = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i, Gender::Male);
+		EXPECT_TRUE(w.AddParticipant(j));
+	}
+
+	ASSERT_TRUE(w.GetPool(0));
+	ASSERT_TRUE(w.GetPool(1));
+	ASSERT_TRUE(w.GetPool(2));
+	ASSERT_TRUE(w.GetPool(3));
+
+	w.GetPool(0)->SetMatID(1);
+	w.GetPool(1)->SetMatID(2);
+	w.GetPool(2)->SetMatID(3);
+	w.GetPool(3)->SetMatID(4);
+	w.GetFinals().SetMatID(5);
+
+	w.GenerateSchedule();
+
+	YAML::Emitter yaml;
+	yaml << YAML::BeginMap;
+	w >> yaml;
+	yaml << YAML::EndMap;
+
+	Pool w2(YAML::Load(yaml.c_str()));
+
+	Mat m(1);
+
+	for (auto match : w2.GetSchedule())
+	{
+		ASSERT_TRUE(!match->IsEmptyMatch());
+
+		//Check if match is on the right mat
+		auto mat_id = match->GetMatID();
+
+		if (1 <= mat_id && mat_id <= 4)
+			EXPECT_TRUE(w.GetPool(mat_id-1)->FindMatch(*match));
+		else
+			EXPECT_TRUE(w.GetFinals().FindMatch(*match));
+
+		m.SetMatID(match->GetMatID());
+		EXPECT_TRUE(m.StartMatch(match));
+
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
