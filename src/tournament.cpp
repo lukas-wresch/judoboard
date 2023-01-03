@@ -494,13 +494,13 @@ Status Tournament::GetStatus() const
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
 	{
-		if (!match->HasValidFighters())
-			continue;
+		if (match->IsScheduled())
+			all_matches_finished = false;
 
-		if (!match->HasConcluded())
+		else if (!match->HasConcluded())
 			all_matches_finished = false;
 			
-		if (match->IsRunning() || match->HasConcluded())
+		else
 			one_match_finished = true;
 	}
 
