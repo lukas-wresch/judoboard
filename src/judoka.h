@@ -44,6 +44,10 @@ namespace Judoboard
 		bool operator == (const Judoka* rhs) const;
 		bool operator == (const DependentJudoka& rhs) const;
 
+		operator bool () const {
+			return m_Judoka || m_Type != DependencyType::None;
+		}
+
 	private:
 		DependentJudoka() = default;
 

@@ -172,11 +172,27 @@ void Pool::GenerateSchedule()
 
 		final_input = new Fixed(mixer);
 		
-		//Swap the two incorrect positions manually
-		auto temp = final_input->GetJudokaByStartPosition(2);
-		final_input->SetStartPosition(temp, 3);
+		if (m_TakeTop == 3)
+		{
+			auto temp = final_input->GetJudokaByStartPosition(4);
+			if (temp)
+				final_input->SetStartPosition(temp, 7);
+			temp = final_input->GetJudokaByStartPosition(5);
+			if (temp)
+				final_input->SetStartPosition(temp, 6);
+		}
 
-		//final_input->Dump();
+		else
+		{
+			//Swap the two incorrect positions manually
+			auto temp = final_input->GetJudokaByStartPosition(2);
+			if (temp)
+				final_input->SetStartPosition(temp, 3);
+		}
+
+#ifdef _DEBUG
+		final_input->Dump();
+#endif
 	}
 
 	else if (pool_count == 4)
@@ -196,9 +212,11 @@ void Pool::GenerateSchedule()
 		final_input = new Fixed(mixer);
 
 		auto temp = final_input->GetJudokaByStartPosition(4);
-		final_input->SetStartPosition(temp, 5);
+		if (temp)
+			final_input->SetStartPosition(temp, 5);
 		temp = final_input->GetJudokaByStartPosition(6);
-		final_input->SetStartPosition(temp, 7);
+		if (temp)
+			final_input->SetStartPosition(temp, 7);
 
 		//final_input->Dump();
 	}

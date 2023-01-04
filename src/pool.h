@@ -56,7 +56,7 @@ namespace Judoboard
 		const SingleElimination& GetFinals() const { return m_Finals; }
 
 		auto GetTakeTop() const { return m_TakeTop; }
-		void SetTakeTop(uint32_t NumJudoka) { m_TakeTop = NumJudoka; }
+		void SetTakeTop(uint32_t NumJudoka) { m_TakeTop = NumJudoka; GenerateSchedule(); }
 
 		//Serialization
 		virtual const std::string ToHTML() const override;

@@ -211,8 +211,8 @@ void SingleElimination::GenerateSchedule()
 	{
 		for (size_t i = 0; i < max_start_pos/2; ++i)
 		{
-			auto new_match = CreateAutoMatch(GetJudokaByStartPosition(i),
-											 GetJudokaByStartPosition(i + max_start_pos/2));
+			auto new_match = CreateAutoMatch(GetFilter()->GetJudokaByStartPosition(i),
+											 GetFilter()->GetJudokaByStartPosition(i + max_start_pos/2));
 			nextRound.emplace_back(new_match);
 		}
 	}
