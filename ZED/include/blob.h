@@ -106,6 +106,7 @@ namespace ZED
 
 		operator void*  () { return m_Data; }
 		operator uint8_t* () { return m_Data; }
+		explicit operator char* () { return (char*)m_Data; }
 
 		operator const void* () const { return m_Data; }
 		operator const uint8_t* () const { return m_Data; }
