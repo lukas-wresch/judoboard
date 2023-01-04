@@ -663,6 +663,61 @@ TEST(Ajax, Judoka_Edit_Participant)
 
 
 
+TEST(Ajax, Judoka_Delete)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddJudoka(HttpServer::Request("", "firstname=first&lastname=last&weight=10&gender=0&birthyear=2000&number=A123")), "ok");
+
+		auto& judokas = app.GetDatabase().GetAllJudokas();
+
+		auto id = judokas.begin()->second->GetUUID();
+
+		EXPECT_TRUE(app.Ajax_DeleteJudoka(HttpServer::Request("id="+(std::string)id)));
+
+		EXPECT_EQ(judokas.size(), 0);
+	}
+}
+
+
+
+TEST(Ajax, Judoka_Import)
+{
+	initialize();
+
+	{
+		Application app;
+
+		Tournament* tourney = new Tournament;
+
+		auto c = new Club("Club 1");
+		c->SetShortName("c");
+		auto j = new Judoka("first", "last");
+		j->SetClub(c);
+
+		tourney->AddParticipant(j);
+
+		app.AddTournament(tourney);
+		
+
+		auto& judokas = app.GetDatabase().GetAllJudokas();
+		auto& clubs   = app.GetDatabase().GetAllClubs();
+
+		EXPECT_TRUE(app.Ajax_ImportJudoka(HttpServer::Request("id="+(std::string)j->GetUUID())));
+
+		ASSERT_EQ(judokas.size(), 1);
+		EXPECT_EQ(judokas.begin()->second->GetUUID(), *j);
+
+		ASSERT_EQ(clubs.size(), 1);
+		EXPECT_EQ(clubs[0]->GetUUID(), *c);
+	}
+}
+
+
+
 TEST(Ajax, GetNamesOnMat)
 {
 	initialize();
