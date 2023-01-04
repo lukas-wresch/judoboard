@@ -50,6 +50,8 @@ var lang_en = {
     gender:  [ "Gender", "Geschlecht" ],
     goldenscore_time:  [ "Golden Score Time", "Golden Score Zeit" ],
     hide_mats:  [ "Hide Mats", "Matten ausblenden" ],
+    import:  [ "Import", "Importieren" ],
+    judo_passport_number:  [ "Judo Passport Number", "Judopassnummer" ],
     list_associations:  [ "List Associations", "Verb&auml;nde anzeigen" ],
     list_clubs:  [ "List Clubs", "Vereine anzeigen" ],
     list_judokas:  [ "List Judokas", "Judokas anzeigen" ],
@@ -152,8 +154,12 @@ var lang_en = {
 function translate(keyword)
 {
   console.log("Translating " + keyword);
-  //return eval('lang_en.' + keyword + "[0]");
-  return eval('lang_en.' + keyword + "[1]");
+
+  var ret = eval('lang_en.' + keyword);
+
+  if (typeof ret == 'object')
+    return ret[1];
+  return keyword;
 }
 
 
