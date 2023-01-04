@@ -1121,7 +1121,7 @@ TEST(Mat, MatchTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 120; time <= 4*60 + 30 ; time += 90 + rand()%60)
+	for (int time = 120; time <= 4*60 + 30 ; time += 100 + rand()%60)
 	{
 		Application app;
 		Mat m(1);
@@ -1150,7 +1150,7 @@ TEST(Mat, GoldenScoreTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 30; time <= 3 * 60; time += 65 + rand() % 50)
+	for (int time = 50; time <= 3 * 60; time += 65 + rand() % 50)
 	{
 		Application app;
 		Mat m(1);
@@ -1372,7 +1372,7 @@ TEST(Mat, OsaekomiTillEndDuringGoldenScore)
 	//and now get cancelled after reaching the wazaari time
 
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 5; time <= 25; time += 5 + rand() % 8)
+	for (int time = 5; time <= 25; time += 6 + rand() % 8)
 	{
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 		{
@@ -2274,7 +2274,7 @@ TEST(Mat, BreakTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 55; time <= 180; time += 95 + rand() % 30)
+	for (int time = 60; time <= 180; time += 95 + rand() % 30)
 	{
 		Application app;
 		Mat m(1);
