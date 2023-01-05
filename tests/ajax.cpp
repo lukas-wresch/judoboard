@@ -2014,6 +2014,33 @@ TEST(Ajax, Tournament_Get)
 
 
 
+TEST(Ajax, Tournament_List)
+{
+	initialize();
+
+	Application app;
+
+	EXPECT_TRUE(app.Ajax_AddTournament(HttpServer::Request("", "name=test1&year=2000")));
+	EXPECT_TRUE(app.Ajax_AddTournament(HttpServer::Request("", "name=test2&year=2001")));
+
+	auto tour1 = app.FindTournamentByName("test1");
+	auto tour2 = app.FindTournamentByName("test2");
+	ASSERT_TRUE(tour1);
+	ASSERT_TRUE(tour2);
+
+	YAML::Node yaml = YAML::Load( app.Ajax_ListTournaments() );
+
+	EXPECT_EQ(yaml[0]["name"].as<std::string>(), "test1");
+	EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), tour1->GetUUID());
+	EXPECT_EQ(yaml[0]["is_locked"].as<bool>(), false);
+
+	EXPECT_EQ(yaml[1]["name"].as<std::string>(), "test2");
+	EXPECT_EQ(yaml[1]["uuid"].as<std::string>(), tour2->GetUUID());
+	EXPECT_EQ(yaml[1]["is_locked"].as<bool>(), false);	
+}
+
+
+
 TEST(Ajax, Tournament_Edit)
 {
 	initialize();

@@ -2012,18 +2012,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		ZED::CSV ret;
-		for (auto tournament : m_Tournaments)
-		{
-			if (tournament)//Filter out temporary tournament
-			{
-				ret << (std::string)tournament->GetUUID() << tournament->GetName() << tournament->GetParticipants().size() << tournament->GetSchedule().size() << tournament->GetStatus();
-				//Is the tournament open?
-				ret << (m_CurrentTournament && tournament->GetUUID() == m_CurrentTournament->GetUUID());
-			}
-		}
-
-		return ret;
+		return Ajax_ListTournaments();
 	});
 
 
@@ -2516,6 +2505,35 @@ std::string Application::Ajax_GetTournament(const HttpServer::Request& Request)
 	yaml << YAML::EndMap;
 
 	return yaml.c_str();
+}
+
+
+
+std::string Application::Ajax_ListTournaments()
+{
+	auto guard = LockTillScopeEnd();
+
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
+	for (auto tournament : m_Tournaments)
+	{
+		if (tournament)//Filter out temporary tournament
+		{
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "uuid" << YAML::Value << (std::string)tournament->GetUUID();
+			ret << YAML::Key << "name" << YAML::Value << tournament->GetName();
+			ret << YAML::Key << "num_participants" << YAML::Value << tournament->GetParticipants().size();
+			ret << YAML::Key << "num_matches" << YAML::Value << tournament->GetSchedule().size();
+			ret << YAML::Key << "status"  << YAML::Value << (int)tournament->GetStatus();
+			ret << YAML::Key << "is_open" << YAML::Value << (m_CurrentTournament && tournament->GetUUID() == m_CurrentTournament->GetUUID());
+			ret << YAML::Key << "is_locked" << YAML::Value << tournament->IsReadonly();
+			ret << YAML::EndMap;
+		}
+	}
+	
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 

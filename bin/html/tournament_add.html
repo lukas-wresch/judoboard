@@ -31,7 +31,7 @@
 
 <div>
   <label style="width: 200px;float:left;margin-top:4px;" id="label_readonly"></label>
-  <input type="checkbox" checked id="readonly" class="switch-input">
+  <input type="checkbox" id="readonly" class="switch-input">
   <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="readonly">
     <span class="toggle-on" id="readonly_enabled"></span><span class="toggle-off" id="readonly_disabled"></span>
   </label>
@@ -147,6 +147,7 @@ function GetTournament(id)
 
     document.getElementById("name").value = res.name;
     document.getElementById("year").value = res.year;
+    document.getElementById("readonly").checked = res.is_locked;
 
     GetRuleSets(function() {
       if (typeof res.rule_set_uuid !== 'undefined')
