@@ -40,15 +40,21 @@ namespace Judoboard
 		Match* FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
 		virtual const StandingData& GetDatabase() const override { return m_StandingData; }//Returns a database containing all participants
-		void SetYear(uint32_t NewYear) { m_StandingData.SetYear(NewYear); }
+		void SetYear(uint32_t NewYear) {
+			if (!IsReadonly())
+				m_StandingData.SetYear(NewYear);
+		}
 
-		void SetName(const std::string& NewName) { m_Name = NewName; }
+		void SetName(const std::string& NewName) {\
+			if (!IsReadonly())
+				m_Name = NewName;
+		}
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 		bool IsAutoSave() const { return m_AutoSave; }
 
 		virtual const Association* GetOrganizer() const override { return m_Organizer; }
 		void SetOrganizer(Association* NewOrganizer) {
-			if (!NewOrganizer)
+			if (!NewOrganizer || IsReadonly())
 				return;
 			if (NewOrganizer->GetLevel() == -1)
 				m_StandingData.AddClub((Club*)NewOrganizer);
@@ -109,8 +115,11 @@ namespace Judoboard
 		//Rule Sets
 		virtual const RuleSet* GetDefaultRuleSet() const override { return m_pDefaultRules; }
 		virtual void SetDefaultRuleSet(RuleSet* NewDefaultRuleSet) override {
-			m_StandingData.AddRuleSet(NewDefaultRuleSet);
-			m_pDefaultRules = NewDefaultRuleSet;
+			if (!IsReadonly())
+			{
+				m_StandingData.AddRuleSet(NewDefaultRuleSet);
+				m_pDefaultRules = NewDefaultRuleSet;
+			}
 		}
 		virtual bool AddRuleSet(RuleSet* NewRuleSet) override { return m_StandingData.AddRuleSet(NewRuleSet); }
 		virtual const RuleSet* FindRuleSetByName(const std::string& Name) const override { return m_StandingData.FindRuleSetByName(Name); }
@@ -151,7 +160,7 @@ namespace Judoboard
 		virtual bool PerformLottery() override;
 		virtual uint32_t GetLotteryTier() const override { return m_LotteryTier; }
 		virtual void SetLotteryTier(uint32_t NewLotteryTier) override {
-			if (GetStatus() == Status::Scheduled)
+			if (GetStatus() == Status::Scheduled && !IsReadonly())
 			{
 				m_LotteryTier = NewLotteryTier;
 				PerformLottery();

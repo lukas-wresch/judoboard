@@ -2443,6 +2443,7 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 	auto year         = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "year"));
 	UUID rule_id      = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
 	UUID organizer_id = HttpServer::DecodeURLEncoded(Request.m_Body, "organizer");
+	bool readonly     = HttpServer::DecodeURLEncoded(Request.m_Body, "readonly") == "true";
 
 	if (name.empty())
 		return Error::Type::InvalidInput;
@@ -2461,6 +2462,9 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 	if (!rules)
 		ZED::Log::Warn("Adding tournament: Could not find rule set in database");
 
+	if (!readonly)
+		tournament->IsReadonly(readonly);
+
 	auto organizer = m_Database.FindAssociation(organizer_id);
 
 	tournament->SetName(name);
@@ -2469,7 +2473,10 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 	tournament->SetDefaultRuleSet(rules);
 	tournament->SetOrganizer(organizer);
 
-	if (!tournament->Save())
+	if (readonly)
+		tournament->IsReadonly(readonly);
+
+	if (!readonly && !tournament->Save())
 		return Error(Error::Type::OperationFailed);
 
 	//TODO delete the old tournament file in case the name changed
@@ -2497,6 +2504,7 @@ std::string Application::Ajax_GetTournament(const HttpServer::Request& Request)
 	yaml << YAML::Key << "num_participants" << YAML::Value << tournament->GetParticipants().size();
 	yaml << YAML::Key << "schedule_size" << YAML::Value    << tournament->GetSchedule().size();
 	yaml << YAML::Key << "status" << YAML::Value << (int)tournament->GetStatus();
+	yaml << YAML::Key << "is_locked" << YAML::Value << tournament->IsReadonly();
 
 	if (tournament->GetDefaultRuleSet())
 		yaml << YAML::Key << "rule_set_uuid" << YAML::Value << (std::string)tournament->GetDefaultRuleSet()->GetUUID();
