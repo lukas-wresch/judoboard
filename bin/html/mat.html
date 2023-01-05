@@ -179,16 +179,24 @@
         <button class="white"   style="width: 3.5cm;" id="white_wins" onclick="SetScore('white', 'hantei'); ShowHantei(false);">White wins</button>
         <button class="add"     style="width: 3.5cm;" id="draw" onclick="SetScore('', '+draw'); ShowHantei(false);">Draw</button>
         <button class="additional" style="width: 3.5cm;" id="blue_wins" onclick="SetScore('blue', 'hantei'); ShowHantei(false);">Blue wins</button>
-        <button class="neutral" style="width: 3.5cm;" id="golden_score" onclick="SetScore('', '+golden_score'); ShowHantei(false);">Golden Score</button>
+        <button class="neutral" style="width: 3.5cm;" id="golden_score" onclick="SetScore('', '+golden_score'); ShowHantei(false); ShowRevokeGoldenScore(true); ">Golden Score</button>
       </div>
     </td>
   </tr>
 
-  <tr id="row_revoke_decision" style="display: none; ">
+  <tr id="row_revoke_decision" style="display: none;">
     <td colspan="2">
       <div id="div_revoke_decision" style="display: none; height: 0px; text-align: center;">
         <h2>Hantei: <label id="label_hantei"></label></h2>
         <button class="remove" style="width: 6.5cm;" id="revoke_hantei" onclick="RevokeHantei();"></button>
+      </div>
+    </td>
+  </tr>
+
+  <tr id="row_revoke_goldenscore" style="display: none;">
+    <td colspan="2">
+      <div id="div_revoke_goldenscore" style="display: none; height: 0px; text-align: center;">
+        <button class="remove" style="width: 7.5cm;" id="revoke_goldenscore" onclick="RevokeGoldenScore();"></button>
       </div>
     </td>
   </tr>
@@ -213,6 +221,7 @@ var show_next_matches = false;
 var more = false;
 var showHantei = false;
 var showRevokeHantei = false;
+var showRevokeGoldenScore = false;
 var showHansokumakeDecisionWhite = false;
 var showHansokumakeDecisionBlue  = false;
 
@@ -223,6 +232,7 @@ function Hajime()
   AjaxCallback('ajax/mat/hajime?id='+id, function(response) {
     GetScore();
   });
+  ShowRevokeGoldenScore(false);
 }
 
 
@@ -305,6 +315,18 @@ function RevokeHantei()
     Ajax('/ajax/mat/-draw?id=' + id);
   else
     Ajax('/ajax/mat/-hantei?id=' + id);
+}
+
+
+function RevokeGoldenScore()
+{
+  if (!CurrentScore.is_goldenscore)
+    return;
+
+  Ajax('/ajax/mat/-golden_score?id=' + id);
+
+  ShowRevokeGoldenScore(false);
+  ShowHantei(true);
 }
 
 
@@ -422,6 +444,26 @@ function ShowRevokeHantei(show)
   }
 
   showRevokeHantei = show;
+}
+
+
+function ShowRevokeGoldenScore(show)
+{
+  if (show == showRevokeGoldenScore)
+    return;
+
+  if (show)
+  {
+    $("#row_revoke_goldenscore").show();
+    $("#div_revoke_goldenscore").show().animate({height: '50px', opacity: 100}, 1000);
+  }
+  else
+  {
+    $("#div_revoke_goldenscore").animate({height: '0px', opacity: 0}, 1000);
+    $("#row_revoke_goldenscore").hide(1000);
+  }
+
+  showRevokeGoldenScore = show;
 }
 
 
@@ -612,10 +654,7 @@ function GetScore()
     else
       ShowRevokeHantei(false);
 
-    if (res.is_goldenscore)
-      document.getElementById("golden_score").disabled = true;
-    else
-      document.getElementById("golden_score").disabled = false;
+    document.getElementById("golden_score").disabled = res.is_goldenscore;
 
     if (typeof res.white.unknown_disqualification !== 'undefined')
         ShowHansokumakeDecision(true, 'white');
@@ -879,5 +918,6 @@ document.getElementById("white_wins").innerHTML = translate('white_wins');
 document.getElementById("blue_wins").innerHTML  = translate('blue_wins');
 document.getElementById("draw").innerHTML  = translate('draw');
 document.getElementById("revoke_hantei").innerHTML  = translate('revoke_hantei');
+document.getElementById("revoke_goldenscore").innerHTML = translate('revoke_goldenscore');
 
 </script>
