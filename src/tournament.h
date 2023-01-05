@@ -61,6 +61,9 @@ namespace Judoboard
 		bool CanCloseTournament() const;
 		void DeleteAllMatchResults();
 
+		bool IsReadonly() const { return m_Readonly; }
+		void IsReadonly(bool Enable) { m_Readonly = Enable; }
+
 		bool AddMatch(Match* NewMatch);
 		//bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
 		Match* GetNextMatch(int32_t MatID = -1) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
@@ -133,7 +136,6 @@ namespace Judoboard
 		virtual void ListAgeGroups(YAML::Emitter& Yaml) const override;
 
 		//Master schedule / schedule entries
-		MatchTable* GetScheduleEntry(const UUID& UUID) override;
 		bool MoveScheduleEntryUp(const UUID& UUID) override;
 		bool MoveScheduleEntryDown(const UUID& UUID) override;
 
@@ -187,6 +189,7 @@ namespace Judoboard
 
 		std::string m_Name;
 		bool m_AutoSave = true;
+		bool m_Readonly = false;
 
 		const Association* m_Organizer = nullptr;//Tournament is organized by this association, only childen of this association can participate
 		uint32_t m_LotteryTier = 0;//Tier for performing lottery (usually organizer tier + 1)

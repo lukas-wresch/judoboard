@@ -420,7 +420,7 @@ void Application::SetupHttpServer()
 		if (GetTournament()->GetStatus() == Status::Concluded)
 			return std::string("Tournament is already finalized");
 
-		auto entry = GetTournament()->GetScheduleEntry(id);
+		auto entry = GetTournament()->FindMatchTable(id);
 
 		if (!entry)
 			return Error(Error::Type::ItemNotFound);
