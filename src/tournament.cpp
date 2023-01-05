@@ -535,18 +535,21 @@ void Tournament::DeleteAllMatchResults()
 bool Tournament::AddMatch(Match* NewMatch)
 {
 	if (IsReadonly())
+	{
+		ZED::Log::Warn("Can not add a match to a tournament which is read only");
 		return false;
+	}
 
 	if (!NewMatch)
 	{
 		ZED::Log::Error("Invalid match");
 		return false;
 	}
-	if (GetStatus() == Status::Concluded)
+	/*if (GetStatus() == Status::Concluded)
 	{
 		ZED::Log::Warn("Can not add a match to a tournament which is finalized");
 		return false;
-	}
+	}*/
 
 	if (NewMatch->GetFighter(Fighter::White) && NewMatch->GetFighter(Fighter::Blue) &&
 		NewMatch->GetFighter(Fighter::White)->GetUUID() == NewMatch->GetFighter(Fighter::Blue)->GetUUID())

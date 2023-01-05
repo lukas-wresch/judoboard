@@ -68,7 +68,7 @@ namespace Judoboard
 		void DeleteAllMatchResults();
 
 		bool IsReadonly() const { return m_Readonly; }
-		void IsReadonly(bool Enable) { m_Readonly = Enable; }
+		void IsReadonly(bool Enable) { if (m_Name[0] != 0x00) m_Readonly = Enable; }
 
 		bool AddMatch(Match* NewMatch);
 		//bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
