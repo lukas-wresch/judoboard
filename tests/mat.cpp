@@ -2024,6 +2024,41 @@ TEST(Mat, WazariAwaseteIppon)
 
 
 
+TEST(Mat, GoldenScore_Revoke)
+{
+	initialize();
+	Application app;
+	Mat m(1);
+
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+	match.SetMatID(1);
+	match.SetRuleSet(new RuleSet("Test", 2, 10, 30, 20, false, false, true, 0));
+	EXPECT_TRUE(m.StartMatch(&match));
+
+	m.Hajime();
+
+	ZED::Core::Pause(2500);
+	EXPECT_TRUE(m.IsOutOfTime());
+
+	EXPECT_FALSE(m.HasConcluded());
+
+	m.EnableGoldenScore();
+	m.EnableGoldenScore(false);
+
+	EXPECT_TRUE(m.IsOutOfTime());
+	EXPECT_EQ(m.GetTimeElapsed(), 2000);
+
+	EXPECT_FALSE(m.HasConcluded());
+	EXPECT_FALSE(m.EndMatch());
+
+	m.Hantei(Fighter::White);
+
+	EXPECT_TRUE(m.HasConcluded());
+	EXPECT_TRUE(m.EndMatch());
+}
+
+
+
 TEST(Mat, GoldenScore)
 {
 	initialize();
@@ -2037,7 +2072,7 @@ TEST(Mat, GoldenScore)
 
 	m.Hajime();
 
-	ZED::Core::Pause(3000);
+	ZED::Core::Pause(2500);
 	EXPECT_TRUE(m.IsOutOfTime());
 
 	EXPECT_FALSE(m.HasConcluded());

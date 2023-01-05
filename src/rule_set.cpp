@@ -82,12 +82,12 @@ bool RuleSet::IsOutOfTime(int MatchTime_Millseconds, bool GoldenScore) const
 	{
 		if (m_MatchTime < 0)//Infinite match time?
 			return false;
-		return MatchTime_Millseconds > m_MatchTime * 1000;
+		return MatchTime_Millseconds >= m_MatchTime * 1000;
 	}
 
 	if (m_GoldenScoreTime < 0)//Infinite golden score time?
 		return false;
-	return MatchTime_Millseconds > m_GoldenScoreTime * 1000;
+	return MatchTime_Millseconds >= m_GoldenScoreTime * 1000;
 }
 
 

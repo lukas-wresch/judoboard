@@ -353,7 +353,10 @@ bool Mat::EnableGoldenScore(bool GoldenScore)
 		AddEvent(MatchLog::NeutralEvent::EnableGoldenScore);
 	}
 	else
+	{
+		m_HajimeTimer = m_pMatch->GetRuleSet().GetMatchTime() * 1000;
 		AddEvent(MatchLog::NeutralEvent::DisableGoldenScore);
+	}
 
 	m_GoldenScore = GoldenScore;
 	return true;
