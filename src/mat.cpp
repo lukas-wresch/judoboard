@@ -402,6 +402,7 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "is_out_of_time"       << YAML::Value << IsOutOfTime();
 	Yaml << YAML::Key << "no_winner_yet"        << YAML::Value << (GetResult().m_Winner == Winner::Draw);
 	Yaml << YAML::Key << "is_goldenscore"       << YAML::Value << IsGoldenScore();
+	Yaml << YAML::Key << "is_hantei"            << YAML::Value << (GetScoreboard(Fighter::White).m_Hantei || GetScoreboard(Fighter::Blue).m_Hantei);
 
 	if (m_pMatch)
 	{
@@ -737,6 +738,28 @@ void Mat::Hantei(Fighter Whom)
 	}
 
 	ZED::Log::Info("Hantei");
+}
+
+
+
+void Mat::RevokeHantei()
+{
+	m_mutex.lock();
+
+	if (AreFightersOnMat() && (GetScoreboard(Fighter::White).m_Hantei || GetScoreboard(Fighter::Blue).m_Hantei))
+	{
+		if (GetScoreboard(Fighter::White).m_Hantei)
+			AddEvent(Fighter::White, MatchLog::BiasedEvent::HanteiRevoked);
+		if (GetScoreboard(Fighter::Blue).m_Hantei)
+			AddEvent(Fighter::Blue,  MatchLog::BiasedEvent::HanteiRevoked);
+
+		SetScoreboard(Fighter::White).m_Hantei = false;
+		SetScoreboard(Fighter::Blue ).m_Hantei = false;
+	}
+
+	m_mutex.unlock();
+
+	ZED::Log::Info("Revoke Hantei");
 }
 
 

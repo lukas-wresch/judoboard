@@ -105,6 +105,7 @@ var lang_en = {
     overview:  [ "Overview", "&Uuml;bersicht" ],
     open:  [ "Oppen", "&Ouml;ffnen" ],
     participants: [ "Participants", "Teilnehmer" ],
+    revoke_hantei: [ "Revoke Hantei", "Hantei zur&uuml;cknehmen" ],
     rule_set:   [ "Rule Set", "Regelwerk" ],
     rule_sets:  [ "Rule Sets", "Regelwerke" ],
     remove:  [ "Remove", "Entfernen" ],

@@ -183,6 +183,15 @@
       </div>
     </td>
   </tr>
+
+  <tr id="row_revoke_decision" style="display: none; ">
+    <td colspan="2">
+      <div id="div_revoke_decision" style="display: none; height: 0px; text-align: center;">
+        <h2>Hantei: <label id="label_hantei"></label></h2>
+        <button class="remove" style="width: 6.5cm;" id="revoke_hantei" onclick="RevokeHantei();"></button>
+      </div>
+    </td>
+  </tr>
 </table>
 
 <script>
@@ -201,6 +210,11 @@ var ScoreUpdate_Counter = 10;
 
 var show_next_matches = false;
 
+var more = false;
+var showHantei = false;
+var showRevokeHantei = false;
+var showHansokumakeDecisionWhite = false;
+var showHansokumakeDecisionBlue  = false;
 
 
 function Hajime()
@@ -279,6 +293,18 @@ function EndMatch()
     GetJudokaName();
     GetScore();
   });
+}
+
+
+function RevokeHantei()
+{
+  if (!CurrentScore.has_concluded)
+    return;
+
+  if (CurrentScore.has_concluded && CurrentScore.winner == 2)
+    Ajax('/ajax/mat/-draw?id=' + id);
+  else
+    Ajax('/ajax/mat/-hantei?id=' + id);
 }
 
 
@@ -376,6 +402,26 @@ function ShowHantei(show)
   }
 
   showHantei = show;
+}
+
+
+function ShowRevokeHantei(show)
+{
+  if (show == showRevokeHantei)
+    return;
+
+  if (show)
+  {
+    $("#row_revoke_decision").show();
+    $("#div_revoke_decision").show().animate({height: '120px', opacity: 100}, 1000);
+  }
+  else
+  {
+    $("#div_revoke_decision").animate({height: '0px', opacity: 0}, 1000);
+    $("#row_revoke_decision").hide(1000);
+  }
+
+  showRevokeHantei = show;
 }
 
 
@@ -552,6 +598,20 @@ function GetScore()
     else
       ShowHantei(false);
 
+    if (res.is_hantei || (res.has_concluded && res.winner == 2))
+    {
+      if (res.winner == 0)
+        document.getElementById('label_hantei').innerHTML = translate('white');
+      else if (res.winner == 1)
+        document.getElementById('label_hantei').innerHTML = translate('blue');
+      else
+        document.getElementById('label_hantei').innerHTML = translate('draw');
+
+      ShowRevokeHantei(true);
+    }
+    else
+      ShowRevokeHantei(false);
+
     if (res.is_goldenscore)
       document.getElementById("golden_score").disabled = true;
     else
@@ -584,15 +644,26 @@ function GetJudokaName()
     if (name2.length > 20)
       name2 = name2.substr(0, 20) + ".";
 
-    var hidden = 'hidden';
+    var white_name;
+    var blue_name;
+
+    var hidden = 'hidden="" ';
     if (CurrentScore.has_concluded && CurrentScore.winner == 0)
       hidden = '';
-    document.getElementById("white_name").innerHTML = name1 + '<img src="winner.png" id="winner_white" ' + hidden + ' style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;"/>';
+    white_name = name1 + '<img src="winner.png" id="winner_white" ' + hidden + 'style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;">';
 
-    hidden = 'hidden';
+    hidden = 'hidden="" ';
     if (CurrentScore.has_concluded && CurrentScore.winner == 1)
       hidden = '';
-    document.getElementById("blue_name").innerHTML  = name2 + '<img src="winner.png" id="winner_blue"  ' + hidden + ' style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;"/>';;
+    blue_name = name2 + '<img src="winner.png" id="winner_blue" ' + hidden + 'style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;">';;
+
+    //Update needed?    
+    if (white_name != document.getElementById("white_name").innerHTML || blue_name != document.getElementById("blue_name").innerHTML)
+    {
+      console.log("update");
+      document.getElementById("white_name").innerHTML = white_name;
+      document.getElementById("blue_name").innerHTML  = blue_name;
+    }
 
     var table = document.getElementById("next_matches_table");
 
@@ -778,11 +849,6 @@ GetJudokaName();
 TimerID = window.setInterval(UpdateTimer, 100);
 
 
-var more = false;
-var showHantei = false;
-var showHansokumakeDecisionWhite = false;
-var showHansokumakeDecisionBlue  = false;
-
 document.getElementById("time").innerHTML = translate('time');
 document.getElementById("mat").innerHTML  = translate('mat') + ' ' + id;
 
@@ -812,5 +878,6 @@ for (const el of document.getElementsByClassName("remove_medical_examiniations")
 document.getElementById("white_wins").innerHTML = translate('white_wins');
 document.getElementById("blue_wins").innerHTML  = translate('blue_wins');
 document.getElementById("draw").innerHTML  = translate('draw');
+document.getElementById("revoke_hantei").innerHTML  = translate('revoke_hantei');
 
 </script>

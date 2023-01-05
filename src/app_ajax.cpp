@@ -1042,47 +1042,104 @@ void Application::SetupHttpServer()
 
 			return Error();//OK
 		});
-
-		m_Server.RegisterResource("/ajax/mat/+draw", [this](auto& Request) -> std::string {
-			auto account = IsLoggedIn(Request);
-			if (!account)
-				return Error(Error::Type::NotLoggedIn);
-
-			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-			if (id <= 0)
-				return Error(Error::Type::InvalidID);
-
-			auto mat = FindMat(id);
-
-			if (mat)
-				mat->SetAsDraw();
-
-			return Error();//OK
-		});
-
-		m_Server.RegisterResource("/ajax/mat/+golden_score", [this](auto& Request) -> std::string {
-			auto account = IsLoggedIn(Request);
-			if (!account)
-				return Error(Error::Type::NotLoggedIn);
-
-			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-			if (id <= 0)
-				return Error(Error::Type::InvalidID);
-
-			auto mat = FindMat(id);
-
-			if (!mat)
-				return Error(Error::Type::MatNotFound);
-
-			if (!mat->EnableGoldenScore())
-				return Error(Error::Type::OperationFailed);
-
-			return Error();//OK
-		});
 	}
 
+
+	m_Server.RegisterResource("/ajax/mat/-hantei", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (mat)
+			mat->RevokeHantei();
+
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/mat/+draw", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (mat)
+			mat->SetAsDraw();
+
+		return Error();//OK
+		});
+
+	m_Server.RegisterResource("/ajax/mat/-draw", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (mat)
+			mat->SetAsDraw(false);
+
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/mat/+golden_score", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (!mat)
+			return Error(Error::Type::MatNotFound);
+
+		if (!mat->EnableGoldenScore())
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/mat/-golden_score", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (!mat)
+			return Error(Error::Type::MatNotFound);
+
+		if (!mat->EnableGoldenScore(false))
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
+	});
 
 	m_Server.RegisterResource("/ajax/mat/tokeda", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
