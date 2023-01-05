@@ -29,6 +29,14 @@
   </select>
 </div>
 
+<div>
+  <label style="width: 200px;float:left;margin-top:4px;" id="label_readonly"></label>
+  <input type="checkbox" checked id="readonly" class="switch-input">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="readonly">
+    <span class="toggle-on" id="readonly_enabled"></span><span class="toggle-off" id="readonly_disabled"></span>
+  </label>
+</div>
+
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddTournament()" id="add">New Tournament</button>
 <button class="add" style="margin-top: 0.8cm;" onclick="return UpdateTournament()" id="update">Save Tournament</button>
 <br/>
@@ -67,6 +75,7 @@ function UpdateTournament()
     year:        document.getElementById("year").value,
     rules:       document.getElementById("rule").value,
     organizer:   document.getElementById("clubs").value,
+    readonly:    document.getElementById("readonly").checked,
   });
 
   AjaxPost('ajax/tournament/update?id='+id, params, function() {
@@ -184,5 +193,9 @@ document.getElementById("label_rules").innerHTML = translate('default_rule_set')
 
 document.getElementById("label_name").innerHTML = translate('name');
 document.getElementById("label_year").innerHTML = translate('year');
+
+document.getElementById("label_readonly").innerHTML = translate('readonly');
+document.getElementById("readonly_enabled").innerHTML = translate('enabled');
+document.getElementById("readonly_disabled").innerHTML = translate('disabled');
 
 </script>

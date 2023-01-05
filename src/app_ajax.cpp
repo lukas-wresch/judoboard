@@ -2006,6 +2006,7 @@ void Application::SetupHttpServer()
 		return HttpServer::LoadFile(filename);
 	}, HttpServer::ResourceType::Binary);
 
+
 	m_Server.RegisterResource("/ajax/tournament/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
