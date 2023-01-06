@@ -75,7 +75,7 @@ TEST(Pool, Count4)
 
 
 
-TEST(Pool, Count4_Top1)
+TEST(Pool, Count4_Pool2Top1)
 {
 	initialize();
 
@@ -220,7 +220,7 @@ TEST(Pool, Count4_3rdPlace)
 
 
 
-TEST(Pool, Count6)
+TEST(Pool, Count6_Pool2)
 {
 	initialize();
 
@@ -285,7 +285,7 @@ TEST(Pool, Count6)
 
 
 
-TEST(Pool, Count8)
+TEST(Pool, Count8_Pool4)
 {
 	initialize();
 
@@ -389,7 +389,94 @@ TEST(Pool, Count8)
 
 
 
-TEST(Pool, Count8_Top3)
+TEST(Pool, Count8_Pool4Top1)
+{
+	initialize();
+
+	Judoka j1(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
+	Judoka j2(GetFakeFirstname(), GetFakeLastname(), 51, Gender::Male);
+	Judoka j3(GetFakeFirstname(), GetFakeLastname(), 52, Gender::Male);
+	Judoka j4(GetFakeFirstname(), GetFakeLastname(), 53, Gender::Male);
+	Judoka j5(GetFakeFirstname(), GetFakeLastname(), 54, Gender::Male);
+	Judoka j6(GetFakeFirstname(), GetFakeLastname(), 55, Gender::Male);
+	Judoka j7(GetFakeFirstname(), GetFakeLastname(), 56, Gender::Male);
+	Judoka j8(GetFakeFirstname(), GetFakeLastname(), 57, Gender::Male);
+
+	Pool w(Weight(10), Weight(100));
+	w.SetMatID(1);
+
+	EXPECT_TRUE(w.AddParticipant(&j1));
+	EXPECT_TRUE(w.AddParticipant(&j2));
+	EXPECT_TRUE(w.AddParticipant(&j3));
+	EXPECT_TRUE(w.AddParticipant(&j4));
+	EXPECT_TRUE(w.AddParticipant(&j5));
+	EXPECT_TRUE(w.AddParticipant(&j6));
+	EXPECT_TRUE(w.AddParticipant(&j7));
+	EXPECT_TRUE(w.AddParticipant(&j8));
+
+	w.SetPoolCount(4);
+	w.SetTakeTop(1);
+
+	ASSERT_EQ(w.GetPoolCount(), 4);
+
+	ASSERT_TRUE(w.GetPool(0));
+	ASSERT_TRUE(w.GetPool(1));
+	ASSERT_TRUE(w.GetPool(2));
+	ASSERT_TRUE(w.GetPool(3));
+
+	ASSERT_EQ(w.GetPool(0)->GetParticipants().size(), 2);
+	ASSERT_EQ(w.GetPool(1)->GetParticipants().size(), 2);
+
+	EXPECT_EQ(*w.GetPool(0)->GetJudokaByStartPosition(0), j1);
+	EXPECT_EQ(*w.GetPool(0)->GetJudokaByStartPosition(1), j5);
+	EXPECT_EQ(*w.GetPool(1)->GetJudokaByStartPosition(0), j2);
+	EXPECT_EQ(*w.GetPool(1)->GetJudokaByStartPosition(1), j6);
+	EXPECT_EQ(*w.GetPool(2)->GetJudokaByStartPosition(0), j3);
+	EXPECT_EQ(*w.GetPool(2)->GetJudokaByStartPosition(1), j7);
+	EXPECT_EQ(*w.GetPool(3)->GetJudokaByStartPosition(0), j4);
+	EXPECT_EQ(*w.GetPool(3)->GetJudokaByStartPosition(1), j8);
+
+	EXPECT_EQ(w.GetSchedule().size(), 1*4 + 2+1);
+
+	auto schedule = w.GetSchedule();
+	auto semi1   = schedule[w.GetSchedule().size() - 3];
+	auto semi2   = schedule[w.GetSchedule().size() - 2];
+
+	EXPECT_EQ(semi1->GetDependencyTypeOf(Fighter::White), DependencyType::TakeRank1);
+	EXPECT_EQ(*semi1->GetDependentMatchTableOf(Fighter::White), *w.GetPool(0));
+	EXPECT_EQ(semi1->GetDependencyTypeOf(Fighter::Blue),  DependencyType::TakeRank1);
+	EXPECT_EQ(*semi1->GetDependentMatchTableOf(Fighter::Blue),  *w.GetPool(2));
+
+	EXPECT_EQ(semi2->GetDependencyTypeOf(Fighter::White), DependencyType::TakeRank1);
+	EXPECT_EQ(*semi2->GetDependentMatchTableOf(Fighter::White), *w.GetPool(1));
+	EXPECT_EQ(semi2->GetDependencyTypeOf(Fighter::Blue),  DependencyType::TakeRank1);
+	EXPECT_EQ(*semi2->GetDependentMatchTableOf(Fighter::Blue),  *w.GetPool(3));
+
+	Mat m(1);
+
+	for (auto match : w.GetSchedule())
+	{
+		if (match->IsEmptyMatch())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = w.CalculateResults();
+
+	ASSERT_EQ(results.GetSize(), 2);
+	EXPECT_EQ(*results[0].Judoka, j8);
+	EXPECT_EQ(*results[1].Judoka, j7);
+}
+
+
+
+TEST(Pool, Count8_Pool2Top3)
 {
 	initialize();
 
