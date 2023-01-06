@@ -355,6 +355,10 @@ bool Tournament::LoadYAML(const std::string& Filename)
 			if (!node.IsScalar())
 				continue;
 
+#ifdef _DEBUG
+			auto old_size = m_Schedule.size();
+#endif
+
 			UUID id = node.as<std::string>();
 			for (auto table : m_MatchTables)
 			{
@@ -362,9 +366,10 @@ bool Tournament::LoadYAML(const std::string& Filename)
 				if (index != SIZE_MAX)
 					m_Schedule.emplace_back(table, index);
 			}
-				//for (auto match : table->GetSchedule())
-					//if (match->GetUUID() == id)
-						//m_Schedule.emplace_back(match);
+
+#ifdef _DEBUG
+			assert(m_Schedule.size() == old_size + 1);
+#endif
 		}
 	}
 

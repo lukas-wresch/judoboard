@@ -41,16 +41,14 @@ Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
 	m_Finals.IsSubMatchTable(true);
 
 	if (Yaml["pool_count"])
-		SetPoolCount(Yaml["pool_count"].as<uint32_t>());
+		m_PoolCount = Yaml["pool_count"].as<uint32_t>();
 	if (Yaml["take_top"])
-		SetTakeTop(Yaml["take_top"].as<uint32_t>());
+		m_TakeTop   = Yaml["take_top"].as<uint32_t>();
 
 	if (Yaml["third_place_match"])
-		IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
+		m_Finals.IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
 	if (Yaml["fifth_place_match"])
-		IsFifthPlaceMatch(Yaml["fifth_place_match"].as<bool>());
-
-	GenerateSchedule();
+		m_Finals.IsFifthPlaceMatch(Yaml["fifth_place_match"].as<bool>());
 
 	//Check if pools have specific data
 	for (size_t i = 0; i < m_Pools.size(); ++i)
