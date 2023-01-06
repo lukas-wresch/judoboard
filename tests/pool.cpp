@@ -553,36 +553,44 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 {
 	initialize();
 
-	Pool w(Weight(10), Weight(100));
-	w.SetMatID(1);
+	Tournament tourney;
+	Pool* w = new Pool(Weight(10), Weight(100));
+	w->SetMatID(1);
+	tourney.AddMatchTable(w);
 
 	for (int i = 0; i < 16; i++)
 	{
 		Judoka* j = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i, Gender::Male);
-		EXPECT_TRUE(w.AddParticipant(j));
+		EXPECT_TRUE(w->AddParticipant(j));
 	}
 
-	ASSERT_TRUE(w.GetPool(0));
-	ASSERT_TRUE(w.GetPool(1));
-	ASSERT_TRUE(w.GetPool(2));
-	ASSERT_TRUE(w.GetPool(3));
+	ASSERT_TRUE(w->GetPool(0));
+	ASSERT_TRUE(w->GetPool(1));
+	ASSERT_TRUE(w->GetPool(2));
+	ASSERT_TRUE(w->GetPool(3));
 
-	w.GetPool(0)->SetMatID(1);
-	w.GetPool(1)->SetMatID(2);
-	w.GetPool(2)->SetMatID(3);
-	w.GetPool(3)->SetMatID(4);
-	w.GetFinals().SetMatID(5);
+	w->GetPool(0)->SetMatID(1);
+	w->GetPool(1)->SetMatID(2);
+	w->GetPool(2)->SetMatID(3);
+	w->GetPool(3)->SetMatID(4);
+	w->GetFinals().SetMatID(5);
 
-	w.GenerateSchedule();
+	w->GenerateSchedule();
 
 	YAML::Emitter yaml;
 	yaml << YAML::BeginMap;
-	w >> yaml;
+	*w >> yaml;
 	yaml << YAML::EndMap;
 
-	Pool w2(YAML::Load(yaml.c_str()));
+	Pool w2(YAML::Load(yaml.c_str()), &tourney);
 
-	w2.GenerateSchedule();
+	EXPECT_EQ(w2.GetSchedule().size(), w->GetSchedule().size());
+
+	EXPECT_EQ(w2.GetPool(0)->GetMatID(), 1);
+	EXPECT_EQ(w2.GetPool(1)->GetMatID(), 2);
+	EXPECT_EQ(w2.GetPool(2)->GetMatID(), 3);
+	EXPECT_EQ(w2.GetPool(3)->GetMatID(), 4);
+	EXPECT_EQ(w2.GetFinals().GetMatID(), 5);
 
 	Mat m(1);
 	int count[5] = {0, 0, 0, 0, 0};

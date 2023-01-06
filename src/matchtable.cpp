@@ -155,13 +155,16 @@ bool MatchTable::AddMatch(Match* NewMatch)
 
 
 
-bool MatchTable::AddParticipant(const Judoka* NewParticipant, bool Force)
+bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 {
 	if (!NewParticipant || !m_Filter)
 		return false;
 
 	if (!m_Filter->AddParticipant(NewParticipant, Force))
 		return false;
+
+	if (GetTournament())//Add to tournament?
+		((ITournament*)GetTournament())->AddParticipant(NewParticipant);//Const cast
 
 	GenerateSchedule();
 	return true;

@@ -294,7 +294,7 @@ namespace Judoboard
 
 		virtual const std::string ToHTML() const = 0;
 
-		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
+		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
 
 		//Basics

@@ -49,6 +49,21 @@ Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
 		IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
 	if (Yaml["fifth_place_match"])
 		IsFifthPlaceMatch(Yaml["fifth_place_match"].as<bool>());
+
+	GenerateSchedule();
+
+	//Check if pools have specific data
+	for (size_t i = 0; i < m_Pools.size(); ++i)
+	{
+		if (Yaml["mat_of_pool_" + std::to_string(i)])
+			m_Pools[i]->SetMatID(Yaml["mat_of_pool_" + std::to_string(i)].as<uint32_t>());
+		if (Yaml["name_of_pool_" + std::to_string(i)])
+			m_Pools[i]->SetName(Yaml["name_of_pool_" + std::to_string(i)].as<std::string>());
+	}
+
+	if (Yaml["mat_of_finals"])
+		GetFinals().SetMatID(Yaml["mat_of_finals"].as<uint32_t>());
+	GetFinals().SetName(Yaml["name_of_finals"].as<std::string>());
 }
 
 
@@ -64,6 +79,18 @@ void Pool::operator >> (YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "third_place_match" << YAML::Value << IsThirdPlaceMatch();
 	if (IsFifthPlaceMatch())
 		Yaml << YAML::Key << "fifth_place_match" << YAML::Value << IsFifthPlaceMatch();
+
+	//Serialize mats of pools if they differ
+	for (size_t i = 0; i < m_Pools.size(); ++i)
+	{
+		if (m_Pools[i]->GetMatID() != 0)
+			Yaml << YAML::Key << "mat_of_pool_" + std::to_string(i) << YAML::Value << m_Pools[i]->GetMatID();
+		Yaml << YAML::Key << "name_of_pool_" + std::to_string(i) << YAML::Value << m_Pools[i]->GetName();
+	}
+
+	if (GetFinals().GetMatID() != 0 && GetFinals().GetMatID() != GetMatID())
+		Yaml << YAML::Key << "mat_of_finals" << YAML::Value << GetFinals().GetMatID();
+	Yaml << YAML::Key << "name_of_finals" << YAML::Value << GetFinals().GetName();
 }
 
 
