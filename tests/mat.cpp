@@ -234,7 +234,7 @@ TEST(Mat, CorrectWinner)
 				m.AddNoDisqualification(!f);
 			}
 
-			ZED::Core::Pause(2500);
+			ZED::Core::Pause(2200);
 
 			if (i == 4)
 				m.SetAsDraw();
@@ -245,6 +245,9 @@ TEST(Mat, CorrectWinner)
 				EXPECT_EQ(match.GetResult().m_Winner, Winner::Draw);
 			else
 				EXPECT_EQ(match.GetResult().m_Winner, Fighter2Winner(f));
+
+			if (i != 0 && i != 5)
+				EXPECT_EQ(match.GetResult().m_Time, 2000);
 		}
 	}
 }
