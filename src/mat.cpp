@@ -473,8 +473,13 @@ void Mat::Mate()
 		m_HajimeTimer.Pause();
 
 		//Don't overflow timer
-		if (m_pMatch && m_HajimeTimer > m_pMatch->GetRuleSet().GetMatchTime() * 1000)
-			m_HajimeTimer = m_pMatch->GetRuleSet().GetMatchTime() * 1000;
+		if (IsOutOfTime())
+		{
+			if (!IsGoldenScore() && m_pMatch && m_HajimeTimer > m_pMatch->GetRuleSet().GetMatchTime() * 1000)
+				m_HajimeTimer = m_pMatch->GetRuleSet().GetMatchTime() * 1000;
+			else if (IsGoldenScore() && m_pMatch && m_HajimeTimer > m_pMatch->GetRuleSet().GetMatchTime() * 1000)
+				m_HajimeTimer = m_pMatch->GetRuleSet().GetGoldenScoreTime() * 1000;
+		}
 
 		if (IsOsaekomi())//Mate during osaekomi?
 		{
