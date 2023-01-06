@@ -1594,7 +1594,7 @@ bool Tournament::PerformLottery()
 		organizer_level = m_Organizer->GetLevel();
 
 	auto lottery_level = organizer_level + 1;//Default
-	if (m_LotteryTier > 0 && m_LotteryTier > organizer_level)//Is valid?
+	if (m_LotteryTier > 0 && (int)m_LotteryTier > organizer_level)//Is valid?
 		lottery_level = m_LotteryTier;
 
 	for (auto [id, judoka] : GetDatabase().GetAllJudokas())
