@@ -671,6 +671,8 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 
 	Pool w2(YAML::Load(yaml.c_str()), &tourney);
 
+	w2.GenerateSchedule();
+
 	EXPECT_EQ(w2.GetSchedule().size(), w->GetSchedule().size());
 
 	EXPECT_EQ(w2.GetPool(0)->GetMatID(), 1);

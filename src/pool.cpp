@@ -50,6 +50,12 @@ Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
 	if (Yaml["fifth_place_match"])
 		m_Finals.IsFifthPlaceMatch(Yaml["fifth_place_match"].as<bool>());
 
+	const auto pool_count = CalculatePoolCount();
+	m_Pools.resize(pool_count);
+
+	for (int i = 0; i < pool_count; ++i)
+		m_Pools[i] = new RoundRobin(nullptr);
+
 	//Check if pools have specific data
 	for (size_t i = 0; i < m_Pools.size(); ++i)
 	{
