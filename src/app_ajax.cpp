@@ -2795,9 +2795,6 @@ Error Application::Ajax_ImportJudoka(const HttpServer::Request& Request)
 	if (!m_Database.AddJudoka(judoka))
 		return Error::Type::OperationFailed;
 
-	if (!m_Database.AddClub((Club*)judoka->GetClub()))
-		return Error::Type::OperationFailed;
-
 	return Error();//OK
 }
 
