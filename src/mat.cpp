@@ -1195,7 +1195,8 @@ bool Mat::Animation::Process(GraphicElement& Graphic, double dt)
 				return false;
 
 			Graphic->SetSize((float)(m_BaseSize + m_Amplitude * sin(m_Frequency * (double)Timer::GetTimestamp())) );
-			m_Amplitude -= dt * m_Damping;
+			m_Amplitude -= dt * m_Amplitude * m_DampingQuadratic;
+			m_Amplitude -= dt * m_DampingLinear;
 			if (m_Amplitude < 0.0)
 			{
 				m_Amplitude = 0.0;
@@ -1357,19 +1358,6 @@ void Mat::NextState(State NextState) const
 			m_Graphics["yoshi"].UpdateTexture(renderer, "Yoshi", ZED::Color(255, 255, 255));
 
 			//Effects
-			m_Graphics["effect_ippon_white"].StopAllAnimations();
-			m_Graphics["effect_ippon_white"].AddAnimation(Animation::CreateScaleSinus(0.15 * m_ScalingFactor, 0.006, 1.0, 0.02));
-			m_Graphics["effect_ippon_white"].GetAnimations()[0].RunInParallel();
-
-			m_Graphics["effect_ippon_blue"].StopAllAnimations();
-			m_Graphics["effect_ippon_blue"].AddAnimation(Animation::CreateScaleSinus(0.15 * m_ScalingFactor, 0.006, 1.0, 0.02));
-			m_Graphics["effect_ippon_blue"].GetAnimations()[0].RunInParallel();
-
-			m_Graphics["effect_ippon_white"].UpdateTexture(renderer, "Ippon", ZED::Color(0, 0, 0));
-			m_Graphics["effect_ippon_blue" ].UpdateTexture(renderer, "Ippon", ZED::Color(255, 255, 255));
-			m_Graphics["effect_ippon_white"].Centralize();
-			m_Graphics["effect_ippon_blue" ].Centralize();
-
 			m_Graphics["effect_wazaari_white"].UpdateTexture(renderer, "Wazaari", ZED::Color(0, 0, 0));
 			m_Graphics["effect_wazaari_blue" ].UpdateTexture(renderer, "Wazaari", ZED::Color(255, 255, 255));
 
@@ -1408,6 +1396,19 @@ void Mat::NextState(State NextState) const
 
 			m_Graphics["effect_tokeda_blue" ].SetPosition((int)(520.0 * m_ScalingFactor), effect_row3);
 			m_Graphics["effect_tokeda_white"].SetPosition(width - (int)(850.0 * m_ScalingFactor), effect_row3);
+
+			m_Graphics["effect_ippon_white"].StopAllAnimations();
+			m_Graphics["effect_ippon_white"].AddAnimation(Animation::CreateScaleSinus(0.25 * m_ScalingFactor, 0.007, 1.0, 0.01, 0.4));
+			m_Graphics["effect_ippon_white"].GetAnimations()[0].RunInParallel();
+
+			m_Graphics["effect_ippon_blue"].StopAllAnimations();
+			m_Graphics["effect_ippon_blue"].AddAnimation(Animation::CreateScaleSinus(0.25 * m_ScalingFactor, 0.007, 1.0, 0.01, 0.4));
+			m_Graphics["effect_ippon_blue"].GetAnimations()[0].RunInParallel();
+
+			m_Graphics["effect_ippon_white"].UpdateTexture(renderer, "Ippon", ZED::Color(0, 0, 0));
+			m_Graphics["effect_ippon_blue" ].UpdateTexture(renderer, "Ippon", ZED::Color(255, 255, 255));
+			m_Graphics["effect_ippon_white"].Centralize();
+			m_Graphics["effect_ippon_blue" ].Centralize();
 
 			//Same as ippon
 			m_Graphics["effect_shido_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row1);

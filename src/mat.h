@@ -175,7 +175,7 @@ namespace Judoboard
 				return ret;
 			}
 
-			static Animation CreateScaleSinus(double Amplitude, double Frequency, double BaseSize = 1.0, double Damping = 0.0, std::function<bool(const GraphicElement&)> AnimateTill = nullptr)
+			static Animation CreateScaleSinus(double Amplitude, double Frequency, double BaseSize = 1.0, double DampingLinear = 0.0, double DampingQuadratic = 0.0, std::function<bool(const GraphicElement&)> AnimateTill = nullptr)
 			{
 				Animation ret;
 				ret.m_Type = Type::ScaleSinus;
@@ -183,7 +183,8 @@ namespace Judoboard
 				ret.m_Amplitude = Amplitude;
 				ret.m_Frequency = Frequency;
 				ret.m_BaseSize  = BaseSize;
-				ret.m_Damping   = Damping;
+				ret.m_DampingLinear    = DampingLinear;
+				ret.m_DampingQuadratic = DampingQuadratic;
 				return ret;
 			}
 
@@ -208,7 +209,7 @@ namespace Judoboard
 				};
 
 				struct {//For scale animation
-					double m_Amplitude, m_Frequency, m_BaseSize, m_Damping;
+					double m_Amplitude, m_Frequency, m_BaseSize, m_DampingLinear, m_DampingQuadratic;
 				};
 			};
 		};
