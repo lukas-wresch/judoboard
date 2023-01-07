@@ -34,7 +34,7 @@ function GetAgeGroups()
 
       cell1.innerHTML = age.name;
       cell2.innerHTML = age.desc;
-      cell3.innerHTML = "<button class=\"neutral\" onclick=\"navigate('age_groups_add.html?id=" + age.uuid + "');\">Edit</button>";
+      cell3.innerHTML = "<button class=\"neutral\" onclick=\"navigate('age_groups_add.html?id=" + age.uuid + "');\">"+ translate('edit') +"</button>";
     }
   });
 }

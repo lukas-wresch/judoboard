@@ -111,6 +111,7 @@ var lang_en = {
     remove:  [ "Remove", "Entfernen" ],
     running:   [ "Running", "am K&auml;mpfen" ],
     shutdown_confirm:  [ "Are you sure you want to shutdown Judoboard?", "Soll Judoboard wirklich heruntergefahren werden?" ],
+    start:  [ "Start", "Starten" ],
     start_next_match:  [ "Start Next Match", "Kampf starten" ],
     save:  [ "Save", "Speichern" ],
     select_age_groups: [ "Select Age Groups", "Altersklassen ausw&auml;hlen" ],
