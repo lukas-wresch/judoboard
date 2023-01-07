@@ -58,12 +58,12 @@
 
 
 <div>
-    <p style="width:150px;margin-top:1cm;">Log</p>
+    <p style="width:150px;margin-top:1cm;" id="matchlog"></p>
     <table id="log" border="1" rules="all">
       <tr>
-        <th style="width: 2cm;">Time</th>
-        <th style="width: 2cm;">For</th>
-        <th style="width: 4cm;">Event</th>
+        <th style="width: 2cm;" id="log_time">Time</th>
+        <th style="width: 2cm;" id="log_for">For</th>
+        <th style="width: 5cm;" id="log_event">Event</th>
       </tr>
     </table>
 </div>
@@ -295,6 +295,11 @@ document.getElementById("label_winner").innerHTML = translate('winner');
 document.getElementById("label_score").innerHTML  = translate('score');
 document.getElementById("label_time").innerHTML   = translate('time');
 document.getElementById("delete").innerHTML       = translate('delete_match');
+
+document.getElementById("matchlog").innerHTML     = translate('match_log');
+document.getElementById("log_time").innerHTML     = translate('time');
+document.getElementById("log_for").innerHTML      = translate('for');
+document.getElementById("log_event").innerHTML    = translate('event');
 
 GetLog();
 
