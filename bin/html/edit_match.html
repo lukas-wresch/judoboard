@@ -103,6 +103,10 @@ function GetMatch()
       document.getElementById("status").innerHTML = translate('running');
     else if (res.state == 2)
       document.getElementById("status").innerHTML = translate('concluded');
+    else if (res.state == 3)
+      document.getElementById("status").innerHTML = translate('optional');
+    else if (res.state == 4)
+      document.getElementById("status").innerHTML = translate('skipped');
 
     document.getElementById("class").innerHTML = res.match_table_name;
 
