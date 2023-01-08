@@ -155,9 +155,6 @@
     <ClInclude Include="..\..\src\remote_mat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\pause.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\matchtable.h">
       <Filter>Header Files</Filter>
     </ClInclude>

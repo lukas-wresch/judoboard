@@ -2,7 +2,6 @@
 #include "app.h"
 #include "database.h"
 #include "weightclass.h"
-#include "pause.h"
 #include "customtable.h"
 #include "single_elimination.h"
 #include "remote_mat.h"
