@@ -253,6 +253,43 @@ TEST(Ajax, UpdateMat)
 
 
 
+TEST(Ajax, PauseMat)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+
+		EXPECT_TRUE(app.Ajax_PauseMat(HttpServer::Request("id=1&enable=true")));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetDefaultMat()->IsPaused());
+
+		EXPECT_FALSE(app.Ajax_PauseMat(HttpServer::Request("id=5&enable=false")));
+		EXPECT_TRUE( app.Ajax_PauseMat(HttpServer::Request("id=1&enable=false")));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
+		EXPECT_FALSE(app.GetDefaultMat()->IsPaused());
+
+		EXPECT_FALSE(app.Ajax_PauseMat(HttpServer::Request("id=5&enable=true")));
+		EXPECT_TRUE( app.Ajax_PauseMat(HttpServer::Request("id=1&enable=true")));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetDefaultMat()->IsPaused());
+	}
+}
+
+
+
 TEST(Ajax, UpdatePassword)
 {
 	initialize();
