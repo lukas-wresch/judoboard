@@ -32,7 +32,7 @@ void StandingData::Reset()
 
 
 
-void StandingData::operator << (YAML::Node& Yaml)
+void StandingData::operator << (const YAML::Node& Yaml)
 {
 	if (Yaml["year"])
 		m_Year = Yaml["year"].as<uint32_t>();
