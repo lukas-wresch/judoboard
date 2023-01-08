@@ -179,6 +179,48 @@ void Application::SetupHttpServer()
 		return Error(Error::Type::InvalidFormat);
 	});
 
+	m_Server.RegisterResource("/upload/yml", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		//ZED::Log::Debug(Request.m_Body);
+
+		auto pos = Request.m_Body.Find("\r\n\r\n");
+		if (pos != 0)
+		{
+			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
+
+			if (boundary_end == 0)
+				return Error(Error::Type::InvalidFormat);
+
+			Tournament* tournament_file = new Tournament("");
+
+			auto yaml = YAML::Load((char*)Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
+
+			if (!tournament_file->Load(yaml))
+			{
+				delete tournament_file;
+				return Error(Error::Type::InvalidFormat);
+			}
+
+			tournament_file->Save();
+			AddTournament(tournament_file);//Add
+
+			std::string output = R"(
+<html>
+	<head>
+		<meta http-equiv = "refresh" content = "5; url=/#tournament_list.html"/>
+	</head>
+</html>
+)";
+
+			return "Parsing OK<br/><br/>" + output;
+		}
+
+		return Error(Error::Type::InvalidFormat);
+	});
+
 	//Ajax requests
 
 	m_Server.RegisterResource("/ajax/get_nonce", [this](auto& Request) {

@@ -243,29 +243,11 @@ void Tournament::Reset()
 
 
 
-bool Tournament::LoadYAML(const std::string& Filename)
+bool Tournament::Load(const YAML::Node& yaml)
 {
-	if (IsReadonly())
-		return false;
-
-	std::ifstream file(Filename);
-	if (!file)
-	{
-		ZED::Log::Warn("Could not open file " + Filename);
-		return false;
-	}
-
-	YAML::Node yaml = YAML::LoadFile(Filename);
-
-	if (!yaml)
-	{
-		ZED::Log::Warn("Could not open file " + Filename);
-		return false;
-	}
-
 	if (!yaml["version"] || !yaml["name"])
 	{
-		ZED::Log::Warn("File " + Filename + " is not a valid tournament file");
+		ZED::Log::Warn("Data is not a valid tournament file");
 		return false;
 	}
 
@@ -365,6 +347,31 @@ bool Tournament::LoadYAML(const std::string& Filename)
 						m_Schedule.emplace_back(match);
 		}
 	}
+
+	return true;
+}
+
+
+
+bool Tournament::LoadYAML(const std::string& Filename)
+{
+	std::ifstream file(Filename);
+	if (!file)
+	{
+		ZED::Log::Warn("Could not open file " + Filename);
+		return false;
+	}
+
+	YAML::Node yaml = YAML::LoadFile(Filename);
+
+	if (!yaml)
+	{
+		ZED::Log::Warn("Could not open file " + Filename);
+		return false;
+	}
+
+	if (!Load(yaml))
+		return false;
 
 	ZED::Log::Info("Tournament " + Filename + " loaded successfully");
 	return true;
