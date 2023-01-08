@@ -17,6 +17,7 @@ namespace Judoboard
 		virtual bool Open()  override;
 		virtual bool Close() override;
 		virtual bool Pause(bool Enable = true) override { return false; }
+		virtual bool IsPaused() const override { return false; }
 
 		virtual bool IsConnected() const override;
 

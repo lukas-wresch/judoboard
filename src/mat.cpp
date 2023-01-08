@@ -2201,9 +2201,39 @@ bool Mat::Render(double dt) const
 
 
 	case State::Paused:
+		if (m_Logo)//Render logo
+		{
+			m_Logo->SetSize(renderer.GetWidth() / 1920.0f);
+			renderer.RenderTransformed(*m_Logo, width / 2 - (int)(m_Logo->GetWidth() / 2.0f * m_Logo->GetSizeX()), 50);
+		}
+
+		auto appname = renderer.RenderFont(ZED::FontSize::Middle, Application::Name, ZED::Color(0, 0, 0));
+		if (appname)
+			renderer.RenderTransformed(appname, 30, height - 120);
+
+		auto version = renderer.RenderFont(ZED::FontSize::Middle, "Version: " + Application::Version, ZED::Color(0, 0, 0));
+		if (version)
+			renderer.RenderTransformed(version, 30, height - 70);
+
+		auto date = ZED::Core::GetDate();
+
+		std::stringstream day, time;
+		day << date.day << "." << date.month << "." << date.year;
+		time << std::setfill('0') << std::setw(1) << date.hour << ":" << std::setw(2) << date.minute << ":" << std::setw(2) << date.second;
+
+		auto text_date = renderer.RenderFont(ZED::FontSize::Middle, day.str(), ZED::Color(0, 0, 0));
+		if (text_date)
+			renderer.RenderTransformed(text_date, width - 250, height - 120);
+		auto text_time = renderer.RenderFont(ZED::FontSize::Middle, time.str(), ZED::Color(0, 0, 0));
+		if (text_time)
+			renderer.RenderTransformed(text_time, width - 250, height - 70);
+
+		auto name = renderer.RenderFont(ZED::FontSize::Gigantic, GetName(), ZED::Color(0, 0, 0));
+		if (name)
+			renderer.RenderTransformed(name, width / 2 - name->GetWidth() / 2, height - name->GetHeight() - 10);
 
 		auto font = renderer.RenderFont(ZED::FontSize::Gigantic, Localizer::Translate("Pause"), ZED::Color(0, 0, 0));
-		renderer.RenderTransformed(*font.data, width/2 - 100, height/2 - 50);
+		renderer.RenderTransformed(*font.data, width/2 - font->GetWidth()/2, height/2 - font->GetHeight()/2);
 	}
 
 

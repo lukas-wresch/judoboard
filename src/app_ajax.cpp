@@ -236,7 +236,7 @@ void Application::SetupHttpServer()
 	});
 
 
-	m_Server.RegisterResource("/ajax/config/close_mat", [this](auto& Request) -> std::string {
+	m_Server.RegisterResource("/ajax/config/pause", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -2553,6 +2553,7 @@ std::string Application::Ajax_GetMats() const
 				ret << YAML::Key << "name"    << YAML::Value << mat->GetName();
 				ret << YAML::Key << "type"    << YAML::Value << (int)mat->GetType();
 				ret << YAML::Key << "is_open" << YAML::Value << mat->IsOpen();
+				ret << YAML::Key << "is_paused" << YAML::Value << mat->IsPaused();
 				ret << YAML::Key << "ippon_style"   << YAML::Value << (int)mat->GetIpponStyle();
 				ret << YAML::Key << "timer_style"   << YAML::Value << (int)mat->GetTimerStyle();
 				ret << YAML::Key << "name_style"    << YAML::Value << (int)mat->GetNameStyle();
@@ -2623,18 +2624,20 @@ Error Application::Ajax_CloseMat(const HttpServer::Request& Request)
 
 Error Application::Ajax_PauseMat(const HttpServer::Request& Request)
 {
-	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+	int id      = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+	bool enable = HttpServer::DecodeURLEncoded(Request.m_Query, "enable") == "true";
 
-	auto guard = LockTillScopeEnd();
 	if (id <= 0)
 		return Error(Error::Type::InvalidID);
+
+	auto guard = LockTillScopeEnd();
 
 	auto mat = FindMat(id);
 
 	if (!mat)
 		return Error(Error::Type::MatNotFound);
 
-	if (!mat->Pause())
+	if (!mat->Pause(enable))
 		return Error(Error::Type::OperationFailed);
 
 	return Error();//OK
@@ -2695,7 +2698,7 @@ Error Application::Ajax_AddJudoka(const HttpServer::Request& Request)
 	auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
 	auto lastname  = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
 	auto weight    = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
-	Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+	Gender gender  = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 	int  birthyear = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "birthyear"));
 	auto number = HttpServer::DecodeURLEncoded(Request.m_Body, "number");
 	UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");

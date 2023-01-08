@@ -105,6 +105,7 @@ namespace Judoboard
 		virtual bool Open() = 0;//Opens the mat. Returns true if successful
 		virtual bool Close() = 0;//Tries to close the mat. Returns true if successful
 		virtual bool Pause(bool Enable = true) = 0;//Tries to pause the mat. Returns true if successful
+		virtual bool IsPaused() const = 0;
 
 		virtual bool IsConnected() const { return true; };//Only relevant for remote mats. Retuns false if and only the connection to the slave server is lost
 

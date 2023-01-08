@@ -117,6 +117,7 @@ TEST(Ajax, GetMats)
 	EXPECT_EQ(yaml["highest_mat_id"].as<int>(), 2);
 	EXPECT_EQ(yaml["mats"][0]["type"].as<int>(), (int)Mat::Type::LocalMat);
 	EXPECT_EQ(yaml["mats"][0]["name"].as<std::string>(), "Mat 1");
+	EXPECT_EQ(yaml["mats"][0]["is_paused"].as<bool>(), false);
 	EXPECT_EQ(yaml["mats"][0]["ippon_style"].as<int>(), (int)IMat::IpponStyle::DoubleDigit);
 	EXPECT_EQ(yaml["mats"][0]["name_style"].as<int>(),  (int)NameStyle::FamilyName);
 }

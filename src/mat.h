@@ -34,17 +34,23 @@ namespace Judoboard
 		virtual bool Open()  override;
 		virtual bool Close() override;
 		virtual bool Pause(bool Enable = true) override {
-			if (m_State != State::StartUp && m_State != State::Waiting)
-				return false;
-
 			if (Enable)
-				NextState(State::Paused);
-			else
+			{
+				if (m_State == State::StartUp || m_State == State::Waiting)
+				{
+					NextState(State::Paused);
+					return true;
+				}
+			}
+			else if (IsPaused())
+			{
 				NextState(State::Waiting);
+				return true;
+			}
 
-			return true;
+			return false;
 		}
-		bool IsPaused() const { return m_State == State::Paused; }
+		virtual bool IsPaused() const override { return m_State == State::Paused; }
 
 		virtual bool HasConcluded() const override;
 

@@ -84,6 +84,11 @@ function Update()
         else
           cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('windowed'," + mat.id + ");\">Window Mode</button>";
 
+        if (!mat.is_paused)
+          cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('pause','" + mat.id + "&enable=true');\">"+ translate('pause') +"</button>";
+        else
+          cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('pause','" + mat.id + "&enable=false');\">"+ translate('unpause') +"</button>";
+
         cell4.innerHTML += "<button class=\"neutral\" onclick=\"navigate('mat_edit.html?id=" + mat.id + "');\">Edit</button>";
       }
       else if (mat.type == 2)
