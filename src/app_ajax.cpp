@@ -237,6 +237,15 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/config/close_mat", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_PauseMat(Request);
+	});
+
+
 	m_Server.RegisterResource("/ajax/config/set_mat", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -2609,6 +2618,27 @@ Error Application::Ajax_CloseMat(const HttpServer::Request& Request)
 		return Error::Type::NoError;//OK
 
 	return Error::Type::OperationFailed;
+}
+
+
+
+Error Application::Ajax_PauseMat(const HttpServer::Request& Request)
+{
+	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	auto guard = LockTillScopeEnd();
+	if (id <= 0)
+		return Error(Error::Type::InvalidID);
+
+	auto mat = FindMat(id);
+
+	if (!mat)
+		return Error(Error::Type::MatNotFound);
+
+	if (!mat->Pause())
+		return Error(Error::Type::OperationFailed);
+
+	return Error();//OK
 }
 
 

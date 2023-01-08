@@ -33,7 +33,7 @@ namespace Judoboard
 		virtual bool IsOpen()  const override { return m_Window.IsRunning(); }
 		virtual bool Open()  override;
 		virtual bool Close() override;
-		bool Pause(bool Enable = true) {
+		virtual bool Pause(bool Enable = true) override {
 			if (m_State != State::StartUp && m_State != State::Waiting)
 				return false;
 

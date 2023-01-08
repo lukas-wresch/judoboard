@@ -166,6 +166,12 @@ bool Mat::StartMatch(Match* NewMatch)
 		return false;
 	}
 
+	if (IsPaused())
+	{
+		ZED::Log::Warn("Can not start match since mat is paused");
+		return false;
+	}
+
 	if (!NewMatch->IsAssociatedWithMat() || NewMatch->GetMatID() != GetMatID())
 	{
 		ZED::Log::Warn("Match does not belong to this mat");
