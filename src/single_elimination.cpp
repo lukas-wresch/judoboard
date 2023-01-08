@@ -378,7 +378,7 @@ const std::string SingleElimination::ToHTML() const
 		//Output result
 		if (match->IsRunning())
 			ret += "<br/>" + Localizer::Translate("In Progress");
-		else if (match->HasConcluded() && !match->IsCompletelyEmptyMatch())
+		else if (match->GetStatus() == Status::Concluded || match->GetStatus() == Status::Skipped)
 		{
 			const auto& result = match->GetResult();
 			if (result.m_Winner == Winner::White)
