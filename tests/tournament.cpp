@@ -887,11 +887,17 @@ TEST(Tournament, SaveAndLoad)
 
 		tourney->Disqualify(*j1);
 
-		tourney->EnableAutoSave(false);
+		tourney->IsReadonly(true);
+
+		EXPECT_TRUE(tourney->IsReadonly());
+
+		tourney->Save();
 
 
 		Tournament t("deleteMe");
 		t.EnableAutoSave(false);
+
+		EXPECT_EQ(t.IsReadonly(), tourney->IsReadonly());
 
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		EXPECT_EQ(t.GetParticipants().size(), 4);
@@ -902,6 +908,8 @@ TEST(Tournament, SaveAndLoad)
 		EXPECT_FALSE(t.IsDisqualified(*j2));
 		EXPECT_FALSE(t.IsDisqualified(*j3));
 		EXPECT_FALSE(t.IsDisqualified(*j4));
+
+		delete tourney;
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");

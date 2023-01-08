@@ -280,6 +280,9 @@ bool Tournament::LoadYAML(const std::string& Filename)
 	//Read standing data
 	m_StandingData << yaml;
 
+	if (yaml["readonly"] && yaml["readonly"].IsScalar())
+		IsReadonly(yaml["readonly"].as<bool>());
+
 	if (yaml["organizer"] && yaml["organizer"].IsScalar())
 	{
 		m_Organizer = m_StandingData.FindAssociation(yaml["organizer"].as<std::string>());
@@ -371,8 +374,6 @@ bool Tournament::LoadYAML(const std::string& Filename)
 
 bool Tournament::SaveYAML(const std::string& Filename)
 {
-	if (IsReadonly())
-		return false;
 	if (m_Name.empty())
 		return false;
 
@@ -405,6 +406,9 @@ bool Tournament::SaveYAML(const std::string& Filename)
 	}
 
 	m_StandingData >> yaml;
+
+	if (IsReadonly())
+		yaml << YAML::Key << "readonly" << YAML::Value << IsReadonly();
 
 	if (m_Organizer)
 		yaml << YAML::Key << "organizer" << YAML::Value << (std::string)m_Organizer->GetUUID();
