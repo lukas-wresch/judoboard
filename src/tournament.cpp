@@ -9,8 +9,8 @@
 #include "customtable.h"
 #include "round_robin.h"
 #include "single_elimination.h"
+#include "filter.h"
 #include "weightclass_generator.h"
-#include "md5.h"
 #define YAML_CPP_STATIC_DEFINE
 #include "yaml-cpp/yaml.h"
 
@@ -1002,6 +1002,36 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 		if (!match->IsEmptyMatch())
 			m_Schedule.emplace_back(match);
 	}
+
+	//Sort
+	std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
+		//Sort by filter
+		if (a->GetFilter() && !b->GetFilter())
+			return true;
+		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() != IFilter::Type::Weightclass)
+			return true;
+
+		//Both weightclasses?
+		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
+		{
+			auto weightclassA = (const Weightclass*)a->GetFilter();
+			auto weightclassB = (const Weightclass*)b->GetFilter();
+
+			//Sort by age group
+			if (weightclassA->GetAgeGroup() && weightclassB->GetAgeGroup() && weightclassA->GetAgeGroup()->GetMinAge() != weightclassB->GetAgeGroup()->GetMinAge())
+				return weightclassA->GetAgeGroup()->GetMinAge() < weightclassB->GetAgeGroup()->GetMinAge();
+
+			//Sort by gender
+			if (weightclassA->GetGender() != weightclassB->GetGender())
+				return (int)weightclassA->GetGender() < (int)weightclassB->GetGender();
+
+			//Sort by weight
+			if (weightclassA->GetMinWeight() != weightclassB->GetMinWeight())
+				return weightclassA->GetMinWeight() < weightclassB->GetMinWeight();
+		}
+
+		return a->GetUUID() < b->GetUUID();
+	});
 
 	Unlock();
 }
