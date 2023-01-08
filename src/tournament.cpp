@@ -604,6 +604,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 
 	auto new_match_table = new CustomTable(this);
 	new_match_table->AddMatch(NewMatch);
+	new_match_table->SetMatID(NewMatch->GetMatID());
 	AddMatchTable(new_match_table);
 
 	Unlock();
