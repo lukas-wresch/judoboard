@@ -2027,24 +2027,16 @@ bool Mat::Render(double dt) const
 
 	case State::Waiting:
 
-		/*if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetType() == MatchTable::Type::Pause)
+		for (int i = 0; i < 2; i++)
 		{
-			auto font = renderer.RenderFont(ZED::FontSize::Gigantic, "Pause", ZED::Color(0, 0, 0));
-			renderer.RenderTransformed(*font.data, width/2 - 100, height/2 - 50);
-		}
-		else*/
-		{
-			for (int i = 0; i < 2; i++)
-			{
-				m_Graphics["next_matches_white_" + std::to_string(i)].Render(renderer, dt);
-				m_Graphics["next_matches_blue_"  + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_white_" + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_blue_"  + std::to_string(i)].Render(renderer, dt);
 
-				m_Graphics["next_matches_white2_" + std::to_string(i)].Render(renderer, dt);
-				m_Graphics["next_matches_blue2_"  + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_white2_" + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_blue2_"  + std::to_string(i)].Render(renderer, dt);
 
-				m_Graphics["next_matches_white_club_" + std::to_string(i)].Render(renderer, dt);
-				m_Graphics["next_matches_blue_club_"  + std::to_string(i)].Render(renderer, dt);
-			}
+			m_Graphics["next_matches_white_club_" + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_blue_club_"  + std::to_string(i)].Render(renderer, dt);
 		}
 
 		m_Graphics["next_match"].Render(renderer, dt);
@@ -2200,6 +2192,12 @@ bool Mat::Render(double dt) const
 			NextState(State::Waiting);
 
 		break;
+
+
+	case State::Paused:
+
+		auto font = renderer.RenderFont(ZED::FontSize::Gigantic, Localizer::Translate("Pause"), ZED::Color(0, 0, 0));
+		renderer.RenderTransformed(*font.data, width/2 - 100, height/2 - 50);
 	}
 
 
