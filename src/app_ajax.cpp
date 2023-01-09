@@ -36,8 +36,8 @@ void Application::SetupHttpServer()
 
 	m_Server.RegisterResource("/slideout.min.js", [](auto& Request) { return HttpServer::LoadFile("html/slideout.min.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
 
-	m_Server.RegisterResource("/menu.png",   [](auto& Request) { return HttpServer::LoadFile("html/menu.png");     }, HttpServer::ResourceType::Image_PNG, 24*60*60);
-	m_Server.RegisterResource("/winner.png", [](auto& Request) { return HttpServer::LoadFile("assets/winner.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
+	m_Server.RegisterResource("/menu.png",   [](auto& Request) { return HttpServer::LoadFile("html/menu.png");   }, HttpServer::ResourceType::Image_PNG, 24*60*60);
+	m_Server.RegisterResource("/winner.png", [](auto& Request) { return HttpServer::LoadFile("html/winner.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
 
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit", "lots",
@@ -164,6 +164,48 @@ void Application::SetupHttpServer()
 				return Error(Error::Type::InvalidFormat);
 
 			AddTournament(new Tournament(md5_file, &GetDatabase()));//apply MD5 file
+
+			std::string output = R"(
+<html>
+	<head>
+		<meta http-equiv = "refresh" content = "5; url=/#tournament_list.html"/>
+	</head>
+</html>
+)";
+
+			return "Parsing OK<br/><br/>" + output;
+		}
+
+		return Error(Error::Type::InvalidFormat);
+	});
+
+	m_Server.RegisterResource("/upload/yml", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		//ZED::Log::Debug(Request.m_Body);
+
+		auto pos = Request.m_Body.Find("\r\n\r\n");
+		if (pos != 0)
+		{
+			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
+
+			if (boundary_end == 0)
+				return Error(Error::Type::InvalidFormat);
+
+			Tournament* tournament_file = new Tournament("");
+
+			auto yaml = YAML::Load((char*)Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
+
+			if (!tournament_file->Load(yaml))
+			{
+				delete tournament_file;
+				return Error(Error::Type::InvalidFormat);
+			}
+
+			tournament_file->Save();
+			AddTournament(tournament_file);//Add
 
 			std::string output = R"(
 <html>
@@ -3090,10 +3132,6 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 		new_table = new SingleElimination(new Weightclass(0, 0), GetTournament());
 		break;
 	}
-
-	case MatchTable::Type::Pause:
-		return Error::Type::InternalError;
-		break;
 
 	case MatchTable::Type::Custom:
 		new_table = new CustomTable(GetTournament());

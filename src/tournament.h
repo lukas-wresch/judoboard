@@ -34,6 +34,8 @@ namespace Judoboard
 
 		void Reset();
 
+		bool Load(const YAML::Node& yaml);
+
 		[[nodiscard]]
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
 		const auto& GetSchedule() const { return m_Schedule; }

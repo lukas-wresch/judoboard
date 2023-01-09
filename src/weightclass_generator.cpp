@@ -140,8 +140,8 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 
 	Weight min = 1000 * 1000;
 	Weight max = 0;
-	int Middle = Start;
-	for (int i = Start; i < End; ++i)
+	size_t Middle = Start;
+	for (size_t i = Start; i < End; ++i)
 	{
 		if (WeightsSlots[i].first < min)
 			min = WeightsSlots[i].first;
@@ -182,7 +182,8 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 
 		//Can we move 'Middle' to the left, if we can split of a complete group?
 
-		if (Middle - 1 > Start && !isGroupOK(WeightsSlots, Start, Middle + 1)
+		if (Middle - 1 > Start && WeightsSlots[Middle - 1].first < WeightsSlots[Middle].first
+							   && !isGroupOK(WeightsSlots, Start, Middle + 1)
 			                   &&  isGroupOK(WeightsSlots, Start, Middle))
 		{
 			Middle--;
@@ -191,7 +192,8 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 			ZED::Log::Debug("Moved 'Middle' to the left to split a group of!");
 			ZED::Log::Debug("Middle: " + std::to_string(Middle));
 		}
-		else if (Middle + 1 < End && !isGroupOK(WeightsSlots, Middle + 1, End)
+		else if (Middle + 1 < End && WeightsSlots[Middle + 1].first < WeightsSlots[Middle + 2].first
+								  && !isGroupOK(WeightsSlots, Middle + 1, End)
 			                      &&  isGroupOK(WeightsSlots, Middle + 2, End))
 		{
 			Middle++;
