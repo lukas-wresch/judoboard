@@ -723,7 +723,7 @@ TEST(Ajax, GetNamesOnMat)
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "A B");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "C D");
 		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
-		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "table1 Custom");
+		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "table1");
 		ASSERT_TRUE(yaml["next_matches"].IsSequence());
 		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "E F");
 		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "G H");
@@ -761,7 +761,7 @@ TEST(Ajax, GetNamesOnMat)
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "E F");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "G H");
 		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
-		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "table2 Custom");
+		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "table2");
 		ASSERT_TRUE(yaml["next_matches"].IsSequence());
 		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "I J");
 		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "K L");
