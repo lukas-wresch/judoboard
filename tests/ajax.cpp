@@ -1485,7 +1485,7 @@ TEST(Ajax, MatchTable_Add)
 
 		auto& tables = app.GetTournament()->GetMatchTables();
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7")), "ok");
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7&minWeight=9,7&maxWeight=19.3")));
 
 		ASSERT_EQ(tables.size(), 1);
 		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
@@ -1494,7 +1494,7 @@ TEST(Ajax, MatchTable_Add)
 		ASSERT_TRUE(tables[0]->GetFilter());
 
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")));
 
 		ASSERT_EQ(tables.size(), 2);
 		ASSERT_EQ(tables[1]->GetType(), MatchTable::Type::RoundRobin);
@@ -1506,14 +1506,14 @@ TEST(Ajax, MatchTable_Add)
 		EXPECT_EQ( ((Weightclass*) tables[1]->GetFilter())->GetGender(), Gender::Male);
 		EXPECT_EQ(((RoundRobin*)tables[1])->IsBestOfThree(), true);
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=3&name=Test3&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=3&name=Test3&mat=5&minWeight=10,8&maxWeight=20.4&gender=1&bo3=true&mf3=true&mf5=true")));
 
 		ASSERT_EQ(tables.size(), 3);
 		ASSERT_EQ(tables[2]->GetType(), MatchTable::Type::SingleElimination);
 		EXPECT_EQ(tables[2]->GetName(), "Test3");
 		EXPECT_EQ(tables[2]->GetMatID(), 5);
-		EXPECT_EQ( ((Weightclass*) tables[2]->GetFilter())->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ( ((Weightclass*) tables[2]->GetFilter())->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ( ((Weightclass*) tables[2]->GetFilter())->GetMinWeight(), Weight("10,8"));
+		EXPECT_EQ( ((Weightclass*) tables[2]->GetFilter())->GetMaxWeight(), Weight("20.4"));
 		EXPECT_EQ( ((Weightclass*) tables[2]->GetFilter())->GetGender(), Gender::Female);
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsBestOfThree(), true);
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsThirdPlaceMatch(), true);
@@ -1583,7 +1583,7 @@ TEST(Ajax, MatchTable_Get)
 
 		auto& tables = app.GetTournament()->GetMatchTables();
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7")), "ok");
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7&minWeight=1,7&maxWeight=2.3")));
 
 		ASSERT_EQ(tables.size(), 1);
 
@@ -1596,7 +1596,7 @@ TEST(Ajax, MatchTable_Get)
 		EXPECT_EQ(yaml1.c_str(), output);
 
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test2&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")));
 
 		ASSERT_EQ(tables.size(), 2);
 
@@ -1608,7 +1608,7 @@ TEST(Ajax, MatchTable_Get)
 		yaml2 << YAML::EndMap;
 		EXPECT_EQ(yaml2.c_str(), output);
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=3&name=Test3&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=3&name=Test3&mat=5&minWeight=10,8&maxWeight=20.4&gender=1&bo3=true&mf3=true&mf5=true")));
 
 		ASSERT_EQ(tables.size(), 3);
 
@@ -1621,6 +1621,8 @@ TEST(Ajax, MatchTable_Get)
 		EXPECT_EQ(yaml3.c_str(), output);
 
 		auto node = YAML::Load(output);
+
+		EXPECT_EQ(node["name"].as<std::string>(), "Test3");
 
 		ASSERT_TRUE(node["best_of_three"].IsDefined());
 		ASSERT_TRUE(node["third_place"].IsDefined());

@@ -1008,8 +1008,13 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 		//Sort by filter
 		if (a->GetFilter() && !b->GetFilter())
 			return true;
+		if (!a->GetFilter() && b->GetFilter())
+			return false;
+
 		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() != IFilter::Type::Weightclass)
 			return true;
+		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() != IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
+			return false;
 
 		//Both weightclasses?
 		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
@@ -1030,6 +1035,9 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 				return weightclassA->GetMinWeight() < weightclassB->GetMinWeight();
 		}
 
+		if (a->GetName() != b->GetName())
+			return a->GetName() < b->GetName();
+
 		return a->GetUUID() < b->GetUUID();
 	});
 
@@ -1048,24 +1056,61 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 	if (!matchTable)
 		return false;
 
-	if (matchTable->GetStatus() == Status::Scheduled)//Can safely recalculate the match table
+	if (matchTable->GetStatus() != Status::Scheduled)//Can safely recalculate the match table
+		return false;
+
+	for (auto judoka : matchTable->GetParticipants())
+		if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
+			matchTable->RemoveParticipant(judoka);
+
+	for (auto& [id, judoka] : m_StandingData.GetAllJudokas())
 	{
-		for (auto judoka : matchTable->GetParticipants())
-			if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
-				matchTable->RemoveParticipant(judoka);
-
-		for (auto& [id, judoka] : m_StandingData.GetAllJudokas())
-		{
-			if (judoka && matchTable->IsElgiable(*judoka))
-				matchTable->AddParticipant(judoka);
-		}
-
-		matchTable->GenerateSchedule();
-		GenerateSchedule();
-		return true;
+		if (judoka && matchTable->IsElgiable(*judoka))
+			matchTable->AddParticipant(judoka);
 	}
 
-	return false;
+	matchTable->GenerateSchedule();
+	GenerateSchedule();
+
+	//Sort
+	std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
+		//Sort by filter
+		if (a->GetFilter() && !b->GetFilter())
+			return true;
+		if (!a->GetFilter() && b->GetFilter())
+			return false;
+
+		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() != IFilter::Type::Weightclass)
+			return true;
+		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() != IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
+			return false;
+
+		//Both weightclasses?
+		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
+		{
+			auto weightclassA = (const Weightclass*)a->GetFilter();
+			auto weightclassB = (const Weightclass*)b->GetFilter();
+
+			//Sort by age group
+			if (weightclassA->GetAgeGroup() && weightclassB->GetAgeGroup() && weightclassA->GetAgeGroup()->GetMinAge() != weightclassB->GetAgeGroup()->GetMinAge())
+				return weightclassA->GetAgeGroup()->GetMinAge() < weightclassB->GetAgeGroup()->GetMinAge();
+
+			//Sort by gender
+			if (weightclassA->GetGender() != weightclassB->GetGender())
+				return (int)weightclassA->GetGender() < (int)weightclassB->GetGender();
+
+			//Sort by weight
+			if (weightclassA->GetMinWeight() != weightclassB->GetMinWeight())
+				return weightclassA->GetMinWeight() < weightclassB->GetMinWeight();
+		}
+
+		if (a->GetName() != b->GetName())
+			return a->GetName() < b->GetName();
+
+		return a->GetUUID() < b->GetUUID();
+	});
+
+	return true;
 }
 
 
