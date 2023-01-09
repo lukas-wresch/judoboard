@@ -1003,43 +1003,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 			m_Schedule.emplace_back(match);
 	}
 
-	//Sort
-	std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
-		//Sort by filter
-		if (a->GetFilter() && !b->GetFilter())
-			return true;
-		if (!a->GetFilter() && b->GetFilter())
-			return false;
-
-		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() != IFilter::Type::Weightclass)
-			return true;
-		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() != IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
-			return false;
-
-		//Both weightclasses?
-		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
-		{
-			auto weightclassA = (const Weightclass*)a->GetFilter();
-			auto weightclassB = (const Weightclass*)b->GetFilter();
-
-			//Sort by age group
-			if (weightclassA->GetAgeGroup() && weightclassB->GetAgeGroup() && weightclassA->GetAgeGroup()->GetMinAge() != weightclassB->GetAgeGroup()->GetMinAge())
-				return weightclassA->GetAgeGroup()->GetMinAge() < weightclassB->GetAgeGroup()->GetMinAge();
-
-			//Sort by gender
-			if (weightclassA->GetGender() != weightclassB->GetGender())
-				return (int)weightclassA->GetGender() < (int)weightclassB->GetGender();
-
-			//Sort by weight
-			if (weightclassA->GetMinWeight() != weightclassB->GetMinWeight())
-				return weightclassA->GetMinWeight() < weightclassB->GetMinWeight();
-		}
-
-		if (a->GetName() != b->GetName())
-			return a->GetName() < b->GetName();
-
-		return a->GetUUID() < b->GetUUID();
-	});
+	UpdateMatchTable(*NewMatchTable);
 
 	Unlock();
 }
@@ -1070,7 +1034,6 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 	}
 
 	matchTable->GenerateSchedule();
-	GenerateSchedule();
 
 	//Sort
 	std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
@@ -1109,6 +1072,8 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 
 		return a->GetUUID() < b->GetUUID();
 	});
+
+	GenerateSchedule();
 
 	return true;
 }
