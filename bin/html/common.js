@@ -37,6 +37,7 @@ var lang_en = {
     disabled:  [ "Disabled", "Deaktiviert" ],
     disqualification:  [ "Disqualification", "Disqualifiziert" ],
     end_match:  [ "End Match", "Kampf beenden" ],
+    end_of_match:  [ "End of match", "Kampf beendet" ],
     edit_account: [ "Edit Account", "Benutzerkonto &auml;ndern" ],
     edit_club: [ "Edit Club", "Verein &auml;ndern" ],
     edit_age_group: [ "Edit Age Group", "Altersklasse &auml;ndern" ],
@@ -82,6 +83,7 @@ var lang_en = {
     max_participants:  [ "Max participants", "Maximalteilnehmer" ],
     max_weight_diff:  [ "Weight difference", "Gewichtsunterschied" ],
     more:  [ "More", "Mehr" ],
+    match_stated:  [ "Match started", "Kampf gestartet" ],
     match_time:  [ "Match Time", "Kampfzeit" ],
     name_white:  [ "Name (White)", "Name (Wei&szlig;)" ],
     name_blue:   [ "Name (Blue)", "Name (Blau)" ],
@@ -102,6 +104,7 @@ var lang_en = {
     optional:   [ "Optional", "Optional" ],
     osaekomi_time_ippon:    [ "Osaekomi Time (Ippon)", "Osaekomi Zeit (Ippon)" ],
     osaekomi_time_wazaari:  [ "Osaekomi Time (Waza-Ari)", "Osaekomi Zeit (Waza-Ari)" ],
+    osaekomi_switched: [ "Osaekomi switched to other fighter" , "Osaekomi auf anderen K&auml;pfer gewechselt"];
     overview:  [ "Overview", "&Uuml;bersicht" ],
     open:  [ "Oppen", "&Ouml;ffnen" ],
     participants: [ "Participants", "Teilnehmer" ],
