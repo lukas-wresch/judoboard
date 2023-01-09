@@ -442,13 +442,17 @@ function GetScore()
     {
       document.getElementById("white_yuko").innerHTML = res.white.yuko;
       document.getElementById("white_koka").innerHTML = res.white.koka;
+      document.getElementById("white_ippon").style.fontSize = "20pt";
+      document.getElementById("blue_ippon").style.fontSize  = "20pt";
     }
     if (res.koka_enabled)
     {
       document.getElementById("blue_yuko").innerHTML  = res.blue.yuko;
       document.getElementById("blue_koka").innerHTML  = res.blue.koka;
+      document.getElementById("white_ippon").style.fontSize = "20pt";
+      document.getElementById("blue_ippon").style.fontSize  = "20pt";
     }
-
+    
     document.getElementById("white_shidos").innerHTML = res.white.shido;
     document.getElementById("blue_shidos").innerHTML  = res.blue.shido;
 
