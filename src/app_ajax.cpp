@@ -2485,6 +2485,7 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 	auto year         = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "year"));
 	UUID rule_id      = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
 	UUID organizer_id = HttpServer::DecodeURLEncoded(Request.m_Body, "organizer");
+	auto description  = HttpServer::DecodeURLEncoded(Request.m_Body, "description");
 
 	if (name.empty())
 		return Error::Type::InvalidInput;
@@ -2510,6 +2511,7 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 		tournament->SetYear(year);
 	tournament->SetDefaultRuleSet(rules);
 	tournament->SetOrganizer(organizer);
+	tournament->SetDescription(description);
 
 	if (!tournament->Save())
 		return Error(Error::Type::OperationFailed);
@@ -2539,6 +2541,7 @@ std::string Application::Ajax_GetTournament(const HttpServer::Request& Request)
 	yaml << YAML::Key << "num_participants" << YAML::Value << tournament->GetParticipants().size();
 	yaml << YAML::Key << "schedule_size" << YAML::Value    << tournament->GetSchedule().size();
 	yaml << YAML::Key << "status" << YAML::Value << (int)tournament->GetStatus();
+	yaml << YAML::Key << "description" << YAML::Value << tournament->GetDescription();
 
 	if (tournament->GetDefaultRuleSet())
 		yaml << YAML::Key << "rule_set_uuid" << YAML::Value << (std::string)tournament->GetDefaultRuleSet()->GetUUID();

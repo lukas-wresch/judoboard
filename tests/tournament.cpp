@@ -941,6 +941,8 @@ TEST(Tournament, SaveAndLoad_MatchTableConnection)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
+		tourney->SetDescription("test description");
+
 		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(155)));
 		tourney->GenerateSchedule();
 
@@ -951,6 +953,7 @@ TEST(Tournament, SaveAndLoad_MatchTableConnection)
 		t.EnableAutoSave(false);
 
 		EXPECT_EQ(t.GetName(), "deleteMe");
+		EXPECT_EQ(t.GetDescription(), tourney->GetDescription());
 		EXPECT_EQ(t.GetParticipants().size(), 4);
 		EXPECT_EQ(t.GetMatchTables().size(), 1);
 		EXPECT_EQ(t.GetSchedule().size(), 6);
