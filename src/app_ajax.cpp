@@ -477,8 +477,8 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-		auto rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
+		UUID id   = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+		UUID rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 
 		LockTillScopeEnd();
 
@@ -486,7 +486,7 @@ void Application::SetupHttpServer()
 			return std::string("No tournament open");
 
 		auto match = GetTournament()->FindMatch(id);
-		auto ruleSet = m_Database.FindRuleSetByName(rule);
+		auto ruleSet = m_Database.FindRuleSet(rule);
 
 		if (!match)
 			return std::string("Could not find match");
