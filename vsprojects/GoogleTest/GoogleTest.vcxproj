@@ -135,7 +135,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>account.obj;age_group.obj;app.obj;app_ajax.obj;association.obj;club.obj;customtable.obj;database.obj;dm4.obj;dmf.obj;error.obj;filter.obj;fixed.obj;fuser.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mixer.obj;mongoose.obj;pool.obj;remote_mat.obj;reverser.obj;rule_set.obj;round_robin.obj;single_elimination.obj;standing_data.obj;splitter.obj;take_top_ranks.obj;timer.obj;tournament.obj;weightclass.obj;weightclass_generator.obj;window_win.obj;yaml-cpp\yaml-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;age_group.obj;app.obj;app_ajax.obj;association.obj;club.obj;customtable.obj;database.obj;double_elimination.obj;dm4.obj;dmf.obj;error.obj;filter.obj;fixed.obj;fuser.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mixer.obj;mongoose.obj;pool.obj;remote_mat.obj;reverser.obj;rule_set.obj;round_robin.obj;single_elimination.obj;standing_data.obj;splitter.obj;take_top_ranks.obj;timer.obj;tournament.obj;weightclass.obj;weightclass_generator.obj;window_win.obj;yaml-cpp\yaml-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -176,7 +176,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;age_group.obj;association.obj;club.obj;customtable.obj;database.obj;dm4.obj;dmf.obj;error.obj;filter.obj;fixed.obj;fuser.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mixer.obj;mongoose.obj;pool.obj;remote_mat.obj;reverser.obj;rule_set.obj;round_robin.obj;single_elimination.obj;standing_data.obj;splitter.obj;take_top_ranks.obj;timer.obj;tournament.obj;weightclass.obj;weightclass_generator.obj;window_win.obj;yaml-cpp\yaml-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>account.obj;app.obj;app_ajax.obj;age_group.obj;association.obj;club.obj;customtable.obj;database.obj;dm4.obj;dmf.obj;double_elimination.obj;error.obj;filter.obj;fixed.obj;fuser.obj;HttpServer.obj;md5.obj;id.obj;judoka.obj;remote_tournament.obj;localizer.obj;main.obj;mat.obj;match.obj;matchlog.obj;matchtable.obj;mixer.obj;mongoose.obj;pool.obj;remote_mat.obj;reverser.obj;rule_set.obj;round_robin.obj;single_elimination.obj;standing_data.obj;splitter.obj;take_top_ranks.obj;timer.obj;tournament.obj;weightclass.obj;weightclass_generator.obj;window_win.obj;yaml-cpp\yaml-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -10,6 +10,7 @@
 #include "round_robin.h"
 #include "single_elimination.h"
 #include "pool.h"
+#include "double_elimination.h"
 #include "weightclass_generator.h"
 #include "md5.h"
 #define YAML_CPP_STATIC_DEFINE
@@ -323,6 +324,9 @@ bool Tournament::Load(const YAML::Node& yaml)
 				break;
 			case MatchTable::Type::Pool:
 				new_table = new Pool(node, this);
+				break;
+			case MatchTable::Type::DoubleElimination:
+				new_table = new DoubleElimination(node, this);
 				break;
 			}
 

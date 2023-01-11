@@ -17,7 +17,7 @@ namespace Judoboard
 
 		static std::string GetHTMLForm();
 
-		virtual Type GetType() const override { return Type::Pool; }
+		virtual Type GetType() const override { return Type::DoubleElimination; }
 
 		virtual size_t GetMaxStartPositions() const override;
 

@@ -141,7 +141,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Unknown, RoundRobin, Custom, SingleElimination, Pool
+			Unknown, RoundRobin, Custom, SingleElimination, Pool, DoubleElimination
 		};
 
 		struct Result
