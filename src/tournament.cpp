@@ -591,10 +591,18 @@ bool Tournament::AddMatch(Match* NewMatch)
 			NewMatch->EndMatch();//Mark match as concluded
 		}
 	}
-
-	auto new_match_table = new CustomTable(this);
-	new_match_table->AddMatch(NewMatch);
-	AddMatchTable(new_match_table);
+	
+	if (NewMatch->GetMatchTable())
+	{
+		AddMatchTable((MatchTable*)NewMatch->GetMatchTable());
+		GenerateSchedule();
+	}
+	else
+	{
+		auto new_match_table = new CustomTable(this);
+		new_match_table->AddMatch(NewMatch);
+		AddMatchTable(new_match_table);
+	}
 
 	Unlock();
 	Save();
@@ -958,9 +966,12 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	if (!NewMatchTable)
 		return;
 
-	NewMatchTable->SetTournament(this);
-
 	Lock();
+
+	if (FindMatchTable(*NewMatchTable))
+		return;//Nothing to add
+
+	NewMatchTable->SetTournament(this);
 
 	//Add all judoka of the match table to the tournament
 	for (auto judoka : NewMatchTable->GetParticipants())
