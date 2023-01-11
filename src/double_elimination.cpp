@@ -2,6 +2,7 @@
 #include <random>
 #include "double_elimination.h"
 #include "weightclass.h"
+#include "losersof.h"
 #include "rule_set.h"
 #include "localizer.h"
 #include "match.h"
@@ -17,6 +18,8 @@ DoubleElimination::DoubleElimination(IFilter* Filter, const ITournament* Tournam
 {
 	m_WinnerBracket.IsSubMatchTable(true);
 	m_LoserBracket.IsSubMatchTable(true);
+
+	m_LoserBracket.SetFilter(new LosersOf(m_WinnerBracket));
 	GenerateSchedule();
 }
 
@@ -32,9 +35,6 @@ DoubleElimination::DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender 
 DoubleElimination::DoubleElimination(const YAML::Node& Yaml, ITournament* Tournament)
 	: DoubleElimination(nullptr, Tournament)
 {
-	m_WinnerBracket.IsSubMatchTable(true);
-	m_LoserBracket.IsSubMatchTable(true);
-
 	if (Yaml["third_place_match"])
 		m_WinnerBracket.IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
 	if (Yaml["fifth_place_match"])
@@ -120,8 +120,10 @@ void DoubleElimination::GenerateSchedule()
 		return;
 
 
-	//TODO
+	m_WinnerBracket.SetFilter(this->GetFilter());
 
+	m_WinnerBracket.GenerateSchedule();
+	m_LoserBracket.GenerateSchedule();
 
 	//Add matches
 	for (auto match : m_WinnerBracket.GetSchedule())

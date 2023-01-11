@@ -15,7 +15,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser
+			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser, LosersOf
 		};
 
 		IFilter(const YAML::Node& Yaml, const ITournament* Tournament);
@@ -69,6 +69,10 @@ namespace Judoboard
 
 		void SetParticipants(std::unordered_map<size_t, const DependentJudoka>&& NewParticipants) const {
 			m_Participants = std::move(NewParticipants);
+		}
+
+		void RemoveAllParticipants() {
+			m_Participants.clear();
 		}
 
 

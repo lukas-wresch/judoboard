@@ -141,7 +141,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Unknown, RoundRobin, Custom, SingleElimination, Pool, DoubleElimination
+			Unknown, RoundRobin, Custom, SingleElimination, Pool, LoserBracket, DoubleElimination
 		};
 
 		struct Result
@@ -325,6 +325,7 @@ namespace Judoboard
 
 		const IFilter* GetFilter() const { return m_Filter; }
 		IFilter* GetFilter() { return m_Filter; }
+		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
 		const ITournament* GetTournament() const { return m_Tournament; }
 
 		//Rule sets
@@ -377,7 +378,6 @@ namespace Judoboard
 
 		void DeleteSchedule() { m_Schedule.clear(); }
 
-		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
 		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
 
 		const std::string ResultsToHTML() const;
