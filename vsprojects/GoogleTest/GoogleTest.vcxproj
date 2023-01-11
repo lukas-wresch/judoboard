@@ -73,6 +73,7 @@
     <ClCompile Include="..\..\tests\database.cpp" />
     <ClCompile Include="..\..\tests\dm4.cpp" />
     <ClCompile Include="..\..\tests\dmf.cpp" />
+    <ClCompile Include="..\..\tests\double_elimination.cpp" />
     <ClCompile Include="..\..\tests\id.cpp" />
     <ClCompile Include="..\..\tests\judoka.cpp" />
     <ClCompile Include="..\..\tests\mat.cpp" />
