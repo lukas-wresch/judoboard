@@ -1,6 +1,7 @@
 #pragma once
 #include "weightclass.h"
 #include "single_elimination.h"
+#include "loser_bracket.h"
 
 
 
@@ -45,6 +46,6 @@ namespace Judoboard
 
 	private:
 		SingleElimination m_WinnerBracket;
-		SingleElimination m_LoserBracket;
+		LoserBracket      m_LoserBracket;
 	};
 }

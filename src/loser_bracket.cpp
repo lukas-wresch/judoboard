@@ -40,7 +40,7 @@ LoserBracket::LoserBracket(const MD5::Weightclass& Weightclass_, const ITourname
 
 
 
-size_t SingleElimination::GetNumberOfRounds() const
+size_t LoserBracket::GetNumberOfRounds() const
 {
 	if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
 		return 0;
