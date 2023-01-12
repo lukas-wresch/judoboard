@@ -328,7 +328,9 @@ TEST(Match, MatchTimeOnlyForWinner)
 		ASSERT_EQ(r->GetSchedule().size(), 1);
 		EXPECT_TRUE(mat.StartMatch(r->GetSchedule()[0]));
 
-		ZED::Core::Pause(3000);
+		mat.Hajime();
+
+		ZED::Core::Pause(3005);
 
 		mat.AddIppon(f);
 		mat.EndMatch();
