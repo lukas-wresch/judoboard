@@ -51,3 +51,41 @@ TEST(LoserBracket, Count14)
 
 	delete t;
 }
+
+
+
+TEST(DoubleElimination, Count8)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	Judoka* j[33];
+	bool has_match[33];
+	const size_t count = 8;
+
+	for (int i = 1; i <= count; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		has_match[i] = false;
+		t->AddParticipant(j[i]);
+	}
+
+	DoubleElimination* group = new DoubleElimination(0, 200);
+	group->SetMatID(1);
+	t->AddMatchTable(group);
+
+	for (int i = 0; i < count; ++i)
+		group->SetStartPosition(j[i+1], i);
+
+	EXPECT_EQ(group->GetMaxStartPositions(), count);
+
+	auto loser_schedule = group->GetLoserBracket().GetSchedule();
+
+	//EXPECT_TRUE(loser_schedule[0]->Contains(*j[1]));
+
+	ASSERT_EQ(loser_schedule.size(),  4 + 4 + 2 + 2 + 1);
+
+	delete t;
+}
