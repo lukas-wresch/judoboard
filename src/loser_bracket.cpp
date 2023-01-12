@@ -45,7 +45,10 @@ size_t LoserBracket::GetNumberOfRounds() const
 	if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
 		return 0;
 
-	return (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size()));
+	auto base_rounds = GetNumberOfBaseRounds();
+	auto additional_rounds = (size_t)std::floor( (base_rounds - 1.0) / 2.0 );
+
+	return base_rounds + additional_rounds;
 }
 
 
@@ -83,112 +86,77 @@ void LoserBracket::GenerateSchedule()
 
 	const auto rounds = GetNumberOfRounds();
 	const auto max_start_pos = GetMaxStartPositions();
+	const auto max_initial_start_pos = (max_start_pos + 2) / 2;
 	
 	//Round 1
 	std::vector<Match*> lastRound;
 	std::vector<Match*> nextRound;
 
-	auto create_pair = [&](int i) {
-		auto new_match = CreateAutoMatch(GetFilter()->GetJudokaByStartPosition(i-1),
-										 GetFilter()->GetJudokaByStartPosition(i-1 + max_start_pos/2));
+	size_t current_start_pos = 0;
+
+	for (; current_start_pos < max_initial_start_pos; current_start_pos += 2)
+	{
+		auto new_match = CreateAutoMatch(GetFilter()->GetJudokaByStartPosition(current_start_pos),
+										 GetFilter()->GetJudokaByStartPosition(current_start_pos + 1));
 		nextRound.emplace_back(new_match);
-	};
-
-	if (rounds == 2)//4 participants hardcoded
-	{
-		for (int j = 0; j < 2; j++)
-			create_pair(1 + j);
-	}
-
-	else if (rounds == 3)//8 participants hardcoded
-	{
-		for (int j = 0; j < 2; j++)
-		{
-			create_pair(1 + j);
-			create_pair(3 + j);
-		}
-	}
-
-	else if (rounds == 4)//16 participants hardcoded
-	{
-		for (int j = 0; j < 2; j++)
-		{
-			create_pair(1 + j);
-			create_pair(5 + j);
-			create_pair(3 + j);
-			create_pair(7 + j);
-		}
-	}
-
-	else if (rounds == 5)//32 participants hardcoded
-	{
-		for (int j = 0; j < 2; j++)
-		{
-			create_pair(1  + j);
-			create_pair(9  + j);
-			create_pair(5  + j);
-			create_pair(13 + j);
-			create_pair(3  + j);
-			create_pair(11 + j);
-			create_pair(7  + j);
-			create_pair(15 + j);
-		}
-	}
-
-	else if (rounds == 6)//64 participants hardcoded
-	{
-		for (int j = 0; j < 2; j++)
-		{
-			create_pair(1  + j);
-			create_pair(17 + j);
-			create_pair(9  + j);
-			create_pair(25 + j);
-			create_pair(5  + j);
-			create_pair(21 + j);
-			create_pair(13 + j);
-			create_pair(29 + j);
-			create_pair(3  + j);
-			create_pair(19 + j);
-			create_pair(11 + j);
-			create_pair(27 + j);
-			create_pair(7  + j);
-			create_pair(23 + j);
-			create_pair(15 + j);
-			create_pair(31 + j);
-		}
-	}
-
-	else
-	{
-		for (size_t i = 0; i < max_start_pos/2; ++i)
-		{
-			auto new_match = CreateAutoMatch(GetFilter()->GetJudokaByStartPosition(i),
-											 GetFilter()->GetJudokaByStartPosition(i + max_start_pos/2));
-			nextRound.emplace_back(new_match);
-		}
 	}
 
 	//Additional rounds
+	bool infuse = true;
+	bool swap   = true;
+
 	for (int round = 1; round < rounds; ++round)
 	{
 		lastRound = std::move(nextRound);
 
-		for (size_t i = 0; i < lastRound.size(); i += 2)
+		for (size_t i = 0; i < lastRound.size(); ++i)
 		{
-			if (i+1 >= lastRound.size())
-				break;
+			Match* new_match = nullptr;
 
-			auto match1 = lastRound[i];
-			auto match2 = lastRound[i+1];
+			if (infuse)//Infuse further participants
+			{
+				if (swap)
+				{
+					if (i < lastRound.size()/2)
+						new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, *lastRound[i]),
+													GetFilter()->GetJudokaByStartPosition(current_start_pos++  + lastRound.size()/2));
+					else
+						new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, *lastRound[i]),
+													GetFilter()->GetJudokaByStartPosition(current_start_pos++  - lastRound.size()/2));
+				}
 
-			auto new_match = AddMatchForWinners(match1, match2);
-			nextRound.emplace_back(new_match);
+				else
+				{
+					new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, *lastRound[i]),
+												GetFilter()->GetJudokaByStartPosition(current_start_pos++));
+				}
+			}
+			else//Only take winners from previous round
+			{
+				if (i+1 >= lastRound.size())
+					break;
+
+				auto match1 = lastRound[i];
+				auto match2 = lastRound[++i];
+
+				new_match = AddMatchForWinners(match1, match2);
+			}
+
+			if (new_match)
+				nextRound.emplace_back(new_match);
 		}
+
+		if (infuse)
+			swap = !swap;
+
+		infuse = !infuse;//Switch for next round
 	}
 
 
+	//TODO REFACTOR THE FOLLOWING
+	
 	//Add additional match for 3rd place
-	if (IsThirdPlaceMatch() && m_Schedule.size() >= 3)
+	/*if (IsThirdPlaceMatch() && m_Schedule.size() >= 3)
 	{
 		auto match1 = m_Schedule[m_Schedule.size() - 3];
 		auto match2 = m_Schedule[m_Schedule.size() - 2];
@@ -237,7 +205,7 @@ void LoserBracket::GenerateSchedule()
 
 		if (IsThirdPlaceMatch())
 			std::swap(m_Schedule[m_Schedule.size() - 1 - offset - 3], m_Schedule[m_Schedule.size() - 1 - 3]);
-	}
+	}*/
 
 
 	//Add additional matches for best of three
@@ -431,7 +399,7 @@ const std::string LoserBracket::ToHTML() const
 	ret += "</table>";
 
 
-	if (IsThirdPlaceMatch())
+	/*if (IsThirdPlaceMatch())
 	{
 		ret += "<table width=\"" + std::to_string(width) + "%\" border='1' rules='all' style=\"margin-bottom: 5mm;\">";
 
@@ -475,7 +443,7 @@ const std::string LoserBracket::ToHTML() const
 		ret += "</tr>";
 
 		ret += "</table>";
-	}
+	}*/
 
 	ret += ResultsToHTML();	
 

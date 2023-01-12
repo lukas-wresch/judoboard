@@ -1,5 +1,6 @@
 #pragma once
 #include "judoboard.h"
+#include "filter.h"
 #include "single_elimination.h"
 
 
@@ -23,8 +24,9 @@ namespace Judoboard
 		virtual Type GetType() const override { return Type::LoserBracket; }
 
 		virtual size_t GetMaxStartPositions() const override {
-			const auto rounds = GetNumberOfRounds();
-			return (int)pow(2, rounds);
+			if (!GetFilter())
+				return 0;
+			return (size_t)pow(2, GetNumberOfBaseRounds()) - 2;
 		}
 
 		virtual Results CalculateResults() const override;
@@ -42,6 +44,14 @@ namespace Judoboard
 
 	private:
 		size_t GetNumberOfRounds() const;
+
+		size_t GetNumberOfBaseRounds() const
+		{
+			if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
+				return 0;
+
+			return (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size() + 2));
+		}
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;
