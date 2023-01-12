@@ -28,6 +28,7 @@ namespace Judoboard
 			Ippon = 10, Wazaari = 7, Yuko = 5, Koka = 3, Hantei = 1, Draw = 0
 		};
 
+
 		struct Result
 		{
 			Result() = default;
@@ -98,6 +99,7 @@ namespace Judoboard
 
 		//Match dependencies
 		void SetDependency(Fighter Fighter, DependencyType Type, Match* Reference);
+		void SetDependency(Fighter Fighter, DependencyType Type, const MatchTable* Reference);
 		void SetBestOfThree(Match* Reference1, Match* Reference2);
 		bool HasUnresolvedDependency() const;
 		bool HasDependentMatches() const {//Returns true if and only if this match depends upon other matches (as in the depend matches needs to conclude in order for this match to start)
@@ -123,6 +125,11 @@ namespace Judoboard
 			if (Fighter == Fighter::White)
 				return m_White.m_DependentMatch;
 			return m_Blue.m_DependentMatch;
+		}
+		const MatchTable* GetDependentMatchTableOf(Fighter Fighter) const {
+			if (Fighter == Fighter::White)
+				return m_White.m_DependentMatchTable;
+			return m_Blue.m_DependentMatchTable;
 		}
 
 		const RuleSet& GetRuleSet() const;

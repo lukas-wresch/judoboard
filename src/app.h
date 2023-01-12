@@ -186,7 +186,11 @@ namespace Judoboard
 			std::recursive_mutex& m_Mutex;
 		};
 
+		[[nodiscard]]
 		ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
+		void Lock()    const { m_mutex.lock(); }
+		void Unlock()  const { m_mutex.unlock(); }
+		bool TryLock() const { return m_mutex.try_lock(); }
 
 
 		enum class Mode
