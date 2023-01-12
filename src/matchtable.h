@@ -141,7 +141,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Unknown, RoundRobin, Pause, Custom, SingleElimination
+			Unknown, RoundRobin, Custom, SingleElimination, Pool
 		};
 
 		struct Result
@@ -226,6 +226,17 @@ namespace Judoboard
 				return nullptr;
 			}
 
+			const Judoka* Get(DependencyType Type)
+			{
+				if ((int)DependencyType::TakeRank1 <= (int)Type && (int)Type <= (int)DependencyType::TakeRank10)
+				{
+					int pos = (int)Type - (int)DependencyType::TakeRank1;
+					if (pos < m_Results.size())
+						return m_Results[pos].Judoka;
+				}
+				return nullptr;
+			}
+
 			void Sort() const
 			{
 				std::sort(m_Results.begin(), m_Results.end());
@@ -283,7 +294,7 @@ namespace Judoboard
 
 		virtual const std::string ToHTML() const = 0;
 
-		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
+		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
 
 		//Basics
@@ -313,6 +324,8 @@ namespace Judoboard
 		const std::vector<const Judoka*> GetParticipants() const;
 
 		const IFilter* GetFilter() const { return m_Filter; }
+		IFilter* GetFilter() { return m_Filter; }
+		const ITournament* GetTournament() const { return m_Tournament; }
 
 		//Rule sets
 		const RuleSet& GetRuleSet() const;
@@ -337,6 +350,10 @@ namespace Judoboard
 		bool IsBestOfThree() const { return m_BestOfThree; }
 		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; GenerateSchedule(); }
 
+		//Sub match tables
+		bool IsSubMatchTable() const { return m_IsSubMatchTable; }
+		void IsSubMatchTable(bool SetFlag) { m_IsSubMatchTable = SetFlag; }
+
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual void ToString(YAML::Emitter& Yaml) const;
@@ -358,24 +375,20 @@ namespace Judoboard
 
 		void AddMatchesForBestOfThree();
 
-		const ITournament* GetTournament() const { return m_Tournament; }
-
 		void DeleteSchedule() { m_Schedule.clear(); }
 
 		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
+		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
 
 		const std::string ResultsToHTML() const;
+
+		std::vector<Match*>&  SetSchedule() { return m_Schedule; }
 
 
 		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
 
 	private:
-		std::vector<Match*>&  SetSchedule() { return m_Schedule; }
-		
-		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
-
-
 		const RuleSet* m_Rules = nullptr;//Custom rule set for the matches (if available)
 
 		std::string m_Name;
@@ -387,6 +400,8 @@ namespace Judoboard
 		int32_t m_ScheduleIndex = -1;//Index when this entry should be in the schedule
 		uint32_t m_MatID = 0;
 		Color m_Color;
+
+		bool m_IsSubMatchTable = false;//Is this a match table that is purely used by another match table?
 
 		bool m_BestOfThree = false;
 	};

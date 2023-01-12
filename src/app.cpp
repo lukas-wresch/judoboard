@@ -16,7 +16,7 @@ using namespace Judoboard;
 
 
 const std::string Application::Name = "Judoboard";
-const std::string Application::Version = "0.4.1";
+const std::string Application::Version = "0.4.2";
 bool Application::NoWindow = false;
 
 
@@ -117,7 +117,7 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 	ret += "Tournament date: " + File.GetTournamentDate() + "<br/>";
 	ret += "<br/>";
 
-	LockTillScopeEnd();
+	auto guard = LockTillScopeEnd();
 
 	for (auto club : File.GetClubs())
 	{
@@ -278,7 +278,7 @@ Error Application::CheckPermission(const HttpServer::Request& Request, Account::
 
 	auto value = HttpServer::DecodeURLEncoded(header->Value, "session");
 
-	LockTillScopeEnd();
+	auto guard = LockTillScopeEnd();
 	auto account = m_Database.IsLoggedIn(Request.m_RequestInfo.RemoteIP, value);
 
 	if (!account || account->GetAccessLevel() < AccessLevel)
@@ -340,17 +340,23 @@ uint32_t Application::GetHighestMatID() const
 
 bool Application::CloseMat(uint32_t ID)
 {
-	LockTillScopeEnd();
+	Lock();
+	auto mats_copy = m_Mats;
+	Unlock();
 
-	for (auto it = m_Mats.begin(); it != m_Mats.end(); ++it)
+	for (auto it = mats_copy.begin(); it != mats_copy.end(); ++it)
 	{
-		if (*it && (*it)->GetMatID() == ID && (*it)->Close())
+		if (*it && (*it)->GetMatID() == ID && (*it)->Close())//This also requires an application lock
 		{
 			if ((*it)->GetType() == IMat::Type::VirtualMat)
 			{
-				delete* it;
+				delete *it;
 				it = m_Mats.erase(it);
 			}
+
+			Lock();
+			m_Mats = std::move(mats_copy);
+			Unlock();
 
 			return true;
 		}
@@ -365,7 +371,7 @@ bool Application::StartLocalMat(uint32_t ID)
 {
 	ZED::Log::Info("Starting local mat");
 
-	LockTillScopeEnd();
+	auto guard = LockTillScopeEnd();
 
 	for (; true; ID++)
 	{
@@ -411,14 +417,25 @@ bool Application::StartLocalMat(uint32_t ID)
 
 std::vector<Match> Application::GetNextMatches(uint32_t MatID) const
 {
-	LockTillScopeEnd();
-
-	if (!GetTournament())
+	if (!TryLock())//Can we get a lock?
 	{
 		std::vector<Match> empty;
 		return empty;
 	}
-	return GetTournament()->GetNextMatches(MatID);
+
+	//Mutex is now locked
+
+	if (!GetTournament())
+	{
+		std::vector<Match> empty;
+		Unlock();
+		return empty;
+	}
+
+	auto ret = GetTournament()->GetNextMatches(MatID);
+	Unlock();
+
+	return ret;
 }
 
 

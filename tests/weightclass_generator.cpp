@@ -219,3 +219,54 @@ TEST(WeightclassGenerator, FullTest)
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
+
+
+
+TEST(WeightclassGenerator, Bug)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+		Tournament tour("deleteMe");
+		tour.EnableAutoSave(false);
+
+		tour.AddParticipant(new Judoka(GetRandomName(), GetRandomName(), Weight(53), Gender::Female));
+		tour.AddParticipant(new Judoka(GetRandomName(), GetRandomName(), Weight(66), Gender::Female));
+		tour.AddParticipant(new Judoka(GetRandomName(), GetRandomName(), Weight(67), Gender::Female));
+		tour.AddParticipant(new Judoka(GetRandomName(), GetRandomName(), Weight(69), Gender::Female));
+		tour.AddParticipant(new Judoka(GetRandomName(), GetRandomName(), Weight(69), Gender::Female));
+		tour.AddParticipant(new Judoka(GetRandomName(), GetRandomName(), Weight(81), Gender::Female));
+		tour.AddParticipant(new Judoka(GetRandomName(), GetRandomName(), Weight(81), Gender::Female));
+		
+		//53 66 | 67 69 69 | 81 81
+
+		auto age_groups  = tour.GetAgeGroups();
+		auto descriptors = tour.GenerateWeightclasses(2, 5, 10, age_groups, true);
+
+		EXPECT_TRUE(tour.ApplyWeightclasses(descriptors));
+
+		EXPECT_EQ(tour.GetMatchTables().size(), 3);
+
+		for (auto table : tour.GetMatchTables())
+			EXPECT_GE(table->GetSchedule().size(), 1);
+
+		//Check if everyone is in a match table
+		for (auto [id, judoka] : tour.GetParticipants())
+		{
+			bool is_included = false;
+			for (auto table : tour.GetMatchTables())
+			{
+				if (table->IsIncluded(*judoka))
+				{
+					is_included = true;
+					break;
+				}
+			}
+
+			EXPECT_TRUE(is_included);
+		}
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}

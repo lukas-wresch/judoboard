@@ -131,7 +131,7 @@ function UpdateJudoka()
 
 function DeleteJudoka()
 {
-  if (confirm(lang.delete_judoka_confirm))
+  if (confirm(translate('delete_judoka_confirm')))
   {
     Ajax('ajax/judoka/delete?id='+id);
     navigate('judoka_list.html');

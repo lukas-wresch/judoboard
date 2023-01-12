@@ -7,6 +7,7 @@
 namespace Judoboard
 {
 	class AgeGroup;
+	class Tournament;
 
 
 	class IFilter : public ID
@@ -14,7 +15,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Weightclass, Custom
+			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser
 		};
 
 		IFilter(const YAML::Node& Yaml, const ITournament* Tournament);
@@ -28,32 +29,36 @@ namespace Judoboard
 		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
 
+		const ITournament* GetTournament() const { return m_Tournament; }
+
 		//Age groups
 		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
 		void SetAgeGroup(const AgeGroup* NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
 
 		//Participants + Start Positions
-		auto& GetParticipants() const { return m_Participants; }
+		virtual std::unordered_map<size_t, const DependentJudoka> GetParticipants() const { return m_Participants; }
 
 		virtual size_t GetStartPosition(const Judoka* Judoka) const;
 		virtual void   SetStartPosition(const DependentJudoka Judoka, size_t NewStartPosition);
 		virtual void   SetStartPosition(const Judoka* Judoka, size_t NewStartPosition);
 
-		const DependentJudoka GetJudokaByStartPosition(size_t StartPosition) const {
+		virtual const DependentJudoka GetJudokaByStartPosition(size_t StartPosition) const {
 			auto result = m_Participants.find(StartPosition);
 			if (result == m_Participants.end())
 				return nullptr;
 			return result->second;
 		}
 
-		bool IsStartPositionTaken(size_t StartPosition) const {
+		virtual bool IsStartPositionTaken(size_t StartPosition) const {
 			return m_Participants.find(StartPosition) != m_Participants.end();
 		}
 
-		void FindFreeStartPos(const DependentJudoka NewParticipant);
+		virtual void FindFreeStartPos(const DependentJudoka NewParticipant);
 
 		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual void ToString(YAML::Emitter& Yaml) const;
+
+		void Dump() const;
 
 
 	protected:
@@ -62,11 +67,13 @@ namespace Judoboard
 		size_t GetStartPosition(const DependentJudoka Judoka) const;
 		bool RemoveParticipant(const DependentJudoka Participant);
 
-		const ITournament* GetTournament() const { return m_Tournament; }
+		void SetParticipants(std::unordered_map<size_t, const DependentJudoka>&& NewParticipants) const {
+			m_Participants = std::move(NewParticipants);
+		}
 
 
 	private:
-		std::unordered_map<size_t, const DependentJudoka> m_Participants;//List of all participants that are in the match table
+		mutable std::unordered_map<size_t, const DependentJudoka> m_Participants;//List of all participants that are in the match table
 
 		const AgeGroup* m_pAgeGroup = nullptr;//Age group for the matches (if available)
 

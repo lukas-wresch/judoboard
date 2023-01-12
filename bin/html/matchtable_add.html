@@ -12,8 +12,9 @@
   <label style="width:100px;float:left;margin-top:4px;" id="label_fight_system">Fight System</label>
   <select style="margin-bottom:20px; width: 5.5cm;" id="fight_system" onchange="GetFightSystemForm();">
     <option selected value="1" id="label_weightclass">Round Robin</option>
-    <option value="3" id="label_custom">Custom</option>
-    <option value="4" id="label_single_elimination">Single Elimination</option>
+    <option value="2" id="label_custom">Custom</option>
+    <option value="3" id="label_single_elimination">Single Elimination</option>
+    <option value="4" id="label_pool">Pool</option>
   </select>
 </div>
 
@@ -49,12 +50,12 @@
 </div>
 
 
-<div style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
+<div id="div_filter" style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
   <form id="form_filter">
   </form>
 </div>
 
-<div style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
+<div id="div_fight_system" style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 7cm; padding: 0.3cm; margin-bottom: 0.3cm;">
   <form id="form_fight_system">
   </form>
 </div>
@@ -273,10 +274,19 @@ function GetMatchTable(id)
     g_yaml = res;
     
     document.getElementById("name").value = res.name;
-    document.getElementById("type").value = res.filter_type;
-    document.getElementById("type").onchange();
-    document.getElementById("fight_system").value = res.type;
-    document.getElementById("fight_system").onchange();
+
+    if (!res.is_sub_match_table)
+    {
+      document.getElementById("type").value = res.filter_type;
+      document.getElementById("type").onchange();
+      document.getElementById("fight_system").value = res.type;
+      document.getElementById("fight_system").onchange();
+    }
+    else
+    {
+      document.getElementById("div_filter").style.display = "none";
+      document.getElementById("div_fight_system").style.display = "none";
+    }
     
     GetMats(function() {
       document.getElementById("mat").value = res.mat_id;

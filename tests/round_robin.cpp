@@ -15,7 +15,7 @@ TEST(Weightclass, Eligable_NoMaxWeight)
 
 
 
-TEST(Weightclass, CorrectOrder2)
+TEST(RoundRobin, CorrectOrder2)
 {
 	initialize();
 
@@ -35,7 +35,7 @@ TEST(Weightclass, CorrectOrder2)
 
 
 
-TEST(Weightclass, CorrectOrder2_BO3)
+TEST(RoundRobin, CorrectOrder2_BO3)
 {
 	initialize();
 
@@ -136,7 +136,7 @@ TEST(Weightclass, CorrectOrder3)
 
 
 
-TEST(Weightclass, CorrectOrder4)
+TEST(RoundRobin, CorrectOrder4)
 {
 	initialize();
 
@@ -175,7 +175,7 @@ TEST(Weightclass, CorrectOrder4)
 
 
 
-TEST(Weightclass, CorrectOrder5)
+TEST(RoundRobin, CorrectOrder5)
 {
 	initialize();
 
@@ -228,7 +228,7 @@ TEST(Weightclass, CorrectOrder5)
 
 
 
-TEST(Weightclass, CorrectOrder6)
+TEST(RoundRobin, CorrectOrder6)
 {
 	initialize();
 
@@ -298,7 +298,7 @@ TEST(Weightclass, CorrectOrder6)
 
 
 
-TEST(Weightclass, ExportImport)
+TEST(RoundRobin, ExportImport)
 {
 	initialize();
 

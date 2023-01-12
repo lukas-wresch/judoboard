@@ -143,8 +143,10 @@ bool MatchTable::AddMatch(Match* NewMatch)
 	if (!NewMatch)
 		return false;
 
-	AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)), true);
-	AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
+	if (NewMatch->GetFighter(Fighter::White))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)), true);
+	if (NewMatch->GetFighter(Fighter::Blue))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
 
 	NewMatch->SetMatchTable(this);
 	m_Schedule.emplace_back(NewMatch);
@@ -153,13 +155,16 @@ bool MatchTable::AddMatch(Match* NewMatch)
 
 
 
-bool MatchTable::AddParticipant(const Judoka* NewParticipant, bool Force)
+bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 {
 	if (!NewParticipant || !m_Filter)
 		return false;
 
 	if (!m_Filter->AddParticipant(NewParticipant, Force))
 		return false;
+
+	if (GetTournament())//Add to tournament?
+		((ITournament*)GetTournament())->AddParticipant(NewParticipant);//Const cast
 
 	GenerateSchedule();
 	return true;
@@ -452,7 +457,10 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
 	Yaml << YAML::Key << "description" << YAML::Value << GetDescription();
 
-	Yaml << YAML::Key << "best_of_three" << YAML::Value << m_BestOfThree;
+	Yaml << YAML::Key << "best_of_three" << YAML::Value << IsBestOfThree();
+
+	if (IsSubMatchTable())
+		Yaml << YAML::Key << "is_sub_match_table" << YAML::Value << IsSubMatchTable();
 
 	if (m_Rules)
 		Yaml << YAML::Key << "rule_set" << YAML::Value << (std::string)m_Rules->GetUUID();
