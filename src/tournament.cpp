@@ -629,7 +629,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 	}
 
 	auto new_match_table = new CustomTable(this);
-	new_match_table->SetFilter(new Fixed);
+	new_match_table->SetFilter(new IFilter(this));
 	new_match_table->AddMatch(NewMatch);
 	AddMatchTable(new_match_table);
 

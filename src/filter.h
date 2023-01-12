@@ -15,16 +15,17 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser
+			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser, Standard
 		};
 
+		IFilter(const ITournament* Tournament) : m_Tournament(Tournament) {}
 		IFilter(const YAML::Node& Yaml, const ITournament* Tournament);
 
-		virtual Type GetType() const = 0;
+		virtual Type GetType() const { return Type::Standard; };
 
 		virtual std::string GetDescription() const { return ""; }
 
-		virtual bool IsElgiable(const Judoka& Fighter) const = 0;
+		virtual bool IsElgiable(const Judoka& Fighter) const { return false; };
 
 		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
@@ -62,7 +63,7 @@ namespace Judoboard
 
 
 	protected:
-		IFilter(const ITournament* Tournament) : m_Tournament(Tournament) {}
+		//IFilter(const ITournament* Tournament) : m_Tournament(Tournament) {}
 
 		size_t GetStartPosition(const DependentJudoka Judoka) const;
 		bool RemoveParticipant(const DependentJudoka Participant);
