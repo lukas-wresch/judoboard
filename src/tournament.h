@@ -38,7 +38,8 @@ namespace Judoboard
 
 		[[nodiscard]]
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
-		const auto& GetSchedule() const { return m_Schedule; }
+		[[nodiscard]]
+		std::vector<Match*> GetSchedule() const;
 		Match* FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
 		virtual const StandingData& GetDatabase() const override { return m_StandingData; }//Returns a database containing all participants
@@ -198,6 +199,19 @@ namespace Judoboard
 
 		std::vector<MatchTable*>& SetMatchTables() { return m_MatchTables; }
 
+		class ScopedLock
+		{
+		public:
+			ScopedLock(std::recursive_mutex& Mutex) : m_Mutex(Mutex) { Mutex.lock(); }
+			~ScopedLock() { m_Mutex.unlock(); }
+
+		private:
+			std::recursive_mutex& m_Mutex;
+		};
+
+		[[nodiscard]]
+		ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
+
 		std::string m_Name;
 		bool m_AutoSave = true;
 		bool m_Readonly = false;
@@ -206,7 +220,8 @@ namespace Judoboard
 		uint32_t m_LotteryTier = 0;//Tier for performing lottery (usually organizer tier + 1)
 
 		std::vector<MatchTable*> m_MatchTables;
-		std::vector<Match*> m_Schedule;
+		//std::vector<Match*> m_Schedule;
+		std::vector<std::pair<MatchTable*, size_t>> m_Schedule;
 
 		const RuleSet* m_pDefaultRules = nullptr;//Default rule set of the tournament
 
