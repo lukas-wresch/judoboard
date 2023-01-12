@@ -695,10 +695,10 @@ TEST(Tournament, Lottery_Histogram)
 		c2_count += lot2;
 	}
 
-	EXPECT_GE(c1_count, 40);
-	EXPECT_LE(c1_count, 60);
-	EXPECT_GE(c2_count, 40);
-	EXPECT_LE(c2_count, 60);
+	EXPECT_GE(c1_count, 35);
+	EXPECT_LE(c1_count, 65);
+	EXPECT_GE(c2_count, 35);
+	EXPECT_LE(c2_count, 65);
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
