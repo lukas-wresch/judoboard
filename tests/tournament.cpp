@@ -921,6 +921,8 @@ TEST(Tournament, SaveAndLoad)
 		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
 		tourney->AddMatchTable(new RoundRobin(Weight(60), Weight(65)));
 		tourney->AddMatchTable(new Pool(Weight(50), Weight(65)));
+		tourney->AddMatchTable(new SingleElimination(Weight(50), Weight(65)));
+		tourney->AddMatchTable(new DoubleElimination(Weight(50), Weight(65)));
 		tourney->AddMatch(new Match(j1, j3, tourney, 1));
 		tourney->AddMatch(new Match(j1, j4, tourney, 2));
 		tourney->GenerateSchedule();

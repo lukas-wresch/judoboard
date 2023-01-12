@@ -20,7 +20,6 @@ DoubleElimination::DoubleElimination(IFilter* Filter, const ITournament* Tournam
 	m_LoserBracket.IsSubMatchTable(true);
 
 	m_LoserBracket.SetFilter(new LosersOf(m_WinnerBracket));
-	GenerateSchedule();
 }
 
 
@@ -56,6 +55,9 @@ DoubleElimination::DoubleElimination(const YAML::Node& Yaml, ITournament* Tourna
 
 void DoubleElimination::operator >> (YAML::Emitter& Yaml) const
 {
+	if (!IsSubMatchTable())
+		Yaml << YAML::BeginMap;
+
 	MatchTable::operator >>(Yaml);
 
 	if (IsThirdPlaceMatch())
@@ -71,6 +73,9 @@ void DoubleElimination::operator >> (YAML::Emitter& Yaml) const
 	if (m_LoserBracket.GetMatID() != 0)
 		Yaml << YAML::Key << "mat_of_loser_bracket" << YAML::Value << m_LoserBracket.GetMatID();
 	Yaml << YAML::Key << "name_of_loserbracket" << YAML::Value << m_LoserBracket.GetName();
+
+	if (!IsSubMatchTable())
+		Yaml << YAML::EndMap;
 }
 
 

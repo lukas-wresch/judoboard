@@ -665,9 +665,7 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	w->GenerateSchedule();
 
 	YAML::Emitter yaml;
-	yaml << YAML::BeginMap;
 	*w >> yaml;
-	yaml << YAML::EndMap;
 
 	Pool w2(YAML::Load(yaml.c_str()), &tourney);
 

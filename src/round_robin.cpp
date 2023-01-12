@@ -185,6 +185,19 @@ MatchTable::Results RoundRobin::CalculateResults() const
 
 
 
+void RoundRobin::operator >> (YAML::Emitter& Yaml) const
+{
+	if (!IsSubMatchTable())
+		Yaml << YAML::BeginMap;
+
+	MatchTable::operator >>(Yaml);
+
+	if (!IsSubMatchTable())
+		Yaml << YAML::EndMap;
+}
+
+
+
 const std::string RoundRobin::ToHTML() const
 {
 	std::string ret;

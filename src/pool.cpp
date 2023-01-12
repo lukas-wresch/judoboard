@@ -75,6 +75,9 @@ Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
 
 void Pool::operator >> (YAML::Emitter& Yaml) const
 {
+	if (!IsSubMatchTable())
+		Yaml << YAML::BeginMap;
+
 	MatchTable::operator >>(Yaml);
 
 	Yaml << YAML::Key << "pool_count" << YAML::Value << m_PoolCount;
@@ -96,6 +99,9 @@ void Pool::operator >> (YAML::Emitter& Yaml) const
 	if (GetFinals().GetMatID() != 0 && GetFinals().GetMatID() != GetMatID())
 		Yaml << YAML::Key << "mat_of_finals" << YAML::Value << GetFinals().GetMatID();
 	Yaml << YAML::Key << "name_of_finals" << YAML::Value << GetFinals().GetName();
+
+	if (!IsSubMatchTable())
+		Yaml << YAML::EndMap;
 }
 
 

@@ -49,12 +49,18 @@ SingleElimination::SingleElimination(const MD5::Weightclass& Weightclass_, const
 
 void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 {
+	if (!IsSubMatchTable())
+		Yaml << YAML::BeginMap;
+
 	MatchTable::operator >>(Yaml);
 
 	if (m_ThirdPlaceMatch)
 		Yaml << YAML::Key << "third_place_match" << YAML::Value << m_ThirdPlaceMatch;
 	if (m_FifthPlaceMatch)
 		Yaml << YAML::Key << "fifth_place_match" << YAML::Value << m_FifthPlaceMatch;
+
+	if (!IsSubMatchTable())
+		Yaml << YAML::EndMap;
 }
 
 

@@ -21,6 +21,7 @@ namespace Judoboard
 		virtual void GenerateSchedule() override {}
 
 		//Serialization
+		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual const std::string ToHTML() const override;
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
