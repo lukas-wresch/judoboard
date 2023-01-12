@@ -67,7 +67,8 @@ Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
 
 	if (Yaml["mat_of_finals"])
 		GetFinals().SetMatID(Yaml["mat_of_finals"].as<uint32_t>());
-	GetFinals().SetName(Yaml["name_of_finals"].as<std::string>());
+	if (Yaml["name_of_finals"])
+		GetFinals().SetName(Yaml["name_of_finals"].as<std::string>());
 }
 
 
