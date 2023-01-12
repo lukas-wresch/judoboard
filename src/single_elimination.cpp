@@ -363,62 +363,7 @@ const std::string SingleElimination::ToHTML() const
 	const auto N = pow(2, rounds);
 
 
-	auto renderMatchIndex = [this, N](size_t matchIndex, std::string style = "") -> std::string {
-
-		if (matchIndex >= GetSchedule().size())
-			return "";
-
-		auto match = GetSchedule()[matchIndex];
-
-		std::string ret = "<td style=\"" + style + "\">";
-
-		if (!match->IsEmptyMatch())
-			ret += "<a href='#edit_match.html?id=" + (std::string)match->GetUUID() + "'>";
-
-		//Output name of fighters
-		if (match->GetFighter(Fighter::White))
-			ret += match->GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
-		//else if (match->HasDependentMatches() || match->GetDependencyTypeOf(Fighter::White))
-		else if ((match->GetDependencyTypeOf(Fighter::White) != DependencyType::None) &&
-				 (match->GetDependencyTypeOf(Fighter::White) != DependencyType::BestOfThree))
-			ret += "???";
-		else
-			ret += "- - -";
-
-		ret += " vs. ";
-
-		if (match->GetFighter(Fighter::Blue))
-			ret += match->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
-		//else if (match->HasDependentMatches())
-		else if ((match->GetDependencyTypeOf(Fighter::Blue) != DependencyType::None) &&
-				 (match->GetDependencyTypeOf(Fighter::Blue) != DependencyType::BestOfThree))
-			ret += "???";
-		else
-			ret += "- - -";
-
-		//Output result
-		if (match->IsRunning())
-			ret += "<br/>" + Localizer::Translate("In Progress");
-		else if (match->HasConcluded() && !match->IsCompletelyEmptyMatch())
-		{
-			const auto& result = match->GetResult();
-			if (result.m_Winner == Winner::White)
-				ret += "<br/>"   + std::to_string((int)result.m_Score) + ":0";
-			else
-				ret += "<br/>0:" + std::to_string((int)result.m_Score);
-
-			ret += " (" + Timer::TimestampToString(result.m_Time) + ")";
-		}
-
-		if (!match->IsEmptyMatch())
-			ret += "</a>";
-		ret += "</a></td>";
-
-		return ret;
-	};
-
-
-	auto renderMatch = [this, N, renderMatchIndex](size_t roundIndex, int matchOfRound) -> std::string {
+	auto renderMatchIndex = [this, N](size_t roundIndex, int matchOfRound) -> std::string {
 		int matchIndex = 0;
 		for (int i = 1; i <= roundIndex; ++i)
 			matchIndex += (int)(N / pow(2.0, i));
@@ -440,7 +385,9 @@ const std::string SingleElimination::ToHTML() const
 		if (matchOfRound % 2 == 0)
 			style += "border-right-style: hidden;";
 
-		return renderMatchIndex(matchIndex, style);
+		if (matchIndex < GetSchedule().size())
+			return RenderMatch(*GetSchedule()[matchIndex], style);
+		return "";
 	};
 
 	size_t width = 100;
@@ -471,7 +418,7 @@ const std::string SingleElimination::ToHTML() const
 			}
 
 			const int matchOfRound = y / (int)std::pow(2, round+1);
-			ret += renderMatch(round, matchOfRound);
+			ret += renderMatchIndex(round, matchOfRound);
 		}
 
 		ret += "</tr>";
@@ -489,7 +436,7 @@ const std::string SingleElimination::ToHTML() const
 		ret += "</tr>";
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += renderMatchIndex(m_Schedule.size() - 2);
+		ret += RenderMatch(*m_Schedule[m_Schedule.size() - 2]);
 		ret += "</tr>";
 
 		ret += "</table>";
@@ -509,17 +456,17 @@ const std::string SingleElimination::ToHTML() const
 			offset = 5;
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += renderMatchIndex(m_Schedule.size() - offset - 2, "border-left-style: hidden; border-right-style: hidden;");
+		ret += RenderMatch(*m_Schedule[m_Schedule.size() - offset - 2], "border-left-style: hidden; border-right-style: hidden;");
 		ret += "<td style=\"border-bottom-style: hidden; border-right-style: hidden;\"></td>";
 		ret += "</tr>";
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
 		ret += "<td style=\"border-bottom-style: hidden; border-left-style: hidden;\"></td>";
-		ret += renderMatchIndex(m_Schedule.size() - offset, "border-right-style: hidden;");
+		ret += RenderMatch(*m_Schedule[m_Schedule.size() - offset], "border-right-style: hidden;");
 		ret += "</tr>";
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += renderMatchIndex(m_Schedule.size() - offset - 1, "border-left-style: hidden;");
+		ret += RenderMatch(*m_Schedule[m_Schedule.size() - offset - 1], "border-left-style: hidden;");
 		ret += "<td style=\"border-bottom-style: hidden; border-right-style: hidden;\"></td>";
 		ret += "</tr>";
 
@@ -530,3 +477,54 @@ const std::string SingleElimination::ToHTML() const
 
 	return ret;
 }
+
+
+
+std::string SingleElimination::RenderMatch(const Match& match, std::string style) const
+{
+	std::string ret = "<td style=\"" + style + "\">";
+
+	if (!match.IsEmptyMatch())
+		ret += "<a href='#edit_match.html?id=" + (std::string)match.GetUUID() + "'>";
+
+	//Output name of fighters
+	if (match.GetFighter(Fighter::White))
+		ret += match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+	//else if (match->HasDependentMatches() || match->GetDependencyTypeOf(Fighter::White))
+	else if ((match.GetDependencyTypeOf(Fighter::White) != DependencyType::None) &&
+		(match.GetDependencyTypeOf(Fighter::White) != DependencyType::BestOfThree))
+		ret += "???";
+	else
+		ret += "- - -";
+
+	ret += " vs. ";
+
+	if (match.GetFighter(Fighter::Blue))
+		ret += match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+	//else if (match->HasDependentMatches())
+	else if ((match.GetDependencyTypeOf(Fighter::Blue) != DependencyType::None) &&
+		(match.GetDependencyTypeOf(Fighter::Blue) != DependencyType::BestOfThree))
+		ret += "???";
+	else
+		ret += "- - -";
+
+	//Output result
+	if (match.IsRunning())
+		ret += "<br/>" + Localizer::Translate("In Progress");
+	else if (match.HasConcluded() && !match.IsCompletelyEmptyMatch())
+	{
+		const auto& result = match.GetResult();
+		if (result.m_Winner == Winner::White)
+			ret += "<br/>"   + std::to_string((int)result.m_Score) + ":0";
+		else
+			ret += "<br/>0:" + std::to_string((int)result.m_Score);
+
+		ret += " (" + Timer::TimestampToString(result.m_Time) + ")";
+	}
+
+	if (!match.IsEmptyMatch())
+		ret += "</a>";
+	ret += "</a></td>";
+
+	return ret;
+};

@@ -55,6 +55,8 @@ namespace Judoboard
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
+	protected:
+		std::string RenderMatch(const Match& match, std::string style = "") const;
 
 	private:
 		size_t GetNumberOfRounds() const;
