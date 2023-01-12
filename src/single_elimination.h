@@ -16,6 +16,21 @@ namespace Judoboard
 		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament = nullptr);
 		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 
+		void operator =(const SingleElimination& rhs) = delete;
+		void operator =(SingleElimination&& rhs) noexcept {
+			m_ThirdPlaceMatch = rhs.m_ThirdPlaceMatch;
+			m_FifthPlaceMatch = rhs.m_FifthPlaceMatch;
+			SetRuleSet(rhs.GetOwnRuleSet());
+			SetName(rhs.GetName());
+			SetFilter(rhs.GetFilter());
+			SetTournament(rhs.GetTournament());
+			SetScheduleIndex(rhs.GetScheduleIndex());
+			SetMatID(rhs.GetMatID());
+			SetColor(rhs.GetColor());
+			SetSchedule() = std::move(rhs.SetSchedule());
+			IsBestOfThree(rhs.IsBestOfThree());
+		}
+
 		static std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::SingleElimination; }
@@ -42,14 +57,7 @@ namespace Judoboard
 
 
 	private:
-		void FindFreeStartPos(const Judoka* NewParticipant);
-
-		size_t GetNumberOfRounds() const {
-			if (GetParticipants().size() == 0)
-				return 0;
-
-			return (size_t)std::ceil(std::log2(GetParticipants().size()));
-		}
+		size_t GetNumberOfRounds() const;
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;

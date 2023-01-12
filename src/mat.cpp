@@ -1519,6 +1519,9 @@ void Mat::NextState(State NextState) const
 
 void Mat::UpdateGraphics() const
 {
+	if (m_State == State::StartUp)
+		return;
+
 	auto& renderer = m_Window.GetRenderer();
 
 	const unsigned int width  = renderer.GetWidth();
@@ -2313,6 +2316,9 @@ bool Mat::Mainloop()
 
 	uint32_t frameTime = 40;//25 FPS when idle
 
+	if (m_Window.GetRenderer().GetType() != ZED::Type::OpenGL)
+		frameTime = 200;
+
 	if (m_State != State::Running && m_Application)
 	{
 		auto nextMatches = m_Application->GetNextMatches(GetMatID());
@@ -2329,10 +2335,11 @@ bool Mat::Mainloop()
 
 	Render((double)m_LastFrameTime * 0.001f);
 
-	if (IsDoingAnimation())
+	if (IsDoingAnimation() || AreFightersOnMat())
 		frameTime = 15;
-	else if (AreFightersOnMat())
-		frameTime = 15;
+
+	else
+		ZED::Core::Pause(frameTime);
 
 	while (Timer::GetTimestamp() - frameStart < frameTime)
 	{

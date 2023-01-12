@@ -27,11 +27,26 @@ namespace Judoboard
 			m_Judoka = Judoka;
 			m_Type   = DependencyType::None;
 		}
+		DependentJudoka(DependencyType DependencyType, Match& DependentMatch) {
+			m_Type = DependencyType;
+			m_DependentMatch = &DependentMatch;
+		}
+		DependentJudoka(DependencyType DependencyType, const MatchTable& DependentMatchTable) {
+			m_Type = DependencyType;
+			m_DependentMatchTable = &DependentMatchTable;
+		}
 
-		const Judoka* GetJudoka() const { return m_Judoka; }
+		const Judoka* GetJudoka() const;
+		auto GetDependency() const { return m_Type; }
+		const Match* GetDependentMatch() const { return m_DependentMatch; }
+		auto GetDependentMatchTable() const { return m_DependentMatchTable; }
 
 		bool operator == (const Judoka* rhs) const;
 		bool operator == (const DependentJudoka& rhs) const;
+
+		operator bool () const {
+			return m_Judoka || m_Type != DependencyType::None;
+		}
 
 	private:
 		DependentJudoka() = default;
@@ -80,6 +95,8 @@ namespace Judoboard
 		[[deprecated]] Judoka(const DM4::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from DM4 data
 		[[deprecated]] Judoka(const MD5::Participant& Participant, const StandingData* pStandingData = nullptr);//Load judoka from MD5 data
 		[[deprecated]] Judoka(const DMF::Participant& Participant);//Load judoka from DMF data
+
+		virtual bool IsValid() const { return true; }
 
 		auto GetGender() const { return m_Gender; }
 		auto GetWeight() const { return m_Weight; }
