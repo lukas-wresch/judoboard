@@ -183,7 +183,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		Match* new_match = new Match(white, blue, this);
 
-		if (match.Status == 3)//Match completed?
+		if (match.Result == 1)//Match completed?
 		{
 			if (match.WinnerID == match.WhiteID)
 				new_match->SetResult(Match::Result(Fighter::White, (Match::Score)match.ScoreWinner, match.Time));
@@ -196,11 +196,12 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			auto match_table = (MatchTable*)match.Weightclass->pUserData;
 			match_table->AddMatch(new_match);//Add match to weightclass
 
-			auto index = match_table->FindMatchIndex(*new_match);
-			m_Schedule.emplace_back(match_table, index);
+      if (!new_match->IsEmptyMatch())
+      {
+			  auto index = match_table->FindMatchIndex(*new_match);
+			  m_Schedule.emplace_back(match_table, index);
+      }
 		}
-
-		//m_Schedule.emplace_back(new_match);
 	}
 
 	Save();
