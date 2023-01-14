@@ -549,6 +549,7 @@ TEST(Ajax, Judoka_Add)
 TEST(Ajax, Judoka_Get)
 {
 	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
 		Application app;
@@ -631,6 +632,7 @@ TEST(Ajax, Judoka_Edit)
 TEST(Ajax, Judoka_Edit_Participant)
 {
 	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
 		Application app;
@@ -1028,6 +1030,7 @@ TEST(Ajax, Clubs_List)
 TEST(Ajax, Clubs_List_All)
 {
 	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
 		Application app;
@@ -1078,6 +1081,7 @@ TEST(Ajax, Clubs_Get)
 TEST(Ajax, Clubs_Get_From_Tournament)
 {
 	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
 		Application app;
