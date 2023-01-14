@@ -121,6 +121,7 @@ var lang_en = {
     overview:  [ "Overview", "&Uuml;bersicht" ],
     open:  [ "Oppen", "&Ouml;ffnen" ],
     participants: [ "Participants", "Teilnehmer" ],
+    readonly: [ "Readonly", "Schreibschutz" ],
     rule_set:   [ "Rule Set", "Regelwerk" ],
     rule_sets:  [ "Rule Sets", "Regelwerke" ],
     remove:  [ "Remove", "Entfernen" ],
@@ -164,6 +165,7 @@ var lang_en = {
     winner:  [ "Winner", "Gewinner" ],
     year: ["Year", "Jahr" ],
     yuko_revoked:  [ "Yuko revoked!", "Yuko zur&uuml;ckgenommen!" ],
+    yes: ["Yes", "Ja" ],
 }
 
 
