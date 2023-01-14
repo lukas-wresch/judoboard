@@ -1523,14 +1523,14 @@ TEST(Ajax, MatchTable_Add)
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsThirdPlaceMatch(), true);
 		EXPECT_EQ(((SingleElimination*)tables[2])->IsFifthPlaceMatch(), true);
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=4&name=Test3&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=4&name=Test4&mat=5&minWeight=10,9&maxWeight=20.5&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
 
 		ASSERT_EQ(tables.size(), 4);
 		ASSERT_EQ(tables[3]->GetType(), MatchTable::Type::Pool);
-		EXPECT_EQ(tables[3]->GetName(), "Test3");
+		EXPECT_EQ(tables[3]->GetName(), "Test4");
 		EXPECT_EQ(tables[3]->GetMatID(), 5);
-		EXPECT_EQ( ((Weightclass*) tables[3]->GetFilter())->GetMinWeight(), Weight("10,7"));
-		EXPECT_EQ( ((Weightclass*) tables[3]->GetFilter())->GetMaxWeight(), Weight("20.3"));
+		EXPECT_EQ( ((Weightclass*) tables[3]->GetFilter())->GetMinWeight(), Weight("10,9"));
+		EXPECT_EQ( ((Weightclass*) tables[3]->GetFilter())->GetMaxWeight(), Weight("20.5"));
 		EXPECT_EQ( ((Weightclass*) tables[3]->GetFilter())->GetGender(), Gender::Female);
 		EXPECT_EQ(((Pool*)tables[3])->IsBestOfThree(), true);
 		EXPECT_EQ(((Pool*)tables[3])->IsThirdPlaceMatch(), true);
@@ -1672,7 +1672,7 @@ TEST(Ajax, MatchTable_Get)
 		EXPECT_EQ(node["fifth_place"].as<bool>(), true);
 
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=4&name=Test4&mat=5&minWeight=10,7&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
+		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=4&name=Test4&mat=5&minWeight=10,9&maxWeight=20.3&gender=1&bo3=true&mf3=true&mf5=true")), "ok");
 
 		ASSERT_EQ(tables.size(), 4);
 

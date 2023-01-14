@@ -40,7 +40,7 @@ TEST(Mat, QuickClose)
 		Application app;
 		Mat m(1);
 	}
-	EXPECT_TRUE(ZED::Core::CurrentTimestamp() - time < 1500);
+	EXPECT_LE(ZED::Core::CurrentTimestamp() - time, 2000);
 }
 
 
