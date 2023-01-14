@@ -107,6 +107,7 @@ var lang_en = {
     participants: [ "Participants", "Teilnehmer" ],
     revoke_goldenscore: [ "Revoke Golden Score", "Golden Score zur&uuml;cknehmen" ],
     revoke_hantei: [ "Revoke Hantei", "Hantei zur&uuml;cknehmen" ],
+    readonly: [ "Readonly", "Schreibschutz" ],
     rule_set:   [ "Rule Set", "Regelwerk" ],
     rule_sets:  [ "Rule Sets", "Regelwerke" ],
     remove:  [ "Remove", "Entfernen" ],
@@ -147,6 +148,7 @@ var lang_en = {
     white_wins: [ "White Wins", "Sieger Wei&szlig" ],
     winner:  [ "Winner", "Gewinner" ],
     year: ["Year", "Jahr" ],
+    yes: ["Yes", "Ja" ],
 }
 
 

@@ -164,6 +164,8 @@ void Match::ToString(YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "white_dependency_type" << YAML::Value << (int)m_White.m_Type;
 		if (m_White.m_DependentMatch)
 			Yaml << YAML::Key << "white_dependency_uuid" << YAML::Value << (std::string)m_White.m_DependentMatch->GetUUID();
+		else if (m_White.m_DependentMatchTable)
+			Yaml << YAML::Key << "white_dependency_uuid" << YAML::Value << (std::string)m_White.m_DependentMatchTable->GetUUID();
 	}
 
 	if (GetFighter(Fighter::Blue))
@@ -176,6 +178,8 @@ void Match::ToString(YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "blue_dependency_type" << YAML::Value << (int)m_Blue.m_Type;
 		if (m_Blue.m_DependentMatch)
 			Yaml << YAML::Key << "blue_dependency_uuid" << YAML::Value << (std::string)m_Blue.m_DependentMatch->GetUUID();
+		else if (m_Blue.m_DependentMatchTable)
+			Yaml << YAML::Key << "blue_dependency_uuid" << YAML::Value << (std::string)m_Blue.m_DependentMatchTable->GetUUID();
 	}
 
 	Yaml << YAML::Key << "mat_id" << YAML::Value << GetMatID();
@@ -277,6 +281,15 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 				return m_White.m_DependentMatch->GetLoser();
 		}
 
+		else if (m_White.m_DependentMatchTable)
+		{
+			if (!m_White.m_DependentMatchTable->HasConcluded())
+				return nullptr;
+
+			auto results = m_White.m_DependentMatchTable->CalculateResults();
+			return results.Get(m_White.m_Type);
+		}
+
 		return nullptr;
 	}
 
@@ -297,6 +310,15 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 	{
 		if (m_Blue.m_DependentMatch && m_Blue.m_DependentMatch->HasConcluded())
 			return m_Blue.m_DependentMatch->GetLoser();
+	}
+
+	else if (m_Blue.m_DependentMatchTable)
+	{
+		if (!m_Blue.m_DependentMatchTable->HasConcluded())
+			return nullptr;
+
+		auto results = m_Blue.m_DependentMatchTable->CalculateResults();
+		return results.Get(m_Blue.m_Type);
 	}
 
 	return nullptr;
@@ -540,8 +562,15 @@ const std::vector<const Match*> Match::GetDependentMatches() const
 
 bool Match::IsEmptyMatch() const
 {
-	if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
-		return m_White.m_DependentMatch->IsCompletelyEmptyMatch() || m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
+	if (m_White.m_DependentMatchTable && !m_White.m_DependentMatchTable->HasConcluded())
+		return !GetFighter(Fighter::Blue);
+	if (m_Blue.m_DependentMatchTable  && !m_Blue.m_DependentMatchTable->HasConcluded())
+		return !GetFighter(Fighter::White);
+
+	if (m_White.m_DependentMatch)
+		return m_White.m_DependentMatch->IsCompletelyEmptyMatch();
+	if (m_Blue.m_DependentMatch)
+		return m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
 
 	return !GetFighter(Fighter::White) || !GetFighter(Fighter::Blue);
 }
@@ -550,6 +579,11 @@ bool Match::IsEmptyMatch() const
 
 bool Match::IsCompletelyEmptyMatch() const
 {
+	if (m_White.m_DependentMatchTable && !m_White.m_DependentMatchTable->HasConcluded())
+		return false;
+	if (m_Blue.m_DependentMatchTable  && !m_Blue.m_DependentMatchTable->HasConcluded())
+		return false;
+
 	if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
 		return m_White.m_DependentMatch->IsCompletelyEmptyMatch() && m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
 

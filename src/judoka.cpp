@@ -3,10 +3,53 @@
 #include "../ZED/include/core.h"
 #include "judoka.h"
 #include "database.h"
+#include "matchtable.h"
 
 
 
 using namespace Judoboard;
+
+
+
+const Judoka* DependentJudoka::GetJudoka() const
+{
+	if (m_Judoka)
+		return m_Judoka;
+
+	switch (m_Type)
+	{
+	case DependencyType::TakeWinner:
+		if (m_DependentMatch && m_DependentMatch->HasConcluded())
+			return m_DependentMatch->GetWinner();
+		break;
+
+	case DependencyType::TakeLoser:
+		if (m_DependentMatch && m_DependentMatch->HasConcluded())
+			return m_DependentMatch->GetLoser();
+		break;
+
+	case DependencyType::TakeRank1:
+	case DependencyType::TakeRank2:
+	case DependencyType::TakeRank3:
+	case DependencyType::TakeRank4:
+	case DependencyType::TakeRank5:
+	case DependencyType::TakeRank6:
+	case DependencyType::TakeRank7:
+	case DependencyType::TakeRank8:
+	case DependencyType::TakeRank9:
+	case DependencyType::TakeRank10:
+		int pos = (int)m_Type - (int)DependencyType::TakeRank1;
+		if (m_DependentMatchTable && m_DependentMatchTable->HasConcluded())
+		{
+			auto results = m_DependentMatchTable->CalculateResults();
+			if (pos < results.GetSize())
+				return results[pos].Judoka;
+		}
+		break;
+	}
+
+	return nullptr;
+}
 
 
 

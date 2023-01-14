@@ -16,6 +16,9 @@ using namespace Judoboard;
 RoundRobin::RoundRobin(IFilter* Filter, const ITournament* Tournament)
 	: MatchTable(Filter, Tournament)
 {
+	if (Filter)
+		SetTournament(Filter->GetTournament());
+	GenerateSchedule();
 }
 
 
@@ -163,15 +166,12 @@ MatchTable::Results RoundRobin::CalculateResults() const
 		const auto& result = match->GetResult();
 
 		auto winner = results.GetResultsOf(match->GetWinner());
-		auto loser  = results.GetResultsOf(match->GetLoser());
 
-		if (winner && loser)
+		if (winner)
 		{
 			winner->Wins++;
 			winner->Score += (uint32_t)result.m_Score;
 			winner->Time  += result.m_Time;
-
-			loser->Time += result.m_Time;
 		}
 	}
 
@@ -188,7 +188,8 @@ const std::string RoundRobin::ToHTML() const
 
 	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
 
-	ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
+	if (GetMatID() != 0)
+		ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
 
 	if (!GetFilter())
 		return ret;
