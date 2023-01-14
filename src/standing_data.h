@@ -24,7 +24,7 @@ namespace Judoboard
 		StandingData() = default;
 		void Reset();
 
-		void operator << (YAML::Node& Yaml);
+		void operator << (const YAML::Node& Yaml);
 		void operator >> (YAML::Emitter& Yaml) const;
 
 		void AddMD5File(const MD5& File);

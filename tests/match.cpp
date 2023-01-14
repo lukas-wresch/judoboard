@@ -309,3 +309,51 @@ TEST(Match, BreakTime)
 
 	EXPECT_TRUE(m3.GetCurrentBreaktime() > 20);
 }
+
+
+
+TEST(Match, MatchTimeOnlyForWinner)
+{
+	initialize();
+
+	Mat mat(1);
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+		Judoka* j2 = new Judoka(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+
+		Tournament tourney;
+
+		RoundRobin* r = new RoundRobin(Weight(0), Weight(0));
+		r->AddParticipant(j1);
+		r->AddParticipant(j2);
+		r->SetMatID(1);
+
+		tourney.AddMatchTable(r);
+
+		ASSERT_EQ(r->GetSchedule().size(), 1);
+		EXPECT_TRUE(mat.StartMatch(r->GetSchedule()[0]));
+
+		mat.Hajime();
+
+		ZED::Core::Pause(3005);
+
+		mat.AddIppon(f);
+		mat.EndMatch();
+
+		
+		EXPECT_EQ(r->GetStatus(), Status::Concluded);
+		auto results = r->CalculateResults();
+
+		ASSERT_EQ(results.GetSize(), 2);
+
+		EXPECT_EQ(results[0].Wins, 1);
+		EXPECT_EQ(results[0].Score, 10);
+		EXPECT_EQ(results[0].Time / 1000, 3);
+
+		EXPECT_EQ(results[1].Wins,  0);
+		EXPECT_EQ(results[1].Score, 0);
+		EXPECT_EQ(results[1].Time,  0);//Not counted for loser
+	}
+}

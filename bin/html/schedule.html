@@ -402,7 +402,7 @@ function Update()
       cell6.style.fontSize  = "16pt";
       cell6.style.textAlign = "center";
 
-      if (match.state == 1 || match.state == 2 || match.current_breaktime >= 10*60)
+      if (match.state == 1 || match.state == 2 || match.current_breaktime >= 10*60 || match.current_breaktime == 0)
         cell6.innerHTML = '- - -';
       else
       {
