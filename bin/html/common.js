@@ -108,6 +108,7 @@ var lang_en = {
     open:  [ "Oppen", "&Ouml;ffnen" ],
     optional:  [ "Optional", "Optional" ],
     participants: [ "Participants", "Teilnehmer" ],
+    readonly: [ "Readonly", "Schreibschutz" ],
     rule_set:   [ "Rule Set", "Regelwerk" ],
     rule_sets:  [ "Rule Sets", "Regelwerke" ],
     remove:  [ "Remove", "Entfernen" ],
@@ -149,6 +150,7 @@ var lang_en = {
     white_wins: [ "White Wins", "Sieger Wei&szlig" ],
     winner:  [ "Winner", "Gewinner" ],
     year: ["Year", "Jahr" ],
+    yes: ["Yes", "Ja" ],
 }
 
 

@@ -87,12 +87,23 @@ function GetMatch()
     else if (res.white_dependency_type == 3)
       document.getElementById("white").innerHTML = "<a href='#edit_match.html?id=" + res.white_dependency_uuid + "'>Loser of this match</a>";
 
+    else if (res.white_dependency_type == 11)
+      document.getElementById("white").innerHTML = "<a href='#matchtable_add.html?id=" + res.white_dependency_uuid + "'>Place 1 of this match table</a>";
+    else if (res.white_dependency_type == 12)
+      document.getElementById("white").innerHTML = "<a href='#matchtable_add.html?id=" + res.white_dependency_uuid + "'>Place 2 of this match table</a>";
+
+
     if (typeof res.blue_name !== 'undefined')
       document.getElementById("blue" ).innerHTML = res.blue_name;
     else if (res.blue_dependency_type == 2)
       document.getElementById("blue").innerHTML = "<a href='#edit_match.html?id=" + res.blue_dependency_uuid + "'>Winner of this match</a>";
     else if (res.blue_dependency_type == 3)
       document.getElementById("blue").innerHTML = "<a href='#edit_match.html?id=" + res.blue_dependency_uuid + "'>Loser of this match</a>";
+
+    else if (res.blue_dependency_type == 11)
+      document.getElementById("blue").innerHTML = "<a href='#matchtable_add.html?id=" + res.blue_dependency_uuid + "'>Place 1 of this match table</a>";
+    else if (res.blue_dependency_type == 12)
+      document.getElementById("blue").innerHTML = "<a href='#matchtable_add.html?id=" + res.blue_dependency_uuid + "'>Place 2 of this match table</a>";
 
     if (res.state == 0)
     {

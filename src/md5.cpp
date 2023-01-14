@@ -279,7 +279,8 @@ MD5::MD5(const Tournament& Tournament)
 				new_result.AgeGroup   = new_weightclass->AgeGroup;
 				new_result.AgeGroupID = new_weightclass->AgeGroupID;
 
-				new_result.ParticipantID = uuid2id(result.Judoka->GetUUID());
+				if (result.Judoka)
+					new_result.ParticipantID = uuid2id(result.Judoka->GetUUID());
 				new_result.Participant = (Participant*)id2ptr(new_result.ParticipantID);
 				new_result.PointsPlus  = result.Wins;
 				new_result.ScorePlus   = result.Score;
@@ -331,7 +332,8 @@ MD5::MD5(const Tournament& Tournament)
 
 	//Convert matches
 
-	for (auto match : Tournament.GetSchedule())
+	const auto schedule = Tournament.GetSchedule();
+	for (auto match : schedule)
 	{
 		Match new_match;
 
