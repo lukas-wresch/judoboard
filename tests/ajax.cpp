@@ -2070,6 +2070,34 @@ TEST(Ajax, Tournament_Get)
 	EXPECT_EQ(yaml["name"].as<std::string>(), tour->GetName());
 	EXPECT_EQ(yaml["rule_set_uuid"].as<std::string>(),  *rules);
 	EXPECT_EQ(yaml["organizer_uuid"].as<std::string>(), *assoc);
+	EXPECT_EQ(yaml["is_locked"].as<bool>(), false);
+}
+
+
+
+TEST(Ajax, Tournament_List)
+{
+	initialize();
+
+	Application app;
+
+	EXPECT_TRUE(app.Ajax_AddTournament(HttpServer::Request("", "name=test1&year=2000")));
+	EXPECT_TRUE(app.Ajax_AddTournament(HttpServer::Request("", "name=test2&year=2001")));
+
+	auto tour1 = app.FindTournamentByName("test1");
+	auto tour2 = app.FindTournamentByName("test2");
+	ASSERT_TRUE(tour1);
+	ASSERT_TRUE(tour2);
+
+	YAML::Node yaml = YAML::Load( app.Ajax_ListTournaments() );
+
+	EXPECT_EQ(yaml[0]["name"].as<std::string>(), "test1");
+	EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), tour1->GetUUID());
+	EXPECT_EQ(yaml[0]["is_locked"].as<bool>(), false);
+
+	EXPECT_EQ(yaml[1]["name"].as<std::string>(), "test2");
+	EXPECT_EQ(yaml[1]["uuid"].as<std::string>(), tour2->GetUUID());
+	EXPECT_EQ(yaml[1]["is_locked"].as<bool>(), false);	
 }
 
 
@@ -2103,7 +2131,7 @@ TEST(Ajax, Tournament_Edit)
 
 		EXPECT_TRUE(app.CloseTournament());
 
-		EXPECT_TRUE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test2&year=2001&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
+		EXPECT_TRUE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test2&year=2001&readonly=true&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
 
 		auto tour = app.FindTournamentByName("test2");
 		ASSERT_TRUE(tour);
@@ -2112,6 +2140,19 @@ TEST(Ajax, Tournament_Edit)
 		EXPECT_EQ(tour->GetDatabase().GetYear(), 2001);
 		ASSERT_TRUE(tour->GetOrganizer());
 		EXPECT_EQ(*tour->GetOrganizer(), *assoc2);
+		EXPECT_EQ(tour->IsReadonly(), true);
+
+
+		EXPECT_TRUE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test3&year=2000&readonly=false&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
+
+		tour = app.FindTournamentByName("test3");
+		ASSERT_TRUE(tour);
+		ASSERT_TRUE(tour->GetDefaultRuleSet());
+		EXPECT_EQ(*tour->GetDefaultRuleSet(), *rules2);
+		EXPECT_EQ(tour->GetDatabase().GetYear(), 2000);
+		ASSERT_TRUE(tour->GetOrganizer());
+		EXPECT_EQ(*tour->GetOrganizer(), *assoc2);
+		EXPECT_EQ(tour->IsReadonly(), false);
 	}
 
 	ZED::Core::RemoveFile("tournaments/test.yml");

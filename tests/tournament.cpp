@@ -927,11 +927,17 @@ TEST(Tournament, SaveAndLoad)
 
 		tourney->Disqualify(*j1);
 
-		tourney->EnableAutoSave(false);
+		tourney->IsReadonly(true);
+
+		EXPECT_TRUE(tourney->IsReadonly());
+
+		tourney->Save();
 
 
 		Tournament t("deleteMe");
 		t.EnableAutoSave(false);
+
+		EXPECT_EQ(t.IsReadonly(), tourney->IsReadonly());
 
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		EXPECT_EQ(t.GetParticipants().size(), 4);
@@ -1447,6 +1453,10 @@ TEST(Tournament, AddMatchAfterConclusion)
 		mat->AddIppon(Fighter::White);
 		mat->EndMatch();
 
+		EXPECT_TRUE(tourney.AddMatch(match2));
+
+		tourney.IsReadonly(true);
+
 		EXPECT_FALSE(tourney.AddMatch(match2));
 		delete mat;
 	}
@@ -1486,6 +1496,7 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 
 	auto match1 = new Match(j1, j3, &tourney, 1);
 	auto match2 = new Match(j1, j4, &tourney, 1);
+	auto match3 = new Match(j1, j4, &tourney, 1);
 
 	EXPECT_TRUE(tourney.AddMatch(match1));
 
@@ -1496,6 +1507,11 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 	mat->EndMatch();
 
 	EXPECT_TRUE(tourney.AddMatch(match2));
+
+	tourney.IsReadonly(true);//Temp tournament can not be read only
+
+	EXPECT_TRUE(tourney.AddMatch(match3));
+
 	delete mat;
 }
 

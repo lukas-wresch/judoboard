@@ -473,6 +473,9 @@ bool Application::DeleteTournament(const UUID& UUID)
 	{
 		if (*it && (*it)->GetUUID() == UUID)
 		{
+			if ((*it)->IsReadonly())
+				return false;
+
 			const auto filename = "tournaments/" + (*it)->GetName() + ".yml";
 
 			delete *it;
