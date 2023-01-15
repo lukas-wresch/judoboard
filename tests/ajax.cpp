@@ -722,6 +722,7 @@ TEST(Ajax, GetNamesOnMat)
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
+		ASSERT_TRUE(yaml["white_name"]);
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "A B");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "C D");
 		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
@@ -743,6 +744,7 @@ TEST(Ajax, GetNamesOnMat)
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
+		ASSERT_TRUE(yaml["white_name"]);
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
 		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
@@ -755,11 +757,12 @@ TEST(Ajax, GetNamesOnMat)
 
 		mat->StartMatch(match2);
 
-		ZED::Core::Pause(500);
+		ZED::Core::Pause(1000);
 
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
+		ASSERT_TRUE(yaml["white_name"]);
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "E F");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "G H");
 		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
@@ -776,6 +779,7 @@ TEST(Ajax, GetNamesOnMat)
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
+		ASSERT_TRUE(yaml["white_name"]);
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
 		ASSERT_TRUE(yaml["next_matches"].IsSequence());
