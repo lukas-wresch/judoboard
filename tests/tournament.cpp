@@ -957,6 +957,38 @@ TEST(Tournament, SaveAndLoad)
 
 
 
+TEST(Tournament, WeightclassesAreSorted)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	for (int i = 0; i < 100; ++i)
+	{
+		Tournament tourney("deleteMe");
+		tourney.EnableAutoSave(false);
+
+		for (int j = 0; j < 30; ++j)
+		{
+			auto w = rand() % 100;
+			tourney.AddMatchTable(new RoundRobin(Weight(w), Weight(w + 10)));
+		}
+		
+		auto tables = tourney.GetMatchTables();
+		int current = 0;
+		for (auto table : tables)
+		{
+			EXPECT_LE(current, (int)((Weightclass*)table->GetFilter())->GetMinWeight());
+
+			current = (int)((Weightclass*)table->GetFilter())->GetMinWeight();
+		}
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, SaveAndLoad_MatchTableConnection)
 {
 	initialize();
