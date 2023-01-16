@@ -21,7 +21,7 @@ namespace Judoboard
 		IFilter(const ITournament* Tournament) : m_Tournament(Tournament) {}
 		IFilter(const YAML::Node& Yaml, const ITournament* Tournament);
 
-		virtual Type GetType() const { return Type::Standard; };
+		virtual Type GetType() const = 0;
 
 		virtual std::string GetDescription() const { return ""; }
 

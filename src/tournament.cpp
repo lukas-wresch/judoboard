@@ -9,11 +9,9 @@
 #include "customtable.h"
 #include "round_robin.h"
 #include "single_elimination.h"
-#include "filter.h"
 #include "pool.h"
+#include "standard.h"
 #include "weightclass_generator.h"
-#define YAML_CPP_STATIC_DEFINE
-#include "yaml-cpp/yaml.h"
 
 
 
@@ -658,7 +656,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 	else
 	{
 		auto new_match_table = new CustomTable(this);
-		new_match_table->SetFilter(new IFilter(this));
+		new_match_table->SetFilter(new Standard(this));
 		new_match_table->AddMatch(NewMatch);
 		AddMatchTable(new_match_table);
 	}
