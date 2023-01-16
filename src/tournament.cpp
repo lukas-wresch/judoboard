@@ -522,17 +522,22 @@ Status Tournament::GetStatus() const
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
 	{
-		if (match->IsScheduled())
+		if (match->IsEmptyMatch())
+			continue;
+
+		auto status = match->GetStatus();
+
+		if (status == Status::Scheduled || status == Status::Optional)
 			all_matches_finished = false;
 
-		else if (!match->HasConcluded())
+		else if (status != Status::Concluded && status != Status::Skipped)
 			all_matches_finished = false;
 			
-		else
+		else if (status != Status::Skipped)
 			one_match_finished = true;
 	}
 
-	if (all_matches_finished && !m_Name.empty())//Temporary tournaments can never conclude
+	if (all_matches_finished && one_match_finished && !m_Name.empty())//Temporary tournaments can never conclude
 		return Status::Concluded;
 	if (one_match_finished)
 		return Status::Running;

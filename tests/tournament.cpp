@@ -886,6 +886,50 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 
 
 
+TEST(Tournament, ConcludedStatus)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+
+		Tournament* tourney = new Tournament("deleteMe");
+		tourney->EnableAutoSave(false);
+
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+
+		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
+		tourney->GetMatchTables()[0]->IsBestOfThree(true);
+		tourney->GetMatchTables()[0]->SetMatID(1);
+		tourney->GenerateSchedule();
+
+		ASSERT_EQ(tourney->GetSchedule().size(), 3);
+
+		Mat mat(1);
+
+		mat.StartMatch(tourney->GetSchedule()[0]);
+		mat.AddIppon(Fighter::White);
+		mat.EndMatch();
+
+		mat.StartMatch(tourney->GetSchedule()[1]);
+		mat.AddIppon(Fighter::Blue);
+		mat.EndMatch();
+
+		EXPECT_EQ(tourney->GetSchedule()[2]->GetStatus(), Status::Skipped);
+		EXPECT_EQ(tourney->GetStatus(), Status::Concluded);
+
+		delete tourney;
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, SaveAndLoad)
 {
 	initialize();
