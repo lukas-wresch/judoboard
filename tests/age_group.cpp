@@ -14,8 +14,8 @@ TEST(AgeGroup, MatchTableTakeRuleSet)
 		auto r = new RuleSet(GetRandomName(), rand(), rand(), rand(), rand());
 		AgeGroup a(GetRandomName(), rand(), rand(), r, t.GetDatabase());
 
-		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), &t, 1);
-		t.AddMatch(&match);
+		Match* match = new Match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), &t, 1);
+		t.AddMatch(match);
 
 		ASSERT_EQ(t.GetMatchTables().size(), 1);
 
