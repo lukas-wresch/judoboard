@@ -525,7 +525,7 @@ Status Tournament::GetStatus() const
 		if (match->IsScheduled())
 			all_matches_finished = false;
 
-		else if (!match->HasConcluded())
+		else if (match->GetStatus() != Status::Concluded && match->GetStatus() != Status::Skipped)
 			all_matches_finished = false;
 			
 		else

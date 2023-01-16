@@ -60,7 +60,7 @@ namespace Judoboard
 		void SetMatID(int32_t MatID) { if (m_State == Status::Scheduled) m_MatID = MatID; }
 		Status GetStatus() const;
 
-		bool IsScheduled()  const { return m_State == Status::Scheduled; }
+		bool IsScheduled()  const { return GetStatus() == Status::Scheduled; }
 		bool IsRunning()    const { return m_State == Status::Running; }
 		bool HasConcluded() const;
 		bool IsAssociatedWithMat() const { return GetMatID() > 0; }
