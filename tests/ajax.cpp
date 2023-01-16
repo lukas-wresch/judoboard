@@ -1753,7 +1753,7 @@ TEST(Ajax, MatchTable_StartPositionsAfterUpdate)
 			start_j4 = group->GetStartPosition(j4);
 			start_j5 = group->GetStartPosition(j5);
 
-			EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)group->GetUUID(), "type=1&fight_system=3&name=Test2&mat=5&minWeight=0,7&maxWeight=200.3&bo3=true")), "ok");
+			EXPECT_TRUE(app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)group->GetUUID(), "type=1&fight_system=3&name=Test2&mat=5&minWeight=0,7&maxWeight=200.3&bo3=true")));
 
 
 			ASSERT_EQ(group->GetStartPosition(j1), start_j1);
