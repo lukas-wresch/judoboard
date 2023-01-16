@@ -139,8 +139,11 @@ namespace Judoboard
 		//Rule sets
 
 		//Age groups
+		std::string Ajax_AddAgeGroup(const HttpServer::Request& Request) const;
+		std::string Ajax_EditAgeGroup(const HttpServer::Request& Request) const;
 		std::string Ajax_GetAgeGroup(const HttpServer::Request& Request) const;
 		std::string Ajax_ListAllAgeGroups() const;
+		std::string Ajax_DeleteAgeGroup(const HttpServer::Request& Request) const;
 
 		//Match tables
 		Error Ajax_AddMatchTable(HttpServer::Request Request);

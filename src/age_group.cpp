@@ -114,5 +114,8 @@ void AgeGroup::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "desc" << YAML::Value << desc;
 
 	if (m_pRules)
-		Yaml << YAML::Key << "rules" << YAML::Value << (std::string)m_pRules->GetUUID();
+	{
+		Yaml << YAML::Key << "rules_name" << YAML::Value << m_pRules->GetName();
+		Yaml << YAML::Key << "rules_uuid" << YAML::Value << (std::string)m_pRules->GetUUID();
+	}
 }

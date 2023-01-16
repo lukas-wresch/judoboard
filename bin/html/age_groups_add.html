@@ -17,6 +17,12 @@
     <input style="margin-bottom:20px;" type="number" id="max_age" value="18" min="0" max="100" />
 </div>
 
+<div>
+  <label id="label_rule" style="width:150px;float:left;margin-top:5px;">Rule Set</label>
+  <select style="padding-top:5px;margin-bottom:20px;width: 5.0cm;" id="rule">
+  </select>
+</div>
+
 <button class="add" id="add" onclick="return Add()">New Age Group</button>
 <button class="neutral" style="margin-right: 2cm;" onclick="return Update()" id="update">Save</button>
 <button class="remove" onclick="return Delete()" id="delete">Delete</button>
@@ -32,6 +38,7 @@ function Add()
     name:    document.getElementById("name").value,
     min_age: document.getElementById("min_age").value,
     min_age: document.getElementById("max_age").value,
+    rule:    document.getElementById("rule").value,
   });
 
   AjaxPost('ajax/age_groups/add', params, function() {    
@@ -65,6 +72,7 @@ function Update()
     name:    document.getElementById("name").value,
     min_age: document.getElementById("min_age").value,
     min_age: document.getElementById("max_age").value,
+    rule:    document.getElementById("rule").value,
   });
 
   AjaxPost('ajax/age_groups/update?id='+id, params, function() {
@@ -103,6 +111,8 @@ else
     document.getElementById("update").style.display = "none";
     document.getElementById("delete").style.display = "none";
 }
+
+GetRuleSets();
 
 document.getElementById("update").innerHTML = translate('save');
 document.getElementById("delete").innerHTML = translate('delete');

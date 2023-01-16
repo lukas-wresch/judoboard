@@ -9,7 +9,8 @@ TEST(Ajax, AgeGroup_Get)
 	{
 		Application app;
 
-		auto a1 = new AgeGroup("age 1", 10, 20, nullptr, app.GetDatabase());
+		auto r  = new RuleSet("test", 1, 2, 3, 4);
+		auto a1 = new AgeGroup("age 1", 10, 20, r, app.GetDatabase());
 		auto a2 = new AgeGroup("age 2", 30, 40, nullptr, app.GetDatabase());
 
 		app.GetDatabase().AddAgeGroup(a1);
@@ -21,6 +22,10 @@ TEST(Ajax, AgeGroup_Get)
 		EXPECT_EQ(yaml["name"].as<std::string>(), a1->GetName());
 		EXPECT_EQ(yaml["min_age"].as<int>(), a1->GetMinAge());
 		EXPECT_EQ(yaml["max_age"].as<int>(), a1->GetMaxAge());
+		ASSERT_TRUE(yaml["rules_name"]);
+		EXPECT_EQ(yaml["rules_name"].as<std::string>(), "test");
+		EXPECT_TRUE(yaml["rules_uuid"]);
+		EXPECT_EQ(yaml["rules_uuid"].as<std::string>(), *r);
 
 		yaml = YAML::Load(app.Ajax_GetAgeGroup(HttpServer::Request("id=" + (std::string)a2->GetUUID())));
 
@@ -28,6 +33,8 @@ TEST(Ajax, AgeGroup_Get)
 		EXPECT_EQ(yaml["name"].as<std::string>(), a2->GetName());
 		EXPECT_EQ(yaml["min_age"].as<int>(), a2->GetMinAge());
 		EXPECT_EQ(yaml["max_age"].as<int>(), a2->GetMaxAge());
+		EXPECT_FALSE(yaml["rules_name"]);
+		EXPECT_FALSE(yaml["rules_uuid"]);
 	}
 }
 

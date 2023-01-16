@@ -1859,6 +1859,22 @@ void Application::SetupHttpServer()
 
 	//Age groups
 
+	m_Server.RegisterResource("/ajax/age_groups/add", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		TODO
+	});
+
+	m_Server.RegisterResource("/ajax/age_groups/update", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		TODO
+	});
+
 	m_Server.RegisterResource("/ajax/age_groups/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -1908,6 +1924,14 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::OperationFailed);
 
 		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/age_groups/delete", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		TODO
 	});
 
 
