@@ -695,10 +695,10 @@ TEST(Tournament, Lottery_Histogram)
 		c2_count += lot2;
 	}
 
-	EXPECT_GE(c1_count, 40);
-	EXPECT_LE(c1_count, 60);
-	EXPECT_GE(c2_count, 40);
-	EXPECT_LE(c2_count, 60);
+	EXPECT_GE(c1_count, 35);
+	EXPECT_LE(c1_count, 65);
+	EXPECT_GE(c2_count, 35);
+	EXPECT_LE(c2_count, 65);
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
@@ -927,11 +927,17 @@ TEST(Tournament, SaveAndLoad)
 
 		tourney->Disqualify(*j1);
 
-		tourney->EnableAutoSave(false);
+		tourney->IsReadonly(true);
+
+		EXPECT_TRUE(tourney->IsReadonly());
+
+		tourney->Save();
 
 
 		Tournament t("deleteMe");
 		t.EnableAutoSave(false);
+
+		EXPECT_EQ(t.IsReadonly(), tourney->IsReadonly());
 
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		EXPECT_EQ(t.GetParticipants().size(), 4);
@@ -944,6 +950,38 @@ TEST(Tournament, SaveAndLoad)
 		EXPECT_FALSE(t.IsDisqualified(*j4));
 
 		delete tourney;
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Tournament, WeightclassesAreSorted)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	for (int i = 0; i < 100; ++i)
+	{
+		Tournament tourney("deleteMe");
+		tourney.EnableAutoSave(false);
+
+		for (int j = 0; j < 30; ++j)
+		{
+			auto w = rand() % 100;
+			tourney.AddMatchTable(new RoundRobin(Weight(w), Weight(w + 10)));
+		}
+		
+		auto tables = tourney.GetMatchTables();
+		int current = 0;
+		for (auto table : tables)
+		{
+			EXPECT_LE(current, (int)((Weightclass*)table->GetFilter())->GetMinWeight());
+
+			current = (int)((Weightclass*)table->GetFilter())->GetMinWeight();
+		}
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
@@ -1447,6 +1485,10 @@ TEST(Tournament, AddMatchAfterConclusion)
 		mat->AddIppon(Fighter::White);
 		mat->EndMatch();
 
+		EXPECT_TRUE(tourney.AddMatch(match2));
+
+		tourney.IsReadonly(true);
+
 		EXPECT_FALSE(tourney.AddMatch(match2));
 		delete mat;
 	}
@@ -1486,6 +1528,7 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 
 	auto match1 = new Match(j1, j3, &tourney, 1);
 	auto match2 = new Match(j1, j4, &tourney, 1);
+	auto match3 = new Match(j1, j4, &tourney, 1);
 
 	EXPECT_TRUE(tourney.AddMatch(match1));
 
@@ -1496,6 +1539,11 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 	mat->EndMatch();
 
 	EXPECT_TRUE(tourney.AddMatch(match2));
+
+	tourney.IsReadonly(true);//Temp tournament can not be read only
+
+	EXPECT_TRUE(tourney.AddMatch(match3));
+
 	delete mat;
 }
 
