@@ -62,8 +62,8 @@ function GetTournaments()
       if (tour.is_locked)
         cell3.innerHTML += "<br/>" + translate('readonly');
 
-      if (tour.is_open == 0)
-        cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenTournament('" + tour.uuid + "');\">"+ translate('open') +"</button>" + "<button class=\"neutral\" onclick=\"navigate('tournament_add.html?id=" + tour.uuid + "');\">Edit</button>";
+      if (!tour.is_open)
+        cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenTournament('" + id + "');\">"+ translate('open') +"</button>" + "<button class=\"neutral\" onclick=\"navigate('tournament_add.html?id=" + id + "');\">"+ translate('edit') +"</button>";
       else
         cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseTournament('" + tour.uuid + "');\">"+ translate('close') +"</button>";
     }
