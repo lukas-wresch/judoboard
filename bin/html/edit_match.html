@@ -214,19 +214,19 @@ function GetLog()
       else if (res[i+1] == 2 && res[i+2] == 4)
         cell3.innerHTML = "Yoshi";
       else if (res[i+1] == 2 && res[i+2] == 5)
-        cell3.innerHTML = "Osaekomi switched to other fighter";
+        cell3.innerHTML = translate('osaekomi_switched');
       else if (res[i+1] == 2 && res[i+2] == 6)
-        cell3.innerHTML = "Match started";
+        cell3.innerHTML = translate('match_started');
       else if (res[i+1] == 2 && res[i+2] == 7)
-        cell3.innerHTML = "End of match";
+        cell3.innerHTML = translate('end_of_match');
       else if (res[i+1] == 2 && res[i+2] == 8)
-        cell3.innerHTML = "Golden Score activated";
+        cell3.innerHTML = translate('goldenscore_activate');
       else if (res[i+1] == 2 && res[i+2] == 9)
-        cell3.innerHTML = "Golden Score revoked!";
+        cell3.innerHTML = translate('goldenscore_revoked');
       else if (res[i+1] == 2 && res[i+2] == 10)
-        cell3.innerHTML = "Match is a draw";
+        cell3.innerHTML = translate('draw');
       else if (res[i+1] == 2 && res[i+2] == 11)
-        cell3.innerHTML = "Draw revoked!";
+        cell3.innerHTML = translate('draw_revoked');
 
       else if (res[i+2] == 0)
         cell3.innerHTML = "Ippon";
@@ -237,13 +237,13 @@ function GetLog()
       else if (res[i+2] == 3)
         cell3.innerHTML = "Koka";
       else if (res[i+2] == 4)
-        cell3.innerHTML = "Ippon revoked!";
+        cell3.innerHTML = translate('ippon_revoked');
       else if (res[i+2] == 5)
-        cell3.innerHTML = "Wazaari revoked!";
+        cell3.innerHTML = translate('wazaari_revoked');
       else if (res[i+2] == 6)
-        cell3.innerHTML = "Yuko revoked!";
+        cell3.innerHTML = translate('yuko_revoked');
       else if (res[i+2] == 7)
-        cell3.innerHTML = "Koka revoked!";
+        cell3.innerHTML = translate('koka_revoked');
       else if (res[i+2] == 8)
         cell3.innerHTML = "Wazari awasete Ippon";
       else if (res[i+2] == 9)
@@ -251,31 +251,31 @@ function GetLog()
       else if (res[i+2] == 10)
         cell3.innerHTML = "Shido";
       else if (res[i+2] == 11)
-        cell3.innerHTML = "Hansoku-Make (indirect)";
+        cell3.innerHTML = translate('hansokumake_direct');
       else if (res[i+2] == 12)
-        cell3.innerHTML = "Hansoku-Make (direct)";
+        cell3.innerHTML = translate('hansokumake_indirect');
       else if (res[i+2] == 13)
-        cell3.innerHTML = "Shido revoked!";
+        cell3.innerHTML = translate('shido_revoked');
       else if (res[i+2] == 14)
-        cell3.innerHTML = "Hansoku-Make revoked!";
+        cell3.innerHTML = translate('hansokumake_revoked');
       else if (res[i+2] == 15)
-        cell3.innerHTML = "Medical Examination";
+        cell3.innerHTML = translate('medical_examiniation');
       else if (res[i+2] == 16)
-        cell3.innerHTML = "Medical Examination revoked!";
+        cell3.innerHTML = translate('medical_examiniation_revoked');
       else if (res[i+2] == 17)
         cell3.innerHTML = "Hantei";
       else if (res[i+2] == 18)
-        cell3.innerHTML = "Disqualification";
+        cell3.innerHTML = translate('disqualification');
       else if (res[i+2] == 19)
-        cell3.innerHTML = "No Disqualification";
+        cell3.innerHTML = translate('no_disqualification');
       else if (res[i+2] == 20)
-        cell3.innerHTML = "Disqualification revoked!";
+        cell3.innerHTML = translate('disqualification_revoked');
       else if (res[i+2] == 21)
-        cell3.innerHTML = "No Disqualification revoked!";
+        cell3.innerHTML = translate('no_disqualification_revoked');
       else if (res[i+2] == 22)
         cell3.innerHTML = "Gachi";
       else if (res[i+2] == 23)
-        cell3.innerHTML = "Gachi revoked!";
+        cell3.innerHTML = translate('gachi_revoked');
     }
   });
 }
