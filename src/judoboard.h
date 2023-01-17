@@ -92,9 +92,20 @@ namespace Judoboard
 		explicit operator uint32_t () const {
 			return m_InGrams;
 		}
+		explicit operator int () const {
+			return m_InGrams;
+		}
+
+		/*bool operator <=> (const Weight& rhs) const {
+			return this->m_InGrams <=> rhs.m_InGrams;
+		}*/
 
 		bool operator == (const Weight& rhs) const {
 			return this->m_InGrams == rhs.m_InGrams;
+		}
+
+		bool operator != (const Weight& rhs) const {
+			return this->m_InGrams != rhs.m_InGrams;
 		}
 
 		bool operator < (const Weight& rhs) const {
@@ -161,6 +172,17 @@ namespace Judoboard
 		BestOfThree = 1,//Match is the last in the series of a best of three series
 		TakeWinner  = 2,//Take the winner of the match this match depends upon
 		TakeLoser   = 3,//Take the loser of the match this match depends upon
+
+		TakeRank1  = 11,//Take the 1st of a match table
+		TakeRank2  = 12,//Take the 2nd of a match table
+		TakeRank3  = 13,//Take the 3rd of a match table
+		TakeRank4  = 14,//Take the 4th of a match table
+		TakeRank5  = 15,//Take the 5th of a match table
+		TakeRank6  = 16,//Take the 6th of a match table
+		TakeRank7  = 17,//Take the 7th of a match table
+		TakeRank8  = 18,//Take the 8th of a match table
+		TakeRank9  = 19,//Take the 9th of a match table
+		TakeRank10 = 20,//Take the 10th of a match table
 	};
 
 

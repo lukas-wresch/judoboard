@@ -86,6 +86,7 @@ namespace Judoboard
 		virtual void RemoveKoka(Fighter Whom) override;
 
 		virtual void Hantei(Fighter Whom) override;
+		virtual void RevokeHantei() override;
 		virtual void SetAsDraw(bool Enable = true) override;
 
 		virtual void AddShido(Fighter Whom) override;
@@ -175,7 +176,7 @@ namespace Judoboard
 				return ret;
 			}
 
-			static Animation CreateScaleSinus(double Amplitude, double Frequency, double BaseSize = 1.0, std::function<bool(const GraphicElement&)> AnimateTill = nullptr)
+			static Animation CreateScaleSinus(double Amplitude, double Frequency, double BaseSize = 1.0, double DampingLinear = 0.0, double DampingQuadratic = 0.0, std::function<bool(const GraphicElement&)> AnimateTill = nullptr)
 			{
 				Animation ret;
 				ret.m_Type = Type::ScaleSinus;
@@ -183,6 +184,8 @@ namespace Judoboard
 				ret.m_Amplitude = Amplitude;
 				ret.m_Frequency = Frequency;
 				ret.m_BaseSize  = BaseSize;
+				ret.m_DampingLinear    = DampingLinear;
+				ret.m_DampingQuadratic = DampingQuadratic;
 				return ret;
 			}
 
@@ -207,7 +210,7 @@ namespace Judoboard
 				};
 
 				struct {//For scale animation
-					double m_Amplitude, m_Frequency, m_BaseSize;
+					double m_Amplitude, m_Frequency, m_BaseSize, m_DampingLinear, m_DampingQuadratic;
 				};
 			};
 		};
@@ -290,11 +293,11 @@ namespace Judoboard
 					else
 						m_Texture->SetAlpha((unsigned char)m_a);
 
-					if (m_Aligment == Aligment::Left)
+					if (m_Alignment == Alignment::Left)
 						Renderer.RenderTransformed(m_Texture, (int)m_x, (int)m_y);
-					else if (m_Aligment == Aligment::Center)
+					else if (m_Alignment == Alignment::Center)
 						Renderer.RenderTransformed(m_Texture, (int)m_x - (int)(m_Texture->GetWidth()*m_Texture->GetSizeX()/2.0f), (int)m_y - (int)(m_Texture->GetHeight()*m_Texture->GetSizeY()/2.0f));
-					else if (m_Aligment == Aligment::Right)
+					else if (m_Alignment == Alignment::Right)
 						Renderer.RenderTransformed(m_Texture, (int)m_x - (int)(m_Texture->GetWidth()*m_Texture->GetSizeX()), (int)m_y);
 				}
 			}
@@ -340,19 +343,35 @@ namespace Judoboard
 
 			GraphicElement& Left()
 			{
-				m_Aligment = Aligment::Left;
+				m_Alignment = Alignment::Left;
 				return *this;
 			}
 
 			GraphicElement& Center()
 			{
-				m_Aligment = Aligment::Center;
+				m_Alignment = Alignment::Center;
 				return *this;
 			}
 
 			GraphicElement& Right()
 			{
-				m_Aligment = Aligment::Right;
+				m_Alignment = Alignment::Right;
+				return *this;
+			}
+
+			GraphicElement& Centralize()//Change alignment to center without changing the position of the graphics element
+			{
+				if (m_Alignment == Alignment::Left)
+				{
+					m_x += m_Texture->GetWidth()  * m_Texture->GetSizeX() / 2;
+					m_y += m_Texture->GetHeight() * m_Texture->GetSizeY() / 2;
+				}
+				else if (m_Alignment == Alignment::Right)
+				{
+					m_x -= m_Texture->GetWidth()  * m_Texture->GetSizeX() / 2;
+					m_y -= m_Texture->GetHeight() * m_Texture->GetSizeY() / 2;
+				}
+				m_Alignment = Alignment::Center;
 				return *this;
 			}
 
@@ -377,10 +396,10 @@ namespace Judoboard
 			int m_width = 0, m_height = 0;
 			ZED::Color m_color{ 0, 0, 0, 0 };
 
-			enum class Aligment
+			enum class Alignment
 			{
 				Left, Center, Right
-			} m_Aligment = Aligment::Left;
+			} m_Alignment = Alignment::Left;
 		};
 
 

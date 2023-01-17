@@ -353,7 +353,10 @@ bool Mat::EnableGoldenScore(bool GoldenScore)
 		AddEvent(MatchLog::NeutralEvent::EnableGoldenScore);
 	}
 	else
+	{
+		m_HajimeTimer = m_pMatch->GetRuleSet().GetMatchTime() * 1000;
 		AddEvent(MatchLog::NeutralEvent::DisableGoldenScore);
+	}
 
 	m_GoldenScore = GoldenScore;
 	return true;
@@ -402,6 +405,7 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "is_out_of_time"       << YAML::Value << IsOutOfTime();
 	Yaml << YAML::Key << "no_winner_yet"        << YAML::Value << (GetResult().m_Winner == Winner::Draw);
 	Yaml << YAML::Key << "is_goldenscore"       << YAML::Value << IsGoldenScore();
+	Yaml << YAML::Key << "is_hantei"            << YAML::Value << (GetScoreboard(Fighter::White).m_Hantei || GetScoreboard(Fighter::Blue).m_Hantei);
 
 	if (m_pMatch)
 	{
@@ -737,6 +741,28 @@ void Mat::Hantei(Fighter Whom)
 	}
 
 	ZED::Log::Info("Hantei");
+}
+
+
+
+void Mat::RevokeHantei()
+{
+	m_mutex.lock();
+
+	if (AreFightersOnMat() && (GetScoreboard(Fighter::White).m_Hantei || GetScoreboard(Fighter::Blue).m_Hantei))
+	{
+		if (GetScoreboard(Fighter::White).m_Hantei)
+			AddEvent(Fighter::White, MatchLog::BiasedEvent::HanteiRevoked);
+		if (GetScoreboard(Fighter::Blue).m_Hantei)
+			AddEvent(Fighter::Blue,  MatchLog::BiasedEvent::HanteiRevoked);
+
+		SetScoreboard(Fighter::White).m_Hantei = false;
+		SetScoreboard(Fighter::Blue ).m_Hantei = false;
+	}
+
+	m_mutex.unlock();
+
+	ZED::Log::Info("Revoke Hantei");
 }
 
 
@@ -1191,7 +1217,17 @@ bool Mat::Animation::Process(GraphicElement& Graphic, double dt)
 			return false;
 
 		case Type::ScaleSinus:
+			if (Graphic.m_a <= 0.0)
+				return false;
+
 			Graphic->SetSize((float)(m_BaseSize + m_Amplitude * sin(m_Frequency * (double)Timer::GetTimestamp())) );
+			m_Amplitude -= dt * m_Amplitude * m_DampingQuadratic;
+			m_Amplitude -= dt * m_DampingLinear;
+			if (m_Amplitude < 0.0)
+			{
+				m_Amplitude = 0.0;
+				return true;
+			}
 			return false;
 	}
 
@@ -1297,6 +1333,7 @@ void Mat::NextState(State NextState) const
 
 			//Scores
 			double a = 25.0;
+
 			m_Graphics["blue_ippon"].SetPosition(score_margin, score_height - 500, 80).Center()
 				.AddAnimation(Animation::CreateLinear(0.0, 67.0, a, [=](auto& g) { return g.m_y < score_height; }));
 
@@ -1347,9 +1384,6 @@ void Mat::NextState(State NextState) const
 			m_Graphics["yoshi"].UpdateTexture(renderer, "Yoshi", ZED::Color(255, 255, 255));
 
 			//Effects
-			m_Graphics["effect_ippon_white"].UpdateTexture(renderer, "Ippon", ZED::Color(0, 0, 0));
-			m_Graphics["effect_ippon_blue" ].UpdateTexture(renderer, "Ippon", ZED::Color(255, 255, 255));
-
 			m_Graphics["effect_wazaari_white"].UpdateTexture(renderer, "Wazaari", ZED::Color(0, 0, 0));
 			m_Graphics["effect_wazaari_blue" ].UpdateTexture(renderer, "Wazaari", ZED::Color(255, 255, 255));
 
@@ -1371,8 +1405,8 @@ void Mat::NextState(State NextState) const
 			m_Graphics["effect_hansokumake_white"].UpdateTexture(renderer, "Hansokumake", ZED::Color(0, 0, 0));
 			m_Graphics["effect_hansokumake_blue" ].UpdateTexture(renderer, "Hansokumake", ZED::Color(255, 255, 255));
 
-			m_Graphics["effect_ippon_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row1);
-			m_Graphics["effect_ippon_white"].SetPosition(width - (int)(550.0 * m_ScalingFactor), effect_row1);
+			m_Graphics["effect_ippon_blue" ].Left().SetPosition((int)(20.0 * m_ScalingFactor), effect_row1);
+			m_Graphics["effect_ippon_white"].Left().SetPosition(width - (int)(550.0 * m_ScalingFactor), effect_row1);
 
 			m_Graphics["effect_wazaari_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row2);
 			m_Graphics["effect_wazaari_white"].SetPosition(width - (int)(550.0 * m_ScalingFactor), effect_row2);
@@ -1388,6 +1422,19 @@ void Mat::NextState(State NextState) const
 
 			m_Graphics["effect_tokeda_blue" ].SetPosition((int)(520.0 * m_ScalingFactor), effect_row3);
 			m_Graphics["effect_tokeda_white"].SetPosition(width - (int)(850.0 * m_ScalingFactor), effect_row3);
+
+			m_Graphics["effect_ippon_white"].StopAllAnimations();
+			m_Graphics["effect_ippon_white"].AddAnimation(Animation::CreateScaleSinus(0.25 * m_ScalingFactor, 0.007, 1.0, 0.01, 0.4));
+			m_Graphics["effect_ippon_white"].GetAnimations()[0].RunInParallel();
+
+			m_Graphics["effect_ippon_blue"].StopAllAnimations();
+			m_Graphics["effect_ippon_blue"].AddAnimation(Animation::CreateScaleSinus(0.25 * m_ScalingFactor, 0.007, 1.0, 0.01, 0.4));
+			m_Graphics["effect_ippon_blue"].GetAnimations()[0].RunInParallel();
+
+			m_Graphics["effect_ippon_white"].UpdateTexture(renderer, "Ippon", ZED::Color(0, 0, 0));
+			m_Graphics["effect_ippon_blue" ].UpdateTexture(renderer, "Ippon", ZED::Color(255, 255, 255));
+			m_Graphics["effect_ippon_white"].Centralize();
+			m_Graphics["effect_ippon_blue" ].Centralize();
 
 			//Same as ippon
 			m_Graphics["effect_shido_blue" ].SetPosition((int)(20.0 * m_ScalingFactor), effect_row1);

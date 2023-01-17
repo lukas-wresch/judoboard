@@ -27,17 +27,14 @@ function GetTournaments()
 {
   AjaxCallback("ajax/tournament/list", function(response) {
     console.log(response);
-    var res = response.split(",");
-
-    if (res.length < 4)
-      return;
+    var res = YAML.parse(response);
 
     var table = document.getElementById("list");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    for (var i=0; i < res.length;)
+    for (const tour of res)
     {
       var row = table.insertRow(-1);
       var cell1 = row.insertCell(0);
@@ -45,34 +42,30 @@ function GetTournaments()
       var cell3 = row.insertCell(2);
       var cell4 = row.insertCell(3);
 
-      var id            = res[i++];
-      var name          = res[i++];
-      var num_part      = res[i++];
-      var schedule_size = res[i++];
-      var status        = res[i++];
-      var is_open       = res[i++];
+      cell1.innerHTML = tour.name;
 
-      cell1.innerHTML = name;
+      cell2.innerHTML = tour.num_participants + " " + translate('participants') + "<br/>" + tour.num_matches + " " + translate('matches');
 
-      cell2.innerHTML = num_part + " " + translate('participants') + "<br/>" + schedule_size + " " + translate('matches');
-
-      if (status == 0)
+      if (tour.status == 0)
         cell3.innerHTML = translate('scheduled');
-      else if (status == 1)
+      else if (tour.status == 1)
       {
         cell3.innerHTML = translate('running');
         cell3.style.color = "red";
       }
-      else if (status == 2)
+      else if (tour.status == 2)
       {
         cell3.innerHTML = translate('concluded');
         cell3.style.color = "green";
       }
 
-      if (is_open == 0)
-        cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenTournament('" + id + "');\">"+ translate('open') +"</button>" + "<button class=\"neutral\" onclick=\"navigate('tournament_add.html?id=" + id + "');\">Edit</button>";
+      if (tour.is_locked)
+        cell3.innerHTML += "<br/>" + translate('readonly');
+
+      if (!tour.is_open)
+        cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenTournament('" + id + "');\">"+ translate('open') +"</button>" + "<button class=\"neutral\" onclick=\"navigate('tournament_add.html?id=" + id + "');\">"+ translate('edit') +"</button>";
       else
-        cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseTournament('" + id + "');\">"+ translate('close') +"</button>";
+        cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseTournament('" + tour.uuid + "');\">"+ translate('close') +"</button>";
     }
   });
 }
