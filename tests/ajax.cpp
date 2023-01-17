@@ -693,12 +693,16 @@ TEST(Ajax, Judoka_Import)
 
 		Tournament* tourney = new Tournament;
 
-		auto c = new Club("Club 1");
-		c->SetShortName("c");
-		auto j = new Judoka("first", "last");
-		j->SetClub(c);
+		auto c1 = new Club("Club 1");
+		auto c2 = new Club("Club 1");
+		c1->SetShortName("c");
+		auto j1 = new Judoka("first", "last");
+		j1->SetClub(c1);
+		auto j2 = new Judoka("first", "last");
+		j2->SetClub(c2);
 
-		tourney->AddParticipant(j);
+		tourney->AddParticipant(j1);
+		tourney->AddParticipant(j2);
 
 		app.AddTournament(tourney);
 		
@@ -706,13 +710,20 @@ TEST(Ajax, Judoka_Import)
 		auto& judokas = app.GetDatabase().GetAllJudokas();
 		auto& clubs   = app.GetDatabase().GetAllClubs();
 
-		EXPECT_TRUE(app.Ajax_ImportJudoka(HttpServer::Request("id="+(std::string)j->GetUUID())));
+		EXPECT_TRUE(app.Ajax_ImportJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID())));
 
 		ASSERT_EQ(judokas.size(), 1);
-		EXPECT_EQ(judokas.begin()->second->GetUUID(), *j);
+		EXPECT_EQ(judokas.begin()->second->GetUUID(), *j1);
 
 		ASSERT_EQ(clubs.size(), 1);
-		EXPECT_EQ(clubs[0]->GetUUID(), *c);
+		EXPECT_EQ(clubs[0]->GetUUID(), *c1);
+
+		EXPECT_TRUE(app.Ajax_ImportJudoka(HttpServer::Request("id="+(std::string)j2->GetUUID())));
+
+		ASSERT_EQ(judokas.size(), 2);
+
+		ASSERT_EQ(clubs.size(), 1);//Don't import second club since it has the same name
+		EXPECT_EQ(clubs[0]->GetUUID(), *c1);
 	}
 }
 

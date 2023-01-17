@@ -195,8 +195,6 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 
 	m_Judokas.insert({ NewJudoka->GetUUID(), NewJudoka });
 
-	AddClub((Club*)NewJudoka->GetClub());
-
 	return true;
 }
 

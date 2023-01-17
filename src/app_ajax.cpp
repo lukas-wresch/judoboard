@@ -2830,12 +2830,18 @@ Error Application::Ajax_ImportJudoka(const HttpServer::Request& Request)
 	if (!judoka)
 		return Error::Type::ItemNotFound;
 
+	Club* club = (Club*)judoka->GetClub();
+
 	//Already in database?
 	if (m_Database.FindJudoka(id))
 		return Error::Type::OperationFailed;
 
 	if (!m_Database.AddJudoka(judoka))
 		return Error::Type::OperationFailed;
+
+	if (club && !m_Database.FindClubByName(club->GetName()))
+		if (!m_Database.AddClub(club))
+			return Error::Type::OperationFailed;
 
 	return Error();//OK
 }

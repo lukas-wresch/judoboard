@@ -833,8 +833,6 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		}
 	}
 
-	auto old_num_clubs = m_StandingData.GetAllClubs().size();
-
 	if (!m_StandingData.AddJudoka(Judoka))
 	{
 		ZED::Log::Warn("Could not add judoka!");
@@ -842,7 +840,7 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		return false;
 	}
 
-	const bool club_added = m_StandingData.GetAllClubs().size() != old_num_clubs;
+	const bool club_added = m_StandingData.AddClub((Club*)Judoka->GetClub());
 
 	FindAgeGroupForJudoka(*Judoka);
 
