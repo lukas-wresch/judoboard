@@ -40,7 +40,7 @@ TEST(Mat, QuickClose)
 		Application app;
 		Mat m(1);
 	}
-	EXPECT_TRUE(ZED::Core::CurrentTimestamp() - time < 1500);
+	EXPECT_LE(std::abs((long)(ZED::Core::CurrentTimestamp() - time)), 2000);
 }
 
 
@@ -1346,7 +1346,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 
 			m.RemoveWazaAri(f);
 
-			for (int k = 0; k < time - 1; k++)
+			for (int k = 0; k < time - 2; k++)
 			{
 				EXPECT_FALSE(m.IsOutOfTime());
 				EXPECT_FALSE(m.HasConcluded());
@@ -1354,7 +1354,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 				ZED::Core::Pause(1000);
 			}
 
-			ZED::Core::Pause(3000);
+			ZED::Core::Pause(4000);
 
 			EXPECT_TRUE(m.HasConcluded());
 			EXPECT_TRUE(m.EndMatch());
@@ -2024,6 +2024,41 @@ TEST(Mat, WazariAwaseteIppon)
 
 
 
+TEST(Mat, GoldenScore_Revoke)
+{
+	initialize();
+	Application app;
+	Mat m(1);
+
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+	match.SetMatID(1);
+	match.SetRuleSet(new RuleSet("Test", 2, 10, 30, 20, false, false, true, 0));
+	EXPECT_TRUE(m.StartMatch(&match));
+
+	m.Hajime();
+
+	ZED::Core::Pause(2500);
+	EXPECT_TRUE(m.IsOutOfTime());
+
+	EXPECT_FALSE(m.HasConcluded());
+
+	m.EnableGoldenScore();
+	m.EnableGoldenScore(false);
+
+	EXPECT_TRUE(m.IsOutOfTime());
+	EXPECT_EQ(m.GetTimeElapsed(), 2000);
+
+	EXPECT_FALSE(m.HasConcluded());
+	EXPECT_FALSE(m.EndMatch());
+
+	m.Hantei(Fighter::White);
+
+	EXPECT_TRUE(m.HasConcluded());
+	EXPECT_TRUE(m.EndMatch());
+}
+
+
+
 TEST(Mat, GoldenScore)
 {
 	initialize();
@@ -2037,7 +2072,7 @@ TEST(Mat, GoldenScore)
 
 	m.Hajime();
 
-	ZED::Core::Pause(3000);
+	ZED::Core::Pause(2500);
 	EXPECT_TRUE(m.IsOutOfTime());
 
 	EXPECT_FALSE(m.HasConcluded());

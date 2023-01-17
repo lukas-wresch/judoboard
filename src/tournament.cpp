@@ -9,9 +9,9 @@
 #include "customtable.h"
 #include "round_robin.h"
 #include "single_elimination.h"
+#include "filter.h"
 #include "pool.h"
 #include "weightclass_generator.h"
-#include "md5.h"
 #define YAML_CPP_STATIC_DEFINE
 #include "yaml-cpp/yaml.h"
 
@@ -522,17 +522,22 @@ Status Tournament::GetStatus() const
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
 	{
-		if (match->IsScheduled())
+		if (match->IsEmptyMatch())
+			continue;
+
+		auto status = match->GetStatus();
+
+		if (status == Status::Scheduled || status == Status::Optional)
 			all_matches_finished = false;
 
-		else if (!match->HasConcluded())
+		else if (status != Status::Concluded && status != Status::Skipped)
 			all_matches_finished = false;
 			
-		else
+		else if (status != Status::Skipped)
 			one_match_finished = true;
 	}
 
-	if (all_matches_finished && !m_Name.empty())//Temporary tournaments can never conclude
+	if (all_matches_finished && one_match_finished && !m_Name.empty())//Temporary tournaments can never conclude
 		return Status::Concluded;
 	if (one_match_finished)
 		return Status::Running;
@@ -649,10 +654,18 @@ bool Tournament::AddMatch(Match* NewMatch)
 			NewMatch->EndMatch();//Mark match as concluded
 		}
 	}
-
-	auto new_match_table = new CustomTable(this);
-	new_match_table->AddMatch(NewMatch);
-	AddMatchTable(new_match_table);
+	
+	if (NewMatch->GetMatchTable())
+	{
+		AddMatchTable((MatchTable*)NewMatch->GetMatchTable());
+		GenerateSchedule();
+	}
+	else
+	{
+		auto new_match_table = new CustomTable(this);
+		new_match_table->AddMatch(NewMatch);
+		AddMatchTable(new_match_table);
+	}
 
 	Save();
 
@@ -1125,9 +1138,12 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	if (!NewMatchTable)
 		return;
 
-	NewMatchTable->SetTournament(this);
-
 	auto guard = LockTillScopeEnd();
+
+	if (FindMatchTable(*NewMatchTable))
+		return;//Nothing to add
+
+	NewMatchTable->SetTournament(this);
 
 	//Add all judoka of the match table to the tournament
 	for (auto judoka : NewMatchTable->GetParticipants())
@@ -1170,6 +1186,8 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 		if (!match->IsEmptyMatch())
 			m_Schedule.emplace_back(NewMatchTable, i);
 	}
+
+	UpdateMatchTable(*NewMatchTable);
 }
 
 
@@ -1188,24 +1206,62 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 	if (!matchTable)
 		return false;
 
-	if (matchTable->GetStatus() == Status::Scheduled)//Can safely recalculate the match table
+	if (matchTable->GetStatus() != Status::Scheduled)//Can safely recalculate the match table
+		return false;
+
+	for (auto judoka : matchTable->GetParticipants())
+		if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
+			matchTable->RemoveParticipant(judoka);
+
+	for (auto& [id, judoka] : m_StandingData.GetAllJudokas())
 	{
-		for (auto judoka : matchTable->GetParticipants())
-			if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
-				matchTable->RemoveParticipant(judoka);
-
-		for (auto& [id, judoka] : m_StandingData.GetAllJudokas())
-		{
-			if (judoka && matchTable->IsElgiable(*judoka))
-				matchTable->AddParticipant(judoka);
-		}
-
-		matchTable->GenerateSchedule();
-		GenerateSchedule();
-		return true;
+		if (judoka && matchTable->IsElgiable(*judoka))
+			matchTable->AddParticipant(judoka);
 	}
 
-	return false;
+	matchTable->GenerateSchedule();
+
+	//Sort
+	std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
+		//Sort by filter
+		if (a->GetFilter() && !b->GetFilter())
+			return true;
+		if (!a->GetFilter() && b->GetFilter())
+			return false;
+
+		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() != IFilter::Type::Weightclass)
+			return true;
+		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() != IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
+			return false;
+
+		//Both weightclasses?
+		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
+		{
+			auto weightclassA = (const Weightclass*)a->GetFilter();
+			auto weightclassB = (const Weightclass*)b->GetFilter();
+
+			//Sort by age group
+			if (weightclassA->GetAgeGroup() && weightclassB->GetAgeGroup() && weightclassA->GetAgeGroup()->GetMinAge() != weightclassB->GetAgeGroup()->GetMinAge())
+				return weightclassA->GetAgeGroup()->GetMinAge() < weightclassB->GetAgeGroup()->GetMinAge();
+
+			//Sort by gender
+			if (weightclassA->GetGender() != weightclassB->GetGender())
+				return (int)weightclassA->GetGender() < (int)weightclassB->GetGender();
+
+			//Sort by weight
+			if (weightclassA->GetMinWeight() != weightclassB->GetMinWeight())
+				return weightclassA->GetMinWeight() < weightclassB->GetMinWeight();
+		}
+
+		if (a->GetName() != b->GetName())
+			return a->GetName() < b->GetName();
+
+		return a->GetUUID() < b->GetUUID();
+	});
+
+	GenerateSchedule();
+
+	return true;
 }
 
 

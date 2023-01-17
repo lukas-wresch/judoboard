@@ -75,16 +75,16 @@ function Update()
       {
         cell3.innerHTML = "Local mat";
         if (mat.is_open == 1)
-          cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseMat(" + mat.id + ");\">Close</button>";
+          cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseMat(" + mat.id + ");\">"+ translate('close') +"</button>";
         else
-          cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenMat(" + mat.id + ");\">Start</button>";
+          cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenMat(" + mat.id + ");\">"+ translate('start') +"</button>";
 
         if (!mat.is_fullscreen)
           cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('fullscreen'," + mat.id + ");\">Fullscreen</button>";
         else
           cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('windowed'," + mat.id + ");\">Window Mode</button>";
 
-        cell4.innerHTML += "<button class=\"neutral\" onclick=\"navigate('mat_edit.html?id=" + mat.id + "');\">Edit</button>";
+        cell4.innerHTML += "<button class=\"neutral\" onclick=\"navigate('mat_edit.html?id=" + mat.id + "');\">"+ translate('edit') +"</button>";
       }
       else if (mat.type == 2)
       {

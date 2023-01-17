@@ -92,9 +92,20 @@ namespace Judoboard
 		explicit operator uint32_t () const {
 			return m_InGrams;
 		}
+		explicit operator int () const {
+			return m_InGrams;
+		}
+
+		/*bool operator <=> (const Weight& rhs) const {
+			return this->m_InGrams <=> rhs.m_InGrams;
+		}*/
 
 		bool operator == (const Weight& rhs) const {
 			return this->m_InGrams == rhs.m_InGrams;
+		}
+
+		bool operator != (const Weight& rhs) const {
+			return this->m_InGrams != rhs.m_InGrams;
 		}
 
 		bool operator < (const Weight& rhs) const {

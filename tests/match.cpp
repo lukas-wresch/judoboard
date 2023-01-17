@@ -228,8 +228,15 @@ TEST(Match, BestOf3ExportImport)
 		EXPECT_EQ(dep[1], m2);
 
 		tourney.AddMatch(m1);
-		tourney.AddMatch(m2);
-		tourney.AddMatch(m3);
+
+		ASSERT_EQ(tourney.GetMatchTables().size(), 1);
+		auto& custom = tourney.GetMatchTables()[0];
+		custom->AddMatch(m2);
+		custom->AddMatch(m3);
+
+		//tourney.AddMatch(m2);
+		//tourney.AddMatch(m3);
+		tourney.GenerateSchedule();
 
 		tourney.Save();
 		tourney.EnableAutoSave(false);

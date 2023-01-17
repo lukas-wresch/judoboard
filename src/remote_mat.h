@@ -57,6 +57,7 @@ namespace Judoboard
 		virtual void RemoveKoka(Fighter Whom) override {}
 
 		virtual void Hantei(Fighter Whom) override {}
+		virtual void RevokeHantei() override {}
 		virtual void SetAsDraw(bool Enable = true) override {}
 
 		virtual void AddShido(Fighter Whom) override {}
