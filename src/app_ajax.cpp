@@ -1830,10 +1830,14 @@ void Application::SetupHttpServer()
 		int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
 
 		RuleSet* new_rule_set = new RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time);
+
+		auto guard = LockTillScopeEnd();
+
 		if (!m_Database.AddRuleSet(new_rule_set))
-			return std::string("Could not add rule set to database");
+			return Error(Error::Type::OperationFailed);
+
 		m_Database.Save();
-		return Error();//OK
+		return Error(Error::Type::NoError);//OK
 	});
 
 	m_Server.RegisterResource("/ajax/rule/update", [this](auto& Request) -> std::string {
@@ -1853,6 +1857,8 @@ void Application::SetupHttpServer()
 		bool draw = HttpServer::DecodeURLEncoded(Request.m_Body, "draw") == "true";
 		int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
 
+		auto guard = LockTillScopeEnd();
+
 		auto rule = m_Database.FindRuleSet(id);
 
 		if (!rule)
@@ -1870,6 +1876,8 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		auto guard = LockTillScopeEnd();
+
 		auto rule = m_Database.FindRuleSet(id);
 		if (!rule)
 			return std::string("Could not find rule set in database");
@@ -1883,6 +1891,8 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
+
+		auto guard = LockTillScopeEnd();
 
 		auto& rules = m_Database.GetRuleSets();
 		YAML::Emitter ret;
@@ -1911,6 +1921,22 @@ void Application::SetupHttpServer()
 		ret << YAML::EndMap;
 
 		return ret.c_str();
+	});
+
+	m_Server.RegisterResource("/ajax/rule/delete", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+		auto guard = LockTillScopeEnd();
+
+		if (!m_Database.DeleteRuleSet(id))
+			return Error(Error::Type::OperationFailed);
+
+		m_Database.Save();
+		return Error(Error::Type::NoError);//OK
 	});
 
 

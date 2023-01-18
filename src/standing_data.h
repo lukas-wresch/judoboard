@@ -81,6 +81,9 @@ namespace Judoboard
 		bool AssociationHasChildren(const Association* Association) const;
 
 		//Rule sets
+		bool AddRuleSet(RuleSet* NewRuleSet);
+		[[nodiscard]]
+
 		[[nodiscard]]
 		RuleSet* FindRuleSetByName(const std::string& RuleSetName);
 		[[nodiscard]]
@@ -90,11 +93,12 @@ namespace Judoboard
 		[[nodiscard]]
 		const RuleSet* FindRuleSet(const UUID& UUID) const;
 
-		bool AddRuleSet(RuleSet* NewRuleSet);
-		[[nodiscard]]
 		std::vector<RuleSet*>& GetRuleSets() { return m_RuleSets; }
 		[[nodiscard]]
 		const std::vector<RuleSet*>& GetRuleSets() const { return m_RuleSets; }
+
+		[[nodiscard]]
+		bool DeleteRuleSet(const UUID& UUID);
 
 		//Age groups
 		bool AddAgeGroup(AgeGroup* NewAgeGroup);
