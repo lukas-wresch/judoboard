@@ -342,6 +342,11 @@ TEST(SingleElimination, Count4)
 	ASSERT_EQ(group->GetParticipants().size(), 4);
 	ASSERT_EQ(group->GetSchedule().size(),     3);
 
+	EXPECT_EQ(*group->GetSchedule()[0]->GetFighter(Fighter::White), *j1);
+	EXPECT_EQ(*group->GetSchedule()[0]->GetFighter(Fighter::Blue),  *j3);
+	EXPECT_EQ(*group->GetSchedule()[1]->GetFighter(Fighter::White), *j2);
+	EXPECT_EQ(*group->GetSchedule()[1]->GetFighter(Fighter::Blue),  *j4);
+
 	Mat m(1);
 
 	for (auto match : group->GetSchedule())

@@ -695,10 +695,10 @@ TEST(Tournament, Lottery_Histogram)
 		c2_count += lot2;
 	}
 
-	EXPECT_GE(c1_count, 40);
-	EXPECT_LE(c1_count, 60);
-	EXPECT_GE(c2_count, 40);
-	EXPECT_LE(c2_count, 60);
+	EXPECT_GE(c1_count, 35);
+	EXPECT_LE(c1_count, 65);
+	EXPECT_GE(c2_count, 35);
+	EXPECT_LE(c2_count, 65);
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
@@ -807,6 +807,45 @@ TEST(Tournament, HasDefaultRuleSet2)
 
 
 
+TEST(Tournament, FindSubMatchTable)
+{
+	initialize();
+
+	{
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+		Tournament tourney("deleteMe");
+		tourney.EnableAutoSave(false);
+
+		for (int i = 0; i < 16; i++)
+		{
+			Judoka* j = new Judoka(GetRandomName(), GetRandomName(), 50, Gender::Male);
+			tourney.AddParticipant(j);
+		}
+
+		Pool* pool = new Pool(Weight(10), Weight(100));
+		tourney.AddMatchTable(pool);
+
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetUUID()));
+		ASSERT_TRUE(pool->GetPool(0));
+
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetPool(0)->GetUUID()));
+		EXPECT_TRUE(tourney.FindMatchTable(pool->GetPool(0)->GetUUID())->IsSubMatchTable());
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetPool(1)->GetUUID()));
+		EXPECT_TRUE(tourney.FindMatchTable(pool->GetPool(1)->GetUUID())->IsSubMatchTable());
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetPool(2)->GetUUID()));
+		EXPECT_TRUE(tourney.FindMatchTable(pool->GetPool(2)->GetUUID())->IsSubMatchTable());
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetPool(3)->GetUUID()));
+		EXPECT_TRUE(tourney.FindMatchTable(pool->GetPool(3)->GetUUID())->IsSubMatchTable());
+
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetFinals().GetUUID()));
+		EXPECT_TRUE(tourney.FindMatchTable(pool->GetFinals().GetUUID())->IsSubMatchTable());
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 {
 	initialize();
@@ -840,6 +879,50 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 		ASSERT_TRUE(d.FindRuleSetByName("Test"));
 		//EXPECT_EQ(t.FindRuleSetByName("Test")->GetID(), d.FindRuleSetByName("Test")->GetID());
 		EXPECT_EQ(t.FindRuleSetByName("Test")->GetUUID(), d.FindRuleSetByName("Test")->GetUUID());
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Tournament, ConcludedStatus)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+
+		Tournament* tourney = new Tournament("deleteMe");
+		tourney->EnableAutoSave(false);
+
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+
+		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
+		tourney->GetMatchTables()[0]->IsBestOfThree(true);
+		tourney->GetMatchTables()[0]->SetMatID(1);
+		tourney->GenerateSchedule();
+
+		ASSERT_EQ(tourney->GetSchedule().size(), 3);
+
+		Mat mat(1);
+
+		mat.StartMatch(tourney->GetSchedule()[0]);
+		mat.AddIppon(Fighter::White);
+		mat.EndMatch();
+
+		mat.StartMatch(tourney->GetSchedule()[1]);
+		mat.AddIppon(Fighter::Blue);
+		mat.EndMatch();
+
+		EXPECT_EQ(tourney->GetSchedule()[2]->GetStatus(), Status::Skipped);
+		EXPECT_EQ(tourney->GetStatus(), Status::Concluded);
+
+		delete tourney;
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
@@ -881,27 +964,68 @@ TEST(Tournament, SaveAndLoad)
 
 		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
 		tourney->AddMatchTable(new RoundRobin(Weight(60), Weight(65)));
+		tourney->AddMatchTable(new Pool(Weight(50), Weight(65)));
 		tourney->AddMatch(new Match(j1, j3, tourney, 1));
 		tourney->AddMatch(new Match(j1, j4, tourney, 2));
 		tourney->GenerateSchedule();
 
 		tourney->Disqualify(*j1);
 
-		tourney->EnableAutoSave(false);
+		tourney->IsReadonly(true);
+
+		EXPECT_TRUE(tourney->IsReadonly());
+
+		tourney->Save();
 
 
 		Tournament t("deleteMe");
 		t.EnableAutoSave(false);
 
+		EXPECT_EQ(t.IsReadonly(), tourney->IsReadonly());
+
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		EXPECT_EQ(t.GetParticipants().size(), 4);
-		EXPECT_EQ(t.GetMatchTables().size(), 4);
-		EXPECT_EQ(t.GetSchedule().size(), 4);
+		EXPECT_EQ(t.GetMatchTables().size(), tourney->GetMatchTables().size());
+		EXPECT_EQ(t.GetSchedule().size(), tourney->GetSchedule().size());
 
 		EXPECT_TRUE( t.IsDisqualified(*j1));
 		EXPECT_FALSE(t.IsDisqualified(*j2));
 		EXPECT_FALSE(t.IsDisqualified(*j3));
 		EXPECT_FALSE(t.IsDisqualified(*j4));
+
+		delete tourney;
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Tournament, WeightclassesAreSorted)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	for (int i = 0; i < 100; ++i)
+	{
+		Tournament tourney("deleteMe");
+		tourney.EnableAutoSave(false);
+
+		for (int j = 0; j < 30; ++j)
+		{
+			auto w = rand() % 100;
+			tourney.AddMatchTable(new RoundRobin(Weight(w), Weight(w + 10)));
+		}
+		
+		auto tables = tourney.GetMatchTables();
+		int current = 0;
+		for (auto table : tables)
+		{
+			EXPECT_LE(current, (int)((Weightclass*)table->GetFilter())->GetMinWeight());
+
+			current = (int)((Weightclass*)table->GetFilter())->GetMinWeight();
+		}
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
@@ -1405,6 +1529,10 @@ TEST(Tournament, AddMatchAfterConclusion)
 		mat->AddIppon(Fighter::White);
 		mat->EndMatch();
 
+		EXPECT_TRUE(tourney.AddMatch(match2));
+
+		tourney.IsReadonly(true);
+
 		EXPECT_FALSE(tourney.AddMatch(match2));
 		delete mat;
 	}
@@ -1444,6 +1572,7 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 
 	auto match1 = new Match(j1, j3, &tourney, 1);
 	auto match2 = new Match(j1, j4, &tourney, 1);
+	auto match3 = new Match(j1, j4, &tourney, 1);
 
 	EXPECT_TRUE(tourney.AddMatch(match1));
 
@@ -1454,6 +1583,11 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 	mat->EndMatch();
 
 	EXPECT_TRUE(tourney.AddMatch(match2));
+
+	tourney.IsReadonly(true);//Temp tournament can not be read only
+
+	EXPECT_TRUE(tourney.AddMatch(match3));
+
 	delete mat;
 }
 

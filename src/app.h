@@ -99,6 +99,7 @@ namespace Judoboard
 		Error Ajax_AddTournament(const HttpServer::Request& Request);
 		Error Ajax_EditTournament(const HttpServer::Request& Request);
 		std::string Ajax_GetTournament(const HttpServer::Request& Request);
+		std::string Ajax_ListTournaments();
 
 		//Mat
 		std::string Ajax_GetMats() const;
@@ -188,7 +189,11 @@ namespace Judoboard
 			std::recursive_mutex& m_Mutex;
 		};
 
+		[[nodiscard]]
 		ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
+		void Lock()    const { m_mutex.lock(); }
+		void Unlock()  const { m_mutex.unlock(); }
+		bool TryLock() const { return m_mutex.try_lock(); }
 
 
 		enum class Mode

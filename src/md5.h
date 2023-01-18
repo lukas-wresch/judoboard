@@ -268,6 +268,7 @@ namespace Judoboard
 			//1 = GO (ready), could also be invalid match (RedID == WhiteID)
 			//2 = Half empty match (one of the fighters is empty)
 			//3 = completed match
+			//5 = completed match (is elimination match)
 			//0, 2, 4, 5 = ???
 
 			int RedOutMatchID   = -1;
