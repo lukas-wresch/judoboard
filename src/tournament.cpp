@@ -52,8 +52,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	{
 		Club* new_club = nullptr;
 
-		if (pDatabase)
-			new_club = pDatabase->AddClub(*club);
+		if (pDatabase && pDatabase->FindClubByName(club->Name))
+			new_club = pDatabase->FindClubByName(club->Name);
 		else
 			new_club = new Club(*club);
 		
@@ -114,8 +114,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		Judoka* new_judoka = nullptr;
 		std::string dummy;
 
-		if (pDatabase)
-			new_judoka = pDatabase->UpdateOrAdd(*judoka, false, dummy);
+		if (pDatabase && pDatabase->FindJudoka_ExactMatch(*judoka))
+			new_judoka = pDatabase->FindJudoka_ExactMatch(*judoka);
 		else
 			new_judoka = new Judoka(JudokaData(*judoka), &m_StandingData);
 
