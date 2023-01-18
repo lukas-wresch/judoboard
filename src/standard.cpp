@@ -1,4 +1,4 @@
-#include "Standard.h"
+#include "standard.h"
 
 
 
@@ -30,7 +30,7 @@ void Standard::operator >> (YAML::Emitter& Yaml) const
 
 
 
-/*void Fixed::ToString(YAML::Emitter& Yaml) const
+/*void Standard::ToString(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
 }*/
