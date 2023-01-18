@@ -2035,7 +2035,7 @@ TEST(Ajax, Tournament_Add)
 	auto assoc = new Association("Organizer", nullptr);
 	app.GetDatabase().AddAssociation(assoc);
 
-	EXPECT_TRUE(app.Ajax_AddTournament(HttpServer::Request("", "name=test&year=2000&rules=" + (std::string)rules->GetUUID() + "&organizer=" + (std::string)assoc->GetUUID())));
+	EXPECT_TRUE(app.Ajax_AddTournament(HttpServer::Request("", "name=test&year=2000&rules=" + (std::string)rules->GetUUID() + "&organizer=" + (std::string)assoc->GetUUID() + "&description=test description")));
 
 	auto tour = app.FindTournamentByName("test");
 	ASSERT_TRUE(tour);
@@ -2044,6 +2044,7 @@ TEST(Ajax, Tournament_Add)
 	EXPECT_EQ(tour->GetDatabase().GetYear(), 2000);
 	ASSERT_TRUE(tour->GetOrganizer());
 	EXPECT_EQ(*tour->GetOrganizer(), *assoc);
+	EXPECT_EQ(tour->GetDescription(), "test description");
 }
 
 

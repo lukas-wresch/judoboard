@@ -2460,6 +2460,7 @@ Error Application::Ajax_AddTournament(const HttpServer::Request& Request)
 	auto year         = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "year"));
 	UUID rule_id      = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
 	UUID organizer_id = HttpServer::DecodeURLEncoded(Request.m_Body, "organizer");
+	auto description  = HttpServer::DecodeURLEncoded(Request.m_Body, "description");
 
 	if (name.empty())
 		return Error::Type::InvalidInput;
@@ -2480,6 +2481,7 @@ Error Application::Ajax_AddTournament(const HttpServer::Request& Request)
 		new_tournament->SetYear(year);
 	new_tournament->SetDefaultRuleSet(rules);
 	new_tournament->SetOrganizer(organizer);
+	new_tournament->SetDescription(description);
 
 	if (!AddTournament(new_tournament))
 		return Error::Type::OperationFailed;
