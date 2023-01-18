@@ -1320,7 +1320,7 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 		auto age_group = GetAgeGroupOfJudoka(judoka);
 
 		//Not assigned to any age group and eligable for this new one?
-		if (!age_group && NewAgeGroup->IsElgiable(*judoka))
+		if (!age_group && NewAgeGroup->IsElgiable(*judoka, GetDatabase()))
 		{
 			//Add him to his new age group
 			m_JudokaToAgeGroup.insert({ judoka->GetUUID(), NewAgeGroup->GetUUID() });
@@ -1407,7 +1407,7 @@ std::vector<const AgeGroup*> Tournament::GetEligableAgeGroupsOfJudoka(const Judo
 
 	for (auto age_group : m_StandingData.GetAgeGroups())
 	{
-		if (Judoka && age_group->IsElgiable(*Judoka))
+		if (Judoka && age_group->IsElgiable(*Judoka, GetDatabase()))
 			ret.emplace_back(age_group);
 	}
 
@@ -2053,7 +2053,7 @@ void Tournament::FindAgeGroupForJudoka(const Judoka& Judoka)
 	std::vector<AgeGroup*> EligableAgeGroups;
 	for (auto age_group : m_StandingData.GetAgeGroups())
 	{
-		if (age_group && age_group->IsElgiable(Judoka))
+		if (age_group && age_group->IsElgiable(Judoka, GetDatabase()))
 			EligableAgeGroups.emplace_back(age_group);
 	}
 

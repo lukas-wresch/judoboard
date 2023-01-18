@@ -97,6 +97,7 @@ namespace Judoboard
 		const std::vector<RuleSet*>& GetRuleSets() const { return m_RuleSets; }
 
 		//Age groups
+		bool AddAgeGroup(AgeGroup* NewAgeGroup);
 		[[nodiscard]]
 		AgeGroup* FindAgeGroupByName(const std::string& AgeGroupName);
 		[[nodiscard]]
@@ -106,7 +107,6 @@ namespace Judoboard
 		[[nodiscard]]
 		const AgeGroup* FindAgeGroup(const UUID& UUID) const;
 
-		bool AddAgeGroup(AgeGroup* NewAgeGroup);
 		bool RemoveAgeGroup(const UUID& UUID);
 		[[nodiscard]]
 		std::vector<AgeGroup*>& GetAgeGroups() { return m_AgeGroups; }

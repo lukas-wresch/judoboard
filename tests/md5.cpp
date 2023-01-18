@@ -2294,8 +2294,8 @@ TEST(MD5, ExportCompletedTournament)
 	clubs.push_back(new Judoboard::Club("Brackwede", biegue));
 	clubs.push_back(new Judoboard::Club("Senne", biegue));
 
-	auto age_group1 = new AgeGroup("U11",  8,  10, nullptr, tour.GetDatabase());
-	auto age_group2 = new AgeGroup("U15", 12,  14, nullptr, tour.GetDatabase());
+	auto age_group1 = new AgeGroup("U11",  8,  10, nullptr);
+	auto age_group2 = new AgeGroup("U15", 12,  14, nullptr);
 	tour.AddAgeGroup(age_group1);
 	tour.AddAgeGroup(age_group2);
 
@@ -2324,7 +2324,7 @@ TEST(MD5, ExportCompletedTournament)
 		}
 
 		j->SetBirthyear(2005 + rand() % 15);
-		if (!age_group1->IsElgiable(*j) && !age_group2->IsElgiable(*j))
+		if (!age_group1->IsElgiable(*j, tour.GetDatabase()) && !age_group2->IsElgiable(*j, tour.GetDatabase()))
 		{
 			delete j;
 			continue;
@@ -2612,7 +2612,7 @@ TEST(MD5, ExportSingleElimination16)
 	clubs.push_back(new Judoboard::Club("Senne", biegue));
 
 
-	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr, t->GetDatabase());
+	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr);
 	t->AddAgeGroup(age);
 
 	Judoka* j[17];
@@ -2724,7 +2724,7 @@ TEST(MD5, ExportSingleElimination16_3rd_5th)
 	clubs.push_back(new Judoboard::Club("Senne", biegue));
 
 
-	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr, t->GetDatabase());
+	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr);
 	t->AddAgeGroup(age);
 
 	Judoka* j[17];
@@ -2837,7 +2837,7 @@ TEST(MD5, ExportSingleElimination32)
 	clubs.push_back(new Judoboard::Club("Senne", biegue));
 
 
-	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr, t->GetDatabase());
+	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr);
 	t->AddAgeGroup(age);
 
 	Judoka* j[33];

@@ -156,10 +156,10 @@ bool Weightclass::IsElgiable(const Judoka& Fighter) const
 		return false;
 
 
-	if (GetAgeGroup())
+	if (GetAgeGroup() && GetTournament())
 	{
 		//Does the judoka belong in this age group?
-		if (!GetAgeGroup()->IsElgiable(Fighter))
+		if (!GetAgeGroup()->IsElgiable(Fighter, GetTournament()->GetDatabase()))
 			return false;
 
 		//Check if the judoka is indeed starting for that age group

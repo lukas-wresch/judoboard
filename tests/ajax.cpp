@@ -10,8 +10,8 @@ TEST(Ajax, AgeGroup_Get)
 		Application app;
 
 		auto r  = new RuleSet("test", 1, 2, 3, 4);
-		auto a1 = new AgeGroup("age 1", 10, 20, r, app.GetDatabase());
-		auto a2 = new AgeGroup("age 2", 30, 40, nullptr, app.GetDatabase());
+		auto a1 = new AgeGroup("age 1", 10, 20, r);
+		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
 
 		app.GetDatabase().AddAgeGroup(a1);
 		app.GetTournament()->AddAgeGroup(a2);
@@ -47,8 +47,8 @@ TEST(Ajax, AgeGroup_List)
 	{
 		Application app;
 
-		auto a1 = new AgeGroup("age 1", 10, 20, nullptr, app.GetDatabase());
-		auto a2 = new AgeGroup("age 2", 30, 40, nullptr, app.GetDatabase());
+		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
+		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
 
 		app.GetDatabase().AddAgeGroup(a1);
 		app.GetTournament()->AddAgeGroup(a2);

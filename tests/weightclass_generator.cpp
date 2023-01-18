@@ -153,8 +153,8 @@ TEST(WeightclassGenerator, FullTest)
 		clubs.push_back(new Judoboard::Club("Brackwede"));
 		clubs.push_back(new Judoboard::Club("Senne"));
 
-		auto age_group1 = new AgeGroup("U11", 8, 10, nullptr, tour.GetDatabase());
-		auto age_group2 = new AgeGroup("U15", 12, 14, nullptr, tour.GetDatabase());
+		auto age_group1 = new AgeGroup("U11", 8,  10, nullptr);
+		auto age_group2 = new AgeGroup("U15", 12, 14, nullptr);
 		tour.AddAgeGroup(age_group1);
 		tour.AddAgeGroup(age_group2);
 
@@ -183,7 +183,7 @@ TEST(WeightclassGenerator, FullTest)
 			}
 
 			j->SetBirthyear(2005 + rand() % 15);
-			if (!age_group1->IsElgiable(*j) && !age_group2->IsElgiable(*j))
+			if (!age_group1->IsElgiable(*j, tour.GetDatabase()) && !age_group2->IsElgiable(*j, tour.GetDatabase()))
 			{
 				delete j;
 				continue;

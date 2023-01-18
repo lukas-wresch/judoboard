@@ -584,6 +584,7 @@ bool StandingData::RemoveAgeGroup(const UUID& UUID)
 	{
 		if ((*it)->GetUUID() == UUID)
 		{
+			delete *it;
 			m_AgeGroups.erase(it);
 			return true;
 		}
