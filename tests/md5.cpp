@@ -318,9 +318,12 @@ TEST(MD5, CreateTournamentFromTestData2)
 
 		EXPECT_EQ(file.GetNumParticipants(),     142);
 		EXPECT_EQ(file.GetParticipants().size(), 142);
-		EXPECT_EQ(db.GetNumJudoka(),             142);
-		EXPECT_EQ(db.GetAllJudokas().size(),     142);
-		EXPECT_EQ(db.GetNumClubs(), 20);
+		//EXPECT_EQ(db.GetNumJudoka(),             142);
+		//EXPECT_EQ(db.GetAllJudokas().size(),     142);
+		//EXPECT_EQ(db.GetNumClubs(), 20);
+		EXPECT_EQ(db.GetNumJudoka(),         0);
+		EXPECT_EQ(db.GetAllJudokas().size(), 0);
+		EXPECT_EQ(db.GetNumClubs(),          0);
 	}
 
 	ZED::Core::RemoveFile("tournaments/KEM U15 KT U10 - U18.yml");
@@ -2537,12 +2540,19 @@ TEST(MD5, ImportSingleElimination)
 	Database db;
 	Tournament tour(file, &db);
 
-	auto j1 = db.FindJudokaByName("v1 n1");
-	auto j2 = db.FindJudokaByName("v2 n2");
-	auto j3 = db.FindJudokaByName("v3 n3");
-	auto j4 = db.FindJudokaByName("v4 n4");
-	auto j5 = db.FindJudokaByName("v5 n5");
-	auto j6 = db.FindJudokaByName("v6 n6");
+	auto j1 = tour.GetDatabase().FindJudokaByName("v1 n1");
+	auto j2 = tour.GetDatabase().FindJudokaByName("v2 n2");
+	auto j3 = tour.GetDatabase().FindJudokaByName("v3 n3");
+	auto j4 = tour.GetDatabase().FindJudokaByName("v4 n4");
+	auto j5 = tour.GetDatabase().FindJudokaByName("v5 n5");
+	auto j6 = tour.GetDatabase().FindJudokaByName("v6 n6");
+
+	ASSERT_TRUE(j1);
+	ASSERT_TRUE(j2);
+	ASSERT_TRUE(j3);
+	ASSERT_TRUE(j4);
+	ASSERT_TRUE(j5);
+	ASSERT_TRUE(j6);
 
 	auto table = tour.FindMatchTableByDescription("Jugend u10 m -10 kg");
 	ASSERT_TRUE(table);
