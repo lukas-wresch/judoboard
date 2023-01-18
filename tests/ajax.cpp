@@ -2,6 +2,79 @@
 
 
 
+TEST(Ajax, AgeGroup_Add)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto r = app.GetDatabase().GetRuleSets()[0];
+		app.Ajax_AddAgeGroup(HttpServer::Request("", "name=test&min_age=3&max_age=5&gender=0&rule=" + (std::string)r->GetUUID()));
+		
+		auto& age_groups = app.GetDatabase().GetAgeGroups();
+
+		ASSERT_EQ(age_groups.size(), 7);
+		EXPECT_EQ(age_groups[6]->GetName(), "test");
+		EXPECT_EQ(age_groups[6]->GetMinAge(), 3);
+		EXPECT_EQ(age_groups[6]->GetMaxAge(), 5);
+		EXPECT_EQ(age_groups[6]->GetGender(), Gender::Male);
+		ASSERT_TRUE(age_groups[6]->GetRuleSet());
+		EXPECT_EQ(*age_groups[6]->GetRuleSet(), *r);
+	}
+}
+
+
+
+TEST(Ajax, AgeGroup_Edit)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto r = app.GetDatabase().GetRuleSets()[0];
+		app.Ajax_AddAgeGroup(HttpServer::Request("", "name=test&min_age=3&max_age=5&gender=0&rule=" + (std::string)r->GetUUID()));
+
+		auto& age_groups = app.GetDatabase().GetAgeGroups();
+		ASSERT_EQ(age_groups.size(), 7);
+		auto a = age_groups[6];
+
+		app.Ajax_EditAgeGroup(HttpServer::Request("id=" + (std::string)a->GetUUID(), "name=test2&min_age=6&max_age=10&gender=1&rule=" + (std::string)r->GetUUID()));
+
+		EXPECT_EQ(age_groups[6]->GetName(), "test2");
+		EXPECT_EQ(age_groups[6]->GetMinAge(), 6);
+		EXPECT_EQ(age_groups[6]->GetMaxAge(), 10);
+		EXPECT_EQ(age_groups[6]->GetGender(), Gender::Female);
+		ASSERT_TRUE(age_groups[6]->GetRuleSet());
+		EXPECT_EQ(*age_groups[6]->GetRuleSet(), *r);
+	}
+}
+
+
+
+TEST(Ajax, AgeGroup_Delete)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto r = app.GetDatabase().GetRuleSets()[0];
+		app.Ajax_AddAgeGroup(HttpServer::Request("", "name=test&min_age=3&max_age=5&gender=0&rule=" + (std::string)r->GetUUID()));
+
+		auto& age_groups = app.GetDatabase().GetAgeGroups();
+		ASSERT_EQ(age_groups.size(), 7);
+		auto a = age_groups[6];
+
+		app.Ajax_DeleteAgeGroup(HttpServer::Request("id=" + (std::string)a->GetUUID()));
+
+		ASSERT_EQ(age_groups.size(), 6);
+	}
+}
+
+
+
 TEST(Ajax, AgeGroup_Get)
 {
 	initialize();
