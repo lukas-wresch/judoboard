@@ -783,6 +783,9 @@ TEST(MD5, ImportIntoTournament)
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Darian");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Luca");
 		EXPECT_EQ(results[3].Judoka->GetFirstname(), "Titus");
+
+		EXPECT_EQ(db.GetNumJudoka(), 0);
+		EXPECT_EQ(db.GetNumClubs(),  0);
 	}
 
 	ZED::Core::RemoveFile("tournaments/KEM U15 KT U10 - U18.yml");
