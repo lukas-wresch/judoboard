@@ -2138,12 +2138,18 @@ TEST(Ajax, Tournament_Edit)
 
 		auto tour1 = app.FindTournamentByName("test");
 		ASSERT_TRUE(tour1);
+		EXPECT_TRUE(tour1->Save());
 
 		EXPECT_FALSE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test2&year=2001&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
 
 		EXPECT_TRUE(app.CloseTournament());
 
 		EXPECT_TRUE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test2&year=2001&readonly=true&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
+
+		EXPECT_FALSE(app.FindTournamentByName("test"));
+
+		//Check if the old tournament file still exists
+		EXPECT_FALSE(ZED::Core::RemoveFile("tournaments/test.yml"));
 
 		auto tour = app.FindTournamentByName("test2");
 		ASSERT_TRUE(tour);

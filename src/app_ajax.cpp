@@ -2577,6 +2577,7 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 
 	auto organizer = m_Database.FindAssociation(organizer_id);
 
+	auto old_name = tournament->GetName();
 	tournament->SetName(name);
 	if (year >= 0)
 		tournament->SetYear(year);
@@ -2589,7 +2590,8 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 	if (!readonly && !tournament->Save())
 		return Error(Error::Type::OperationFailed);
 
-	//TODO delete the old tournament file in case the name changed
+	if (old_name != name)//Did the name change?
+		ZED::Core::RemoveFile("tournaments/" + old_name + ".yml");//Remove the old file
 
 	return Error();//OK
 }
