@@ -99,11 +99,14 @@ TEST(App, AddDMFFile)
 	for (auto [uuid, j] : judokas)
 	{
 		EXPECT_EQ(j->GetFirstname(), "firstname");
-		EXPECT_EQ(j->GetLastname(), "lastname");
+		EXPECT_EQ(j->GetLastname(),  "lastname");
 		EXPECT_EQ(j->GetBirthyear(), 1990);
 		ASSERT_TRUE(j->GetClub());
 		EXPECT_EQ(j->GetClub()->GetName(), "club name");
 	}
+
+	EXPECT_EQ(app.GetDatabase().GetNumJudoka(), 0);
+	EXPECT_EQ(app.GetDatabase().GetAllClubs().size(), 0);
 }
 
 
