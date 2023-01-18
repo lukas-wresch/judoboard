@@ -472,7 +472,7 @@ void Application::SetupHttpServer()
 		if (GetTournament()->GetStatus() == Status::Concluded)
 			return std::string("Tournament is already finalized");
 
-		auto entry = GetTournament()->GetScheduleEntry(id);
+		auto entry = GetTournament()->FindMatchTable(id);
 
 		if (!entry)
 			return Error(Error::Type::ItemNotFound);
@@ -487,8 +487,8 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-		auto rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
+		UUID id   = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+		UUID rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 
 		auto guard = LockTillScopeEnd();
 
@@ -496,7 +496,7 @@ void Application::SetupHttpServer()
 			return std::string("No tournament open");
 
 		auto match = GetTournament()->FindMatch(id);
-		auto ruleSet = m_Database.FindRuleSetByName(rule);
+		auto ruleSet = m_Database.FindRuleSet(rule);
 
 		if (!match)
 			return std::string("Could not find match");
@@ -1110,47 +1110,104 @@ void Application::SetupHttpServer()
 
 			return Error();//OK
 		});
-
-		m_Server.RegisterResource("/ajax/mat/+draw", [this](auto& Request) -> std::string {
-			auto account = IsLoggedIn(Request);
-			if (!account)
-				return Error(Error::Type::NotLoggedIn);
-
-			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-			if (id <= 0)
-				return Error(Error::Type::InvalidID);
-
-			auto mat = FindMat(id);
-
-			if (mat)
-				mat->SetAsDraw();
-
-			return Error();//OK
-		});
-
-		m_Server.RegisterResource("/ajax/mat/+golden_score", [this](auto& Request) -> std::string {
-			auto account = IsLoggedIn(Request);
-			if (!account)
-				return Error(Error::Type::NotLoggedIn);
-
-			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-			if (id <= 0)
-				return Error(Error::Type::InvalidID);
-
-			auto mat = FindMat(id);
-
-			if (!mat)
-				return Error(Error::Type::MatNotFound);
-
-			if (!mat->EnableGoldenScore())
-				return Error(Error::Type::OperationFailed);
-
-			return Error();//OK
-		});
 	}
 
+
+	m_Server.RegisterResource("/ajax/mat/-hantei", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (mat)
+			mat->RevokeHantei();
+
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/mat/+draw", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (mat)
+			mat->SetAsDraw();
+
+		return Error();//OK
+		});
+
+	m_Server.RegisterResource("/ajax/mat/-draw", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (mat)
+			mat->SetAsDraw(false);
+
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/mat/+golden_score", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (!mat)
+			return Error(Error::Type::MatNotFound);
+
+		if (!mat->EnableGoldenScore())
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/mat/-golden_score", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (!mat)
+			return Error(Error::Type::MatNotFound);
+
+		if (!mat->EnableGoldenScore(false))
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
+	});
 
 	m_Server.RegisterResource("/ajax/mat/tokeda", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
@@ -2076,23 +2133,13 @@ void Application::SetupHttpServer()
 		return HttpServer::LoadFile(filename);
 	}, HttpServer::ResourceType::Binary);
 
+
 	m_Server.RegisterResource("/ajax/tournament/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
 
-		ZED::CSV ret;
-		for (auto tournament : m_Tournaments)
-		{
-			if (tournament)//Filter out temporary tournament
-			{
-				ret << (std::string)tournament->GetUUID() << tournament->GetName() << tournament->GetParticipants().size() << tournament->GetSchedule().size() << tournament->GetStatus();
-				//Is the tournament open?
-				ret << (m_CurrentTournament && tournament->GetUUID() == m_CurrentTournament->GetUUID());
-			}
-		}
-
-		return ret;
+		return Ajax_ListTournaments();
 	});
 
 
@@ -2514,6 +2561,7 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 	auto year         = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "year"));
 	UUID rule_id      = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
 	UUID organizer_id = HttpServer::DecodeURLEncoded(Request.m_Body, "organizer");
+	bool readonly     = HttpServer::DecodeURLEncoded(Request.m_Body, "readonly") == "true";
 
 	if (name.empty())
 		return Error::Type::InvalidInput;
@@ -2532,18 +2580,26 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 	if (!rules)
 		ZED::Log::Warn("Adding tournament: Could not find rule set in database");
 
+	if (!readonly)
+		tournament->IsReadonly(readonly);
+
 	auto organizer = m_Database.FindAssociation(organizer_id);
 
+	auto old_name = tournament->GetName();
 	tournament->SetName(name);
 	if (year >= 0)
 		tournament->SetYear(year);
 	tournament->SetDefaultRuleSet(rules);
 	tournament->SetOrganizer(organizer);
 
-	if (!tournament->Save())
+	if (readonly)
+		tournament->IsReadonly(readonly);
+
+	if (!readonly && !tournament->Save())
 		return Error(Error::Type::OperationFailed);
 
-	//TODO delete the old tournament file in case the name changed
+	if (old_name != name)//Did the name change?
+		ZED::Core::RemoveFile("tournaments/" + old_name + ".yml");//Remove the old file
 
 	return Error();//OK
 }
@@ -2568,6 +2624,7 @@ std::string Application::Ajax_GetTournament(const HttpServer::Request& Request)
 	yaml << YAML::Key << "num_participants" << YAML::Value << tournament->GetParticipants().size();
 	yaml << YAML::Key << "schedule_size" << YAML::Value    << tournament->GetSchedule().size();
 	yaml << YAML::Key << "status" << YAML::Value << (int)tournament->GetStatus();
+	yaml << YAML::Key << "is_locked" << YAML::Value << tournament->IsReadonly();
 
 	if (tournament->GetDefaultRuleSet())
 		yaml << YAML::Key << "rule_set_uuid" << YAML::Value << (std::string)tournament->GetDefaultRuleSet()->GetUUID();
@@ -2578,6 +2635,35 @@ std::string Application::Ajax_GetTournament(const HttpServer::Request& Request)
 	yaml << YAML::EndMap;
 
 	return yaml.c_str();
+}
+
+
+
+std::string Application::Ajax_ListTournaments()
+{
+	auto guard = LockTillScopeEnd();
+
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
+	for (auto tournament : m_Tournaments)
+	{
+		if (tournament)//Filter out temporary tournament
+		{
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "uuid" << YAML::Value << (std::string)tournament->GetUUID();
+			ret << YAML::Key << "name" << YAML::Value << tournament->GetName();
+			ret << YAML::Key << "num_participants" << YAML::Value << tournament->GetParticipants().size();
+			ret << YAML::Key << "num_matches" << YAML::Value << tournament->GetSchedule().size();
+			ret << YAML::Key << "status"  << YAML::Value << (int)tournament->GetStatus();
+			ret << YAML::Key << "is_open" << YAML::Value << (m_CurrentTournament && tournament->GetUUID() == m_CurrentTournament->GetUUID());
+			ret << YAML::Key << "is_locked" << YAML::Value << tournament->IsReadonly();
+			ret << YAML::EndMap;
+		}
+	}
+	
+	ret << YAML::EndSeq;
+	return ret.c_str();
 }
 
 
