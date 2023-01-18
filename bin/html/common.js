@@ -120,7 +120,7 @@ var lang_en = {
     optional:   [ "Optional", "Optional" ],
     osaekomi_time_ippon:    [ "Osaekomi Time (Ippon)", "Osaekomi Zeit (Ippon)" ],
     osaekomi_time_wazaari:  [ "Osaekomi Time (Waza-Ari)", "Osaekomi Zeit (Waza-Ari)" ],
-    osaekomi_switched: [ "Osaekomi switched to other fighter" , "Osaekomi auf anderen K&auml;pfer gewechselt"];
+    osaekomi_switched: [ "Osaekomi switched to other fighter" , "Osaekomi auf anderen K&auml;pfer gewechselt"],
     overview:  [ "Overview", "&Uuml;bersicht" ],
     open:  [ "Oppen", "&Ouml;ffnen" ],
     optional:  [ "Optional", "Optional" ],
