@@ -1102,47 +1102,104 @@ void Application::SetupHttpServer()
 
 			return Error();//OK
 		});
-
-		m_Server.RegisterResource("/ajax/mat/+draw", [this](auto& Request) -> std::string {
-			auto account = IsLoggedIn(Request);
-			if (!account)
-				return Error(Error::Type::NotLoggedIn);
-
-			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-			if (id <= 0)
-				return Error(Error::Type::InvalidID);
-
-			auto mat = FindMat(id);
-
-			if (mat)
-				mat->SetAsDraw();
-
-			return Error();//OK
-		});
-
-		m_Server.RegisterResource("/ajax/mat/+golden_score", [this](auto& Request) -> std::string {
-			auto account = IsLoggedIn(Request);
-			if (!account)
-				return Error(Error::Type::NotLoggedIn);
-
-			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-			if (id <= 0)
-				return Error(Error::Type::InvalidID);
-
-			auto mat = FindMat(id);
-
-			if (!mat)
-				return Error(Error::Type::MatNotFound);
-
-			if (!mat->EnableGoldenScore())
-				return Error(Error::Type::OperationFailed);
-
-			return Error();//OK
-		});
 	}
 
+
+	m_Server.RegisterResource("/ajax/mat/-hantei", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (mat)
+			mat->RevokeHantei();
+
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/mat/+draw", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (mat)
+			mat->SetAsDraw();
+
+		return Error();//OK
+		});
+
+	m_Server.RegisterResource("/ajax/mat/-draw", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (mat)
+			mat->SetAsDraw(false);
+
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/mat/+golden_score", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (!mat)
+			return Error(Error::Type::MatNotFound);
+
+		if (!mat->EnableGoldenScore())
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/mat/-golden_score", [this](auto& Request) -> std::string {
+		auto account = IsLoggedIn(Request);
+		if (!account)
+			return Error(Error::Type::NotLoggedIn);
+
+		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+		if (id <= 0)
+			return Error(Error::Type::InvalidID);
+
+		auto mat = FindMat(id);
+
+		if (!mat)
+			return Error(Error::Type::MatNotFound);
+
+		if (!mat->EnableGoldenScore(false))
+			return Error(Error::Type::OperationFailed);
+
+		return Error();//OK
+	});
 
 	m_Server.RegisterResource("/ajax/mat/tokeda", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
@@ -2544,6 +2601,7 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 
 	auto organizer = m_Database.FindAssociation(organizer_id);
 
+	auto old_name = tournament->GetName();
 	tournament->SetName(name);
 	if (year >= 0)
 		tournament->SetYear(year);
@@ -2556,7 +2614,8 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 	if (!readonly && !tournament->Save())
 		return Error(Error::Type::OperationFailed);
 
-	//TODO delete the old tournament file in case the name changed
+	if (old_name != name)//Did the name change?
+		ZED::Core::RemoveFile("tournaments/" + old_name + ".yml");//Remove the old file
 
 	return Error();//OK
 }

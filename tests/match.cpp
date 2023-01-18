@@ -2,6 +2,36 @@
 
 
 
+TEST(Match, NoDoubleEvents)
+{
+	initialize();
+
+	Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+
+	Match* match = new Match(&j1, &j2, nullptr, 1);
+	Mat mat(1);
+
+	EXPECT_TRUE(mat.StartMatch(match));
+
+	mat.Hajime();
+	mat.Hajime();
+
+	mat.Mate();
+	mat.Mate();
+
+	auto log = match->GetLog();
+	EXPECT_EQ(log.GetNumEvent(), 3);//Start, hajime, mate
+	EXPECT_EQ(log.GetEvents()[0].m_Event, MatchLog::NeutralEvent::StartMatch);
+	EXPECT_EQ(log.GetEvents()[1].m_Event, MatchLog::NeutralEvent::Hajime);
+	EXPECT_EQ(log.GetEvents()[2].m_Event, MatchLog::NeutralEvent::Mate);
+
+	mat.AddIppon(Fighter::White);
+	mat.EndMatch();
+}
+
+
+
 TEST(Match, ExportImport)
 {
 	initialize();

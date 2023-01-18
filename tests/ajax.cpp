@@ -699,15 +699,17 @@ TEST(Ajax, GetNamesOnMat)
 
 		app.AddTournament(tourney);
 
-		ZED::Core::Pause(500);
+		ZED::Core::Pause(1000);
 
 		YAML::Node yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
+		ASSERT_TRUE(yaml["white_name"]);
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
 		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
 		EXPECT_EQ(yaml["match_table_name" ].as<std::string>(), "");
+		ASSERT_TRUE(yaml["next_matches"]);
 		ASSERT_TRUE(yaml["next_matches"].IsSequence());
 		EXPECT_EQ(yaml["next_matches"][0]["white_name"].as<std::string>(), "A B");
 		EXPECT_EQ(yaml["next_matches"][0]["blue_name" ].as<std::string>(), "C D");
@@ -724,11 +726,12 @@ TEST(Ajax, GetNamesOnMat)
 
 		mat->StartMatch(match1);
 
-		ZED::Core::Pause(500);
+		ZED::Core::Pause(1000);
 
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
+		ASSERT_TRUE(yaml["white_name"]);
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "A B");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "C D");
 		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
@@ -745,11 +748,12 @@ TEST(Ajax, GetNamesOnMat)
 		mat->AddIppon(Fighter::White);
 		mat->EndMatch();
 
-		ZED::Core::Pause(500);
+		ZED::Core::Pause(1000);
 
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
+		ASSERT_TRUE(yaml["white_name"]);
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
 		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
@@ -762,11 +766,12 @@ TEST(Ajax, GetNamesOnMat)
 
 		mat->StartMatch(match2);
 
-		ZED::Core::Pause(500);
+		ZED::Core::Pause(1000);
 
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
+		ASSERT_TRUE(yaml["white_name"]);
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "E F");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "G H");
 		EXPECT_EQ(yaml["mat_name"  ].as<std::string>(), "mat name");
@@ -778,11 +783,12 @@ TEST(Ajax, GetNamesOnMat)
 		mat->AddIppon(Fighter::White);
 		mat->EndMatch();
 
-		ZED::Core::Pause(500);
+		ZED::Core::Pause(1000);
 
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
+		ASSERT_TRUE(yaml["white_name"]);
 		EXPECT_EQ(yaml["white_name"].as<std::string>(), "- - -");
 		EXPECT_EQ(yaml["blue_name" ].as<std::string>(), "- - -");
 		ASSERT_TRUE(yaml["next_matches"].IsSequence());
@@ -1760,7 +1766,7 @@ TEST(Ajax, MatchTable_StartPositionsAfterUpdate)
 			start_j4 = group->GetStartPosition(j4);
 			start_j5 = group->GetStartPosition(j5);
 
-			EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)group->GetUUID(), "type=1&fight_system=3&name=Test2&mat=5&minWeight=0,7&maxWeight=200.3&bo3=true")), "ok");
+			EXPECT_TRUE(app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)group->GetUUID(), "type=1&fight_system=3&name=Test2&mat=5&minWeight=0,7&maxWeight=200.3&bo3=true")));
 
 
 			ASSERT_EQ(group->GetStartPosition(j1), start_j1);
@@ -2139,12 +2145,18 @@ TEST(Ajax, Tournament_Edit)
 
 		auto tour1 = app.FindTournamentByName("test");
 		ASSERT_TRUE(tour1);
+		EXPECT_TRUE(tour1->Save());
 
 		EXPECT_FALSE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test2&year=2001&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
 
 		EXPECT_TRUE(app.CloseTournament());
 
 		EXPECT_TRUE(app.Ajax_EditTournament(HttpServer::Request("id=" + (std::string)tour1->GetUUID(), "name=test2&year=2001&readonly=true&rules=" + (std::string)rules2->GetUUID() + "&organizer=" + (std::string)assoc2->GetUUID())));
+
+		EXPECT_FALSE(app.FindTournamentByName("test"));
+
+		//Check if the old tournament file still exists
+		EXPECT_FALSE(ZED::Core::RemoveFile("tournaments/test.yml"));
 
 		auto tour = app.FindTournamentByName("test2");
 		ASSERT_TRUE(tour);

@@ -147,6 +147,7 @@ namespace Judoboard
 		virtual void RemoveKoka(Fighter Whom) = 0;
 
 		virtual void Hantei(Fighter Whom) = 0;
+		virtual void RevokeHantei() = 0;
 		virtual void SetAsDraw(bool Enable = true) = 0;
 
 		virtual void AddShido(Fighter Whom) = 0;
