@@ -29,6 +29,8 @@ namespace Judoboard
 
 		[[nodiscard]]
 		virtual const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
+		[[nodiscard]]
+		virtual StandingData& GetDatabase() { return m_StandingData; }//Returns a database containing all participants
 
 		virtual const Association* GetOrganizer() const { return nullptr; }
 
