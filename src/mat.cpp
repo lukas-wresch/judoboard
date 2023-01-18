@@ -424,6 +424,12 @@ void Mat::Hajime()
 {
 	m_mutex.lock();
 
+	if (IsHajime() && !IsSonomama())//Already hajime and not a sonomama situation?
+	{
+		m_mutex.unlock();
+		return;
+	}
+
 	//Double ippons during golden score?
 	if (AreFightersOnMat() && IsGoldenScore() && GetScoreboard(Fighter::White).m_Ippon == 1 && GetScoreboard(Fighter::Blue).m_Ippon == 1)
 	{

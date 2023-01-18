@@ -49,6 +49,7 @@ namespace Judoboard
 		bool IsHajime() const override { return m_HajimeTimer.IsRunning(); }
 		bool IsOsaekomiRunning() const override { return m_OsaekomiTimer[0].IsRunning() || m_OsaekomiTimer[1].IsRunning(); }//Returns true during an osaekomi situation
 		bool IsOsaekomi() const override { return m_IsOsaekomi; }//Returns true during an osaekomi situation (even during sonomama!)
+		bool IsSonomama() const { return !IsHajime() && IsOsaekomi(); }
 		Fighter GetOsaekomiHolder() const { return m_OsaekomiHolder; }
 		bool CanNextMatchStart() const override { return m_State == State::Waiting; }
 		bool IsDoingAnimation() const { return m_State == State::TransitionToMatch || m_State == State::TransitionToWaiting; }
