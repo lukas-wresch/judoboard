@@ -64,11 +64,14 @@ TEST(App, AddDM4File)
 	for (auto [uuid, j] : judokas)
 	{
 		EXPECT_EQ(j->GetFirstname(), "VornameTN");
-		EXPECT_EQ(j->GetLastname(), "NachnameTN");
+		EXPECT_EQ(j->GetLastname(),  "NachnameTN");
 		EXPECT_EQ(j->GetBirthyear(), 2007);
 		ASSERT_TRUE(j->GetClub());
 		EXPECT_EQ(j->GetClub()->GetName(), "Verein1");
 	}
+
+	EXPECT_EQ(app.GetDatabase().GetNumJudoka(), 0);
+	EXPECT_EQ(app.GetDatabase().GetAllClubs().size(), 0);
 }
 
 
