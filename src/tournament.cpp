@@ -418,7 +418,7 @@ bool Tournament::SaveYAML(const std::string& Filename)
 
 	//Prune unused clubs
 	std::set<UUID> used_clubs;
-	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
+	for (auto judoka : m_StandingData.GetAllJudokas())
 		if (judoka->GetClub())
 			used_clubs.insert(*judoka->GetClub());
 
@@ -984,7 +984,7 @@ bool Tournament::RemoveParticipant(const UUID& UUID)
 		if (!table->IsIncluded(*deleted_judoka))
 			continue;
 
-		for (auto& [id, judoka] : m_StandingData.GetAllJudokas())
+		for (auto judoka : m_StandingData.GetAllJudokas())
 		{
 			if (table->IsElgiable(*judoka))
 				table->AddParticipant(judoka);
@@ -1156,7 +1156,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 		AddRuleSet(const_cast<RuleSet*>(NewMatchTable->GetOwnRuleSet()));
 
 	//Add all eligable participants to the match table
-	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
+	for (auto judoka : m_StandingData.GetAllJudokas())
 	{
 		if (judoka && NewMatchTable->IsElgiable(*judoka))
 			NewMatchTable->AddParticipant(judoka);
@@ -1213,7 +1213,7 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 		if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
 			matchTable->RemoveParticipant(judoka);
 
-	for (auto& [id, judoka] : m_StandingData.GetAllJudokas())
+	for (auto judoka : m_StandingData.GetAllJudokas())
 	{
 		if (judoka && matchTable->IsElgiable(*judoka))
 			matchTable->AddParticipant(judoka);
@@ -1316,7 +1316,7 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 	if (NewAgeGroup->GetRuleSet())
 		m_StandingData.AddRuleSet(const_cast<RuleSet*>(NewAgeGroup->GetRuleSet()));
 
-	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
+	for (auto judoka : m_StandingData.GetAllJudokas())
 	{
 		auto age_group = GetAgeGroupOfJudoka(judoka);
 
@@ -1359,7 +1359,7 @@ bool Tournament::RemoveAgeGroup(const UUID& UUID)
 	}
 
 	//Assign not-assigned judoka to a age group if possible
-	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
+	for (auto judoka : m_StandingData.GetAllJudokas())
 	{
 		//Not assigned to any age group?
 		if (judoka && !GetAgeGroupOfJudoka(judoka))
@@ -1555,7 +1555,7 @@ std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min
 
 			std::vector<Weight> weights;
 
-			for (const auto [id, judoka] : m_StandingData.GetAllJudokas())
+			for (const auto judoka : m_StandingData.GetAllJudokas())
 			{
 				//Filter for correct gender
 				if (SplitGenders && judoka->GetGender() != gender)
@@ -1611,7 +1611,7 @@ std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min
 
 				std::vector<Weight> weights;
 
-				for (const auto [id, judoka] : m_StandingData.GetAllJudokas())
+				for (const auto judoka : m_StandingData.GetAllJudokas())
 				{
 					//Filter for correct gender
 					if (SplitGenders && judoka->GetGender() != gender)
@@ -1827,7 +1827,7 @@ bool Tournament::PerformLottery()
 	if (m_LotteryTier > 0 && (int)m_LotteryTier > organizer_level)//Is valid?
 		lottery_level = m_LotteryTier;
 
-	for (auto [id, judoka] : GetDatabase().GetAllJudokas())
+	for (auto judoka : GetDatabase().GetAllJudokas())
 	{
 		const Association* club = judoka->GetClub();
 
@@ -1909,7 +1909,7 @@ const std::string Tournament::Participants2String() const
 	Lock();
 
 	auto schedule = GetSchedule();
-	for (auto [id, judoka] : m_StandingData.GetAllJudokas())
+	for (auto judoka : m_StandingData.GetAllJudokas())
 	{
 		uint32_t num_matches = 0;
 		for (auto match : schedule)

@@ -61,7 +61,7 @@ TEST(App, AddDM4File)
 
 	ASSERT_EQ(judokas.size(), 1);
 
-	for (auto [uuid, j] : judokas)
+	for (auto j : judokas)
 	{
 		EXPECT_EQ(j->GetFirstname(), "VornameTN");
 		EXPECT_EQ(j->GetLastname(), "NachnameTN");
@@ -96,7 +96,7 @@ TEST(App, AddDMFFile)
 
 	ASSERT_EQ(judokas.size(), 1);
 
-	for (auto [uuid, j] : judokas)
+	for (auto j : judokas)
 	{
 		EXPECT_EQ(j->GetFirstname(), "firstname");
 		EXPECT_EQ(j->GetLastname(), "lastname");

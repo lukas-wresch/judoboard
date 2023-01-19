@@ -1126,7 +1126,7 @@ TEST(Tournament, SaveAndLoad_AgeGroups)
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		ASSERT_EQ(t.GetParticipants().size(), 4);
 
-		for (auto [id, j] : t.GetParticipants())
+		for (auto j : t.GetParticipants())
 		{
 			auto age_group = t.GetAgeGroupOfJudoka(j);
 
@@ -1175,7 +1175,7 @@ TEST(Tournament, SaveAndLoad_Clubs)
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		ASSERT_EQ(t.GetParticipants().size(), 4);
 
-		for (auto [id, j] : t.GetParticipants())
+		for (auto j : t.GetParticipants())
 		{
 			ASSERT_TRUE(j->GetClub());
 			EXPECT_EQ(j->GetClub()->GetUUID(), c.GetUUID());

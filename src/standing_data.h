@@ -36,8 +36,8 @@ namespace Judoboard
 		//Judokas
 		bool AddJudoka(Judoka&& NewJudoka) { return AddJudoka(new Judoka(NewJudoka)); }//Adds a judoka to the database
 		bool AddJudoka(Judoka* NewJudoka);//Adds a judoka to the database by reference
-		[[nodiscard]] const std::unordered_map<UUID, Judoka*>& GetAllJudokas() const { return m_Judokas; }
-		[[nodiscard]] std::unordered_map<UUID, Judoka*>& GetAllJudokas() { return m_Judokas; }
+		[[nodiscard]] const std::vector<Judoka*>& GetAllJudokas() const { return m_Judokas; }
+		[[nodiscard]] std::vector<Judoka*>& GetAllJudokas() { return m_Judokas; }
 		[[nodiscard]] size_t GetNumJudoka() const { return m_Judokas.size(); }
 		[[nodiscard]] size_t GetNumClubs()  const { return m_Clubs.size(); }
 
@@ -118,7 +118,7 @@ namespace Judoboard
 		const std::string Judoka2String(std::string SearchString, const ITournament* Tournament) const;
 
 	protected:
-		std::unordered_map<UUID, Judoka*> m_Judokas;
+		std::vector<Judoka*> m_Judokas;
 
 		std::vector<Club*> m_Clubs;
 		std::vector<Association*> m_Associations;

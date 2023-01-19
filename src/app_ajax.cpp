@@ -1254,7 +1254,7 @@ void Application::SetupHttpServer()
 
 		YAML::Emitter ret;
 		ret << YAML::BeginSeq;
-		for (auto [id, judoka] : m_Database.GetAllJudokas())
+		for (auto judoka : m_Database.GetAllJudokas())
 		{
 			if (judoka)
 				judoka->ToString(ret);
