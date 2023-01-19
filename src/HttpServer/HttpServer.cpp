@@ -143,7 +143,7 @@ HttpServer::HttpServer(uint16_t Port) : m_Port(Port)
 
     //const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", nullptr };
 #ifdef _DEBUG
-    const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", "num_threads", "5", nullptr};
+    const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", "num_threads", "7", nullptr};
 #else
     const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", "num_threads", "12", nullptr};
 #endif

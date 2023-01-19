@@ -98,7 +98,7 @@ var lang_en = {
     max_participants:  [ "Max participants", "Maximalteilnehmer" ],
     max_weight_diff:  [ "Weight difference", "Gewichtsunterschied" ],
     more:  [ "More", "Mehr" ],
-    match_stated:  [ "Match started", "Kampf gestartet" ],
+    match_started:  [ "Match started", "Kampf gestartet" ],
     match_time:  [ "Match Time", "Kampfzeit" ],
     name_white:  [ "Name (White)", "Name (Wei&szlig;)" ],
     name_blue:   [ "Name (Blue)", "Name (Blau)" ],
