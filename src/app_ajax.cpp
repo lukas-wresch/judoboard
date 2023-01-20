@@ -1273,22 +1273,21 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/judoka/import", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_ImportJudoka(Request);
+	});
+
+
 	m_Server.RegisterResource("/ajax/judoka/delete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		auto judoka = m_Database.FindJudoka(id);
-
-		if (!judoka)
-			return std::string("Judoka not found");
-
-		if (!m_Database.DeleteJudoka(judoka->GetUUID()))
-			return std::string("Failed to delete");
-
-		return Error();//OK
+		return Ajax_DeleteJudoka(Request);
 	});
 
 
@@ -2922,6 +2921,54 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 		auto tour = (Tournament*)GetTournament();//TODO could be remote tournament
 		judoka->SetClub(tour->GetDatabase().FindClub(clubID));
 	}
+
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_ImportJudoka(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockTillScopeEnd();
+
+	auto judoka = GetTournament()->FindParticipant(id);
+
+	if (!judoka)
+		return Error::Type::ItemNotFound;
+
+	Club* club = (Club*)judoka->GetClub();
+
+	//Already in database?
+	if (m_Database.FindJudoka(id))
+		return Error::Type::OperationFailed;
+
+	if (!m_Database.AddJudoka(judoka))
+		return Error::Type::OperationFailed;
+
+	if (club && !m_Database.FindClubByName(club->GetName()))
+		if (!m_Database.AddClub(club))
+			return Error::Type::OperationFailed;
+
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_DeleteJudoka(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockTillScopeEnd();
+
+	auto judoka = m_Database.FindJudoka(id);
+
+	if (!judoka)
+		return Error::Type::ItemNotFound;
+
+	if (!m_Database.DeleteJudoka(judoka->GetUUID()))
+		return Error::Type::OperationFailed;
 
 	return Error();//OK
 }
