@@ -676,7 +676,7 @@ TEST(Ajax, Judoka_Delete)
 
 		auto& judokas = app.GetDatabase().GetAllJudokas();
 
-		auto id = judokas.begin()->second->GetUUID();
+		auto id = judokas[0]->GetUUID();
 
 		EXPECT_TRUE(app.Ajax_DeleteJudoka(HttpServer::Request("id="+(std::string)id)));
 
@@ -715,7 +715,7 @@ TEST(Ajax, Judoka_Import)
 		EXPECT_TRUE(app.Ajax_ImportJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID())));
 
 		ASSERT_EQ(judokas.size(), 1);
-		EXPECT_EQ(judokas.begin()->second->GetUUID(), *j1);
+		EXPECT_EQ(judokas[0]->GetUUID(), *j1);
 
 		ASSERT_EQ(clubs.size(), 1);
 		EXPECT_EQ(clubs[0]->GetUUID(), *c1);
