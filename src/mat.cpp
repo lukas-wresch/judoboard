@@ -166,6 +166,12 @@ bool Mat::StartMatch(Match* NewMatch)
 		return false;
 	}
 
+	if (IsPaused())
+	{
+		ZED::Log::Warn("Can not start match since mat is paused");
+		return false;
+	}
+
 	if (!NewMatch->IsAssociatedWithMat() || NewMatch->GetMatID() != GetMatID())
 	{
 		ZED::Log::Warn("Match does not belong to this mat");
@@ -481,6 +487,15 @@ void Mat::Mate()
 	if (AreFightersOnMat() && (IsHajime() || IsOsaekomi()) )//Mate can also be called during sonomama
 	{
 		m_HajimeTimer.Pause();
+
+		//Don't overflow timer
+		if (IsOutOfTime())
+		{
+			if (!IsGoldenScore() && m_pMatch && m_HajimeTimer > m_pMatch->GetRuleSet().GetMatchTime() * 1000)
+				m_HajimeTimer = m_pMatch->GetRuleSet().GetMatchTime() * 1000;
+			else if (IsGoldenScore() && m_pMatch && m_HajimeTimer > m_pMatch->GetRuleSet().GetMatchTime() * 1000)
+				m_HajimeTimer = m_pMatch->GetRuleSet().GetGoldenScoreTime() * 1000;
+		}
 
 		if (IsOsaekomi())//Mate during osaekomi?
 		{
@@ -1120,11 +1135,11 @@ void Mat::Process()
 	if (!AreFightersOnMat())
 		return;
 
+	m_mutex.lock();
+
 	if (IsOsaekomiRunning() && m_OsaekomiTimer[(int)GetOsaekomiHolder()].GetElapsedTime() >= EndTimeOfOsaekomi() * 1000)
 	{
-		m_mutex.lock();
 		m_OsaekomiList.emplace_back(OsaekomiEntry(GetOsaekomiHolder(), m_OsaekomiTimer[(int)GetOsaekomiHolder()].GetElapsedTime()));
-		m_mutex.unlock();
 
 		UpdateGraphics();
 
@@ -1136,6 +1151,8 @@ void Mat::Process()
 		else
 			AddIppon(GetOsaekomiHolder());
 	}
+
+	m_mutex.unlock();
 
 	if (IsOutOfTime() && IsHajime())
 		Mate();
@@ -2083,24 +2100,16 @@ bool Mat::Render(double dt) const
 
 	case State::Waiting:
 
-		/*if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetType() == MatchTable::Type::Pause)
+		for (int i = 0; i < 2; i++)
 		{
-			auto font = renderer.RenderFont(ZED::FontSize::Gigantic, "Pause", ZED::Color(0, 0, 0));
-			renderer.RenderTransformed(*font.data, width/2 - 100, height/2 - 50);
-		}
-		else*/
-		{
-			for (int i = 0; i < 2; i++)
-			{
-				m_Graphics["next_matches_white_" + std::to_string(i)].Render(renderer, dt);
-				m_Graphics["next_matches_blue_"  + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_white_" + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_blue_"  + std::to_string(i)].Render(renderer, dt);
 
-				m_Graphics["next_matches_white2_" + std::to_string(i)].Render(renderer, dt);
-				m_Graphics["next_matches_blue2_"  + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_white2_" + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_blue2_"  + std::to_string(i)].Render(renderer, dt);
 
-				m_Graphics["next_matches_white_club_" + std::to_string(i)].Render(renderer, dt);
-				m_Graphics["next_matches_blue_club_"  + std::to_string(i)].Render(renderer, dt);
-			}
+			m_Graphics["next_matches_white_club_" + std::to_string(i)].Render(renderer, dt);
+			m_Graphics["next_matches_blue_club_"  + std::to_string(i)].Render(renderer, dt);
 		}
 
 		m_Graphics["next_match"].Render(renderer, dt);
@@ -2256,6 +2265,42 @@ bool Mat::Render(double dt) const
 			NextState(State::Waiting);
 
 		break;
+
+
+	case State::Paused:
+		if (m_Logo)//Render logo
+		{
+			m_Logo->SetSize(renderer.GetWidth() / 1920.0f);
+			renderer.RenderTransformed(*m_Logo, width / 2 - (int)(m_Logo->GetWidth() / 2.0f * m_Logo->GetSizeX()), 50);
+		}
+
+		auto appname = renderer.RenderFont(ZED::FontSize::Middle, Application::Name, ZED::Color(0, 0, 0));
+		if (appname)
+			renderer.RenderTransformed(appname, 30, height - 120);
+
+		auto version = renderer.RenderFont(ZED::FontSize::Middle, "Version: " + Application::Version, ZED::Color(0, 0, 0));
+		if (version)
+			renderer.RenderTransformed(version, 30, height - 70);
+
+		auto date = ZED::Core::GetDate();
+
+		std::stringstream day, time;
+		day << date.day << "." << date.month << "." << date.year;
+		time << std::setfill('0') << std::setw(1) << date.hour << ":" << std::setw(2) << date.minute << ":" << std::setw(2) << date.second;
+
+		auto text_date = renderer.RenderFont(ZED::FontSize::Middle, day.str(), ZED::Color(0, 0, 0));
+		if (text_date)
+			renderer.RenderTransformed(text_date, width - 250, height - 120);
+		auto text_time = renderer.RenderFont(ZED::FontSize::Middle, time.str(), ZED::Color(0, 0, 0));
+		if (text_time)
+			renderer.RenderTransformed(text_time, width - 250, height - 70);
+
+		auto name = renderer.RenderFont(ZED::FontSize::Gigantic, GetName(), ZED::Color(0, 0, 0));
+		if (name)
+			renderer.RenderTransformed(name, width / 2 - name->GetWidth() / 2, height - name->GetHeight() - 10);
+
+		auto font = renderer.RenderFont(ZED::FontSize::Gigantic, Localizer::Translate("Pause"), ZED::Color(0, 0, 0));
+		renderer.RenderTransformed(*font.data, width/2 - font->GetWidth()/2, height/2 - font->GetHeight()/2);
 	}
 
 

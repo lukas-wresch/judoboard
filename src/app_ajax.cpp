@@ -2,7 +2,6 @@
 #include "app.h"
 #include "database.h"
 #include "weightclass.h"
-#include "pause.h"
 #include "customtable.h"
 #include "single_elimination.h"
 #include "pool.h"
@@ -277,6 +276,15 @@ void Application::SetupHttpServer()
 			return error;
 
 		return Ajax_CloseMat(Request);
+	});
+
+
+	m_Server.RegisterResource("/ajax/config/pause", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_PauseMat(Request);
 	});
 
 
@@ -1273,22 +1281,21 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/judoka/import", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_ImportJudoka(Request);
+	});
+
+
 	m_Server.RegisterResource("/ajax/judoka/delete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		auto judoka = m_Database.FindJudoka(id);
-
-		if (!judoka)
-			return std::string("Judoka not found");
-
-		if (!m_Database.DeleteJudoka(judoka->GetUUID()))
-			return std::string("Failed to delete");
-
-		return Error();//OK
+		return Ajax_DeleteJudoka(Request);
 	});
 
 
@@ -2745,6 +2752,7 @@ std::string Application::Ajax_GetMats() const
 				ret << YAML::Key << "name"    << YAML::Value << mat->GetName();
 				ret << YAML::Key << "type"    << YAML::Value << (int)mat->GetType();
 				ret << YAML::Key << "is_open" << YAML::Value << mat->IsOpen();
+				ret << YAML::Key << "is_paused" << YAML::Value << mat->IsPaused();
 				ret << YAML::Key << "ippon_style"   << YAML::Value << (int)mat->GetIpponStyle();
 				ret << YAML::Key << "timer_style"   << YAML::Value << (int)mat->GetTimerStyle();
 				ret << YAML::Key << "name_style"    << YAML::Value << (int)mat->GetNameStyle();
@@ -2814,6 +2822,29 @@ Error Application::Ajax_CloseMat(const HttpServer::Request& Request)
 
 
 
+Error Application::Ajax_PauseMat(const HttpServer::Request& Request)
+{
+	int id      = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+	bool enable = HttpServer::DecodeURLEncoded(Request.m_Query, "enable") == "true";
+
+	if (id <= 0)
+		return Error(Error::Type::InvalidID);
+
+	auto guard = LockTillScopeEnd();
+
+	auto mat = FindMat(id);
+
+	if (!mat)
+		return Error(Error::Type::MatNotFound);
+
+	if (!mat->Pause(enable))
+		return Error(Error::Type::OperationFailed);
+
+	return Error();//OK
+}
+
+
+
 Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 {
 	int id     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -2867,7 +2898,7 @@ Error Application::Ajax_AddJudoka(const HttpServer::Request& Request)
 	auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
 	auto lastname  = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
 	auto weight    = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
-	Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+	Gender gender  = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 	int  birthyear = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "birthyear"));
 	auto number = HttpServer::DecodeURLEncoded(Request.m_Body, "number");
 	UUID clubID = HttpServer::DecodeURLEncoded(Request.m_Body, "club");
@@ -2973,6 +3004,54 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 		auto tour = (Tournament*)GetTournament();//TODO could be remote tournament
 		judoka->SetClub(tour->GetDatabase().FindClub(clubID));
 	}
+
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_ImportJudoka(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockTillScopeEnd();
+
+	auto judoka = GetTournament()->FindParticipant(id);
+
+	if (!judoka)
+		return Error::Type::ItemNotFound;
+
+	Club* club = (Club*)judoka->GetClub();
+
+	//Already in database?
+	if (m_Database.FindJudoka(id))
+		return Error::Type::OperationFailed;
+
+	if (!m_Database.AddJudoka(judoka))
+		return Error::Type::OperationFailed;
+
+	if (club && !m_Database.FindClubByName(club->GetName()))
+		if (!m_Database.AddClub(club))
+			return Error::Type::OperationFailed;
+
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_DeleteJudoka(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockTillScopeEnd();
+
+	auto judoka = m_Database.FindJudoka(id);
+
+	if (!judoka)
+		return Error::Type::ItemNotFound;
+
+	if (!m_Database.DeleteJudoka(judoka->GetUUID()))
+		return Error::Type::OperationFailed;
 
 	return Error();//OK
 }

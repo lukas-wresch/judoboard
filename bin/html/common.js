@@ -63,7 +63,9 @@ var lang_en = {
     hansokumake_indirect:  [ "Hansoku-Make (indirect)", "Hansoku-Make (indirekt)" ],
     hansokumake_revoked:  [ "Hansoku-Make revoked!", "Hansoku-Make zur&uuml;ckgenommen!" ],
     hide_mats:  [ "Hide Mats", "Matten ausblenden" ],
+    import:  [ "Import", "Importieren" ],
     ippon_revoked:  [ "Ippon revoked!", "Ippon zur&uuml;ckgenommen!" ],
+    judo_passport_number:  [ "Judo Passport Number", "Judopassnummer" ],
     koka_revoked:  [ "Koka revoked!", "Koka zur&uuml;ckgenommen!" ],
     list_associations:  [ "List Associations", "Verb&auml;nde anzeigen" ],
     list_clubs:  [ "List Clubs", "Vereine anzeigen" ],
@@ -100,7 +102,7 @@ var lang_en = {
     max_participants:  [ "Max participants", "Maximalteilnehmer" ],
     max_weight_diff:  [ "Weight difference", "Gewichtsunterschied" ],
     more:  [ "More", "Mehr" ],
-    match_stated:  [ "Match started", "Kampf gestartet" ],
+    match_started:  [ "Match started", "Kampf gestartet" ],
     match_time:  [ "Match Time", "Kampfzeit" ],
     name_white:  [ "Name (White)", "Name (Wei&szlig;)" ],
     name_blue:   [ "Name (Blue)", "Name (Blau)" ],
@@ -157,8 +159,10 @@ var lang_en = {
     skipped:   [ "Skipped", "Ausgelassen" ],
     push_up:  [ "Push Up", "Vorziehen" ],
     options:  [ "Options", "Optionen" ],
+    pause:  [ "Pause", "Pause" ],
     parent_association:  [ "Parent Association", "H&ouml;herer Verband" ],
     organizer:  [ "Organizer", "Organisator" ],
+    unpause:  [ "Unpause", "Pause beenden" ],
     upload_md5_file: [ "Upload MD5 File", "MD5 Datei hochladen" ],
     user:  [ "User", "Benutzer" ],
     username:  [ "Username", "Benutzername" ],
@@ -182,8 +186,12 @@ var lang_en = {
 function translate(keyword)
 {
   console.log("Translating " + keyword);
-  //return eval('lang_en.' + keyword + "[0]");
-  return eval('lang_en.' + keyword + "[1]");
+
+  var ret = eval('lang_en.' + keyword);
+
+  if (typeof ret == 'object')
+    return ret[1];
+  return keyword;
 }
 
 

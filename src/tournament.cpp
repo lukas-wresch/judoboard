@@ -50,8 +50,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	{
 		Club* new_club = nullptr;
 
-		if (pDatabase)
-			new_club = pDatabase->AddClub(*club);
+		if (pDatabase && pDatabase->FindClubByName(club->Name))
+			new_club = pDatabase->FindClubByName(club->Name);
 		else
 			new_club = new Club(*club);
 		
@@ -112,8 +112,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		Judoka* new_judoka = nullptr;
 		std::string dummy;
 
-		if (pDatabase)
-			new_judoka = pDatabase->UpdateOrAdd(*judoka, false, dummy);
+		if (pDatabase && pDatabase->FindJudoka_ExactMatch(*judoka))
+			new_judoka = pDatabase->FindJudoka_ExactMatch(*judoka);
 		else
 			new_judoka = new Judoka(JudokaData(*judoka), &m_StandingData);
 
@@ -934,10 +934,14 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		}
 	}
 
-	m_StandingData.AddJudoka(Judoka);
-	bool club_added = false;
-	if (m_StandingData.AddClub(const_cast<Club*>(Judoka->GetClub())))
-		club_added = true;
+	if (!m_StandingData.AddJudoka(Judoka))
+	{
+		ZED::Log::Warn("Could not add judoka!");
+		Unlock();
+		return false;
+	}
+
+	const bool club_added = m_StandingData.AddClub((Club*)Judoka->GetClub());
 
 	FindAgeGroupForJudoka(*Judoka);
 

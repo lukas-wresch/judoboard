@@ -197,6 +197,7 @@ TEST(Ajax, GetMats)
 	EXPECT_EQ(yaml["highest_mat_id"].as<int>(), 2);
 	EXPECT_EQ(yaml["mats"][0]["type"].as<int>(), (int)Mat::Type::LocalMat);
 	EXPECT_EQ(yaml["mats"][0]["name"].as<std::string>(), "Mat 1");
+	EXPECT_EQ(yaml["mats"][0]["is_paused"].as<bool>(), false);
 	EXPECT_EQ(yaml["mats"][0]["ippon_style"].as<int>(), (int)IMat::IpponStyle::DoubleDigit);
 	EXPECT_EQ(yaml["mats"][0]["name_style"].as<int>(),  (int)NameStyle::FamilyName);
 }
@@ -327,6 +328,43 @@ TEST(Ajax, UpdateMat)
 		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 2);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 0);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  0);
+	}
+}
+
+
+
+TEST(Ajax, PauseMat)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+
+		EXPECT_TRUE(app.Ajax_PauseMat(HttpServer::Request("id=1&enable=true")));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetDefaultMat()->IsPaused());
+
+		EXPECT_FALSE(app.Ajax_PauseMat(HttpServer::Request("id=5&enable=false")));
+		EXPECT_TRUE( app.Ajax_PauseMat(HttpServer::Request("id=1&enable=false")));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
+		EXPECT_FALSE(app.GetDefaultMat()->IsPaused());
+
+		EXPECT_FALSE(app.Ajax_PauseMat(HttpServer::Request("id=5&enable=true")));
+		EXPECT_TRUE( app.Ajax_PauseMat(HttpServer::Request("id=1&enable=true")));
+
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetDefaultMat()->IsPaused());
 	}
 }
 
@@ -740,6 +778,72 @@ TEST(Ajax, Judoka_Edit_Participant)
 		EXPECT_EQ(j1->GetNumber(), "A1234");
 		ASSERT_TRUE(j1->GetClub());
 		EXPECT_EQ(*j1->GetClub(), *c1);
+	}
+}
+
+
+
+TEST(Ajax, Judoka_Delete)
+{
+	initialize();
+
+	{
+		Application app;
+
+		EXPECT_EQ((std::string)app.Ajax_AddJudoka(HttpServer::Request("", "firstname=first&lastname=last&weight=10&gender=0&birthyear=2000&number=A123")), "ok");
+
+		auto& judokas = app.GetDatabase().GetAllJudokas();
+
+		auto id = judokas.begin()->second->GetUUID();
+
+		EXPECT_TRUE(app.Ajax_DeleteJudoka(HttpServer::Request("id="+(std::string)id)));
+
+		EXPECT_EQ(judokas.size(), 0);
+	}
+}
+
+
+
+TEST(Ajax, Judoka_Import)
+{
+	initialize();
+
+	{
+		Application app;
+
+		Tournament* tourney = new Tournament;
+
+		auto c1 = new Club("Club 1");
+		auto c2 = new Club("Club 1");
+		c1->SetShortName("c");
+		auto j1 = new Judoka("first", "last");
+		j1->SetClub(c1);
+		auto j2 = new Judoka("first", "last");
+		j2->SetClub(c2);
+
+		tourney->AddParticipant(j1);
+		tourney->AddParticipant(j2);
+
+		app.AddTournament(tourney);
+		
+
+		auto& judokas = app.GetDatabase().GetAllJudokas();
+		auto& clubs   = app.GetDatabase().GetAllClubs();
+
+		EXPECT_TRUE(app.Ajax_ImportJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID())));
+
+		ASSERT_EQ(judokas.size(), 1);
+		EXPECT_EQ(judokas.begin()->second->GetUUID(), *j1);
+
+		ASSERT_EQ(clubs.size(), 1);
+		EXPECT_EQ(clubs[0]->GetUUID(), *c1);
+
+		EXPECT_TRUE(app.Ajax_ImportJudoka(HttpServer::Request("id="+(std::string)j2->GetUUID())));
+
+		ASSERT_EQ(judokas.size(), 2);
+
+		ASSERT_EQ(clubs.size(), 1);//Don't import second club since it has the same name
+		EXPECT_EQ(clubs[0]->GetUUID(), *c1);
 	}
 }
 
