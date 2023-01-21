@@ -33,6 +33,24 @@ namespace Judoboard
 		virtual bool IsOpen()  const override { return m_Window.IsRunning(); }
 		virtual bool Open()  override;
 		virtual bool Close() override;
+		virtual bool Pause(bool Enable = true) override {
+			if (Enable)
+			{
+				if (m_State == State::StartUp || m_State == State::Waiting)
+				{
+					NextState(State::Paused);
+					return true;
+				}
+			}
+			else if (IsPaused())
+			{
+				NextState(State::Waiting);
+				return true;
+			}
+
+			return false;
+		}
+		virtual bool IsPaused() const override { return m_State == State::Paused; }
 
 		virtual bool HasConcluded() const override;
 
@@ -151,7 +169,8 @@ namespace Judoboard
 			Waiting,//Waiting for the next fight to be issued
 			TransitionToMatch,
 			Running,//Running a match
-			TransitionToWaiting
+			TransitionToWaiting,
+			Paused,//Mat is paused
 		} mutable m_State = State::StartUp;
 
 

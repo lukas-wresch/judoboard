@@ -245,7 +245,6 @@
     <ClInclude Include="..\..\src\matchtable.h" />
     <ClInclude Include="..\..\src\md5.h" />
     <ClInclude Include="..\..\src\mixer.h" />
-    <ClInclude Include="..\..\src\pause.h" />
     <ClInclude Include="..\..\src\pool.h" />
     <ClInclude Include="..\..\src\remote_mat.h" />
     <ClInclude Include="..\..\src\remote_tournament.h" />
