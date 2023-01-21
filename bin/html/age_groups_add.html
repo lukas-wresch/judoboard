@@ -18,21 +18,30 @@
 </div>
 
 <div>
+  <label style="width:150px;float:left;margin-top:5px;" id="label_gender"></label>
+  <select style="margin-bottom:20px;" id="gender">
+    <option selected value="-1" id="both"></option>
+    <option value="0" id="male">Male</option>
+    <option value="1" id="female">Female</option>
+  </select>
+</div>
+
+<div>
   <label id="label_rule" style="width:150px;float:left;margin-top:5px;">Rule Set</label>
   <select style="padding-top:5px;margin-bottom:20px;width: 5.0cm;" id="rule">
   </select>
 </div>
 
-<button class="add" id="add" onclick="return Add()">New Age Group</button>
-<button class="neutral" style="margin-right: 2cm;" onclick="return Update()" id="update">Save</button>
-<button class="remove" onclick="return Delete()" id="delete">Delete</button>
+<button class="add" id="add" onclick="return AddAgeGroup()">New Age Group</button>
+<button class="neutral" style="margin-right: 2cm;" onclick="return UpdateAgeGroup()" id="update">Save</button>
+<button class="remove" onclick="return DeleteAgeGroup()" id="delete">Delete</button>
 
 </form>
 
 
 <script>
 
-function Add()
+function AddAgeGroup()
 {
   var params = URLEncode({
     name:    document.getElementById("name").value,
@@ -49,6 +58,18 @@ function Add()
   return false;
 }
 
+
+function DeleteAgeGroup()
+{
+  if (confirm(translate('delete_age_group_confirm')))
+  {
+    AjaxCallback('ajax/age_groups/delete?id='+id, function() {
+      navigate('age_groups_list.html');
+    });
+  }
+
+  return false;
+}
 
 
 function GetAgeGroup(id)
@@ -67,7 +88,7 @@ function GetAgeGroup(id)
 
 
 
-function Update()
+function UpdateAgeGroup()
 {
   var params = URLEncode({
     name:    document.getElementById("name").value,
@@ -83,20 +104,6 @@ function Update()
 
   return false;
 }
-
-
-
-function Delete()
-{
-  if (confirm(translate('delete_age_group_confirm')))
-  {
-    Ajax('ajax/age_groups/delete?id='+id);
-    navigate('age_groups_list.html');
-  }
-
-  return false;
-}
-
 
 
 var id = URLDecode(URL, "id");
@@ -116,6 +123,10 @@ else
 
 GetRuleSets();
 
+document.getElementById("label_gender").innerHTML = translate('gender');
+document.getElementById("both").innerHTML = translate('both');
+document.getElementById("male").innerHTML = translate('male');
+document.getElementById("female").innerHTML = translate('female');
 document.getElementById("update").innerHTML = translate('save');
 document.getElementById("delete").innerHTML = translate('delete');
 document.getElementById("add").innerHTML = translate('new_age_group');
