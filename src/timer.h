@@ -26,6 +26,13 @@ public:
 
 	uint32_t GetElapsedTime() const;//Returns elapsed time in milliseconds
 
+	/*int operator <=> (uint32_t Time) const {
+		return GetElapsedTime() <=> Time;
+	}*/
+	int operator > (uint32_t Time) const {
+		return GetElapsedTime() > Time;
+	}
+
 private:
 	uint32_t m_Timestamp = 0;
 	uint32_t m_TimeElapsed = 0;

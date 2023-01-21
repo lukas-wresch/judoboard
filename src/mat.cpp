@@ -482,6 +482,15 @@ void Mat::Mate()
 	{
 		m_HajimeTimer.Pause();
 
+		//Don't overflow timer
+		if (IsOutOfTime())
+		{
+			if (!IsGoldenScore() && m_pMatch && m_HajimeTimer > m_pMatch->GetRuleSet().GetMatchTime() * 1000)
+				m_HajimeTimer = m_pMatch->GetRuleSet().GetMatchTime() * 1000;
+			else if (IsGoldenScore() && m_pMatch && m_HajimeTimer > m_pMatch->GetRuleSet().GetMatchTime() * 1000)
+				m_HajimeTimer = m_pMatch->GetRuleSet().GetGoldenScoreTime() * 1000;
+		}
+
 		if (IsOsaekomi())//Mate during osaekomi?
 		{
 			const auto osaekomi_holder = GetOsaekomiHolder();
@@ -1120,11 +1129,11 @@ void Mat::Process()
 	if (!AreFightersOnMat())
 		return;
 
+	m_mutex.lock();
+
 	if (IsOsaekomiRunning() && m_OsaekomiTimer[(int)GetOsaekomiHolder()].GetElapsedTime() >= EndTimeOfOsaekomi() * 1000)
 	{
-		m_mutex.lock();
 		m_OsaekomiList.emplace_back(OsaekomiEntry(GetOsaekomiHolder(), m_OsaekomiTimer[(int)GetOsaekomiHolder()].GetElapsedTime()));
-		m_mutex.unlock();
 
 		UpdateGraphics();
 
@@ -1136,6 +1145,8 @@ void Mat::Process()
 		else
 			AddIppon(GetOsaekomiHolder());
 	}
+
+	m_mutex.unlock();
 
 	if (IsOutOfTime() && IsHajime())
 		Mate();
