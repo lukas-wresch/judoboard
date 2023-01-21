@@ -1988,7 +1988,8 @@ void Application::SetupHttpServer()
 		if (!age_group)
 			return Error(Error::Type::ItemNotFound);
 
-		if (!GetTournament()->AddAgeGroup(age_group))
+		//Insert a copy
+		if (!GetTournament()->AddAgeGroup(new AgeGroup(*age_group)))
 			return Error(Error::Type::OperationFailed);
 
 		return Error();//OK

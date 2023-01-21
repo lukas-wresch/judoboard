@@ -13,7 +13,7 @@
 
 <script>
 
-function GetAgeGroups()
+function _GetAgeGroups()
 {
   AjaxCallback("ajax/age_groups/list", function(response) {
     console.log(response);
@@ -37,7 +37,12 @@ function GetAgeGroups()
 
       cell1.innerHTML = age.name;
       cell2.innerHTML = age.desc;
-      cell3.innerHTML = "<a href=\"#rule_add.html?id=" + age.rules_uuid + "\">" + age.rules_name + "</a>";
+
+      if (typeof age.rules_uuid === 'undefined')
+        cell3.innerHTML = "- - -";
+      else
+        cell3.innerHTML = "<a href=\"#rule_add.html?id=" + age.rules_uuid + "\">" + age.rules_name + "</a>";
+
       cell4.innerHTML  = "<button class=\"neutral\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"navigate('age_groups_add.html?id=" + age.uuid + "');\">"+ translate('edit') +"</button>";
       cell4.innerHTML += "<button class=\"remove\" style=\"margin-left: 7mm; width: 2.5cm; height: 0.9cm;\" onclick=\"return DeleteAgeGroup('"+age.uuid+"')\">" + translate('remove') + "</button>";
     }
@@ -45,7 +50,7 @@ function GetAgeGroups()
 }
 
 
-function DeleteAgeGroup(id)
+function _DeleteAgeGroup(id)
 {
   if (confirm(translate('delete_age_group_confirm')))
   {
@@ -58,7 +63,7 @@ function DeleteAgeGroup(id)
 }
 
 
-GetAgeGroups();
+_GetAgeGroups();
 
 document.getElementById("headline").innerHTML = translate('list_of_age_groups');
 document.getElementById("name").innerHTML     = translate('name');
