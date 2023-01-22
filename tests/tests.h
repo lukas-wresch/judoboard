@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <signal.h>
+#include <algorithm>
 
 
 #include "../src/account.h"

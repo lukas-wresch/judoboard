@@ -16,6 +16,8 @@ namespace Judoboard
 		virtual bool IsOpen() const override;
 		virtual bool Open()  override;
 		virtual bool Close() override;
+		virtual bool Pause(bool Enable = true) override { return false; }
+		virtual bool IsPaused() const override { return false; }
 
 		virtual bool IsConnected() const override;
 
@@ -57,6 +59,7 @@ namespace Judoboard
 		virtual void RemoveKoka(Fighter Whom) override {}
 
 		virtual void Hantei(Fighter Whom) override {}
+		virtual void RevokeHantei() override {}
 		virtual void SetAsDraw(bool Enable = true) override {}
 
 		virtual void AddShido(Fighter Whom) override {}

@@ -26,7 +26,7 @@
 </div>
 
 <div>
-    <label style="width:200px;float:left;margin-top:4px;" id="label_birthyear">Birthyear</label>
+    <label style="width:200px;float:left;margin-top:4px;" id="label_birthyear"></label>
     <input style="margin-bottom:20px;" type="number" id="birthyear" value="1995" min="1900" max="2100" />
 </div>
 
@@ -46,8 +46,9 @@
 </div>
 
 <button class="add" id="add" onclick="return AddJudoka()">New Judoka</button>
-<button class="neutral" style="margin-right: 2cm;" onclick="return UpdateJudoka()" id="update">Save</button>
-<button class="remove" onclick="return DeleteJudoka()" id="delete">Delete</button>
+<button class="neutral" style="margin-right: 2cm;" onclick="return UpdateJudoka()" id="update"></button>
+<button class="neutral" style="margin-right: 2cm;" onclick="return ImportJudoka()" id="import"></button>
+<button class="remove" onclick="return DeleteJudoka()" id="delete"></button>
 
 </form>
 
@@ -129,12 +130,36 @@ function UpdateJudoka()
 
 
 
+function ImportJudoka()
+{
+    var params = URLEncode({
+    firstname: document.getElementById("firstname").value,
+    lastname:  document.getElementById("lastname").value,
+    weight:    document.getElementById("weight").value,
+    gender:    document.getElementById("gender").value,
+    birthyear: document.getElementById("birthyear").value,
+    number:    document.getElementById("number").value,
+    club:      document.getElementById("clubs").value,
+  });
+
+  AjaxPost('ajax/judoka/update?id='+id, params, function() {
+    AjaxCallback('ajax/judoka/import?id='+id, function(response) {
+        navigate('judoka_list.html');
+    });
+  });
+
+  return false;
+}
+
+
+
 function DeleteJudoka()
 {
   if (confirm(translate('delete_judoka_confirm')))
   {
-    Ajax('ajax/judoka/delete?id='+id);
-    navigate('judoka_list.html');
+    AjaxCallback('ajax/judoka/delete?id='+id, function(response) {
+      navigate('judoka_list.html');
+    });
   }
 
   return false;
@@ -164,8 +189,14 @@ document.getElementById("label_lastname").innerHTML  = translate('lastname');
 document.getElementById("label_weight").innerHTML  = translate('weight');
 document.getElementById("label_gender").innerHTML  = translate('gender');
 document.getElementById("label_club").innerHTML    = translate('club');
+document.getElementById("label_birthyear").innerHTML = translate('birthyear');
+document.getElementById("label_number").innerHTML    = translate('judo_passport_number');
+
 document.getElementById("male").innerHTML    = translate('male');
 document.getElementById("female").innerHTML  = translate('female');
 document.getElementById("add").innerHTML     = translate('new_judoka');
+document.getElementById("update").innerHTML  = translate('save');
+document.getElementById("import").innerHTML  = translate('import');
+document.getElementById("delete").innerHTML  = translate('delete');
 
 </script>

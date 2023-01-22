@@ -31,11 +31,11 @@
 
   <tr>
     <td style="width: 65mm; text-align: center; background-color: rgba(255, 255, 255, 0.9)">
-      <span class="score" id="white_ippon">0</span> <span class="score" id="white_wazaari">0</span>
+      <span class="score" id="white_ippon">0</span> <span class="score" id="white_wazaari">0</span> <span class="score" style="display: none;" id="white_yuko"></span> <span class="score" style="display: none;" id="white_koka"></span>
     </td>
 
     <td style="width: 65mm; text-align: center; background-color: rgba(30, 30, 255, 1.0); color: white;">
-      <span class="score" id="blue_ippon">0</span> <span class="score" id="blue_wazaari">0</span>
+      <span class="score" id="blue_ippon">0</span> <span class="score" id="blue_wazaari">0</span> <span class="score" style="display: none;" id="blue_yuko"></span> <span class="score" style="display: none;" id="blue_koka"></span>
     </td>
 
     <td style="text-align: center; font-size: 18pt; width: 6.9cm; border-right-style: hidden; border-bottom-style: hidden;">
@@ -75,6 +75,24 @@
           <tr><th style="width: 50%;" id="osaekomi_for"></th><th style="width: 50%;" id="osaekomi_time"></th></tr>
         </table>
       </div>
+    </td>
+  </tr>
+
+  <tr id="yuko_koka_row" style="text-align: center; display: none;">
+    <td>
+      <button class="add" id="add_yuko_white" onclick="SetScore('white', '+yuko');">+Yuko</button>
+      <button class="add" id="add_koka_white" style="margin-left: 5mm;" onclick="SetScore('white', '+koka');">+Koka</button>
+      <br/>
+      <button class="remove" id="rem_yuko_white" onclick="SetScore('white', '-yuko');">-Yuko</button>
+      <button class="remove" id="rem_koka_white" style="margin-left: 5mm;" onclick="SetScore('white', '-koka');">-Koka</button>
+    </td>
+
+    <td style="text-align:">
+      <button class="add" id="add_yuko_blue" onclick="SetScore('blue', '+yuko');">+Yuko</button>
+      <button class="add" id="add_koka_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '+koka');">+Koka</button>
+      <br/>
+      <button class="remove" id="rem_yuko_blue" onclick="SetScore('blue', '-yuko');">-Yuko</button>
+      <button class="remove" id="rem_koka_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '-koka');">-Koka</button>
     </td>
   </tr>
 
@@ -179,7 +197,24 @@
         <button class="white"   style="width: 3.5cm;" id="white_wins" onclick="SetScore('white', 'hantei'); ShowHantei(false);">White wins</button>
         <button class="add"     style="width: 3.5cm;" id="draw" onclick="SetScore('', '+draw'); ShowHantei(false);">Draw</button>
         <button class="additional" style="width: 3.5cm;" id="blue_wins" onclick="SetScore('blue', 'hantei'); ShowHantei(false);">Blue wins</button>
-        <button class="neutral" style="width: 3.5cm;" id="golden_score" onclick="SetScore('', '+golden_score'); ShowHantei(false);">Golden Score</button>
+        <button class="neutral" style="width: 3.5cm;" id="golden_score" onclick="SetScore('', '+golden_score'); ShowHantei(false); ShowRevokeGoldenScore(true); ">Golden Score</button>
+      </div>
+    </td>
+  </tr>
+
+  <tr id="row_revoke_decision" style="display: none;">
+    <td colspan="2">
+      <div id="div_revoke_decision" style="display: none; height: 0px; text-align: center;">
+        <h2>Hantei: <label id="label_hantei"></label></h2>
+        <button class="remove" style="width: 6.5cm;" id="revoke_hantei" onclick="RevokeHantei();"></button>
+      </div>
+    </td>
+  </tr>
+
+  <tr id="row_revoke_goldenscore" style="display: none;">
+    <td colspan="2">
+      <div id="div_revoke_goldenscore" style="display: none; height: 0px; text-align: center;">
+        <button class="remove" style="width: 7.5cm;" id="revoke_goldenscore" onclick="RevokeGoldenScore();"></button>
       </div>
     </td>
   </tr>
@@ -201,6 +236,12 @@ var ScoreUpdate_Counter = 10;
 
 var show_next_matches = false;
 
+var more = false;
+var showHantei = false;
+var showRevokeHantei = false;
+var showRevokeGoldenScore = false;
+var showHansokumakeDecisionWhite = false;
+var showHansokumakeDecisionBlue  = false;
 
 
 function Hajime()
@@ -209,6 +250,7 @@ function Hajime()
   AjaxCallback('ajax/mat/hajime?id='+id, function(response) {
     GetScore();
   });
+  ShowRevokeGoldenScore(false);
 }
 
 
@@ -279,6 +321,30 @@ function EndMatch()
     GetJudokaName();
     GetScore();
   });
+}
+
+
+function RevokeHantei()
+{
+  if (!CurrentScore.has_concluded)
+    return;
+
+  if (CurrentScore.has_concluded && CurrentScore.winner == 2)
+    Ajax('/ajax/mat/-draw?id=' + id);
+  else
+    Ajax('/ajax/mat/-hantei?id=' + id);
+}
+
+
+function RevokeGoldenScore()
+{
+  if (!CurrentScore.is_goldenscore)
+    return;
+
+  Ajax('/ajax/mat/-golden_score?id=' + id);
+
+  ShowRevokeGoldenScore(false);
+  ShowHantei(true);
 }
 
 
@@ -379,6 +445,46 @@ function ShowHantei(show)
 }
 
 
+function ShowRevokeHantei(show)
+{
+  if (show == showRevokeHantei)
+    return;
+
+  if (show)
+  {
+    $("#row_revoke_decision").show();
+    $("#div_revoke_decision").show().animate({height: '120px', opacity: 100}, 1000);
+  }
+  else
+  {
+    $("#div_revoke_decision").animate({height: '0px', opacity: 0}, 1000);
+    $("#row_revoke_decision").hide(1000);
+  }
+
+  showRevokeHantei = show;
+}
+
+
+function ShowRevokeGoldenScore(show)
+{
+  if (show == showRevokeGoldenScore)
+    return;
+
+  if (show)
+  {
+    $("#row_revoke_goldenscore").show();
+    $("#div_revoke_goldenscore").show().animate({height: '50px', opacity: 100}, 1000);
+  }
+  else
+  {
+    $("#div_revoke_goldenscore").animate({height: '0px', opacity: 0}, 1000);
+    $("#row_revoke_goldenscore").hide(1000);
+  }
+
+  showRevokeGoldenScore = show;
+}
+
+
 function ShowHansokumakeDecision(show, whom)
 {
     if (whom == 'white')
@@ -420,11 +526,70 @@ function GetScore()
     document.getElementById("blue_ippon").innerHTML    = res.blue.ippon;
     document.getElementById("blue_wazaari").innerHTML  = res.blue.wazaari;
 
-    /*var white_yuko = res[i++];
-    var blue_yuko  = res[i++];
-    var white_koka = res[i++];
-    var blue_koka  = res[i++];*/
+    if (res.yuko_enabled)
+    {
+      document.getElementById("white_yuko").style.display = '';
+      document.getElementById("blue_yuko").style.display  = '';
+      document.getElementById("white_yuko").innerHTML = res.white.yuko;
+      document.getElementById("blue_yuko").innerHTML  = res.blue.yuko;
 
+      document.getElementById("white_ippon").style.fontSize = "45pt";
+      document.getElementById("white_ippon").style.marginRight= '0mm';
+      document.getElementById("white_wazaari").style.fontSize = "45pt";
+      document.getElementById("white_wazaari").style.marginRight= '0mm';
+      document.getElementById("white_yuko").style.fontSize = "45pt";
+
+      document.getElementById("blue_ippon").style.fontSize = "45pt";
+      document.getElementById("blue_ippon").style.marginRight= '0mm';
+      document.getElementById("blue_wazaari").style.fontSize = "45pt";
+      document.getElementById("blue_wazaari").style.marginRight= '0mm';
+      document.getElementById("blue_yuko").style.fontSize = "45pt";
+    }
+    else
+    {
+      document.getElementById("white_yuko").style.display = 'none';
+      document.getElementById("blue_yuko").style.display  = 'none';
+    }
+
+    if (res.koka_enabled)
+    {
+      document.getElementById("white_koka").style.display = '';
+      document.getElementById("blue_koka").style.display  = '';
+      document.getElementById("white_koka").innerHTML = res.white.koka;
+      document.getElementById("blue_koka").innerHTML  = res.blue.koka;
+
+      document.getElementById("white_ippon").style.marginLeft= '2mm';
+      document.getElementById("white_ippon").style.fontSize = "40pt";
+      document.getElementById("white_ippon").style.marginRight= '0mm';
+      document.getElementById("white_wazaari").style.fontSize = "40pt";
+      document.getElementById("white_wazaari").style.marginRight= '0mm';
+      document.getElementById("white_yuko").style.fontSize = "35pt";
+      document.getElementById("white_yuko").style.marginRight= '0mm';
+      document.getElementById("white_koka").style.fontSize = "35pt";
+      document.getElementById("white_koka").style.marginRight= '2mm';
+
+      document.getElementById("blue_ippon").style.marginLeft= '2mm';
+      document.getElementById("blue_ippon").style.fontSize = "40pt";
+      document.getElementById("blue_ippon").style.marginRight= '0mm';
+      document.getElementById("blue_wazaari").style.fontSize = "40pt";
+      document.getElementById("blue_wazaari").style.marginRight= '0mm';
+      document.getElementById("blue_yuko").style.fontSize = "35pt";
+      document.getElementById("blue_yuko").style.marginRight= '0mm';
+      document.getElementById("blue_koka").style.fontSize = "35pt";
+      document.getElementById("blue_koka").style.marginRight= '2mm';
+    }
+    else
+    {
+      document.getElementById("white_koka").style.display = 'none';
+      document.getElementById("blue_koka").style.display  = 'none';
+    }
+
+    if (res.yuko_enabled || res.koka_enabled)
+      document.getElementById("yuko_koka_row").style.display  = '';
+    else
+      document.getElementById("yuko_koka_row").style.display  = 'none';
+
+    
     document.getElementById("white_shidos").innerHTML = res.white.shido;
     document.getElementById("blue_shidos").innerHTML  = res.blue.shido;
 
@@ -434,13 +599,21 @@ function GetScore()
 
     document.getElementById("add_ippon_white").disabled   = !res.are_fighters_on_mat;
     document.getElementById("add_wazaari_white").disabled = !res.are_fighters_on_mat;
+    document.getElementById("add_yuko_white").disabled    = !res.are_fighters_on_mat || !res.yuko_enabled;
+    document.getElementById("add_koka_white").disabled    = !res.are_fighters_on_mat || !res.koka_enabled;
     document.getElementById("rem_ippon_white").disabled   = !res.are_fighters_on_mat;
     document.getElementById("rem_wazaari_white").disabled = !res.are_fighters_on_mat;
+    document.getElementById("rem_yuko_white").disabled    = !res.are_fighters_on_mat || !res.yuko_enabled;
+    document.getElementById("rem_koka_white").disabled    = !res.are_fighters_on_mat || !res.koka_enabled;
 
     document.getElementById("add_ippon_blue").disabled   = !res.are_fighters_on_mat;
     document.getElementById("add_wazaari_blue").disabled = !res.are_fighters_on_mat;
+    document.getElementById("add_yuko_blue").disabled    = !res.are_fighters_on_mat || !res.yuko_enabled;
+    document.getElementById("add_koka_blue").disabled    = !res.are_fighters_on_mat || !res.koka_enabled;
     document.getElementById("rem_ippon_blue").disabled   = !res.are_fighters_on_mat;
     document.getElementById("rem_wazaari_blue").disabled = !res.are_fighters_on_mat;
+    document.getElementById("rem_yuko_blue").disabled    = !res.are_fighters_on_mat || !res.yuko_enabled;
+    document.getElementById("rem_koka_blue").disabled    = !res.are_fighters_on_mat || !res.koka_enabled;
 
     HajimeTimer = parseInt(res.hajime_time);
 
@@ -552,10 +725,21 @@ function GetScore()
     else
       ShowHantei(false);
 
-    if (res.is_goldenscore)
-      document.getElementById("golden_score").disabled = true;
+    if (res.is_hantei || (res.has_concluded && res.winner == 2))
+    {
+      if (res.winner == 0)
+        document.getElementById('label_hantei').innerHTML = translate('white');
+      else if (res.winner == 1)
+        document.getElementById('label_hantei').innerHTML = translate('blue');
+      else
+        document.getElementById('label_hantei').innerHTML = translate('draw');
+
+      ShowRevokeHantei(true);
+    }
     else
-      document.getElementById("golden_score").disabled = false;
+      ShowRevokeHantei(false);
+
+    document.getElementById("golden_score").disabled = res.is_goldenscore;
 
     if (typeof res.white.unknown_disqualification !== 'undefined')
         ShowHansokumakeDecision(true, 'white');
@@ -584,15 +768,26 @@ function GetJudokaName()
     if (name2.length > 20)
       name2 = name2.substr(0, 20) + ".";
 
-    var hidden = 'hidden';
+    var white_name;
+    var blue_name;
+
+    var hidden = 'hidden="" ';
     if (CurrentScore.has_concluded && CurrentScore.winner == 0)
       hidden = '';
-    document.getElementById("white_name").innerHTML = name1 + '<img src="winner.png" id="winner_white" ' + hidden + ' style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;"/>';
+    white_name = name1 + '<img src="winner.png" id="winner_white" ' + hidden + 'style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;">';
 
-    hidden = 'hidden';
+    hidden = 'hidden="" ';
     if (CurrentScore.has_concluded && CurrentScore.winner == 1)
       hidden = '';
-    document.getElementById("blue_name").innerHTML  = name2 + '<img src="winner.png" id="winner_blue"  ' + hidden + ' style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;"/>';;
+    blue_name = name2 + '<img src="winner.png" id="winner_blue" ' + hidden + 'style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;">';;
+
+    //Update needed?    
+    if (white_name != document.getElementById("white_name").innerHTML || blue_name != document.getElementById("blue_name").innerHTML)
+    {
+      console.log("update");
+      document.getElementById("white_name").innerHTML = white_name;
+      document.getElementById("blue_name").innerHTML  = blue_name;
+    }
 
     var table = document.getElementById("next_matches_table");
 
@@ -778,11 +973,6 @@ GetJudokaName();
 TimerID = window.setInterval(UpdateTimer, 100);
 
 
-var more = false;
-var showHantei = false;
-var showHansokumakeDecisionWhite = false;
-var showHansokumakeDecisionBlue  = false;
-
 document.getElementById("time").innerHTML = translate('time');
 document.getElementById("mat").innerHTML  = translate('mat') + ' ' + id;
 
@@ -812,5 +1002,7 @@ for (const el of document.getElementsByClassName("remove_medical_examiniations")
 document.getElementById("white_wins").innerHTML = translate('white_wins');
 document.getElementById("blue_wins").innerHTML  = translate('blue_wins');
 document.getElementById("draw").innerHTML  = translate('draw');
+document.getElementById("revoke_hantei").innerHTML  = translate('revoke_hantei');
+document.getElementById("revoke_goldenscore").innerHTML = translate('revoke_goldenscore');
 
 </script>

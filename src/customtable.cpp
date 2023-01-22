@@ -12,7 +12,7 @@ using namespace Judoboard;
 
 
 
-CustomTable::CustomTable(const ITournament* Tournament) : RoundRobin(nullptr, Tournament)
+CustomTable::CustomTable(const ITournament* Tournament) : MatchTable(nullptr, Tournament)
 {
 	SetName(Localizer::Translate("Custom"));
 }

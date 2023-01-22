@@ -9,10 +9,10 @@
 #include "customtable.h"
 #include "round_robin.h"
 #include "single_elimination.h"
+#include "filter.h"
 #include "pool.h"
 #include "double_elimination.h"
 #include "weightclass_generator.h"
-#include "md5.h"
 #define YAML_CPP_STATIC_DEFINE
 #include "yaml-cpp/yaml.h"
 
@@ -53,8 +53,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	{
 		Club* new_club = nullptr;
 
-		if (pDatabase)
-			new_club = pDatabase->AddClub(*club);
+		if (pDatabase && pDatabase->FindClubByName(club->Name))
+			new_club = pDatabase->FindClubByName(club->Name);
 		else
 			new_club = new Club(*club);
 		
@@ -115,8 +115,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		Judoka* new_judoka = nullptr;
 		std::string dummy;
 
-		if (pDatabase)
-			new_judoka = pDatabase->UpdateOrAdd(*judoka, false, dummy);
+		if (pDatabase && pDatabase->FindJudoka_ExactMatch(*judoka))
+			new_judoka = pDatabase->FindJudoka_ExactMatch(*judoka);
 		else
 			new_judoka = new Judoka(JudokaData(*judoka), &m_StandingData);
 
@@ -184,7 +184,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		Match* new_match = new Match(white, blue, this);
 
-		if (match.Status == 3)//Match completed?
+		if (match.Result == 1)//Match completed?
 		{
 			if (match.WinnerID == match.WhiteID)
 				new_match->SetResult(Match::Result(Fighter::White, (Match::Score)match.ScoreWinner, match.Time));
@@ -197,11 +197,12 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			auto match_table = (MatchTable*)match.Weightclass->pUserData;
 			match_table->AddMatch(new_match);//Add match to weightclass
 
-			auto index = match_table->FindMatchIndex(*new_match);
-			m_Schedule.emplace_back(match_table, index);
+      if (!new_match->IsEmptyMatch())
+      {
+			  auto index = match_table->FindMatchIndex(*new_match);
+			  m_Schedule.emplace_back(match_table, index);
+      }
 		}
-
-		//m_Schedule.emplace_back(new_match);
 	}
 
 	Save();
@@ -222,6 +223,11 @@ Tournament::~Tournament()
 
 void Tournament::Reset()
 {
+	if (IsReadonly())
+		return;
+
+  m_Description.clear();
+  
 	//Clear but don't delete standing data since this could be shared with a database
 	m_StandingData.GetAllJudokas().clear();
 	m_StandingData.GetRuleSets().clear();
@@ -262,6 +268,12 @@ bool Tournament::Load(const YAML::Node& yaml)
 
 	//Read standing data
 	m_StandingData << yaml;
+
+	if (yaml["description"] && yaml["description"].IsScalar())
+		m_Description = yaml["description"].as<std::string>();
+
+	if (yaml["readonly"] && yaml["readonly"].IsScalar())
+		IsReadonly(yaml["readonly"].as<bool>());
 
 	if (yaml["organizer"] && yaml["organizer"].IsScalar())
 	{
@@ -430,6 +442,12 @@ bool Tournament::SaveYAML(const std::string& Filename)
 
 	m_StandingData >> yaml;
 
+	if (!m_Description.empty())
+		yaml << YAML::Key << "description" << YAML::Value << m_Description;
+
+	if (IsReadonly())
+		yaml << YAML::Key << "readonly" << YAML::Value << IsReadonly();
+
 	if (m_Organizer)
 		yaml << YAML::Key << "organizer" << YAML::Value << (std::string)m_Organizer->GetUUID();
 	if (m_LotteryTier > 0)
@@ -498,6 +516,9 @@ bool Tournament::SaveYAML(const std::string& Filename)
 
 Status Tournament::GetStatus() const
 {
+	if (IsReadonly())
+		return Status::Concluded;
+    
 	auto guard = LockTillScopeEnd();
 
 	if (m_Schedule.size() == 0)
@@ -509,17 +530,22 @@ Status Tournament::GetStatus() const
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
 	{
-		if (match->IsScheduled())
+		if (match->IsEmptyMatch())
+			continue;
+
+		auto status = match->GetStatus();
+
+		if (status == Status::Scheduled || status == Status::Optional)
 			all_matches_finished = false;
 
-		else if (!match->HasConcluded())
+		else if (status != Status::Concluded && status != Status::Skipped)
 			all_matches_finished = false;
 			
-		else
+		else if (status != Status::Skipped)
 			one_match_finished = true;
 	}
 
-	if (all_matches_finished && !m_Name.empty())//Temporary tournaments can never conclude
+	if (all_matches_finished && one_match_finished && !m_Name.empty())//Temporary tournaments can never conclude
 		return Status::Concluded;
 	if (one_match_finished)
 		return Status::Running;
@@ -544,31 +570,40 @@ bool Tournament::CanCloseTournament() const
 
 void Tournament::DeleteAllMatchResults()
 {
+	if (IsReadonly())
+		return;
+
 	auto guard = LockTillScopeEnd();
 
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
 		if (match)
-	{
-		match->m_State = Status::Scheduled;
-		match->GetLog().SetEvents().clear();
-	}
+	  {
+		  match->m_State = Status::Scheduled;
+		  match->GetLog().SetEvents().clear();
+	  }
 }
 
 
 
 bool Tournament::AddMatch(Match* NewMatch)
 {
+	if (IsReadonly())
+	{
+		ZED::Log::Warn("Can not add a match to a tournament which is read only");
+		return false;
+	}
+
 	if (!NewMatch)
 	{
 		ZED::Log::Error("Invalid match");
 		return false;
 	}
-	if (GetStatus() == Status::Concluded)
+	/*if (GetStatus() == Status::Concluded)
 	{
 		ZED::Log::Warn("Can not add a match to a tournament which is finalized");
 		return false;
-	}
+	}*/
 
 	if (NewMatch->GetFighter(Fighter::White) && NewMatch->GetFighter(Fighter::Blue) &&
 		NewMatch->GetFighter(Fighter::White)->GetUUID() == NewMatch->GetFighter(Fighter::Blue)->GetUUID())
@@ -627,10 +662,19 @@ bool Tournament::AddMatch(Match* NewMatch)
 			NewMatch->EndMatch();//Mark match as concluded
 		}
 	}
-
-	auto new_match_table = new CustomTable(this);
-	new_match_table->AddMatch(NewMatch);
-	AddMatchTable(new_match_table);
+	
+	if (NewMatch->GetMatchTable())
+	{
+		AddMatchTable((MatchTable*)NewMatch->GetMatchTable());
+		GenerateSchedule();
+	}
+	else
+	{
+		auto new_match_table = new CustomTable(this);
+		new_match_table->AddMatch(NewMatch);
+		new_match_table->SetMatID(NewMatch->GetMatID());
+		AddMatchTable(new_match_table);
+	}
 
 	Save();
 
@@ -682,6 +726,9 @@ const Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
 
 bool Tournament::RemoveMatch(const UUID& MatchID)
 {
+	if (IsReadonly())
+		return false;
+    
 	auto guard = LockTillScopeEnd();
 
 	if (GetStatus() == Status::Concluded)
@@ -752,6 +799,9 @@ Match* Tournament::FindMatch(const UUID& UUID) const
 
 bool Tournament::MoveMatchUp(const UUID& MatchID, uint32_t MatID)
 {
+	if (IsReadonly())
+		return false;
+
 	size_t prev_match_index = 0;
 	size_t current_index = 0;
 
@@ -794,6 +844,9 @@ bool Tournament::MoveMatchUp(const UUID& MatchID, uint32_t MatID)
 
 bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 {
+	if (IsReadonly())
+		return false;
+
 	size_t next_match_index = 0;
 	size_t curr_match_index = 0;
 	bool found = false;
@@ -864,6 +917,8 @@ std::vector<Match> Tournament::GetNextMatches(uint32_t MatID) const
 
 bool Tournament::AddParticipant(Judoka* Judoka)
 {
+	if (IsReadonly())
+		return false;
 	if (!Judoka || IsParticipant(*Judoka))
 		return false;
 
@@ -889,10 +944,14 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		}
 	}
 
-	m_StandingData.AddJudoka(Judoka);
-	bool club_added = false;
-	if (m_StandingData.AddClub(const_cast<Club*>(Judoka->GetClub())))
-		club_added = true;
+	if (!m_StandingData.AddJudoka(Judoka))
+	{
+		ZED::Log::Warn("Could not add judoka!");
+		Unlock();
+		return false;
+	}
+
+	const bool club_added = m_StandingData.AddClub((Club*)Judoka->GetClub());
 
 	FindAgeGroupForJudoka(*Judoka);
 
@@ -921,6 +980,9 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 
 bool Tournament::RemoveParticipant(const UUID& UUID)
 {
+	if (IsReadonly())
+		return false;
+    
 	auto guard = LockTillScopeEnd();
 
 	const Judoka* deleted_judoka = m_StandingData.FindJudoka(UUID);
@@ -983,6 +1045,9 @@ bool Tournament::IsMatUsed(uint32_t ID) const
 
 MatchTable* Tournament::FindMatchTable(const UUID& ID)
 {
+	if (IsReadonly())
+		return nullptr;
+
 	auto guard = LockTillScopeEnd();
 
 	for (auto table : m_MatchTables)
@@ -1045,6 +1110,9 @@ const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 
 MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
 {
+	if (IsReadonly())
+		return nullptr;
+
 	auto guard = LockTillScopeEnd();
 
 	for (auto table : m_MatchTables)
@@ -1060,6 +1128,9 @@ MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
 
 MatchTable* Tournament::FindMatchTableByDescription(const std::string& Description)
 {
+	if (IsReadonly())
+		return nullptr;
+
 	auto guard = LockTillScopeEnd();
 
 	for (auto table : m_MatchTables)
@@ -1075,12 +1146,17 @@ MatchTable* Tournament::FindMatchTableByDescription(const std::string& Descripti
 
 void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 {
+	if (IsReadonly())
+		return;
 	if (!NewMatchTable)
 		return;
 
-	NewMatchTable->SetTournament(this);
-
 	auto guard = LockTillScopeEnd();
+
+	if (FindMatchTable(*NewMatchTable))
+		return;//Nothing to add
+
+	NewMatchTable->SetTournament(this);
 
 	//Add all judoka of the match table to the tournament
 	for (auto judoka : NewMatchTable->GetParticipants())
@@ -1123,12 +1199,16 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 		if (!match->IsEmptyMatch())
 			m_Schedule.emplace_back(NewMatchTable, i);
 	}
+
+	UpdateMatchTable(*NewMatchTable);
 }
 
 
 
 bool Tournament::UpdateMatchTable(const UUID& UUID)
 {
+	if (IsReadonly())
+		return false;
 	if (GetStatus() != Status::Scheduled)
 		return false;
 
@@ -1139,30 +1219,71 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 	if (!matchTable)
 		return false;
 
-	if (matchTable->GetStatus() == Status::Scheduled)//Can safely recalculate the match table
+	if (matchTable->GetStatus() != Status::Scheduled)//Can safely recalculate the match table
+		return false;
+
+	for (auto judoka : matchTable->GetParticipants())
+		if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
+			matchTable->RemoveParticipant(judoka);
+
+	for (auto& [id, judoka] : m_StandingData.GetAllJudokas())
 	{
-		for (auto judoka : matchTable->GetParticipants())
-			if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
-				matchTable->RemoveParticipant(judoka);
-
-		for (auto& [id, judoka] : m_StandingData.GetAllJudokas())
-		{
-			if (judoka && matchTable->IsElgiable(*judoka))
-				matchTable->AddParticipant(judoka);
-		}
-
-		matchTable->GenerateSchedule();
-		GenerateSchedule();
-		return true;
+		if (judoka && matchTable->IsElgiable(*judoka))
+			matchTable->AddParticipant(judoka);
 	}
 
-	return false;
+	matchTable->GenerateSchedule();
+
+	//Sort
+	std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
+		//Sort by filter
+		if (a->GetFilter() && !b->GetFilter())
+			return true;
+		if (!a->GetFilter() && b->GetFilter())
+			return false;
+
+		/*if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() != IFilter::Type::Weightclass)
+			return true;
+		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() != IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
+			return false;*/
+
+		//Both weightclasses?
+		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
+		{
+			auto weightclassA = (const Weightclass*)a->GetFilter();
+			auto weightclassB = (const Weightclass*)b->GetFilter();
+
+			//Sort by age group
+			if (weightclassA->GetAgeGroup() && weightclassB->GetAgeGroup() && weightclassA->GetAgeGroup()->GetMinAge() != weightclassB->GetAgeGroup()->GetMinAge())
+				return weightclassA->GetAgeGroup()->GetMinAge() < weightclassB->GetAgeGroup()->GetMinAge();
+
+			//Sort by gender
+			if (weightclassA->GetGender() != weightclassB->GetGender())
+				return (int)weightclassA->GetGender() < (int)weightclassB->GetGender();
+
+			//Sort by weight
+			if (weightclassA->GetMinWeight() != weightclassB->GetMinWeight())
+				return weightclassA->GetMinWeight() < weightclassB->GetMinWeight();
+		}
+
+		if (a->GetName() != b->GetName())
+			return a->GetName() < b->GetName();
+
+		return a->GetUUID() < b->GetUUID();
+	});
+
+	GenerateSchedule();
+
+	return true;
 }
 
 
 
 bool Tournament::RemoveMatchTable(const UUID& UUID)
 {
+	if (IsReadonly())
+		return false;
+
 	auto guard = LockTillScopeEnd();
 
 	auto matchTable = FindMatchTable(UUID);
@@ -1192,6 +1313,8 @@ bool Tournament::RemoveMatchTable(const UUID& UUID)
 
 bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 {
+	if (IsReadonly())
+		return false;
 	if (!NewAgeGroup)
 		return false;
 
@@ -1226,6 +1349,9 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 
 bool Tournament::RemoveAgeGroup(const UUID& UUID)
 {
+	if (IsReadonly())
+		return false;
+
 	auto guard = LockTillScopeEnd();
 
 	auto age_group_to_remove = m_StandingData.FindAgeGroup(UUID);
@@ -1261,6 +1387,9 @@ bool Tournament::RemoveAgeGroup(const UUID& UUID)
 
 bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup)
 {
+	if (IsReadonly())
+		return false;
+
 	if (!Judoka || !AgeGroup)
 		return false;
 
@@ -1358,20 +1487,10 @@ void Tournament::ListAgeGroups(YAML::Emitter& Yaml) const
 
 
 
-MatchTable* Tournament::GetScheduleEntry(const UUID& UUID)
-{
-	auto guard = LockTillScopeEnd();
-
-	for (auto entry : m_MatchTables)
-		if (entry->GetUUID() == UUID)
-			return entry;
-	return nullptr;
-}
-
-
-
 bool Tournament::MoveScheduleEntryUp(const UUID& UUID)
 {
+	if (IsReadonly())
+		return false;
 	if (GetStatus() == Status::Concluded)
 		return false;
 
@@ -1401,6 +1520,8 @@ bool Tournament::MoveScheduleEntryUp(const UUID& UUID)
 
 bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 {
+	if (IsReadonly())
+		return false;
 	if (GetStatus() == Status::Concluded)
 		return false;
 
@@ -1555,6 +1676,9 @@ std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min
 
 bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>& Descriptors)
 {
+	if (IsReadonly())
+		return false;
+
 	auto guard = LockTillScopeEnd();
 
 	bool temp_auto_save = IsAutoSave();
@@ -1624,6 +1748,9 @@ bool Tournament::IsDisqualified(const Judoka& Judoka) const
 
 void Tournament::Disqualify(const Judoka& Judoka)
 {
+	if (IsReadonly())
+		return;
+
 	Lock();
 
 	m_DisqualifiedJudoka.insert(Judoka.GetUUID());
@@ -1661,6 +1788,8 @@ void Tournament::Disqualify(const Judoka& Judoka)
 
 void Tournament::RevokeDisqualification(const Judoka& Judoka)
 {
+	if (IsReadonly())
+		return;
 	if (!IsDisqualified(Judoka))
 		return;
 
@@ -1695,6 +1824,8 @@ void Tournament::RevokeDisqualification(const Judoka& Judoka)
 
 bool Tournament::PerformLottery()
 {
+	if (IsReadonly())
+		return false;
 	if (GetStatus() != Status::Scheduled)
 		return false;
 
@@ -2009,6 +2140,8 @@ uint32_t Tournament::GetMaxEntriesAtScheduleIndex(uint32_t MatID, int32_t Schedu
 
 void Tournament::GenerateSchedule()
 {
+	if (IsReadonly())
+		return;
 	if (GetStatus() != Status::Scheduled)
 		return;
 

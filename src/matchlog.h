@@ -116,6 +116,7 @@ namespace Judoboard
 			RemoveNoDisqualification,
 			AddGachi,
 			RemoveGachi,
+			HanteiRevoked
 		};
 
 

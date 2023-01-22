@@ -318,9 +318,12 @@ TEST(MD5, CreateTournamentFromTestData2)
 
 		EXPECT_EQ(file.GetNumParticipants(),     142);
 		EXPECT_EQ(file.GetParticipants().size(), 142);
-		EXPECT_EQ(db.GetNumJudoka(),             142);
-		EXPECT_EQ(db.GetAllJudokas().size(),     142);
-		EXPECT_EQ(db.GetNumClubs(), 20);
+		//EXPECT_EQ(db.GetNumJudoka(),             142);
+		//EXPECT_EQ(db.GetAllJudokas().size(),     142);
+		//EXPECT_EQ(db.GetNumClubs(), 20);
+		EXPECT_EQ(db.GetNumJudoka(),         0);
+		EXPECT_EQ(db.GetAllJudokas().size(), 0);
+		EXPECT_EQ(db.GetNumClubs(),          0);
 	}
 
 	ZED::Core::RemoveFile("tournaments/KEM U15 KT U10 - U18.yml");
@@ -544,11 +547,11 @@ TEST(MD5, ImportIntoTournament)
 
 		ASSERT_EQ(results.GetSize(), 0);
 
-		/*table = tour.FindMatchTableByDescription("Jugend u15 m -55 kg");
+		table = tour.FindMatchTableByDescription("Jugend u15 m -55 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 5);//TODO renable when double elimination can be imported
+		/*ASSERT_EQ(results.GetSize(), 5);//TODO renable when double elimination can be imported
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Sebastian");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Harry");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Marlon");
@@ -783,6 +786,9 @@ TEST(MD5, ImportIntoTournament)
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Darian");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Luca");
 		EXPECT_EQ(results[3].Judoka->GetFirstname(), "Titus");
+
+		EXPECT_EQ(db.GetNumJudoka(), 0);
+		EXPECT_EQ(db.GetNumClubs(),  0);
 	}
 
 	ZED::Core::RemoveFile("tournaments/KEM U15 KT U10 - U18.yml");
@@ -1002,11 +1008,11 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 
 		ASSERT_EQ(results.GetSize(), 0);
 
-		/*table = tour2.FindMatchTableByDescription("Jugend u15 m -55 kg");
+		table = tour2.FindMatchTableByDescription("Jugend u15 m -55 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		/*ASSERT_EQ(results.size(), 5);//TODO reactive (double elimination)
+		/*ASSERT_EQ(results.GetSize(), 5);//TODO double elimination
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Sebastian");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Harry");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Marlon");
@@ -1420,8 +1426,8 @@ TEST(MD5, ConvertToMD5)
 		EXPECT_EQ(file.FindResult("Jugend u15 m", "-43 kg", 2)->Participant->Firstname, "David");
 		ASSERT_FALSE(file.FindResult("Jugend u15 m", "-43 kg", 3));
 
-		//ASSERT_TRUE(file.FindResult("Jugend u15 m", "-55 kg", 1));//TODO
-		/*EXPECT_EQ(file.FindResult("Jugend u15 m", "-55 kg", 1)->Participant->Firstname, "Sebastian");
+		/*ASSERT_TRUE(file.FindResult("Jugend u15 m", "-55 kg", 1));//TODO double elimination
+		EXPECT_EQ(file.FindResult("Jugend u15 m", "-55 kg", 1)->Participant->Firstname, "Sebastian");
 		EXPECT_EQ(file.FindResult("Jugend u15 m", "-55 kg", 2)->Participant->Firstname, "Harry");
 		EXPECT_EQ(file.FindResult("Jugend u15 m", "-55 kg", 3)->Participant->Firstname, "Marlon");
 		EXPECT_EQ(file.FindResult("Jugend u15 m", "-55 kg", 4)->Participant->Firstname, "Maximilian");
@@ -1819,12 +1825,12 @@ TEST(MD5, ConvertToMD5AndBack)
 
 		ASSERT_EQ(results.GetSize(), 0);
 
-		/*table = tour.FindMatchTableByDescription("Jugend u15 m -55 kg");
+		table = tour.FindMatchTableByDescription("Jugend u15 m -55 kg");
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.size(), 5);//TODO
-		/*EXPECT_EQ(results[0].Judoka->GetFirstname(), "Sebastian");
+		/*ASSERT_EQ(results.GetSize(), 5);//TODO double elimination
+		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Sebastian");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Harry");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Marlon");
 		EXPECT_EQ(results[3].Judoka->GetFirstname(), "Maximilian");
@@ -2240,6 +2246,7 @@ TEST(MD5, ExportStructureData)
 
 	j->SetClub(club);
 
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 	Tournament tour("deleteMe");
 	tour.AddParticipant(j);
 
@@ -2533,12 +2540,19 @@ TEST(MD5, ImportSingleElimination)
 	Database db;
 	Tournament tour(file, &db);
 
-	auto j1 = db.FindJudokaByName("v1 n1");
-	auto j2 = db.FindJudokaByName("v2 n2");
-	auto j3 = db.FindJudokaByName("v3 n3");
-	auto j4 = db.FindJudokaByName("v4 n4");
-	auto j5 = db.FindJudokaByName("v5 n5");
-	auto j6 = db.FindJudokaByName("v6 n6");
+	auto j1 = tour.GetDatabase().FindJudokaByName("v1 n1");
+	auto j2 = tour.GetDatabase().FindJudokaByName("v2 n2");
+	auto j3 = tour.GetDatabase().FindJudokaByName("v3 n3");
+	auto j4 = tour.GetDatabase().FindJudokaByName("v4 n4");
+	auto j5 = tour.GetDatabase().FindJudokaByName("v5 n5");
+	auto j6 = tour.GetDatabase().FindJudokaByName("v6 n6");
+
+	ASSERT_TRUE(j1);
+	ASSERT_TRUE(j2);
+	ASSERT_TRUE(j3);
+	ASSERT_TRUE(j4);
+	ASSERT_TRUE(j5);
+	ASSERT_TRUE(j6);
 
 	auto table = tour.FindMatchTableByDescription("Jugend u10 m -10 kg");
 	ASSERT_TRUE(table);

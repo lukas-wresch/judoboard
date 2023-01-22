@@ -166,15 +166,12 @@ MatchTable::Results RoundRobin::CalculateResults() const
 		const auto& result = match->GetResult();
 
 		auto winner = results.GetResultsOf(match->GetWinner());
-		auto loser  = results.GetResultsOf(match->GetLoser());
 
-		if (winner && loser)
+		if (winner)
 		{
 			winner->Wins++;
 			winner->Score += (uint32_t)result.m_Score;
 			winner->Time  += result.m_Time;
-
-			loser->Time += result.m_Time;
 		}
 	}
 

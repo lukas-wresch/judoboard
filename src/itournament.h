@@ -29,6 +29,8 @@ namespace Judoboard
 
 		[[nodiscard]]
 		virtual const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
+		[[nodiscard]]
+		virtual StandingData& GetDatabase() { return m_StandingData; }//Returns a database containing all participants
 
 		virtual const Association* GetOrganizer() const { return nullptr; }
 
@@ -45,13 +47,13 @@ namespace Judoboard
 
 		//Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;
+		virtual const Judoka* FindParticipant(const UUID& UUID) const { return nullptr; }
+		virtual Judoka* FindParticipant(const UUID& UUID) { return nullptr; }
 		virtual std::unordered_map<UUID, Judoka*> GetParticipants() const {
 			std::unordered_map<UUID, Judoka*> ret;
 			return ret; }
 		virtual bool AddParticipant(Judoka* Judoka) { return false; }
 		virtual bool RemoveParticipant(const UUID& ID) { return false; }
-		virtual Judoka* FindParticipant(const UUID& UUID) = 0;
-		virtual const Judoka* FindParticipant(const UUID& UUID) const = 0;
 
 		virtual uint32_t GetHighestMatIDUsed() const { return 0; }//Returns the highest ID of all mats that are used in the tournament. Returns zero if no mats are used
 		virtual bool IsMatUsed(uint32_t ID) const { return false; }

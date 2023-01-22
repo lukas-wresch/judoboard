@@ -124,12 +124,13 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 		if (!club)
 			continue;
 
-		if (!GetDatabase().FindClubByName(club->Name))
+		if (!GetTournament()->FindClubByName(club->Name))
+			if (!GetDatabase().FindClubByName(club->Name))
 		{
 			ret += "Adding new club: " + club->Name + "<br/>";
 
 			if (!ParseOnly)
-				GetDatabase().AddClub(new Club(club->Name));
+				GetTournament()->GetDatabase().AddClub(new Club(club->Name));
 		}
 	}
 
@@ -140,14 +141,13 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 	{
 		ret += "Judoka: " + dm4_judoka.Firstname + " " + dm4_judoka.Lastname + "<br/>";
 
-		//auto new_judoka = GetDatabase().UpdateOrAdd(dm4_judoka, ParseOnly, ret);
-		Judoka* new_judoka = new Judoka(JudokaData(dm4_judoka), &GetDatabase());
-
 		//Judoka is now added/updated
 
 		if (!ParseOnly)
 		{//Add to the current tournament
-			if (File.GetClubs().size() == 1)//If there is only one
+			Judoka* new_judoka = new Judoka(JudokaData(dm4_judoka), &GetTournament()->GetDatabase());
+
+			if (!new_judoka->GetClub() && File.GetClubs().size() == 1)//If there is only one
 				new_judoka->SetClub(GetDatabase().FindClubByName(File.GetClubs()[0]->Name));
 
 			GetTournament()->AddParticipant(new_judoka);
@@ -177,8 +177,12 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 	ret += "Tournament name: " + File.GetTournamentName() + "<br/>";
 	ret += "Tournament date: " + File.GetTournamentDate() + "<br/>";
 
+	auto guard = LockTillScopeEnd();
 
-	auto club = GetDatabase().FindClubByName(File.GetClub().Name);
+	auto club = GetTournament()->FindClubByName(File.GetClub().Name);
+
+	if (!club)
+		club = GetDatabase().FindClubByName(File.GetClub().Name);
 
 	if (!club)
 	{
@@ -186,23 +190,20 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 
 		ret += "Adding new club: " + File.GetClub().Name + "<br/>";
 
-		if (!ParseOnly)
-			GetDatabase().AddClub(new Club(File.GetClub().Name));
-
-		club = GetDatabase().FindClubByName(File.GetClub().Name);
+		club = new Club(File.GetClub().Name);
 	}
 
 	for (auto dmf_judoka : File.GetParticipants())
 	{
 		ret += "Judoka: " + dmf_judoka.Firstname + " " + dmf_judoka.Lastname + "<br/>";
 
-		//auto new_judoka = GetDatabase().UpdateOrAdd(JudokaData(dmf_judoka), ParseOnly, ret);	
-
 		//Judoka is now added/updated
 
 		if (!ParseOnly)
 		{//Add to the current tournament
-			GetTournament()->AddParticipant(new Judoka(JudokaData(dmf_judoka), &GetDatabase()));
+			auto new_judoka = new Judoka(JudokaData(dmf_judoka), nullptr);
+			new_judoka->SetClub(club);
+			GetTournament()->AddParticipant(new_judoka);
 		}
 	}
 
@@ -473,6 +474,9 @@ bool Application::DeleteTournament(const UUID& UUID)
 	{
 		if (*it && (*it)->GetUUID() == UUID)
 		{
+			if ((*it)->IsReadonly())
+				return false;
+
 			const auto filename = "tournaments/" + (*it)->GetName() + ".yml";
 
 			delete *it;

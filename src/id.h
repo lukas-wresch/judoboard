@@ -29,6 +29,9 @@ namespace Judoboard
 		bool operator < (const UUID& rhs) const noexcept { return m_UUID < rhs.m_UUID; }
 		bool operator < (const std::string& rhs) const noexcept { return m_UUID < rhs; }
 
+		bool operator > (const UUID& rhs) const noexcept { return m_UUID > rhs.m_UUID; }
+		bool operator > (const std::string& rhs) const noexcept { return m_UUID > rhs; }
+
 		void operator = (UUID&& NewUUID) noexcept { m_UUID = std::move(NewUUID.m_UUID); }
 
 	protected:
