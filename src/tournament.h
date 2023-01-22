@@ -55,6 +55,9 @@ namespace Judoboard
 		void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
 		bool IsAutoSave() const { return m_AutoSave; }
 
+		const std::string& GetDescription() const { return m_Description; }
+		void SetDescription(const std::string& Description) { m_Description = Description; }
+
 		virtual const Association* GetOrganizer() const override { return m_Organizer; }
 		void SetOrganizer(Association* NewOrganizer) {
 			if (!NewOrganizer || IsReadonly())
@@ -214,6 +217,7 @@ namespace Judoboard
 
 		std::string m_Name;
 		bool m_AutoSave = true;
+		std::string m_Description;
 		bool m_Readonly = false;
 
 		const Association* m_Organizer = nullptr;//Tournament is organized by this association, only childen of this association can participate

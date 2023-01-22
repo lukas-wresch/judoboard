@@ -37,6 +37,11 @@
   </label>
 </div>
 
+<div>
+  <label style="width:200px;float:left;margin-top:5px;" id="label_description"></label>
+  <textarea style="margin-bottom:20px;" cols="30" rows="3" id="description"/>
+</div>
+
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddTournament()" id="add">New Tournament</button>
 <button class="add" style="margin-top: 0.8cm;" onclick="return UpdateTournament()" id="update">Save Tournament</button>
 <br/>
@@ -58,6 +63,7 @@ function AddTournament()
     year:        document.getElementById("year").value,
     rules:       document.getElementById("rule").value,
     organizer:   document.getElementById("clubs").value,
+    description: document.getElementById("description").value,
   });
 
   AjaxPost('ajax/tournament/add', params, function() {
@@ -75,6 +81,7 @@ function UpdateTournament()
     year:        document.getElementById("year").value,
     rules:       document.getElementById("rule").value,
     organizer:   document.getElementById("clubs").value,
+    description: document.getElementById("description").value,
     readonly:    document.getElementById("readonly").checked,
   });
 
@@ -147,6 +154,7 @@ function GetTournament(id)
 
     document.getElementById("name").value = res.name;
     document.getElementById("year").value = res.year;
+    document.getElementById("description").value = res.description;
     document.getElementById("readonly").checked = res.is_locked;
 
     GetRuleSets(function() {
@@ -198,5 +206,6 @@ document.getElementById("label_year").innerHTML = translate('year');
 document.getElementById("label_readonly").innerHTML = translate('readonly');
 document.getElementById("readonly_enabled").innerHTML = translate('enabled');
 document.getElementById("readonly_disabled").innerHTML = translate('disabled');
+document.getElementById("label_description").innerHTML = translate('description');
 
 </script>

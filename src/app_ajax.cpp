@@ -2524,6 +2524,7 @@ Error Application::Ajax_AddTournament(const HttpServer::Request& Request)
 	auto year         = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "year"));
 	UUID rule_id      = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
 	UUID organizer_id = HttpServer::DecodeURLEncoded(Request.m_Body, "organizer");
+	auto description  = HttpServer::DecodeURLEncoded(Request.m_Body, "description");
 
 	if (name.empty())
 		return Error::Type::InvalidInput;
@@ -2544,6 +2545,7 @@ Error Application::Ajax_AddTournament(const HttpServer::Request& Request)
 		new_tournament->SetYear(year);
 	new_tournament->SetDefaultRuleSet(rules);
 	new_tournament->SetOrganizer(organizer);
+	new_tournament->SetDescription(description);
 
 	if (!AddTournament(new_tournament))
 		return Error::Type::OperationFailed;
@@ -2560,6 +2562,7 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 	auto year         = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "year"));
 	UUID rule_id      = HttpServer::DecodeURLEncoded(Request.m_Body, "rules");
 	UUID organizer_id = HttpServer::DecodeURLEncoded(Request.m_Body, "organizer");
+	auto description  = HttpServer::DecodeURLEncoded(Request.m_Body, "description");
 	bool readonly     = HttpServer::DecodeURLEncoded(Request.m_Body, "readonly") == "true";
 
 	if (name.empty())
@@ -2590,6 +2593,7 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 		tournament->SetYear(year);
 	tournament->SetDefaultRuleSet(rules);
 	tournament->SetOrganizer(organizer);
+	tournament->SetDescription(description);
 
 	if (readonly)
 		tournament->IsReadonly(readonly);
@@ -2623,6 +2627,7 @@ std::string Application::Ajax_GetTournament(const HttpServer::Request& Request)
 	yaml << YAML::Key << "num_participants" << YAML::Value << tournament->GetParticipants().size();
 	yaml << YAML::Key << "schedule_size" << YAML::Value    << tournament->GetSchedule().size();
 	yaml << YAML::Key << "status" << YAML::Value << (int)tournament->GetStatus();
+	yaml << YAML::Key << "description" << YAML::Value << tournament->GetDescription();
 	yaml << YAML::Key << "is_locked" << YAML::Value << tournament->IsReadonly();
 
 	if (tournament->GetDefaultRuleSet())

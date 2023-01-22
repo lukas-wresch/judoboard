@@ -225,6 +225,8 @@ void Tournament::Reset()
 	if (IsReadonly())
 		return;
 
+  m_Description.clear();
+  
 	//Clear but don't delete standing data since this could be shared with a database
 	m_StandingData.GetAllJudokas().clear();
 	m_StandingData.GetRuleSets().clear();
@@ -265,6 +267,9 @@ bool Tournament::Load(const YAML::Node& yaml)
 
 	//Read standing data
 	m_StandingData << yaml;
+
+	if (yaml["description"] && yaml["description"].IsScalar())
+		m_Description = yaml["description"].as<std::string>();
 
 	if (yaml["readonly"] && yaml["readonly"].IsScalar())
 		IsReadonly(yaml["readonly"].as<bool>());
@@ -432,6 +437,9 @@ bool Tournament::SaveYAML(const std::string& Filename)
 	}
 
 	m_StandingData >> yaml;
+
+	if (!m_Description.empty())
+		yaml << YAML::Key << "description" << YAML::Value << m_Description;
 
 	if (IsReadonly())
 		yaml << YAML::Key << "readonly" << YAML::Value << IsReadonly();
