@@ -5,20 +5,27 @@
 
 namespace Judoboard
 {
-	class CustomTable : public RoundRobin
+	class CustomTable : public MatchTable
 	{
 		friend class Tournament;
 
 	public:
 		CustomTable(const ITournament* Tournament);
-		CustomTable(const YAML::Node& Yaml, const ITournament* Tournament) : RoundRobin(Yaml, Tournament) {}
+		CustomTable(const YAML::Node& Yaml, const ITournament* Tournament) : MatchTable(Yaml, Tournament) {}
 
 		static std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::Custom; }
-		virtual std::string GetDescription() const override { return GetName() + " Custom"; }
+		virtual std::string GetDescription() const override { return GetName(); }
 
 		virtual void GenerateSchedule() override {}
+
+		virtual Results CalculateResults() const override {
+			Results ret;
+			return ret;
+		}
+
+		virtual size_t GetMaxStartPositions() const { return 0; }
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
