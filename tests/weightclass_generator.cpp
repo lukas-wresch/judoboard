@@ -201,7 +201,7 @@ TEST(WeightclassGenerator, FullTest)
 		EXPECT_TRUE(tour.ApplyWeightclasses(descriptors));
 
 		//Check if everyone is in a match table
-		for (auto [id, judoka] : tour.GetParticipants())
+		for (auto judoka : tour.GetParticipants())
 		{
 			bool is_included = false;
 			for (auto table : tour.GetMatchTables())
@@ -252,7 +252,7 @@ TEST(WeightclassGenerator, Bug)
 			EXPECT_GE(table->GetSchedule().size(), 1);
 
 		//Check if everyone is in a match table
-		for (auto [id, judoka] : tour.GetParticipants())
+		for (auto judoka : tour.GetParticipants())
 		{
 			bool is_included = false;
 			for (auto table : tour.GetMatchTables())

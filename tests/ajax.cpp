@@ -571,7 +571,7 @@ TEST(Ajax, Judoka_Add)
 		auto judokas = app.GetDatabase().GetAllJudokas();
 
 		ASSERT_EQ(judokas.size(), 1);
-		auto judoka = judokas.begin()->second;
+		auto judoka = judokas[0];
 
 		EXPECT_EQ(judoka->GetFirstname(), "first");
 		EXPECT_EQ(judoka->GetLastname(),  "last");
@@ -597,7 +597,7 @@ TEST(Ajax, Judoka_Get)
 		auto judokas = app.GetDatabase().GetAllJudokas();
 
 		ASSERT_EQ(judokas.size(), 1);
-		auto judoka = judokas.begin()->second;
+		auto judoka = judokas[0];
 
 		auto yaml = app.Ajax_GetJudoka(HttpServer::Request("id="+(std::string)judoka->GetUUID()));
 
@@ -652,9 +652,9 @@ TEST(Ajax, Judoka_Edit)
 		auto judokas = app.GetDatabase().GetAllJudokas();
 
 		ASSERT_EQ(judokas.size(), 1);
-		auto judoka = judokas.begin()->second;
+		auto judoka = judokas[0];
 
-		EXPECT_EQ((std::string)app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)judoka->GetUUID(), "firstname=first2&lastname=last2&weight=12,5&gender=1&birthyear=2001&number=A1234")), "ok");
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)judoka->GetUUID(), "firstname=first2&lastname=last2&weight=12,5&gender=1&birthyear=2001&number=A1234")));
 
 		EXPECT_EQ(judoka->GetFirstname(), "first2");
 		EXPECT_EQ(judoka->GetLastname(),  "last2");
@@ -714,7 +714,7 @@ TEST(Ajax, Judoka_Delete)
 
 		auto& judokas = app.GetDatabase().GetAllJudokas();
 
-		auto id = judokas.begin()->second->GetUUID();
+		auto id = judokas[0]->GetUUID();
 
 		EXPECT_TRUE(app.Ajax_DeleteJudoka(HttpServer::Request("id="+(std::string)id)));
 
@@ -753,7 +753,7 @@ TEST(Ajax, Judoka_Import)
 		EXPECT_TRUE(app.Ajax_ImportJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID())));
 
 		ASSERT_EQ(judokas.size(), 1);
-		EXPECT_EQ(judokas.begin()->second->GetUUID(), *j1);
+		EXPECT_EQ(judokas[0]->GetUUID(), *j1);
 
 		ASSERT_EQ(clubs.size(), 1);
 		EXPECT_EQ(clubs[0]->GetUUID(), *c1);

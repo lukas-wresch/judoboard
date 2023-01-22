@@ -136,7 +136,7 @@ MD5::MD5(const Tournament& Tournament)
 
 	//Convert judoka
 
-	for (auto [uuid, judoka] : Tournament.GetParticipants())
+	for (auto judoka : Tournament.GetParticipants())
 	{
 		Participant* new_judoka = new Participant;
 
@@ -162,7 +162,7 @@ MD5::MD5(const Tournament& Tournament)
 			new_judoka->HasBeenWeighted = true;//Mark judoka as being weighted
 
 		m_Participants.emplace_back(new_judoka);
-		UUID2ID.insert({ uuid, id - 1 });
+		UUID2ID.insert({ judoka->GetUUID(), id - 1 });
 		ID2PTR.insert({ id - 1, new_judoka });
 	}
 
