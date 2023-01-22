@@ -28,6 +28,7 @@ namespace Judoboard
 
 		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
+		bool RemoveParticipant(const DependentJudoka Participant);
 
 		const ITournament* GetTournament() const { return m_Tournament; }
 
@@ -65,7 +66,6 @@ namespace Judoboard
 		IFilter(const ITournament* Tournament) : m_Tournament(Tournament) {}
 
 		size_t GetStartPosition(const DependentJudoka Judoka) const;
-		bool RemoveParticipant(const DependentJudoka Participant);
 
 		void SetParticipants(std::unordered_map<size_t, const DependentJudoka>&& NewParticipants) const {
 			m_Participants = std::move(NewParticipants);

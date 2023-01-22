@@ -10,7 +10,10 @@ LosersOf::LosersOf(const MatchTable& Table) :
 	IFilter(Table.GetTournament()), m_MatchTable(Table)
 {
 	if (Table.GetFilter())
+	{
 		SetAgeGroup(Table.GetFilter()->GetAgeGroup());
+		Recalculate();
+	}
 }
 
 
@@ -71,6 +74,9 @@ void LosersOf::Recalculate() const
 
 	for (auto match : m_MatchTable.GetSchedule())
 		ret.insert({ i++, DependentJudoka(DependencyType::TakeLoser, *match) });
+
+	if (m_RemoveLast)
+		ret.erase(i-1);
 
 	SetParticipants(std::move(ret));//Save to cache
 }

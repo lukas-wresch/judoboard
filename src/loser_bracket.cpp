@@ -40,7 +40,7 @@ LoserBracket::LoserBracket(const MD5::Weightclass& Weightclass_, const ITourname
 
 
 
-size_t LoserBracket::GetNumberOfRounds() const
+/*size_t LoserBracket::GetNumberOfRounds() const
 {
 	if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
 		return 0;
@@ -49,7 +49,7 @@ size_t LoserBracket::GetNumberOfRounds() const
 	auto additional_rounds = (size_t)std::floor( (base_rounds - 1.0) / 2.0 );
 
 	return base_rounds + additional_rounds;
-}
+}*/
 
 
 
@@ -281,14 +281,19 @@ const std::string LoserBracket::ToHTML() const
 	const auto rounds = GetNumberOfRounds();
 	const auto max_start_pos = GetMaxStartPositions();
 	const auto max_initial_start_pos = (max_start_pos + 2) / 2;
-	const auto N = max_initial_start_pos;
-	//const auto N = pow(2, GetNumberOfBaseRounds());
+	const auto N = max_initial_start_pos * 2;
 
 
-	auto renderMatchIndex = [this, N](size_t roundIndex, int matchOfRound) -> std::string {
-		int matchIndex = 0;
-		for (int i = 1; i <= roundIndex; ++i)
-			matchIndex += (int)(N / pow(2.0, i));
+	auto renderMatchIndex = [this, N, max_initial_start_pos](size_t roundIndex, int matchOfRound) -> std::string {
+		size_t matchIndex = 0;
+
+		size_t no_matches = max_initial_start_pos;
+		for (size_t i = 0; i < roundIndex; i++)
+		{
+			if (i%2 == 0)
+				no_matches /= 2;
+			matchIndex += no_matches;
+		}
 
 		matchIndex += matchOfRound;
 
@@ -307,9 +312,11 @@ const std::string LoserBracket::ToHTML() const
 		if (matchOfRound % 2 == 0)
 			style += "border-right-style: hidden;";
 
+		//return "<td>INDEX " + std::to_string(matchIndex) + "</td>";
+
 		if (matchIndex < GetSchedule().size())
 			return RenderMatch(*GetSchedule()[matchIndex], style);
-		return "";
+		return "<td>NOT FOUND</td>";
 	};
 
 	size_t width = 100;
@@ -327,11 +334,24 @@ const std::string LoserBracket::ToHTML() const
 
 		for (size_t round = 0; round < rounds; ++round)
 		{
-			if ( (y + (int)std::pow(2, round) + 1) % (int)std::pow(2, round+1) != 0)
+			bool infuse = round % 2 == 1;
+
+			size_t no_matches = max_initial_start_pos / 2;//For round 0
+			for (size_t i = 1; i < round; i+=2)
+				no_matches /= 2;
+
+			assert(no_matches != 0);
+
+			//const int split = (int)std::pow(2, round+1)
+			const size_t split = N / no_matches;
+			//const int offset = (int)std::pow(2, round) + 1;
+			const size_t offset = split - round;
+
+			if ( (y + offset) % split != 0)
 			{
 				std::string style;
-				if (round == 0 || (y + (int)std::pow(2, round) + (int)std::pow(2, round-1) ) % (int)std::pow(2, round+1)  >= (int)std::pow(2, round))
-					style += "border-left-style: hidden;";
+				//if (round == 0 || (y + (int)std::pow(2, round) + (int)std::pow(2, round-1) ) % (int)std::pow(2, round+1)  >= (int)std::pow(2, round))
+					//style += "border-left-style: hidden;";
 				if (round+1 == rounds)
 					style += "border-right-style: hidden;";
 
@@ -339,7 +359,7 @@ const std::string LoserBracket::ToHTML() const
 				continue;
 			}
 
-			const int matchOfRound = y / (int)std::pow(2, round+1);
+			const int matchOfRound = y / (int)split;
 			ret += renderMatchIndex(round, matchOfRound);
 		}
 

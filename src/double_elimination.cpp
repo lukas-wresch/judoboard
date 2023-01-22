@@ -3,6 +3,7 @@
 #include "double_elimination.h"
 #include "weightclass.h"
 #include "losersof.h"
+#include "fixed.h"
 #include "rule_set.h"
 #include "localizer.h"
 #include "match.h"
@@ -18,8 +19,6 @@ DoubleElimination::DoubleElimination(IFilter* Filter, const ITournament* Tournam
 {
 	m_WinnerBracket.IsSubMatchTable(true);
 	m_LoserBracket.IsSubMatchTable(true);
-
-	m_LoserBracket.SetFilter(new LosersOf(m_WinnerBracket));
 }
 
 
@@ -36,8 +35,6 @@ DoubleElimination::DoubleElimination(const YAML::Node& Yaml, ITournament* Tourna
 {
 	m_WinnerBracket.IsSubMatchTable(true);
 	m_LoserBracket.IsSubMatchTable(true);
-
-	m_LoserBracket.SetFilter(new LosersOf(m_WinnerBracket));
 
 	if (Yaml["third_place_match"])
 		m_WinnerBracket.IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
@@ -131,8 +128,21 @@ void DoubleElimination::GenerateSchedule()
 
 
 	m_WinnerBracket.SetFilter(this->GetFilter());
-
 	m_WinnerBracket.GenerateSchedule();
+
+	delete m_LoserBracket.GetFilter();
+	
+	/*LosersOf losers_of(m_WinnerBracket);
+
+	//Remove the last one, second place doesn't go to the loser bracket
+	auto num_participants = this->GetFilter()->GetParticipants().size();
+	auto last = losers_of.GetJudokaByStartPosition(num_participants - 2);
+	losers_of.RemoveParticipant(last);*/
+
+	auto losers = new LosersOf(m_WinnerBracket);
+	losers->RemoveLast();
+	m_LoserBracket.SetFilter(losers);
+
 	m_LoserBracket.GenerateSchedule();
 
 	//Add matches

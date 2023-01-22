@@ -22,6 +22,9 @@ namespace Judoboard
 
 		virtual const DependentJudoka GetJudokaByStartPosition(size_t StartPosition) const override;
 
+		bool IsRemoveLast() const { return m_RemoveLast; }
+		void RemoveLast(bool Remove = true) { m_RemoveLast = Remove; }
+
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
 		//virtual void ToString(YAML::Emitter& Yaml) const override;
@@ -30,5 +33,7 @@ namespace Judoboard
 		void Recalculate() const;
 
 		const MatchTable& m_MatchTable;
+
+		bool m_RemoveLast = false;
 	};
 }
