@@ -32,8 +32,13 @@ DoubleElimination::DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender 
 
 
 DoubleElimination::DoubleElimination(const YAML::Node& Yaml, ITournament* Tournament)
-	: DoubleElimination(nullptr, Tournament)
+	: MatchTable(Yaml, Tournament), m_WinnerBracket(nullptr, Tournament), m_LoserBracket(nullptr, Tournament)
 {
+	m_WinnerBracket.IsSubMatchTable(true);
+	m_LoserBracket.IsSubMatchTable(true);
+
+	m_LoserBracket.SetFilter(new LosersOf(m_WinnerBracket));
+
 	if (Yaml["third_place_match"])
 		m_WinnerBracket.IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
 	if (Yaml["fifth_place_match"])
