@@ -663,6 +663,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 		auto new_match_table = new CustomTable(this);
 		new_match_table->SetFilter(new Standard(this));
 		new_match_table->AddMatch(NewMatch);
+		new_match_table->SetMatID(NewMatch->GetMatID());
 		AddMatchTable(new_match_table);
 	}
 
@@ -1232,10 +1233,10 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 		if (!a->GetFilter() && b->GetFilter())
 			return false;
 
-		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() != IFilter::Type::Weightclass)
+		/*if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() != IFilter::Type::Weightclass)
 			return true;
 		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() != IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
-			return false;
+			return false;*/
 
 		//Both weightclasses?
 		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)

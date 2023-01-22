@@ -4116,7 +4116,7 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 	if (current_match && current_match->GetMatchTable())
 		ret << current_match->GetMatchTable()->GetDescription();
 	else
-		ret << "";
+		ret << "- - -";
 
 	ret << YAML::Key << "next_matches" << YAML::Value << YAML::BeginSeq;
 
