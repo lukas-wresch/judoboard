@@ -281,7 +281,7 @@ const std::string LoserBracket::ToHTML() const
 	const auto rounds = GetNumberOfRounds();
 	const auto max_start_pos = GetMaxStartPositions();
 	const auto max_initial_start_pos = (max_start_pos + 2) / 2;
-	const auto N = max_initial_start_pos * 2;
+	const auto N = max_initial_start_pos;
 
 
 	auto renderMatchIndex = [this, N, max_initial_start_pos](size_t roundIndex, int matchOfRound) -> std::string {
@@ -350,12 +350,12 @@ const std::string LoserBracket::ToHTML() const
 			if ( (y + offset) % split != 0)
 			{
 				std::string style;
-				//if (round == 0 || (y + (int)std::pow(2, round) + (int)std::pow(2, round-1) ) % (int)std::pow(2, round+1)  >= (int)std::pow(2, round))
-					//style += "border-left-style: hidden;";
+				if (round == 0 || (y + offset) % split >= 1)
+					style += "border-left-style: hidden;";
 				if (round+1 == rounds)
 					style += "border-right-style: hidden;";
 
-				ret += "<td style=\"" + style + "border-bottom-style: hidden; \"></td>";
+				ret += "<td style=\"" + style + "border-bottom-style: hidden; \">" + std::to_string((y + offset) % split) + "</td>";
 				continue;
 			}
 

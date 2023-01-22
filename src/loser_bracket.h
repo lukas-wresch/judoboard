@@ -26,7 +26,7 @@ namespace Judoboard
 		virtual size_t GetMaxStartPositions() const override {
 			if (!GetFilter())
 				return 0;
-			return (size_t)pow(2, GetNumberOfRounds()) - 2;
+			return (size_t)pow(2, GetNumberOfBaseRounds()) - 2;
 		}
 
 		virtual Results CalculateResults() const override;
@@ -48,16 +48,23 @@ namespace Judoboard
 			if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
 				return 0;
 
-			return (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size() + 2));
+			auto rounds = (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size() + 2));
+
+			if (rounds%2 == 0)
+				rounds++;
+
+			return rounds;
 		}
 
-		/*size_t GetNumberOfBaseRounds() const
+		size_t GetNumberOfBaseRounds() const
 		{
 			if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
 				return 0;
 
-			return (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size() + 2));
-		}*/
+			auto rounds = (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size() + 2));
+
+			return rounds;
+		}
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;
