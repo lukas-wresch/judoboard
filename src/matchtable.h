@@ -382,10 +382,10 @@ namespace Judoboard
 
 		const std::string ResultsToHTML() const;
 
-		std::vector<Match*>&  SetSchedule() { return m_Schedule; }
+		std::vector<Match*>& SetSchedule() const { return m_Schedule; }
+		void SetSchedule(std::vector<Match*>&& NewSchedule) const { m_Schedule = std::move(NewSchedule); }
 
 
-		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
 
 	private:
@@ -396,6 +396,8 @@ namespace Judoboard
 		IFilter* m_Filter = nullptr;
 
 		const ITournament* m_Tournament = nullptr;
+
+		mutable std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 
 		int32_t m_ScheduleIndex = -1;//Index when this entry should be in the schedule
 		uint32_t m_MatID = 0;
