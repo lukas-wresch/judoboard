@@ -712,4 +712,6 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	EXPECT_EQ(count[2], 6);
 	EXPECT_EQ(count[3], 6);
 	EXPECT_EQ(count[4], 7);
+
+	EXPECT_EQ(w2.ToHTML(), w->ToHTML());
 }

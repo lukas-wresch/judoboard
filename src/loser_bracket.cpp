@@ -153,6 +153,10 @@ void LoserBracket::GenerateSchedule()
 	}
 
 
+	if (!IsFinalMatch() && m_Schedule.size() >= 1)
+		m_Schedule.pop_back();//Remove the last match
+
+
 	//TODO REFACTOR THE FOLLOWING
 	
 	//Add additional match for 3rd place

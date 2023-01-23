@@ -32,9 +32,11 @@ namespace Judoboard
 		virtual Results CalculateResults() const override;
 		virtual void GenerateSchedule() override;
 
+		bool IsFinalMatch() const { return m_FinalMatch; }
 		bool IsThirdPlaceMatch() const { return m_ThirdPlaceMatch; }
 		bool IsFifthPlaceMatch() const { return m_FifthPlaceMatch; }
 
+		void IsFinalMatch(bool Enable) { m_FinalMatch = Enable; GenerateSchedule(); }
 		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; GenerateSchedule(); }
 		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; GenerateSchedule(); }
 
@@ -65,6 +67,8 @@ namespace Judoboard
 
 			return rounds;
 		}
+
+		bool m_FinalMatch = false;
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;
