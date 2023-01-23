@@ -667,17 +667,24 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	YAML::Emitter yaml;
 	*w >> yaml;
 
-	Pool w2(YAML::Load(yaml.c_str()), &tourney);
+	Tournament tourney2;
+	Pool w2(YAML::Load(yaml.c_str()), &tourney2);
 
-	w2.GenerateSchedule();
-
-	EXPECT_EQ(w2.GetSchedule().size(), w->GetSchedule().size());
+	ASSERT_EQ(w2.GetSchedule().size(), w->GetSchedule().size());
 
 	EXPECT_EQ(w2.GetPool(0)->GetMatID(), 1);
 	EXPECT_EQ(w2.GetPool(1)->GetMatID(), 2);
 	EXPECT_EQ(w2.GetPool(2)->GetMatID(), 3);
 	EXPECT_EQ(w2.GetPool(3)->GetMatID(), 4);
 	EXPECT_EQ(w2.GetFinals().GetMatID(), 5);
+
+	//Check UUIDs
+	EXPECT_EQ(*w2.GetSchedule()[0], *w->GetSchedule()[0]);
+	EXPECT_EQ(*w2.GetPool(0), *w->GetPool(0));
+	EXPECT_EQ(*w2.GetPool(1), *w->GetPool(1));
+	EXPECT_EQ(*w2.GetPool(2), *w->GetPool(2));
+	EXPECT_EQ(*w2.GetPool(3), *w->GetPool(3));
+	EXPECT_EQ( w2.GetFinals(), w->GetFinals());
 
 	Mat m(1);
 	int count[5] = {0, 0, 0, 0, 0};

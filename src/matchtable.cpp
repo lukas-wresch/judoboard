@@ -413,11 +413,18 @@ void MatchTable::SetAgeGroup(const AgeGroup* NewAgeGroup)
 void MatchTable::operator >> (YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
-	Yaml << YAML::Key << "schedule_index" << YAML::Value << m_ScheduleIndex;
-	Yaml << YAML::Key << "mat_id" << YAML::Value << m_MatID;
-	Yaml << YAML::Key << "color"  << YAML::Value << (int)m_Color;
+
+	if (!IsSubMatchTable())
+	{
+		Yaml << YAML::Key << "schedule_index" << YAML::Value << m_ScheduleIndex;
+		Yaml << YAML::Key << "color"  << YAML::Value << (int)m_Color;
+	}
+
+	if (!IsSubMatchTable() || GetMatID() != 0)
+		Yaml << YAML::Key << "mat_id" << YAML::Value << m_MatID;	
 
 	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
+
 	if (m_Name.length() > 0)
 		Yaml << YAML::Key << "name" << YAML::Value << m_Name;
 
@@ -430,13 +437,16 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 		*GetFilter() >> Yaml;
 	}
 
-	Yaml << YAML::Key << "matches";
-	Yaml << YAML::BeginSeq;
+	if (!m_Schedule.empty())
+	{
+		Yaml << YAML::Key << "matches";
+		Yaml << YAML::BeginSeq;
 
-	for (auto match : m_Schedule)
-		*match >> Yaml;
+		for (auto match : m_Schedule)
+			*match >> Yaml;
 
-	Yaml << YAML::EndSeq;
+		Yaml << YAML::EndSeq;
+	}
 }
 
 

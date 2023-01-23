@@ -38,37 +38,36 @@ Pool::Pool(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament*
 Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
 	: MatchTable(Yaml, Tournament), m_Finals(nullptr, Tournament)
 {
-	m_Finals.IsSubMatchTable(true);
-
 	if (Yaml["pool_count"])
 		m_PoolCount = Yaml["pool_count"].as<uint32_t>();
 	if (Yaml["take_top"])
 		m_TakeTop   = Yaml["take_top"].as<uint32_t>();
 
-	if (Yaml["third_place_match"])
-		m_Finals.IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
-	if (Yaml["fifth_place_match"])
-		m_Finals.IsFifthPlaceMatch(Yaml["fifth_place_match"].as<bool>());
+	//if (Yaml["third_place_match"])
+		//m_Finals.IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
+	//if (Yaml["fifth_place_match"])
+		//m_Finals.IsFifthPlaceMatch(Yaml["fifth_place_match"].as<bool>());
 
 	const auto pool_count = CalculatePoolCount();
 	m_Pools.resize(pool_count);
 
-	for (int i = 0; i < pool_count; ++i)
-		m_Pools[i] = new RoundRobin(nullptr);
-
-	//Check if pools have specific data
-	for (size_t i = 0; i < m_Pools.size(); ++i)
+	if (Yaml["pools"] && Yaml["pools"].IsSequence())
 	{
-		if (Yaml["mat_of_pool_" + std::to_string(i)])
-			m_Pools[i]->SetMatID(Yaml["mat_of_pool_" + std::to_string(i)].as<uint32_t>());
-		if (Yaml["name_of_pool_" + std::to_string(i)])
-			m_Pools[i]->SetName(Yaml["name_of_pool_" + std::to_string(i)].as<std::string>());
+		size_t i = 0;
+		for (const auto& node : Yaml["pools"])
+		{
+			m_Pools[i] = new RoundRobin(node, Tournament);
+			m_Pools[i]->IsSubMatchTable(true);
+			i++;
+		}
 	}
 
-	if (Yaml["mat_of_finals"])
-		GetFinals().SetMatID(Yaml["mat_of_finals"].as<uint32_t>());
-	if (Yaml["name_of_finals"])
-		GetFinals().SetName(Yaml["name_of_finals"].as<std::string>());
+	if (Yaml["finals"] && Yaml["finals"].IsMap())
+		GetFinals() = SingleElimination(Yaml["finals"], Tournament);
+
+	GetFinals().IsSubMatchTable(true);
+
+	CopyMatchesFromSubtables();
 }
 
 
@@ -85,22 +84,21 @@ void Pool::operator >> (YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "pool_count" << YAML::Value << m_PoolCount;
 	Yaml << YAML::Key << "take_top"   << YAML::Value << m_TakeTop;
 
-	if (IsThirdPlaceMatch())
-		Yaml << YAML::Key << "third_place_match" << YAML::Value << IsThirdPlaceMatch();
-	if (IsFifthPlaceMatch())
-		Yaml << YAML::Key << "fifth_place_match" << YAML::Value << IsFifthPlaceMatch();
-
-	//Serialize mats of pools if they differ
-	for (size_t i = 0; i < m_Pools.size(); ++i)
+	//Serialize pools
+	Yaml << YAML::Key << "pools" << YAML::Value;
+	Yaml << YAML::BeginSeq;
+	for (auto pool : m_Pools)
 	{
-		if (m_Pools[i]->GetMatID() != 0)
-			Yaml << YAML::Key << "mat_of_pool_" + std::to_string(i) << YAML::Value << m_Pools[i]->GetMatID();
-		Yaml << YAML::Key << "name_of_pool_" + std::to_string(i) << YAML::Value << m_Pools[i]->GetName();
+		Yaml << YAML::BeginMap;
+		*pool >>(Yaml);
+		Yaml << YAML::EndMap;
 	}
+	Yaml << YAML::EndSeq;
 
-	if (GetFinals().GetMatID() != 0 && GetFinals().GetMatID() != GetMatID())
-		Yaml << YAML::Key << "mat_of_finals" << YAML::Value << GetFinals().GetMatID();
-	Yaml << YAML::Key << "name_of_finals" << YAML::Value << GetFinals().GetName();
+	Yaml << YAML::Key << "finals" << YAML::Value;
+	Yaml << YAML::BeginMap;
+	GetFinals() >>(Yaml);
+	Yaml << YAML::EndMap;
 
 	SetSchedule(std::move(schedule_copy));
 
@@ -171,7 +169,7 @@ void Pool::GenerateSchedule()
 
 	if (!GetFilter() || GetParticipants().size() <= 1)
 		return;
-	
+
 	auto old_pools = std::move(m_Pools);
 	assert(m_Pools.empty());
 
@@ -186,7 +184,7 @@ void Pool::GenerateSchedule()
 		m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
 
 		std::string name = Localizer::Translate("Pool") + " ";
-		name.append(&letters[i%26], 1);
+		name.append(&letters[i % 26], 1);
 		m_Pools[i]->SetName(name);
 		m_Pools[i]->IsSubMatchTable(true);
 
@@ -217,7 +215,7 @@ void Pool::GenerateSchedule()
 		mixer.AddSource(topB);
 
 		final_input = new Fixed(mixer);
-		
+
 		if (m_TakeTop == 3)
 		{
 			auto temp = final_input->GetJudokaByStartPosition(4);
@@ -284,11 +282,11 @@ void Pool::GenerateSchedule()
 	assert(final_input);
 	bool third_place = m_Finals.IsThirdPlaceMatch();
 	bool fifth_place = m_Finals.IsFifthPlaceMatch();
-	auto color       = m_Finals.GetColor();
-	auto name        = m_Finals.GetName();
-	auto mat_id      = m_Finals.GetMatID();
+	auto color = m_Finals.GetColor();
+	auto name = m_Finals.GetName();
+	auto mat_id = m_Finals.GetMatID();
 
-	m_Finals = std::move(SingleElimination(final_input));
+	m_Finals = SingleElimination(final_input);
 	m_Finals.SetName(Localizer::Translate("Finals"));
 	m_Finals.IsSubMatchTable(true);
 	m_Finals.IsThirdPlaceMatch(third_place);
@@ -298,6 +296,15 @@ void Pool::GenerateSchedule()
 		m_Finals.SetName(name);
 	m_Finals.SetMatID(mat_id);
 
+
+	CopyMatchesFromSubtables();
+}
+
+
+
+void Pool::CopyMatchesFromSubtables()
+{
+	const auto pool_count = CalculatePoolCount();
 
 	//Add matches from pools
 	size_t index = 0;

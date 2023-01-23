@@ -61,10 +61,20 @@ namespace Judoboard
 		ID();
 		~ID();
 
+		ID(ID& rhs) : m_UUID(rhs.m_UUID) {}
+		ID(const ID& rhs) : m_UUID(rhs.m_UUID) {}
+		ID(ID&& rhs) noexcept : m_UUID(std::move(rhs.m_UUID)) {}
+
+		ID& operator =(const ID& rhs)
+		{
+			m_UUID = rhs.m_UUID;
+			return *this;
+		}
+
 		static const UUID GenerateUUID();
 		static void Reset();
 
-		const UUID& GetUUID() const { return m_UUID; }
+		const UUID GetUUID() const { return m_UUID; }
 
 		bool operator == (const UUID& rhs) const noexcept { return m_UUID == rhs.m_UUID; }
 		bool operator != (const UUID& rhs) const noexcept { return m_UUID != rhs.m_UUID; }

@@ -77,6 +77,8 @@ namespace Judoboard
 			return pool_count;
 		}
 
+		void CopyMatchesFromSubtables();
+
 		uint32_t m_PoolCount = 0;//0 for auto, otherwise number of pools
 		uint32_t m_TakeTop   = 2;//Number of judoka to go to the next round from each pool
 

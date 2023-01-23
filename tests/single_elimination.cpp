@@ -18,7 +18,7 @@ TEST(SingleElimination, ExportImport)
 	*group >> yaml;
 	yaml << YAML::EndMap;
 
-	SingleElimination group2(YAML::Load(yaml.c_str()));
+	SingleElimination group2(YAML::Load(yaml.c_str()), nullptr);
 
 	EXPECT_EQ(group2.IsThirdPlaceMatch(), group->IsThirdPlaceMatch());
 	EXPECT_EQ(group2.IsFifthPlaceMatch(), group->IsFifthPlaceMatch());
@@ -33,7 +33,7 @@ TEST(SingleElimination, ExportImport)
 		*group >> yaml;
 		yaml << YAML::EndMap;
 
-		SingleElimination group2(YAML::Load(yaml.c_str()));
+		SingleElimination group2(YAML::Load(yaml.c_str()), nullptr);
 
 		EXPECT_EQ(group2.IsThirdPlaceMatch(), group->IsThirdPlaceMatch());
 		EXPECT_EQ(group2.IsFifthPlaceMatch(), group->IsFifthPlaceMatch());

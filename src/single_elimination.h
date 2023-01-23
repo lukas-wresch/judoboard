@@ -13,11 +13,12 @@ namespace Judoboard
 	public:
 		SingleElimination(IFilter* Filter, const ITournament* Tournament = nullptr);
 		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
-		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament = nullptr);
+		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament);
 		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 
 		void operator =(const SingleElimination& rhs) = delete;
 		void operator =(SingleElimination&& rhs) noexcept {
+			ID::operator=(rhs);
 			m_ThirdPlaceMatch = rhs.m_ThirdPlaceMatch;
 			m_FifthPlaceMatch = rhs.m_FifthPlaceMatch;
 			SetRuleSet(rhs.GetOwnRuleSet());
@@ -27,8 +28,12 @@ namespace Judoboard
 			SetScheduleIndex(rhs.GetScheduleIndex());
 			SetMatID(rhs.GetMatID());
 			SetColor(rhs.GetColor());
-			SetSchedule() = std::move(rhs.SetSchedule());
+
+			IsSubMatchTable(rhs.IsSubMatchTable());
+			DeleteSchedule();
 			IsBestOfThree(rhs.IsBestOfThree());
+
+			SetSchedule(std::move(rhs.SetSchedule()));
 		}
 
 		static std::string GetHTMLForm();
