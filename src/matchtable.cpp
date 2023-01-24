@@ -353,11 +353,9 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, co
 				break;
 			default:
 				ZED::Log::Error("Unknown filter type " + std::to_string(Yaml["filter"]["type"].as<int>()) + " in match table");
-				assert(false);
 		}
 
 		assert(GetFilter());
-		assert(GetFilter()->GetParticipants().size() >= 1);
 	}
 
 	if (Yaml["matches"] && Yaml["matches"].IsSequence())

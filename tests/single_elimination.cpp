@@ -14,9 +14,7 @@ TEST(SingleElimination, ExportImport)
 	group->IsFifthPlaceMatch(true);
 
 	YAML::Emitter yaml;
-	yaml << YAML::BeginMap;
 	*group >> yaml;
-	yaml << YAML::EndMap;
 
 	SingleElimination group2(YAML::Load(yaml.c_str()), nullptr);
 
@@ -29,9 +27,7 @@ TEST(SingleElimination, ExportImport)
 		group->IsFifthPlaceMatch(false);
 
 		YAML::Emitter yaml;
-		yaml << YAML::BeginMap;
 		*group >> yaml;
-		yaml << YAML::EndMap;
 
 		SingleElimination group2(YAML::Load(yaml.c_str()), nullptr);
 
@@ -86,9 +82,7 @@ TEST(SingleElimination, ExportImport_StartPositions)
 
 		{
 			YAML::Emitter yaml;
-			yaml << YAML::BeginMap;
 			*group >> yaml;
-			yaml << YAML::EndMap;
 
 			SingleElimination group2(YAML::Load(yaml.c_str()), t);
 
@@ -1051,9 +1045,7 @@ TEST(SingleElimination, Count4_ExportImport)
 	t->AddParticipant(j4);
 
 	YAML::Emitter yaml;
-	yaml << YAML::BeginMap;
 	*group >> yaml;
-	yaml << YAML::EndMap;
 
 	SingleElimination group2(YAML::Load(yaml.c_str()), t);
 
@@ -1098,9 +1090,7 @@ TEST(SingleElimination, Count5_ExportImport)
 	t->AddParticipant(j5);
 
 	YAML::Emitter yaml;
-	yaml << YAML::BeginMap;
 	*group >> yaml;
-	yaml << YAML::EndMap;
 
 	SingleElimination group2(YAML::Load(yaml.c_str()), t);
 
@@ -1397,9 +1387,7 @@ TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 	group->IsFifthPlaceMatch(true);
 
 	YAML::Emitter yaml;
-	yaml << YAML::BeginMap;
 	*group >> yaml;
-	yaml << YAML::EndMap;
 
 	SingleElimination* group2 = new SingleElimination(YAML::Load(yaml.c_str()), t);
 

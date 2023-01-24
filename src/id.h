@@ -74,7 +74,7 @@ namespace Judoboard
 		static const UUID GenerateUUID();
 		static void Reset();
 
-		const UUID GetUUID() const { return m_UUID; }
+		const UUID& GetUUID() const { return m_UUID; }
 
 		bool operator == (const UUID& rhs) const noexcept { return m_UUID == rhs.m_UUID; }
 		bool operator != (const UUID& rhs) const noexcept { return m_UUID != rhs.m_UUID; }
