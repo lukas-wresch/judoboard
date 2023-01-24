@@ -29,6 +29,8 @@ TEST(LoserBracket, Count14)
 
 	EXPECT_EQ(group->GetMaxStartPositions(), count);
 
+	ASSERT_EQ(group->GetSchedule().size(), 13);
+
 	EXPECT_TRUE(group->GetMatch(0)->Contains(*j[1]));
 	EXPECT_TRUE(group->GetMatch(0)->Contains(*j[2]));
 	EXPECT_TRUE(group->GetMatch(1)->Contains(*j[3]));
@@ -47,7 +49,6 @@ TEST(LoserBracket, Count14)
 	EXPECT_TRUE(group->GetMatch(11)->Contains(*j[14]));
 
 	ASSERT_EQ(group->GetParticipants().size(), 14);
-	ASSERT_EQ(group->GetSchedule().size(),     13);
 
 	delete t;
 }

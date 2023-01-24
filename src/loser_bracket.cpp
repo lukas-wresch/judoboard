@@ -62,7 +62,7 @@ std::string LoserBracket::GetHTMLForm()
 
 void LoserBracket::GenerateSchedule()
 {
-	if (GetStatus() != Status::Scheduled)
+	if (!IsSubMatchTable() && GetStatus() != Status::Scheduled)
 		return;
 
 	/*for (auto it = m_Schedule.begin(); it != m_Schedule.end();)

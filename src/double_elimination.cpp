@@ -110,7 +110,7 @@ size_t DoubleElimination::GetMaxStartPositions() const
 
 void DoubleElimination::GenerateSchedule()
 {
-	if (GetStatus() != Status::Scheduled)
+	if (!IsSubMatchTable() && GetStatus() != Status::Scheduled)
 		return;
 
 	/*for (auto it = m_Schedule.begin(); it != m_Schedule.end();)
@@ -120,7 +120,7 @@ void DoubleElimination::GenerateSchedule()
 		else
 			++it;
 	}*/
-	DeleteSchedule();
+	SetSchedule().clear();
 
 	m_RecommendedNumMatches_Before_Break = 4;//TODO
 

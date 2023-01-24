@@ -16,6 +16,10 @@ namespace Judoboard
 		DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
 		DoubleElimination(const YAML::Node& Yaml, ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 
+		~DoubleElimination() {
+			SetSchedule().clear();
+		}
+
 		static std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::DoubleElimination; }

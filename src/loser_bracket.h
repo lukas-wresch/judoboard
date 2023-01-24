@@ -26,6 +26,8 @@ namespace Judoboard
 		virtual size_t GetMaxStartPositions() const override {
 			if (!GetFilter())
 				return 0;
+			if (GetNumberOfBaseRounds() == 1)
+				return 2;
 			return (size_t)pow(2, GetNumberOfBaseRounds()) - 2;
 		}
 
@@ -47,23 +49,35 @@ namespace Judoboard
 	private:
 		size_t GetNumberOfRounds() const
 		{
-			if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
+			if (!GetFilter() || GetFilter()->GetParticipants().size() <= 1)
 				return 0;
+
+			if (GetFilter()->GetParticipants().size() == 2)
+				return 1;
 
 			auto rounds = (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size() + 2));
 
 			if (rounds%2 == 0)
 				rounds++;
 
+			if (!IsFinalMatch())
+				rounds--;
+
 			return rounds;
 		}
 
 		size_t GetNumberOfBaseRounds() const
 		{
-			if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
+			if (!GetFilter() || GetFilter()->GetParticipants().size() <= 1)
 				return 0;
 
+			if (GetFilter()->GetParticipants().size() == 2)
+				return 1;
+
 			auto rounds = (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size() + 2));
+
+			if (!IsFinalMatch())
+				rounds--;
 
 			return rounds;
 		}

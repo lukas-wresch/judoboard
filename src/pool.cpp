@@ -166,7 +166,7 @@ const MatchTable* Pool::FindMatchTable(const UUID& UUID) const
 
 void Pool::GenerateSchedule()
 {
-	if (GetStatus() != Status::Scheduled)
+	if (!IsSubMatchTable() && GetStatus() != Status::Scheduled)
 		return;
 
 	/*for (auto it = m_Schedule.begin(); it != m_Schedule.end();)
@@ -176,7 +176,7 @@ void Pool::GenerateSchedule()
 		else
 			++it;
 	}*/
-	DeleteSchedule();
+	SetSchedule().clear();
 
 	m_RecommendedNumMatches_Before_Break = 4;//TODO
 

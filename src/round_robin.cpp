@@ -54,7 +54,7 @@ std::string RoundRobin::GetHTMLForm()
 
 void RoundRobin::GenerateSchedule()
 {
-	if (GetStatus() != Status::Scheduled)
+	if (!IsSubMatchTable() && GetStatus() != Status::Scheduled)
 		return;
 
 	/*for (auto it = m_Schedule.begin(); it != m_Schedule.end();)

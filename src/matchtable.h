@@ -380,7 +380,11 @@ namespace Judoboard
 
 		void AddMatchesForBestOfThree();
 
-		void DeleteSchedule() { m_Schedule.clear(); }
+		void DeleteSchedule() {
+			for (auto match : m_Schedule)
+				delete match;
+			m_Schedule.clear();
+		}
 
 		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
 
