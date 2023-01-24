@@ -14,7 +14,7 @@ namespace Judoboard
 	public:
 		DoubleElimination(IFilter* Filter, const ITournament* Tournament = nullptr);
 		DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
-		DoubleElimination(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
+		DoubleElimination(const YAML::Node& Yaml, ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 
 		static std::string GetHTMLForm();
 

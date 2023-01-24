@@ -12,8 +12,8 @@ using namespace Judoboard;
 
 
 
-LoserBracket::LoserBracket(IFilter* Filter, const ITournament* Tournament)
-	: SingleElimination(Filter, Tournament)
+LoserBracket::LoserBracket(IFilter* Filter, const ITournament* Tournament, const MatchTable* Parent)
+	: SingleElimination(Filter, Tournament, Parent)
 {
 }
 
@@ -26,8 +26,8 @@ LoserBracket::LoserBracket(Weight MinWeight, Weight MaxWeight, const ITournament
 
 
 
-LoserBracket::LoserBracket(const YAML::Node& Yaml, const ITournament* Tournament)
-	: SingleElimination(Yaml, Tournament)
+LoserBracket::LoserBracket(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
+	: SingleElimination(Yaml, Tournament, Parent)
 {
 }
 

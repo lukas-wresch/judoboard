@@ -3,8 +3,8 @@
 #include "../ZED/include/log.h"
 #include "matchtable.h"
 #include "match.h"
-#include "filter.h"
 #include "weightclass.h"
+#include "fixed.h"
 #include "tournament.h"
 
 
@@ -323,7 +323,8 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 
 
 
-MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament) : m_Tournament(Tournament)
+MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
+	: m_Tournament(Tournament), m_Parent(Parent)
 {
 	if (Yaml["uuid"])
 		SetUUID(Yaml["uuid"].as<std::string>());
@@ -347,9 +348,16 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament) : 
 			case IFilter::Type::Weightclass:
 				SetFilter(new Weightclass(Yaml["filter"], GetTournament()));
 				break;
+			case IFilter::Type::Fixed:
+				SetFilter(new Fixed(Yaml["filter"], GetTournament()));
+				break;
 			default:
-				ZED::Log::Error("Unknown filter in match table");
+				ZED::Log::Error("Unknown filter type " + std::to_string(Yaml["filter"]["type"].as<int>()) + " in match table");
+				assert(false);
 		}
+
+		assert(GetFilter());
+		assert(GetFilter()->GetParticipants().size() >= 1);
 	}
 
 	if (Yaml["matches"] && Yaml["matches"].IsSequence())

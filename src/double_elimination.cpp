@@ -17,8 +17,8 @@ using namespace Judoboard;
 DoubleElimination::DoubleElimination(IFilter* Filter, const ITournament* Tournament)
 	: MatchTable(Filter, Tournament), m_WinnerBracket(nullptr, Tournament), m_LoserBracket(nullptr, Tournament)
 {
-	m_WinnerBracket.IsSubMatchTable(true);
-	m_LoserBracket.IsSubMatchTable(true);
+	m_WinnerBracket.SetParent(this);
+	m_LoserBracket.SetParent(this);
 }
 
 
@@ -30,12 +30,9 @@ DoubleElimination::DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender 
 
 
 
-DoubleElimination::DoubleElimination(const YAML::Node& Yaml, ITournament* Tournament)
-	: MatchTable(Yaml, Tournament), m_WinnerBracket(nullptr, Tournament), m_LoserBracket(nullptr, Tournament)
+DoubleElimination::DoubleElimination(const YAML::Node& Yaml, ITournament* Tournament, const MatchTable* Parent)
+	: MatchTable(Yaml, Tournament, Parent), m_WinnerBracket(nullptr, Tournament, this), m_LoserBracket(nullptr, Tournament, this)
 {
-	m_WinnerBracket.IsSubMatchTable(true);
-	m_LoserBracket.IsSubMatchTable(true);
-
 	if (Yaml["third_place_match"])
 		m_WinnerBracket.IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
 	if (Yaml["fifth_place_match"])

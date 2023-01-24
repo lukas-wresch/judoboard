@@ -14,7 +14,7 @@ namespace Judoboard
 	public:
 		Pool(IFilter* Filter, const ITournament* Tournament = nullptr);
 		Pool(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
-		Pool(const YAML::Node& Yaml, ITournament* Tournament = nullptr);
+		Pool(const YAML::Node& Yaml, ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 
 		~Pool() {
 			SetSchedule().clear();
@@ -30,6 +30,9 @@ namespace Judoboard
 
 		virtual Results CalculateResults() const override { return m_Finals.CalculateResults(); }
 		virtual void GenerateSchedule() override;
+
+		virtual Match* FindMatch(const UUID& UUID) const override;
+		virtual const MatchTable* FindMatchTable(const UUID& UUID) const override;
 
 		bool IsThirdPlaceMatch() const { return m_Finals.IsThirdPlaceMatch(); }
 		bool IsFifthPlaceMatch() const { return m_Finals.IsFifthPlaceMatch(); }

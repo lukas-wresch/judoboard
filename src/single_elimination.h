@@ -11,9 +11,9 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		SingleElimination(IFilter* Filter, const ITournament* Tournament = nullptr);
+		SingleElimination(IFilter* Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
-		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament);
+		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent = nullptr);
 		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 
 		void operator =(const SingleElimination& rhs) = delete;
@@ -29,7 +29,7 @@ namespace Judoboard
 			SetMatID(rhs.GetMatID());
 			SetColor(rhs.GetColor());
 
-			IsSubMatchTable(rhs.IsSubMatchTable());
+			SetParent(rhs.GetParent());
 			DeleteSchedule();
 			IsBestOfThree(rhs.IsBestOfThree());
 

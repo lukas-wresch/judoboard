@@ -22,7 +22,7 @@ using namespace Judoboard;
 Pool::Pool(IFilter* Filter, const ITournament* Tournament)
 	: MatchTable(Filter, Tournament), m_Finals(nullptr, Tournament)
 {
-	m_Finals.IsSubMatchTable(true);
+	m_Finals.SetParent(this);
 	GenerateSchedule();
 }
 
@@ -35,37 +35,22 @@ Pool::Pool(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament*
 
 
 
-Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament)
-	: MatchTable(Yaml, Tournament), m_Finals(nullptr, Tournament)
+Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament, const MatchTable* Parent)
+	: MatchTable(Yaml, Tournament, Parent), m_Finals(nullptr, Tournament, Parent)
 {
 	if (Yaml["pool_count"])
 		m_PoolCount = Yaml["pool_count"].as<uint32_t>();
 	if (Yaml["take_top"])
 		m_TakeTop   = Yaml["take_top"].as<uint32_t>();
 
-	//if (Yaml["third_place_match"])
-		//m_Finals.IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
-	//if (Yaml["fifth_place_match"])
-		//m_Finals.IsFifthPlaceMatch(Yaml["fifth_place_match"].as<bool>());
-
-	const auto pool_count = CalculatePoolCount();
-	m_Pools.resize(pool_count);
-
 	if (Yaml["pools"] && Yaml["pools"].IsSequence())
 	{
-		size_t i = 0;
 		for (const auto& node : Yaml["pools"])
-		{
-			m_Pools[i] = new RoundRobin(node, Tournament);
-			m_Pools[i]->IsSubMatchTable(true);
-			i++;
-		}
+			m_Pools.push_back(new RoundRobin(node, Tournament, this));
 	}
 
 	if (Yaml["finals"] && Yaml["finals"].IsMap())
-		GetFinals() = SingleElimination(Yaml["finals"], Tournament);
-
-	GetFinals().IsSubMatchTable(true);
+		GetFinals() = SingleElimination(Yaml["finals"], Tournament, this);
 
 	CopyMatchesFromSubtables();
 }
@@ -151,6 +136,34 @@ size_t Pool::GetMaxStartPositions() const
 
 
 
+Match* Pool::FindMatch(const UUID& UUID) const
+{
+	for (auto pool : m_Pools)
+	{
+		auto ret = pool->FindMatch(UUID);
+		if (ret)
+			return ret;
+	}
+
+	return m_Finals.FindMatch(UUID);
+}
+
+
+
+const MatchTable* Pool::FindMatchTable(const UUID& UUID) const
+{
+	for (auto pool : m_Pools)
+		if (*pool == UUID)
+			return pool;
+
+	if (m_Finals == UUID)
+		return &m_Finals;
+
+	return nullptr;
+}
+
+
+
 void Pool::GenerateSchedule()
 {
 	if (GetStatus() != Status::Scheduled)
@@ -186,7 +199,7 @@ void Pool::GenerateSchedule()
 		std::string name = Localizer::Translate("Pool") + " ";
 		name.append(&letters[i % 26], 1);
 		m_Pools[i]->SetName(name);
-		m_Pools[i]->IsSubMatchTable(true);
+		m_Pools[i]->SetParent(this);
 
 		//Convert from old pools
 		if (i < old_pools.size())
@@ -282,13 +295,13 @@ void Pool::GenerateSchedule()
 	assert(final_input);
 	bool third_place = m_Finals.IsThirdPlaceMatch();
 	bool fifth_place = m_Finals.IsFifthPlaceMatch();
-	auto color = m_Finals.GetColor();
-	auto name = m_Finals.GetName();
+	auto color  = m_Finals.GetColor();
+	auto name   = m_Finals.GetName();
 	auto mat_id = m_Finals.GetMatID();
 
 	m_Finals = SingleElimination(final_input);
 	m_Finals.SetName(Localizer::Translate("Finals"));
-	m_Finals.IsSubMatchTable(true);
+	m_Finals.SetParent(this);
 	m_Finals.IsThirdPlaceMatch(third_place);
 	m_Finals.IsFifthPlaceMatch(fifth_place);
 	m_Finals.SetColor(color);
@@ -304,15 +317,13 @@ void Pool::GenerateSchedule()
 
 void Pool::CopyMatchesFromSubtables()
 {
-	const auto pool_count = CalculatePoolCount();
-
 	//Add matches from pools
 	size_t index = 0;
 	bool added;
 	do
 	{
 		added = false;
-		for (int pool = 0; pool < pool_count; ++pool)
+		for (int pool = 0; pool < m_Pools.size(); ++pool)
 		{
 			auto schedule = GetPool(pool)->GetSchedule();
 

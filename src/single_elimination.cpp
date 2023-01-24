@@ -12,8 +12,8 @@ using namespace Judoboard;
 
 
 
-SingleElimination::SingleElimination(IFilter* Filter, const ITournament* Tournament)
-	: MatchTable(Filter, Tournament)
+SingleElimination::SingleElimination(IFilter* Filter, const ITournament* Tournament, const MatchTable* Parent)
+	: MatchTable(Filter, Tournament, Parent)
 {
 	if (Filter)
 		SetTournament(Filter->GetTournament());
@@ -29,8 +29,8 @@ SingleElimination::SingleElimination(Weight MinWeight, Weight MaxWeight, const I
 
 
 
-SingleElimination::SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament)
-	: MatchTable(Yaml, Tournament)
+SingleElimination::SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
+	: MatchTable(Yaml, Tournament, Parent)
 {
 	if (Yaml["third_place_match"])
 		m_ThirdPlaceMatch = Yaml["third_place_match"].as<bool>();

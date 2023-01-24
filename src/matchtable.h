@@ -315,7 +315,7 @@ namespace Judoboard
 
 		bool HasConcluded() const;
 
-		Match*  FindMatch(const UUID& UUID) const;
+		virtual Match* FindMatch(const UUID& UUID) const;
 		size_t  FindMatchIndex(const UUID& UUID) const;
 		const Judoka* FindParticipant(const UUID& UUID) const;
 
@@ -327,6 +327,8 @@ namespace Judoboard
 		IFilter* GetFilter() { return m_Filter; }
 		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
 		const ITournament* GetTournament() const { return m_Tournament; }
+
+		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
 
 		//Rule sets
 		const RuleSet& GetRuleSet() const;
@@ -352,8 +354,9 @@ namespace Judoboard
 		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; GenerateSchedule(); }
 
 		//Sub match tables
-		bool IsSubMatchTable() const { return m_IsSubMatchTable; }
-		void IsSubMatchTable(bool SetFlag) { m_IsSubMatchTable = SetFlag; }
+		bool IsSubMatchTable() const { return m_Parent; }
+		auto GetParent() const { return m_Parent; }
+		void SetParent(const MatchTable* NewParent) { m_Parent = NewParent; }
 
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const;
@@ -363,8 +366,9 @@ namespace Judoboard
 		virtual void OnLotteryPerformed();//Called when a lottery draw was performed
 
 	protected:
-		MatchTable(IFilter* Filter, const ITournament* Tournament) : m_Filter(Filter), m_Tournament(Tournament) {}
-		MatchTable(const YAML::Node& Yaml, const ITournament* Tournament);
+		MatchTable(IFilter* Filter, const ITournament* Tournament, const MatchTable* Parent = nullptr)
+			: m_Filter(Filter), m_Tournament(Tournament), m_Parent(Parent) {}
+		MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent);
 
 		virtual void GenerateSchedule() = 0;
 
@@ -403,7 +407,7 @@ namespace Judoboard
 		uint32_t m_MatID = 0;
 		Color m_Color;
 
-		bool m_IsSubMatchTable = false;//Is this a match table that is purely used by another match table?
+		const MatchTable* m_Parent = nullptr;//Is this a match table that is purely used by another match table?
 
 		bool m_BestOfThree = false;
 	};

@@ -641,6 +641,7 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	initialize();
 
 	Tournament tourney;
+	Tournament tourney2;
 	Pool* w = new Pool(Weight(10), Weight(100));
 	w->SetMatID(1);
 	tourney.AddMatchTable(w);
@@ -649,6 +650,7 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	{
 		Judoka* j = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i, Gender::Male);
 		EXPECT_TRUE(w->AddParticipant(j));
+		EXPECT_TRUE(tourney2.AddParticipant(j));
 	}
 
 	ASSERT_TRUE(w->GetPool(0));
@@ -667,7 +669,6 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	YAML::Emitter yaml;
 	*w >> yaml;
 
-	Tournament tourney2;
 	Pool w2(YAML::Load(yaml.c_str()), &tourney2);
 
 	ASSERT_EQ(w2.GetSchedule().size(), w->GetSchedule().size());
@@ -689,8 +690,26 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	Mat m(1);
 	int count[5] = {0, 0, 0, 0, 0};
 
+	for (auto match : w->GetSchedule())
+	{
+		ASSERT_TRUE(!match->IsEmptyMatch());
+
+		m.SetMatID(match->GetMatID());
+		EXPECT_TRUE(m.StartMatch(match));
+
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+
 	for (auto match : w2.GetSchedule())
 	{
+		if (match->IsEmptyMatch())
+			int t = 546;
 		ASSERT_TRUE(!match->IsEmptyMatch());
 
 		//Check if match is on the right mat

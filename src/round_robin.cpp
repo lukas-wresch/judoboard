@@ -30,8 +30,8 @@ RoundRobin::RoundRobin(Weight MinWeight, Weight MaxWeight, Gender Gender, const 
 
 
 
-RoundRobin::RoundRobin(const YAML::Node& Yaml, const ITournament* Tournament)
-	: MatchTable(Yaml, Tournament)
+RoundRobin::RoundRobin(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
+	: MatchTable(Yaml, Tournament, Parent)
 {
 }
 
