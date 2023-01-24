@@ -31,8 +31,8 @@ IFilter::IFilter(const YAML::Node& Yaml, const MatchTable* Parent)
 					UUID uuid = data[2].as<std::string>();
 					const MatchTable* match_table = nullptr;
 
-					if (GetParent() && *GetParent() == uuid)
-						match_table = GetParent();
+					if (GetParent())
+						match_table = GetParent()->FindMatchTable(uuid);
 					else
 						match_table = GetTournament()->FindMatchTable(uuid);
 

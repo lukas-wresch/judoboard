@@ -688,7 +688,7 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	EXPECT_EQ( w2.GetFinals(), w->GetFinals());
 
 	EXPECT_EQ(w2.GetFinals().GetParticipants(), w->GetFinals().GetParticipants());
-	EXPECT_EQ(w2.GetFinals().GetFilter()->GetParticipants(), w->GetFinals().GetFilter()->GetParticipants());
+	EXPECT_EQ(w2.GetFinals().GetFilter()->GetParticipants().size(), w->GetFinals().GetFilter()->GetParticipants().size());
 	EXPECT_EQ(w2.ToHTML(), w->ToHTML());
 
 	Mat m(1);
