@@ -10,16 +10,49 @@ using namespace Judoboard;
 
 
 
-IFilter::IFilter(const YAML::Node& Yaml, const ITournament* Tournament)
-	: IFilter(Tournament)
+IFilter::IFilter(const YAML::Node& Yaml, const MatchTable* Parent)
+	: IFilter(Parent)
 {
-	if (Yaml["age_group"] && Tournament)
-		SetAgeGroup(Tournament->FindAgeGroup(Yaml["age_group"].as<std::string>()));
+	if (Yaml["age_group"] && GetTournament())
+		SetAgeGroup(GetTournament()->FindAgeGroup(Yaml["age_group"].as<std::string>()));
 
-	if (Yaml["participants"] && Yaml["participants"].IsMap() && Tournament)
+	if (Yaml["participants"] && Yaml["participants"].IsMap() && GetTournament())
 	{
 		for (const auto& node : Yaml["participants"])
-			m_Participants.insert({ node.first.as<int>(), Tournament->FindParticipant(node.second.as<std::string>()) });
+		{
+			auto& data = node.second;
+
+			if (data.IsSequence())
+			{
+				if (data[0].as<int>() == 0)//Type 0
+					m_Participants.insert({ node.first.as<int>(), GetTournament()->FindParticipant(data[1].as<std::string>()) });
+				else if (data[0].as<int>() == 1)//Type 1
+				{
+					UUID uuid = data[2].as<std::string>();
+					const MatchTable* match_table = nullptr;
+
+					if (GetParent() && *GetParent() == uuid)
+						match_table = GetParent();
+					else
+						match_table = GetTournament()->FindMatchTable(uuid);
+
+					assert(match_table);
+
+					if (match_table)
+						m_Participants.insert({ node.first.as<int>(), DependentJudoka((DependencyType)data[1].as<int>(), *match_table) });
+				}
+				else if (data[0].as<int>() == 2)//Type 2
+				{
+					auto match = GetTournament()->FindMatch(data[2].as<std::string>());
+					assert(match);
+
+					if (match)
+						m_Participants.insert({ node.first.as<int>(), DependentJudoka((DependencyType)data[1].as<int>(), *match) });
+				}
+				else
+					assert(false);
+			}
+		}
 	}
 }
 
@@ -37,8 +70,30 @@ void IFilter::operator >> (YAML::Emitter& Yaml) const
 	Yaml << YAML::BeginMap;
 	for (const auto [start_pos, judoka] : GetParticipants())
 	{
-		if (judoka.GetJudoka())//TODO handle other cases
-			Yaml << YAML::Key << start_pos << YAML::Value << (std::string)judoka.GetJudoka()->GetUUID();
+		Yaml << YAML::Key << start_pos << YAML::Value;
+		Yaml << YAML::BeginSeq;
+
+		if (judoka.GetJudoka())
+		{
+			Yaml << 0;//Type 0
+			Yaml << (std::string)judoka.GetJudoka()->GetUUID();
+		}
+		else if (judoka.GetDependentMatchTable())
+		{
+			Yaml << 1;//Type 1
+			Yaml << (int)judoka.GetDependency();
+			Yaml << (std::string)judoka.GetDependentMatchTable()->GetUUID();
+		}
+		else if (judoka.GetDependentMatch())
+		{
+			Yaml << 2;//Type 2
+			Yaml << (int)judoka.GetDependency();
+			Yaml << (std::string)judoka.GetDependentMatch()->GetUUID();
+		}
+		else
+			assert(false);
+
+		Yaml << YAML::EndSeq;
 	}
 	Yaml << YAML::EndMap;
 }
@@ -122,6 +177,15 @@ bool IFilter::RemoveParticipant(const DependentJudoka Participant)
 	}
 
 	return false;
+}
+
+
+
+const ITournament* IFilter::GetTournament() const
+{
+	if (!m_Parent)
+		return nullptr;
+	return m_Parent->GetTournament();
 }
 
 

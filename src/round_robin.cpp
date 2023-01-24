@@ -24,7 +24,7 @@ RoundRobin::RoundRobin(IFilter* Filter, const ITournament* Tournament)
 
 
 RoundRobin::RoundRobin(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
-	: MatchTable(new Weightclass(MinWeight, MaxWeight, Gender, Tournament), Tournament)
+	: MatchTable(new Weightclass(MinWeight, MaxWeight, Gender, this), Tournament)
 {
 }
 
@@ -38,7 +38,7 @@ RoundRobin::RoundRobin(const YAML::Node& Yaml, const ITournament* Tournament, co
 
 
 RoundRobin::RoundRobin(const MD5::Weightclass& Weightclass_, const ITournament* Tournament)
-	: MatchTable(new Weightclass(Weightclass_, Tournament), Tournament)
+	: MatchTable(new Weightclass(Weightclass_, this), Tournament)
 {
 	SetName(Weightclass_.Description);
 }

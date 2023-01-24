@@ -6,8 +6,8 @@ using namespace Judoboard;
 
 
 
-LosersOf::LosersOf(const MatchTable& Table) :
-	IFilter(Table.GetTournament()), m_MatchTable(Table)
+LosersOf::LosersOf(const MatchTable& Table, const MatchTable* Parent) :
+	IFilter(Parent), m_MatchTable(Table)
 {
 	if (Table.GetFilter())
 	{

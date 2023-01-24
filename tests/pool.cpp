@@ -687,6 +687,10 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	EXPECT_EQ(*w2.GetPool(3), *w->GetPool(3));
 	EXPECT_EQ( w2.GetFinals(), w->GetFinals());
 
+	EXPECT_EQ(w2.GetFinals().GetParticipants(), w->GetFinals().GetParticipants());
+	EXPECT_EQ(w2.GetFinals().GetFilter()->GetParticipants(), w->GetFinals().GetFilter()->GetParticipants());
+	EXPECT_EQ(w2.ToHTML(), w->ToHTML());
+
 	Mat m(1);
 	int count[5] = {0, 0, 0, 0, 0};
 
@@ -738,6 +742,4 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	EXPECT_EQ(count[2], 6);
 	EXPECT_EQ(count[3], 6);
 	EXPECT_EQ(count[4], 7);
-
-	EXPECT_EQ(w2.ToHTML(), w->ToHTML());
 }

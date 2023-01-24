@@ -6,8 +6,8 @@ using namespace Judoboard;
 
 
 
-Splitter::Splitter(const IFilter& pSource, size_t Divisor, size_t Remainder) :
-	m_pSource(pSource), IFilter(pSource.GetTournament())
+Splitter::Splitter(const IFilter& pSource, size_t Divisor, size_t Remainder, const MatchTable* Parent) :
+	m_pSource(pSource), IFilter(Parent)
 {
 	m_Divisor   = Divisor;
 	m_Remainder = Remainder;
@@ -18,7 +18,7 @@ Splitter::Splitter(const IFilter& pSource, size_t Divisor, size_t Remainder) :
 
 
 
-/*Splitter::Splitter(const YAML::Node& Yaml, const ITournament* Tournament) : IFilter(Yaml, Tournament)
+/*Splitter::Splitter(const YAML::Node& Yaml, const MatchTable* Parent) : IFilter(Yaml, Parent)
 {
 	if (Yaml["divisor"])
 		m_Divisor = Yaml["divisor"].as<size_t>();

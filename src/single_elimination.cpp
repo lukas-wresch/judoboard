@@ -23,7 +23,7 @@ SingleElimination::SingleElimination(IFilter* Filter, const ITournament* Tournam
 
 
 SingleElimination::SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
-	: MatchTable(new Weightclass(MinWeight, MaxWeight, Tournament), Tournament)
+	: MatchTable(new Weightclass(MinWeight, MaxWeight, this), Tournament)
 {
 }
 
@@ -41,7 +41,7 @@ SingleElimination::SingleElimination(const YAML::Node& Yaml, const ITournament* 
 
 
 SingleElimination::SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament)
-	: MatchTable(new Weightclass(Weightclass_, Tournament), Tournament)
+	: MatchTable(new Weightclass(Weightclass_, this), Tournament)
 {
 }
 

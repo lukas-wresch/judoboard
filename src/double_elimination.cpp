@@ -24,7 +24,7 @@ DoubleElimination::DoubleElimination(IFilter* Filter, const ITournament* Tournam
 
 
 DoubleElimination::DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
-	: DoubleElimination(new Weightclass(MinWeight, MaxWeight, Gender, Tournament), Tournament)
+	: DoubleElimination(new Weightclass(MinWeight, MaxWeight, Gender, this), Tournament)
 {
 }
 

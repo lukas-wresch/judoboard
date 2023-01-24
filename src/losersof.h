@@ -9,8 +9,8 @@ namespace Judoboard
 	class LosersOf : public IFilter
 	{
 	public:
-		LosersOf(const MatchTable& Table);
-		//LosersOf(const YAML::Node& Yaml, const ITournament* Tournament);
+		LosersOf(const MatchTable& Table, const MatchTable* Parent = nullptr);
+		//LosersOf(const YAML::Node& Yaml, const MatchTable* Parent);
 
 		virtual Type GetType() const override { return Type::LosersOf; }
 

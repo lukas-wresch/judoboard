@@ -20,7 +20,7 @@ LoserBracket::LoserBracket(IFilter* Filter, const ITournament* Tournament, const
 
 
 LoserBracket::LoserBracket(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
-	: LoserBracket(new Weightclass(MinWeight, MaxWeight, Tournament), Tournament)
+	: LoserBracket(new Weightclass(MinWeight, MaxWeight, this), Tournament)
 {
 }
 
@@ -34,7 +34,7 @@ LoserBracket::LoserBracket(const YAML::Node& Yaml, const ITournament* Tournament
 
 
 LoserBracket::LoserBracket(const MD5::Weightclass& Weightclass_, const ITournament* Tournament)
-	: LoserBracket(new Weightclass(Weightclass_, Tournament), Tournament)
+	: LoserBracket(new Weightclass(Weightclass_, this), Tournament)
 {
 }
 

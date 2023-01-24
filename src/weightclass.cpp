@@ -12,7 +12,8 @@ using namespace Judoboard;
 
 
 
-Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament) : IFilter(Tournament)
+Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, const MatchTable* Parent)
+	: IFilter(Parent)
 {
 	m_MinWeight = MinWeight;
 	m_MaxWeight = MaxWeight;
@@ -20,15 +21,16 @@ Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, const ITournament* 
 
 
 
-Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
-	: Weightclass(MinWeight, MaxWeight, Tournament)
+Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, Gender Gender, const MatchTable* Parent)
+	: Weightclass(MinWeight, MaxWeight, Parent)
 {
 	m_Gender = Gender;
 }
 
 
 
-Weightclass::Weightclass(const YAML::Node& Yaml, const ITournament* Tournament) : IFilter(Yaml, Tournament)
+Weightclass::Weightclass(const YAML::Node& Yaml, const MatchTable* Parent)
+	: IFilter(Yaml, Parent)
 {
 	if (Yaml["min_weight"])
 		m_MinWeight = Weight(Yaml["min_weight"]);
@@ -40,7 +42,8 @@ Weightclass::Weightclass(const YAML::Node& Yaml, const ITournament* Tournament) 
 
 
 
-Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament) : IFilter(Tournament)
+Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const MatchTable* Parent)
+	: IFilter(Parent)
 {
 	if (Weightclass.WeightLargerThan > 0)
 		m_MinWeight = Weightclass.WeightLargerThan  * 1000 + Weightclass.WeightInGrammsLargerThan;

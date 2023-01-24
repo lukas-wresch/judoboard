@@ -346,10 +346,10 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, co
 		switch ((IFilter::Type)Yaml["filter"]["type"].as<int>())
 		{
 			case IFilter::Type::Weightclass:
-				SetFilter(new Weightclass(Yaml["filter"], GetTournament()));
+				SetFilter(new Weightclass(Yaml["filter"], this));
 				break;
 			case IFilter::Type::Fixed:
-				SetFilter(new Fixed(Yaml["filter"], GetTournament()));
+				SetFilter(new Fixed(Yaml["filter"], this));
 				break;
 			default:
 				ZED::Log::Error("Unknown filter type " + std::to_string(Yaml["filter"]["type"].as<int>()) + " in match table");
@@ -440,7 +440,13 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 	if (GetFilter())
 	{
 		Yaml << YAML::Key << "filter" << YAML::Value;
-		*GetFilter() >> Yaml;
+		if (GetFilter()->GetType() == IFilter::Type::Weightclass)
+			*GetFilter() >> Yaml;
+		else//Export as fixed participants
+		{
+			Fixed temp(*GetFilter());
+			temp >> Yaml;
+		}
 	}
 
 	if (!m_Schedule.empty())

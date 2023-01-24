@@ -29,7 +29,7 @@ Pool::Pool(IFilter* Filter, const ITournament* Tournament)
 
 
 Pool::Pool(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
-	: Pool(new Weightclass(MinWeight, MaxWeight, Gender, Tournament), Tournament)
+	: Pool(new Weightclass(MinWeight, MaxWeight, Gender, this), Tournament)
 {
 }
 
@@ -222,7 +222,7 @@ void Pool::GenerateSchedule()
 		TakeTopRanks topA(*m_Pools[0], m_TakeTop);
 		TakeTopRanks topB(*m_Pools[1], m_TakeTop);
 
-		Mixer mixer(GetTournament());
+		Mixer mixer;
 
 		mixer.AddSource(topA);
 		mixer.AddSource(topB);
@@ -254,7 +254,7 @@ void Pool::GenerateSchedule()
 
 	else if (pool_count == 4)
 	{
-		Mixer mixer(GetTournament());
+		Mixer mixer;
 
 		TakeTopRanks topA(*m_Pools[0], m_TakeTop);
 		TakeTopRanks topB(*m_Pools[1], m_TakeTop);
@@ -280,7 +280,7 @@ void Pool::GenerateSchedule()
 
 	else
 	{
-		auto mixer = new Mixer(GetTournament());
+		auto mixer = new Mixer;
 
 		for (int i = 0; i < pool_count; ++i)
 		{

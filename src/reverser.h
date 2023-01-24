@@ -8,8 +8,8 @@ namespace Judoboard
 	class Reverser : public IFilter
 	{
 	public:
-		Reverser(const IFilter& pSource);
-		Reverser(const YAML::Node& Yaml, const ITournament* Tournament);
+		Reverser(const IFilter& pSource, const MatchTable* Parent = nullptr);
+		Reverser(const YAML::Node& Yaml, const MatchTable* Parent);
 
 		virtual Type GetType() const override { return Type::Reverser; }
 

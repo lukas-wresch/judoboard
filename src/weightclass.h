@@ -11,10 +11,10 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		Weightclass(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
-		Weightclass(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament = nullptr);
-		Weightclass(const YAML::Node& Yaml, const ITournament* Tournament = nullptr);
-		Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament = nullptr);
+		Weightclass(Weight MinWeight, Weight MaxWeight, const MatchTable* Parent = nullptr);
+		Weightclass(Weight MinWeight, Weight MaxWeight, Gender Gender, const MatchTable* Parent = nullptr);
+		Weightclass(const YAML::Node& Yaml, const MatchTable* Parent = nullptr);
+		Weightclass(const MD5::Weightclass& Weightclass, const MatchTable* Parent = nullptr);
 
 		virtual Type GetType() const override { return Type::Weightclass; }
 
