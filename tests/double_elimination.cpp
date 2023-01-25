@@ -366,6 +366,107 @@ TEST(LoserBracket, Count32_Final_3rd)
 
 
 
+TEST(LoserBracket, Count64)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	Judoka* j[65];
+	bool has_match[65];
+	const size_t count = 64-2;
+
+	for (int i = 1; i <= count; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		has_match[i] = false;
+		t->AddParticipant(j[i]);
+	}
+
+	LoserBracket* group = new LoserBracket(0, 200);
+	group->SetMatID(1);
+	t->AddMatchTable(group);
+
+	for (int i = 0; i < count; ++i)
+		group->SetStartPosition(j[i+1], i);
+
+	EXPECT_EQ(group->GetMaxStartPositions(),   count);
+	ASSERT_EQ(group->GetParticipants().size(), count);
+	ASSERT_EQ(group->GetSchedule().size(), 16 + 16 + 8 + 8 + 4 + 4 + 2 + 2);
+
+	EXPECT_TRUE(group->GetMatch(0)->Contains(*j[29]));
+	EXPECT_TRUE(group->GetMatch(0)->Contains(*j[30]));
+	EXPECT_TRUE(group->GetMatch(1)->Contains(*j[31]));
+	EXPECT_TRUE(group->GetMatch(1)->Contains(*j[32]));
+	EXPECT_TRUE(group->GetMatch(2)->Contains(*j[25]));
+	EXPECT_TRUE(group->GetMatch(2)->Contains(*j[26]));
+	EXPECT_TRUE(group->GetMatch(3)->Contains(*j[27]));
+	EXPECT_TRUE(group->GetMatch(3)->Contains(*j[28]));
+	EXPECT_TRUE(group->GetMatch(4)->Contains(*j[21]));
+	EXPECT_TRUE(group->GetMatch(4)->Contains(*j[22]));
+	EXPECT_TRUE(group->GetMatch(5)->Contains(*j[23]));
+	EXPECT_TRUE(group->GetMatch(5)->Contains(*j[24]));
+	EXPECT_TRUE(group->GetMatch(6)->Contains(*j[17]));
+	EXPECT_TRUE(group->GetMatch(6)->Contains(*j[18]));
+	EXPECT_TRUE(group->GetMatch(7)->Contains(*j[19]));
+	EXPECT_TRUE(group->GetMatch(7)->Contains(*j[20]));
+	EXPECT_TRUE(group->GetMatch(8)->Contains(*j[13]));
+	EXPECT_TRUE(group->GetMatch(8)->Contains(*j[14]));
+	EXPECT_TRUE(group->GetMatch(9)->Contains(*j[15]));
+	EXPECT_TRUE(group->GetMatch(9)->Contains(*j[26]));
+	EXPECT_TRUE(group->GetMatch(10)->Contains(*j[9]));
+	EXPECT_TRUE(group->GetMatch(10)->Contains(*j[10]));
+	EXPECT_TRUE(group->GetMatch(11)->Contains(*j[11]));
+	EXPECT_TRUE(group->GetMatch(11)->Contains(*j[12]));
+	EXPECT_TRUE(group->GetMatch(12)->Contains(*j[5]));
+	EXPECT_TRUE(group->GetMatch(12)->Contains(*j[6]));
+	EXPECT_TRUE(group->GetMatch(13)->Contains(*j[7]));
+	EXPECT_TRUE(group->GetMatch(13)->Contains(*j[8]));
+	EXPECT_TRUE(group->GetMatch(14)->Contains(*j[1]));
+	EXPECT_TRUE(group->GetMatch(14)->Contains(*j[2]));
+	EXPECT_TRUE(group->GetMatch(15)->Contains(*j[3]));
+	EXPECT_TRUE(group->GetMatch(15)->Contains(*j[4]));
+
+	EXPECT_TRUE(group->GetMatch(16)->Contains(*j[37]));
+	EXPECT_TRUE(group->GetMatch(17)->Contains(*j[38]));
+	EXPECT_TRUE(group->GetMatch(18)->Contains(*j[39]));
+	EXPECT_TRUE(group->GetMatch(19)->Contains(*j[40]));
+	EXPECT_TRUE(group->GetMatch(20)->Contains(*j[33]));
+	EXPECT_TRUE(group->GetMatch(21)->Contains(*j[34]));
+	EXPECT_TRUE(group->GetMatch(22)->Contains(*j[35]));
+	EXPECT_TRUE(group->GetMatch(23)->Contains(*j[36]));
+	EXPECT_TRUE(group->GetMatch(24)->Contains(*j[45]));
+	EXPECT_TRUE(group->GetMatch(25)->Contains(*j[46]));
+	EXPECT_TRUE(group->GetMatch(26)->Contains(*j[47]));
+	EXPECT_TRUE(group->GetMatch(27)->Contains(*j[48]));
+	EXPECT_TRUE(group->GetMatch(28)->Contains(*j[41]));
+	EXPECT_TRUE(group->GetMatch(29)->Contains(*j[42]));
+	EXPECT_TRUE(group->GetMatch(30)->Contains(*j[43]));
+	EXPECT_TRUE(group->GetMatch(31)->Contains(*j[44]));
+
+	EXPECT_TRUE(group->GetMatch(39)->Contains(*j[69-16]));
+	EXPECT_TRUE(group->GetMatch(40)->Contains(*j[70-16]));
+	EXPECT_TRUE(group->GetMatch(41)->Contains(*j[71-16]));
+	EXPECT_TRUE(group->GetMatch(42)->Contains(*j[72-16]));
+	EXPECT_TRUE(group->GetMatch(43)->Contains(*j[65-16]));
+	EXPECT_TRUE(group->GetMatch(44)->Contains(*j[66-16]));
+	EXPECT_TRUE(group->GetMatch(45)->Contains(*j[67-16]));
+	EXPECT_TRUE(group->GetMatch(46)->Contains(*j[68-16]));
+
+	EXPECT_TRUE(group->GetMatch(50)->Contains(*j[89-16-24]));
+	EXPECT_TRUE(group->GetMatch(51)->Contains(*j[90-16-24]));
+	EXPECT_TRUE(group->GetMatch(52)->Contains(*j[91-16-24]));
+	EXPECT_TRUE(group->GetMatch(53)->Contains(*j[92-16-24]));
+
+	EXPECT_TRUE(group->GetMatch(56)->Contains(*j[110-16-24-20]));
+	EXPECT_TRUE(group->GetMatch(57)->Contains(*j[109-16-24-20]));
+
+	delete t;
+}
+
+
+
 TEST(DoubleElimination, Count8)
 {
 	initialize();

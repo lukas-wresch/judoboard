@@ -36,11 +36,11 @@ namespace Judoboard
 
 		bool IsFinalMatch() const { return m_FinalMatch; }
 		bool IsThirdPlaceMatch() const { return m_ThirdPlaceMatch; }
-		bool IsFifthPlaceMatch() const { return m_FifthPlaceMatch; }
+		//bool IsFifthPlaceMatch() const { return m_FifthPlaceMatch; }
 
 		void IsFinalMatch(bool Enable) { m_FinalMatch = Enable; GenerateSchedule(); }
 		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; GenerateSchedule(); }
-		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; GenerateSchedule(); }
+		//void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; GenerateSchedule(); }
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
@@ -88,6 +88,6 @@ namespace Judoboard
 		bool m_FinalMatch = false;
 
 		bool m_ThirdPlaceMatch = false;
-		bool m_FifthPlaceMatch = false;
+		//bool m_FifthPlaceMatch = false;
 	};
 }

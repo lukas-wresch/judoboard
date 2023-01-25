@@ -176,22 +176,25 @@ void LoserBracket::GenerateSchedule()
 	//TODO REFACTOR THE FOLLOWING
 	
 	//Add additional match for 3rd place
-	/*if (IsThirdPlaceMatch() && m_Schedule.size() >= 3)
+	if (IsThirdPlaceMatch() && GetSchedule().size() >= 2)
 	{
-		auto match1 = m_Schedule[m_Schedule.size() - 3];
-		auto match2 = m_Schedule[m_Schedule.size() - 2];
+		auto match1 = GetSchedule()[GetSchedule().size() - 2];
+		auto match2 = GetSchedule()[GetSchedule().size() - 1];
+
+		if (IsFinalMatch() && GetSchedule().size() >= 3)
+		{
+			auto match1 = GetSchedule()[GetSchedule().size() - 3];
+			auto match2 = GetSchedule()[GetSchedule().size() - 2];
+		}
 
 		auto third_place = CreateAutoMatch(nullptr, nullptr);
 		third_place->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
 		third_place->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
-
-		//Swap matches so that match for 1st place is still the last one
-		std::swap(m_Schedule[m_Schedule.size() - 1], m_Schedule[m_Schedule.size() - 2]);
 	}
 	
 
 	//Add additional matches for 5th place
-	if (IsFifthPlaceMatch() && m_Schedule.size() >= 8)
+	/*if (IsFifthPlaceMatch() && m_Schedule.size() >= 8)
 	{
 		int offset = 3;//Final and two semi finals
 		if (IsThirdPlaceMatch())
