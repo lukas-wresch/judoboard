@@ -96,11 +96,29 @@ void LoserBracket::GenerateSchedule()
 
 	size_t current_start_pos = 0;
 
-	for (; current_start_pos < max_initial_start_pos; current_start_pos += 2)
-	{
-		auto new_match = CreateAutoMatch(GetFilter()->GetJudokaByStartPosition(current_start_pos),
-										 GetFilter()->GetJudokaByStartPosition(current_start_pos + 1));
+	auto create_pair = [&](size_t i) {
+		auto new_match = CreateAutoMatch(GetFilter()->GetJudokaByStartPosition(i-1),
+										 GetFilter()->GetJudokaByStartPosition(i));
 		nextRound.emplace_back(new_match);
+	};
+
+	//Hardcoded starting positions
+	if (max_initial_start_pos == 16)
+	{
+		create_pair(13);
+		create_pair(15);
+		create_pair(9);
+		create_pair(11);
+		create_pair(5);
+		create_pair(7);
+		create_pair(1);
+		create_pair(3);
+		current_start_pos = max_initial_start_pos;
+	}
+	else//Default
+	{
+		for (; current_start_pos < max_initial_start_pos; current_start_pos += 2)
+			create_pair(current_start_pos + 1);
 	}
 
 	//Additional rounds

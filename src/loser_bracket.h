@@ -55,15 +55,21 @@ namespace Judoboard
 			if (GetFilter()->GetParticipants().size() == 2)
 				return 1;
 
-			auto rounds = (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size() + 2));
+			const auto max_initial_start_pos = (GetMaxStartPositions() + 2) / 2;
 
-			if (rounds%2 == 0)
-				rounds++;
+			size_t no_matches = max_initial_start_pos;
+			size_t round = 0;
+			while (no_matches > 2)
+			{
+				if (round%2 == 0)
+					no_matches /= 2;
+				round++;
+			}
 
-			if (!IsFinalMatch())
-				rounds--;
+			if (IsFinalMatch())
+				round++;
 
-			return rounds;
+			return round + 1;
 		}
 
 		size_t GetNumberOfBaseRounds() const
