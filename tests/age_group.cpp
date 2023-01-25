@@ -24,6 +24,7 @@ TEST(AgeGroup, MatchTableTakeRuleSet)
 		ASSERT_TRUE(t.GetMatchTables()[0]->GetAgeGroup());
 		EXPECT_EQ(*t.GetMatchTables()[0]->GetAgeGroup(), a);
 		EXPECT_EQ(t.GetMatchTables()[0]->GetRuleSet(),  *r);
+		EXPECT_EQ(t.GetMatchTables()[0]->GetSchedule()[0]->GetRuleSet(), *r);
 	}
 }
 
