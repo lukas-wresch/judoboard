@@ -154,11 +154,6 @@ void LoserBracket::GenerateSchedule()
 		infuse = !infuse;//Switch for next round
 	}
 
-	auto& schedule = SetSchedule();
-
-	if (!IsFinalMatch() && schedule.size() >= 1)
-		schedule.pop_back();//Remove the last match
-
 
 	//TODO REFACTOR THE FOLLOWING
 	

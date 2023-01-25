@@ -76,9 +76,6 @@ namespace Judoboard
 
 			auto rounds = (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size() + 2));
 
-			if (!IsFinalMatch())
-				rounds--;
-
 			return rounds;
 		}
 
