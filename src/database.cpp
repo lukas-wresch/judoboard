@@ -29,20 +29,20 @@ void Database::Reset()
 	//No rule set defined and no age groups defined
 	if (m_RuleSets.empty() && m_AgeGroups.empty())
 	{
-		auto childen = new RuleSet(Localizer::Translate("Children"), 2*60, 0, 20, 10);
-		auto youth   = new RuleSet(Localizer::Translate("Youth"),    3*60, 0, 20, 10);
-		auto adults  = new RuleSet(Localizer::Translate("Adults"),   4*60, 0, 20, 10);
+		auto children = new RuleSet(Localizer::Translate("Children"), 2*60, 0, 20, 10);
+		auto youth    = new RuleSet(Localizer::Translate("Youth"),    3*60, 0, 20, 10);
+		auto adults   = new RuleSet(Localizer::Translate("Adults"),   4*60, 0, 20, 10);
 
-		AddRuleSet(childen);
+		AddRuleSet(children);
 		AddRuleSet(youth);
 		AddRuleSet(adults);
 
-		AddAgeGroup(new AgeGroup("U11", 8,  10, childen, *this));
-		AddAgeGroup(new AgeGroup("U13", 10, 12, youth,   *this));
-		AddAgeGroup(new AgeGroup("U15", 12, 14, youth,   *this));
-		AddAgeGroup(new AgeGroup("U18", 15, 17, adults,  *this));
-		AddAgeGroup(new AgeGroup("U21", 17, 20, adults,  *this));
-		AddAgeGroup(new AgeGroup(Localizer::Translate("Seniors"), 17, 0, adults,  *this));
+		AddAgeGroup(new AgeGroup("U11", 8,  10, children));
+		AddAgeGroup(new AgeGroup("U13", 10, 12, youth));
+		AddAgeGroup(new AgeGroup("U15", 12, 14, youth));
+		AddAgeGroup(new AgeGroup("U18", 15, 17, adults));
+		AddAgeGroup(new AgeGroup("U21", 17, 20, adults));
+		AddAgeGroup(new AgeGroup(Localizer::Translate("Seniors"), 17, 0, adults));
 	}
 }
 

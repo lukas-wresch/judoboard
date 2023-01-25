@@ -166,7 +166,7 @@ function Update()
 
 function GetAgeGroups_Multiple()
 {
-  AjaxCallback("ajax/age_groups/get", function(response) {
+  AjaxCallback("ajax/age_groups/list", function(response) {
     console.log(response);
     var res = YAML.parse(response);
 
@@ -175,6 +175,8 @@ function GetAgeGroups_Multiple()
     var no = 0;
     for (const age of res)
     {
+      if (!age.is_used)
+        continue;
       ages.innerHTML += "<label><input type=\"checkbox\" checked id=\"age_group_"+no+"\" value=\"" + age.uuid + "\" onclick='Update();'/>" + age.name + "</label><br/>";
       no++;
     }

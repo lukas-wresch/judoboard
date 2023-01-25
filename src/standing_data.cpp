@@ -522,6 +522,23 @@ const RuleSet* StandingData::FindRuleSet(const UUID& UUID) const
 
 
 
+bool StandingData::DeleteRuleSet(const UUID& UUID)
+{
+	for (auto it = m_RuleSets.begin(); it != m_RuleSets.end(); ++it)
+	{
+		if ((*it)->GetUUID() == UUID)
+		{
+			delete *it;
+			m_RuleSets.erase(it);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
 bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
 {
 	if (!NewRuleSet || FindRuleSet(NewRuleSet->GetUUID()))
@@ -594,6 +611,7 @@ bool StandingData::RemoveAgeGroup(const UUID& UUID)
 	{
 		if ((*it)->GetUUID() == UUID)
 		{
+			delete *it;
 			m_AgeGroups.erase(it);
 			return true;
 		}

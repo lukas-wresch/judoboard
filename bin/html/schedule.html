@@ -440,6 +440,9 @@ function Update()
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
+      
+    if (res === null)
+      return;
 
     var no = 0;
     for (const age of res)

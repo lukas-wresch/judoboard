@@ -2,6 +2,34 @@
 
 
 
+TEST(AgeGroup, MatchTableTakeRuleSet)
+{
+	initialize();
+
+	for (int i = 0; i < 1000; i++)
+	{
+		Tournament t("deleteMe");
+		t.EnableAutoSave(false);
+
+		auto r = new RuleSet(GetRandomName(), rand(), rand(), rand(), rand());
+		AgeGroup a(GetRandomName(), rand(), rand(), r);
+
+		Match* match = new Match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), &t, 1);
+		t.AddMatch(match);
+
+		ASSERT_EQ(t.GetMatchTables().size(), 1);
+
+		t.GetMatchTables()[0]->SetAgeGroup(&a);
+
+		ASSERT_TRUE(t.GetMatchTables()[0]->GetAgeGroup());
+		EXPECT_EQ(*t.GetMatchTables()[0]->GetAgeGroup(), a);
+		EXPECT_EQ(t.GetMatchTables()[0]->GetRuleSet(),  *r);
+		EXPECT_EQ(t.GetMatchTables()[0]->GetSchedule()[0]->GetRuleSet(), *r);
+	}
+}
+
+
+
 TEST(AgeGroup, ExportImport)
 {
 	initialize();
@@ -11,7 +39,7 @@ TEST(AgeGroup, ExportImport)
 		Database d;
 		auto r = new RuleSet(GetRandomName(), rand(), rand(), rand(), rand());
 		d.AddRuleSet(r);
-		AgeGroup a(GetRandomName(), rand(), rand(), r, d);
+		AgeGroup a(GetRandomName(), rand(), rand(), r);
 
 		YAML::Emitter yaml;
 		a >> yaml;
@@ -89,42 +117,42 @@ TEST(AgeGroup, Default2021)
 		ASSERT_TRUE(u21);
 		ASSERT_TRUE(sen);
 
-		EXPECT_FALSE(u11->IsElgiable(j10));
-		EXPECT_TRUE( u11->IsElgiable(j11));
-		EXPECT_TRUE( u11->IsElgiable(j12));
-		EXPECT_TRUE( u11->IsElgiable(j13));
-		EXPECT_FALSE(u11->IsElgiable(j14));
+		EXPECT_FALSE(u11->IsElgiable(j10, d));
+		EXPECT_TRUE( u11->IsElgiable(j11, d));
+		EXPECT_TRUE( u11->IsElgiable(j12, d));
+		EXPECT_TRUE( u11->IsElgiable(j13, d));
+		EXPECT_FALSE(u11->IsElgiable(j14, d));
 
-		EXPECT_FALSE(u13->IsElgiable(j08));
-		EXPECT_TRUE( u13->IsElgiable(j09));
-		EXPECT_TRUE( u13->IsElgiable(j10));
-		EXPECT_TRUE( u13->IsElgiable(j11));
-		EXPECT_FALSE(u13->IsElgiable(j12));
+		EXPECT_FALSE(u13->IsElgiable(j08, d));
+		EXPECT_TRUE( u13->IsElgiable(j09, d));
+		EXPECT_TRUE( u13->IsElgiable(j10, d));
+		EXPECT_TRUE( u13->IsElgiable(j11, d));
+		EXPECT_FALSE(u13->IsElgiable(j12, d));
 
-		EXPECT_FALSE(u15->IsElgiable(j06));
-		EXPECT_TRUE( u15->IsElgiable(j07));
-		EXPECT_TRUE( u15->IsElgiable(j08));
-		EXPECT_TRUE( u15->IsElgiable(j09));
-		EXPECT_FALSE(u15->IsElgiable(j10));
+		EXPECT_FALSE(u15->IsElgiable(j06, d));
+		EXPECT_TRUE( u15->IsElgiable(j07, d));
+		EXPECT_TRUE( u15->IsElgiable(j08, d));
+		EXPECT_TRUE( u15->IsElgiable(j09, d));
+		EXPECT_FALSE(u15->IsElgiable(j10, d));
 
-		EXPECT_FALSE(u18->IsElgiable(j03));
-		EXPECT_TRUE( u18->IsElgiable(j04));
-		EXPECT_TRUE( u18->IsElgiable(j05));
-		EXPECT_TRUE( u18->IsElgiable(j06));
-		EXPECT_FALSE(u18->IsElgiable(j07));
+		EXPECT_FALSE(u18->IsElgiable(j03, d));
+		EXPECT_TRUE( u18->IsElgiable(j04, d));
+		EXPECT_TRUE( u18->IsElgiable(j05, d));
+		EXPECT_TRUE( u18->IsElgiable(j06, d));
+		EXPECT_FALSE(u18->IsElgiable(j07, d));
 
-		EXPECT_FALSE(u21->IsElgiable(j00));
-		EXPECT_TRUE( u21->IsElgiable(j01));
-		EXPECT_TRUE( u21->IsElgiable(j02));
-		EXPECT_TRUE( u21->IsElgiable(j03));
-		EXPECT_TRUE( u21->IsElgiable(j04));
-		EXPECT_FALSE(u21->IsElgiable(j05));
+		EXPECT_FALSE(u21->IsElgiable(j00, d));
+		EXPECT_TRUE( u21->IsElgiable(j01, d));
+		EXPECT_TRUE( u21->IsElgiable(j02, d));
+		EXPECT_TRUE( u21->IsElgiable(j03, d));
+		EXPECT_TRUE( u21->IsElgiable(j04, d));
+		EXPECT_FALSE(u21->IsElgiable(j05, d));
 
-		EXPECT_FALSE(sen->IsElgiable(j05));
-		EXPECT_TRUE( sen->IsElgiable(j04));
-		EXPECT_TRUE( sen->IsElgiable(j03));
-		EXPECT_TRUE( sen->IsElgiable(j02));
-		EXPECT_TRUE( sen->IsElgiable(j01));
+		EXPECT_FALSE(sen->IsElgiable(j05, d));
+		EXPECT_TRUE( sen->IsElgiable(j04, d));
+		EXPECT_TRUE( sen->IsElgiable(j03, d));
+		EXPECT_TRUE( sen->IsElgiable(j02, d));
+		EXPECT_TRUE( sen->IsElgiable(j01, d));
 	}
 }
 
@@ -183,42 +211,42 @@ TEST(AgeGroup, Default2022)
 		ASSERT_TRUE(u21);
 		ASSERT_TRUE(sen);
 
-		EXPECT_FALSE(u11->IsElgiable(j11));
-		EXPECT_TRUE( u11->IsElgiable(j12));
-		EXPECT_TRUE( u11->IsElgiable(j13));
-		EXPECT_TRUE( u11->IsElgiable(j14));
-		EXPECT_FALSE(u11->IsElgiable(j15));
+		EXPECT_FALSE(u11->IsElgiable(j11, d));
+		EXPECT_TRUE( u11->IsElgiable(j12, d));
+		EXPECT_TRUE( u11->IsElgiable(j13, d));
+		EXPECT_TRUE( u11->IsElgiable(j14, d));
+		EXPECT_FALSE(u11->IsElgiable(j15, d));
 
-		EXPECT_FALSE(u13->IsElgiable(j09));
-		EXPECT_TRUE( u13->IsElgiable(j10));
-		EXPECT_TRUE( u13->IsElgiable(j11));
-		EXPECT_TRUE( u13->IsElgiable(j12));
-		EXPECT_FALSE(u13->IsElgiable(j13));
+		EXPECT_FALSE(u13->IsElgiable(j09, d));
+		EXPECT_TRUE( u13->IsElgiable(j10, d));
+		EXPECT_TRUE( u13->IsElgiable(j11, d));
+		EXPECT_TRUE( u13->IsElgiable(j12, d));
+		EXPECT_FALSE(u13->IsElgiable(j13, d));
 
-		EXPECT_FALSE(u15->IsElgiable(j07));
-		EXPECT_TRUE( u15->IsElgiable(j08));
-		EXPECT_TRUE( u15->IsElgiable(j09));
-		EXPECT_TRUE( u15->IsElgiable(j10));
-		EXPECT_FALSE(u15->IsElgiable(j11));
+		EXPECT_FALSE(u15->IsElgiable(j07, d));
+		EXPECT_TRUE( u15->IsElgiable(j08, d));
+		EXPECT_TRUE( u15->IsElgiable(j09, d));
+		EXPECT_TRUE( u15->IsElgiable(j10, d));
+		EXPECT_FALSE(u15->IsElgiable(j11, d));
 
-		EXPECT_FALSE(u18->IsElgiable(j04));
-		EXPECT_TRUE( u18->IsElgiable(j05));
-		EXPECT_TRUE( u18->IsElgiable(j06));
-		EXPECT_TRUE( u18->IsElgiable(j07));
-		EXPECT_FALSE(u18->IsElgiable(j08));
+		EXPECT_FALSE(u18->IsElgiable(j04, d));
+		EXPECT_TRUE( u18->IsElgiable(j05, d));
+		EXPECT_TRUE( u18->IsElgiable(j06, d));
+		EXPECT_TRUE( u18->IsElgiable(j07, d));
+		EXPECT_FALSE(u18->IsElgiable(j08, d));
 
-		EXPECT_FALSE(u21->IsElgiable(j01));
-		EXPECT_TRUE( u21->IsElgiable(j02));
-		EXPECT_TRUE( u21->IsElgiable(j03));
-		EXPECT_TRUE( u21->IsElgiable(j04));
-		EXPECT_TRUE( u21->IsElgiable(j05));
-		EXPECT_FALSE(u21->IsElgiable(j06));
+		EXPECT_FALSE(u21->IsElgiable(j01, d));
+		EXPECT_TRUE( u21->IsElgiable(j02, d));
+		EXPECT_TRUE( u21->IsElgiable(j03, d));
+		EXPECT_TRUE( u21->IsElgiable(j04, d));
+		EXPECT_TRUE( u21->IsElgiable(j05, d));
+		EXPECT_FALSE(u21->IsElgiable(j06, d));
 
-		EXPECT_FALSE(sen->IsElgiable(j06));
-		EXPECT_TRUE( sen->IsElgiable(j05));
-		EXPECT_TRUE( sen->IsElgiable(j04));
-		EXPECT_TRUE( sen->IsElgiable(j03));
-		EXPECT_TRUE( sen->IsElgiable(j02));
+		EXPECT_FALSE(sen->IsElgiable(j06, d));
+		EXPECT_TRUE( sen->IsElgiable(j05, d));
+		EXPECT_TRUE( sen->IsElgiable(j04, d));
+		EXPECT_TRUE( sen->IsElgiable(j03, d));
+		EXPECT_TRUE( sen->IsElgiable(j02, d));
 	}
 }
 

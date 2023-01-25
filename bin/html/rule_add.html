@@ -108,6 +108,7 @@
 
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddRuleSet()" id="add">New Rule Set</button>
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateRuleSet()" id="update">Update Rule Set</button>
+<button class="remove" onclick="return DeleteRuleSet()" id="delete"></button>
 
 </form>
 
@@ -158,6 +159,19 @@ function UpdateRuleSet()
 }
 
 
+function DeleteRuleSet()
+{
+  if (confirm(translate('delete_rules_confirm')))
+  {
+    AjaxCallback('ajax/rule/delete?id='+id, function() {
+      navigate("rule_list.html");
+    });
+  }
+
+  return false;
+}
+
+
 function GetRuleSet(id)
 {
   AjaxCallback("ajax/rule/get?id="+id, function(response) {
@@ -196,6 +210,7 @@ document.getElementById("draw_disabled").innerHTML = translate('disabled');
 
 document.getElementById("label_draw").innerHTML       = translate('draw');
 document.getElementById("label_break_time").innerHTML = translate('break_time');
+document.getElementById("delete").innerHTML  = translate('delete');
 
 var id = URLDecode(URL, "id");
 
@@ -209,6 +224,7 @@ else
 {
   document.getElementById("headline").innerHTML = translate('new_rule_set');
   document.getElementById("update").style.display = "none";
+  document.getElementById("delete").style.display = "none";
 }
 
 </script>
