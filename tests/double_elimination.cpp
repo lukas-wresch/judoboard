@@ -136,10 +136,52 @@ TEST(DoubleElimination, Count8)
 
 	EXPECT_EQ(group->GetMaxStartPositions(), count);
 
-	auto loser_schedule = group->GetLoserBracket().GetSchedule();
+	auto& winner_schedule = group->GetWinnerBracket().GetSchedule();
+	auto& loser_schedule  = group->GetLoserBracket() .GetSchedule();
 
 	//EXPECT_TRUE(loser_schedule[0]->Contains(*j[1]));
 
+	ASSERT_EQ(winner_schedule.size(),  4 + 2 + 1);
+	ASSERT_EQ(loser_schedule.size(),   2 + 2);
+
+	delete t;
+}
+
+
+
+TEST(DoubleElimination, Count16)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	Judoka* j[33];
+	bool has_match[33];
+	const size_t count = 16;
+
+	for (int i = 1; i <= count; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		has_match[i] = false;
+		t->AddParticipant(j[i]);
+	}
+
+	DoubleElimination* group = new DoubleElimination(0, 200);
+	group->SetMatID(1);
+	t->AddMatchTable(group);
+
+	for (int i = 0; i < count; ++i)
+		group->SetStartPosition(j[i+1], i);
+
+	EXPECT_EQ(group->GetMaxStartPositions(), count);
+
+	auto& winner_schedule = group->GetWinnerBracket().GetSchedule();
+	auto& loser_schedule  = group->GetLoserBracket() .GetSchedule();
+
+	//EXPECT_TRUE(loser_schedule[0]->Contains(*j[1]));
+
+	ASSERT_EQ(winner_schedule.size(), 8 + 4 + 2 + 1);
 	ASSERT_EQ(loser_schedule.size(),  4 + 4 + 2 + 2);
 
 	delete t;
@@ -151,10 +193,10 @@ TEST(DoubleElimination, ExportImport)
 {
 	initialize();
 
-	for (size_t count = 1; count <= 32; ++count)
+	for (size_t count = 1; count <= 64; count *= 2)
 	{
-		Judoka* j[33];
-		bool has_match[33];
+		Judoka* j[65];
+		bool has_match[65];
 
 		DoubleElimination group(0, 200);
 
