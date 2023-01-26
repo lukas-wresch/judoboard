@@ -368,12 +368,15 @@ function Color(index)
 
 
 
+var g_URL;
+
+
 function navigate(url)
 {
   window.clearInterval(TimerID);
 
+  g_URL = url;
   window.location = '/#' + url;
-  URL = url;
 
   if (window.innerWidth <= 900)//Mobile
     slideout.close();
@@ -386,7 +389,7 @@ window.onhashchange = function(e)
 {
   console.log(location.hash.slice(1));
   navigate(location.hash.slice(1));
-  $( "#main" ).load(URL);
+  $( "#main" ).load(g_URL);
 };
 
 

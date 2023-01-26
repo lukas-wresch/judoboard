@@ -33,6 +33,8 @@ void Application::SetupHttpServer()
 	m_Server.RegisterResource("/jquery-ui.css", [](auto& Request) { return HttpServer::LoadFile("html/jquery-ui.css"); }, HttpServer::ResourceType::CSS, 24*60*60);
 
 	m_Server.RegisterResource("/yaml.min.js", [](auto& Request) { return HttpServer::LoadFile("html/yaml.min.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
+	m_Server.RegisterResource("/jspdf.umd.min.js", [](auto& Request) { return HttpServer::LoadFile("html/jspdf.umd.min.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
+	m_Server.RegisterResource("/jspdf.plugin.autotable.min.js", [](auto& Request) { return HttpServer::LoadFile("html/jspdf.plugin.autotable.min.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
 
 	m_Server.RegisterResource("/slideout.min.js", [](auto& Request) { return HttpServer::LoadFile("html/slideout.min.js"); }, HttpServer::ResourceType::JavaScript, 24*60*60);
 

@@ -8,6 +8,8 @@
 <script type="text/javascript" src="slideout.min.js"></script>
 <script type="text/javascript" src="jquery-ui.min.js"></script>
 <script type="text/javascript" src="yaml.min.js"></script>
+<script type="text/javascript" src="jspdf.umd.min.js"></script>
+<script type="text/javascript" src="jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -149,13 +151,12 @@ function Update_MatCount()
 
 var TimerID = 0;
 var Streaming = false;
-var URL;
 
 console.log(window.location.hash.slice(1));
 
 if (window.location.hash.slice(1).length > 1)
 {
-  var URL = window.location.hash.slice(1);
+  g_URL = window.location.hash.slice(1);
   $( "#main" ).load(window.location.hash.slice(1));
   //navigate(window.location.hash.slice(1));
 }
