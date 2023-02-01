@@ -52,6 +52,11 @@ IFilter::IFilter(const YAML::Node& Yaml, const MatchTable* Parent)
 				else
 					assert(false);
 			}
+
+			else//Different (old) format
+			{
+				m_Participants.insert({ node.first.as<int>(), GetTournament()->FindParticipant(data.as<std::string>()) });
+			}
 		}
 	}
 }
