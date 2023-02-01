@@ -556,30 +556,33 @@ TEST(DoubleElimination, ExportImport)
 		Judoka* j[65];
 		bool has_match[65];
 
-		DoubleElimination group(0, 200);
+		Tournament t;
+		DoubleElimination* group = new DoubleElimination(0, 200);
 
 		for (int i = 1; i <= count; ++i)
 		{
 			j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
 			has_match[i] = false;
-			group.AddParticipant(j[i]);
+			group->AddParticipant(j[i]);
 		}
 
-		group.SetMatID(1);
+		group->SetMatID(1);
 
 		for (int i = 1; i <= count; ++i)
-			group.SetStartPosition(j[i], i-1);
+			group->SetStartPosition(j[i], i-1);
 
-		EXPECT_EQ(group.GetMaxStartPositions(), count);
+		EXPECT_EQ(group->GetMaxStartPositions(), count);
 
-		auto& loser_schedule = group.GetLoserBracket().GetSchedule();
+		auto& loser_schedule = group->GetLoserBracket().GetSchedule();
+
+		t.AddMatchTable(group);
 
 		YAML::Emitter yaml;
-		group >> yaml;
+		*group >> yaml;
 
-		DoubleElimination group2(YAML::Load(yaml.c_str()));
+		DoubleElimination group2(YAML::Load(yaml.c_str()), &t);
 
-		EXPECT_EQ(group.ToHTML(), group2.ToHTML());
+		EXPECT_EQ(group->ToHTML(), group2.ToHTML());
 
 		for (int i = 1; i <= count; ++i)
 			delete j[i];
