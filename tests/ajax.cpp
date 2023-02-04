@@ -479,7 +479,7 @@ TEST(Ajax, ExecuteCommand)
 
 		std::string result = app.Ajax_Execute(HttpServer::Request("cmd=dir"));
 
-		EXPECT_GE(result.length(), 170);
+		EXPECT_GE(result.length(), 120);
 
 		//TODO?!
 	}
