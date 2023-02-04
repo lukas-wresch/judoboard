@@ -21,7 +21,7 @@ TEST(App, ServerConnection)
 	EXPECT_FALSE(app.IsSlave());
 
 	EXPECT_TRUE(app.GetTournament());
-	EXPECT_TRUE(app.GetTournamentList().size() == 0);
+	EXPECT_EQ(app.GetTournamentList().size(), 0);
 }
 
 
@@ -38,6 +38,82 @@ TEST(App, ServerConnection)
 
 
 
+TEST(App, AddDM4File)
+{
+	initialize();
+	Application app;
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	app.AddTournament(t);
+
+	DM4 dm4_file("test-data/Verein1_U13 (m).dm4");
+
+	ASSERT_TRUE(dm4_file);
+
+	bool success;
+	auto output = app.AddDM4File(dm4_file, false, &success);
+
+	ASSERT_TRUE(success);
+
+	auto judokas = app.GetTournament()->GetParticipants();
+
+	ASSERT_EQ(judokas.size(), 1);
+
+	for (auto j : judokas)
+	{
+		EXPECT_EQ(j->GetFirstname(), "VornameTN");
+		EXPECT_EQ(j->GetLastname(),  "NachnameTN");
+		EXPECT_EQ(j->GetBirthyear(), 2007);
+		ASSERT_TRUE(j->GetClub());
+		EXPECT_EQ(j->GetClub()->GetName(), "Verein1");
+	}
+
+	EXPECT_EQ(app.GetDatabase().GetNumJudoka(), 0);
+	EXPECT_EQ(app.GetDatabase().GetAllClubs().size(), 0);
+}
+
+
+
+TEST(App, AddDMFFile)
+{
+	initialize();
+	Application app;
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	app.AddTournament(t);
+
+	DMF dmf_file("test-data/firstage group1 (m).dmf");
+
+	ASSERT_TRUE(dmf_file);
+
+	bool success;
+	auto output = app.AddDMFFile(dmf_file, false, &success);
+
+	ASSERT_TRUE(success);
+
+	auto judokas = app.GetTournament()->GetParticipants();
+
+	ASSERT_EQ(judokas.size(), 1);
+
+	for (auto j : judokas)
+	{
+		EXPECT_EQ(j->GetFirstname(), "firstname");
+		EXPECT_EQ(j->GetLastname(),  "lastname");
+		EXPECT_EQ(j->GetBirthyear(), 1990);
+		ASSERT_TRUE(j->GetClub());
+		EXPECT_EQ(j->GetClub()->GetName(), "club name");
+	}
+
+	EXPECT_EQ(app.GetDatabase().GetNumJudoka(), 0);
+	EXPECT_EQ(app.GetDatabase().GetAllClubs().size(), 0);
+}
+
+
+
 TEST(App, Tournaments)
 {
 	initialize();
@@ -49,14 +125,84 @@ TEST(App, Tournaments)
 	EXPECT_TRUE(app.AddTournament(t));
 	EXPECT_TRUE(app.GetTournament());
 
-	EXPECT_TRUE(app.GetTournamentList().size() == 1);
-	EXPECT_TRUE((*app.GetTournamentList().begin())->GetName() == t->GetName());
+	EXPECT_EQ(app.GetTournamentList().size(), 1);
+	EXPECT_EQ((*app.GetTournamentList().begin())->GetName(), t->GetName());
 
-	EXPECT_TRUE(app.OpenTournament(0));
-	EXPECT_TRUE(app.GetTournament()->GetName() == t->GetName());
+	EXPECT_TRUE(app.OpenTournament(t->GetUUID()));
+	ASSERT_TRUE(app.GetTournament());
+	EXPECT_EQ(app.GetTournament()->GetName(), t->GetName());
 	EXPECT_TRUE(app.CloseTournament());
 
-	EXPECT_EQ(app.FindTournament("Tournament Name")->GetName(), t->GetName());
+	EXPECT_EQ(app.FindTournamentByName("Tournament Name")->GetName(), t->GetName());
+}
+
+
+
+TEST(App, Tournaments_OpenLastTournament)
+{
+	initialize();
+
+	{
+		Application app;
+
+		Tournament* t = new Tournament("deleteMe");
+		t->AddMatch(new Match(nullptr, nullptr, t));
+
+		EXPECT_TRUE(app.AddTournament(t));
+		t->Save();
+	}
+
+	{
+		Application app;
+
+		app.LoadDataFromDisk();
+
+		EXPECT_TRUE(app.FindTournamentByName("deleteMe"));
+		ASSERT_TRUE(app.GetTournament());
+		EXPECT_EQ(app.GetTournament()->GetName(), "deleteMe");
+
+		EXPECT_TRUE(app.CloseTournament());
+	}
+
+	{
+		Application app;
+
+		app.LoadDataFromDisk();
+
+		EXPECT_TRUE(app.FindTournamentByName("deleteMe"));
+		ASSERT_TRUE(app.GetTournament());
+		EXPECT_NE(app.GetTournament()->GetName(), "deleteMe");
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(App, DeleteTournament)
+{
+	initialize();
+	Application app;
+
+	{
+		Tournament* t = new Tournament("deleteMe");
+
+		Judoka j(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
+		t->AddParticipant(&j);
+
+		EXPECT_TRUE(app.AddTournament(t));
+		ASSERT_TRUE(app.GetTournament());
+
+		EXPECT_EQ(app.GetTournamentList().size(), 1);
+		EXPECT_EQ((*app.GetTournamentList().begin())->GetName(), t->GetName());
+
+		EXPECT_TRUE(app.CloseTournament());
+		EXPECT_TRUE(app.DeleteTournament(t->GetUUID()));
+	}
+	
+
+	std::ifstream file("tournaments/deleteMe.yaml");
+	EXPECT_FALSE(file);
 }
 
 
@@ -64,26 +210,31 @@ TEST(App, Tournaments)
 TEST(App, Mats)
 {
 	initialize();
-	Application app;
 
-	EXPECT_TRUE(app.GetMats().size() == 0);
-	EXPECT_TRUE(app.FindDefaultMatID() == 0);
-	EXPECT_TRUE(app.GetDefaultMat() == nullptr);
-	EXPECT_TRUE(app.FindMat(1) == nullptr);
+	{
+		Application app;
 
-	EXPECT_TRUE(app.StartLocalMat(1));
+		EXPECT_EQ(app.GetMats().size(), 0);
+		EXPECT_EQ(app.FindDefaultMatID(), 0);
+		EXPECT_FALSE(app.GetDefaultMat());
+		EXPECT_FALSE(app.FindMat(1));
 
-	EXPECT_TRUE(app.GetMats().size() == 1);
-	EXPECT_TRUE(app.FindDefaultMatID() == 1);
-	EXPECT_TRUE(app.GetDefaultMat() != nullptr);
-	EXPECT_TRUE(app.FindMat(1) != nullptr);
+		EXPECT_TRUE(app.StartLocalMat(1));
 
-	EXPECT_TRUE(app.CloseMat(1));
+		EXPECT_EQ(app.GetMats().size(), 1);
+		EXPECT_EQ(app.FindDefaultMatID(), 1);
+		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.FindMat(1));
 
-	EXPECT_TRUE(app.GetMats().size() == 1);
-	EXPECT_TRUE(app.FindDefaultMatID() == 1);
-	EXPECT_TRUE(app.GetDefaultMat() != nullptr);
-	EXPECT_TRUE(app.FindMat(1) != nullptr);
+		EXPECT_TRUE(app.CloseMat(1));
+
+		EXPECT_EQ(app.GetMats().size(), 1);
+		EXPECT_EQ(app.FindDefaultMatID(), 1);
+		EXPECT_TRUE(app.GetDefaultMat() != nullptr);
+		EXPECT_TRUE(app.FindMat(1) != nullptr);
+	}
+
+	ZED::Core::Pause(5000);
 }
 
 
@@ -91,102 +242,285 @@ TEST(App, Mats)
 TEST(App, FullTournament)
 {
 	initialize();
-	Application app;
 
-	app.CloseTournament();
-	app.SetTournamentList().clear();
-
-	app.StartLocalMat(1);
-
-	Account acc("admin", "1234", Account::AccessLevel::Admin);
-	app.GetDatabase().AddAccount(acc);
-
-	ZED::Core::Pause(5000);
-
-	Judoka j1(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
-	Judoka j2(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
-	Judoka j3(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
-
-	Judoka j4(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
-	Judoka j5(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
-	Judoka j6(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
-
-	app.GetDatabase().AddJudoka(std::move(j1));
-	app.GetDatabase().AddJudoka(std::move(j2));
-	app.GetDatabase().AddJudoka(std::move(j3));
-
-	app.GetDatabase().AddJudoka(std::move(j4));
-	app.GetDatabase().AddJudoka(std::move(j5));
-	app.GetDatabase().AddJudoka(std::move(j6));
-
-	auto tournament_name = GetRandomName();
-	auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3*60, 3*60, 20, 10));
-	tourney->EnableAutoSave(false);
-	EXPECT_TRUE(app.AddTournament(tourney));
-
-	app.OpenTournament(app.FindTournamentIndex(tournament_name));
-
-	tourney->AddParticipant(&j1);
-	tourney->AddParticipant(&j2);
-	tourney->AddParticipant(&j3);
-	tourney->AddParticipant(&j4);
-	tourney->AddParticipant(&j5);
-	tourney->AddParticipant(&j6);
-
-	MatchTable* m1 = new Weightclass(tourney, 0, 49);
-	MatchTable* m2 = new Weightclass(tourney, 50, 100);
-	m1->SetMatID(1);
-	m2->SetMatID(1);
-	tourney->AddMatchTable(m1);
-	tourney->AddMatchTable(m2);
-
-	auto mat = app.GetDefaultMat();
-	ASSERT_TRUE(mat);
-
-	for (int i = 0; i < 6; i++)
 	{
-		ZED::Core::Pause(6000);
-		auto match = tourney->GetNextMatch(mat->GetMatID());
-		ASSERT_TRUE(match);
-		EXPECT_TRUE(mat->StartMatch(match));
+		Application app;
 
-		ZED::Core::Pause(8000);
-				
-		mat->Hajime();
+		app.CloseTournament();
+		app.SetTournamentList().clear();
 
-		ZED::Core::Pause(6000);
+		app.StartLocalMat(1);
 
-		while (!mat->HasConcluded())
+		Account acc("admin", "1234", Account::AccessLevel::Admin);
+		app.GetDatabase().AddAccount(acc);
+
+		ZED::Core::Pause(1000);
+
+		Judoka j1(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
+		Judoka j2(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
+		Judoka j3(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
+
+		Judoka j4(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
+		Judoka j5(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
+		Judoka j6(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
+
+		app.GetDatabase().AddJudoka(std::move(j1));
+		app.GetDatabase().AddJudoka(std::move(j2));
+		app.GetDatabase().AddJudoka(std::move(j3));
+
+		app.GetDatabase().AddJudoka(std::move(j4));
+		app.GetDatabase().AddJudoka(std::move(j5));
+		app.GetDatabase().AddJudoka(std::move(j6));
+
+		auto tournament_name = GetRandomName();
+		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
+		tourney->EnableAutoSave(false);
+		EXPECT_TRUE(app.AddTournament(tourney));
+
+		ASSERT_TRUE(app.FindTournamentByName(tournament_name));
+		EXPECT_TRUE(app.OpenTournament(app.FindTournamentByName(tournament_name)->GetUUID()));
+
+		EXPECT_GE(j1.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j2.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j3.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j4.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j5.GetLengthOfBreak(), 60u);
+		EXPECT_GE(j6.GetLengthOfBreak(), 60u);
+
+		tourney->AddParticipant(&j1);
+		tourney->AddParticipant(&j2);
+		tourney->AddParticipant(&j3);
+		tourney->AddParticipant(&j4);
+		tourney->AddParticipant(&j5);
+		tourney->AddParticipant(&j6);
+
+		MatchTable* m1 = new RoundRobin(Weight(0), Weight(49));
+		MatchTable* m2 = new RoundRobin(Weight(0), Weight(49));
+		m1->SetMatID(1);
+		m2->SetMatID(1);
+		tourney->AddMatchTable(m1);
+		tourney->AddMatchTable(m2);
+
+		auto mat = app.GetDefaultMat();
+		ASSERT_TRUE(mat);
+
+		for (int i = 0; i < 6; i++)
 		{
-			Fighter f = Fighter::White;
-			if (rand() % 2 == 0)
-				f = Fighter::Blue;
+			ZED::Core::Pause(6000);
+			auto match = tourney->GetNextMatch(mat->GetMatID());
+			ASSERT_TRUE(match);
+			EXPECT_TRUE(mat->StartMatch(match));
 
-			int rnd = rand() % 6;
+			ZED::Core::Pause(5000);
 
-			if (rnd == 0)
-				mat->AddIppon(f);
-			else if (rnd == 1)
-				mat->AddWazaAri(f);
-			else if (rnd == 2)
-				mat->AddWazaAri(f);
-			else if (rnd == 3)
-				mat->AddShido(f);
-			else if (rnd == 4)
-				mat->AddMedicalExamination(f);
-			else
+			mat->Hajime();
+
+			ZED::Core::Pause(6000);
+
+			while (!mat->HasConcluded())
 			{
-				mat->Osaekomi(f);
-				ZED::Core::Pause(12 * 1000);
+				Fighter f = Fighter::White;
+				if (rand() % 2 == 0)
+					f = Fighter::Blue;
+
+				int rnd = rand() % 6;
+
+				if (rnd == 0)
+					mat->AddIppon(f);
+				else if (rnd == 1)
+					mat->AddWazaAri(f);
+				else if (rnd == 2)
+					mat->AddWazaAri(f);
+				else if (rnd == 3)
+					mat->AddShido(f);
+				else if (rnd == 4)
+					mat->AddMedicalExamination(f);
+				else
+				{
+					mat->Osaekomi(f);
+					ZED::Core::Pause(12 * 1000);
+				}
+
+				ZED::Core::Pause(10 * 1000);
 			}
 
-			ZED::Core::Pause(10 * 1000);
+			ZED::Core::Pause(3000);
+
+			EXPECT_TRUE(mat->EndMatch());
+			ZED::Core::Pause(8000);
 		}
+	}
+}
+
+
+
+TEST(App, FullTournament_SingleElimination14)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.CloseTournament();
+		app.SetTournamentList().clear();
+
+		app.StartLocalMat(1);
+
+		Account acc("admin", "1234", Account::AccessLevel::Admin);
+		app.GetDatabase().AddAccount(acc);
+
+		ZED::Core::Pause(5000);
+
+		auto tournament_name = GetRandomName();
+		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
+		tourney->EnableAutoSave(false);
+		EXPECT_TRUE(app.AddTournament(tourney));
+
+		ASSERT_TRUE(app.FindTournamentByName(tournament_name));
+		EXPECT_TRUE(app.OpenTournament(app.FindTournamentByName(tournament_name)->GetUUID()));
+
+		for (int i = 0; i < 14; ++i)
+			tourney->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i));
+
+		tourney->AddMatchTable(new SingleElimination(10, 200, tourney));
+		tourney->GetMatchTables()[0]->SetMatID(1);
+		tourney->GenerateSchedule();
+
+		auto mat = app.GetDefaultMat();
+		ASSERT_TRUE(mat);
 
 		ZED::Core::Pause(3000);
 
-		EXPECT_TRUE(mat->EndMatch());
-		ZED::Core::Pause(8000);
+		for (auto match : tourney->GetSchedule())
+		{
+			ASSERT_TRUE(match);
+			ASSERT_TRUE(mat->StartMatch(match));
+
+			ZED::Core::Pause(1000);
+
+			ASSERT_TRUE(mat->AreFightersOnMat());
+
+			mat->Hajime();
+
+			ZED::Core::Pause(1000);
+
+			while (!mat->HasConcluded())
+			{
+				Fighter f = Fighter::White;
+				if (rand() % 2 == 0)
+					f = Fighter::Blue;
+
+				int rnd = rand() % 6;
+
+				if (rnd == 0)
+					mat->AddIppon(f);
+				else if (rnd == 1)
+					mat->AddWazaAri(f);
+				else if (rnd == 2)
+					mat->AddWazaAri(f);
+				else if (rnd == 3)
+					mat->AddShido(f);
+				else if (rnd == 4)
+					mat->AddMedicalExamination(f);
+				else
+				{
+					mat->Osaekomi(f);
+					ZED::Core::Pause(11 * 1000);
+				}
+
+				ZED::Core::Pause(12 * 1000);
+			}
+
+			EXPECT_TRUE(mat->EndMatch());
+			ZED::Core::Pause(12 * 1000);
+		}
+
+		ZED::Core::Pause(5000);
+	}
+}
+
+
+
+TEST(App, FullTournament_SingleElimination7_BO3)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.CloseTournament();
+		app.SetTournamentList().clear();
+
+		app.StartLocalMat(1);
+
+		Account acc("admin", "1234", Account::AccessLevel::Admin);
+		app.GetDatabase().AddAccount(acc);
+
+		auto tournament_name = GetRandomName();
+		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
+		tourney->EnableAutoSave(false);
+		EXPECT_TRUE(app.AddTournament(tourney));
+
+		ASSERT_TRUE(app.FindTournamentByName(tournament_name));
+		EXPECT_TRUE(app.OpenTournament(app.FindTournamentByName(tournament_name)->GetUUID()));
+
+		for (int i = 0; i < 7; ++i)
+			tourney->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i));
+
+		auto group = new SingleElimination(10, 200, tourney);
+		group->SetMatID(1);
+		group->IsBestOfThree(true);
+		tourney->AddMatchTable(group);
+		tourney->GenerateSchedule();
+
+		auto mat = app.GetDefaultMat();
+		ASSERT_TRUE(mat);
+
+		ZED::Core::Pause(3000);
+
+		for (auto match : tourney->GetSchedule())
+		{
+			if (!mat->StartMatch(match))
+				continue;
+
+			ZED::Core::Pause(1000);
+
+			ASSERT_TRUE(mat->AreFightersOnMat());
+
+			mat->Hajime();
+
+			ZED::Core::Pause(1000);
+
+			while (!mat->HasConcluded())
+			{
+				Fighter f = Fighter::White;
+				if (rand() % 2 == 0)
+					f = Fighter::Blue;
+
+				int rnd = rand() % 6;
+
+				if (rnd == 0)
+					mat->AddIppon(f);
+				else if (rnd == 1)
+					mat->AddWazaAri(f);
+				else if (rnd == 2)
+					mat->AddWazaAri(f);
+				else
+				{
+					mat->Osaekomi(f);
+					ZED::Core::Pause(12 * 1000);
+				}
+
+				ZED::Core::Pause(10 * 1000);
+			}
+
+			ZED::Core::Pause(3000);
+
+			EXPECT_TRUE(mat->EndMatch());
+			ZED::Core::Pause(15 * 1000);
+		}
+
+		ZED::Core::Pause(5000);
 	}
 }
 
@@ -201,7 +535,7 @@ TEST(App, VeryLongNameTest)
 	Judoka j1("Very-Long-Firstname", "Very-Long-Lastname", rand() % 50);
 	Judoka j2("Very-Long-Firstname", "Very-Long-Lastname", rand() % 50);
 
-	Match match(nullptr, &j1, &j2);
+	Match match(&j1, &j2, nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 25, 0, 30, 20, true, true, true, 0));
 
@@ -274,29 +608,36 @@ TEST(App, MatchOnSlave)
 
 	slave.StartLocalMat(2);
 
+	ZED::Core::Pause(100);
 
 	Judoka j1("White", "LastnameW");
 	Judoka j2("Blue",  "LastnameB");
-	Match match(nullptr, &j1, &j2);
-	match.SetMatID(2);
+	Match* match = new Match(&j1, &j2, nullptr);
+	match->SetMatID(2);
 
-	master.GetTournament()->AddMatch(&match);
+	master.GetTournament()->AddMatch(match);
 
 	auto mat = master.FindMat(2);
 
-	ASSERT_TRUE(mat != nullptr);
-	ASSERT_TRUE(mat->StartMatch(&match));
+	ASSERT_TRUE(mat);
+	ASSERT_TRUE(mat->StartMatch(match));
 
-	ZED::Core::Pause(5000);
+	ZED::Core::Pause(2000);
+
+	EXPECT_TRUE(mat->AreFightersOnMat());
 
 	mat->Hajime();
 
 	mat->AddIppon(Fighter::White);
 
+	ZED::Core::Pause(100);
+
 	EXPECT_TRUE(mat->EndMatch());
 
-	EXPECT_EQ(match.GetMatchResult().m_Winner, Fighter::White);
-	EXPECT_EQ(match.GetMatchResult().m_Score, Match::Score::Ippon);
+	ZED::Core::Pause(100);
+
+	EXPECT_EQ(match->GetResult().m_Winner, Fighter::White);
+	EXPECT_EQ(match->GetResult().m_Score, Match::Score::Ippon);
 }
 
 

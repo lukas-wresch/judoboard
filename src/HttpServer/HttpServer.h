@@ -23,7 +23,8 @@ public:
 		CSS,
 		JavaScript,
 		Image_JPG,
-		Image_PNG
+		Image_PNG,
+		Binary//Arbitrary binary data (to force downloads)
 	};
 
 	struct RequestHeader
@@ -53,6 +54,10 @@ public:
 
 	struct Request
 	{
+		Request(const Request& Org)//Deep copy
+			: m_Query(Org.m_Query), m_Body(Org.m_Body, Org.m_Body.GetSize()), m_RequestInfo(Org.m_RequestInfo), m_ResponseHeader(Org.m_ResponseHeader) {
+		}
+
 		Request(const std::string& Query) : m_Query(Query) {}
 		Request(const std::string& Query, ZED::Blob&& Body) : m_Query(Query), m_Body(std::move(Body)) {}
 		Request(const std::string& Query, const std::string& Body) : Request(Query, ZED::Blob(Body)) {}
@@ -60,7 +65,6 @@ public:
 		Request(const std::string& Query, std::string& Body, const RequestInfo& RequestInfo) : Request(Query, ZED::Blob(Body), RequestInfo) {}
 
 		std::string m_Query;
-		//std::string m_Body;
 		ZED::Blob m_Body;
 		const RequestInfo m_RequestInfo;
 
@@ -81,9 +85,17 @@ public:
 
 	[[nodiscard]]
 	static std::string DecodeURLEncoded(const ZED::Blob& Input, const char* VariableName);
+	[[nodiscard]]
+	static std::string DecodeURLEncoded(const ZED::Blob& Input, const std::string& VariableName) {
+		return DecodeURLEncoded(Input, VariableName.c_str());
+	}
 
 	[[nodiscard]]
 	static std::string DecodeURLEncoded(const std::string& Input, const char* VariableName);
+	[[nodiscard]]
+	static std::string DecodeURLEncoded(const std::string& Input, const std::string& VariableName) {
+		return DecodeURLEncoded(Input, VariableName.c_str());
+	}
 
 	[[nodiscard]]
 	static const std::string CookieHeader(const std::string& Name, const std::string& Value, const std::string& Location = "/");
@@ -93,18 +105,20 @@ public:
 		
 	//void RegisterResource(const std::string& URI, std::string (*Callback)(const std::string Query), ResourceType Type = ResourceType::HTML);
 	//void RegisterResource(const std::string& URI, std::function<std::string(Request&)> Callback, ResourceType Type = ResourceType::HTML);
-	void RegisterResource(const std::string& URI, std::function<ZED::Blob(Request&)> Callback, ResourceType Type = ResourceType::HTML);
+	void RegisterResource(const std::string& URI, std::function<ZED::Blob(Request&)> Callback, ResourceType Type = ResourceType::HTML, uint32_t Cache = 0);
 
 private:
 
 	struct Resource
 	{
-		Resource(ResourceType Type, std::function<ZED::Blob(Request&)> Callback) : m_Callback(Callback)
+		Resource(ResourceType Type, std::function<ZED::Blob(Request&)> Callback, uint32_t Cache = 0) : m_Callback(Callback)
 		{
 			m_Type = Type;
+			m_CacheAgeInSeconds = Cache;
 		}
 
 		ResourceType m_Type;
+		uint32_t m_CacheAgeInSeconds = 0;
 		std::function<ZED::Blob(Request&)> m_Callback;
 	};
 

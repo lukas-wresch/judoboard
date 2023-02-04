@@ -1,6 +1,12 @@
 #pragma once
 #include <vector>
-#include "../ZED/include/csv.h"
+
+
+namespace YAML
+{
+	class Emitter;
+	class Node;
+}
 
 
 
@@ -80,7 +86,7 @@ namespace Judoboard
 	public:
 		enum class EventGroup
 		{
-			White, Blue, Neutral
+			White, Blue, Neutral = 2
 		};
 
 		enum class NeutralEvent
@@ -110,6 +116,7 @@ namespace Judoboard
 			RemoveNoDisqualification,
 			AddGachi,
 			RemoveGachi,
+			HanteiRevoked
 		};
 
 
@@ -122,9 +129,8 @@ namespace Judoboard
 
 		const std::string ToString() const;
 
-		void operator << (ZED::CSV& Stream);
-		void operator >> (ZED::CSV& Stream) const;
-
+		void operator << (const YAML::Node& Yaml);
+		void operator >> (YAML::Emitter& Yaml) const;
 
 	private:
 		struct Event

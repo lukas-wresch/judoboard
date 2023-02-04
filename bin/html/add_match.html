@@ -2,7 +2,7 @@
 
 <form>
 
-<div style="display: none;" id="div_showParticipantsOnly">
+<div id="div_showParticipantsOnly">
   <label style="width:200px;float:left;margin-top:4px;" id="label_showParticipantsOnly">Show only participants</label>
   <input type="checkbox" id="showParticipantsOnly" class="switch-input" onclick="ToggleFilter();">
   <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="showParticipantsOnly">
@@ -16,10 +16,36 @@
     <input type="hidden" id="white_id" value=""/>
 </div>
 
+<div id="div_search_white">
+  <table id="search_white" border="1" rules="all" style="margin-bottom: 1cm;">
+    <tr>
+      <th style="width: 0.5cm;" id="no">No.</th>
+      <th style="width: 6.2cm;" id="name">Name</th>
+      <th style="width: 6.2cm;" id="club">Club</th>
+      <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
+      <th style="width: 2cm; text-align: center;" id="birthyear">Birthyear</th>
+      <th style="width: 5.1cm; text-align: center;" class="options">Options</th>
+    </tr>
+  </table>
+</div>
+
 <div>
     <label id="label_blue" style="width:150px;float:left;margin-top:5px;">Name (blue)</label>
     <input style="margin-bottom:20px;" size="50" id="blue" value=""/>
     <input type="hidden" id="blue_id" value=""/>
+</div>
+
+<div id="div_search_blue">
+  <table id="search_blue" border="1" rules="all" style="margin-bottom: 1cm;">
+    <tr>
+      <th style="width: 0.5cm;" id="no">No.</th>
+      <th style="width: 6.2cm;" id="name">Name</th>
+      <th style="width: 6.2cm;" id="club">Club</th>
+      <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
+      <th style="width: 2cm; text-align: center;" id="birthyear">Birthyear</th>
+      <th style="width: 5.1cm; text-align: center;" class="options">Options</th>
+    </tr>
+  </table>
 </div>
 
 <div id="note" style="display: none; font-weight: bold;">
@@ -31,6 +57,19 @@
 
 
 <script>
+
+function Add(color, name, uuid)
+{
+  document.getElementById(color).value = name;
+  document.getElementById(color + "_id").value = uuid;
+
+  var table = document.getElementById("search_" + color);
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+}
+
+
 
 function AddMatch()
 {
@@ -56,56 +95,86 @@ function AddMatch()
 function ToggleFilter()
 {
   filter = !filter;
-
-  $.ajax({
-      url: "ajax/judoka/autocomplete?filter=" + filter,
-      success: function(data)
-      {
-        console.log(data);
-        var obj = jQuery.parseJSON(data);
-
-        console.log(obj);
-        $("#white").autocomplete( "option", "source", obj );
-        $("#blue" ).autocomplete( "option", "source", obj );
-      }
-    });
+  Update('white');
+  Update('blue');
 }
 
 
-$("#white").autocomplete({
-    minLength: 1 ,
-    focus:  function( event, ui ) { this.value = ui.item.label; return false; },
-    select: function( event, ui ) { this.value = ui.item.label; $( "#white_id" ).val(ui.item.value); return false; }
-});
 
+function Update(color)
+{
+  AjaxCallback('ajax/judoka/search?name=' + document.getElementById(color).value, function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
 
-$("#blue").autocomplete({
-    minLength: 1 ,
-    focus:  function( event, ui ) { this.value = ui.item.label; return false; },
-    select: function( event, ui ) { this.value = ui.item.label; $( "#blue_id" ).val(ui.item.value); return false; }
-});
+    var table = document.getElementById("search_" + color);
 
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
 
-
-var filter = true;
-
-
-AjaxCallback('ajax/tournament/is_open', function(response) {
-    if (response == 'ok')
+    var no = 0;
+    for (const judoka of res)
     {
-      $("#div_showParticipantsOnly").show();
-      filter = false;  
-      showParticipantsOnly.checked = true;
+      if (!judoka.is_participant && filter)
+        continue;
+
+      var row = table.insertRow(-1);
+      var cell0 = row.insertCell(0);
+      var cell1 = row.insertCell(1);
+      var cell2 = row.insertCell(2);
+      var cell3 = row.insertCell(3);
+      var cell4 = row.insertCell(4);
+      var cell5 = row.insertCell(5);
+
+      if (no%2 == 0)
+        row.style.backgroundColor = "#eee";
+      no++;
+
+      cell0.innerHTML = no;
+      cell0.style.textAlign = "center";
+      cell0.style.fontSize  = "16pt";
+
+      cell1.innerHTML = judoka.name;
+      cell1.style.fontSize  = "16pt";
+
+      if (typeof judoka.club === 'undefined')
+        cell2.innerHTML = "- - -";
+      else
+        cell2.innerHTML = judoka.club;
+      cell2.style.fontSize  = "16pt";
+
+      cell3.innerHTML = judoka.weight + " kg";
+      cell3.style.textAlign = "center";
+      cell3.style.fontSize  = "16pt";
+
+      cell4.innerHTML = judoka.birthyear;
+      cell4.style.textAlign = "center";
+      cell4.style.fontSize  = "16pt";
+
+      cell5.innerHTML = "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return Add('"+ color + "','" + judoka.name + "','"+judoka.uuid+"')\">" + translate('add') + "</button>";
+      cell5.style.textAlign = "right";
     }
-    
-    ToggleFilter();
   });
+}
 
 
-document.getElementById("headline").innerHTML    = lang.new_match;
-document.getElementById("label_white").innerHTML = lang.name_white;
-document.getElementById("label_blue").innerHTML  = lang.name_blue;
-document.getElementById("add").innerHTML         = lang.add_match;
+document.getElementById("white").oninput = function(e)
+{
+  Update("white");
+};
+document.getElementById("blue").oninput = function(e)
+{
+  Update("blue");
+};
+
+var filter = false;
+
+
+
+document.getElementById("headline").innerHTML    = translate('new_match');
+document.getElementById("label_white").innerHTML = translate('name_white');
+document.getElementById("label_blue").innerHTML  = translate('name_blue');
+document.getElementById("add").innerHTML         = translate('add_match');
 
 
 </script>

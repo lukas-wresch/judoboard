@@ -12,7 +12,7 @@ namespace Judoboard
 
 		RemoteTournament(const std::string& Host, uint16_t Port);
 
-		virtual std::vector<const Match*> GetNextMatches(uint32_t MatID) const override;
+		virtual std::vector<Match> GetNextMatches(uint32_t MatID) const override;
 
 		virtual bool IsParticipant(const Judoka& Judoka) const override;
 
@@ -24,7 +24,7 @@ namespace Judoboard
 
 	private:
 		std::string Request2Master(const std::string& URL) const;
-		bool Post2Master(const std::string& URL, const ZED::CSV& Data) const;
+		bool Post2Master(const std::string& URL, const YAML::Emitter& Data) const;
 
 		std::string m_Hostname;
 		uint16_t m_Port;

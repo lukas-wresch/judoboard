@@ -58,12 +58,12 @@
 
 
 <div>
-    <p style="width:150px;margin-top:1cm;">Log</p>
+    <p style="width:150px;margin-top:1cm;" id="matchlog"></p>
     <table id="log" border="1" rules="all">
       <tr>
-        <th style="width: 2cm;">Time</th>
-        <th style="width: 2cm;">For</th>
-        <th style="width: 4cm;">Event</th>
+        <th style="width: 2cm;" id="log_time">Time</th>
+        <th style="width: 2cm;" id="log_for">For</th>
+        <th style="width: 5cm;" id="log_event">Event</th>
       </tr>
     </table>
 </div>
@@ -78,53 +78,66 @@ function GetMatch()
 {
   AjaxCallback('ajax/match/get?id='+id, function(response) {
     console.log(response);
-    var res = response.split(",");
+    var res = YAML.parse(response);
 
-    if (res.length < 4)
-      return;
+    if (typeof res.white_name !== 'undefined')
+      document.getElementById("white").innerHTML = res.white_name;
+    else if (res.white_dependency_type == 2)
+      document.getElementById("white").innerHTML = "<a href='#edit_match.html?id=" + res.white_dependency_uuid + "'>Winner of this match</a>";
+    else if (res.white_dependency_type == 3)
+      document.getElementById("white").innerHTML = "<a href='#edit_match.html?id=" + res.white_dependency_uuid + "'>Loser of this match</a>";
 
-    var i = 0;
+    else if (res.white_dependency_type == 11)
+      document.getElementById("white").innerHTML = "<a href='#matchtable_add.html?id=" + res.white_dependency_uuid + "'>Place 1 of this match table</a>";
+    else if (res.white_dependency_type == 12)
+      document.getElementById("white").innerHTML = "<a href='#matchtable_add.html?id=" + res.white_dependency_uuid + "'>Place 2 of this match table</a>";
 
-    var id = res[i++];
-    document.getElementById("white").innerHTML = res[i++];
-    document.getElementById("blue" ).innerHTML = res[i++];
 
-    var mat    = res[i++];
-    var status = res[i++];
-    var color  = res[i++];
+    if (typeof res.blue_name !== 'undefined')
+      document.getElementById("blue" ).innerHTML = res.blue_name;
+    else if (res.blue_dependency_type == 2)
+      document.getElementById("blue").innerHTML = "<a href='#edit_match.html?id=" + res.blue_dependency_uuid + "'>Winner of this match</a>";
+    else if (res.blue_dependency_type == 3)
+      document.getElementById("blue").innerHTML = "<a href='#edit_match.html?id=" + res.blue_dependency_uuid + "'>Loser of this match</a>";
 
-    if (status == 0)
+    else if (res.blue_dependency_type == 11)
+      document.getElementById("blue").innerHTML = "<a href='#matchtable_add.html?id=" + res.blue_dependency_uuid + "'>Place 1 of this match table</a>";
+    else if (res.blue_dependency_type == 12)
+      document.getElementById("blue").innerHTML = "<a href='#matchtable_add.html?id=" + res.blue_dependency_uuid + "'>Place 2 of this match table</a>";
+
+    if (res.state == 0)
     {
-      document.getElementById("status").innerHTML = lang.scheduled;
+      document.getElementById("status").innerHTML = translate('scheduled');
       $('#div_delete').show();
     }
-    else if (status == 1)
-      document.getElementById("status").innerHTML = lang.running;
-    else if (status == 2)
-      document.getElementById("status").innerHTML = lang.concluded;
+    else if (res.state == 1)
+      document.getElementById("status").innerHTML = translate('running');
+    else if (res.state == 2)
+      document.getElementById("status").innerHTML = translate('concluded');
+    else if (res.state == 3)
+      document.getElementById("status").innerHTML = translate('optional');
+    else if (res.state == 4)
+      document.getElementById("status").innerHTML = translate('skipped');
 
-    var matchtable_id = res[i++];
-    document.getElementById("class").innerHTML = res[i++];
+    document.getElementById("class").innerHTML = res.match_table_name;
 
-    var winner = res[i++];
-    if (winner == 0)
-      document.getElementById("winner").innerHTML = lang.white;
-    else if (winner == 1)
-      document.getElementById("winner").innerHTML = lang.blue;
-    else if (winner == 2 && status == 2)
-      document.getElementById("winner").innerHTML = lang.draw;
+    if (res.winner == 0)
+      document.getElementById("winner").innerHTML = translate('white');
+    else if (res.winner == 1)
+      document.getElementById("winner").innerHTML = translate('blue');
+    else if (res.winner == 2 && status == 2)
+      document.getElementById("winner").innerHTML = translate('draw');
 
-    document.getElementById("score").innerHTML = res[i++];
-    document.getElementById("time").innerHTML  = NiceTimeMS(res[i++]);
-
-    var rules = res[i++];
+    document.getElementById("score").innerHTML = res.score;
+    document.getElementById("time").innerHTML  = NiceTimeMS(res.time);
 
     GetMats(function (){
-      document.getElementById("mat").value = mat;
+      document.getElementById("mat").value = res.mat_id;
     });
 
     GetRuleSets(function() {
-      //document.getElementById("rule").value = rules;
+      if (typeof res.rule_set !== 'undefined')
+        document.getElementById("rule").value = res.rule_set;
     });
   });
 }
@@ -182,11 +195,11 @@ function GetLog()
       if (res[i+1] == 2)
         cell2.innerHTML = "- - -";
       else if (res[i+1] == 0)
-        cell2.innerHTML = lang.white;
+        cell2.innerHTML = translate('white');
       else if (res[i+1] == 1)
       {
         cell2.style.color = "blue";
-        cell2.innerHTML = lang.blue;
+        cell2.innerHTML = translate('blue');
       }
 
 
@@ -201,19 +214,19 @@ function GetLog()
       else if (res[i+1] == 2 && res[i+2] == 4)
         cell3.innerHTML = "Yoshi";
       else if (res[i+1] == 2 && res[i+2] == 5)
-        cell3.innerHTML = "Osaekomi switched to other fighter";
+        cell3.innerHTML = translate('osaekomi_switched');
       else if (res[i+1] == 2 && res[i+2] == 6)
-        cell3.innerHTML = "Match started";
+        cell3.innerHTML = translate('match_started');
       else if (res[i+1] == 2 && res[i+2] == 7)
-        cell3.innerHTML = "End of match";
+        cell3.innerHTML = translate('end_of_match');
       else if (res[i+1] == 2 && res[i+2] == 8)
-        cell3.innerHTML = "Golden Score activated";
+        cell3.innerHTML = translate('goldenscore_activate');
       else if (res[i+1] == 2 && res[i+2] == 9)
-        cell3.innerHTML = "Golden Score revoked!";
+        cell3.innerHTML = translate('goldenscore_revoked');
       else if (res[i+1] == 2 && res[i+2] == 10)
-        cell3.innerHTML = "Match is a draw";
+        cell3.innerHTML = translate('draw');
       else if (res[i+1] == 2 && res[i+2] == 11)
-        cell3.innerHTML = "Draw revoked!";
+        cell3.innerHTML = translate('draw_revoked');
 
       else if (res[i+2] == 0)
         cell3.innerHTML = "Ippon";
@@ -224,13 +237,13 @@ function GetLog()
       else if (res[i+2] == 3)
         cell3.innerHTML = "Koka";
       else if (res[i+2] == 4)
-        cell3.innerHTML = "Ippon revoked!";
+        cell3.innerHTML = translate('ippon_revoked');
       else if (res[i+2] == 5)
-        cell3.innerHTML = "Wazaari revoked!";
+        cell3.innerHTML = translate('wazaari_revoked');
       else if (res[i+2] == 6)
-        cell3.innerHTML = "Yuko revoked!";
+        cell3.innerHTML = translate('yuko_revoked');
       else if (res[i+2] == 7)
-        cell3.innerHTML = "Koka revoked!";
+        cell3.innerHTML = translate('koka_revoked');
       else if (res[i+2] == 8)
         cell3.innerHTML = "Wazari awasete Ippon";
       else if (res[i+2] == 9)
@@ -238,31 +251,31 @@ function GetLog()
       else if (res[i+2] == 10)
         cell3.innerHTML = "Shido";
       else if (res[i+2] == 11)
-        cell3.innerHTML = "Hansoku-Make (indirect)";
+        cell3.innerHTML = translate('hansokumake_direct');
       else if (res[i+2] == 12)
-        cell3.innerHTML = "Hansoku-Make (direct)";
+        cell3.innerHTML = translate('hansokumake_indirect');
       else if (res[i+2] == 13)
-        cell3.innerHTML = "Shido revoked!";
+        cell3.innerHTML = translate('shido_revoked');
       else if (res[i+2] == 14)
-        cell3.innerHTML = "Hansoku-Make revoked!";
+        cell3.innerHTML = translate('hansokumake_revoked');
       else if (res[i+2] == 15)
-        cell3.innerHTML = "Medical Examination";
+        cell3.innerHTML = translate('medical_examiniation');
       else if (res[i+2] == 16)
-        cell3.innerHTML = "Medical Examination revoked!";
+        cell3.innerHTML = translate('medical_examiniation_revoked');
       else if (res[i+2] == 17)
         cell3.innerHTML = "Hantei";
       else if (res[i+2] == 18)
-        cell3.innerHTML = "Disqualification";
+        cell3.innerHTML = translate('disqualification');
       else if (res[i+2] == 19)
-        cell3.innerHTML = "No Disqualification";
+        cell3.innerHTML = translate('no_disqualification');
       else if (res[i+2] == 20)
-        cell3.innerHTML = "Disqualification revoked!";
+        cell3.innerHTML = translate('disqualification_revoked');
       else if (res[i+2] == 21)
-        cell3.innerHTML = "No Disqualification revoked!";
+        cell3.innerHTML = translate('no_disqualification_revoked');
       else if (res[i+2] == 22)
         cell3.innerHTML = "Gachi";
       else if (res[i+2] == 23)
-        cell3.innerHTML = "Gachi revoked!";
+        cell3.innerHTML = translate('gachi_revoked');
     }
   });
 }
@@ -270,7 +283,7 @@ function GetLog()
 
 function DeleteMatch()
 {
-  if (confirm(lang.delete_match_confirm))
+  if (confirm(translate('delete_match_confirm')))
   {
     Ajax('ajax/match/delete?id='+id);
     navigate('schedule.html');
@@ -284,15 +297,20 @@ var id = URLDecode(URL, "id");
 
 GetMatch();
 
-document.getElementById("label_white").innerHTML  = lang.name_white;
-document.getElementById("label_blue").innerHTML   = lang.name_blue;
-document.getElementById("label_mat").innerHTML    = lang.mat;
-document.getElementById("label_rule").innerHTML   = lang.rule_set;
-document.getElementById("label_status").innerHTML = lang.status;
-document.getElementById("label_winner").innerHTML = lang.winner;
-document.getElementById("label_score").innerHTML  = lang.score;
-document.getElementById("label_time").innerHTML   = lang.time;
-document.getElementById("delete").innerHTML       = lang.delete_match;
+document.getElementById("label_white").innerHTML  = translate('name_white');
+document.getElementById("label_blue").innerHTML   = translate('name_blue');
+document.getElementById("label_mat").innerHTML    = translate('mat');
+document.getElementById("label_rule").innerHTML   = translate('rule_set');
+document.getElementById("label_status").innerHTML = translate('status');
+document.getElementById("label_winner").innerHTML = translate('winner');
+document.getElementById("label_score").innerHTML  = translate('score');
+document.getElementById("label_time").innerHTML   = translate('time');
+document.getElementById("delete").innerHTML       = translate('delete_match');
+
+document.getElementById("matchlog").innerHTML     = translate('match_log');
+document.getElementById("log_time").innerHTML     = translate('time');
+document.getElementById("log_for").innerHTML      = translate('for');
+document.getElementById("log_event").innerHTML    = translate('event');
 
 GetLog();
 

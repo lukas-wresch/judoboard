@@ -46,6 +46,14 @@
   </select>
 </div>
 
+<div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_nameStyle">Name Style</label>
+  <select style="margin-bottom:20px;" id="nameStyle">
+    <option selected value="0" id="given_name_first">Give name first</option>
+    <option value="1" id="family_name_first">Family name first</option>
+  </select>
+</div>
+
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateMat()" id="update">Update Mat</button>
 
 </form>
@@ -82,6 +90,7 @@ function UpdateMat()
     timerStyle:      document.getElementById("timerStyle").value,
     sound:           document.getElementById("sound").checked,
     sound_filename:  document.getElementById("sound_filename").value,
+    nameStyle:   document.getElementById("nameStyle").value,
   });
 
   AjaxPost('/ajax/config/set_mat?id=' + id, params, function() {
@@ -97,31 +106,20 @@ function GetMat(id)
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
     console.log(response);
-    var res = response.split(",");
+    var res = YAML.parse(response);
 
-    if (res.length < 3)
-      return;
-
-    var maxID = res[0];
-
-    for (var i=1; i < res.length;)
+    for (const mat of res.mats)
     {
-      var matID   = res[i++];
-      var type    = res[i++];
-      var is_open = res[i++];
-      var name    = res[i++];
-      var ipponStyle = res[i++];
-      var timerStyle = res[i++];
-
-      if (matID == id)
+      if (id == mat.id)
       {
-        document.getElementById("name").value = name;
-        document.getElementById("ipponStyle").value = ipponStyle;
-        document.getElementById("timerStyle").value = timerStyle;
+        document.getElementById("name").value = mat.name;
+        document.getElementById("ipponStyle").value = mat.ippon_style;
+        document.getElementById("timerStyle").value = mat.timer_style;
+        document.getElementById("nameStyle").value  = mat.name_style;
       }
     }
 
-    for (var i=1; i <= maxID; i++)
+    for (var i=1; i <= res.highest_mat_id; i++)
     {
       var option = document.createElement("option");
       option.text  = i;

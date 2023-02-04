@@ -5,8 +5,8 @@
 TEST(Database, JudokaTest)
 {
 	initialize();
-	ZED::Core::RemoveFile("temp.csv");
-	ZED::Core::RemoveFile("temp2.csv");
+	ZED::Core::RemoveFile("temp.yml");
+	ZED::Core::RemoveFile("temp2.yml");
 
 	{
 		Database d;
@@ -19,34 +19,34 @@ TEST(Database, JudokaTest)
 		d.AddJudoka(&j1);
 		d.AddJudoka(&j2);
 
-		EXPECT_TRUE(d.FindJudoka(j1.GetID())->GetWeight() == 50);
-		EXPECT_TRUE(d.FindJudoka(j2.GetID())->GetWeight() == 60);
+		EXPECT_EQ(d.FindJudoka(j1.GetUUID())->GetWeight(), Weight(50));
+		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), Weight(60));
 
-		EXPECT_TRUE(d.Save("temp.csv"));
-		EXPECT_TRUE(d.Save("temp2.csv"));
+		EXPECT_TRUE(d.Save("temp.yml"));
+		EXPECT_TRUE(d.Save("temp2.yml"));
 
-		ASSERT_TRUE(d.DeleteJudoka(j1.GetID()));
-		EXPECT_FALSE(d.DeleteJudoka(j1.GetID()));
+		ASSERT_TRUE(d.DeleteJudoka(j1.GetUUID()));
+		EXPECT_FALSE(d.DeleteJudoka(j1.GetUUID()));
 
-		ASSERT_TRUE(d.FindJudoka(j1.GetID()) == nullptr);
-		EXPECT_TRUE(d.FindJudoka(j2.GetID())->GetWeight() == 60);
+		ASSERT_TRUE(d.FindJudoka(j1.GetUUID()) == nullptr);
+		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), Weight(60));
 
-		EXPECT_TRUE(d.DeleteJudoka(j2.GetID()));
-		EXPECT_FALSE(d.DeleteJudoka(j2.GetID()));
+		EXPECT_TRUE(d.DeleteJudoka(j2.GetUUID()));
+		EXPECT_FALSE(d.DeleteJudoka(j2.GetUUID()));
 
-		EXPECT_TRUE(d.FindJudoka(j1.GetID()) == nullptr);
-		EXPECT_TRUE(d.FindJudoka(j2.GetID()) == nullptr);
+		EXPECT_TRUE(d.FindJudoka(j1.GetUUID()) == nullptr);
+		EXPECT_TRUE(d.FindJudoka(j2.GetUUID()) == nullptr);
 
-		EXPECT_TRUE(d.Load("temp.csv"));
+		EXPECT_TRUE(d.Load("temp.yml"));
 
 		ASSERT_TRUE(d.FindJudoka(j1.GetUUID()));
-		EXPECT_EQ(d.FindJudoka(j1.GetUUID())->GetWeight(), 50);
+		EXPECT_EQ(d.FindJudoka(j1.GetUUID())->GetWeight(), Weight(50));
 		ASSERT_TRUE(d.FindJudoka(j2.GetUUID()));
-		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), 60);
+		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), Weight(60));
 	}
 
-	ZED::Core::RemoveFile("temp.csv");
-	ZED::Core::RemoveFile("temp2.csv");
+	ZED::Core::RemoveFile("temp.yml");
+	ZED::Core::RemoveFile("temp2.yml");
 }
 
 
@@ -58,55 +58,130 @@ TEST(Database, SaveAndLoad)
 	{
 		Database d;
 
-		EXPECT_TRUE(d.GetNumJudoka() == 0);
-		EXPECT_TRUE(d.GetRuleSets().size() == 1);
+		EXPECT_EQ(d.GetNumJudoka(), 0);
+		EXPECT_EQ(d.GetRuleSets().size(), 3);
 
-		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
-		Judoka j2("Firstname2", "Lastname2", 60, Gender::Female);
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 60, Gender::Female);
 
-		d.AddJudoka(&j1);
-		d.AddJudoka(&j2);
+		d.AddJudoka(j1);
+		d.AddJudoka(j2);
 
-		EXPECT_NE(j1.GetID(),   j2.GetID());
-		EXPECT_NE(j1.GetUUID(), j2.GetUUID());
+		d.AddAccount(Account("UserTest", "UserPass", Account::AccessLevel::Moderator));
+
+		EXPECT_NE(j1->GetUUID(), j2->GetUUID());
 
 		d.AddRuleSet(new RuleSet("Test", 60, 30, 20, 10, true, true, true, 1));
 
-		EXPECT_TRUE(d.FindJudoka(j1.GetID())->GetWeight() == 50);
-		EXPECT_TRUE(d.FindJudoka(j2.GetID())->GetWeight() == 60);
+		EXPECT_EQ(d.FindJudoka(j1->GetUUID())->GetWeight(), Weight(50));
+		EXPECT_EQ(d.FindJudoka(j2->GetUUID())->GetWeight(), Weight(60));
 
-		EXPECT_TRUE(d.Save("temp.csv"));
+		auto club1 = new Club("Club name");
+		d.AddClub(club1);
+
+		auto club2 = new Club("Club name 2");
+		d.AddClub(club2);
+
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Female);
+		j3->SetClub(club2);
+		d.AddJudoka(j3);
+
+		d.SetServerPort(rand());
+		d.SetIpponStyle(Mat::IpponStyle::SpelledOut);
+		d.SetTimerStyle(Mat::TimerStyle::Full);
+		d.SetNameStyle(NameStyle::GivenName);
+
+		EXPECT_TRUE(d.Save("temp.yml"));
 
 
 		Database d2;
-		EXPECT_TRUE(d2.Load("temp.csv"));
+		EXPECT_TRUE(d2.Load("temp.yml"));
 
-		EXPECT_TRUE(d2.GetNumJudoka() == 2);
+		EXPECT_EQ(d2.GetServerPort(), d.GetServerPort());
+		EXPECT_EQ(d2.GetIpponStyle(), d.GetIpponStyle());
+		EXPECT_EQ(d2.GetTimerStyle(), d.GetTimerStyle());
+		EXPECT_EQ(d2.GetNameStyle(),  d.GetNameStyle());
 
-		ASSERT_TRUE(d2.FindJudoka(j1.GetUUID()));
-		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetUUID(), j1.GetUUID());
-		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetWeight(), 50);
-		EXPECT_EQ(d2.FindJudoka(j1.GetUUID())->GetGender(), j1.GetGender());
+		EXPECT_EQ(d2.GetNumJudoka(), 3);
 
-		ASSERT_TRUE(d2.FindJudoka(j2.GetUUID()));
-		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetUUID(), j2.GetUUID());
-		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetWeight(), 60);
-		EXPECT_EQ(d2.FindJudoka(j2.GetUUID())->GetGender(), j2.GetGender());
+		ASSERT_TRUE(d2.FindJudoka(j1->GetUUID()));
+		EXPECT_EQ(d2.FindJudoka(j1->GetUUID())->GetUUID(), j1->GetUUID());
+		EXPECT_EQ(d2.FindJudoka(j1->GetUUID())->GetWeight(), Weight(50));
+		EXPECT_EQ(d2.FindJudoka(j1->GetUUID())->GetGender(), j1->GetGender());
+
+		ASSERT_TRUE(d2.FindJudoka(j2->GetUUID()));
+		EXPECT_EQ(d2.FindJudoka(j2->GetUUID())->GetUUID(), j2->GetUUID());
+		EXPECT_EQ(d2.FindJudoka(j2->GetUUID())->GetWeight(), Weight(60));
+		EXPECT_EQ(d2.FindJudoka(j2->GetUUID())->GetGender(), j2->GetGender());
+
+		ASSERT_TRUE(d2.FindJudoka(j3->GetUUID())->GetClub());
+		EXPECT_EQ(*d2.FindJudoka(j3->GetUUID())->GetClub(), *club2);
+
+		ASSERT_TRUE(d2.FindClub(club1->GetUUID()));
+		EXPECT_EQ(d2.FindClub(club1->GetUUID())->GetName(), club1->GetName());
+		EXPECT_EQ(d2.FindClub(club1->GetUUID())->GetUUID(), club1->GetUUID());
+
+		EXPECT_TRUE(d2.DeleteClub(club1->GetUUID()));
+		EXPECT_FALSE(d2.FindClub(club1->GetUUID()));
+
+		EXPECT_TRUE(d2.FindClub(club2->GetUUID()));
+		EXPECT_FALSE(d2.DeleteClub(club2->GetUUID()));
+		EXPECT_TRUE(d2.DeleteJudoka(j3->GetUUID()));
+		EXPECT_TRUE(d2.DeleteClub(club2->GetUUID()));
 
 		auto rule_set = d2.FindRuleSetByName("Test");
 		ASSERT_TRUE(rule_set);
-		EXPECT_TRUE(rule_set->GetMatchTime() == 60);
-		EXPECT_TRUE(rule_set->GetGoldenScoreTime() == 30);
-		EXPECT_TRUE(rule_set->GetOsaeKomiTime(false) == 20);
-		EXPECT_TRUE(rule_set->GetOsaeKomiTime(true) == 10);
+		EXPECT_EQ(rule_set->GetMatchTime(), 60);
+		EXPECT_EQ(rule_set->GetGoldenScoreTime(), 30);
+		EXPECT_EQ(rule_set->GetOsaeKomiTime(false), 20);
+		EXPECT_EQ(rule_set->GetOsaeKomiTime(true), 10);
 		EXPECT_TRUE(rule_set->IsYukoEnabled());
 		EXPECT_TRUE(rule_set->IsKokaEnabled());
 		EXPECT_TRUE(rule_set->IsDrawAllowed());
-		EXPECT_TRUE(rule_set->GetBreakTime() == 1);
+		EXPECT_EQ(rule_set->GetBreakTime(), 1);
+
+		auto acc = d2.FindAccount("UserTest");
+		ASSERT_TRUE(acc);
+		EXPECT_EQ(acc->GetUsername(), "UserTest");
+		EXPECT_EQ(acc->GetPassword(), "UserPass");
+		EXPECT_EQ(acc->GetAccessLevel(), Account::AccessLevel::Moderator);
 	}
 
-	ZED::Core::RemoveFile("temp.csv");
-	ZED::Core::RemoveFile("temp2.csv");
+	ZED::Core::RemoveFile("temp.yml");
+	ZED::Core::RemoveFile("temp2.yml");
+}
+
+
+
+TEST(Database, SaveAndLoad_Umlaut)
+{
+	initialize();
+
+	{
+		Database d;
+
+		EXPECT_EQ(d.GetNumJudoka(), 0);
+		EXPECT_EQ(d.GetRuleSets().size(), 3);
+
+		Judoka* j1 = new Judoka(u8"S\u00f6ren", u8"K\u00f6nig",  50, Gender::Male);
+
+		d.AddJudoka(j1);
+
+		EXPECT_TRUE(d.Save("temp.yml"));
+
+
+		Database d2;
+		EXPECT_TRUE(d2.Load("temp.yml"));
+
+		ASSERT_EQ(d2.GetNumJudoka(), 1);
+
+		ASSERT_TRUE(d2.FindJudoka(j1->GetUUID()));
+		EXPECT_EQ(d2.FindJudoka(j1->GetUUID())->GetUUID(), j1->GetUUID());
+		EXPECT_EQ(d2.FindJudoka(j1->GetUUID())->GetFirstname(), u8"S\u00f6ren");
+		EXPECT_EQ(d2.FindJudoka(j1->GetUUID())->GetLastname(),  u8"K\u00f6nig");
+	}
+
+	ZED::Core::RemoveFile("temp.yml");
 }
 
 
@@ -126,7 +201,7 @@ TEST(Database, OnlyOneDefaultRuleSet)
 		Database d3;
 		d3.Load("temp.csv");
 
-		EXPECT_TRUE(d3.GetRuleSets().size() == 1);
+		EXPECT_EQ(d3.GetRuleSets().size(), 3);
 	}
 
 	ZED::Core::RemoveFile("temp.csv");
@@ -141,8 +216,44 @@ TEST(Database, EmptyDatabaseShouldHaveDefaultRuleSet)
 
 	EXPECT_EQ(d.GetNumAccounts(), 0);
 
-	EXPECT_EQ(d.GetRuleSets().size(), 1);
-	EXPECT_EQ(d.GetRuleSets()[0]->GetName(), "Default");
+	ASSERT_EQ(d.GetRuleSets().size(), 3);
+	EXPECT_EQ(d.GetRuleSets()[0]->GetName(), "Children");
+	EXPECT_EQ(d.GetRuleSets()[1]->GetName(), "Youth");
+	EXPECT_EQ(d.GetRuleSets()[2]->GetName(), "Adults");
+}
+
+
+
+TEST(Database, JudokaSorted)
+{
+	initialize();
+	Database d;
+
+	d.AddJudoka(new Judoka("John", "Smith", 65, Gender::Male, 1990));
+	d.AddJudoka(new Judoka("Jane", "Doe", 55, Gender::Female, 1995));
+	d.AddJudoka(new Judoka("Adam", "Johnson", 75, Gender::Male, 1985));
+	d.AddJudoka(new Judoka("Emily", "Williams", 48, Gender::Female, 2000));
+	d.AddJudoka(new Judoka("Michael", "Jones", 70, Gender::Male, 1988));
+	d.AddJudoka(new Judoka("Sarah", "Miller", 63, Gender::Female, 1992));
+	d.AddJudoka(new Judoka("Adam", "Miller", 63, Gender::Female, 1992));
+
+	auto& judokas = d.GetAllJudokas();
+
+	//Check that the judokas are sorted correctly
+	EXPECT_EQ(judokas[0]->GetLastname(),  "Doe");
+	EXPECT_EQ(judokas[0]->GetFirstname(), "Jane");
+	EXPECT_EQ(judokas[1]->GetLastname(),  "Johnson");
+	EXPECT_EQ(judokas[1]->GetFirstname(), "Adam");
+	EXPECT_EQ(judokas[2]->GetLastname(),  "Jones");
+	EXPECT_EQ(judokas[2]->GetFirstname(), "Michael");
+	EXPECT_EQ(judokas[3]->GetLastname(),  "Miller");
+	EXPECT_EQ(judokas[3]->GetFirstname(), "Adam");
+	EXPECT_EQ(judokas[4]->GetLastname(),  "Miller");
+	EXPECT_EQ(judokas[4]->GetFirstname(), "Sarah");
+	EXPECT_EQ(judokas[5]->GetLastname(),  "Smith");
+	EXPECT_EQ(judokas[5]->GetFirstname(), "John");
+	EXPECT_EQ(judokas[6]->GetLastname(),  "Williams");
+	EXPECT_EQ(judokas[6]->GetFirstname(), "Emily");
 }
 
 
@@ -153,7 +264,7 @@ TEST(Database, AccountTest)
 	{
 		Database d;
 
-		EXPECT_TRUE(d.GetNumAccounts() == 0);
+		EXPECT_EQ(d.GetNumAccounts(), 0);
 
 		Account j1("Username", "Password");
 		Account j2("Username2", "Password2");
@@ -164,29 +275,32 @@ TEST(Database, AccountTest)
 		EXPECT_EQ(d.FindAccount(j1.GetUsername())->GetUsername(), j1.GetUsername());
 		EXPECT_EQ(d.FindAccount(j2.GetUsername())->GetUsername(), j2.GetUsername());
 
-		EXPECT_TRUE(d.Save("temp.csv"));
-		EXPECT_TRUE(d.Save("temp2.csv"));
+		EXPECT_TRUE(d.Save("temp.yml"));
+		EXPECT_TRUE(d.Save("temp2.yml"));
 
 		EXPECT_TRUE(d.DeleteAccount(j1.GetUsername()));
 		EXPECT_FALSE(d.DeleteAccount(j1.GetUsername()));
 
-		EXPECT_TRUE(d.FindAccount(j1.GetUsername()) == nullptr);
+		ASSERT_TRUE(d.FindAccount(j2.GetUsername()));
 		EXPECT_EQ(d.FindAccount(j2.GetUsername())->GetUsername(), j2.GetUsername());
 
 		EXPECT_TRUE(d.DeleteAccount(j2.GetUsername()));
 		EXPECT_FALSE(d.DeleteAccount(j2.GetUsername()));
 
-		EXPECT_TRUE(d.FindAccount(j1.GetUsername()) == nullptr);
-		EXPECT_TRUE(d.FindAccount(j2.GetUsername()) == nullptr);
+		ASSERT_FALSE(d.FindAccount(j1.GetUsername()));
+		ASSERT_FALSE(d.FindAccount(j2.GetUsername()));
 
-		EXPECT_TRUE(d.Load("temp.csv"));
+		EXPECT_TRUE(d.Load("temp.yml"));
+
+		ASSERT_TRUE(d.FindAccount(j1.GetUsername()));
+		ASSERT_TRUE(d.FindAccount(j2.GetUsername()));
 
 		EXPECT_EQ(d.FindAccount(j1.GetUsername())->GetUsername(), j1.GetUsername());
 		EXPECT_EQ(d.FindAccount(j2.GetUsername())->GetUsername(), j2.GetUsername());
 	}
 
-	ZED::Core::RemoveFile("temp.csv");
-	ZED::Core::RemoveFile("temp2.csv");
+	ZED::Core::RemoveFile("temp.yml");
+	ZED::Core::RemoveFile("temp2.yml");
 }
 
 
@@ -264,7 +378,7 @@ TEST(Database, RuleSets)
 
 		RuleSet* rules = new RuleSet(name, 60, 30, 30, 20);
 
-		ASSERT_TRUE(d.FindRuleSetByName(name) == nullptr);
+		ASSERT_EQ(d.FindRuleSetByName(name), nullptr);
 
 		d.AddRuleSet(rules);
 

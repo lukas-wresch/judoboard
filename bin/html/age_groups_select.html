@@ -1,0 +1,65 @@
+<h2 id="headline"></h2>
+
+<button class="add" style="margin-bottom: 1cm;" onclick="navigate('age_groups_add.html')" id="new_age_group"></button>
+
+<table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
+  <tr>
+    <th style="width: 4cm;" id="name">Name</th>
+    <th style="width: 4cm;" id="description">Description</th>
+    <th style="width: 3cm;" id="options">Options</th>
+  </tr>
+</table>
+
+<script>
+
+function Add(id)
+{
+  AjaxCallback("ajax/age_groups/select?id="+id, function(response) {
+    GetAgeGroups();
+  });
+}
+
+function Remove(id)
+{
+  AjaxCallback("ajax/age_groups/remove?id="+id, function(response) {
+    GetAgeGroups();
+  });
+}
+
+function GetAgeGroups()
+{
+  AjaxCallback("ajax/age_groups/list", function(response) {
+    var res = YAML.parse(response);
+
+    var table = document.getElementById("list");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    for (const age of res)
+    {
+      var row = table.insertRow(-1);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+
+      cell1.innerHTML = age.name;
+      cell2.innerHTML = age.desc;
+
+      if (!age.is_used)
+        cell3.innerHTML = "<button class=\"add\" onclick=\"Add('" + age.uuid + "');\">" + translate('add') + "</button>";
+      else
+        cell3.innerHTML = "<button class=\"remove\" onclick=\"Remove('" + age.uuid + "');\">" + translate('remove') + "</button>";
+    }
+  });
+}
+
+GetAgeGroups();
+
+document.getElementById("headline").innerHTML = translate('list_of_age_groups');
+document.getElementById("name").innerHTML     = translate('name');
+document.getElementById("description").innerHTML = translate('description');
+document.getElementById("options").innerHTML  = translate('options');
+document.getElementById("new_age_group").innerHTML = translate('new_age_group');
+
+</script>

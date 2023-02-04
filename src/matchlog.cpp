@@ -1,3 +1,5 @@
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include <sstream>
 #include "matchlog.h"
 
@@ -25,25 +27,43 @@ const std::string MatchLog::ToString() const
 
 
 
-void MatchLog::operator << (ZED::CSV& Stream)
+void MatchLog::operator << (const YAML::Node& Yaml)
 {
-	uint32_t size;
-	Stream >> size;
+	if (!Yaml.IsSequence())
+		return;
 
-	for (uint32_t i = 0; i < size; i++)
+	for (const auto& node : Yaml)
 	{
-		Event event;
-		Stream >> event.m_Group >> event.m_Event >> event.m_Timestamp;
-		m_Events.emplace_back(event);
+		if (!node.IsMap())
+			continue;
+
+		if (node["group"] && node["event"] && node["timestamp"])
+		{
+			if ((EventGroup)node["group"].as<int>() == EventGroup::Neutral)
+				m_Events.emplace_back(Event((NeutralEvent)node["event"].as<int>(),
+											node["timestamp"].as<int>()));
+			else
+				m_Events.emplace_back(Event((Fighter)node["group"].as<int>(),
+											(BiasedEvent)node["event"].as<int>(),
+											node["timestamp"].as<int>()));
+		}
 	}
 }
 
 
 
-void MatchLog::operator >> (ZED::CSV& Stream) const
+void MatchLog::operator >> (YAML::Emitter& Yaml) const
 {
-	Stream << m_Events.size();
+	Yaml << YAML::BeginSeq;
 
 	for (auto& event : m_Events)
-		Stream << event.m_Group << event.m_Event << event.m_Timestamp;
+	{
+		Yaml << YAML::BeginMap;
+		Yaml << YAML::Key << "group"     << YAML::Value << (int)event.m_Group;
+		Yaml << YAML::Key << "event"     << YAML::Value << (int)event.m_Event;
+		Yaml << YAML::Key << "timestamp" << YAML::Value << event.m_Timestamp;
+		Yaml << YAML::EndMap;
+	}
+
+	Yaml << YAML::EndSeq;
 }

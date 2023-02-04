@@ -153,8 +153,10 @@ bool DM4::ParseLine(const std::string& Line)
 				new_participant.Lastname  = Latin1ToUTF8(RemoveCharFromString(lastname,  '\"'));
 
 				RemoveCharFromString(weight, '\"');
-				if (sscanf_s(weight.c_str(), "%d", &new_participant.Weight) != 1)
+				if (sscanf_s(weight.c_str(), "%d", &new_participant.WeightInGrams) != 1)
 					ZED::Log::Debug("Could not parse weight of line:" + Line);
+				if (new_participant.WeightInGrams > 0)
+					new_participant.WeightInGrams *= 1000;//Convert to gram
 
 				RemoveCharFromString(birthyear, '\"');
 				if (sscanf_s(birthyear.c_str(), "%d", &new_participant.Birthyear) != 1)

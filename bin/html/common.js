@@ -1,217 +1,198 @@
 var lang_en = {
-    name: "Name",
-    username: "Username",
-    password: "Password",
-    user: "User",
-    moderator: "Moderator",
-    admin: "Admin",
-    schedule: "Schedule",
-    match_tables: "Match Tables",
-    add_match: "Add Match",
-    add_matchtable: "Add Match Table",
-    update_matchtable: "Update Match Table",
-    delete_matchtable: "Delete Match Table",
-    matchtable: "Match Table",
-    matchtables: "Match Tables",
-    new_club: "New Club",
-    new_match: "New Match",
-    participants: "Participants",
-    database: "Database",
-    new_judoka: "New Judoka",
-    edit_judoka: "Edit Judoka",
-    new_participant: "New Participant",
-    add_participant: "Add Participant",
-    list_clubs: "List Clubs",
-    list_judokas: "List Judokas",
-    list_of_all_clubs: "List of all Clubs",
-    list_of_all_judokas: "List of all Judokas",
-    new_account: "New Account",
-    list_accounts: "List Accounts",
-    rule_set: "Rule Set",
-    rule_sets: "Rule Sets",
-    edit_rule_set: "Edit Rule Set",
-    tournament: "Tournament",
-    tournaments: "Tournaments",
-    tournament_default: "Tournament Default",
-    overview: "Overview",
-    matches: "Matches",
-    next_matches: "Next Matches",
-    update_account: "Update Account",
-    update_club: "Update Club",
-    new_rule_set: "New Rule Set",
-    update_rule_set: "Update Rule Set",
-    new_tournament: "New Tournament",
-    update_tournament: "Update Tournament",
-    hide_mats: "Hide Mats",
-    show_mats: "Show Mats",
-    firstname: "Given name",
-    lastname: "Family name",
-    weight: "Weight",
-    gender: "Gender",
-    all: "All",
-    male: "Male",
-    female: "Female",
-    settings: "Settings",
-    type: "Type",
-    weightclass: "Weightclass",
-    medical_examiniations: "Medical Examinations",
-    min_weight: "Minimum weight",
-    max_weight: "Maximum weight",
-    details: "Details",
-    time: "Time",
-    for: "For",
-    mat: "Mat",
-    mats: "Mats",
-    neutral: "Neutral",
-    white: "White",
-    blue: "Blue",
-    draw: "Draw",
-    name_white: "Name (White)",
-    name_blue: "Name (Blue)",
-    no: "No.",
-    status: "Status",
-    winner: "Winner",
-    score: "Score",
-    scheduled: "Scheduled",
-    running: "Running",
-    concluded: "Concluded",
-    match_time: "Match Time",
-    goldenscore_time: "Golden Score Time",
-    enabled:  "Enabled",
-    disabled: "Disabled",
-    disqualification: "Disqualification",
-    no_disqualification: "No Disqualification",
-    osaekomi_time_ippon:   "Osaekomi Time (Ippon)",
-    osaekomi_time_wazaari: "Osaekomi Time (Waza-Ari)",
-    break_time: "Break Time",
-    start_next_match: "Start Next Match",
-    end_match: "End Match",
-    more: "More",
-    less: "Less",
-    remove: "Remove",
-    options: "Options",
-    delete_match: "Delete Match",
-    delete_match_confirm: "Are you sure you want to delete this match?",
-    delete_matchtable_confirm: "Are you sure you want to delete this match table?",
-    delete_account_confirm: "Are you sure you want to delete this account?",
-    delete_judoka: "Delete",
-    delete_judoka_confirm: "Are you sure you want to delete this judoka?",
-    empty_tournament_confirm: "Are you sure you want to delete all match results of this tournament?",
-    delete_tournament_confirm: "Are you sure you want to completely delete this tournament?",
-    delete_rules_confirm: "Are you sure you want to delete this rule set?",
-    shutdown_confirm: "Are you sure you want to shutdown Judoboard?"
+    access_level: [ "Access Level", "Rechte" ],
+    admin:  [ "Admin", "Administrator" ],
+    add: [ "Add", "Hinzuf&uuml;gen" ],
+    add_match: [ "Add Match", "Kampf hinzuf&uuml;gen" ],
+    add_matchtable: [ "Add Match Table", "Kampfliste hinzuf&uuml;gen" ],
+    add_participant:  [ "Add Participant", "Teilnehmer  hinzuf&uuml;gen" ],
+    age_group:  [ "Age group", "Altersklasse" ],
+    age_groups: [ "Age groups", "Altersklassen" ],
+    all:   [ "All", "Alle" ],
+    all_mats: [ "All Mats", "Alle Matten" ],
+    birthyear: [ "Birthyear", "Geburtsjahr" ],
+    break_time: [ "Break Time", "Ruhepause" ],
+    blue:   [ "Blue", "Blau" ],
+    blue_wins:  [ "Blue Wins",  "Sieger Blau" ],
+    both:  [ "Both",  "Beide" ],
+    close:  [ "Close",  "Schlie&szlig;en" ],
+    concluded:  [ "Concluded", "Beendet" ],
+    change_password:  [ "Change Password", "Passwort &auml;ndern" ],
+    club: [ "Club", "Verein" ],
+    configuration: [ "Configuration", "Konfiguration" ],
+    database:  [ "Database", "Stammdaten" ],
+    details:  [ "Details", "Details" ],
+    default_rule_set: [ "Default Rule Set", "Standard Regelwerk" ],
+    description:  [ "Description", "Beschreibung" ],
+    delete:  [ "Delete", "L&ouml;schen" ],
+    delete_age_group_confirm:  [ "Are you sure you want to delete this age group?", unescape("Willst du diese Altersklasse wirklich l%F6schen?") ],
+    delete_match:  [ "Delete Match", "L&ouml;sche Kampf" ],
+    delete_match_confirm:  [ "Are you sure you want to delete this match?", unescape("Willst du diesen Kampf wirklich l%F6schen?") ],
+    delete_matchtable_confirm:  [ "Are you sure you want to delete this match table?",  unescape("Willst du diese Kampfliste wirklich l%F6schen?") ],
+    delete_account_confirm:  [ "Are you sure you want to delete this account?", unescape("Willst du dieses Benutzerkonto wirklich l%F6schen?") ],
+    delete_judoka:  [ "Delete", "L&ouml;schen" ],
+    delete_judoka_confirm:  [ "Are you sure you want to delete this judoka?", unescape("Willst du diesen Judoka wirklich l%F6schen?") ],
+    delete_club_confirm:  [ "Are you sure you want to delete this club/association?", unescape("Willst du diesen Verein/Assoziation wirklich l%F6schen?") ],
+    delete_tournament_confirm:  [ "Are you sure you want to completely delete this tournament?", unescape("Willst du wirklich dieses Turnier vollst%E4ndig l%F6schen?") ],
+    delete_rules_confirm:  [ "Are you sure you want to delete this rule set?", unescape("Willst du wirklich dieses Regelwerk l%F6schen?") ],
+    delete_matchtable:  [ "Delete Match Table", "Kampfliste l&ouml;schen" ],
+    draw:   [ "Draw", "Unentschieden" ],
+    draw_revoked:   [ "Draw revoked!", "Unentschieden zur&uuml;ckgenommen!" ],
+    disabled:  [ "Disabled", "Deaktiviert" ],
+    disqualification:  [ "Disqualification", "Disqualifiziert" ],
+    disqualification_revoked:  [ "Disqualification revoked!", "Disqualifiziert zur&uuml;ckgenommen!" ],
+    end_match:  [ "End Match", "Kampf beenden" ],
+    end_of_match:  [ "End of match", "Kampf beendet" ],
+    edit: [ "Edit", "&Auml;ndern" ],
+    edit_account: [ "Edit Account", "Benutzerkonto &auml;ndern" ],
+    edit_club: [ "Edit Club", "Verein &auml;ndern" ],
+    edit_age_group: [ "Edit Age Group", "Altersklasse &auml;ndern" ],
+    edit_judoka:  [ "Edit Judoka", "Judoka &auml;ndern" ],
+    edit_rule_set:  [ "Edit Rule Set", "Regelwerk &auml;ndern" ],
+    empty_tournament_confirm:  [ "Are you sure you want to delete all match results of this tournament?", unescape("Willst du wirklich alle Ergebnisse dieses Turnieres l%F6schen?") ],
+    enabled:   [ "Enabled", "Aktiviert" ],
+    event:   [ "Event", "Ereigniss" ],
+    female:  [ "Female", "Weiblich" ],
+    firstname:  [ "Given name", "Vorname" ],
+    for:  [ "For", "F&uuml;r" ],
+    gachi_revoked:  [ "Gachi revoked!", "Gachi zur&uuml;ckgenommen!" ],
+    gender:  [ "Gender", "Geschlecht" ],
+    goldenscore_time:  [ "Golden Score Time", "Golden Score Zeit" ],
+    goldenscore_activate:  [ "Golden Score activated", "Golden Score aktiviert" ],
+    goldenscore_revoked:  [ "Golden Score revoked!", "Golden Score zur&uuml;ckgenommen!" ],
+    hansokumake_direct:  [ "Hansoku-Make (direct)", "Hansoku-Make (direkt)" ],
+    hansokumake_indirect:  [ "Hansoku-Make (indirect)", "Hansoku-Make (indirekt)" ],
+    hansokumake_revoked:  [ "Hansoku-Make revoked!", "Hansoku-Make zur&uuml;ckgenommen!" ],
+    hide_mats:  [ "Hide Mats", "Matten ausblenden" ],
+    import:  [ "Import", "Importieren" ],
+    ippon_revoked:  [ "Ippon revoked!", "Ippon zur&uuml;ckgenommen!" ],
+    judo_passport_number:  [ "Judo Passport Number", "Judopassnummer" ],
+    koka_revoked:  [ "Koka revoked!", "Koka zur&uuml;ckgenommen!" ],
+    list_associations:  [ "List Associations", "Verb&auml;nde anzeigen" ],
+    list_clubs:  [ "List Clubs", "Vereine anzeigen" ],
+    list_judokas:  [ "List Judokas", "Judokas anzeigen" ],
+    list_of_accounts:  [ "List of Accounts", "Liste der Benutzerkonten" ],
+    list_of_age_groups:  [ "List of Age Groups", "Liste der Altersklassen" ],
+    list_accounts:  [ "List Accounts", "Benutzerkonten anzeigen" ],
+    list_of_all_clubs:  [ "List of all Clubs", "Liste aller Vereine" ],
+    list_of_all_associations:  [ "List of all Associations", "Liste aller Verb&auml;nde" ],
+    list_of_all_judokas:  [ "List of all Judokas", "Liste aller Judokas" ],
+    level:  [ "Level", "Ebene" ],
+    list_of_tournaments:  [ "List of Tournaments", "Turnierliste" ],
+    less:  [ "Less", "Weniger" ],
+    lastname:  [ "Family name", "Nachname" ],
+    lot:   [ "Lot", "Los" ],
+    lots:  [ "Lots", "Lose" ],
+    moderator:  [ "Moderator", "Moderator" ],
+    match_table:  [ "Match Table", "Kampfliste" ],
+    match_tables:  [ "Match Tables", "Kampflisten" ],
+    name:  [ "Name", "Name" ],
+    generate_matchtables:  [ "Generate Match Tables", "Kampflisten generieren" ],
+    update_matchtable:  [ "Update Match Table", "Kampfliste &auml;ndern" ],
+    matches: [ "Matches", "K&auml;mpfe" ],
+    mat:  [ "Mat", "Matte" ],
+    mats:  [ "Mats", "Matten" ],
+    match_log:  [ "Match Log", "Kampfprotokoll" ],
+    male:  [ "Male", "M&auml;nnlich" ],
+    medical_examiniation:   [ "Medical Examination",  "Medizinische Untersuchung" ],
+    medical_examiniation_revoked:   [ "Medical Examination revoked!",  "Medizinische Untersuchung zur&uuml;ckgenommen!" ],
+    medical_examiniations:  [ "Medical Examinations", "Medizin. Untersuch." ],
+    min_weight:  [ "Minimum weight", "Mindestgewicht" ],
+    max_weight:  [ "Maximum weight", "Maximalgewicht" ],
+    min_participants:  [ "Min participants", "Mindestteilnehmer" ],
+    max_participants:  [ "Max participants", "Maximalteilnehmer" ],
+    max_weight_diff:  [ "Weight difference", "Gewichtsunterschied" ],
+    more:  [ "More", "Mehr" ],
+    match_started:  [ "Match started", "Kampf gestartet" ],
+    match_time:  [ "Match Time", "Kampfzeit" ],
+    name_white:  [ "Name (White)", "Name (Wei&szlig;)" ],
+    name_blue:   [ "Name (Blue)", "Name (Blau)" ],
+    new_age_group: [ "New age group", "Neue Altersklasse" ],
+    neutral:  [ "Neutral", "Neutral" ],
+    new_account:  [ "New Account", "Neues Benutzerkonto" ],
+    new_club:  [ "New Club", "Neuer Verein" ],
+    new_match: [ "New Match", "Neuer Kampf" ],
+    new_matchtable: [ "New Matchtable", "Neuer Kampflist" ],
+    generate_matchtables: [ "Generate Matchtables", "Kampflisten generieren" ],
+    new_judoka:  [ "New Judoka", "Neuer Judoka" ],    
+    new_participant: ["New Participant", "Neuer Teilnehmer" ],
+    new_tournament:  [ "New Tournament", "Neues Turnier" ],
+    next_matches:  [ "Next Matches", "N&auml;chste K&auml;mpfe" ],
+    new_rule_set:  [ "New Rule Set", "Neues Regelwerk" ],
+    no:  [ "No.", "Nr." ],
+    no_disqualification:  [ "No Disqualification", "Nicht disqualifiziert" ],
+    no_disqualification_revoked:  [ "No Disqualification revoked!", "Nicht disqualifiziert zur&uuml;ckgenommen!" ],
+    optional:   [ "Optional", "Optional" ],
+    osaekomi_time_ippon:    [ "Osaekomi Time (Ippon)", "Osaekomi Zeit (Ippon)" ],
+    osaekomi_time_wazaari:  [ "Osaekomi Time (Waza-Ari)", "Osaekomi Zeit (Waza-Ari)" ],
+    osaekomi_switched: [ "Osaekomi switched to other fighter" , "Osaekomi auf anderen K&auml;pfer gewechselt"],
+    overview:  [ "Overview", "&Uuml;bersicht" ],
+    open:  [ "Oppen", "&Ouml;ffnen" ],
+    optional:  [ "Optional", "Optional" ],
+    participants: [ "Participants", "Teilnehmer" ],
+    revoke_goldenscore: [ "Revoke Golden Score", "Golden Score zur&uuml;cknehmen" ],
+    revoke_hantei: [ "Revoke Hantei", "Hantei zur&uuml;cknehmen" ],
+    readonly: [ "Readonly", "Schreibschutz" ],
+    rule_set:   [ "Rule Set", "Regelwerk" ],
+    rule_sets:  [ "Rule Sets", "Regelwerke" ],
+    remove:  [ "Remove", "Entfernen" ],
+    running:   [ "Running", "am K&auml;mpfen" ],
+    shutdown_confirm:  [ "Are you sure you want to shutdown Judoboard?", "Soll Judoboard wirklich heruntergefahren werden?" ],
+    start:  [ "Start", "Starten" ],
+    start_next_match:  [ "Start Next Match", "Kampf starten" ],
+    save:  [ "Save", "Speichern" ],
+    select_age_groups: [ "Select Age Groups", "Altersklassen ausw&auml;hlen" ],
+    shido_revoked:  [ "Shido revoked!", "Shido zur&uuml;ckgenommen!" ],
+    show_mats:  [ "Show Mats", "Matten anzeigen" ],
+    show_matches_on: [ "Show matches on", "K&auml;mpfe auf Matte" ],
+    status:  [ "Status", "Status" ],
+    schedule:  [ "Schedule", "Zeitplan" ],
+    split_genders: [ "Split Genders", "Geschlechter trennen" ],
+    time:  [ "Time", "Zeit" ],
+    tournament:  [ "Tournament", "Turnier" ],
+    tournaments:  [ "Tournaments", "Turniere" ],
+    tournament_default:  [ "Tournament Default", "Turnierstandard" ],
+    password:  [ "Password", "Passwort" ],
+    settings:  [ "Settings", "Einstellungen" ],
+    type:  [ "Type", "Typ" ],
+    score:  [ "Score", "Unterwertung" ],
+    scheduled:  [ "Scheduled", "Eingeplant" ],
+    skipped:   [ "Skipped", "Ausgelassen" ],
+    push_up:  [ "Push Up", "Vorziehen" ],
+    options:  [ "Options", "Optionen" ],
+    pause:  [ "Pause", "Pause" ],
+    parent_association:  [ "Parent Association", "H&ouml;herer Verband" ],
+    organizer:  [ "Organizer", "Organisator" ],
+    unpause:  [ "Unpause", "Pause beenden" ],
+    upload_md5_file: [ "Upload MD5 File", "MD5 Datei hochladen" ],
+    user:  [ "User", "Benutzer" ],
+    username:  [ "Username", "Benutzername" ],
+    update_rule_set:  [ "Update Rule Set", "&Auml;ndere Regelwerk" ],
+    update_tournament:  [ "Update Tournament", "&Auml;ndere Turnier" ],
+    update_account:  [ "Update Account", "Benutzerkonto &auml;ndern" ],
+    update_club:   [ "Update Club", "Verein &auml;ndern" ],
+    wazaari_revoked:  [ "Wazaari revoked!", "Wazaari zur&uuml;ckgenommen!" ],
+    weight:  [ "Weight", "Gewicht" ],
+    weightclass:  [ "Weightclass", "Gewichtsklasse" ],
+    white:  [ "White", "Wei&szlig;" ],
+    white_wins: [ "White Wins", "Sieger Wei&szlig" ],
+    winner:  [ "Winner", "Gewinner" ],
+    year: ["Year", "Jahr" ],
+    yuko_revoked:  [ "Yuko revoked!", "Yuko zur&uuml;ckgenommen!" ],
+    yes: ["Yes", "Ja" ],
 }
 
 
 
-var lang_de = {
-    name: "Name",
-    username: "Benutzername",
-    password: "Passwort",
-    user: "Benutzer",
-    moderator: "Moderator",
-    admin: "Administrator",
-    schedule: "Zeitplan",
-    match_tables: "Kampflisten",
-    add_match: "Kampf hinzuf&uuml;gen",
-    add_matchtable: "Kampfliste hinzuf&uuml;gen",
-    update_matchtable: "Kampfliste &auml;ndern",
-    delete_matchtable: "Kampfliste l&ouml;schen",
-    matchtable: "Kampfliste",
-    matchtables: "Kampflisten",
-    new_club: "Neuer Verein",
-    new_match: "Neuer Kampf",
-    new_participant: "Neuer Teilnehmer",
-    add_participant: "Teilnehmer  hinzuf&uuml;gen",
-    participants: "Teilnehmer",
-    database: "Stammdaten",
-    new_judoka: "Neuer Judoka",
-    edit_judoka: "Judoka &auml;ndern",
-    list_clubs: "Vereine anzeigen",
-    list_judokas: "Judokas anzeigen",
-    list_of_all_clubs: "Liste aller Vereine",
-    list_of_all_judokas: "Liste aller Judokas",
-    //new_account: "Neuer Account",
-    list_accounts: "Accounts anzeigen",
-    rule_set:  "Regelwerk",
-    rule_sets: "Regelwerke",
-    edit_rule_set: "Regelwerk &auml;ndern",
-    tournament: "Turnier",
-    tournaments: "Turniere",
-    tournament_default: "Turnierstandard",
-    overview: "&Uuml;bersicht",
-    matches: "K&auml;mpfe",
-    next_matches: "N&auml;chste K&auml;mpfe",
-    new_account: "Neues Benutzerkonto",
-    update_account: "Benutzerkonto &auml;ndern",
-    update_club: "Verein &auml;ndern",
-    new_rule_set: "Neues Regelwerk",
-    update_rule_set: "&Auml;ndere Regelwerk",
-    new_tournament: "Neues Turnier",
-    update_tournament: "&Auml;ndere Turnier",
-    hide_mats: "Matten ausblenden",
-    show_mats: "Matten anzeigen",
-    firstname: "Vorname",
-    lastname:  "Nachname",
-    weight: "Gewicht",
-    medical_examiniations: "Medizin. Untersuch.",
-    min_weight: "Mindestgewicht",
-    max_weight: "Maximalgewicht",
-    gender: "Geschlecht",
-    all: "Alle",
-    male: "M&auml;nnlich",
-    female: "Weiblich",
-    settings: "Einstellungen",
-    type: "Typ",
-    weightclass: "Gewichtsklasse",
-    details: "Details",
-    time: "Zeit",
-    for: "F&uuml;r",
-    mat: "Matte",
-    mats: "Matten",
-    neutral: "Neutral",
-    white: "Wei&szlig;",
-    draw: "Unentschieden",
-    blue: "Blau",
-    name_white: "Name (Wei&szlig;)",
-    name_blue: "Name (Blau)",
-    no: "Nr.",
-    status: "Status",
-    winner: "Gewinner",
-    score: "Unterwertung",
-    scheduled: "Eingeplant",
-    running: "am K&auml;mpfen",
-    concluded: "Beendet",
-    match_time: "Kampfzeit",
-    goldenscore_time: "Golden Score Zeit",
-    enabled:  "Aktiviert",
-    disabled: "Deaktiviert",
-    disqualification: "Disqualifiziert",
-    no_disqualification: "Nicht disqualifiziert",
-    osaekomi_time_ippon:   "Osaekomi Zeit (Ippon)",
-    osaekomi_time_wazaari: "Osaekomi Zeit (Waza-Ari)",
-    break_time: "Ruhepause",
-    start_next_match: "Kampf starten",
-    end_match: "Kampf beenden",
-    more: "Mehr",
-    less: "Weniger",
-    remove: "Entfernen",
-    options: "Optionen",
-    delete_match: "L&ouml;sche Kampf",
-    delete_match_confirm: unescape("Willst du diesen Kampf wirklich l%F6schen?"),
-    delete_matchtable_confirm: unescape("Willst du diese Kampfliste wirklich l%F6schen?"),
-    delete_account_confirm: unescape("Willst du dieses Benutzerkonto wirklich l%F6schen?"),
-    delete_judoka: "L&ouml;schen",
-    delete_judoka_confirm: unescape("Willst du diesen Judoka wirklich l%F6schen?"),
-    empty_tournament_confirm: unescape("Willst du wirklich alle Ergebnisse dieses Turnieres l%F6schen?"),
-    delete_tournament_confirm: unescape("Willst du wirklich dieses Turnier vollst%E4ndig l%F6schen?"),
-    delete_rules_confirm: unescape("Willst du wirklich dieses Regelwerk l%F6schen?"),
-    shutdown_confirm: "Soll Judoboard wirklich heruntergefahren werden?"
+function translate(keyword)
+{
+  console.log("Translating " + keyword);
+
+  var ret = eval('lang_en.' + keyword);
+
+  if (typeof ret == 'object')
+    return ret[1];
+  return keyword;
 }
-
-
-
-var lang = lang_de;
 
 
 const zeroPad = (num, places) => String(num).padStart(places, '0')
@@ -330,11 +311,28 @@ function AjaxPost(url, params, callback)
   {
     if (this.readyState == 4 && this.status == 200)
     {
-        if (this.response == "ok")
+        if (this.response == "ok" && typeof callback !== 'undefined')
           callback();
-        else
+        else if (this.response != "ok")
           alert("Error: " + this.response);
       }
+  };
+
+  xhttp.send(params);
+}
+
+
+
+function AjaxPostToYaml(url, params, callback)
+{
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", url);
+  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+  xhttp.onreadystatechange = function()
+  {
+    if (this.readyState == 4 && this.status == 200 && typeof callback !== 'undefined')
+      callback(this.responseText);
   };
 
   xhttp.send(params);
@@ -380,17 +378,9 @@ function navigate(url)
   if (window.innerWidth <= 900)//Mobile
     slideout.close();
 
-  //$( "#main" ).load(url);
   return false;
 }
 
-
-
-/*$(window).on('hashchange', function(e)
-{
-  console.log(location.hash.slice(1));
-  navigate(location.hash.slice(1));
-});*/
 
 window.onhashchange = function(e)
 {
@@ -415,37 +405,127 @@ function GetRuleSets(callback)
 {
   AjaxCallback("ajax/rule/list", function(response) {
     console.log(response);
-    var res = response.split(",");
-
-    if (res.length < 1)
-      return;
+    var res = YAML.parse(response);
 
     var rules = document.getElementById("rule");
 
     while (rules.length >= 1)
       rules.remove(rules.length-1);
 
-    var default_rule_set = res[0];
+    var option = document.createElement("option");
+    option.value = 0;
+    option.text = "(None)";
+    rules.add(option);
 
-    for (var i=1; i < res.length; i)
+    for (const rule of res.rules)
     {
       var option = document.createElement("option");
 
-      var id   = res[i++];
-      var name = res[i++];
-      var desc = res[i++];
+      option.value = rule.uuid;
 
-      option.value = id;
-
-      if (option.value == default_rule_set)
-        option.text = name + " (" + lang.tournament_default + ")";
+      if (typeof res.default !== 'undefined' && rule.uuid == res.default)
+        option.text = rule.name + " (" + lang.tournament_default + ")";
       else
-        option.text = name;
+        option.text = rule.name;
 
       rules.add(option);
     }
 
-    rules.value = default_rule_set;
+    if (typeof res.default !== 'undefined' && rule.uuid == res.default)
+        rules.value = res.default;
+
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+}
+
+
+
+function GetAgeGroups(callback)
+{
+  AjaxCallback("ajax/age_groups/list", function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    var ages = document.getElementById("age_group");
+
+    while (ages.length >= 1)
+      ages.remove(ages.length-1);
+
+    var option = document.createElement("option");
+    option.value = 0;
+    option.text = "(None)";
+    ages.add(option);
+
+    for (const age of res)
+    {
+      var option = document.createElement("option");
+      option.value = age.uuid;
+      option.text  = age.name;
+      ages.add(option);
+    }
+
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+}
+
+
+
+function GetClubs(callback, query = "")
+{
+  AjaxCallback("ajax/club/list?" + query, function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    var clubs = document.getElementById("clubs");
+
+    while (clubs.length >= 1)
+      clubs.remove(clubs.length-1);
+
+    var option = document.createElement("option");
+    option.value = 0;
+    option.text  = "(None)";
+    clubs.add(option);
+
+    for (const club of res)
+    {
+      var option = document.createElement("option");
+      option.value = club.uuid;
+      option.text  = club.name;
+      clubs.add(option);
+    }
+
+    if (typeof callback !== 'undefined')
+      callback();
+  });
+}
+
+
+
+function GetAssociations(callback, query = "")
+{
+  AjaxCallback("ajax/association/list?" + query, function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    var clubs = document.getElementById("clubs");
+
+    while (clubs.length >= 1)
+      clubs.remove(clubs.length-1);
+
+    var option = document.createElement("option");
+    option.value = 0;
+    option.text  = "(None)";
+    clubs.add(option);
+
+    for (const club of res)
+    {
+      var option = document.createElement("option");
+      option.value = club.uuid;
+      option.text  = club.name;
+      clubs.add(option);
+    }
 
     if (typeof callback !== 'undefined')
       callback();
@@ -497,28 +577,20 @@ function GetColors(callback)
 function GetMats(callback)
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
-    var res = response.split(",");
+    var res = YAML.parse(response);
 
     if (res.length < 2)
       return;
 
-    var mat = document.getElementById("mat");
-    var maxID = res[0];
+    var ui_mats = document.getElementById("mat");
 
-    for (var i=1; i < res.length;)
+    for (const mat of res.mats)
     {
-      var matID   = res[i++];
-      var type    = res[i++];
-      var is_open = res[i++];
-      var name    = res[i++];
-      var showIpponAsTwoWazaari = res[i++];
-      var timerStyle = res[i++];
-      var fullscreen = res[i++];
-
       var option = document.createElement("option");
-      option.text  = name;
-      option.value = matID;
-      mat.add(option);
+      option.text  = mat.name;
+      option.value = mat.id;
+
+      ui_mats.add(option);
     }
 
     if (typeof callback !== 'undefined')

@@ -1,6 +1,9 @@
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include "../ZED/include/core.h"
 #include "judoka.h"
 #include "database.h"
+#include "matchtable.h"
 
 
 
@@ -8,24 +11,177 @@ using namespace Judoboard;
 
 
 
-Judoka::Judoka(const std::string& Firstname, const std::string& Lastname, uint16_t Weight, Gender Gender) : m_Firstname(Firstname), m_Lastname(Lastname)
+const Judoka* DependentJudoka::GetJudoka() const
 {
-	if (Weight < 1000)
-		m_Weight = Weight;
-	if (Gender == Gender::Male || Gender == Gender::Female)
-		m_Gender = Gender;
+	if (m_Judoka)
+		return m_Judoka;
+
+	switch (m_Type)
+	{
+	case DependencyType::TakeWinner:
+		if (m_DependentMatch && m_DependentMatch->HasConcluded())
+			return m_DependentMatch->GetWinner();
+		break;
+
+	case DependencyType::TakeLoser:
+		if (m_DependentMatch && m_DependentMatch->HasConcluded())
+			return m_DependentMatch->GetLoser();
+		break;
+
+	case DependencyType::TakeRank1:
+	case DependencyType::TakeRank2:
+	case DependencyType::TakeRank3:
+	case DependencyType::TakeRank4:
+	case DependencyType::TakeRank5:
+	case DependencyType::TakeRank6:
+	case DependencyType::TakeRank7:
+	case DependencyType::TakeRank8:
+	case DependencyType::TakeRank9:
+	case DependencyType::TakeRank10:
+		int pos = (int)m_Type - (int)DependencyType::TakeRank1;
+		if (m_DependentMatchTable && m_DependentMatchTable->HasConcluded())
+		{
+			auto results = m_DependentMatchTable->CalculateResults();
+			if (pos < results.GetSize())
+				return results[pos].Judoka;
+		}
+		break;
+	}
+
+	return nullptr;
 }
 
 
 
-Judoka::Judoka(ZED::CSV& Stream, const StandingData* pStandingData)
+bool DependentJudoka::operator == (const Judoka* rhs) const
 {
-	std::string uuid, club_uuid;
-	Stream >> m_Firstname >> m_Lastname >> m_Weight >> m_Gender >> m_Birthyear >> uuid >> club_uuid;
-	SetUUID(std::move(uuid));
+	if (!m_Judoka || !rhs)
+		return false;
+	return *m_Judoka == *rhs;
+}
 
-	if (pStandingData && club_uuid.length() > 1)
-		m_pClub = pStandingData->FindClub(UUID(std::move(club_uuid)));
+
+
+bool DependentJudoka::operator == (const DependentJudoka& rhs) const
+{
+	if (m_Type != rhs.m_Type)
+		return false;
+	if (m_Judoka && rhs.m_Judoka && m_Judoka->GetUUID() != rhs.m_Judoka->GetUUID())
+		return false;
+	if (m_DependentMatch != rhs.m_DependentMatch)
+		return false;
+	if (m_DependentMatchTable != rhs.m_DependentMatchTable)
+		return false;
+	return true;
+}
+
+
+
+JudokaData::JudokaData(const Judoka& Judoka)
+{
+	m_Firstname = Judoka.GetFirstname();
+	m_Lastname  = Judoka.GetLastname();
+	m_Weight    = Judoka.GetWeight();
+	m_Gender    = Judoka.GetGender();
+	m_Birthyear = Judoka.GetBirthyear();
+	m_Number    = Judoka.GetNumber();
+	if (Judoka.GetClub())
+		m_ClubName = Judoka.GetClub()->GetName();
+}
+
+
+
+JudokaData::JudokaData(const MD5::Participant& Judoka)
+{
+	m_Firstname = Judoka.Firstname;
+	m_Lastname  = Judoka.Lastname;
+	if (Judoka.WeightInGrams > 0)
+		m_Weight.SetWeightInGrams(Judoka.WeightInGrams);
+	if (Judoka.AgeGroup)
+		m_Gender = Judoka.AgeGroup->Gender;
+	if (Judoka.Birthyear >= 0)
+		m_Birthyear = Judoka.Birthyear;
+	m_ClubName = Judoka.ClubFullname;
+}
+
+
+
+JudokaData::JudokaData(const DM4::Participant& Judoka)
+{
+	m_Firstname = Judoka.Firstname;
+	m_Lastname  = Judoka.Lastname;
+	if (Judoka.WeightInGrams > 0)
+		m_Weight.SetWeightInGrams(Judoka.WeightInGrams);
+	m_Gender = Judoka.Gender;
+	if (Judoka.Birthyear >= 0)
+		m_Birthyear = Judoka.Birthyear;
+	if (Judoka.Club)
+		m_ClubName = Judoka.Club->Name;
+}
+
+
+
+JudokaData::JudokaData(const DMF::Participant& Judoka)
+{
+	m_Firstname = Judoka.Firstname;
+	m_Lastname  = Judoka.Lastname;
+	if (Judoka.WeightInGrams > 0)
+		m_Weight.SetWeightInGrams(Judoka.WeightInGrams);
+	m_Gender = Judoka.Gender;
+	if (Judoka.Birthyear >= 0)
+		m_Birthyear = Judoka.Birthyear;
+	m_ClubName = Judoka.ClubName;
+}
+
+
+
+Judoka::Judoka(const std::string& Firstname, const std::string& Lastname, Weight Weight, Gender Gender, uint32_t Birthyear)
+	: m_Firstname(Firstname), m_Lastname(Lastname), m_Weight(Weight)
+{
+	if (Gender == Gender::Male || Gender == Gender::Female)
+		m_Gender = Gender;
+
+	m_Birthyear = Birthyear;
+}
+
+
+
+Judoka::Judoka(const YAML::Node& Yaml, const StandingData* pStandingData)
+{
+	if (Yaml["uuid"])
+		SetUUID(Yaml["uuid"].as<std::string>());
+	if (Yaml["firstname"])
+		m_Firstname = Yaml["firstname"].as<std::string>();
+	if (Yaml["lastname"])
+		m_Lastname = Yaml["lastname"].as<std::string>();
+	if (Yaml["weight"])
+		m_Weight = Weight(Yaml["weight"]);
+	if (Yaml["gender"])
+		m_Gender = (Gender)Yaml["gender"].as<int>();
+	if (Yaml["birthyear"])
+		m_Birthyear = Yaml["birthyear"].as<int>();
+	if (Yaml["number"])
+		m_Number = Yaml["number"].as<std::string>();
+	if (Yaml["club"] && pStandingData)
+		m_pClub = pStandingData->FindClub(Yaml["club"].as<std::string>());
+}
+
+
+
+Judoka::Judoka(const JudokaData& JudokaData, const StandingData* pStandingData)
+{
+	m_Firstname = JudokaData.m_Firstname;
+	m_Lastname  = JudokaData.m_Lastname;
+	m_Gender    = JudokaData.m_Gender;
+	m_Number    = JudokaData.m_Number;
+
+	if (JudokaData.m_Birthyear > 0)
+		m_Birthyear = JudokaData.m_Birthyear;
+	if (JudokaData.m_Weight > 0)
+		m_Weight = JudokaData.m_Weight;
+
+	if (pStandingData)
+		m_pClub = pStandingData->FindClubByName(JudokaData.m_ClubName);
 }
 
 
@@ -38,8 +194,8 @@ Judoka::Judoka(const DM4::Participant& Participant, const StandingData* pStandin
 
 	if (Participant.Birthyear > 0)
 		m_Birthyear = Participant.Birthyear;
-	if (Participant.Weight > 0)
-		m_Weight = Participant.Weight;
+	if (Participant.WeightInGrams > 0)
+		m_Weight = Participant.WeightInGrams;
 
 	if (pStandingData && Participant.Club)
 		m_pClub = pStandingData->FindClubByName(Participant.Club->Name);
@@ -56,8 +212,8 @@ Judoka::Judoka(const MD5::Participant& Participant, const StandingData* pStandin
 
 	if (Participant.Birthyear > 0)
 		m_Birthyear = Participant.Birthyear;
-	if (Participant.WeightInGramm > 0)
-		m_Weight = Participant.WeightInGramm/1000;//TODO Loss of information!!
+	if (Participant.WeightInGrams > 0)
+		m_Weight = Participant.WeightInGrams;
 
 	if (pStandingData && Participant.Club)
 		m_pClub = pStandingData->FindClubByName(Participant.Club->Name);
@@ -65,19 +221,59 @@ Judoka::Judoka(const MD5::Participant& Participant, const StandingData* pStandin
 
 
 
-void Judoka::operator >> (ZED::CSV& Stream) const
+Judoka::Judoka(const DMF::Participant& Participant)
 {
-	Stream << m_Firstname;
-	Stream << m_Lastname;
-	Stream << m_Weight << m_Gender << m_Birthyear;
-	Stream << (std::string)GetUUID();
+	m_Firstname = Participant.Firstname;
+	m_Lastname  = Participant.Lastname;
+
+	if (Participant.Birthyear > 0)
+		m_Birthyear = Participant.Birthyear;
+	if (Participant.WeightInGrams > 0)
+		m_Weight = Participant.WeightInGrams;
+}
+
+
+
+void Judoka::operator >> (YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+	Yaml << YAML::Key << "uuid"      << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "firstname" << YAML::Value << m_Firstname;
+	Yaml << YAML::Key << "lastname"  << YAML::Value << m_Lastname;
+
+	Yaml << YAML::Key << "weight"    << YAML::Value;
+	m_Weight >> Yaml;
+
+	Yaml << YAML::Key << "gender"    << YAML::Value << (int)m_Gender;
+	Yaml << YAML::Key << "birthyear" << YAML::Value << m_Birthyear;
+
+	if (!m_Number.empty())
+		Yaml << YAML::Key << "number" << YAML::Value << m_Number;
 
 	if (m_pClub)
-		Stream << (std::string)m_pClub->GetUUID();
-	else
-		Stream << "?";
+		Yaml << YAML::Key << "club"  << YAML::Value << (std::string)m_pClub->GetUUID();
+	Yaml << YAML::EndMap;
+}
 
-	Stream.AddNewline();//Also needed to flush the stream
+
+
+void Judoka::ToString(YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+	Yaml << YAML::Key << "uuid"      << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "firstname" << YAML::Value << m_Firstname;
+	Yaml << YAML::Key << "lastname"  << YAML::Value << m_Lastname;
+	Yaml << YAML::Key << "weight"    << YAML::Value << m_Weight.ToString();
+	Yaml << YAML::Key << "gender"    << YAML::Value << (int)m_Gender;
+	Yaml << YAML::Key << "birthyear" << YAML::Value << m_Birthyear;
+	Yaml << YAML::Key << "number"    << YAML::Value << m_Number;
+
+	if (m_pClub)
+	{
+		Yaml << YAML::Key << "club_uuid" << YAML::Value << (std::string)m_pClub->GetUUID();
+		Yaml << YAML::Key << "club_name" << YAML::Value << m_pClub->GetName();
+	}
+	Yaml << YAML::EndMap;
 }
 
 
@@ -90,23 +286,8 @@ uint16_t Judoka::GetAge() const
 
 
 
-void Judoka::SetWeight(uint16_t NewWeight)
+void Judoka::SetWeight(Weight NewWeight)
 {
-	if (NewWeight < 1000)
+	if (NewWeight < Weight(1000))
 		m_Weight = NewWeight;
-}
-
-
-
-const std::string Judoka::ToString() const
-{
-	ZED::CSV ret;
-	ret << GetID() << m_Firstname << m_Lastname << m_Weight << m_Gender << m_Birthyear;
-
-	if (m_pClub)
-		ret << m_pClub->GetID();
-	else
-		ret << -1;
-
-	return ret;
 }

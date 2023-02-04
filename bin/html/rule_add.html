@@ -108,6 +108,7 @@
 
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddRuleSet()" id="add">New Rule Set</button>
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateRuleSet()" id="update">Update Rule Set</button>
+<button class="remove" onclick="return DeleteRuleSet()" id="delete"></button>
 
 </form>
 
@@ -158,57 +159,72 @@ function UpdateRuleSet()
 }
 
 
+function DeleteRuleSet()
+{
+  if (confirm(translate('delete_rules_confirm')))
+  {
+    AjaxCallback('ajax/rule/delete?id='+id, function() {
+      navigate("rule_list.html");
+    });
+  }
+
+  return false;
+}
+
+
 function GetRuleSet(id)
 {
   AjaxCallback("ajax/rule/get?id="+id, function(response) {
     var res = response.split(",");
-    console.log(response);
+    var res = YAML.parse(response);
 
-    document.getElementById("name").value = res[0];
-    document.getElementById("match_time").value  = res[1];
-    document.getElementById("goldenscore_time").value    = res[2];
-    document.getElementById("osaekomi_ippon").value    = res[3];
-    document.getElementById("osaekomi_wazaari").value    = res[4];
-    document.getElementById("yuko").checked = res[5] == 1 ? true : false;
-    document.getElementById("koka").checked = res[6] == 1 ? true : false;
-    document.getElementById("draw").checked = res[7] == 1 ? true : false;
-    document.getElementById("break_time").value = res[8];
+    document.getElementById("name").value        = res.name;
+    document.getElementById("match_time").value  = res.match_time;
+    document.getElementById("goldenscore_time").value    = res.golden_score_time;
+    document.getElementById("osaekomi_ippon").value      = res.osaekomi_time;
+    document.getElementById("osaekomi_wazaari").value    = res.osaekomi_with_wazaari_time;
+    document.getElementById("yuko").checked = res.yuko;
+    document.getElementById("koka").checked = res.koka;
+    document.getElementById("draw").checked = res.draw;
+    document.getElementById("break_time").value = res.break_time;
   });
 }
 
 
 
-document.getElementById("add").innerHTML    = lang.new_rule_set;
-document.getElementById("update").innerHTML = lang.update_rule_set;
-document.getElementById("label_name").innerHTML             = lang.name;
-document.getElementById("label_match_time").innerHTML       = lang.match_time;
-document.getElementById("label_goldenscore_time").innerHTML = lang.goldenscore_time;
-document.getElementById("disabled").innerHTML               = lang.disabled;
-document.getElementById("label_osaekomi_ippon").innerHTML   = lang.osaekomi_time_ippon;
-document.getElementById("label_osaekomi_wazaari").innerHTML = lang.osaekomi_time_wazaari;
+document.getElementById("add").innerHTML    = translate('new_rule_set');
+document.getElementById("update").innerHTML = translate('update_rule_set');
+document.getElementById("label_name").innerHTML             = translate('name');
+document.getElementById("label_match_time").innerHTML       = translate('match_time');
+document.getElementById("label_goldenscore_time").innerHTML = translate('goldenscore_time');
+document.getElementById("disabled").innerHTML               = translate('disabled');
+document.getElementById("label_osaekomi_ippon").innerHTML   = translate('osaekomi_time_ippon');
+document.getElementById("label_osaekomi_wazaari").innerHTML = translate('osaekomi_time_wazaari');
 
-document.getElementById("yuko_enabled").innerHTML  = lang.enabled;
-document.getElementById("yuko_disabled").innerHTML = lang.disabled;
-document.getElementById("koka_enabled").innerHTML  = lang.enabled;
-document.getElementById("koka_disabled").innerHTML = lang.disabled;
-document.getElementById("draw_enabled").innerHTML  = lang.enabled;
-document.getElementById("draw_disabled").innerHTML = lang.disabled;
+document.getElementById("yuko_enabled").innerHTML  = translate('enabled');
+document.getElementById("yuko_disabled").innerHTML = translate('disabled');
+document.getElementById("koka_enabled").innerHTML  = translate('enabled');
+document.getElementById("koka_disabled").innerHTML = translate('disabled');
+document.getElementById("draw_enabled").innerHTML  = translate('enabled');
+document.getElementById("draw_disabled").innerHTML = translate('disabled');
 
-document.getElementById("label_draw").innerHTML       = lang.draw;
-document.getElementById("label_break_time").innerHTML = lang.break_time;
+document.getElementById("label_draw").innerHTML       = translate('draw');
+document.getElementById("label_break_time").innerHTML = translate('break_time');
+document.getElementById("delete").innerHTML  = translate('delete');
 
 var id = URLDecode(URL, "id");
 
 if (id)
 {
-  document.getElementById("headline").innerHTML = lang.update_rule_set;
+  document.getElementById("headline").innerHTML = translate('update_rule_set');
   document.getElementById("add").style.display = "none";
   GetRuleSet(id);
 }
 else
 {
-  document.getElementById("headline").innerHTML = lang.new_rule_set;
+  document.getElementById("headline").innerHTML = translate('new_rule_set');
   document.getElementById("update").style.display = "none";
+  document.getElementById("delete").style.display = "none";
 }
 
 </script>

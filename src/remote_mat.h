@@ -16,6 +16,8 @@ namespace Judoboard
 		virtual bool IsOpen() const override;
 		virtual bool Open()  override;
 		virtual bool Close() override;
+		virtual bool Pause(bool Enable = true) override { return false; }
+		virtual bool IsPaused() const override { return false; }
 
 		virtual bool IsConnected() const override;
 
@@ -57,6 +59,7 @@ namespace Judoboard
 		virtual void RemoveKoka(Fighter Whom) override {}
 
 		virtual void Hantei(Fighter Whom) override {}
+		virtual void RevokeHantei() override {}
 		virtual void SetAsDraw(bool Enable = true) override {}
 
 		virtual void AddShido(Fighter Whom) override {}
@@ -84,8 +87,7 @@ namespace Judoboard
 		virtual ZED::Blob RequestScreenshot() const;
 
 		//Serialization
-		virtual ZED::CSV Scoreboard2String() const override { return ""; }
-		virtual ZED::CSV Osaekomi2String(Fighter Who) const  override { return ""; }
+		virtual void ToString(YAML::Emitter& Yaml) const override {}
 
 		//Config
 		virtual void SetFullscreen(bool Enabled = true) override
@@ -97,7 +99,7 @@ namespace Judoboard
 	private:
 		bool SendCommand(const std::string& URL) const;
 		ZED::HttpClient::Packet SendRequest(const std::string& URL) const;
-		bool PostData(const std::string& URL, const ZED::CSV& Data) const;
+		bool PostData(const std::string& URL, const YAML::Emitter& Data) const;
 
 		struct InternalState
 		{

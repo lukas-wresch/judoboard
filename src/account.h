@@ -1,11 +1,19 @@
 #pragma once
 #include <string>
+#include "id.h"
+
+
+namespace YAML
+{
+	class Emitter;
+	class Node;
+}
 
 
 
 namespace Judoboard
 {
-	class Account
+	class Account : public ID
 	{
 	public:
 		friend class Database;
@@ -46,14 +54,19 @@ namespace Judoboard
 		{
 			m_AccessLevel = Permissions;
 		}
+		Account(const YAML::Node& Yaml);
 
 		const std::string GetUsername() const { return m_Username; }
 		const std::string GetPassword() const { return m_Password; }
 		AccessLevel GetAccessLevel() const { return m_AccessLevel; }
 
+		void SetPassword(const std::string& NewPassword) { m_Password = NewPassword; }
+
 		const std::string ToString(AccessLevel RequestersAccessLevel) const;
 
 		bool Verify(const Nonce& Nonce, const std::string& Response) const;
+
+		void operator >> (YAML::Emitter& Yaml) const;
 
 	private:
 

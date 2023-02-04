@@ -1,7 +1,8 @@
-<button class="add" id="new_participant" onclick="navigate('participant_add.html')">New Participant</button>
+<button class="add" style="width: 3.0cm;" id="new_participant" onclick="navigate('participant_add.html')">New Participant</button>
 
-<button class="add" id="new_match" onclick="navigate('add_match.html')">New Match</button>
-<button class="add" id="new_matchtable" onclick="navigate('matchtable_add.html')">New Matchtable</button>
+<button class="add" style="width: 3.0cm;" id="new_match" onclick="navigate('add_match.html')">New Match</button>
+<button class="add" style="width: 3.3cm;" id="new_matchtable" onclick="navigate('matchtable_add.html')">New Match table</button>
+<button class="add" style="width: 3.3cm;" id="select_age_groups" onclick="navigate('age_groups_select.html')"></button>
 
 <h2 id="headline-master-schedule">Overview</h2>
 <table id="master-schedule" border="1" rules="all" style="margin-bottom: 1cm;">
@@ -24,26 +25,46 @@
 </div>
 
 <h2 id="headline">Schedule</h2>
+<label style="width:150px;float:left;margin-top:0px;" id="label_mat_display">Show matches on</label>
+  <select style="margin-bottom:20px; width: 200px;" id="display_mat" onchange='Update();'>
+  </select>
+
 <table id="schedule" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
     <th style="width: 0.5cm;" class="no">No.</th>
-    <th style="width: 4cm;" class="white">White</th>
-    <th style="width: 4cm;" class="blue">Blue</th>
-    <th style="width: 2cm; text-align: center;" class="class">Class</th>
+    <th style="width: 6cm;" class="white">White</th>
+    <th style="width: 6cm;" class="blue">Blue</th>
+    <th style="width: 3cm; text-align: center;" class="class">Class</th>
     <th style="width: 1cm;" class="mat">Mat</th>
     <th style="width: 2.5cm; text-align: center;" class="status">Status</th>
+    <th style="width: 2.5cm; text-align: center;" id="break">Break</th>
     <th style="width: 2.5cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
   
 
+<h2 id="headline_age_groups">Age Groups</h2>
+<table id="age_groups" border="1" rules="all" style="margin-bottom: 1cm;">
+  <tr>
+    <th style="width: 0.5cm;" class="no">No.</th>
+    <th style="width: 4cm;" id="name">Name</th>
+    <th style="width: 2cm; text-align: center;" id="age_groups_participants">#Participants</th>
+    <th style="width: 3.0cm; text-align: center;" id="age_groups_match_tables">#Match tables</th>
+    <th style="width: 2cm; text-align: center;" id="age_groups_matches" class="num_matches">#Matches</th>
+    <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
+  </tr>
+</table>
+
+
 <h2 id="headline-participants">Participants</h2>
 <table id="participants" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
     <th style="width: 0.5cm;" class="no">No.</th>
-    <th style="width: 4cm;" id="name">Name</th>
-    <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
-    <th style="width: 2cm; text-align: center;" id="matches">#Matches</th>
+    <th style="width: 7cm;" id="name">Name</th>
+    <th style="width: 6cm; text-align: center;" class="club">Club</th>
+    <th style="width: 2cm; text-align: center;" id="weight" class="weight">Weight</th>
+    <th style="width: 2cm; text-align: center;" id="matches" class="num_matches">#Matches</th>
+    <th style="width: 2.5cm; text-align: center;" id="age_group" class="age_group">Age group</th>
     <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -55,6 +76,7 @@
 
 function MoveEntryUp(id)
 {
+  var mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_up?id=' + id, function() {
     Update();
   });
@@ -64,6 +86,7 @@ function MoveEntryUp(id)
 
 function MoveEntryDown(id)
 {
+  var mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_down?id=' + id, function() {
     Update();
   });
@@ -72,9 +95,9 @@ function MoveEntryDown(id)
 
 
 
-function SetEntryMat(index, mat)
+function SetEntryMat(id, mat)
 {
-  AjaxCallback('ajax/masterschedule/set_mat?index='+index+'&mat='+mat, function() {
+  AjaxCallback('ajax/masterschedule/set_mat?id='+id+'&mat='+mat, function() {
     Update();
   });
 
@@ -85,7 +108,8 @@ function SetEntryMat(index, mat)
 
 function MoveUp(id)
 {
-  AjaxCallback('/ajax/match/move_up?id=' + id, function() {
+  var mat_to_display = document.getElementById("display_mat").value;
+  AjaxCallback('/ajax/match/move_up?id=' + id + '&mat=' + mat_to_display, function() {
     Update();
   });
   return false;
@@ -94,7 +118,8 @@ function MoveUp(id)
 
 function MoveDown(id)
 {
-  AjaxCallback('/ajax/match/move_down?id=' + id, function() {
+  var mat_to_display = document.getElementById("display_mat").value;
+  AjaxCallback('/ajax/match/move_down?id=' + id + '&mat=' + mat_to_display, function() {
     Update();
   });
   return false;
@@ -160,90 +185,117 @@ function RemoveNoDisqualify(fighter, matID)
 
 
 
+function RemoveAgeGroup(id)
+{
+  AjaxCallback('/ajax/age_groups/remove?id=' + id, function() {
+    Update();
+  });
+  return false;
+}
+
+
+
+function AssignAgeGroup(judoka_id, age_group_id)
+{
+  AjaxCallback('/ajax/tournament/assign_age_group?id=' + judoka_id + '&age=' + age_group_id, Update);
+  return false;
+}
+
+
+
 function Update()
 {
   AjaxCallback("ajax/get_masterschedule", function(response) {
     console.log(response);
+    var res = YAML.parse(response);
+    //console.log(res);
 
-    var res = response.split(",");
+    var mat_to_display = document.getElementById("display_mat");
+    var mat_to_display_selected = mat_to_display.value;
+    while (mat_to_display.length > 0)
+      mat_to_display.remove(0);
 
-    if (res.length < 2)
-      return;
-
-    console.log(res);
+    var option = document.createElement("option");
+    option.value = 0;
+    option.text = translate("all_mats");
+    mat_to_display.add(option);
 
     var table = document.getElementById("master-schedule");
 
     while (table.rows.length > 0)
-      table.deleteRow(table.rows.length-1);
+      table.deleteRow(0);
 
     var i = 0;
-    var mat_count = res[i++];
+    var mat_count = res.highest_mat_id;
 
     var row = table.insertRow(-1);
     for (var j=0; j < mat_count; j++)
     {
-      var cell = row.insertCell(j);
-      var colspan = res[i++];
-      var id = res[i++];
+      var option = document.createElement("option");
+      option.value = j+1;
+      option.text = translate('mat') + " " + (j+1);
+      mat_to_display.add(option);
+      mat_to_display.selectedIndex = mat_to_display_selected;
 
-      cell.innerHTML = lang.mat + " " + id;
-      cell.style.backgroundColor = Color(id);
+      var cell = row.insertCell(j);
+      var colspan = res.max_widths[j];
+
+      cell.innerHTML = translate('mat') + " " + (j+1);
+      cell.style.backgroundColor = Color(j+1);
       cell.colSpan = colspan;
       cell.style.textAlign = "center";
       cell.style.fontSize  = "16pt";
       cell.style.height = "1.3cm";
     }
 
-    while (i < res.length)
+    if (typeof res.master_schedule.length === 'undefined')
+      return;
+
+    //For each index
+    for (const per_index of res.master_schedule)
     {
       var row = table.insertRow(-1);
 
-      for (var mat=1; mat <= mat_count;mat++)
+      //For each mat
+      for (const per_mat of per_index)
       {
-        var max         = res[i++];
-        var entry_count = res[i++];
+        var max = per_mat.max;
+        var entries_rendered = 0;
 
-        for (var entry=0; entry < entry_count;entry++)
+        if (per_mat.entries.length > 0)
         {
-          var editable = res[i++];
-          var index    = res[i++];
-          var id    = res[i++];
-          var color = res[i++];
-          var matID = parseInt(res[i++]);
-          var name  = res[i++];
+          for (const entry of per_mat.entries)
+          {
+            var cell = row.insertCell(-1);
 
-          var cell = row.insertCell(-1);
+            var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px; margin-left: 4mm; margin-right: 3mm;";
+            var contents;
 
-          var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px; margin-left: 4mm; margin-right: 3mm;";
-          var contents;
+            if (entry.editable)
+              contents = "<a href=\"#matchtable_add.html?id=" + entry.uuid + "\">" + entry.description + "</a><br/><br/>";
+            else
+              contents = entry.description + "<br/>";
 
-          if (editable)
-            contents = "<a href=\"#matchtable_add.html?id=" + id + "\">" + name + "</a><br/><br/>";
-          else
-            contents = name + "<br/>";
-
-          contents += "<table><tr><td rowspan=\"2\"><a style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat(" + index + "," + (matID-1) + ");\"></a></td>";
-          contents += "           <td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp("   + index + ");\"></a></td>";
-          contents += "           <td rowspan=\"2\"><a style=\"" + style + "transform: rotate(-45deg); \" href=\"#\" onclick=\"SetEntryMat(" + index + "," + (matID+1) + ");\"></a></td></tr>";
-          contents += "       <tr><td><a style=\"" + style + "transform: rotate(45deg);\"    href=\"#\" onclick=\"return MoveEntryDown(" + index + ");\"></a></td></tr></table>";
+            contents += "<table><tr><td rowspan=\"2\"><a style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id-1) + ");\"></a></td>";
+            contents += "           <td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp('"   + entry.uuid + "');\"></a></td>";
+            contents += "           <td rowspan=\"2\"><a style=\"" + style + "transform: rotate(-45deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id+1) + ");\"></a></td></tr>";
+            contents += "       <tr><td><a style=\"" + style + "transform: rotate(45deg);\"    href=\"#\" onclick=\"return MoveEntryDown('" + entry.uuid + "');\"></a></td></tr></table>";
 
 
-          cell.innerHTML = contents;
-          cell.style.backgroundColor = color;
-          cell.style.textAlign = "center";
+            cell.innerHTML = contents;
+            cell.style.backgroundColor = entry.color;
+            cell.style.textAlign = "center";
+            entries_rendered++;
+          }
         }
 
-        if (entry_count < max || max == 0)
+        if (per_mat.entries.length < max || max == 0)
         {
           var cell = row.insertCell(-1);
-          if (entry_count == 0)
-            cell.innerHTML = "";
-          else
-            cell.innerHTML = "";
+          cell.innerHTML = "";
 
           cell.style.textAlign = "center";
-          cell.colSpan = max - entry_count;
+          cell.colSpan = max - entries_rendered;
           cell.style.height = "1.3cm";
         }
       }
@@ -253,21 +305,22 @@ function Update()
 
 
   AjaxCallback("ajax/get_schedule", function(response) {
-    var res = response.split(",");
-
-    if (res.length < 4)
-      return;
+    //console.log(response);
+    var res = YAML.parse(response);
 
     var table = document.getElementById("schedule");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    console.log(response);
+    var mat_to_display = document.getElementById("display_mat").value;
+
     var no = 0;
-    for (var i=0; i < res.length;)
+    for (const match of res)
     {
-      no++;
+      if (mat_to_display != 0 && match.mat_id != mat_to_display)
+        continue;
+
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
       var cell1 = row.insertCell(1);
@@ -276,93 +329,123 @@ function Update()
       var cell4 = row.insertCell(4);
       var cell5 = row.insertCell(5);
       var cell6 = row.insertCell(6);
+      var cell7 = row.insertCell(7);
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
-
-      var id    = res[i++];
-      var white = res[i++];
-      var blue  = res[i++];
-      var matID = res[i++];
-      var state = res[i++];
-      var color = res[i++];
-      var matchtableID   = res[i++];
-      var matchtableName = res[i++];
-
+      no++;
       cell0.innerHTML = no;
       cell0.style.textAlign = "center";
       cell0.style.fontSize  = "14pt";
       cell0.style.height    = "1.5cm";
 
-      cell1.innerHTML = white;
-      cell2.innerHTML = blue;
-
-      if (matchtableID > 0)
-        cell3.innerHTML = "<a href=\"#matchtable_add.html?id="+matchtableID+"\">" + matchtableName + "</a>";
+      if (typeof match.white_name !== 'undefined')
+        cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + match.white_uuid + "\">" + match.white_name + "</a>";
       else
-        cell3.innerHTML = matchtableName;
+        cell1.innerHTML = "???";
+      cell1.style.fontSize  = "16pt";
 
-      cell3.style.backgroundColor = color;
+      if (typeof match.blue_name !== 'undefined')
+        cell2.innerHTML = "<a href=\"#judoka_add.html?id=" + match.blue_uuid + "\">" + match.blue_name + "</a>";
+      else
+        cell2.innerHTML = "???";
+      cell2.style.fontSize  = "16pt";
+
+      if (typeof match.match_table !== 'undefined')
+        cell3.innerHTML = "<a href=\"#matchtable_add.html?id="+match.match_table+"\">" + match.match_table_name + "</a>";
+      else
+        cell3.innerHTML = "- - -";
+      
+      cell3.style.backgroundColor = match.color;
       cell3.style.textAlign = "center";
 
-      if (matID <= 0)
+      if (match.mat_id <= 0)
       {
         cell4.style.fontWeight = "bold";
         cell4.innerHTML = "None";
       }
       else
-        cell4.innerHTML = matID;
+        cell4.innerHTML = match.mat_id;
 
-      cell4.style.backgroundColor = Color(matID);
+      cell4.style.backgroundColor = Color(match.mat_id);
       cell4.style.textAlign = "center";
       cell4.style.fontSize  = "16pt";
 
-      if (state == 0)
-        cell5.innerHTML = lang.scheduled;
-      else if (state == 1)
+      if (match.state == 0)
+        cell5.innerHTML = translate('scheduled');
+      else if (match.state == 1)
       {
         cell5.style.color = "red";
-        cell5.innerHTML = lang.running;
+        cell5.innerHTML = translate('running');
       }
-      else if (state == 2)
+      else if (match.state == 2)
       {
         cell5.style.color = "green";
-        cell5.innerHTML = lang.concluded;
+        cell5.innerHTML = translate('concluded');
+      }
+      else if (match.state == 3)
+      {
+        cell5.style.color = "blue";
+        cell5.innerHTML = translate('optional');
+      }
+      else if (match.state == 4)
+      {
+        cell5.style.color = "blue";
+        cell5.innerHTML = translate('skipped');
       }
       else
         cell5.innerHTML = "Unknown";
 
       cell5.style.textAlign = "center";
 
+
+      cell6.style.fontSize  = "16pt";
+      cell6.style.textAlign = "center";
+
+      if (match.state == 1 || match.state == 2 || match.current_breaktime >= 10*60 || match.current_breaktime == 0)
+        cell6.innerHTML = '- - -';
+      else
+      {
+        var current_breaktime = Math.floor(match.current_breaktime/60) + ':' + zeroPad(Math.floor(match.current_breaktime)%60, 2);
+        cell6.innerHTML = current_breaktime;
+      
+        if (match.current_breaktime < match.breaktime)
+        {
+          if (match.current_breaktime + 30 > match.breaktime)
+            cell6.style.backgroundColor = "#ff6d";
+          else
+            cell6.style.backgroundColor = "#e33d";
+        }
+      }
+
       var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
+      var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 1.8cm; margin-right: 2mm;\" onclick=navigate(\"edit_match.html?id="+match.uuid+"\");>" + translate('details') + "</button></td>";
 
-
-      var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 1.8cm; margin-right: 2mm;\" onclick=navigate(\"edit_match.html?id="+id+"\");>" + lang.details + "</button></td>";
-
-      if (state == 0)
-        options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveUp("+id+")\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return MoveDown("+id+");\"></a></td></tr></table>";
+      if (match.state == 0)
+        options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveUp('"+match.uuid+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return MoveDown('"+match.uuid+"');\"></a></td></tr></table>";
       else
         options += "<td></td></tr><tr><td></td></tr></table>";
 
-      cell6.innerHTML = options;
+      cell7.innerHTML = options;
     }
   });
 
 
 
-  AjaxCallback("ajax/participants/get", function(response) {
-    console.log(response);
-    var res = response.split(",");
+  AjaxCallback("ajax/age_groups/get", function(response) {
+    //console.log(response);
+    var res = YAML.parse(response);
 
-    if (res.length < 4)
-      return;
-
-    var table = document.getElementById("participants");
+    var table = document.getElementById("age_groups");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
+      
+    if (res === null)
+      return;
 
-    for (var i=0; i < res.length; i+=4)
+    var no = 0;
+    for (const age of res)
     {
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
@@ -370,25 +453,120 @@ function Update()
       var cell2 = row.insertCell(2);
       var cell3 = row.insertCell(3);
       var cell4 = row.insertCell(4);
+      var cell5 = row.insertCell(5);
 
-      if ((i/4)%2 == 0)
+      if (no%2 == 0)
         row.style.backgroundColor = "#eee";
+      no++;
 
-      cell0.innerHTML = i/4+1;
+      cell0.innerHTML = no;
       cell0.style.textAlign = "center";
       cell0.style.fontSize  = "14pt";
 
-      cell1.innerHTML = "<a href=\"#judoka_edit.html?id=" + res[i] + "\">" + res[i+1] + "</a>";
-      cell2.innerHTML = res[i+2] + " kg";
+      cell1.innerHTML = "<a href=\"#age_groups_add.html?id=" + age.uuid + "\">" + age.name + "</a>";
+
+      cell2.innerHTML = age.num_participants;
       cell2.style.textAlign = "center";
       cell2.style.fontSize  = "16pt";
 
-      cell3.innerHTML = res[i+3];
+      cell3.innerHTML = age.num_match_tables;
       cell3.style.textAlign = "center";
       cell3.style.fontSize  = "16pt";
 
-      cell4.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant("+res[i]+")\">" + lang.remove + "</button>";
+      cell4.innerHTML = age.num_matches;
       cell4.style.textAlign = "center";
+      cell4.style.fontSize  = "16pt";
+
+      cell5.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveAgeGroup('"+age.uuid+"')\">" + translate('remove') + "</button>";
+      cell5.style.textAlign = "center";
+    }
+  });
+
+
+
+  AjaxCallback("ajax/participants/get", function(response) {
+    //console.log(response);
+    var res = YAML.parse(response);
+
+    var table = document.getElementById("participants");
+
+    while (table.rows.length > 1)
+      table.deleteRow(table.rows.length-1);
+
+    var no = 0;
+    for (const judoka of res)
+    {
+      var row = table.insertRow(-1);
+      var cell0 = row.insertCell(0);
+      var cell1 = row.insertCell(1);
+      var cell6 = row.insertCell(2);
+      var cell2 = row.insertCell(3);
+      var cell3 = row.insertCell(4);
+      var cell4 = row.insertCell(5);
+      var cell5 = row.insertCell(6);
+
+      if (no%2 == 0)
+        row.style.backgroundColor = "#eee";
+      no++;
+
+      cell0.innerHTML = no;
+      cell0.style.textAlign = "center";
+      cell0.style.fontSize  = "14pt";
+
+      cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.name + "</a>";
+      cell1.style.fontSize  = "16pt";
+      cell2.innerHTML = judoka.weight + " kg";
+      cell2.style.textAlign = "center";
+      cell2.style.fontSize  = "16pt";
+
+      if (typeof judoka.club_name !== 'undefined')
+        cell6.innerHTML = judoka.club_name;
+      else
+        cell6.innerHTML = "- - -";
+      cell6.style.textAlign = "center";
+      cell6.style.fontSize  = "14pt";
+
+      cell3.innerHTML = judoka.num_matches;
+      cell3.style.textAlign = "center";
+      cell3.style.fontSize  = "16pt";
+
+      cell4.style.textAlign = "center";
+      
+      if (judoka.age_groups.length == 0)
+        cell4.innerHTML = "- - -";
+      else if (judoka.age_groups.length == 1)
+      {
+        cell4.innerHTML = judoka.age_groups[0].name;
+        cell4.style.fontSize = "14pt";
+      }
+      else
+      {
+        var select = document.createElement("select");
+        select.style.width = "1.7cm";
+        select.style.fontSize = "14pt";
+
+        for (const age_group of judoka.age_groups)
+        {
+          var option = document.createElement("option");
+          option.value = age_group.uuid;
+          option.text  = age_group.name;
+
+          select.appendChild(option);
+        }
+
+        if (typeof judoka.age_group_uuid !== 'undefined')
+          select.value = judoka.age_group_uuid;
+
+        select.onchange = function(e)
+        {
+          AssignAgeGroup(judoka.uuid, select.value);
+        }
+
+        cell4.appendChild(select);
+      }
+
+      cell5.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + translate('remove') + "</button>";
+      cell5.style.textAlign = "center";
     }
   });
 
@@ -396,11 +574,12 @@ function Update()
 
   AjaxCallback("ajax/hansokumake/get", function(response) {
     console.log(response);
-    var res = response.split(",");
+    var res = YAML.parse(response);
 
-    if (res.length < 4)
+    if (res.length < 1)
     {
-       $("#div_hansokumake").animate({height: '0px', opacity: 0}, 1000);
+       if (showHansokumake)
+         $("#div_hansokumake").animate({height: '0px', opacity: 0}, 1000);
        showHansokumake = false;
        return;
     }
@@ -411,20 +590,8 @@ function Update()
       table.deleteRow(table.rows.length-1);
 
     var no = 0;
-    for (var i=0; i < res.length;)
+    for (const hansoku of res)
     {
-      no++;
-      var id = res[i++];
-      var white_name = res[i++];
-      var blue_name  = res[i++];
-      var mat_id  = res[i++];
-      var state   = res[i++];
-      var color   = res[i++];
-      var matchtable_id   = res[i++];
-      var matchtable_name = res[i++];
-      var hansokumake_fighter = res[i++];
-      var hansokumake_state   = res[i++];
-
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
       var cell1 = row.insertCell(1);
@@ -434,6 +601,7 @@ function Update()
       var cell5 = row.insertCell(5);
       var cell6 = row.insertCell(6);
 
+      no++;
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
 
@@ -441,42 +609,42 @@ function Update()
       cell0.style.textAlign = "center";
       cell0.style.fontSize  = "14pt";
 
-      cell1.innerHTML = white_name;
-      cell2.innerHTML = blue_name;
+      cell1.innerHTML = hansoku.match.white_name;
+      cell2.innerHTML = hansoku.match.blue_name;
 
-      cell3.innerHTML = matchtable_name;
+      cell3.innerHTML = hansoku.match.match_table_name;
       cell3.style.textAlign = "center";
 
-      cell4.innerHTML = mat_id;
+      cell4.innerHTML = hansoku.match.mat_id;
       cell4.style.textAlign = "center";
       cell4.style.fontSize  = "16pt";
 
-      if (hansokumake_state == 0)
-        cell5.innerHTML = "Hansokumake " + lang.for + " ";
-      else if (hansokumake_state == 1)
-        cell5.innerHTML = lang.disqualification + " " + lang.for + " ";
-      else if (hansokumake_state == 2)
-        cell5.innerHTML = lang.no_disqualification + " " + lang.for + " ";
+      if (hansoku.disqualification_state == 0)
+        cell5.innerHTML = "Hansokumake " + translate('for') + " ";
+      else if (hansoku.disqualification_state == 1)
+        cell5.innerHTML = translate('disqualification') + " " + translate('for') + " ";
+      else if (hansoku.disqualification_state == 2)
+        cell5.innerHTML = translate('no_disqualification') + " " + translate('for') + " ";
 
-      if (hansokumake_fighter == 0)
-        cell5.innerHTML += lang.white;
+      if (hansoku.fighter == 0)
+        cell5.innerHTML += translate('white');
       else
-        cell5.innerHTML += lang.blue;
+        cell5.innerHTML += translate('blue');
 
       cell5.style.fontSize  = "16pt";
 
-      if (hansokumake_state == 0)
+      if (hansoku.disqualification_state == 0)
       {
-        cell6.innerHTML  = "<button class=\"remove\"  style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return Disqualify("   + hansokumake_fighter + ',' + mat_id+")\">" + "Disqualify" + "</button>";
-        cell6.innerHTML += "<button class=\"neutral\" style=\"width: 4.5cm; height: 0.9cm;\" onclick=\"return NoDisqualify(" + hansokumake_fighter + ',' + mat_id+")\">" + "No Disqualification" + "</button>";
+        cell6.innerHTML  = "<button class=\"remove\"  style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return Disqualify("   + hansoku.fighter + ',' + hansoku.match.mat_id+")\">" + "Disqualify" + "</button>";
+        cell6.innerHTML += "<button class=\"neutral\" style=\"width: 4.5cm; height: 0.9cm;\" onclick=\"return NoDisqualify(" + hansoku.fighter + ',' + hansoku.match.mat_id+")\">" + "No Disqualification" + "</button>";
       }
-      else if (hansokumake_state == 1)
+      else if (hansoku.disqualification_state == 1)
       {
-        cell6.innerHTML = "<button class=\"neutral\" style=\"width: 5.5cm; height: 0.9cm;\" onclick=\"return RemoveDisqualify(" + hansokumake_fighter + ',' + +mat_id+")\">" + "Revoke Disqualification" + "</button>";
+        cell6.innerHTML = "<button class=\"neutral\" style=\"width: 5.5cm; height: 0.9cm;\" onclick=\"return RemoveDisqualify(" + hansoku.fighter + ',' + hansoku.match.mat_id+")\">" + "Revoke Disqualification" + "</button>";
       }
-      else if (hansokumake_state == 2)
+      else if (hansoku.disqualification_state == 2)
       {
-        cell6.innerHTML = "<button class=\"neutral\" style=\"width: 6.5cm; height: 0.9cm;\" onclick=\"return RemoveNoDisqualify(" + hansokumake_fighter + ',' + +mat_id+")\">" + "Revoke No Disqualification" + "</button>";
+        cell6.innerHTML = "<button class=\"neutral\" style=\"width: 6.5cm; height: 0.9cm;\" onclick=\"return RemoveNoDisqualify(" + hansoku.fighter + ',' + hansoku.match.mat_id+")\">" + "Revoke No Disqualification" + "</button>";
       }
 
       cell6.style.textAlign = "center";
@@ -484,7 +652,7 @@ function Update()
 
     if (!showHansokumake)
     {
-        $("#div_hansokumake").show().animate({height: 'auto', opacity: 100}, 1000);
+        $("#div_hansokumake").show().animate({height: 200*res.length + 'px', opacity: 100}, 1000);
         showHansokumake = true;
     }
   });
@@ -498,31 +666,44 @@ Update();
 TimerID = window.setInterval(Update, 5000);
 
 
-document.getElementById("headline").innerHTML = lang.schedule;
+document.getElementById("headline").innerHTML = translate('schedule');
 
-document.getElementById("headline-master-schedule").innerHTML = lang.overview;
-document.getElementById("headline-participants").innerHTML = lang.participants;
+document.getElementById("headline-master-schedule").innerHTML = translate('overview');
+document.getElementById("headline-participants").innerHTML = translate('participants');
 
-document.getElementById("new_participant").innerHTML = lang.new_participant;
-document.getElementById("new_match").innerHTML = lang.new_match;
-document.getElementById("new_matchtable").innerHTML = lang.add_matchtable;
-
-//document.getElementById("white").innerHTML = lang.white;
-//document.getElementById("blue").innerHTML  = lang.blue;
-//document.getElementById("mat").innerHTML   = lang.mat;
+document.getElementById("new_participant").innerHTML = translate('new_participant');
+document.getElementById("new_match").innerHTML = translate('new_match');
+document.getElementById("new_matchtable").innerHTML = translate('add_matchtable');
 
 for (const el of document.getElementsByClassName("no"))
-    el.innerHTML = lang.no;
+    el.innerHTML = translate('no');
 for (const el of document.getElementsByClassName("white"))
-    el.innerHTML = lang.white;
+    el.innerHTML = translate('white');
 for (const el of document.getElementsByClassName("blue"))
-    el.innerHTML = lang.blue;
+    el.innerHTML = translate('blue');
 for (const el of document.getElementsByClassName("class"))
-    el.innerHTML = lang.matchtable;
+    el.innerHTML = translate('match_table');
 for (const el of document.getElementsByClassName("mat"))
-    el.innerHTML = lang.mat;
+    el.innerHTML = translate('mat');
 for (const el of document.getElementsByClassName("options"))
-    el.innerHTML = lang.options;
+    el.innerHTML = translate('options');
+for (const el of document.getElementsByClassName("weight"))
+    el.innerHTML = translate('weight');
+for (const el of document.getElementsByClassName("num_matches"))
+    el.innerHTML = '#' + translate('matches');
+for (const el of document.getElementsByClassName("club"))
+    el.innerHTML = translate('club');
+for (const el of document.getElementsByClassName("age_group"))
+    el.innerHTML = translate('age_group');
 
-document.getElementById("new_participant").innerHTML  = lang.new_participant;
-document.getElementById("new_match").innerHTML  = lang.new_match;
+document.getElementById("new_participant").innerHTML = translate('new_participant');
+document.getElementById("new_match").innerHTML = translate('new_match');
+document.getElementById("age_groups_participants").innerHTML = '#' + translate('participants');
+document.getElementById("headline_age_groups").innerHTML = translate('age_groups');
+
+document.getElementById("break").innerHTML = translate('break_time');
+document.getElementById("age_groups_match_tables").innerHTML = '#' + translate('match_tables');
+
+document.getElementById("label_mat_display").innerHTML = translate('show_matches_on');
+
+document.getElementById("select_age_groups").innerHTML = translate('select_age_groups');

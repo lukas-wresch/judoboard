@@ -4,6 +4,13 @@
 #include "../ZED/include/csv.h"
 
 
+namespace YAML
+{
+	class Emitter;
+	class Node;
+}
+
+
 
 namespace Judoboard
 {
@@ -14,7 +21,7 @@ namespace Judoboard
 	public:
 		RuleSet() = default;
 		RuleSet(const std::string& Name, uint32_t MatchTime, int GoldenScoreTime, uint32_t OsaeKomiTime, uint32_t OsaeKomiTime_with_Wazaari, bool Yuko = false, bool Koka = false, bool Draw = false, uint32_t BreakTime = 0);
-		RuleSet(ZED::CSV& Stream);
+		RuleSet(const YAML::Node& Yaml);
 
 		const std::string& GetName() const { return m_Name; }
 		bool IsYukoEnabled() const { return m_Yuko; }
@@ -38,7 +45,7 @@ namespace Judoboard
 
 		const std::string GetDescription() const;
 
-		void operator >> (ZED::CSV& Stream) const;
+		void operator >> (YAML::Emitter& Yaml) const;
 
 	private:
 

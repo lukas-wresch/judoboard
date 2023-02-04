@@ -1,0 +1,134 @@
+<h1 id="headline"></h1>
+
+<form>
+
+<div>
+    <label style="width:150px;float:left;margin-top:4px;" id="label_name">Name</label>
+    <input style="margin-bottom:20px;" type="text" id="name" value="" size="40" maxlength="64"/>
+</div>
+
+<div>
+    <label style="width:150px;float:left;margin-top:4px;" id="label_min_age">Min Age</label>
+    <input style="margin-bottom:20px;" type="number" id="min_age" value="10" min="0" max="100" />
+</div>
+
+<div>
+    <label style="width:150px;float:left;margin-top:4px;" id="label_max_age">Max Age</label>
+    <input style="margin-bottom:20px;" type="number" id="max_age" value="18" min="0" max="100" />
+</div>
+
+<div>
+  <label style="width:150px;float:left;margin-top:5px;" id="label_gender"></label>
+  <select style="margin-bottom:20px;" id="gender">
+    <option selected value="-1" id="both"></option>
+    <option value="0" id="male">Male</option>
+    <option value="1" id="female">Female</option>
+  </select>
+</div>
+
+<div>
+  <label id="label_rule" style="width:150px;float:left;margin-top:5px;">Rule Set</label>
+  <select style="padding-top:5px;margin-bottom:20px;width: 5.0cm;" id="rule">
+  </select>
+</div>
+
+<button class="add" id="add" onclick="return AddAgeGroup()">New Age Group</button>
+<button class="neutral" style="margin-right: 2cm;" onclick="return UpdateAgeGroup()" id="update">Save</button>
+<button class="remove" onclick="return DeleteAgeGroup()" id="delete">Delete</button>
+
+</form>
+
+
+<script>
+
+function AddAgeGroup()
+{
+  var params = URLEncode({
+    name:    document.getElementById("name").value,
+    min_age: document.getElementById("min_age").value,
+    max_age: document.getElementById("max_age").value,
+    gender:  document.getElementById("gender").value,
+    rule:    document.getElementById("rule").value,
+  });
+
+  AjaxPost('ajax/age_groups/add', params, function() {    
+    navigate('age_groups_list.html');
+  });
+
+  return false;
+}
+
+
+function DeleteAgeGroup()
+{
+  if (confirm(translate('delete_age_group_confirm')))
+  {
+    AjaxCallback('ajax/age_groups/delete?id='+id, function() {
+      navigate('age_groups_list.html');
+    });
+  }
+
+  return false;
+}
+
+
+function GetAgeGroup(id)
+{
+  AjaxCallback("ajax/age_groups/get?id="+id, function(response) {
+    console.log(response);
+    var res = YAML.parse(response);
+
+    document.getElementById("name").value    = res.name;
+    document.getElementById("min_age").value = res.min_age;
+    document.getElementById("max_age").value = res.max_age;
+  });
+
+  return false;
+}
+
+
+
+function UpdateAgeGroup()
+{
+  var params = URLEncode({
+    name:    document.getElementById("name").value,
+    min_age: document.getElementById("min_age").value,
+    max_age: document.getElementById("max_age").value,
+    gender:  document.getElementById("gender").value,
+    rule:    document.getElementById("rule").value,
+  });
+
+  AjaxPost('ajax/age_groups/update?id='+id, params, function() {
+    navigate('age_groups_list.html');
+  });
+
+  return false;
+}
+
+
+var id = URLDecode(URL, "id");
+
+if (id)
+{
+    document.getElementById("add").style.display  = "none";
+    document.getElementById("headline").innerHTML = translate('edit_age_group');
+    GetAgeGroup(id);
+}
+else
+{
+    document.getElementById("headline").innerHTML = translate('new_age_group');
+    document.getElementById("update").style.display = "none";
+    document.getElementById("delete").style.display = "none";
+}
+
+GetRuleSets();
+
+document.getElementById("label_gender").innerHTML = translate('gender');
+document.getElementById("both").innerHTML = translate('both');
+document.getElementById("male").innerHTML = translate('male');
+document.getElementById("female").innerHTML = translate('female');
+document.getElementById("update").innerHTML = translate('save');
+document.getElementById("delete").innerHTML = translate('delete');
+document.getElementById("add").innerHTML = translate('new_age_group');
+
+</script>

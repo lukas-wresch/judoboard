@@ -1,3 +1,5 @@
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include "rule_set.h"
 
 
@@ -25,29 +27,51 @@ RuleSet::RuleSet(const std::string& Name, uint32_t MatchTime, int GoldenScoreTim
 
 
 
-RuleSet::RuleSet(ZED::CSV& Stream)
+RuleSet::RuleSet(const YAML::Node& Yaml)
 {
-	Stream >> m_Name;
+	if (Yaml["uuid"])
+		SetUUID(Yaml["uuid"].as<std::string>());
+	if (Yaml["name"])
+		m_Name = Yaml["name"].as<std::string>();
 
-	std::string uuid;
-	Stream >> uuid;
-	SetUUID(std::move(uuid));
+	if (Yaml["match_time"])
+		m_MatchTime = Yaml["match_time"].as<int>();
+	if (Yaml["golden_score_time"])
+		m_GoldenScoreTime = Yaml["golden_score_time"].as<int>();
+	if (Yaml["osaekomi_time"])
+		m_OsaeKomiTime = Yaml["osaekomi_time"].as<int>();
+	if (Yaml["osaekomi_with_wazaari_time"])
+		m_OsaeKomiTime_With_WazaAri = Yaml["osaekomi_with_wazaari_time"].as<int>();
+	if (Yaml["break_time"])
+		m_BreakTime = Yaml["break_time"].as<int>();
 
-	Stream >> m_MatchTime >> m_GoldenScoreTime >> m_OsaeKomiTime >> m_OsaeKomiTime_With_WazaAri >> m_BreakTime;
-	Stream >> m_Yuko >> m_Koka >> m_Draw;
+	if (Yaml["yuko"])
+		m_Yuko = Yaml["yuko"].as<bool>();
+	if (Yaml["koka"])
+		m_Koka = Yaml["koka"].as<bool>();
+	if (Yaml["draw"])
+		m_Draw = Yaml["draw"].as<bool>();
 }
 
 
 
-void RuleSet::operator >>(ZED::CSV& Stream) const
+void RuleSet::operator >> (YAML::Emitter& Yaml) const
 {
-	Stream << m_Name;
+	Yaml << YAML::BeginMap;
+	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "name" << YAML::Value << m_Name;
 
-	Stream << (std::string)GetUUID();
+	Yaml << YAML::Key << "match_time"        << YAML::Value << m_MatchTime;
+	Yaml << YAML::Key << "golden_score_time" << YAML::Value << m_GoldenScoreTime;
 
-	Stream << m_MatchTime << m_GoldenScoreTime << m_OsaeKomiTime << m_OsaeKomiTime_With_WazaAri << m_BreakTime;
-	Stream << m_Yuko << m_Koka << m_Draw;
-	Stream.AddNewline();//Also needed to flush the stream
+	Yaml << YAML::Key << "osaekomi_time" << YAML::Value << m_OsaeKomiTime;
+	Yaml << YAML::Key << "osaekomi_with_wazaari_time" << YAML::Value << m_OsaeKomiTime_With_WazaAri;
+	Yaml << YAML::Key << "break_time" << YAML::Value << m_BreakTime;
+
+	Yaml << YAML::Key << "yuko" << YAML::Value << m_Yuko;
+	Yaml << YAML::Key << "koka" << YAML::Value << m_Koka;
+	Yaml << YAML::Key << "draw" << YAML::Value << m_Draw;
+	Yaml << YAML::EndMap;
 }
 
 
@@ -58,12 +82,12 @@ bool RuleSet::IsOutOfTime(int MatchTime_Millseconds, bool GoldenScore) const
 	{
 		if (m_MatchTime < 0)//Infinite match time?
 			return false;
-		return MatchTime_Millseconds > m_MatchTime * 1000;
+		return MatchTime_Millseconds >= m_MatchTime * 1000;
 	}
 
 	if (m_GoldenScoreTime < 0)//Infinite golden score time?
 		return false;
-	return MatchTime_Millseconds > m_GoldenScoreTime * 1000;
+	return MatchTime_Millseconds >= m_GoldenScoreTime * 1000;
 }
 
 

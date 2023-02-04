@@ -54,7 +54,7 @@ jobs:
       run: dir; cd vsprojects; dir; nuget install GoogleTest\packages.config -OutputDirectory packages
     - name: compile
       run: dir; .\compile.bat
-    - name: create folder
-      run: dir; cd bin\Release; xcopy ..\assets assets\ /S /Y; xcopy ..\html   html\   /S /Y; mkdir tournaments
     - name: Run Tests
-      run: dir; cd bin\Release; dir; .\GoogleTest.exe --gtest_filter=Matnothing
+      run: dir; cd bin; dir; .\GoogleTest.exe --gtest_filter=Matnothing
+    - name: Debug Tests
+      run: dir; cd bin; dir; .\GoogleTest_Debug.exe --gtest_filter=Matnothing

@@ -12,99 +12,106 @@ using namespace Judoboard;
 
 
 
-Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight) : MatchTable(Tournament)
+Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament) : IFilter(Tournament)
 {
 	m_MinWeight = MinWeight;
 	m_MaxWeight = MaxWeight;
-
-	SetName(Localizer::Translate("Weightclass") + " " + GetDescription());
 }
 
 
 
-Weightclass::Weightclass(const ITournament* Tournament, uint16_t MinWeight, uint16_t MaxWeight, Gender Gender) : Weightclass(Tournament, MinWeight, MaxWeight)
+Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
+	: Weightclass(MinWeight, MaxWeight, Tournament)
 {
 	m_Gender = Gender;
-	m_GenderEnforced = true;
-
-	SetName(Localizer::Translate("Weightclass") + " " + GetDescription());
 }
 
 
 
-Weightclass::Weightclass(ZED::CSV& Stream, ITournament* Tournament) : MatchTable(Stream, Tournament)
+Weightclass::Weightclass(const YAML::Node& Yaml, const ITournament* Tournament) : IFilter(Yaml, Tournament)
 {
-	Stream >> m_MinWeight >> m_MaxWeight >> m_Gender >> m_GenderEnforced;
+	if (Yaml["min_weight"])
+		m_MinWeight = Weight(Yaml["min_weight"]);
+	if (Yaml["max_weight"])
+		m_MaxWeight = Weight(Yaml["max_weight"]);
+	if (Yaml["gender"])
+		m_Gender = (Gender)Yaml["gender"].as<int>();
 }
 
 
 
-Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament) : MatchTable(Tournament)
+Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const ITournament* Tournament) : IFilter(Tournament)
 {
-	if (Weightclass.AgeGroup)
-		SetName(Weightclass.AgeGroup->Name + " " + Weightclass.Description);
-	else
-		SetName(Weightclass.Description);
-
 	if (Weightclass.WeightLargerThan > 0)
-		m_MinWeight = Weightclass.WeightLargerThan;
+		m_MinWeight = Weightclass.WeightLargerThan  * 1000 + Weightclass.WeightInGrammsLargerThan;
 	if (Weightclass.WeightSmallerThan > 0)
-		m_MaxWeight = Weightclass.WeightSmallerThan;
+		m_MaxWeight = Weightclass.WeightSmallerThan * 1000 + Weightclass.WeightInGrammsSmallerThan;
 
 	if (Weightclass.AgeGroup)
-	{
 		m_Gender = Weightclass.AgeGroup->Gender;
-		m_GenderEnforced = true;
-
-		//TODO convert birthyear to actual age limit
-		//m_MinAge = Weightclass.AgeGroup->MinBirthyear;
-		//m_MaxAge = Weightclass.AgeGroup->MaxBirthyear;
-		//m_AgeEnforced = true;
-	}
 }
 
 
 
-void Weightclass::operator >> (ZED::CSV& Stream) const
+void Weightclass::operator >> (YAML::Emitter& Yaml) const
 {
-	MatchTable::operator >>(Stream);
-	Stream << m_MinWeight << m_MaxWeight << m_Gender << m_GenderEnforced;
+	Yaml << YAML::BeginMap;
+
+	IFilter::operator>>(Yaml);
+
+	Yaml << YAML::Key << "min_weight" << YAML::Value;
+	m_MinWeight >> Yaml;
+	Yaml << YAML::Key << "max_weight" << YAML::Value;
+	m_MaxWeight >> Yaml;
+
+	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;
+
+	Yaml << YAML::EndMap;
 }
 
 
 
-const std::string Weightclass::GetDescription() const
+void Weightclass::ToString(YAML::Emitter& Yaml) const
 {
-	std::string name = std::to_string(m_MinWeight) + " - " + std::to_string(m_MaxWeight) + " kg";
-	if (m_GenderEnforced)
-		name += (m_Gender == Gender::Male) ? " (m)" : " (f)";
-	return name;
+	IFilter::ToString(Yaml);
+	Yaml << YAML::Key << "min_weight" << YAML::Value << m_MinWeight.ToString();
+	Yaml << YAML::Key << "max_weight" << YAML::Value << m_MaxWeight.ToString();
+	Yaml << YAML::Key << "gender"     << YAML::Value << (int)m_Gender;
 }
 
 
 
-Status Weightclass::GetStatus() const
+std::string Weightclass::GetDescription() const
 {
-	if (m_Schedule.size() == 0)
-		return Status::Scheduled;
+	std::string desc;
 
-	bool one_match_finished = false;
-	bool all_matches_finished = true;
-
-	for (auto match : m_Schedule)
+	if (GetAgeGroup())
 	{
-		if (!match->HasConcluded())
-			all_matches_finished = false;
+		if (GetAgeGroup()->GetGender() != Gender::Unknown)
+			desc = GetAgeGroup()->GetName();
+		else
+			desc = GetAgeGroup()->GetName() + Localizer::Gender2ShortForm(m_Gender);
 
-		if (match->IsRunning() || match->HasConcluded())
-			one_match_finished = true;
+		if ((uint32_t)m_MaxWeight == 0)
+			desc += " +" + m_MinWeight.ToString() + " kg";
+		else
+			desc += " -" + m_MaxWeight.ToString() + " kg";
 	}
 
-	if (all_matches_finished)
-		return Status::Concluded;
-	if (one_match_finished)
-		return Status::Running;
-	return Status::Scheduled;
+	else
+	{
+		if ((uint32_t)m_MaxWeight == 0)
+			desc = "+" + m_MinWeight.ToString() + " kg";
+		else if ((uint32_t)m_MinWeight == 0)
+			desc = "- " + m_MaxWeight.ToString() + " kg";
+		else
+			desc = m_MinWeight.ToString() + " - " + m_MaxWeight.ToString() + " kg";
+
+		if (m_Gender != Gender::Unknown)
+			desc += " (" + Localizer::Gender2ShortForm(m_Gender) + ")";
+	}
+
+	return desc;
 }
 
 
@@ -114,18 +121,18 @@ std::string Weightclass::GetHTMLForm()
 	std::string ret = R"(
 <div>
     <label style="width:150px;float:left;margin-top:5px;" id="label_min_weight">Min Weight</label>
-    <input style="margin-bottom:20px;" type="number" id="minWeight" value="" min="10" max="500" />
+    <input style="margin-bottom:20px;" type="text" id="minWeight" value="" size="1" />
 </div>
 
 <div>
     <label style="width:150px;float:left;margin-top:5px;" id="label_max_weight">Max Weight</label>
-    <input style="margin-bottom:20px;" type="number" id="maxWeight" value="" min="10" max="500" />
+    <input style="margin-bottom:20px;" type="text" id="maxWeight" value="" size="1" />
 </div>
 
 <div>
   <label style="width:150px;float:left;margin-top:5px;" id="label_gender">Gender</label>
-  <select style="margin-bottom:10px;" id="gender">
-    <option selected value="2" id="all">All</option>
+  <select style="margin-bottom:20px;" id="gender">
+    <option selected value="-1" id="all">All</option>
     <option value="0" id="male">Male</option>
     <option value="1" id="female">Female</option>
   </select>
@@ -139,247 +146,34 @@ std::string Weightclass::GetHTMLForm()
 
 bool Weightclass::IsElgiable(const Judoka& Fighter) const
 {
-	if (m_MinWeight > Fighter.GetWeight() || Fighter.GetWeight() > m_MaxWeight)
+	if ((uint32_t)m_MaxWeight == 0)//No maximum weight
+	{
+		if (m_MinWeight > Fighter.GetWeight())
+			return false;
+	}
+
+	else if (m_MinWeight > Fighter.GetWeight() || Fighter.GetWeight() > m_MaxWeight)
 		return false;
 
-	if (m_AgeEnforced)
-		if (m_MinAge > Fighter.GetAge() || Fighter.GetAge() > m_MaxAge)
+
+	if (GetAgeGroup() && GetTournament())
+	{
+		//Does the judoka belong in this age group?
+		if (!GetAgeGroup()->IsElgiable(Fighter, GetTournament()->GetDatabase()))
 			return false;
 
-	if (m_GenderEnforced)
+		//Check if the judoka is indeed starting for that age group
+		if (GetTournament())
+		{
+			auto age_group_starting_for = GetTournament()->GetAgeGroupOfJudoka(&Fighter);
+			if (!age_group_starting_for || GetAgeGroup()->GetUUID() != age_group_starting_for->GetUUID())
+				return false;
+		}
+	}
+
+	if (m_Gender != Gender::Unknown)//Gender enforced?
 		if (m_Gender != Fighter.GetGender())
 			return false;
 
 	return true;
-}
-
-
-
-void Weightclass::GenerateSchedule()
-{
-	for (auto it = m_Schedule.begin(); it != m_Schedule.end();)
-	{
-		if ((*it)->IsAutoGenerated())
-			it = m_Schedule.erase(it);
-		else
-			++it;
-	}
-
-	if (GetParticipants().size() <= 3)
-		m_RecommendedNumMatches_Before_Break = 1;
-	else
-		m_RecommendedNumMatches_Before_Break = 2;
-
-	if (GetParticipants().size() == 3)
-	{
-		AddAutoMatch(0, 1);
-		AddAutoMatch(0, 2);
-		AddAutoMatch(1, 2);
-	}
-
-	else if (GetParticipants().size() == 4)
-	{
-		AddAutoMatch(0, 1);
-		AddAutoMatch(2, 3);
-
-		AddAutoMatch(0, 2);
-		AddAutoMatch(1, 3);
-
-		AddAutoMatch(0, 3);
-		AddAutoMatch(1, 2);
-	}
-
-	else if (GetParticipants().size() == 5)
-	{
-		AddAutoMatch(0, 1);
-		AddAutoMatch(2, 3);
-		AddAutoMatch(0, 4);
-
-		AddAutoMatch(1, 2);
-		AddAutoMatch(3, 4);
-		AddAutoMatch(0, 2);
-
-		AddAutoMatch(1, 3);
-		AddAutoMatch(2, 4);
-		AddAutoMatch(0, 3);
-
-		AddAutoMatch(1, 4);
-	}
-
-	else
-	{
-		for (size_t white = 0; white < GetParticipants().size(); ++white)
-			for (size_t blue = white + 1; blue < GetParticipants().size(); ++blue)
-			{
-				if (white != blue)
-					AddAutoMatch(white, blue);
-			}
-
-		auto rng = std::default_random_engine{};
-		std::shuffle(std::begin(m_Schedule), std::end(m_Schedule), rng);
-	}
-
-	for (auto match : m_Schedule)
-		match->SetMatchTable(this);
-}
-
-
-
-std::vector<MatchTable::Result> Weightclass::CalculateResults() const
-{
-	std::vector<Result> ret(GetParticipants().size());
-
-	for (size_t i = 0; i < GetParticipants().size(); i++)
-	{
-		auto fighter = GetParticipant(i);
-
-		if (!fighter)
-			continue;
-
-		ret[i].Set(fighter, this);
-
-		for (size_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
-		{
-			auto enemy = GetParticipant(j);
-			if (!enemy)
-				continue;
-
-			if (fighter->GetID() == enemy->GetID())
-				continue;
-
-			auto matches = FindMatches(*fighter, *enemy);//Find all matches of these two
-
-			if (!matches.empty())
-			{
-				if (!matches[0]->HasConcluded())
-					continue;
-
-				const auto& result = matches[0]->GetMatchResult();
-
-				if (matches[0]->GetWinningJudoka()->GetID() == fighter->GetID())
-				{
-					ret[i].Wins++;
-					ret[i].Score += (uint32_t)result.m_Score;
-				}
-
-				ret[i].Time += result.m_Time;
-			}
-		}
-	}
-
-	std::sort(ret.begin(), ret.end());
-
-	return ret;
-}
-
-
-
-const std::string Weightclass::ToHTML() const
-{
-	std::string ret;
-
-	ret += "<a href=\"#matchtable_add.html?id=" + std::to_string(GetID()) + "\">" + GetName() + "</a><br/>";
-
-	ret += GetDescription() + " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
-
-	ret += R"(<table width="50%" border="1" rules="all"><tr><th style="text-align: center;">)" + Localizer::Translate("No.")
-		+ "</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name") + "</th>";
-
-	for (uint32_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
-		ret += "<th>vs " + GetParticipants()[j]->GetName() + "</th>";
-
-	ret += "<th style=\"text-align: center; width: 2.0cm;\">Total</th>";
-	ret += "</tr>";
-
-	auto results = CalculateResults();
-
-	for (size_t i = 0; i < GetParticipants().size();i++)
-	{
-		auto enemy = GetParticipant(i);
-
-		if (!enemy)
-			continue;
-
-		ret += "<tr>";
-		ret += "<td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
-		ret += "<td>" + enemy->GetName() + "<br/>(" + std::to_string(enemy->GetWeight()) + " kg)</td>";
-
-		for (size_t j = 0; j < GetParticipants().size(); j++)//Number of fights + 1
-		{
-			auto fighter = GetParticipant(j);
-			if (!fighter)
-				continue;
-
-			auto matches = FindMatches(*fighter, *enemy);
-
-			if (matches.empty())
-				ret += "<td style=\"background-color: #ccc;\"></td>";
-			else
-			{
-				if (matches[0]->IsRunning())
-					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">In Progress</a></td>";
-				else if (!matches[0]->HasConcluded())
-					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">- - -</a></td>";
-				else if (matches[0]->GetWinningJudoka()->GetID() == fighter->GetID())
-				{
-					const auto& result = matches[0]->GetMatchResult();
-					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
-				}
-				else
-				{
-					const auto& result = matches[0]->GetMatchResult();
-					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + std::to_string(matches[0]->GetID()) + "\">0 (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
-				}
-			}
-		}
-
-		ret += "<td style=\"text-align: center;\">" + std::to_string(results[i].Wins) + " : " + std::to_string(results[i].Score) + "<br/>(" + Timer::TimestampToString(results[i].Time) + ")</td>";
-
-		ret += "</tr>";
-	}
-
-
-
-	ret += "</table><br/><br/><table border=\"1\" rules=\"all\">";
-	ret += "<tr><th style=\"width: 0.5cm; text-align: center;\">#</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name")
-		+ "</th><th style=\"width: 1.0cm;\">" + Localizer::Translate("Wins") + "</th><th style=\"width: 1.0cm;\">"
-		+ Localizer::Translate("Score") + "</th><th style=\"width: 1.3cm;\">" + Localizer::Translate("Time") + "</th></tr>";
-
-	for (size_t i = 0; i < GetParticipants().size(); i++)
-	{
-		const auto& score = results[i];
-
-		ret += "<tr><td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
-		ret += "<td>" + score.Judoka->GetName() + "</td>";
-
-		ret += "<td>" + std::to_string(score.Wins)  + "</td>";
-		ret += "<td>" + std::to_string(score.Score) + "</td>";
-		ret += "<td>" + Timer::TimestampToString(score.Time);
-
-		if (score.NotSortable && score.Time > 0)
-			ret += " Not sortable!";//TODO make proper message
-
-		ret += "</td>";
-
-		ret += "</tr>";
-	}
-
-	ret += "</table>";
-
-	return ret;
-}
-
-
-
-const std::string Weightclass::ToString() const
-{
-	ZED::CSV ret(MatchTable::ToString());
-	ret << m_MinWeight << m_MaxWeight;
-
-	if (!m_GenderEnforced)
-		ret << 2;
-	else
-		ret << m_Gender;
-
-	return ret;
 }

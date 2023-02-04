@@ -5,6 +5,7 @@
 #include "mat.h"
 #include "schedule_entry.h"
 #include "database.h"
+#include "weightclass_generator.h"
 
 
 
@@ -15,48 +16,53 @@ namespace Judoboard
 	public:
 		virtual std::string GetName() const { return ""; }//Returns the name of the tournament
 		//const auto& GetSchedule() const { return m_Schedule; }
-		virtual Match* FindMatch(uint32_t ID) const { return nullptr; }
 		virtual Match* FindMatch(const UUID& UUID) const { return nullptr; }
-		[[nodiscard]]
-		Match* FindMatch(const Match& Match) const { return FindMatch(Match.GetUUID()); }
-		[[nodiscard]]
-		const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
-
-		//void EnableAutoSave(bool Enable = true) { m_AutoSave = Enable; }
+		//[[nodiscard]]
+		//Match* FindMatch(const Match& Match) const { return FindMatch(Match.GetUUID()); }
+		//[[nodiscard]]
+		//const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
+		virtual const std::string JudokaToJSON() const { return ""; }
 
 		virtual Status GetStatus() const { return Status::Concluded; }
 		virtual bool CanCloseTournament() const { return false; }
 		//void DeleteAllMatchResults();
+
+		[[nodiscard]]
+		virtual const StandingData& GetDatabase() const { return m_StandingData; }//Returns a database containing all participants
+		[[nodiscard]]
+		virtual StandingData& GetDatabase() { return m_StandingData; }//Returns a database containing all participants
+
+		virtual const Association* GetOrganizer() const { return nullptr; }
 
 		virtual bool AddMatch(Match* NewMatch) { return false; }
 		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
 		virtual Match* GetNextMatch(int32_t MatID = -1) const { return nullptr; }//Returns the next match for a given mat if available, otherwise null pointer is returned
 		//const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 
-		virtual std::vector<const Match*> GetNextMatches(uint32_t MatID) const = 0;
+		virtual std::vector<Match> GetNextMatches(uint32_t MatID) const = 0;
 
-		virtual bool DeleteMatch(uint32_t MatchID) { return false; }
-		virtual bool MoveMatchUp(uint32_t MatchID) { return false; }
-		virtual bool MoveMatchDown(uint32_t MatchID) { return false; }
+		virtual bool RemoveMatch(const UUID& MatchID) { return false; }
+		virtual bool MoveMatchUp(const UUID& MatchID, uint32_t MatID = 0) { return false; }
+		virtual bool MoveMatchDown(const UUID& MatchID, uint32_t MatID = 0) { return false; }
 
 		//Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;
-		//const std::unordered_map<uint32_t, Judoka*>& GetParticipants() const { return m_StandingData.GetAllJudokas(); }
+		virtual std::vector<Judoka*> GetParticipants() const {
+			std::vector<Judoka*> ret;
+      return ret; }
+		virtual const Judoka* FindParticipant(const UUID& UUID) const { return nullptr; }
+		virtual Judoka* FindParticipant(const UUID& UUID) { return nullptr; }
+			
 		virtual bool AddParticipant(Judoka* Judoka) { return false; }
-		virtual bool RemoveParticipant(uint32_t ID) { return false; }
-		virtual Judoka* FindParticipant(uint32_t ID) { return nullptr; }
-		virtual const Judoka* FindParticipant(uint32_t ID) const { return nullptr; }
-		virtual Judoka* FindParticipant(const UUID& UUID) = 0;
-		virtual const Judoka* FindParticipant(const UUID& UUID) const = 0;
+		virtual bool RemoveParticipant(const UUID& ID) { return false; }
 
 		virtual uint32_t GetHighestMatIDUsed() const { return 0; }//Returns the highest ID of all mats that are used in the tournament. Returns zero if no mats are used
 		virtual bool IsMatUsed(uint32_t ID) const { return false; }
 
 		//Match tables
-		//uint32_t GetFreeMatchTableID() const;//Returns an unused/free ID that should be used for the next match table
 		virtual void AddMatchTable(MatchTable* NewMatchTable) {}
-		virtual void UpdateMatchTable(uint32_t ID) {}//Calling this function we recalculate the given match table
-		virtual bool DeleteMatchTable(uint32_t ID) { return false; }
+		virtual bool UpdateMatchTable(const UUID& UUID) { return false; }//Calling this function we recalculate the given match table
+		virtual bool RemoveMatchTable(const UUID& UUID) { return false; }
 		virtual const std::vector<MatchTable*>& GetMatchTables() const {
 			assert(false);
 			static std::vector<MatchTable*> ret;
@@ -69,28 +75,64 @@ namespace Judoboard
 			return ret;
 		}
 
-		virtual MatchTable* FindMatchTable(uint32_t ID) { return nullptr; }
-		virtual const MatchTable* FindMatchTable(uint32_t ID) const { return nullptr; }
 		virtual MatchTable* FindMatchTable(const UUID& ID) { return nullptr; }
 		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
-		virtual int FindMatchTableIndex(uint32_t ID) const { return -1; }
+
+		//Clubs
+		virtual Club* FindClub(const UUID& UUID) { return nullptr; }
+		virtual Club* FindClubByName(const std::string& Name) { return nullptr; }
+		virtual bool RemoveClub(const UUID& UUID) { return false; }
+
+		//Associations
+		virtual Association* FindAssociation(const UUID& UUID) { return nullptr; }
+		virtual bool RemoveAssociation(const UUID& UUID) { return false; }
 
 		//Rule Sets
 		virtual const RuleSet* GetDefaultRuleSet() const { return nullptr; }
-		virtual void SetDefaultRuleSet(const RuleSet* NewDefaultRuleSet) {}
+		virtual void SetDefaultRuleSet(RuleSet* NewDefaultRuleSet) {}
+		virtual bool AddRuleSet(RuleSet* NewRuleSet) { return false; }
 		virtual const RuleSet* FindRuleSetByName(const std::string& Name) const { return nullptr; }
 		virtual RuleSet* FindRuleSetByName(const std::string& Name) { return nullptr; }
 		virtual const RuleSet* FindRuleSet(const UUID& UUID) const { return nullptr; }
 		virtual RuleSet* FindRuleSet(const UUID& UUID) { return nullptr; }
 
+		//Age groups
+		virtual bool AddAgeGroup(AgeGroup* NewAgeGroup) { return false; }
+		virtual bool RemoveAgeGroup(const UUID& UUID) { return false; }
+		virtual bool AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup) { return false; }
+		virtual AgeGroup* FindAgeGroup(const UUID& UUID) { return nullptr; }
+		virtual const AgeGroup* FindAgeGroup(const UUID& UUID) const { return nullptr; }
+		virtual const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) const { return nullptr; }
+		virtual std::vector<const AgeGroup*> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const {
+			std::vector<const AgeGroup*> ret;
+			return ret;
+		}
+		virtual std::vector<const AgeGroup*> GetAgeGroups() const {
+			std::vector<const AgeGroup*> ret;
+			return ret;
+		}
+		virtual void ListAgeGroups(YAML::Emitter& Yaml) const {}
+
 		//Master schedule / schedule entries
-		virtual Schedulable* GetScheduleEntry(uint32_t Index) { return nullptr; }
-		virtual bool MoveScheduleEntryUp(uint32_t ID) { return false; }
-		virtual bool MoveScheduleEntryDown(uint32_t ID) { return false; }
+		virtual MatchTable* GetScheduleEntry(const UUID& UUID) { return nullptr; }
+		virtual bool MoveScheduleEntryUp(const UUID& UUID) { return false; }
+		virtual bool MoveScheduleEntryDown(const UUID& UUID) { return false; }
+
+		virtual std::vector<WeightclassDescCollection> GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) const {
+			std::vector<WeightclassDescCollection> ret;
+			return ret;
+		}
+		virtual bool ApplyWeightclasses(const std::vector<WeightclassDescCollection>& Descriptors) { return false; }
 
 		//Disqualifications
 		virtual void Disqualify(const Judoka& Judoka) {}
 		virtual void RevokeDisqualification(const Judoka& Judoka) {}
+
+		//Lots
+		virtual bool PerformLottery() { return false; }
+		virtual uint32_t GetLotteryTier() const { return 0; }
+		virtual void SetLotteryTier(uint32_t NewLotteryTier) {}
+		virtual std::vector<std::pair<UUID, size_t>> GetLots() const { std::vector<std::pair<UUID, size_t>> ret; return ret; }
 
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const = 0;
@@ -102,7 +144,7 @@ namespace Judoboard
 
 		virtual void GenerateSchedule() {}
 
-		virtual bool Save() const { return false; }
+		virtual bool Save() { return false; }
 
 		void Lock()   const { m_mutex.lock(); }
 		void Unlock() const { m_mutex.unlock(); }

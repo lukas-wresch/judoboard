@@ -61,6 +61,8 @@ bool ZED::RendererOpenGL::Init(HWND Hwnd)
 bool ZED::RendererOpenGL::Init(GtkWindow* DrawingArea)
 #endif
 {
+	Log::Info("Starting OpenGL renderer");
+
 #ifdef _WIN32
 	if (!RendererSDL2::Init(Hwnd))
 #else
@@ -73,7 +75,10 @@ bool ZED::RendererOpenGL::Init(GtkWindow* DrawingArea)
 	m_glcontext = SDL_GL_CreateContext(m_SDL_window);
 
 	if (!m_glcontext)
+	{
+		Log::Error("Could not create OpenGL context");
 		return false;
+	}
 
 	//SDL_GL_SetSwapInterval(0);//Disable Vsync
 
@@ -839,7 +844,7 @@ bool TextureOpenGL::LoadTexture() const
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 
-	ZED::Log::Debug("Texture id="+std::to_string(m_gl_texture)+" created with size"+std::to_string(m_surface->w)+"x"+ std::to_string(m_surface->h));
+	//ZED::Log::Debug("Texture id="+std::to_string(m_gl_texture)+" created with size "+std::to_string(m_surface->w)+"x"+ std::to_string(m_surface->h));
 
 	//(const_cast<TextureOpenGL*>(this))->TextureSDL2::Unload();
 
