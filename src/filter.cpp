@@ -43,7 +43,14 @@ IFilter::IFilter(const YAML::Node& Yaml, const MatchTable* Parent)
 				}
 				else if (data[0].as<int>() == 2)//Type 2
 				{
-					auto match = GetTournament()->FindMatch(data[2].as<std::string>());
+					UUID uuid = data[2].as<std::string>();
+					Match* match = nullptr;
+
+					if (GetParent())
+						match = GetParent()->FindMatch(uuid);
+					else
+						match = GetTournament()->FindMatch(uuid);
+
 					assert(match);
 
 					if (match)
