@@ -78,10 +78,13 @@ Match::Match(const YAML::Node& Yaml, MatchTable* MatchTable, const ITournament* 
 
 	if (Yaml["dependent_match_white"])
 	{
-		if (m_Table && m_Table->GetParent())
-			m_White.m_DependentMatch = m_Table->GetParent()->FindMatch(Yaml["dependent_match_white"].as<std::string>());
-		else if (m_Table)
-			m_White.m_DependentMatch = m_Table->FindMatch(Yaml["dependent_match_white"].as<std::string>());
+		if (m_Table)
+		{
+			if (m_Table->GetParent())
+				m_White.m_DependentMatch = m_Table->GetParent()->FindMatch(Yaml["dependent_match_white"].as<std::string>());
+			if (!m_White.m_DependentMatch)
+				m_White.m_DependentMatch = m_Table->FindMatch(Yaml["dependent_match_white"].as<std::string>());
+		}
 
 		if (!m_White.m_DependentMatch && Tournament)
 			m_White.m_DependentMatch = Tournament->FindMatch(Yaml["dependent_match_white"].as<std::string>());
@@ -89,10 +92,13 @@ Match::Match(const YAML::Node& Yaml, MatchTable* MatchTable, const ITournament* 
 	}
 	if (Yaml["dependent_match_blue"])
 	{
-		if (m_Table && m_Table->GetParent())
-			m_Blue.m_DependentMatch = m_Table->GetParent()->FindMatch(Yaml["dependent_match_blue"].as<std::string>());
-		else if (m_Table)
-			m_Blue.m_DependentMatch = m_Table->FindMatch(Yaml["dependent_match_blue"].as<std::string>());
+		if (m_Table)
+		{
+			if (m_Table->GetParent())
+				m_Blue.m_DependentMatch = m_Table->GetParent()->FindMatch(Yaml["dependent_match_blue"].as<std::string>());
+			if (!m_Blue.m_DependentMatch)
+				m_Blue.m_DependentMatch = m_Table->FindMatch(Yaml["dependent_match_blue"].as<std::string>());
+		}
 
 		if (!m_Blue.m_DependentMatch && Tournament)
 			m_Blue.m_DependentMatch = Tournament->FindMatch(Yaml["dependent_match_blue"].as<std::string>());

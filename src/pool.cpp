@@ -75,14 +75,14 @@ void Pool::operator >> (YAML::Emitter& Yaml) const
 	for (auto pool : m_Pools)
 	{
 		Yaml << YAML::BeginMap;
-		*pool >>(Yaml);
+		*pool >> Yaml;
 		Yaml << YAML::EndMap;
 	}
 	Yaml << YAML::EndSeq;
 
 	Yaml << YAML::Key << "finals" << YAML::Value;
 	Yaml << YAML::BeginMap;
-	GetFinals() >>(Yaml);
+	GetFinals() >> Yaml;
 	Yaml << YAML::EndMap;
 
 	SetSchedule(std::move(schedule_copy));
