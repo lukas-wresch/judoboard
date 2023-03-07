@@ -326,6 +326,8 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
 	: m_Tournament(Tournament), m_Parent(Parent)
 {
+	assert(Yaml.IsMap());
+
 	if (Yaml["uuid"])
 		SetUUID(Yaml["uuid"].as<std::string>());
 	if (Yaml["schedule_index"])

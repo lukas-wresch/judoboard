@@ -18,6 +18,23 @@ namespace Judoboard
 		LoserBracket(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 
 		void operator =(const LoserBracket& rhs) = delete;
+		void operator =(LoserBracket&& rhs) noexcept {
+			ID::operator=(rhs);
+			m_ThirdPlaceMatch = rhs.m_ThirdPlaceMatch;
+			SetRuleSet(rhs.GetOwnRuleSet());
+			SetName(rhs.GetName());
+			SetFilter(rhs.GetFilter());
+			SetTournament(rhs.GetTournament());
+			SetScheduleIndex(rhs.GetScheduleIndex());
+			SetMatID(rhs.GetMatID());
+			SetColor(rhs.GetColor());
+
+			SetParent(rhs.GetParent());
+			DeleteSchedule();
+			IsBestOfThree(rhs.IsBestOfThree());
+
+			SetSchedule(std::move(rhs.SetSchedule()));
+		}
 
 		static std::string GetHTMLForm();
 
@@ -86,8 +103,5 @@ namespace Judoboard
 		}
 
 		bool m_FinalMatch = false;
-
-		bool m_ThirdPlaceMatch = false;
-		//bool m_FifthPlaceMatch = false;
 	};
 }

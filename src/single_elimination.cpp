@@ -32,6 +32,8 @@ SingleElimination::SingleElimination(Weight MinWeight, Weight MaxWeight, const I
 SingleElimination::SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
 	: MatchTable(Yaml, Tournament, Parent)
 {
+	assert(Yaml.IsMap());
+
 	if (Yaml["third_place_match"])
 		m_ThirdPlaceMatch = Yaml["third_place_match"].as<bool>();
 	if (Yaml["fifth_place_match"])

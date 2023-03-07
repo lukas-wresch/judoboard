@@ -63,10 +63,10 @@ namespace Judoboard
 	protected:
 		std::string RenderMatch(const Match& match, std::string style = "") const;
 
-	private:
-		size_t GetNumberOfRounds() const;
-
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;
+
+	private:
+		size_t GetNumberOfRounds() const;
 	};
 }

@@ -33,21 +33,10 @@ DoubleElimination::DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender 
 DoubleElimination::DoubleElimination(const YAML::Node& Yaml, ITournament* Tournament, const MatchTable* Parent)
 	: MatchTable(Yaml, Tournament, Parent), m_WinnerBracket(nullptr, Tournament, this), m_LoserBracket(nullptr, Tournament, this)
 {
-	if (Yaml["third_place_match"])
-		m_WinnerBracket.IsThirdPlaceMatch(Yaml["third_place_match"].as<bool>());
-	if (Yaml["fifth_place_match"])
-		m_WinnerBracket.IsFifthPlaceMatch(Yaml["fifth_place_match"].as<bool>());
-	
-	
-	if (Yaml["mat_of_winner_bracket"])
-		m_WinnerBracket.SetMatID(Yaml["mat_of_winner_bracket"].as<uint32_t>());
-	if (Yaml["name_of_winner_bracket"])
-		m_WinnerBracket.SetName(Yaml["name_of_winner_bracket"].as<std::string>());
-
-	if (Yaml["mat_of_loser_bracket"])
-		m_LoserBracket.SetMatID(Yaml["mat_of_loser_bracket"].as<uint32_t>());
-	if (Yaml["name_of_loser_bracket"])
-		m_LoserBracket.SetName(Yaml["name_of_loser_bracket"].as<std::string>());
+	if (Yaml["winner_bracket"])
+		m_WinnerBracket = SingleElimination(Yaml["winner_bracket"], Tournament, this);
+	if (Yaml["loser_bracket"])
+		m_LoserBracket = LoserBracket(Yaml["loser_bracket"], Tournament, this);
 }
 
 
@@ -59,19 +48,15 @@ void DoubleElimination::operator >> (YAML::Emitter& Yaml) const
 
 	MatchTable::operator >>(Yaml);
 
-	if (IsThirdPlaceMatch())
-		Yaml << YAML::Key << "third_place_match" << YAML::Value << IsThirdPlaceMatch();
-	if (IsFifthPlaceMatch())
-		Yaml << YAML::Key << "fifth_place_match" << YAML::Value << IsFifthPlaceMatch();
+	Yaml << YAML::Key << "winner_bracket" << YAML::Value;
+	Yaml << YAML::BeginMap;
+	m_WinnerBracket >> Yaml;
+	Yaml << YAML::EndMap;
 
-	//Serialize mats of pools if they differ
-	if (m_WinnerBracket.GetMatID() != 0)
-		Yaml << YAML::Key << "mat_of_winner_bracket" << YAML::Value << m_WinnerBracket.GetMatID();
-	Yaml << YAML::Key << "name_of_winner_bracket" << YAML::Value << m_WinnerBracket.GetName();
-
-	if (m_LoserBracket.GetMatID() != 0)
-		Yaml << YAML::Key << "mat_of_loser_bracket" << YAML::Value << m_LoserBracket.GetMatID();
-	Yaml << YAML::Key << "name_of_loserbracket" << YAML::Value << m_LoserBracket.GetName();
+	Yaml << YAML::Key << "loser_bracket" << YAML::Value;
+	Yaml << YAML::BeginMap;
+	m_LoserBracket >> Yaml;
+	Yaml << YAML::EndMap;
 
 	if (!IsSubMatchTable())
 		Yaml << YAML::EndMap;
