@@ -353,6 +353,9 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, co
 			case IFilter::Type::Weightclass:
 				SetFilter(new Weightclass(Yaml["filter"], m_Parent ? m_Parent : this));
 				break;
+			case IFilter::Type::Fixed:
+				SetFilter(new Fixed(Yaml["filter"], m_Parent ? m_Parent : this));
+				break;
 			case IFilter::Type::Standard:
 				SetFilter(new Standard(Yaml["filter"]));
 				break;
