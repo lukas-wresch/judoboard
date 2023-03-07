@@ -226,7 +226,7 @@ TEST(Tournament, AddAgeGroup)
 	tourney->EnableAutoSave(false);
 
 	auto rule_set  = Judoboard::RuleSet("Demo", 180, 60, 20, 10);
-	auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set, app.GetDatabase());
+	auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set);
 
 	auto m1 = new Judoboard::RoundRobin(Weight(0), Weight(120));
 	m1->SetMatID(1);
@@ -1116,7 +1116,7 @@ TEST(Tournament, SaveAndLoad_AgeGroups)
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 		Tournament tourney("deleteMe");
 
-		AgeGroup a("AgeGroup", 20, 1000, nullptr, tourney.GetDatabase());
+		AgeGroup a("AgeGroup", 20, 1000, nullptr);
 
 		tourney.AddAgeGroup(&a);
 		EXPECT_TRUE(tourney.AddParticipant(j1));
@@ -1131,7 +1131,7 @@ TEST(Tournament, SaveAndLoad_AgeGroups)
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		ASSERT_EQ(t.GetParticipants().size(), 4);
 
-		for (auto [id, j] : t.GetParticipants())
+		for (auto j : t.GetParticipants())
 		{
 			auto age_group = t.GetAgeGroupOfJudoka(j);
 
@@ -1180,7 +1180,7 @@ TEST(Tournament, SaveAndLoad_Clubs)
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		ASSERT_EQ(t.GetParticipants().size(), 4);
 
-		for (auto [id, j] : t.GetParticipants())
+		for (auto j : t.GetParticipants())
 		{
 			ASSERT_TRUE(j->GetClub());
 			EXPECT_EQ(j->GetClub()->GetUUID(), c.GetUUID());

@@ -20,21 +20,23 @@ namespace Judoboard
 	class AgeGroup : public ID
 	{
 	public:
-		AgeGroup(const std::string& Name, uint32_t MinAge, uint32_t MaxAge, const RuleSet* Rules, const StandingData& StandingData);
+		AgeGroup(const std::string& Name, uint32_t MinAge, uint32_t MaxAge, const RuleSet* Rules, Gender Gender = Gender::Unknown);
 		AgeGroup(const YAML::Node& Yaml, const StandingData& StandingData);
 		AgeGroup(const MD5::AgeGroup& AgeGroup, const StandingData& StandingData);
 
 		std::string GetName() const { return m_Name; }
+		void SetName(std::string& NewName) { m_Name = NewName; }
 		const RuleSet* GetRuleSet() const { return m_pRules; }
+		void SetRuleSet(const RuleSet* NewRuleSet) { m_pRules = NewRuleSet; }
 
-		int GetMinAge() const { return m_MinAge; }
-		int GetMaxAge() const { return m_MaxAge; }
+		int  GetMinAge() const { return m_MinAge; }
+		int  GetMaxAge() const { return m_MaxAge; }
 		void SetMinAge(uint32_t Age) { m_MinAge = Age; }
 		void SetMaxAge(uint32_t Age) { m_MaxAge = Age; }
 		auto GetGender() const { return m_Gender; }
 		void SetGender(Gender NewGender) { m_Gender = NewGender; }
 
-		bool IsElgiable(const Judoka& Fighter) const;
+		bool IsElgiable(const Judoka& Fighter, const StandingData& StandingData) const;
 
 		void operator >> (YAML::Emitter& Yaml) const;
 		void ToString(YAML::Emitter& Yaml) const;
@@ -48,7 +50,5 @@ namespace Judoboard
 		Gender m_Gender = Gender::Unknown;
 
 		const RuleSet* m_pRules = nullptr;
-
-		const StandingData& m_StandingData;
 	};
 }

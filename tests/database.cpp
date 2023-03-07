@@ -224,6 +224,40 @@ TEST(Database, EmptyDatabaseShouldHaveDefaultRuleSet)
 
 
 
+TEST(Database, JudokaSorted)
+{
+	initialize();
+	Database d;
+
+	d.AddJudoka(new Judoka("John", "Smith", 65, Gender::Male, 1990));
+	d.AddJudoka(new Judoka("Jane", "Doe", 55, Gender::Female, 1995));
+	d.AddJudoka(new Judoka("Adam", "Johnson", 75, Gender::Male, 1985));
+	d.AddJudoka(new Judoka("Emily", "Williams", 48, Gender::Female, 2000));
+	d.AddJudoka(new Judoka("Michael", "Jones", 70, Gender::Male, 1988));
+	d.AddJudoka(new Judoka("Sarah", "Miller", 63, Gender::Female, 1992));
+	d.AddJudoka(new Judoka("Adam", "Miller", 63, Gender::Female, 1992));
+
+	auto& judokas = d.GetAllJudokas();
+
+	//Check that the judokas are sorted correctly
+	EXPECT_EQ(judokas[0]->GetLastname(),  "Doe");
+	EXPECT_EQ(judokas[0]->GetFirstname(), "Jane");
+	EXPECT_EQ(judokas[1]->GetLastname(),  "Johnson");
+	EXPECT_EQ(judokas[1]->GetFirstname(), "Adam");
+	EXPECT_EQ(judokas[2]->GetLastname(),  "Jones");
+	EXPECT_EQ(judokas[2]->GetFirstname(), "Michael");
+	EXPECT_EQ(judokas[3]->GetLastname(),  "Miller");
+	EXPECT_EQ(judokas[3]->GetFirstname(), "Adam");
+	EXPECT_EQ(judokas[4]->GetLastname(),  "Miller");
+	EXPECT_EQ(judokas[4]->GetFirstname(), "Sarah");
+	EXPECT_EQ(judokas[5]->GetLastname(),  "Smith");
+	EXPECT_EQ(judokas[5]->GetFirstname(), "John");
+	EXPECT_EQ(judokas[6]->GetLastname(),  "Williams");
+	EXPECT_EQ(judokas[6]->GetFirstname(), "Emily");
+}
+
+
+
 TEST(Database, AccountTest)
 {
 	initialize();

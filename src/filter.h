@@ -15,7 +15,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser, LosersOf
+			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser, Standard, LosersOf
 		};
 
 		IFilter(const YAML::Node& Yaml, const MatchTable* Parent);
@@ -24,7 +24,7 @@ namespace Judoboard
 
 		virtual std::string GetDescription() const { return ""; }
 
-		virtual bool IsElgiable(const Judoka& Fighter) const = 0;
+		virtual bool IsElgiable(const Judoka& Fighter) const { return false; };
 
 		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);

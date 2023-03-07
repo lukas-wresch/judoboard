@@ -137,7 +137,7 @@ int main(int argc, char** argv)
 		Judoboard::Match match(&j1, &j2, nullptr, mat->GetMatID());
 		//Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, true, true);
 		Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, false, false);
-		Judoboard::AgeGroup age_group("U18", 15, 18, &rules, app.GetDatabase());
+		Judoboard::AgeGroup age_group("U18", 15, 18, &rules);
 		match.SetRuleSet(&rules);
 		Judoboard::RoundRobin* table = new Judoboard::RoundRobin(new Judoboard::Weightclass(10, 100));
 		table->SetAgeGroup(&age_group);
@@ -203,7 +203,7 @@ int main(int argc, char** argv)
 		tourney->EnableAutoSave(false);
 
 		auto rule_set  = Judoboard::RuleSet("Demo", 180, 60, 20, 10);
-		auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set, app.GetDatabase());
+		auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set);
 
 		auto m1 = new Judoboard::RoundRobin(new Judoboard::Weightclass(0, 120));
 		m1->SetMatID(1);

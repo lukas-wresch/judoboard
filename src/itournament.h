@@ -47,11 +47,12 @@ namespace Judoboard
 
 		//Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;
+		virtual std::vector<Judoka*> GetParticipants() const {
+			std::vector<Judoka*> ret;
+      return ret; }
 		virtual const Judoka* FindParticipant(const UUID& UUID) const { return nullptr; }
 		virtual Judoka* FindParticipant(const UUID& UUID) { return nullptr; }
-		virtual std::unordered_map<UUID, Judoka*> GetParticipants() const {
-			std::unordered_map<UUID, Judoka*> ret;
-			return ret; }
+			
 		virtual bool AddParticipant(Judoka* Judoka) { return false; }
 		virtual bool RemoveParticipant(const UUID& ID) { return false; }
 

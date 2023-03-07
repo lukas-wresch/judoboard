@@ -1263,7 +1263,7 @@ void Application::SetupHttpServer()
 
 		YAML::Emitter ret;
 		ret << YAML::BeginSeq;
-		for (auto [id, judoka] : m_Database.GetAllJudokas())
+		for (auto judoka : m_Database.GetAllJudokas())
 		{
 			if (judoka)
 				judoka->ToString(ret);
@@ -1840,10 +1840,14 @@ void Application::SetupHttpServer()
 		int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
 
 		RuleSet* new_rule_set = new RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time);
+
+		auto guard = LockTillScopeEnd();
+
 		if (!m_Database.AddRuleSet(new_rule_set))
-			return std::string("Could not add rule set to database");
+			return Error(Error::Type::OperationFailed);
+
 		m_Database.Save();
-		return Error();//OK
+		return Error(Error::Type::NoError);//OK
 	});
 
 	m_Server.RegisterResource("/ajax/rule/update", [this](auto& Request) -> std::string {
@@ -1863,6 +1867,8 @@ void Application::SetupHttpServer()
 		bool draw = HttpServer::DecodeURLEncoded(Request.m_Body, "draw") == "true";
 		int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
 
+		auto guard = LockTillScopeEnd();
+
 		auto rule = m_Database.FindRuleSet(id);
 
 		if (!rule)
@@ -1880,6 +1886,8 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
+		auto guard = LockTillScopeEnd();
+
 		auto rule = m_Database.FindRuleSet(id);
 		if (!rule)
 			return std::string("Could not find rule set in database");
@@ -1893,6 +1901,8 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
+
+		auto guard = LockTillScopeEnd();
 
 		auto& rules = m_Database.GetRuleSets();
 		YAML::Emitter ret;
@@ -1923,8 +1933,40 @@ void Application::SetupHttpServer()
 		return ret.c_str();
 	});
 
+	m_Server.RegisterResource("/ajax/rule/delete", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+		auto guard = LockTillScopeEnd();
+
+		if (!m_Database.DeleteRuleSet(id))
+			return Error(Error::Type::OperationFailed);
+
+		m_Database.Save();
+		return Error(Error::Type::NoError);//OK
+	});
+
 
 	//Age groups
+
+	m_Server.RegisterResource("/ajax/age_groups/add", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_AddAgeGroup(Request);
+	});
+
+	m_Server.RegisterResource("/ajax/age_groups/update", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_EditAgeGroup(Request);
+	});
 
 	m_Server.RegisterResource("/ajax/age_groups/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -1956,7 +1998,8 @@ void Application::SetupHttpServer()
 		if (!age_group)
 			return Error(Error::Type::ItemNotFound);
 
-		if (!GetTournament()->AddAgeGroup(age_group))
+		//Insert a copy
+		if (!GetTournament()->AddAgeGroup(new AgeGroup(*age_group)))
 			return Error(Error::Type::OperationFailed);
 
 		return Error();//OK
@@ -1975,6 +2018,14 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::OperationFailed);
 
 		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/age_groups/delete", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_DeleteAgeGroup(Request);
 	});
 
 
@@ -3228,6 +3279,67 @@ std::string Application::Ajax_ListAssociations(const HttpServer::Request& Reques
 
 
 
+Error Application::Ajax_AddAgeGroup(const HttpServer::Request& Request)
+{
+	auto name     = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	int min_age   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "min_age"));
+	int max_age   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "max_age"));
+	Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+	UUID rule_id  = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
+
+	auto guard = LockTillScopeEnd();
+
+	auto rule  = GetDatabase().FindRuleSet(rule_id);
+
+	if (!rule)
+		ZED::Log::Warn("Could not find rule set.");
+
+	auto new_age_group = new AgeGroup(name, min_age, max_age, rule, gender);
+
+	if (!GetDatabase().AddAgeGroup(new_age_group))
+	{
+		delete new_age_group;
+		return Error::Type::OperationFailed;
+	}
+
+	return Error::Type::NoError;
+}
+
+
+
+Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
+{
+	UUID id       = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	auto name     = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	int min_age   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "min_age"));
+	int max_age   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "max_age"));
+	Gender gender = (Gender)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+	UUID rule_id  = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
+
+	auto guard = LockTillScopeEnd();
+
+	auto age_group = GetDatabase().FindAgeGroup(id);
+
+	if (!age_group)
+		return Error::Type::InvalidID;
+
+	auto rule = GetDatabase().FindRuleSet(rule_id);
+
+	if (!rule)
+		ZED::Log::Warn("Could not find rule set.");
+	else
+		age_group->SetRuleSet(rule);
+
+	age_group->SetName(name);
+	age_group->SetMinAge(min_age);
+	age_group->SetMaxAge(max_age);
+	age_group->SetGender(gender);
+
+	return Error::Type::NoError;
+}
+
+
+
 std::string Application::Ajax_GetAgeGroup(const HttpServer::Request& Request) const
 {
 	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
@@ -3297,6 +3409,20 @@ std::string Application::Ajax_ListAllAgeGroups() const
 
 	ret << YAML::EndSeq;
 	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_DeleteAgeGroup(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockTillScopeEnd();
+
+	if (!GetDatabase().RemoveAgeGroup(id))
+		return Error::Type::OperationFailed;
+
+	return Error::Type::NoError;
 }
 
 

@@ -15,7 +15,7 @@ using namespace Judoboard;
 
 void StandingData::Reset()
 {
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 		delete judoka;
 	m_Judokas.clear();
 
@@ -69,7 +69,7 @@ void StandingData::operator << (const YAML::Node& Yaml)
 		for (const auto& node : Yaml["judoka"])
 		{
 			Judoka* newJudoka = new Judoka(node, this);
-			m_Judokas.insert({ (std::string)newJudoka->GetUUID(), newJudoka });
+			m_Judokas.emplace_back(newJudoka);
 		}
 	}
 
@@ -133,7 +133,7 @@ void StandingData::operator >> (YAML::Emitter& Yaml) const
 	Yaml << YAML::Value;
 	Yaml << YAML::BeginSeq;
 
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 	{
 		if (judoka)
 			*judoka >> Yaml;
@@ -193,7 +193,16 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 	if (!NewJudoka)
 		return false;
 
-	m_Judokas.insert({ NewJudoka->GetUUID(), NewJudoka });
+	m_Judokas.emplace_back(NewJudoka);
+
+	std::sort(m_Judokas.begin(), m_Judokas.end(), [](const Judoka* a, const Judoka* b)
+	{
+		if (a->GetLastname() != b->GetLastname())
+			return a->GetLastname() < b->GetLastname();
+		if (a->GetFirstname() != b->GetFirstname())
+			return a->GetFirstname() < b->GetFirstname();
+		return a->GetUUID() < b->GetUUID() ;
+	});
 
 	return true;
 }
@@ -204,7 +213,7 @@ bool StandingData::DeleteJudoka(const UUID& UUID)
 {
 	for (auto it = m_Judokas.begin(); it != m_Judokas.end(); ++it)
 	{
-		if (it->second && it->second->GetUUID() == UUID)
+		if (*it && (*it)->GetUUID() == UUID)
 		{
 			m_Judokas.erase(it);
 			return true;
@@ -227,7 +236,7 @@ const std::string StandingData::Judoka2String(std::string SearchString, const IT
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
 
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 	{
 		auto name = judoka->GetName(NameStyle::GivenName);
 		std::transform(name.begin(), name.end(), name.begin(),
@@ -365,7 +374,7 @@ bool StandingData::DeleteClub(const UUID& UUID)
 		if (*club && (*club)->GetUUID() == UUID)
 		{
 			//Check if there is any judoka associated to this club
-			for (auto [id, judoka] : m_Judokas)
+			for (auto judoka : m_Judokas)
 			{
 				if (judoka->GetClub() && *judoka->GetClub() == UUID)
 					return false;
@@ -513,6 +522,23 @@ const RuleSet* StandingData::FindRuleSet(const UUID& UUID) const
 
 
 
+bool StandingData::DeleteRuleSet(const UUID& UUID)
+{
+	for (auto it = m_RuleSets.begin(); it != m_RuleSets.end(); ++it)
+	{
+		if ((*it)->GetUUID() == UUID)
+		{
+			delete *it;
+			m_RuleSets.erase(it);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
 bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
 {
 	if (!NewRuleSet || FindRuleSet(NewRuleSet->GetUUID()))
@@ -585,6 +611,7 @@ bool StandingData::RemoveAgeGroup(const UUID& UUID)
 	{
 		if ((*it)->GetUUID() == UUID)
 		{
+			delete *it;
 			m_AgeGroups.erase(it);
 			return true;
 		}
@@ -597,7 +624,7 @@ bool StandingData::RemoveAgeGroup(const UUID& UUID)
 
 Judoka* StandingData::FindJudoka(const UUID& UUID)
 {
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 	{
 		if (judoka && judoka->GetUUID() == UUID)
 			return judoka;
@@ -610,7 +637,7 @@ Judoka* StandingData::FindJudoka(const UUID& UUID)
 
 const Judoka* StandingData::FindJudoka(const UUID& UUID) const
 {
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 	{
 		if (judoka && judoka->GetUUID() == UUID)
 			return judoka;
@@ -623,7 +650,7 @@ const Judoka* StandingData::FindJudoka(const UUID& UUID) const
 
 const Judoka* StandingData::FindJudokaByName(const std::string& Name) const
 {
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 	{
 		if (judoka && judoka->GetName(NameStyle::GivenName) == Name)
 			return judoka;
@@ -638,7 +665,7 @@ Judoka* StandingData::FindJudoka_ExactMatch(const JudokaData& NewJudoka)
 {
 	Judoka* ret = nullptr;
 
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 	{
 		if (judoka && judoka->GetFirstname()  == NewJudoka.m_Firstname
 			&& judoka->GetLastname()   == NewJudoka.m_Lastname
@@ -662,7 +689,7 @@ Judoka* StandingData::FindJudoka_SameName(const JudokaData& NewJudoka)
 {
 	Judoka* ret = nullptr;
 
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 	{
 		if (judoka && judoka->GetFirstname() == NewJudoka.m_Firstname
 				   && judoka->GetLastname()  == NewJudoka.m_Lastname

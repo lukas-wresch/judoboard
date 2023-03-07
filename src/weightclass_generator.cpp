@@ -140,8 +140,8 @@ bool Generator::split(std::vector<std::pair<Weight, int>>& WeightsSlots, int Sta
 
 	Weight min = 1000 * 1000;
 	Weight max = 0;
-	size_t Middle = Start;
-	for (size_t i = Start; i < End; ++i)
+	int Middle = Start;
+	for (int i = Start; i < End; ++i)
 	{
 		if (WeightsSlots[i].first < min)
 			min = WeightsSlots[i].first;

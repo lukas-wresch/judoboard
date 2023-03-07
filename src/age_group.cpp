@@ -11,17 +11,17 @@ using namespace Judoboard;
 
 
 
-AgeGroup::AgeGroup(const std::string& Name, uint32_t MinAge, uint32_t MaxAge, const RuleSet* Rules, const StandingData& StandingData)
-	: m_Name(Name), m_pRules(Rules), m_StandingData(StandingData)
+AgeGroup::AgeGroup(const std::string& Name, uint32_t MinAge, uint32_t MaxAge, const RuleSet* Rules, Gender Gender)
+	: m_Name(Name), m_pRules(Rules)
 {
 	m_MinAge = MinAge;
 	m_MaxAge = MaxAge;
+	m_Gender = Gender;
 }
 
 
 
 AgeGroup::AgeGroup(const YAML::Node& Yaml, const StandingData& StandingData)
-	: m_StandingData(StandingData)
 {
 	if (Yaml["uuid"])
 		SetUUID(Yaml["uuid"].as<std::string>());
@@ -41,7 +41,6 @@ AgeGroup::AgeGroup(const YAML::Node& Yaml, const StandingData& StandingData)
 
 
 AgeGroup::AgeGroup(const MD5::AgeGroup& AgeGroup, const StandingData& StandingData)
-	: m_StandingData(StandingData)
 {
 	m_Name   = AgeGroup.Name;
 	m_Gender = AgeGroup.Gender;
@@ -53,13 +52,13 @@ AgeGroup::AgeGroup(const MD5::AgeGroup& AgeGroup, const StandingData& StandingDa
 
 
 
-bool AgeGroup::IsElgiable(const Judoka& Fighter) const
+bool AgeGroup::IsElgiable(const Judoka& Fighter, const StandingData& StandingData) const
 {
 	if (m_Gender != Gender::Unknown)
 		if (m_Gender != Fighter.GetGender())
 			return false;
 
-	uint32_t age = m_StandingData.GetYear() - Fighter.GetBirthyear();
+	uint32_t age = StandingData.GetYear() - Fighter.GetBirthyear();
 
 	if (m_MinAge == 0)//No min age
 		return age <= m_MaxAge;
@@ -114,5 +113,8 @@ void AgeGroup::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "desc" << YAML::Value << desc;
 
 	if (m_pRules)
-		Yaml << YAML::Key << "rules" << YAML::Value << (std::string)m_pRules->GetUUID();
+	{
+		Yaml << YAML::Key << "rules_name" << YAML::Value << m_pRules->GetName();
+		Yaml << YAML::Key << "rules_uuid" << YAML::Value << (std::string)m_pRules->GetUUID();
+	}
 }

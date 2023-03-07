@@ -2,6 +2,79 @@
 
 
 
+TEST(Ajax, AgeGroup_Add)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto r = app.GetDatabase().GetRuleSets()[0];
+		app.Ajax_AddAgeGroup(HttpServer::Request("", "name=test&min_age=3&max_age=5&gender=0&rule=" + (std::string)r->GetUUID()));
+		
+		auto& age_groups = app.GetDatabase().GetAgeGroups();
+
+		ASSERT_EQ(age_groups.size(), 7);
+		EXPECT_EQ(age_groups[6]->GetName(), "test");
+		EXPECT_EQ(age_groups[6]->GetMinAge(), 3);
+		EXPECT_EQ(age_groups[6]->GetMaxAge(), 5);
+		EXPECT_EQ(age_groups[6]->GetGender(), Gender::Male);
+		ASSERT_TRUE(age_groups[6]->GetRuleSet());
+		EXPECT_EQ(*age_groups[6]->GetRuleSet(), *r);
+	}
+}
+
+
+
+TEST(Ajax, AgeGroup_Edit)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto r = app.GetDatabase().GetRuleSets()[0];
+		app.Ajax_AddAgeGroup(HttpServer::Request("", "name=test&min_age=3&max_age=5&gender=0&rule=" + (std::string)r->GetUUID()));
+
+		auto& age_groups = app.GetDatabase().GetAgeGroups();
+		ASSERT_EQ(age_groups.size(), 7);
+		auto a = age_groups[6];
+
+		app.Ajax_EditAgeGroup(HttpServer::Request("id=" + (std::string)a->GetUUID(), "name=test2&min_age=6&max_age=10&gender=1&rule=" + (std::string)r->GetUUID()));
+
+		EXPECT_EQ(age_groups[6]->GetName(), "test2");
+		EXPECT_EQ(age_groups[6]->GetMinAge(), 6);
+		EXPECT_EQ(age_groups[6]->GetMaxAge(), 10);
+		EXPECT_EQ(age_groups[6]->GetGender(), Gender::Female);
+		ASSERT_TRUE(age_groups[6]->GetRuleSet());
+		EXPECT_EQ(*age_groups[6]->GetRuleSet(), *r);
+	}
+}
+
+
+
+TEST(Ajax, AgeGroup_Delete)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto r = app.GetDatabase().GetRuleSets()[0];
+		app.Ajax_AddAgeGroup(HttpServer::Request("", "name=test&min_age=3&max_age=5&gender=0&rule=" + (std::string)r->GetUUID()));
+
+		auto& age_groups = app.GetDatabase().GetAgeGroups();
+		ASSERT_EQ(age_groups.size(), 7);
+		auto a = age_groups[6];
+
+		app.Ajax_DeleteAgeGroup(HttpServer::Request("id=" + (std::string)a->GetUUID()));
+
+		ASSERT_EQ(age_groups.size(), 6);
+	}
+}
+
+
+
 TEST(Ajax, AgeGroup_Get)
 {
 	initialize();
@@ -9,8 +82,9 @@ TEST(Ajax, AgeGroup_Get)
 	{
 		Application app;
 
-		auto a1 = new AgeGroup("age 1", 10, 20, nullptr, app.GetDatabase());
-		auto a2 = new AgeGroup("age 2", 30, 40, nullptr, app.GetDatabase());
+		auto r  = new RuleSet("test", 1, 2, 3, 4);
+		auto a1 = new AgeGroup("age 1", 10, 20, r);
+		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
 
 		app.GetDatabase().AddAgeGroup(a1);
 		app.GetTournament()->AddAgeGroup(a2);
@@ -21,6 +95,10 @@ TEST(Ajax, AgeGroup_Get)
 		EXPECT_EQ(yaml["name"].as<std::string>(), a1->GetName());
 		EXPECT_EQ(yaml["min_age"].as<int>(), a1->GetMinAge());
 		EXPECT_EQ(yaml["max_age"].as<int>(), a1->GetMaxAge());
+		ASSERT_TRUE(yaml["rules_name"]);
+		EXPECT_EQ(yaml["rules_name"].as<std::string>(), "test");
+		EXPECT_TRUE(yaml["rules_uuid"]);
+		EXPECT_EQ(yaml["rules_uuid"].as<std::string>(), *r);
 
 		yaml = YAML::Load(app.Ajax_GetAgeGroup(HttpServer::Request("id=" + (std::string)a2->GetUUID())));
 
@@ -28,6 +106,8 @@ TEST(Ajax, AgeGroup_Get)
 		EXPECT_EQ(yaml["name"].as<std::string>(), a2->GetName());
 		EXPECT_EQ(yaml["min_age"].as<int>(), a2->GetMinAge());
 		EXPECT_EQ(yaml["max_age"].as<int>(), a2->GetMaxAge());
+		EXPECT_FALSE(yaml["rules_name"]);
+		EXPECT_FALSE(yaml["rules_uuid"]);
 	}
 }
 
@@ -40,8 +120,8 @@ TEST(Ajax, AgeGroup_List)
 	{
 		Application app;
 
-		auto a1 = new AgeGroup("age 1", 10, 20, nullptr, app.GetDatabase());
-		auto a2 = new AgeGroup("age 2", 30, 40, nullptr, app.GetDatabase());
+		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
+		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
 
 		app.GetDatabase().AddAgeGroup(a1);
 		app.GetTournament()->AddAgeGroup(a2);
@@ -571,7 +651,7 @@ TEST(Ajax, Judoka_Add)
 		auto judokas = app.GetDatabase().GetAllJudokas();
 
 		ASSERT_EQ(judokas.size(), 1);
-		auto judoka = judokas.begin()->second;
+		auto judoka = judokas[0];
 
 		EXPECT_EQ(judoka->GetFirstname(), "first");
 		EXPECT_EQ(judoka->GetLastname(),  "last");
@@ -597,7 +677,7 @@ TEST(Ajax, Judoka_Get)
 		auto judokas = app.GetDatabase().GetAllJudokas();
 
 		ASSERT_EQ(judokas.size(), 1);
-		auto judoka = judokas.begin()->second;
+		auto judoka = judokas[0];
 
 		auto yaml = app.Ajax_GetJudoka(HttpServer::Request("id="+(std::string)judoka->GetUUID()));
 
@@ -652,9 +732,9 @@ TEST(Ajax, Judoka_Edit)
 		auto judokas = app.GetDatabase().GetAllJudokas();
 
 		ASSERT_EQ(judokas.size(), 1);
-		auto judoka = judokas.begin()->second;
+		auto judoka = judokas[0];
 
-		EXPECT_EQ((std::string)app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)judoka->GetUUID(), "firstname=first2&lastname=last2&weight=12,5&gender=1&birthyear=2001&number=A1234")), "ok");
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)judoka->GetUUID(), "firstname=first2&lastname=last2&weight=12,5&gender=1&birthyear=2001&number=A1234")));
 
 		EXPECT_EQ(judoka->GetFirstname(), "first2");
 		EXPECT_EQ(judoka->GetLastname(),  "last2");
@@ -714,7 +794,7 @@ TEST(Ajax, Judoka_Delete)
 
 		auto& judokas = app.GetDatabase().GetAllJudokas();
 
-		auto id = judokas.begin()->second->GetUUID();
+		auto id = judokas[0]->GetUUID();
 
 		EXPECT_TRUE(app.Ajax_DeleteJudoka(HttpServer::Request("id="+(std::string)id)));
 
@@ -753,7 +833,7 @@ TEST(Ajax, Judoka_Import)
 		EXPECT_TRUE(app.Ajax_ImportJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID())));
 
 		ASSERT_EQ(judokas.size(), 1);
-		EXPECT_EQ(judokas.begin()->second->GetUUID(), *j1);
+		EXPECT_EQ(judokas[0]->GetUUID(), *j1);
 
 		ASSERT_EQ(clubs.size(), 1);
 		EXPECT_EQ(clubs[0]->GetUUID(), *c1);
@@ -802,7 +882,7 @@ TEST(Ajax, GetNamesOnMat)
 
 		app.AddTournament(tourney);
 
-		ZED::Core::Pause(2000);
+		ZED::Core::Pause(3000);
 
 		YAML::Node yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 

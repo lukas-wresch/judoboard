@@ -3,6 +3,7 @@
 #include "../ZED/include/log.h"
 #include "matchtable.h"
 #include "match.h"
+#include "standard.h"
 #include "weightclass.h"
 #include "fixed.h"
 #include "tournament.h"
@@ -242,6 +243,8 @@ const RuleSet& MatchTable::GetRuleSet() const
 {
 	if (m_Rules)
 		return *m_Rules;
+	if (GetFilter() && GetFilter()->GetAgeGroup() && GetFilter()->GetAgeGroup()->GetRuleSet())
+		return *GetFilter()->GetAgeGroup()->GetRuleSet();
 	if (GetTournament() && GetTournament()->GetDefaultRuleSet())
 		return *GetTournament()->GetDefaultRuleSet();
 
@@ -350,11 +353,12 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, co
 			case IFilter::Type::Weightclass:
 				SetFilter(new Weightclass(Yaml["filter"], m_Parent ? m_Parent : this));
 				break;
-			case IFilter::Type::Fixed:
-				SetFilter(new Fixed(Yaml["filter"], m_Parent ? m_Parent : this));
+			case IFilter::Type::Standard:
+				SetFilter(new Standard(Yaml["filter"]));
 				break;
 			default:
-				ZED::Log::Error("Unknown filter type " + std::to_string(Yaml["filter"]["type"].as<int>()) + " in match table");
+				ZED::Log::Error("Unknown filter in match table");
+				assert(false);
 		}
 
 		assert(GetFilter());
