@@ -4,6 +4,7 @@
 #include "weightclass.h"
 #include "customtable.h"
 #include "single_elimination.h"
+#include "double_elimination.h"
 #include "pool.h"
 #include "remote_mat.h"
 #include "tournament.h"
@@ -1646,6 +1647,8 @@ void Application::SetupHttpServer()
 				return SingleElimination::GetHTMLForm();
 			case MatchTable::Type::Pool:
 				return Pool::GetHTMLForm();
+			case MatchTable::Type::DoubleElimination:
+				return DoubleElimination::GetHTMLForm();
 
 			default:
 				return std::string("Unknown form");
@@ -3455,6 +3458,10 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 		new_table = new Pool(new Weightclass(0, 0), GetTournament());
 		break;
 
+	case MatchTable::Type::DoubleElimination:
+		new_table = new DoubleElimination(new Weightclass(0, 0), GetTournament());
+		break;
+
 	case MatchTable::Type::Custom:
 		new_table = new CustomTable(GetTournament());
 		break;
@@ -3605,6 +3612,20 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 		pool->IsBestOfThree(bo3);
 		pool->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
 		pool->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
+
+		GetTournament()->Unlock();
+		break;
+	}
+
+	case MatchTable::Type::DoubleElimination:
+	{
+		DoubleElimination* doubleEli = (DoubleElimination*)table;
+
+		GetTournament()->Lock();
+
+		doubleEli->IsBestOfThree(bo3);
+		doubleEli->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
+		doubleEli->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
 
 		GetTournament()->Unlock();
 		break;

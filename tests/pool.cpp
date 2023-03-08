@@ -641,6 +641,7 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	initialize();
 
 	Tournament tourney;
+	Tournament tourney2;
 	Pool* w = new Pool(Weight(10), Weight(100));
 	w->SetMatID(1);
 	tourney.AddMatchTable(w);
@@ -649,6 +650,7 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	{
 		Judoka* j = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i, Gender::Male);
 		EXPECT_TRUE(w->AddParticipant(j));
+		EXPECT_TRUE(tourney2.AddParticipant(j));
 	}
 
 	ASSERT_TRUE(w->GetPool(0));
@@ -665,15 +667,11 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	w->GenerateSchedule();
 
 	YAML::Emitter yaml;
-	yaml << YAML::BeginMap;
 	*w >> yaml;
-	yaml << YAML::EndMap;
 
-	Pool w2(YAML::Load(yaml.c_str()), &tourney);
+	Pool w2(YAML::Load(yaml.c_str()), &tourney2);
 
-	w2.GenerateSchedule();
-
-	EXPECT_EQ(w2.GetSchedule().size(), w->GetSchedule().size());
+	ASSERT_EQ(w2.GetSchedule().size(), w->GetSchedule().size());
 
 	EXPECT_EQ(w2.GetPool(0)->GetMatID(), 1);
 	EXPECT_EQ(w2.GetPool(1)->GetMatID(), 2);
@@ -681,11 +679,41 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	EXPECT_EQ(w2.GetPool(3)->GetMatID(), 4);
 	EXPECT_EQ(w2.GetFinals().GetMatID(), 5);
 
+	//Check UUIDs
+	EXPECT_EQ(*w2.GetSchedule()[0], *w->GetSchedule()[0]);
+	EXPECT_EQ(*w2.GetPool(0), *w->GetPool(0));
+	EXPECT_EQ(*w2.GetPool(1), *w->GetPool(1));
+	EXPECT_EQ(*w2.GetPool(2), *w->GetPool(2));
+	EXPECT_EQ(*w2.GetPool(3), *w->GetPool(3));
+	EXPECT_EQ( w2.GetFinals(), w->GetFinals());
+
+	EXPECT_EQ(w2.GetFinals().GetParticipants(), w->GetFinals().GetParticipants());
+	EXPECT_EQ(w2.GetFinals().GetFilter()->GetParticipants().size(), w->GetFinals().GetFilter()->GetParticipants().size());
+	EXPECT_EQ(w2.ToHTML(), w->ToHTML());
+
 	Mat m(1);
 	int count[5] = {0, 0, 0, 0, 0};
 
+	for (auto match : w->GetSchedule())
+	{
+		ASSERT_TRUE(!match->IsEmptyMatch());
+
+		m.SetMatID(match->GetMatID());
+		EXPECT_TRUE(m.StartMatch(match));
+
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+
 	for (auto match : w2.GetSchedule())
 	{
+		if (match->IsEmptyMatch())
+			int t = 546;
 		ASSERT_TRUE(!match->IsEmptyMatch());
 
 		//Check if match is on the right mat

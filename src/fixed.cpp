@@ -7,7 +7,7 @@ using namespace Judoboard;
 
 
 Fixed::Fixed(const IFilter& Source) :
-	IFilter(Source.GetTournament())
+	IFilter(Source.GetParent())
 {
 	SetParticipants(Source.GetParticipants());
 	SetAgeGroup(Source.GetAgeGroup());
@@ -15,7 +15,7 @@ Fixed::Fixed(const IFilter& Source) :
 
 
 
-Fixed::Fixed(const YAML::Node& Yaml, const ITournament* Tournament) : IFilter(Yaml, Tournament)
+Fixed::Fixed(const YAML::Node& Yaml, const MatchTable* Parent) : IFilter(Yaml, Parent)
 {
 }
 

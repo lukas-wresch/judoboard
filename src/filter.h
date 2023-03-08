@@ -15,11 +15,10 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser, Standard
+			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser, Standard, LosersOf
 		};
 
-		IFilter(const ITournament* Tournament) : m_Tournament(Tournament) {}
-		IFilter(const YAML::Node& Yaml, const ITournament* Tournament);
+		IFilter(const YAML::Node& Yaml, const MatchTable* Parent);
 
 		virtual Type GetType() const = 0;
 
@@ -29,8 +28,10 @@ namespace Judoboard
 
 		virtual bool AddParticipant(const Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
+		bool RemoveParticipant(const DependentJudoka Participant);
 
-		const ITournament* GetTournament() const { return m_Tournament; }
+		const MatchTable*  GetParent() const { return m_Parent; }
+		const ITournament* GetTournament() const;
 
 		//Age groups
 		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
@@ -63,13 +64,16 @@ namespace Judoboard
 
 
 	protected:
-		//IFilter(const ITournament* Tournament) : m_Tournament(Tournament) {}
+		IFilter(const MatchTable* Parent) : m_Parent(Parent) {}
 
 		size_t GetStartPosition(const DependentJudoka Judoka) const;
-		bool RemoveParticipant(const DependentJudoka Participant);
 
 		void SetParticipants(std::unordered_map<size_t, const DependentJudoka>&& NewParticipants) const {
 			m_Participants = std::move(NewParticipants);
+		}
+
+		void RemoveAllParticipants() {
+			m_Participants.clear();
 		}
 
 
@@ -78,6 +82,6 @@ namespace Judoboard
 
 		const AgeGroup* m_pAgeGroup = nullptr;//Age group for the matches (if available)
 
-		const ITournament* m_Tournament = nullptr;
+		const MatchTable* m_Parent = nullptr;
 	};
 }

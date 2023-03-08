@@ -6,8 +6,8 @@ using namespace Judoboard;
 
 
 
-Reverser::Reverser(const IFilter& pSource) :
-	IFilter(pSource.GetTournament()), m_pSource(pSource)
+Reverser::Reverser(const IFilter& pSource, const MatchTable* Parent) :
+	IFilter(Parent), m_pSource(pSource)
 {
 }
 

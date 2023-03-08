@@ -11,13 +11,14 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		SingleElimination(IFilter* Filter, const ITournament* Tournament = nullptr);
+		SingleElimination(IFilter* Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
-		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament = nullptr);
+		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent = nullptr);
 		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 
 		void operator =(const SingleElimination& rhs) = delete;
 		void operator =(SingleElimination&& rhs) noexcept {
+			ID::operator=(rhs);
 			m_ThirdPlaceMatch = rhs.m_ThirdPlaceMatch;
 			m_FifthPlaceMatch = rhs.m_FifthPlaceMatch;
 			SetRuleSet(rhs.GetOwnRuleSet());
@@ -27,8 +28,12 @@ namespace Judoboard
 			SetScheduleIndex(rhs.GetScheduleIndex());
 			SetMatID(rhs.GetMatID());
 			SetColor(rhs.GetColor());
-			SetSchedule() = std::move(rhs.SetSchedule());
+
+			SetParent(rhs.GetParent());
+			DeleteSchedule();
 			IsBestOfThree(rhs.IsBestOfThree());
+
+			SetSchedule(std::move(rhs.SetSchedule()));
 		}
 
 		static std::string GetHTMLForm();
@@ -55,11 +60,13 @@ namespace Judoboard
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
-
-	private:
-		size_t GetNumberOfRounds() const;
+	protected:
+		std::string RenderMatch(const Match& match, std::string style = "") const;
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;
+
+	private:
+		size_t GetNumberOfRounds() const;
 	};
 }

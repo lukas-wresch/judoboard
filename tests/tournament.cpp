@@ -965,6 +965,8 @@ TEST(Tournament, SaveAndLoad)
 		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
 		tourney->AddMatchTable(new RoundRobin(Weight(60), Weight(65)));
 		tourney->AddMatchTable(new Pool(Weight(50), Weight(65)));
+		tourney->AddMatchTable(new SingleElimination(Weight(50), Weight(65)));
+		tourney->AddMatchTable(new DoubleElimination(Weight(50), Weight(65)));
 		tourney->AddMatch(new Match(j1, j3, tourney, 1));
 		tourney->AddMatch(new Match(j1, j4, tourney, 2));
 		tourney->GenerateSchedule();
@@ -1434,6 +1436,52 @@ TEST(Tournament, SaveAndLoad_SingleElimination)
 
 		EXPECT_EQ(t.GetSchedule()[2]->GetDependentMatches()[0]->GetUUID(), t.GetSchedule()[0]->GetUUID());
 		EXPECT_EQ(t.GetSchedule()[2]->GetDependentMatches()[1]->GetUUID(), t.GetSchedule()[1]->GetUUID());
+
+		delete tourney;
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Tournament, SaveAndLoad_DoubleElimination)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
+
+		Tournament* tourney = new Tournament("deleteMe");
+		tourney->Reset();
+
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+		EXPECT_TRUE(tourney->AddParticipant(j3));
+		EXPECT_TRUE(tourney->AddParticipant(j4));
+
+		tourney->AddMatchTable(new DoubleElimination(Weight(10), Weight(105)));
+		tourney->GenerateSchedule();
+
+		EXPECT_EQ(tourney->GetParticipants().size(), 4);
+		ASSERT_EQ(tourney->GetMatchTables().size(), 1);
+		//ASSERT_EQ(tourney->GetSchedule().size(), 3);
+
+		Tournament t("deleteMe");
+		t.EnableAutoSave(false);
+
+		EXPECT_EQ(t.GetParticipants().size(), 4);
+		ASSERT_EQ(t.GetMatchTables().size(), 1);
+		ASSERT_EQ(t.GetSchedule().size(), tourney->GetSchedule().size());
+
+		EXPECT_TRUE(t.GetSchedule()[0]->GetMatchTable());
+		EXPECT_TRUE(t.GetSchedule()[1]->GetMatchTable());
+		EXPECT_TRUE(t.GetSchedule()[2]->GetMatchTable());
 
 		delete tourney;
 	}

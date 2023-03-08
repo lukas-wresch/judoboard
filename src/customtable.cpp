@@ -28,6 +28,18 @@ std::string CustomTable::GetHTMLForm()
 
 
 
+void CustomTable::operator >> (YAML::Emitter& Yaml) const
+{
+	if (!IsSubMatchTable())
+		Yaml << YAML::BeginMap;
+
+	MatchTable::operator >>(Yaml);
+
+	if (!IsSubMatchTable())
+		Yaml << YAML::EndMap;
+}
+
+
 const std::string CustomTable::ToHTML() const
 {
 	std::string ret;

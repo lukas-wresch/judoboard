@@ -6,8 +6,8 @@ using namespace Judoboard;
 
 
 
-Mixer::Mixer(const IFilter& pSource1, const IFilter& pSource2) :
-	IFilter(pSource1.GetTournament())
+Mixer::Mixer(const IFilter& pSource1, const IFilter& pSource2, const MatchTable* Parent) :
+	IFilter(Parent)
 {
 	m_pSources.push_back(&pSource1);
 	m_pSources.push_back(&pSource2);
@@ -17,7 +17,7 @@ Mixer::Mixer(const IFilter& pSource1, const IFilter& pSource2) :
 
 
 
-/*Mixer::Mixer(const YAML::Node& Yaml, const ITournament* Tournament) : IFilter(Yaml, Tournament)
+/*Mixer::Mixer(const YAML::Node& Yaml, const MatchTable* Parent) : IFilter(Yaml, Parent)
 {
 }*/
 

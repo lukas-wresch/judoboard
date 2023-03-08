@@ -9,7 +9,7 @@ namespace Judoboard
 	{
 	public:
 		Fixed(const IFilter& Source);
-		Fixed(const YAML::Node& Yaml, const ITournament* Tournament);
+		Fixed(const YAML::Node& Yaml, const MatchTable* Parent);
 
 		virtual Type GetType() const override { return Type::Fixed; }
 

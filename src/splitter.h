@@ -11,8 +11,8 @@ namespace Judoboard
 	class Splitter : public IFilter
 	{
 	public:
-		Splitter(const IFilter& pSource, size_t Divisor, size_t Remainder);
-		Splitter(const YAML::Node& Yaml, const ITournament* Tournament);
+		Splitter(const IFilter& pSource, size_t Divisor, size_t Remainder, const MatchTable* Parent = nullptr);
+		Splitter(const YAML::Node& Yaml, const MatchTable* Parent);
 
 		virtual Type GetType() const override { return Type::Splitter; }
 
