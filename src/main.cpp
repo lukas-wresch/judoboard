@@ -1,4 +1,5 @@
 #include <iostream>
+#include <csignal>
 #include "app.h"
 #include "database.h"
 #include "tournament.h"
@@ -6,6 +7,10 @@
 #include "round_robin.h"
 #include "standing_data.h"
 #include "../ZED/include/log.h"
+
+
+
+Judoboard::Application* g_app = nullptr;//Used for signal handling
 
 
 
@@ -372,6 +377,17 @@ int main(int argc, char** argv)
 	ShellExecute(NULL, L"open", L"http://localhost:8080", NULL, NULL, 0);
 #endif
 #endif
+
+	//Register single handler
+	g_app = &app;
+	signal(SIGINT, [](int signum) {
+		if (g_app)
+			g_app->Shutdown();
+	});
+	signal(SIGTERM, [](int signum) {
+		if (g_app)
+			g_app->Shutdown();
+	});
 
 	ZED::Log::Info("Application has started");
 	app.Run();
