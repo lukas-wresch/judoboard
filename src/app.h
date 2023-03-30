@@ -221,7 +221,7 @@ namespace Judoboard
 
 		mutable std::recursive_mutex m_mutex;
 
-		mutable bool m_Running = true;
+		mutable volatile bool m_Running = true;
 		const uint32_t m_StartupTimestamp;
 	};
 }
