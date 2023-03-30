@@ -83,7 +83,7 @@ namespace Judoboard
 		bool StartLocalMat(uint32_t ID = 1);
 		bool CloseMat(uint32_t ID);
 
-		std::vector<Match> GetNextMatches(uint32_t MatID) const;
+		std::vector<Match> GetNextMatches(uint32_t MatID, bool& Success) const;
 
 		bool ConnectToMaster(const std::string& Hostname, uint16_t Port = 8080);
 

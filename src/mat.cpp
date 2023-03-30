@@ -2385,14 +2385,18 @@ bool Mat::Mainloop()
 
 	if (m_State != State::Running && m_Application)
 	{
-		auto nextMatches = m_Application->GetNextMatches(GetMatID());
+		bool success;
+		auto nextMatches = m_Application->GetNextMatches(GetMatID(), success);
 
-		m_mutex.lock();
-		if (nextMatches.size() == 0 && m_State == State::Waiting)
-			NextState(State::StartUp);
+		if (success)
+		{
+			m_mutex.lock();
+			if (nextMatches.size() == 0 && m_State == State::Waiting)
+				NextState(State::StartUp);
 
-		m_NextMatches = std::move(nextMatches);
-		m_mutex.unlock();
+			m_NextMatches = std::move(nextMatches);
+			m_mutex.unlock();
+		}
 	}
 
 	Process();
