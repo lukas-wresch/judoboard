@@ -410,7 +410,11 @@ const std::string LoserBracket::ToHTML() const
 				if (round+1 == rounds)
 					style += "border-right-style: hidden;";
 
+#ifdef _DEBUG
 				ret += "<td style=\"" + style + "border-bottom-style: hidden; \">" + std::to_string((y + offset) % split) + "</td>";
+#else
+				ret += "<td style=\"" + style + "border-bottom-style: hidden; \"></td>";
+#endif
 				continue;
 			}
 

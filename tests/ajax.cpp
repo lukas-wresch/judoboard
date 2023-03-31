@@ -1738,6 +1738,39 @@ TEST(Ajax, MatchTable_Add)
 		EXPECT_EQ(((Pool*)tables[3])->IsBestOfThree(), true);
 		EXPECT_EQ(((Pool*)tables[3])->IsThirdPlaceMatch(), true);
 		EXPECT_EQ(((Pool*)tables[3])->IsFifthPlaceMatch(), true);
+
+
+
+		Judoka* j1 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female);
+		Judoka* j3 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female);
+		Judoka* j4 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female);
+		Judoka* j5 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female);
+		Judoka* j6 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female);
+		Judoka* j7 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female);
+		Judoka* j8 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female);
+
+		app.GetTournament()->AddParticipant(j1);
+		app.GetTournament()->AddParticipant(j2);
+		app.GetTournament()->AddParticipant(j3);
+		app.GetTournament()->AddParticipant(j4);
+		app.GetTournament()->AddParticipant(j5);
+		app.GetTournament()->AddParticipant(j6);
+		app.GetTournament()->AddParticipant(j7);
+		app.GetTournament()->AddParticipant(j8);
+
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=6&name=Test5&mat=5&minWeight=30,9&maxWeight=50.5&gender=1&bo3=false&mf3=false&mf5=false")));
+
+		ASSERT_EQ(tables.size(), 5);
+		ASSERT_EQ(tables[4]->GetType(), MatchTable::Type::DoubleElimination);
+		EXPECT_EQ(tables[4]->GetName(), "Test5");
+		EXPECT_EQ(tables[4]->GetMatID(), 5);
+		EXPECT_EQ( ((Weightclass*) tables[4]->GetFilter())->GetMinWeight(), Weight("30,9"));
+		EXPECT_EQ( ((Weightclass*) tables[4]->GetFilter())->GetMaxWeight(), Weight("50.5"));
+		EXPECT_EQ( ((Weightclass*) tables[4]->GetFilter())->GetGender(), Gender::Female);
+		EXPECT_EQ(((DoubleElimination*)tables[4])->IsBestOfThree(), false);
+		EXPECT_EQ(((DoubleElimination*)tables[4])->IsThirdPlaceMatch(), false);
+		EXPECT_EQ(((DoubleElimination*)tables[4])->IsFifthPlaceMatch(), false);
 	}
 }
 
