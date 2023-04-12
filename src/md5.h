@@ -392,6 +392,10 @@ namespace Judoboard
 		bool ReadRelationParticipantMatchTable(ZED::Blob& Data);
 		bool ReadMatchData(ZED::Blob& Data);
 		bool ReadResult(ZED::Blob& Data);
+		bool ReadPlan(ZED::Blob& Data);
+		bool ReadPause(ZED::Blob& Data);
+		bool ReadInfoPage(ZED::Blob& Data);
+		bool ReadLog(ZED::Blob& Data);
 
 
 		std::vector<Association*> m_Associations;

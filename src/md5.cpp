@@ -1479,7 +1479,8 @@ bool MD5::Parse(ZED::Blob&& Data)
 		return false;
 	}
 
-	if (ReadLine(Data) != "Version 51")
+	auto version = ReadLine(Data);
+	if (version != "Version 51" && version != "Version 70")
 	{
 		ZED::Log::Warn("Data is not a MD5 file");
 		return false;
@@ -1530,8 +1531,18 @@ bool MD5::Parse(ZED::Blob&& Data)
 		else if (line == "Ergebnis")
 			is_ok &= ReadResult(Data);
 
-		else if (newline)
-			continue;
+		//For Version 7
+		else if (line == "PlanungsElement")
+			is_ok &= ReadPlan(Data);
+		else if (line == "Pause")
+			is_ok &= ReadPause(Data);
+		else if (line == "InfoSeite")
+			is_ok &= ReadInfoPage(Data);
+		else if (line == "Kampflog")
+			is_ok &= ReadLog(Data);
+		
+		//else if (newline)
+			//continue;
 		else if (line == "\\\\end")
 		{
 			found_end = true;
@@ -2564,6 +2575,162 @@ bool MD5::ReadResult(ZED::Blob& Data)
 
 
 
+bool MD5::ReadPlan(ZED::Blob& Data)
+{
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
+	std::vector<std::string> data;
+
+	while (!Data.EndReached())
+	{
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
+
+		data.emplace_back(Line);
+
+		if (data.size() >= header.size())//Have we read the entire data block?
+		{
+			//Participant new_participant;
+
+			for (size_t i = 0; i < header.size(); i++)
+			{
+			}
+
+			//m_Participants.emplace_back(new Participant(new_participant));
+
+			data.clear();
+		}
+
+		if (newline)
+			return m_Participants.size() == data_count;
+	}
+
+	return false;
+}
+
+
+
+bool MD5::ReadPause(ZED::Blob& Data)
+{
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
+	std::vector<std::string> data;
+
+	while (!Data.EndReached())
+	{
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
+
+		data.emplace_back(Line);
+
+		if (data.size() >= header.size())//Have we read the entire data block?
+		{
+			//Participant new_participant;
+
+			for (size_t i = 0; i < header.size(); i++)
+			{
+			}
+
+			//m_Participants.emplace_back(new Participant(new_participant));
+
+			data.clear();
+		}
+
+		if (newline)
+			return m_Participants.size() == data_count;
+	}
+
+	return false;
+}
+
+
+
+bool MD5::ReadInfoPage(ZED::Blob& Data)
+{
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
+	std::vector<std::string> data;
+
+	while (!Data.EndReached())
+	{
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
+
+		data.emplace_back(Line);
+
+		if (data.size() >= header.size())//Have we read the entire data block?
+		{
+			//Participant new_participant;
+
+			for (size_t i = 0; i < header.size(); i++)
+			{
+			}
+
+			//m_Participants.emplace_back(new Participant(new_participant));
+
+			data.clear();
+		}
+
+		if (newline)
+			return m_Participants.size() == data_count;
+	}
+
+	return false;
+}
+
+
+
+bool MD5::ReadLog(ZED::Blob& Data)
+{
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
+	std::vector<std::string> data;
+
+	while (!Data.EndReached())
+	{
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
+
+		data.emplace_back(Line);
+
+		if (data.size() >= header.size())//Have we read the entire data block?
+		{
+			//Participant new_participant;
+
+			for (size_t i = 0; i < header.size(); i++)
+			{
+			}
+
+			//m_Participants.emplace_back(new Participant(new_participant));
+
+			data.clear();
+		}
+
+		if (newline)
+			return m_Participants.size() == data_count;
+	}
+
+	return false;
+}
+
+
+
 bool MD5::ReadParticipants(ZED::Blob& Data)
 {
 	int data_count;
@@ -2850,7 +3017,7 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pNewLine)
 		*pNewLine = false;
 
 	bool carry_return = false;
-	bool eof          = false;
+	//bool eof          = false;
 
 	int length = Data.ReadByte();
 
@@ -2859,15 +3026,22 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pNewLine)
 	{
 		char c = Data.ReadByte();//Returns 0x00 when the end of the data stream is reached
 
+		//End of string reached without null-terminator?
+		if (c != '\0' && pNewLine && *pNewLine && Line.length() >= length)
+		{
+			Data.SeekReadCursor(-1);
+			break;
+		}
+
 		if (c == '\0'/* && Line.length() >= 1*/)
 			break;
-		else if (c == '\0')
+		/*else if (c == '\0')
 		{
 			if (eof)
 				return "";
 			eof = true;
 			continue;
-		}
+		}*/
 		else if (c == 0x01)//Start of Heading
 			continue;
 		else if (c == 0x02)//Start of text
