@@ -1898,6 +1898,10 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2004,6 +2008,10 @@ bool MD5::ReadRelationClubAssociation(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2054,6 +2062,10 @@ bool MD5::ReadLottery(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
