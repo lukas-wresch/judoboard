@@ -2920,3 +2920,14 @@ TEST(MD5, ExportSingleElimination32)
 
 	delete t;
 }
+
+
+
+TEST(MD5, ReadMD7TestData)
+{
+	initialize();
+
+	MD5 file("test-data/Schlosspokal2023_U11m.md7");
+
+	ASSERT_TRUE(file);
+}
