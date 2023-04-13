@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <functional>
 #include "judoboard.h"
 #include "../ZED/include/blob.h"
 
@@ -392,10 +393,9 @@ namespace Judoboard
 		bool ReadRelationParticipantMatchTable(ZED::Blob& Data);
 		bool ReadMatchData(ZED::Blob& Data);
 		bool ReadResult(ZED::Blob& Data);
-		bool ReadPlan(ZED::Blob& Data);
-		bool ReadPause(ZED::Blob& Data);
-		bool ReadInfoPage(ZED::Blob& Data);
 		bool ReadLog(ZED::Blob& Data);
+
+		bool ReadTable(ZED::Blob& Data, std::function<bool(std::vector<std::string>&&, std::vector<std::string>&&)> Parse = nullptr);
 
 
 		std::vector<Association*> m_Associations;

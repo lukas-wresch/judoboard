@@ -1533,16 +1533,16 @@ bool MD5::Parse(ZED::Blob&& Data)
 
 		//For Version 7
 		else if (line == "PlanungsElement")
-			is_ok &= ReadPlan(Data);
+			is_ok &= ReadTable(Data);
 		else if (line == "Pause")
-			is_ok &= ReadPause(Data);
+			is_ok &= ReadTable(Data);
 		else if (line == "InfoSeite")
-			is_ok &= ReadInfoPage(Data);
+			is_ok &= ReadTable(Data);
 		else if (line == "Kampflog")
-			is_ok &= ReadLog(Data);
+			is_ok &= ReadTable(Data);
+		else if (line == "Matte")
+			is_ok &= ReadTable(Data);
 		
-		//else if (newline)
-			//continue;
 		else if (line == "\\\\end")
 		{
 			found_end = true;
@@ -2575,7 +2575,7 @@ bool MD5::ReadResult(ZED::Blob& Data)
 
 
 
-bool MD5::ReadPlan(ZED::Blob& Data)
+bool MD5::ReadTable(ZED::Blob& Data, std::function<bool(std::vector<std::string>&&, std::vector<std::string>&&)> Parse)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
@@ -2584,6 +2584,7 @@ bool MD5::ReadPlan(ZED::Blob& Data)
 		return true;
 
 	std::vector<std::string> data;
+	int data_written = 0;
 
 	while (!Data.EndReached())
 	{
@@ -2594,136 +2595,14 @@ bool MD5::ReadPlan(ZED::Blob& Data)
 
 		if (data.size() >= header.size())//Have we read the entire data block?
 		{
-			//Participant new_participant;
-
-			for (size_t i = 0; i < header.size(); i++)
-			{
-			}
-
-			//m_Participants.emplace_back(new Participant(new_participant));
+			if (Parse && Parse(std::move(header), std::move(data)))
+				data_written++;
 
 			data.clear();
 		}
 
 		if (newline)
-			return m_Participants.size() == data_count;
-	}
-
-	return false;
-}
-
-
-
-bool MD5::ReadPause(ZED::Blob& Data)
-{
-	int data_count;
-	auto header = ReadHeader(Data, data_count);
-
-	if (data_count == 0)
-		return true;
-
-	std::vector<std::string> data;
-
-	while (!Data.EndReached())
-	{
-		bool newline;
-		auto Line = ReadLine(Data, &newline);
-
-		data.emplace_back(Line);
-
-		if (data.size() >= header.size())//Have we read the entire data block?
-		{
-			//Participant new_participant;
-
-			for (size_t i = 0; i < header.size(); i++)
-			{
-			}
-
-			//m_Participants.emplace_back(new Participant(new_participant));
-
-			data.clear();
-		}
-
-		if (newline)
-			return m_Participants.size() == data_count;
-	}
-
-	return false;
-}
-
-
-
-bool MD5::ReadInfoPage(ZED::Blob& Data)
-{
-	int data_count;
-	auto header = ReadHeader(Data, data_count);
-
-	if (data_count == 0)
-		return true;
-
-	std::vector<std::string> data;
-
-	while (!Data.EndReached())
-	{
-		bool newline;
-		auto Line = ReadLine(Data, &newline);
-
-		data.emplace_back(Line);
-
-		if (data.size() >= header.size())//Have we read the entire data block?
-		{
-			//Participant new_participant;
-
-			for (size_t i = 0; i < header.size(); i++)
-			{
-			}
-
-			//m_Participants.emplace_back(new Participant(new_participant));
-
-			data.clear();
-		}
-
-		if (newline)
-			return m_Participants.size() == data_count;
-	}
-
-	return false;
-}
-
-
-
-bool MD5::ReadLog(ZED::Blob& Data)
-{
-	int data_count;
-	auto header = ReadHeader(Data, data_count);
-
-	if (data_count == 0)
-		return true;
-
-	std::vector<std::string> data;
-
-	while (!Data.EndReached())
-	{
-		bool newline;
-		auto Line = ReadLine(Data, &newline);
-
-		data.emplace_back(Line);
-
-		if (data.size() >= header.size())//Have we read the entire data block?
-		{
-			//Participant new_participant;
-
-			for (size_t i = 0; i < header.size(); i++)
-			{
-			}
-
-			//m_Participants.emplace_back(new Participant(new_participant));
-
-			data.clear();
-		}
-
-		if (newline)
-			return m_Participants.size() == data_count;
+			return data_written == data_count;
 	}
 
 	return false;
