@@ -101,6 +101,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			new_table->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
 
 		new_table->SetName(weightclass->Description);
+		new_table->SetMatID(1);//Choose 1 as the default mat
 
 		weightclass->pUserData = new_table;
 
@@ -195,11 +196,11 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			auto match_table = (MatchTable*)match.Weightclass->pUserData;
 			match_table->AddMatch(new_match);//Add match to weightclass
 
-      if (!new_match->IsEmptyMatch())
-      {
+			if (!new_match->IsEmptyMatch())
+			{
 			  auto index = match_table->FindMatchIndex(*new_match);
 			  m_Schedule.emplace_back(match_table, index);
-      }
+			}
 		}
 	}
 
