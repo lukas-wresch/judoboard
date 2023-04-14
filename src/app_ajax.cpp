@@ -74,7 +74,7 @@ void Application::SetupHttpServer()
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
 
-			DM4 dm4_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
+			DM4 dm4_file(Request.m_Body.Trim(pos + 5, boundary_end - pos - 5 + 1));
 
 			if (!dm4_file)
 				return Error(Error::Type::InvalidFormat);
@@ -117,7 +117,7 @@ void Application::SetupHttpServer()
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
 
-			DMF dmf_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
+			DMF dmf_file(Request.m_Body.Trim(pos + 5, boundary_end - pos - 5 + 1));
 
 			if (!dmf_file)
 				return Error(Error::Type::InvalidFormat);
@@ -159,7 +159,7 @@ void Application::SetupHttpServer()
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
 
-			MD5 md5_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
+			MD5 md5_file(Request.m_Body.Trim(pos + 5, boundary_end - pos - 5 + 1));
 
 			if (!md5_file)
 				return Error(Error::Type::InvalidFormat);
@@ -197,7 +197,7 @@ void Application::SetupHttpServer()
 
 			Tournament* tournament_file = new Tournament("");
 
-			auto yaml = YAML::Load((char*)Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
+			auto yaml = YAML::Load((char*)Request.m_Body.Trim(pos + 5, boundary_end - pos - 5 + 1));
 
 			if (!tournament_file->Load(yaml))
 			{
