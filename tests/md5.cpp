@@ -2935,4 +2935,8 @@ TEST(MD5, ReadMD7TestData)
 	MD5 file("test-data/Schlosspokal2023_U11m.md7");
 
 	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	Tournament t(file);
 }

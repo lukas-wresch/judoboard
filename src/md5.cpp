@@ -2000,6 +2000,11 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.MaxPooled) != 1)
 						ZED::Log::Warn("Could not read MaxPooled of weightclass");
 				}
+
+				//Version 7
+
+				else if (header[i] == "BestOfThree")
+					new_weightclass.BestOfThree = data[i] != "1";			
 			}
 
 			m_Weightclasses.emplace_back(new Weightclass(new_weightclass));

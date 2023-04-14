@@ -191,6 +191,10 @@ namespace Judoboard
 			std::string Identifier;
 			std::string ForReference = "T";
 
+
+			//Version 7
+			bool BestOfThree = false;
+
 			mutable void* pUserData = nullptr;
 		};
 

@@ -91,7 +91,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			new_table = new RoundRobin(*weightclass, this);
 		else if (weightclass->FightSystemID == 19 ||//Single elimination (single consulation bracket)
 				 weightclass->FightSystemID == 20 ||//Single elimination (single consulation bracket)
-				 weightclass->FightSystemID == 1)//Double elimination (16 system)
+				 weightclass->FightSystemID == 1  ||//Double elimination (16 system)
+				 weightclass->FightSystemID == 2)   //Double elimination
 			new_table = new SingleElimination(*weightclass, this);
 		else
 			continue;
@@ -101,6 +102,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			new_table->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
 
 		new_table->SetName(weightclass->Description);
+		new_table->IsBestOfThree(weightclass->BestOfThree);
 		new_table->SetMatID(1);//Choose 1 as the default mat
 
 		weightclass->pUserData = new_table;
