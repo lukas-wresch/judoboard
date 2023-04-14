@@ -146,7 +146,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		auto match_table = (MatchTable*)judoka->Weightclass->pUserData;
 
 		int pos = File.FindStartNo(judoka->Weightclass->AgeGroupID, judoka->Weightclass->ID, judoka->ID);
-		if (pos > 0)
+		if (pos > 0 && match_table)
 			match_table->SetStartPosition(native_judoka, pos - 1);
 	}
 
