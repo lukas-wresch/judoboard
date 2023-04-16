@@ -104,6 +104,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		new_table->SetName(weightclass->Description);
 		new_table->IsBestOfThree(weightclass->BestOfThree);
 		new_table->SetMatID(1);//Choose 1 as the default mat
+		new_table->SetScheduleIndex(GetFreeScheduleIndex(1));
 
 		weightclass->pUserData = new_table;
 

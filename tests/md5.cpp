@@ -325,10 +325,11 @@ TEST(MD5, CreateTournamentFromTestData2)
 		EXPECT_EQ(db.GetAllJudokas().size(), 0);
 		EXPECT_EQ(db.GetNumClubs(),          0);
 
+		for (auto table : tour.GetMatchTables())
+			EXPECT_GE(table->GetScheduleIndex(), 0);
+
 		for (auto match : tour.GetSchedule())
-		{
 			EXPECT_EQ(match->GetMatID(), 1);
-		}
 	}
 
 	ZED::Core::RemoveFile("tournaments/KEM U15 KT U10 - U18.yml");
