@@ -1465,7 +1465,7 @@ bool MD5::Parse(ZED::Blob&& Data)
 		return false;
 	}
 
-	int unknown = Data.ReadByte();//'3' in MW5, 'F' in MW7
+	int unknown = Data.ReadByte();//'3' in MD5, 'F' in MD7
 
 	if (unknown != 0x33 && unknown != 0x46)
 	{
