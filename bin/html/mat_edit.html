@@ -116,6 +116,8 @@ function GetMat(id)
         document.getElementById("ipponStyle").value = mat.ippon_style;
         document.getElementById("timerStyle").value = mat.timer_style;
         document.getElementById("nameStyle").value  = mat.name_style;
+        document.getElementById("sound").checked    = mat.sound_enabled;
+        document.getElementById("sound_filename").value = mat.sound_filename;
       }
     }
 
@@ -136,7 +138,7 @@ function GetMat(id)
 var id = URLDecode(URL, "id");
 GetMat(id);
 
-document.getElementById("sound_enabled").innerHTML  = lang.enabled;
-document.getElementById("sound_disabled").innerHTML = lang.disabled;
+document.getElementById("sound_enabled").innerHTML  = translate('enabled');
+document.getElementById("sound_disabled").innerHTML = translate('disabled');
 
 </script>
