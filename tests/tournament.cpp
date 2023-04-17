@@ -930,6 +930,61 @@ TEST(Tournament, ConcludedStatus)
 
 
 
+TEST(Tournament, TestData_Randori2022)
+{
+	initialize();
+
+	{
+		Tournament t("../test-data/randori-2022");
+
+		EXPECT_EQ(t.GetDatabase().GetYear(), 2022);
+
+		ASSERT_EQ(t.GetMatchTables().size(), 3);
+
+		auto results = t.GetMatchTables()[0]->CalculateResults();
+		ASSERT_EQ(results.GetSize(), 3);
+		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Theo");
+		EXPECT_EQ(results[0].Wins, 2);
+		EXPECT_EQ(results[0].Score, 14);
+
+		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Richard");
+		EXPECT_EQ(results[1].Wins, 1);
+		EXPECT_EQ(results[1].Score, 10);
+
+		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Joris");
+		EXPECT_EQ(results[2].Wins, 0);
+		EXPECT_EQ(results[2].Score, 0);
+
+		results = t.GetMatchTables()[1]->CalculateResults();
+		ASSERT_EQ(results.GetSize(), 2);
+		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Julius");
+		EXPECT_EQ(results[0].Wins, 2);
+		EXPECT_EQ(results[0].Score, 20);
+
+		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Tom");
+		EXPECT_EQ(results[1].Wins, 0);
+		EXPECT_EQ(results[1].Score, 0);
+
+		results = t.GetMatchTables()[2]->CalculateResults();
+		ASSERT_EQ(results.GetSize(), 3);
+		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Maja");
+		EXPECT_EQ(results[0].Wins, 2);
+		EXPECT_EQ(results[0].Score, 17);
+
+		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Clara");
+		EXPECT_EQ(results[1].Wins, 1);
+		EXPECT_EQ(results[1].Score, 1);
+
+		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Leni");
+		EXPECT_EQ(results[2].Wins, 0);
+		EXPECT_EQ(results[2].Score, 0);
+	}
+
+	ZED::Core::RemoveFile("tournaments/randori-2022.yml");
+}
+
+
+
 TEST(Tournament, SaveAndLoad)
 {
 	initialize();
@@ -965,6 +1020,8 @@ TEST(Tournament, SaveAndLoad)
 		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
 		tourney->AddMatchTable(new RoundRobin(Weight(60), Weight(65)));
 		tourney->AddMatchTable(new Pool(Weight(50), Weight(65)));
+		tourney->AddMatchTable(new SingleElimination(Weight(50), Weight(65)));
+		tourney->AddMatchTable(new DoubleElimination(Weight(50), Weight(65)));
 		tourney->AddMatch(new Match(j1, j3, tourney, 1));
 		tourney->AddMatch(new Match(j1, j4, tourney, 2));
 		tourney->GenerateSchedule();
@@ -1434,6 +1491,52 @@ TEST(Tournament, SaveAndLoad_SingleElimination)
 
 		EXPECT_EQ(t.GetSchedule()[2]->GetDependentMatches()[0]->GetUUID(), t.GetSchedule()[0]->GetUUID());
 		EXPECT_EQ(t.GetSchedule()[2]->GetDependentMatches()[1]->GetUUID(), t.GetSchedule()[1]->GetUUID());
+
+		delete tourney;
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
+TEST(Tournament, SaveAndLoad_DoubleElimination)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
+
+		Tournament* tourney = new Tournament("deleteMe");
+		tourney->Reset();
+
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+		EXPECT_TRUE(tourney->AddParticipant(j3));
+		EXPECT_TRUE(tourney->AddParticipant(j4));
+
+		tourney->AddMatchTable(new DoubleElimination(Weight(10), Weight(105)));
+		tourney->GenerateSchedule();
+
+		EXPECT_EQ(tourney->GetParticipants().size(), 4);
+		ASSERT_EQ(tourney->GetMatchTables().size(), 1);
+		//ASSERT_EQ(tourney->GetSchedule().size(), 3);
+
+		Tournament t("deleteMe");
+		t.EnableAutoSave(false);
+
+		EXPECT_EQ(t.GetParticipants().size(), 4);
+		ASSERT_EQ(t.GetMatchTables().size(), 1);
+		ASSERT_EQ(t.GetSchedule().size(), tourney->GetSchedule().size());
+
+		EXPECT_TRUE(t.GetSchedule()[0]->GetMatchTable());
+		EXPECT_TRUE(t.GetSchedule()[1]->GetMatchTable());
+		EXPECT_TRUE(t.GetSchedule()[2]->GetMatchTable());
 
 		delete tourney;
 	}

@@ -182,6 +182,7 @@
     <ClCompile Include="..\..\src\database.cpp" />
     <ClCompile Include="..\..\src\dm4.cpp" />
     <ClCompile Include="..\..\src\dmf.cpp" />
+    <ClCompile Include="..\..\src\double_elimination.cpp" />
     <ClCompile Include="..\..\src\error.cpp" />
     <ClCompile Include="..\..\src\filter.cpp" />
     <ClCompile Include="..\..\src\fixed.cpp" />
@@ -190,6 +191,8 @@
     <ClCompile Include="..\..\src\id.cpp" />
     <ClCompile Include="..\..\src\judoka.cpp" />
     <ClCompile Include="..\..\src\localizer.cpp" />
+    <ClCompile Include="..\..\src\losersof.cpp" />
+    <ClCompile Include="..\..\src\loser_bracket.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\mat.cpp" />
     <ClCompile Include="..\..\src\match.cpp" />
@@ -230,6 +233,7 @@
     <ClInclude Include="..\..\src\database.h" />
     <ClInclude Include="..\..\src\dm4.h" />
     <ClInclude Include="..\..\src\dmf.h" />
+    <ClInclude Include="..\..\src\double_elimination.h" />
     <ClInclude Include="..\..\src\error.h" />
     <ClInclude Include="..\..\src\filter.h" />
     <ClInclude Include="..\..\src\fixed.h" />
@@ -240,6 +244,8 @@
     <ClInclude Include="..\..\src\judoboard.h" />
     <ClInclude Include="..\..\src\judoka.h" />
     <ClInclude Include="..\..\src\localizer.h" />
+    <ClInclude Include="..\..\src\losersof.h" />
+    <ClInclude Include="..\..\src\loser_bracket.h" />
     <ClInclude Include="..\..\src\mat.h" />
     <ClInclude Include="..\..\src\match.h" />
     <ClInclude Include="..\..\src\matchlog.h" />

@@ -6,14 +6,14 @@ using namespace Judoboard;
 
 
 
-Standard::Standard(const ITournament* Tournament) :
-	IFilter(Tournament)
+Standard::Standard(const MatchTable* Parent) :
+	IFilter(Parent)
 {
 }
 
 
 
-Standard::Standard(const YAML::Node& Yaml, const ITournament* Tournament) : IFilter(Yaml, Tournament)
+Standard::Standard(const YAML::Node& Yaml, const MatchTable* Parent) : IFilter(Yaml, Parent)
 {
 }
 

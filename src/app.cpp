@@ -16,7 +16,7 @@ using namespace Judoboard;
 
 
 const std::string Application::Name = "Judoboard";
-const std::string Application::Version = "0.4.2";
+const std::string Application::Version = "0.4.3";
 bool Application::NoWindow = false;
 
 
@@ -416,15 +416,18 @@ bool Application::StartLocalMat(uint32_t ID)
 
 
 
-std::vector<Match> Application::GetNextMatches(uint32_t MatID) const
+std::vector<Match> Application::GetNextMatches(uint32_t MatID, bool& Success) const
 {
 	if (!TryLock())//Can we get a lock?
 	{
 		std::vector<Match> empty;
+		Success = false;
 		return empty;
 	}
 
 	//Mutex is now locked
+
+	Success = true;
 
 	if (!GetTournament())
 	{

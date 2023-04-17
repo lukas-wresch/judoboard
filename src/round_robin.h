@@ -14,7 +14,7 @@ namespace Judoboard
 	public:
 		RoundRobin(IFilter* Filter, const ITournament* Tournament = nullptr);
 		RoundRobin(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
-		RoundRobin(const YAML::Node& Yaml, const ITournament* Tournament = nullptr);
+		RoundRobin(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent = nullptr);
 		RoundRobin(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 
 		void operator =(const RoundRobin& rhs) = delete;
@@ -29,6 +29,7 @@ namespace Judoboard
 		virtual void GenerateSchedule() override;
 
 		//Serialization
+		virtual void operator >> (YAML::Emitter& Yaml) const override;
 		virtual const std::string ToHTML() const override;
 
 	private:

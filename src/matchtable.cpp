@@ -5,6 +5,7 @@
 #include "match.h"
 #include "standard.h"
 #include "weightclass.h"
+#include "fixed.h"
 #include "tournament.h"
 
 
@@ -325,8 +326,11 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 
 
 
-MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament) : m_Tournament(Tournament)
+MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
+	: m_Tournament(Tournament), m_Parent(Parent)
 {
+	assert(Yaml.IsMap());
+
 	if (Yaml["uuid"])
 		SetUUID(Yaml["uuid"].as<std::string>());
 	if (Yaml["schedule_index"])
@@ -347,15 +351,20 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament) : 
 		switch ((IFilter::Type)Yaml["filter"]["type"].as<int>())
 		{
 			case IFilter::Type::Weightclass:
-				SetFilter(new Weightclass(Yaml["filter"], GetTournament()));
+				SetFilter(new Weightclass(Yaml["filter"], m_Parent ? m_Parent : this));
+				break;
+			case IFilter::Type::Fixed:
+				SetFilter(new Fixed(Yaml["filter"], m_Parent ? m_Parent : this));
 				break;
 			case IFilter::Type::Standard:
-				SetFilter(new Standard(Yaml["filter"], GetTournament()));
+				SetFilter(new Standard(Yaml["filter"]));
 				break;
 			default:
 				ZED::Log::Error("Unknown filter in match table");
 				assert(false);
 		}
+
+		assert(GetFilter());
 	}
 
 	if (Yaml["matches"] && Yaml["matches"].IsSequence())
@@ -419,11 +428,18 @@ void MatchTable::SetAgeGroup(const AgeGroup* NewAgeGroup)
 void MatchTable::operator >> (YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
-	Yaml << YAML::Key << "schedule_index" << YAML::Value << m_ScheduleIndex;
-	Yaml << YAML::Key << "mat_id" << YAML::Value << m_MatID;
-	Yaml << YAML::Key << "color"  << YAML::Value << (int)m_Color;
+
+	if (!IsSubMatchTable())
+	{
+		Yaml << YAML::Key << "schedule_index" << YAML::Value << m_ScheduleIndex;
+		Yaml << YAML::Key << "color"  << YAML::Value << (int)m_Color;
+	}
+
+	if (!IsSubMatchTable() || GetMatID() != 0)
+		Yaml << YAML::Key << "mat_id" << YAML::Value << m_MatID;	
 
 	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
+
 	if (m_Name.length() > 0)
 		Yaml << YAML::Key << "name" << YAML::Value << m_Name;
 
@@ -433,16 +449,25 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 	if (GetFilter())
 	{
 		Yaml << YAML::Key << "filter" << YAML::Value;
-		*GetFilter() >> Yaml;
+		if (GetFilter()->GetType() == IFilter::Type::Weightclass)
+			*GetFilter() >> Yaml;
+		else//Export as fixed participants
+		{
+			Fixed temp(*GetFilter());
+			temp >> Yaml;
+		}
 	}
 
-	Yaml << YAML::Key << "matches";
-	Yaml << YAML::BeginSeq;
+	if (!m_Schedule.empty())
+	{
+		Yaml << YAML::Key << "matches";
+		Yaml << YAML::BeginSeq;
 
-	for (auto match : m_Schedule)
-		*match >> Yaml;
+		for (auto match : m_Schedule)
+			*match >> Yaml;
 
-	Yaml << YAML::EndSeq;
+		Yaml << YAML::EndSeq;
+	}
 }
 
 

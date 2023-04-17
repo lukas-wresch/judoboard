@@ -11,8 +11,8 @@ namespace Judoboard
 	class TakeTopRanks : public IFilter
 	{
 	public:
-		TakeTopRanks(const MatchTable& pSource, size_t NumRanks);
-		TakeTopRanks(const YAML::Node& Yaml, const ITournament* Tournament);
+		TakeTopRanks(const MatchTable& pSource, size_t NumRanks, const MatchTable* Parent = nullptr);
+		TakeTopRanks(const YAML::Node& Yaml, const MatchTable* Parent);
 
 		virtual Type GetType() const override { return Type::TakeTopRanks; }
 

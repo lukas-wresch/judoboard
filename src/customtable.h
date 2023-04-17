@@ -11,7 +11,7 @@ namespace Judoboard
 
 	public:
 		CustomTable(const ITournament* Tournament);
-		CustomTable(const YAML::Node& Yaml, const ITournament* Tournament) : MatchTable(Yaml, Tournament) {}
+		CustomTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent = nullptr) : MatchTable(Yaml, Tournament, Parent) {}
 
 		static std::string GetHTMLForm();
 
@@ -28,6 +28,7 @@ namespace Judoboard
 		virtual size_t GetMaxStartPositions() const { return 0; }
 
 		//Serialization
+		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual const std::string ToHTML() const override;
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 

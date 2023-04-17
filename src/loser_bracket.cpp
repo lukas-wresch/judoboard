@@ -1,0 +1,480 @@
+#include <algorithm>
+#include <random>
+#include "loser_bracket.h"
+#include "weightclass.h"
+#include "tournament.h"
+#include "localizer.h"
+#include "match.h"
+
+
+
+using namespace Judoboard;
+
+
+
+LoserBracket::LoserBracket(IFilter* Filter, const ITournament* Tournament, const MatchTable* Parent)
+	: SingleElimination(Filter, Tournament, Parent)
+{
+}
+
+
+
+LoserBracket::LoserBracket(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
+	: LoserBracket(new Weightclass(MinWeight, MaxWeight, this), Tournament)
+{
+}
+
+
+
+LoserBracket::LoserBracket(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
+	: SingleElimination(Yaml, Tournament, Parent)
+{
+}
+
+
+
+LoserBracket::LoserBracket(const MD5::Weightclass& Weightclass_, const ITournament* Tournament)
+	: LoserBracket(new Weightclass(Weightclass_, this), Tournament)
+{
+}
+
+
+
+/*size_t LoserBracket::GetNumberOfRounds() const
+{
+	if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
+		return 0;
+
+	auto base_rounds = GetNumberOfBaseRounds();
+	auto additional_rounds = (size_t)std::floor( (base_rounds - 1.0) / 2.0 );
+
+	return base_rounds + additional_rounds;
+}*/
+
+
+
+std::string LoserBracket::GetHTMLForm()
+{
+	return SingleElimination::GetHTMLForm();
+}
+
+
+
+void LoserBracket::GenerateSchedule()
+{
+	if (!IsSubMatchTable() && GetStatus() != Status::Scheduled)
+		return;
+
+	DeleteSchedule();
+
+	if (!GetFilter())
+		return;
+
+	if (GetFilter()->GetParticipants().size() <= 3)
+		m_RecommendedNumMatches_Before_Break = 1;
+	else
+		m_RecommendedNumMatches_Before_Break = 2;
+
+	if (GetFilter()->GetParticipants().size() <= 1)
+		return;
+
+	const auto rounds = GetNumberOfRounds();
+	const auto max_start_pos = GetMaxStartPositions();
+	const auto max_initial_start_pos = (max_start_pos + 2) / 2;
+	
+	//Round 1
+	std::vector<Match*> lastRound;
+	std::vector<Match*> nextRound;
+
+	size_t current_start_pos = 0;
+
+	auto create_pair = [&](size_t i) {
+		auto new_match = CreateAutoMatch(GetFilter()->GetJudokaByStartPosition(i-1),
+										 GetFilter()->GetJudokaByStartPosition(i));
+		nextRound.emplace_back(new_match);
+	};
+
+	//Hardcoded starting positions
+	if (max_initial_start_pos == 16)//For double elimination with 32 participants
+	{
+		create_pair(13);
+		create_pair(15);
+		create_pair(9);
+		create_pair(11);
+		create_pair(5);
+		create_pair(7);
+		create_pair(1);
+		create_pair(3);
+		current_start_pos = max_initial_start_pos;
+	}
+	//Hardcoded starting positions
+	else if (max_initial_start_pos == 32)//For double elimination with 64 participants
+	{
+		create_pair(29);
+		create_pair(31);
+		create_pair(25);
+		create_pair(27);
+		create_pair(21);
+		create_pair(23);
+		create_pair(17);
+		create_pair(19);
+		create_pair(13);
+		create_pair(15);
+		create_pair(9);
+		create_pair(11);
+		create_pair(5);
+		create_pair(7);
+		create_pair(1);
+		create_pair(3);
+		current_start_pos = max_initial_start_pos;
+	}
+	else//Default
+	{
+		for (; current_start_pos < max_initial_start_pos; current_start_pos += 2)
+			create_pair(current_start_pos + 1);
+	}
+
+	//Additional rounds
+	bool infuse = true;
+	bool swap   = true;
+	bool special_swap = max_initial_start_pos == 32;//Special swap only used for 64 system
+
+	for (int round = 1; round < rounds; ++round)
+	{
+		lastRound = std::move(nextRound);
+
+		for (size_t i = 0; i < lastRound.size(); ++i)
+		{
+			Match* new_match = nullptr;
+
+			if (infuse)//Infuse further participants
+			{
+				if (special_swap)
+				{
+					const size_t list[] = {37, 38, 39, 40, 33, 34, 35, 36, 45, 46, 47, 48, 41, 42, 43, 44};
+
+					new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, *lastRound[i]),
+						GetFilter()->GetJudokaByStartPosition(list[i] - 1));
+					current_start_pos++;
+				}
+
+				else if (swap)
+				{
+					if (i < lastRound.size()/2)
+						new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, *lastRound[i]),
+													GetFilter()->GetJudokaByStartPosition(current_start_pos++  + lastRound.size()/2));
+					else
+						new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, *lastRound[i]),
+													GetFilter()->GetJudokaByStartPosition(current_start_pos++  - lastRound.size()/2));
+				}
+
+				else
+				{
+					new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, *lastRound[i]),
+												GetFilter()->GetJudokaByStartPosition(current_start_pos++));
+				}
+			}
+			else//Only take winners from previous round
+			{
+				if (i+1 >= lastRound.size())
+					break;
+
+				auto match1 = lastRound[i];
+				auto match2 = lastRound[++i];
+
+				new_match = AddMatchForWinners(match1, match2);
+			}
+
+			if (new_match)
+				nextRound.emplace_back(new_match);
+		}
+
+		if (infuse)
+		{
+			swap = !swap;
+			if (special_swap)
+			{
+				special_swap = false;
+				swap = true;
+			}
+		}
+
+		infuse = !infuse;//Switch for next round
+	}
+
+
+	//TODO REFACTOR THE FOLLOWING
+	
+	//Add additional match for 3rd place
+	if (IsThirdPlaceMatch() && GetSchedule().size() >= 2)
+	{
+		auto match1 = GetSchedule()[GetSchedule().size() - 2];
+		auto match2 = GetSchedule()[GetSchedule().size() - 1];
+
+		if (IsFinalMatch() && GetSchedule().size() >= 3)
+		{
+			auto match1 = GetSchedule()[GetSchedule().size() - 3];
+			auto match2 = GetSchedule()[GetSchedule().size() - 2];
+		}
+
+		auto third_place = CreateAutoMatch(nullptr, nullptr);
+		third_place->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
+		third_place->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
+	}
+	
+
+	//Add additional matches for 5th place
+	/*if (IsFifthPlaceMatch() && m_Schedule.size() >= 8)
+	{
+		int offset = 3;//Final and two semi finals
+		if (IsThirdPlaceMatch())
+			offset = 4;
+
+		auto match1 = m_Schedule[m_Schedule.size() - 1 - offset - 3];
+		auto match2 = m_Schedule[m_Schedule.size() - 1 - offset - 2];
+		auto match3 = m_Schedule[m_Schedule.size() - 1 - offset - 1];
+		auto match4 = m_Schedule[m_Schedule.size() - 1 - offset];
+
+		//Order gets fixed at the end
+		auto semi2 = CreateAutoMatch(nullptr, nullptr);
+		auto fifth = CreateAutoMatch(nullptr, nullptr);
+		auto semi1 = CreateAutoMatch(nullptr, nullptr);
+
+		semi1->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
+		semi1->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
+
+		semi2->SetDependency(Fighter::White, DependencyType::TakeLoser, match3);
+		semi2->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match4);
+
+		fifth->SetDependency(Fighter::White, DependencyType::TakeWinner, semi1);
+		fifth->SetDependency(Fighter::Blue,  DependencyType::TakeWinner, semi2);
+
+		//Swap matches so that match for 1st place is still the last one
+		offset = 3;
+
+		std::swap(m_Schedule[m_Schedule.size() - 1 - offset - 2], m_Schedule[m_Schedule.size() - 1 - 2]);
+		std::swap(m_Schedule[m_Schedule.size() - 1 - offset - 1], m_Schedule[m_Schedule.size() - 1 - 1]);
+		std::swap(m_Schedule[m_Schedule.size() - 1 - offset],     m_Schedule[m_Schedule.size() - 1]);
+
+		if (IsThirdPlaceMatch())
+			std::swap(m_Schedule[m_Schedule.size() - 1 - offset - 3], m_Schedule[m_Schedule.size() - 1 - 3]);
+	}*/
+
+
+	//Add additional matches for best of three
+	if (IsBestOfThree())
+		AddMatchesForBestOfThree();
+}
+
+
+
+MatchTable::Results LoserBracket::CalculateResults() const
+{
+	Results ret;
+
+	if (GetParticipants().size() == 0)
+		return ret;
+
+	if (GetParticipants().size() == 1)
+	{
+		ret.Add(GetParticipants()[0], this);
+		return ret;
+	}
+
+	if (GetSchedule().size() == 0)
+		return ret;
+
+	auto& schedule = GetSchedule();
+
+	//Get final match
+	const Match* lastMatch = schedule[schedule.size() - 1];
+
+	if (lastMatch->HasConcluded())
+	{
+		ret.Add(lastMatch->GetWinner(), this);
+		ret.Add(lastMatch->GetLoser(),  this);
+	}
+	else
+		return ret;
+
+	if (IsThirdPlaceMatch())
+	{
+		const Match* third_place_match = schedule[schedule.size() - 2];
+		ret.Add(third_place_match->GetWinner(), this);
+		ret.Add(third_place_match->GetLoser(),  this);
+	}
+
+	if (IsThirdPlaceMatch() && IsFifthPlaceMatch())
+	{
+		//int offset = 4;
+		//if (IsThirdPlaceMatch())
+		//offset = 5;
+
+		int offset = 5;
+
+		const Match* fifth_place_match = schedule[schedule.size() - offset];
+		ret.Add(fifth_place_match->GetWinner(), this);
+		ret.Add(fifth_place_match->GetLoser(),  this);
+	}
+
+	return ret;
+}
+
+
+
+const std::string LoserBracket::ToHTML() const
+{
+	std::string ret;
+
+	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
+
+	if (GetMatID() != 0)
+		ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
+
+	ret += "<table border='1' rules='all'>";
+
+	const auto rounds = GetNumberOfRounds();
+	const auto max_start_pos = GetMaxStartPositions();
+	const auto max_initial_start_pos = (max_start_pos + 2) / 2;
+	const auto N = max_initial_start_pos;
+
+
+	auto renderMatchIndex = [this, N, max_initial_start_pos](size_t roundIndex, int matchOfRound) -> std::string {
+		size_t matchIndex = 0;
+
+		size_t no_matches = max_initial_start_pos;
+		for (size_t i = 0; i < roundIndex; i++)
+		{
+			if (i%2 == 0)
+				no_matches /= 2;
+			matchIndex += no_matches;
+		}
+
+		matchIndex += matchOfRound;
+
+		if (IsThirdPlaceMatch() && matchIndex >= GetSchedule().size() - 2)
+			matchIndex++;
+		if (IsFifthPlaceMatch() && matchIndex >= GetSchedule().size() - 5)
+			matchIndex += 3;
+
+		if (IsBestOfThree())
+			matchIndex = matchIndex * 3;
+
+		std::string style;
+
+		if (roundIndex == 0)
+			style = "border-left-style: hidden;";
+		if (matchOfRound % 2 == 0)
+			style += "border-right-style: hidden;";
+
+		//return "<td>INDEX " + std::to_string(matchIndex) + "</td>";
+
+		if (matchIndex < GetSchedule().size())
+			return RenderMatch(*GetSchedule()[matchIndex], style);
+		return "<td>NOT FOUND</td>";
+	};
+
+	size_t width = 100;
+	if (rounds > 0)
+		width = 100 / rounds;
+
+	ret += "<tr style='height: 5mm; text-align: center'>";
+	for (int round = 0; round < rounds; ++round)
+		ret += "<th width=\"" + std::to_string(width) + "%\">" + Localizer::Translate("Round") + " " + std::to_string(round + 1) + "</th>";
+	ret += "</tr>";
+
+	for (int y = 0; y < N; ++y)
+	{
+		ret += "<tr style='height: 5mm; text-align: center'>";
+
+		for (size_t round = 0; round < rounds; ++round)
+		{
+			bool infuse = round % 2 == 1;
+
+			size_t no_matches = max_initial_start_pos / 2;//For round 0
+			for (size_t i = 1; i < round; i+=2)
+				no_matches /= 2;
+
+			assert(no_matches != 0);
+
+			//const int split = (int)std::pow(2, round+1)
+			const size_t split = N / no_matches;
+			//const int offset = (int)std::pow(2, round) + 1;
+			const size_t offset = split - round;
+
+			if ( (y + offset) % split != 0)
+			{
+				std::string style;
+				if (round == 0 || (y + offset) % split >= 1)
+					style += "border-left-style: hidden;";
+				if (round+1 == rounds)
+					style += "border-right-style: hidden;";
+
+#ifdef _DEBUG
+				ret += "<td style=\"" + style + "border-bottom-style: hidden; \">" + std::to_string((y + offset) % split) + "</td>";
+#else
+				ret += "<td style=\"" + style + "border-bottom-style: hidden; \"></td>";
+#endif
+				continue;
+			}
+
+			const int matchOfRound = y / (int)split;
+			ret += renderMatchIndex(round, matchOfRound);
+		}
+
+		ret += "</tr>";
+	}
+
+	ret += "</table>";
+
+
+	/*if (IsThirdPlaceMatch())
+	{
+		ret += "<table width=\"" + std::to_string(width) + "%\" border='1' rules='all' style=\"margin-bottom: 5mm;\">";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += "<th>" + Localizer::Translate("3rd Place Match") + "</th>";
+		ret += "</tr>";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += renderMatchIndex(m_Schedule.size() - 2);
+		ret += "</tr>";
+
+		ret += "</table>";
+	}
+
+
+	if (IsFifthPlaceMatch())
+	{
+		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += "<th colspan=\"2\" width=\"" + std::to_string(width*2) + "%\">" + Localizer::Translate("5th Place Match") + "</th>";
+		ret += "</tr>";
+
+		int offset = 4;
+		if (IsThirdPlaceMatch())
+			offset = 5;
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += renderMatchIndex(m_Schedule.size() - offset - 2, "border-left-style: hidden; border-right-style: hidden;");
+		ret += "<td style=\"border-bottom-style: hidden; border-right-style: hidden;\"></td>";
+		ret += "</tr>";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += "<td style=\"border-bottom-style: hidden; border-left-style: hidden;\"></td>";
+		ret += renderMatchIndex(m_Schedule.size() - offset, "border-right-style: hidden;");
+		ret += "</tr>";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += renderMatchIndex(m_Schedule.size() - offset - 1, "border-left-style: hidden;");
+		ret += "<td style=\"border-bottom-style: hidden; border-right-style: hidden;\"></td>";
+		ret += "</tr>";
+
+		ret += "</table>";
+	}*/
+
+	ret += ResultsToHTML();	
+
+	return ret;
+}

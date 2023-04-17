@@ -7,8 +7,8 @@ using namespace Judoboard;
 
 
 
-TakeTopRanks::TakeTopRanks(const MatchTable& pSource, size_t NumRanks) :
-	m_pSource(pSource), IFilter(pSource.GetTournament())
+TakeTopRanks::TakeTopRanks(const MatchTable& pSource, size_t NumRanks, const MatchTable* Parent) :
+	m_pSource(pSource), IFilter(Parent)
 {
 	m_NumRanks = NumRanks;
 
@@ -18,8 +18,8 @@ TakeTopRanks::TakeTopRanks(const MatchTable& pSource, size_t NumRanks) :
 
 
 
-/*TakeTopRanks::TakeTopRanks(const YAML::Node& Yaml, const ITournament& Tournament) :
-	m_pSource(Tournament.FindFilter(Yaml["source"])), IFilter(Yaml, Tournament)
+/*TakeTopRanks::TakeTopRanks(const YAML::Node& Yaml, const MatchTable* Parent) :
+	m_pSource(Tournament.FindFilter(Yaml["source"])), IFilter(Yaml, Parent)
 {
 	if (Yaml["num_ranks"])
 		m_NumRanks = Yaml["num_ranks"].as<size_t>();

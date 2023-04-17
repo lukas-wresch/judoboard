@@ -324,9 +324,7 @@ TEST(RoundRobin, ExportImport)
 
 	{
 		YAML::Emitter yaml;
-		yaml << YAML::BeginMap;
 		*w >> yaml;
-		yaml << YAML::EndMap;
 
 		RoundRobin group2(YAML::Load(yaml.c_str()), &t);
 

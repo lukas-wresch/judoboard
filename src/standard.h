@@ -8,8 +8,8 @@ namespace Judoboard
 	class Standard : public IFilter
 	{
 	public:
-		Standard(const ITournament* Tournament);
-		Standard(const YAML::Node& Yaml, const ITournament* Tournament);
+		Standard(const MatchTable* Parent = nullptr);
+		Standard(const YAML::Node& Yaml, const MatchTable* Parent = nullptr);
 
 		virtual Type GetType() const override { return Type::Standard; }
 

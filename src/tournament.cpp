@@ -10,6 +10,7 @@
 #include "round_robin.h"
 #include "single_elimination.h"
 #include "pool.h"
+#include "double_elimination.h"
 #include "standard.h"
 #include "weightclass_generator.h"
 
@@ -334,6 +335,9 @@ bool Tournament::Load(const YAML::Node& yaml)
 			case MatchTable::Type::Pool:
 				new_table = new Pool(node, this);
 				break;
+			case MatchTable::Type::DoubleElimination:
+				new_table = new DoubleElimination(node, this);
+				break;
 			}
 
 			if (new_table)
@@ -485,11 +489,7 @@ bool Tournament::SaveYAML(const std::string& Filename)
 	yaml << YAML::BeginSeq;
 
 	for (auto table : m_MatchTables)
-	{
-		yaml << YAML::BeginMap;
 		*table >> yaml;
-		yaml << YAML::EndMap;
-	}
 
 	yaml << YAML::EndSeq;
 
@@ -669,7 +669,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 	else
 	{
 		auto new_match_table = new CustomTable(this);
-		new_match_table->SetFilter(new Standard(this));
+		new_match_table->SetFilter(new Standard);
 		new_match_table->AddMatch(NewMatch);
 		new_match_table->SetMatID(NewMatch->GetMatID());
 		AddMatchTable(new_match_table);

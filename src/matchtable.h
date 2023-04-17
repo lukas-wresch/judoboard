@@ -141,7 +141,7 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Unknown, RoundRobin, Custom, SingleElimination, Pool
+			Unknown, RoundRobin, Custom, SingleElimination, Pool, LoserBracket, DoubleElimination
 		};
 
 		struct Result
@@ -315,7 +315,7 @@ namespace Judoboard
 
 		bool HasConcluded() const;
 
-		Match*  FindMatch(const UUID& UUID) const;
+		virtual Match* FindMatch(const UUID& UUID) const;
 		size_t  FindMatchIndex(const UUID& UUID) const;
 		const Judoka* FindParticipant(const UUID& UUID) const;
 
@@ -325,7 +325,10 @@ namespace Judoboard
 
 		const IFilter* GetFilter() const { return m_Filter; }
 		IFilter* GetFilter() { return m_Filter; }
+		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
 		const ITournament* GetTournament() const { return m_Tournament; }
+
+		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
 
 		//Rule sets
 		const RuleSet& GetRuleSet() const;
@@ -351,8 +354,9 @@ namespace Judoboard
 		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; GenerateSchedule(); }
 
 		//Sub match tables
-		bool IsSubMatchTable() const { return m_IsSubMatchTable; }
-		void IsSubMatchTable(bool SetFlag) { m_IsSubMatchTable = SetFlag; }
+		bool IsSubMatchTable() const { return m_Parent; }
+		auto GetParent() const { return m_Parent; }
+		void SetParent(const MatchTable* NewParent) { m_Parent = NewParent; }
 
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const;
@@ -362,8 +366,9 @@ namespace Judoboard
 		virtual void OnLotteryPerformed();//Called when a lottery draw was performed
 
 	protected:
-		MatchTable(IFilter* Filter, const ITournament* Tournament) : m_Filter(Filter), m_Tournament(Tournament) {}
-		MatchTable(const YAML::Node& Yaml, const ITournament* Tournament);
+		MatchTable(IFilter* Filter, const ITournament* Tournament, const MatchTable* Parent = nullptr)
+			: m_Filter(Filter), m_Tournament(Tournament), m_Parent(Parent) {}
+		MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent);
 
 		virtual void GenerateSchedule() = 0;
 
@@ -375,17 +380,20 @@ namespace Judoboard
 
 		void AddMatchesForBestOfThree();
 
-		void DeleteSchedule() { m_Schedule.clear(); }
+		void DeleteSchedule() {
+			for (auto match : m_Schedule)
+				delete match;
+			m_Schedule.clear();
+		}
 
-		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
 		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
 
 		const std::string ResultsToHTML() const;
 
-		std::vector<Match*>&  SetSchedule() { return m_Schedule; }
+		std::vector<Match*>& SetSchedule() const { return m_Schedule; }
+		void SetSchedule(std::vector<Match*>&& NewSchedule) const { m_Schedule = std::move(NewSchedule); }
 
 
-		std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
 
 	private:
@@ -397,11 +405,13 @@ namespace Judoboard
 
 		const ITournament* m_Tournament = nullptr;
 
+		mutable std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
+
 		int32_t m_ScheduleIndex = -1;//Index when this entry should be in the schedule
 		uint32_t m_MatID = 0;
 		Color m_Color;
 
-		bool m_IsSubMatchTable = false;//Is this a match table that is purely used by another match table?
+		const MatchTable* m_Parent = nullptr;//Is this a match table that is purely used by another match table?
 
 		bool m_BestOfThree = false;
 	};
