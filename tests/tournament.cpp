@@ -985,6 +985,63 @@ TEST(Tournament, TestData_Randori2022)
 
 
 
+TEST(Tournament, SwapMatches_Randori2022)
+{
+	initialize();
+
+	{
+		Tournament t("../test-data/randori-2022");
+
+		EXPECT_EQ(t.GetDatabase().GetYear(), 2022);
+
+		ASSERT_EQ(t.GetMatchTables().size(), 3);
+
+		t.SwapAllFighters();
+
+		auto results = t.GetMatchTables()[0]->CalculateResults();
+		ASSERT_EQ(results.GetSize(), 3);
+		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Joris");
+		EXPECT_EQ(results[0].Wins,   2);
+		EXPECT_EQ(results[0].Score, 17);
+
+		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Richard");
+		EXPECT_EQ(results[1].Wins,  1);
+		EXPECT_EQ(results[1].Score, 7);
+
+		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Theo");
+		EXPECT_EQ(results[2].Wins,  0);
+		EXPECT_EQ(results[2].Score, 0);
+
+		results = t.GetMatchTables()[1]->CalculateResults();
+		ASSERT_EQ(results.GetSize(), 2);
+		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Tom");
+		EXPECT_EQ(results[0].Wins,   2);
+		EXPECT_EQ(results[0].Score, 20);
+
+		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Julius");
+		EXPECT_EQ(results[1].Wins,  0);
+		EXPECT_EQ(results[1].Score, 0);
+
+		results = t.GetMatchTables()[2]->CalculateResults();
+		ASSERT_EQ(results.GetSize(), 3);
+		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Leni");
+		EXPECT_EQ(results[0].Wins,  2);
+		EXPECT_EQ(results[0].Score, 8);
+
+		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Clara");
+		EXPECT_EQ(results[1].Wins,   1);
+		EXPECT_EQ(results[1].Score, 10);
+
+		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Maja");
+		EXPECT_EQ(results[2].Wins,  0);
+		EXPECT_EQ(results[2].Score, 0);
+	}
+
+	ZED::Core::RemoveFile("tournaments/randori-2022.yml");
+}
+
+
+
 TEST(Tournament, SaveAndLoad)
 {
 	initialize();

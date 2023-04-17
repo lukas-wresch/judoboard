@@ -99,6 +99,8 @@ namespace Judoboard
 		uint32_t GetHighestMatIDUsed() const;//Returns the highest ID of all mats that are used in the tournament. Returns zero if no mats are used
 		bool IsMatUsed(uint32_t ID) const;
 
+		void SwapAllFighters();//Swaps the white with the blue fighter of all matches
+
 		//Match tables
 		void AddMatchTable(MatchTable* NewMatchTable);
 		bool UpdateMatchTable(const UUID& UUID);//Calling this function we recalculate the given match table
