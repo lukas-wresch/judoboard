@@ -2107,6 +2107,14 @@ void Application::SetupHttpServer()
 		return Error();//OK
 	});
 
+	m_Server.RegisterResource("/ajax/tournament/swap_fighters", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_SwapMatchesOfTournament(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/tournament/empty", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
@@ -2721,6 +2729,22 @@ std::string Application::Ajax_ListTournaments()
 	
 	ret << YAML::EndSeq;
 	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_SwapMatchesOfTournament(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockTillScopeEnd();
+
+	auto tournament = FindTournament(id);
+	if (!tournament)
+		return Error::Type::ItemNotFound;
+
+	tournament->SwapAllFighters();
+	return Error();//OK
 }
 
 
