@@ -200,7 +200,7 @@ TEST(Ajax, GetMats)
 	EXPECT_EQ(yaml["mats"][0]["is_paused"].as<bool>(), false);
 	EXPECT_EQ(yaml["mats"][0]["ippon_style"].as<int>(), (int)IMat::IpponStyle::DoubleDigit);
 	EXPECT_EQ(yaml["mats"][0]["name_style"].as<int>(),  (int)NameStyle::FamilyName);
-  EXPECT_TRUE(yaml["mats"][0]["sound"].as<bool>());
+	EXPECT_TRUE(yaml["mats"][0]["sound_enabled"].as<bool>());
 	EXPECT_EQ(yaml["mats"][0]["sound_filename"].as<std::string>(), "test");
 }
 
