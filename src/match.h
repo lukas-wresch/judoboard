@@ -84,7 +84,7 @@ namespace Judoboard
 			else
 				m_Blue.m_Judoka  = NewFighter;
 		}
-		void SwapFighters() { std::swap(m_White, m_Blue); }
+		void SwapFighters();
 		[[nodiscard]] std::vector<const Judoka*> GetPotentialFighters() const;
 		[[nodiscard]] std::vector<const Judoka*> GetPotentialFighters(Fighter Fighter) const;
 

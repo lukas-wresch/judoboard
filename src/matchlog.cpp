@@ -67,3 +67,11 @@ void MatchLog::operator >> (YAML::Emitter& Yaml) const
 
 	Yaml << YAML::EndSeq;
 }
+
+
+
+void MatchLog::SwapEvents()
+{
+	for (auto& event : m_Events)
+		event.m_Group = !event.m_Group;
+}

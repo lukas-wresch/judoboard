@@ -125,7 +125,8 @@ namespace Judoboard
 
 		auto& GetEvents() const { return m_Events; }
 		size_t GetNumEvent() const { return m_Events.size(); }
-		//const Event* GetEvent(uint32_t Index) const { if (Index < m_Events.size()) return &m_Events[Index]; return nullptr; }
+		
+		void SwapEvents();
 
 		const std::string ToString() const;
 
@@ -183,5 +184,14 @@ namespace Judoboard
 	inline bool operator == (MatchLog::EventGroup g, Fighter f)
 	{
 		return (int)f == (int)g;
+	}
+
+	inline MatchLog::EventGroup operator ! (MatchLog::EventGroup g)
+	{
+		if (g == MatchLog::EventGroup::White)
+			return MatchLog::EventGroup::Blue;
+		else if (g == MatchLog::EventGroup::Blue)
+			return MatchLog::EventGroup::White;
+		return MatchLog::EventGroup::Neutral;
 	}
 }
