@@ -46,9 +46,9 @@ Weightclass::Weightclass(const MD5::Weightclass& Weightclass, const MatchTable* 
 	: IFilter(Parent)
 {
 	if (Weightclass.WeightLargerThan > 0)
-		m_MinWeight = Weightclass.WeightLargerThan  * 1000 + Weightclass.WeightInGrammsLargerThan;
+		m_MinWeight.SetWeightInGrams(Weightclass.WeightLargerThan  * 1000 + Weightclass.WeightInGrammsLargerThan);
 	if (Weightclass.WeightSmallerThan > 0)
-		m_MaxWeight = Weightclass.WeightSmallerThan * 1000 + Weightclass.WeightInGrammsSmallerThan;
+		m_MaxWeight.SetWeightInGrams(Weightclass.WeightSmallerThan * 1000 + Weightclass.WeightInGrammsSmallerThan);
 
 	if (Weightclass.AgeGroup)
 		m_Gender = Weightclass.AgeGroup->Gender;
