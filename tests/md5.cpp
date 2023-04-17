@@ -812,6 +812,39 @@ TEST(MD5, ImportIntoTournament)
 
 
 
+TEST(MD5, ImportTestTurnierIntoTournament)
+{
+	initialize();
+
+	{
+		Localizer::SetLanguage(Language::German);
+
+		MD5 file("test-data/Testturnier.md5");
+
+		ASSERT_TRUE(file);
+
+		file.Dump();
+
+		Database db;
+		Tournament tour(file, &db);
+
+		auto table = tour.FindMatchTableByDescription("Jugend u15 m -37 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMinWeight(), Weight("10"));
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("37"));
+
+
+		table = tour.FindMatchTableByDescription("Jugend u15 m -40 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMinWeight(), Weight("10"));
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("40"));
+	}
+
+	ZED::Core::RemoveFile("tournaments/Testturnier.yml");
+}
+
+
+
 TEST(MD5, ImportIntoTournament_LoadAfterSave)
 {
 	initialize();

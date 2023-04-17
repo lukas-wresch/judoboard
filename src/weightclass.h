@@ -36,8 +36,8 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	private:
-		Weight m_MinWeight = 10*1000;//In gramms
-		Weight m_MaxWeight = 100*1000;//In gramms
+		Weight m_MinWeight = 10; //In kg
+		Weight m_MaxWeight = 100;//In kg
 
 		Gender m_Gender = Gender::Unknown;
 	};
