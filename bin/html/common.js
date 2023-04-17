@@ -157,6 +157,7 @@ var lang_en = {
     score:  [ "Score", "Unterwertung" ],
     scheduled:  [ "Scheduled", "Eingeplant" ],
     skipped:   [ "Skipped", "Ausgelassen" ],
+    swap_tournament_confirm:  [ "Are you sure you want to swap all white/blue fighters with each other?", unescape("Willst du wirklich alle wei\u00dfen/blauen K%E4mpfer miteinander tauschen?") ],
     push_up:  [ "Push Up", "Vorziehen" ],
     options:  [ "Options", "Optionen" ],
     pause:  [ "Pause", "Pause" ],
