@@ -2765,8 +2765,8 @@ std::string Application::Ajax_GetMats() const
 				ret << YAML::Key << "timer_style"   << YAML::Value << (int)mat->GetTimerStyle();
 				ret << YAML::Key << "name_style"    << YAML::Value << (int)mat->GetNameStyle();
 				ret << YAML::Key << "is_fullscreen" << YAML::Value << mat->IsFullscreen();
-        ret << YAML::Key << "sound_enabled" << YAML::Value << mat->IsSoundEnabled();
-        ret << YAML::Key << "sound_filename" << YAML::Value << mat->GetSoundFilename();
+				ret << YAML::Key << "sound_enabled" << YAML::Value << mat->IsSoundEnabled();
+				ret << YAML::Key << "sound_filename" << YAML::Value << mat->GetSoundFilename();
 				ret << YAML::EndMap;
 			}
 		}
@@ -2862,7 +2862,7 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 	auto name  = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
-	bool sound = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "sound")) == 1;
+	bool sound     = HttpServer::DecodeURLEncoded(Request.m_Body, "sound") == "true";
 	std::string soundFilename = HttpServer::DecodeURLEncoded(Request.m_Body, "sound_filename");
 	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
 

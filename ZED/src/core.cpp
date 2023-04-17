@@ -134,7 +134,7 @@ int Core::ToInt(const std::string& Number)
 	{
 		ret = std::stoi(Number);
 	}
-	catch (...)
+	catch (const std::exception& e)
 	{
 		return -1;
 	}
