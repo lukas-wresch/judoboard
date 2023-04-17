@@ -361,6 +361,7 @@ TEST(MD5, ImportIntoTournament)
 
 		auto table = tour.FindMatchTableByDescription("Jugend u10 w -20,7 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("20,7"));
 		auto results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 1);
@@ -369,6 +370,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 w -26,7 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("26,7"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -378,6 +380,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 w -30,7 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("30,7"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -387,6 +390,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -23,7 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("23,7"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -396,6 +400,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -25,4 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("25,4"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -405,6 +410,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -26,3 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("26,3"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -414,6 +420,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -28,9 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("28,9"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 4);
@@ -424,6 +431,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -31,3 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("31,3"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 4);
@@ -434,6 +442,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -33,7 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("33,7"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 4);
@@ -444,6 +453,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -39 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("39"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 1);
