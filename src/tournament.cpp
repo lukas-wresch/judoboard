@@ -1048,6 +1048,9 @@ bool Tournament::IsMatUsed(uint32_t ID) const
 
 void Tournament::SwapAllFighters()
 {
+	if (IsReadonly())
+		return;
+
 	auto guard = LockTillScopeEnd();
 
 	for (auto match : GetSchedule())
