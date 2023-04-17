@@ -69,7 +69,7 @@ void Application::SetupHttpServer()
 		auto pos = Request.m_Body.Find("\r\n\r\n");
 		if (pos != 0)
 		{
-			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
+			auto boundary_end = Request.m_Body.FindLast("\r\n------");
 
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
@@ -111,8 +111,7 @@ void Application::SetupHttpServer()
 		auto pos = Request.m_Body.Find("\r\n\r\n");
 		if (pos != 0)
 		{
-			//std::string body_after_boundary = Request.m_Body.substr(pos + 4)
-			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
+			auto boundary_end = Request.m_Body.FindLast("\r\n------");
 
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
@@ -154,7 +153,7 @@ void Application::SetupHttpServer()
 		auto pos = Request.m_Body.Find("\r\n\r\n");
 		if (pos != 0)
 		{
-			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
+			auto boundary_end = Request.m_Body.FindLast("\r\n------");
 
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
@@ -190,7 +189,7 @@ void Application::SetupHttpServer()
 		auto pos = Request.m_Body.Find("\r\n\r\n");
 		if (pos != 0)
 		{
-			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
+			auto boundary_end = Request.m_Body.FindLast("\r\n------");
 
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
