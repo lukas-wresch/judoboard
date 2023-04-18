@@ -1453,25 +1453,46 @@ void MD5::Dump() const
 
 bool MD5::Parse(ZED::Blob&& Data)
 {
+	if (Data.ReadByte() != 0x00)
+	{
+		ZED::Log::Warn("Data is not a MD5 file");
+		return false;
+	}
+
 	if (ReadLine(Data) != "MMW98")
 	{
 		ZED::Log::Warn("Data is not a MD5 file");
 		return false;
 	}
 
-	if (ReadLine(Data) != "3")
+	int unknown = Data.ReadByte();//'3' in MD5, 'F' in MD7
+
+	if (unknown != 0x33 && unknown != 0x46)
 	{
 		ZED::Log::Warn("Data is not a MD5 file");
 		return false;
 	}
 
-	if (ReadLine(Data) != "Version 51")
+	if (Data.ReadByte() != 0x00)
+	{
+		ZED::Log::Warn("Data is not a MD5 file");
+		return false;
+	}
+
+	auto version = ReadLine(Data);
+	if (version != "Version 51" && version != "Version 70")
 	{
 		ZED::Log::Warn("Data is not a MD5 file");
 		return false;
 	}
 
 	m_FileDate = ReadLine(Data);
+
+	if (ReadLine(Data) != "")
+	{
+		ZED::Log::Warn("Data is not a MD5 file");
+		return false;
+	}
 
 	bool is_ok = true;
 	bool found_end = false;
@@ -1510,8 +1531,18 @@ bool MD5::Parse(ZED::Blob&& Data)
 		else if (line == "Ergebnis")
 			is_ok &= ReadResult(Data);
 
-		else if (newline)
-			continue;
+		//For Version 7
+		else if (line == "PlanungsElement")
+			is_ok &= ReadTable(Data);
+		else if (line == "Pause")
+			is_ok &= ReadTable(Data);
+		else if (line == "InfoSeite")
+			is_ok &= ReadTable(Data);
+		else if (line == "Kampflog")
+			is_ok &= ReadTable(Data);
+		else if (line == "Matte")
+			is_ok &= ReadTable(Data);
+		
 		else if (line == "\\\\end")
 		{
 			found_end = true;
@@ -1606,6 +1637,10 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -1714,6 +1749,10 @@ bool MD5::ReadRankScore(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -1759,6 +1798,10 @@ bool MD5::ReadAgeGroups(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -1866,12 +1909,16 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
 	{
 		bool newline;
-		auto Line = ReadLine(Data,&newline);		
+		auto Line = ReadLine(Data, &newline);
 			
 		data.emplace_back(RemoveControlCharacters(Line));
 
@@ -1953,6 +2000,11 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.MaxPooled) != 1)
 						ZED::Log::Warn("Could not read MaxPooled of weightclass");
 				}
+
+				//Version 7
+
+				else if (header[i] == "BestOfThree")
+					new_weightclass.BestOfThree = data[i] != "1";			
 			}
 
 			m_Weightclasses.emplace_back(new Weightclass(new_weightclass));
@@ -1972,6 +2024,10 @@ bool MD5::ReadRelationClubAssociation(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2022,6 +2078,10 @@ bool MD5::ReadLottery(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2066,6 +2126,10 @@ bool MD5::ReadLotteryScheme(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2117,6 +2181,10 @@ bool MD5::ReadLotterySchemaLine(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2171,6 +2239,10 @@ bool MD5::ReadRelationParticipantMatchTable(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2224,6 +2296,10 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2402,6 +2478,10 @@ bool MD5::ReadResult(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2500,10 +2580,49 @@ bool MD5::ReadResult(ZED::Blob& Data)
 
 
 
+bool MD5::ReadTable(ZED::Blob& Data, std::function<bool(std::vector<std::string>&&, std::vector<std::string>&&)> Parse)
+{
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
+	std::vector<std::string> data;
+	int data_written = 0;
+
+	while (!Data.EndReached())
+	{
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
+
+		data.emplace_back(Line);
+
+		if (data.size() >= header.size())//Have we read the entire data block?
+		{
+			if (Parse && Parse(std::move(header), std::move(data)))
+				data_written++;
+
+			data.clear();
+		}
+
+		if (newline)
+			return data_written == data_count;
+	}
+
+	return false;
+}
+
+
+
 bool MD5::ReadParticipants(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2752,6 +2871,8 @@ std::vector<std::string> MD5::ReadHeader(ZED::Blob& Data, int& DataCount)
 {
 	std::vector<std::string> header;
 
+	int headerCount = ReadInt(Data);//Read number of header entries
+
 	while (!Data.EndReached())
 	{
 		bool newline;
@@ -2760,6 +2881,7 @@ std::vector<std::string> MD5::ReadHeader(ZED::Blob& Data, int& DataCount)
 		header.emplace_back(Line);
 		if (newline)
 		{
+			assert(header.size() == headerCount);
 			DataCount = ReadInt(Data);//Read number of data entries
 			return header;
 		}
@@ -2779,27 +2901,31 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pNewLine)
 		*pNewLine = false;
 
 	bool carry_return = false;
-	bool newline      = false;
-	bool eof          = false;
+	//bool eof          = false;
+
+	int length = Data.ReadByte();
 
 	std::string Line;
 	while (!Data.EndReached())
 	{
 		char c = Data.ReadByte();//Returns 0x00 when the end of the data stream is reached
 
-		if (c == '\0' && Line.length() >= 1)
-			return Line;
-		else if (c == '\0')
+		//End of string reached without null-terminator?
+		if (c != '\0' && pNewLine && *pNewLine && Line.length() >= length)
+		{
+			Data.SeekReadCursor(-1);
+			break;
+		}
+
+		if (c == '\0'/* && Line.length() >= 1*/)
+			break;
+		/*else if (c == '\0')
 		{
 			if (eof)
-			{
-				//if (pDoubleZero)
-					//*pDoubleZero = true;
 				return "";
-			}
 			eof = true;
 			continue;
-		}
+		}*/
 		else if (c == 0x01)//Start of Heading
 			continue;
 		else if (c == 0x02)//Start of text
@@ -2861,39 +2987,49 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pNewLine)
 		else if (c == '\r')
 		{
 			carry_return = true;
-			if (Line.empty())
-				Line += c;
+			//if (Line.empty())
+				//Line += c;
 		}
 		else if (c == '\n')
 		{
-			newline = true;
 			if (pNewLine && carry_return)
 				*pNewLine = true;
 		}
 		else//Printable character
 		{
-			if (Line.length() == 1 && Line[0] == '\r')
-				Line.clear();
+			//if (Line.length() == 1 && Line[0] == '\r')
+				//Line.clear();
 			Line += c;
 		}
 	}
+
+	assert(Line.length() == length);
 
 	return Line;
 }
 
 
 
-int MD5::ReadInt(ZED::Blob& Data)
+int MD5::ReadInt(ZED::Blob& Data, bool* pNewLine)
 {
 	int ret = 0;
+	bool carry_return = false;
+
 	while (!Data.EndReached())
 	{
 		unsigned char c = Data.ReadByte();//Returns 0x00 when the end of the data stream is reached
 
-		if (c == '\0')
+		if (ret == 0 && c == '\r')
+			carry_return = true;
+		else if (ret == 0 && c == '\n' && carry_return)
+		{
+			if (pNewLine)
+				*pNewLine = true;
+		}
+		else if (c == '\0' && (ret != 0 || carry_return))
 			return ret;
-
-		ret = (ret << 8) + c;
+		else
+			ret = (ret << 8) + c;
 	}
 
 	return -1;

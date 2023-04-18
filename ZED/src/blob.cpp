@@ -55,6 +55,20 @@ uint8_t Blob::ReadByte()
 
 
 
+void Blob::SeekReadCursor(int Offset)
+{
+	if (Offset < 0 && -Offset > m_ReadCursor)
+		m_ReadCursor = 0;
+	else
+	{
+		m_ReadCursor += Offset;
+		if (m_ReadCursor > m_Size)
+			m_ReadCursor = m_Size;
+	}
+}
+
+
+
 void Blob::Append(const void* Data, size_t BytesToWrite)
 {
 	if (!m_Data)

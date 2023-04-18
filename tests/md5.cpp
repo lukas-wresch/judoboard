@@ -324,6 +324,12 @@ TEST(MD5, CreateTournamentFromTestData2)
 		EXPECT_EQ(db.GetNumJudoka(),         0);
 		EXPECT_EQ(db.GetAllJudokas().size(), 0);
 		EXPECT_EQ(db.GetNumClubs(),          0);
+
+		for (auto table : tour.GetMatchTables())
+			EXPECT_GE(table->GetScheduleIndex(), 0);
+
+		for (auto match : tour.GetSchedule())
+			EXPECT_EQ(match->GetMatID(), 1);
 	}
 
 	ZED::Core::RemoveFile("tournaments/KEM U15 KT U10 - U18.yml");
@@ -355,6 +361,7 @@ TEST(MD5, ImportIntoTournament)
 
 		auto table = tour.FindMatchTableByDescription("Jugend u10 w -20,7 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("20,7"));
 		auto results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 1);
@@ -363,6 +370,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 w -26,7 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("26,7"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -372,6 +380,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 w -30,7 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("30,7"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -381,6 +390,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -23,7 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("23,7"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -390,6 +400,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -25,4 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("25,4"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -399,6 +410,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -26,3 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("26,3"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -408,6 +420,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -28,9 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("28,9"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 4);
@@ -418,6 +431,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -31,3 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("31,3"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 4);
@@ -428,6 +442,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -33,7 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("33,7"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 4);
@@ -438,6 +453,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -39 kg");
 		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("39"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 1);
@@ -792,6 +808,39 @@ TEST(MD5, ImportIntoTournament)
 	}
 
 	ZED::Core::RemoveFile("tournaments/KEM U15 KT U10 - U18.yml");
+}
+
+
+
+TEST(MD5, ImportTestTurnierIntoTournament)
+{
+	initialize();
+
+	{
+		Localizer::SetLanguage(Language::German);
+
+		MD5 file("test-data/Testturnier.md5");
+
+		ASSERT_TRUE(file);
+
+		file.Dump();
+
+		Database db;
+		Tournament tour(file, &db);
+
+		auto table = tour.FindMatchTableByDescription("Jugend u15 m -37 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMinWeight(), Weight("10"));
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("37"));
+
+
+		table = tour.FindMatchTableByDescription("Jugend u15 m -40 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMinWeight(), Weight("10"));
+		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("40"));
+	}
+
+	ZED::Core::RemoveFile("tournaments/Testturnier.yml");
 }
 
 
@@ -2919,4 +2968,19 @@ TEST(MD5, ExportSingleElimination32)
 	file.Save("output.md5");
 
 	delete t;
+}
+
+
+
+TEST(MD5, ReadMD7TestData)
+{
+	initialize();
+
+	MD5 file("test-data/Schlosspokal2023_U11m.md7");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	Tournament t(file);
 }

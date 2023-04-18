@@ -221,7 +221,7 @@ namespace Judoboard
 
 			Result* GetResultsOf(const Judoka* Judoka) {
 				for (size_t i = 0; i < m_Results.size(); ++i)
-					if (m_Results[i].Judoka && *m_Results[i].Judoka == *Judoka)
+					if (m_Results[i].Judoka && Judoka && *m_Results[i].Judoka == *Judoka)
 						return &m_Results[i];
 				return nullptr;
 			}

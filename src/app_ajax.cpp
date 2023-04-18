@@ -69,12 +69,12 @@ void Application::SetupHttpServer()
 		auto pos = Request.m_Body.Find("\r\n\r\n");
 		if (pos != 0)
 		{
-			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
+			auto boundary_end = Request.m_Body.FindLast("\r\n------");
 
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
 
-			DM4 dm4_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
+			DM4 dm4_file(Request.m_Body.Trim(pos + 5, boundary_end - pos - 5 + 1));
 
 			if (!dm4_file)
 				return Error(Error::Type::InvalidFormat);
@@ -111,13 +111,12 @@ void Application::SetupHttpServer()
 		auto pos = Request.m_Body.Find("\r\n\r\n");
 		if (pos != 0)
 		{
-			//std::string body_after_boundary = Request.m_Body.substr(pos + 4)
-			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
+			auto boundary_end = Request.m_Body.FindLast("\r\n------");
 
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
 
-			DMF dmf_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
+			DMF dmf_file(Request.m_Body.Trim(pos + 5, boundary_end - pos - 5 + 1));
 
 			if (!dmf_file)
 				return Error(Error::Type::InvalidFormat);
@@ -154,12 +153,12 @@ void Application::SetupHttpServer()
 		auto pos = Request.m_Body.Find("\r\n\r\n");
 		if (pos != 0)
 		{
-			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
+			auto boundary_end = Request.m_Body.FindLast("\r\n------");
 
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
 
-			MD5 md5_file(Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
+			MD5 md5_file(Request.m_Body.Trim(pos + 5, boundary_end - pos - 5 + 1));
 
 			if (!md5_file)
 				return Error(Error::Type::InvalidFormat);
@@ -190,14 +189,14 @@ void Application::SetupHttpServer()
 		auto pos = Request.m_Body.Find("\r\n\r\n");
 		if (pos != 0)
 		{
-			auto boundary_end = Request.m_Body.FindLast("\r\n------WebKitFormBoundary");
+			auto boundary_end = Request.m_Body.FindLast("\r\n------");
 
 			if (boundary_end == 0)
 				return Error(Error::Type::InvalidFormat);
 
 			Tournament* tournament_file = new Tournament("");
 
-			auto yaml = YAML::Load((char*)Request.m_Body.Trim(pos + 4, boundary_end - pos - 4 + 1));
+			auto yaml = YAML::Load((char*)Request.m_Body.Trim(pos + 5, boundary_end - pos - 5 + 1));
 
 			if (!tournament_file->Load(yaml))
 			{
@@ -2108,6 +2107,14 @@ void Application::SetupHttpServer()
 		return Error();//OK
 	});
 
+	m_Server.RegisterResource("/ajax/tournament/swap_fighters", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_SwapMatchesOfTournament(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/tournament/empty", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
@@ -2722,6 +2729,22 @@ std::string Application::Ajax_ListTournaments()
 	
 	ret << YAML::EndSeq;
 	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_SwapMatchesOfTournament(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockTillScopeEnd();
+
+	auto tournament = FindTournament(id);
+	if (!tournament)
+		return Error::Type::ItemNotFound;
+
+	tournament->SwapAllFighters();
+	return Error();//OK
 }
 
 

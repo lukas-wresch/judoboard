@@ -91,7 +91,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			new_table = new RoundRobin(*weightclass, this);
 		else if (weightclass->FightSystemID == 19 ||//Single elimination (single consulation bracket)
 				 weightclass->FightSystemID == 20 ||//Single elimination (single consulation bracket)
-				 weightclass->FightSystemID == 1)//Double elimination (16 system)
+				 weightclass->FightSystemID == 1  ||//Double elimination (16 system)
+				 weightclass->FightSystemID == 2)   //Double elimination
 			new_table = new SingleElimination(*weightclass, this);
 		else
 			continue;
@@ -101,6 +102,9 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			new_table->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
 
 		new_table->SetName(weightclass->Description);
+		new_table->IsBestOfThree(weightclass->BestOfThree);
+		new_table->SetMatID(1);//Choose 1 as the default mat
+		new_table->SetScheduleIndex(GetFreeScheduleIndex(1));
 
 		weightclass->pUserData = new_table;
 
@@ -145,7 +149,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		auto match_table = (MatchTable*)judoka->Weightclass->pUserData;
 
 		int pos = File.FindStartNo(judoka->Weightclass->AgeGroupID, judoka->Weightclass->ID, judoka->ID);
-		if (pos > 0)
+		if (pos > 0 && match_table)
 			match_table->SetStartPosition(native_judoka, pos - 1);
 	}
 
@@ -195,11 +199,11 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			auto match_table = (MatchTable*)match.Weightclass->pUserData;
 			match_table->AddMatch(new_match);//Add match to weightclass
 
-      if (!new_match->IsEmptyMatch())
-      {
+			if (!new_match->IsEmptyMatch())
+			{
 			  auto index = match_table->FindMatchIndex(*new_match);
 			  m_Schedule.emplace_back(match_table, index);
-      }
+			}
 		}
 	}
 
@@ -1038,6 +1042,22 @@ bool Tournament::IsMatUsed(uint32_t ID) const
 			return true;
 
 	return false;
+}
+
+
+
+void Tournament::SwapAllFighters()
+{
+	if (IsReadonly())
+		return;
+
+	auto guard = LockTillScopeEnd();
+
+	for (auto match : GetSchedule())
+	{
+		if (!match->IsRunning())
+			match->SwapFighters();
+	}
 }
 
 

@@ -368,6 +368,14 @@ const Judoka* Match::GetFighter(Fighter Fighter) const
 
 
 
+void Match::SwapFighters()
+{
+	std::swap(m_White, m_Blue);
+	m_Log.SwapEvents();
+}
+
+
+
 std::vector<const Judoka*> Match::GetPotentialFighters() const
 {
 	std::vector<const Judoka*> ret;

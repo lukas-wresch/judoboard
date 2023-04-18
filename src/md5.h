@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <functional>
 #include "judoboard.h"
 #include "../ZED/include/blob.h"
 
@@ -190,6 +191,10 @@ namespace Judoboard
 			std::string Identifier;
 			std::string ForReference = "T";
 
+
+			//Version 7
+			bool BestOfThree = false;
+
 			mutable void* pUserData = nullptr;
 		};
 
@@ -374,7 +379,7 @@ namespace Judoboard
 		bool Parse(ZED::Blob&& Data);
 		std::string ReadLine(ZED::Blob& Data, bool* pNewLine = nullptr);
 		std::string RemoveControlCharacters(std::string& Str);//Removes all ASCII and Latin1 control characters
-		int ReadInt(ZED::Blob& Data);
+		int ReadInt(ZED::Blob& Data, bool* pNewLine = nullptr);
 
 		std::vector<std::string> ReadHeader(ZED::Blob& Data, int& DataCount);
 
@@ -392,6 +397,9 @@ namespace Judoboard
 		bool ReadRelationParticipantMatchTable(ZED::Blob& Data);
 		bool ReadMatchData(ZED::Blob& Data);
 		bool ReadResult(ZED::Blob& Data);
+		bool ReadLog(ZED::Blob& Data);
+
+		bool ReadTable(ZED::Blob& Data, std::function<bool(std::vector<std::string>&&, std::vector<std::string>&&)> Parse = nullptr);
 
 
 		std::vector<Association*> m_Associations;
