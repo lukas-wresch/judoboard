@@ -277,7 +277,9 @@ namespace Judoboard
 		MatchTable(MatchTable&) = delete;
 		MatchTable(const MatchTable&) = delete;
 
-		~MatchTable();
+		virtual ~MatchTable() {
+			DeleteSchedule();
+		}
 
 		virtual Type GetType() const { return Type::Unknown; }
 		virtual bool IsEditable() const { return true; }

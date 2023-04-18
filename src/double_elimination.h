@@ -19,7 +19,7 @@ namespace Judoboard
 			: DoubleElimination(new Weightclass(Weightclass_, this), Tournament) {}
 
 		~DoubleElimination() {
-			SetSchedule().clear();
+			DeleteSchedule();
 		}
 
 		static std::string GetHTMLForm();
@@ -27,6 +27,12 @@ namespace Judoboard
 		virtual Type GetType() const override { return Type::DoubleElimination; }
 
 		virtual size_t GetMaxStartPositions() const override;
+
+		virtual void SetMatID(int32_t MatID) override {
+			MatchTable::SetMatID(MatID);
+			m_WinnerBracket.SetMatID(MatID);
+			m_LoserBracket.SetMatID(MatID);
+		}
 
 		virtual Results CalculateResults() const override { return m_WinnerBracket.CalculateResults(); }
 		virtual void GenerateSchedule() override;

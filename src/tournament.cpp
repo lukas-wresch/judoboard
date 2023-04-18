@@ -218,10 +218,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			if (match_table->GetType() == MatchTable::Type::DoubleElimination)
 			{
 				auto de = (DoubleElimination*)match_table;
-				//if (match.AreaID != 1)
-					//de->AddMatchToWinnerBracket(new_match);
-				//else
-					//de->AddMatchToLoserBracket(new_match);
+				if (match.AreaID == 1 || match.AreaID == 3 || match.AreaID == 4)
+					de->AddMatchToLoserBracket(new_match);
+				else
+					de->AddMatchToWinnerBracket(new_match);
 			}
 			else
 				match_table->AddMatch(new_match);

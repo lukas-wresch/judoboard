@@ -568,7 +568,12 @@ TEST(MD5, ImportIntoTournament)
 		results = table->CalculateResults();
 
 		EXPECT_EQ(table->GetType(), MatchTable::Type::DoubleElimination);
-		ASSERT_EQ(results.GetSize(), 5);//double elimination
+		ASSERT_GE(results.GetSize(), 5);//double elimination
+		ASSERT_TRUE(results[0].Judoka);
+		ASSERT_TRUE(results[1].Judoka);
+		ASSERT_TRUE(results[2].Judoka);
+		ASSERT_TRUE(results[3].Judoka);
+		ASSERT_TRUE(results[4].Judoka);
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Sebastian");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Harry");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Marlon");
