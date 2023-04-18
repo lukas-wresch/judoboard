@@ -1,6 +1,7 @@
 #pragma once
 #include "judoboard.h"
 #include "matchtable.h"
+#include "weightclass.h"
 
 
 
@@ -14,7 +15,8 @@ namespace Judoboard
 		SingleElimination(IFilter* Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
 		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent = nullptr);
-		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
+		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
+			: SingleElimination(new Weightclass(Weightclass_, this), Tournament) {}
 
 		void operator =(const SingleElimination& rhs) = delete;
 		void operator =(SingleElimination&& rhs) noexcept {

@@ -290,6 +290,7 @@ namespace Judoboard
 			//2 = first round elimination system
 			//9 = final match elimination system
 			//4 = third place match
+			//Double elimination: 0 = winner bracket, 1 = loser bracket, 2 = semi final, 4 = fifth place match
 		};
 
 		struct Result

@@ -87,15 +87,31 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	{
 		MatchTable* new_table = nullptr;
 
-		if (weightclass->FightSystemID == 16 || weightclass->FightSystemID == 13 || weightclass->FightSystemID == 14 || weightclass->FightSystemID == 15)//Round robin
+		//Round robin
+		if (weightclass->FightSystemID == 13 || weightclass->FightSystemID == 14 || weightclass->FightSystemID == 15 || weightclass->FightSystemID == 16)
 			new_table = new RoundRobin(*weightclass, this);
 		else if (weightclass->FightSystemID == 19 ||//Single elimination (single consulation bracket)
-				 weightclass->FightSystemID == 20 ||//Single elimination (single consulation bracket)
-				 weightclass->FightSystemID == 1  ||//Double elimination (16 system)
+				 weightclass->FightSystemID == 20)  //Single elimination (single consulation bracket)
+		{
+			auto single = new SingleElimination(*weightclass, this);
+			single->IsThirdPlaceMatch(weightclass->MatchForThirdPlace);
+			single->IsFifthPlaceMatch(weightclass->MatchForFifthPlace);
+			new_table = single;
+		}
+		else if (weightclass->FightSystemID == 1  ||//Double elimination (16 system)
 				 weightclass->FightSystemID == 2)   //Double elimination
-			new_table = new SingleElimination(*weightclass, this);
-		else
+		{
+			auto de = new DoubleElimination(*weightclass, this);
+			de->IsThirdPlaceMatch(weightclass->MatchForThirdPlace);
+			de->IsFifthPlaceMatch(weightclass->MatchForFifthPlace);
+			new_table = de;
+		}
+
+		if (!new_table)
+		{
+			ZED::Log::Error("Unknown fight system id " + std::to_string(weightclass->FightSystemID) + ". Can not import match table from MD5/7. Skipping this table.");
 			continue;
+		}
 
 		//Connect to age group
 		if (weightclass->AgeGroup)
@@ -197,12 +213,24 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (match.Weightclass && match.Weightclass->pUserData)
 		{
 			auto match_table = (MatchTable*)match.Weightclass->pUserData;
-			match_table->AddMatch(new_match);//Add match to weightclass
 
+			//Add match to match table
+			if (match_table->GetType() == MatchTable::Type::DoubleElimination)
+			{
+				auto de = (DoubleElimination*)match_table;
+				//if (match.AreaID != 1)
+					//de->AddMatchToWinnerBracket(new_match);
+				//else
+					//de->AddMatchToLoserBracket(new_match);
+			}
+			else
+				match_table->AddMatch(new_match);
+
+			//Add to schedule
 			if (!new_match->IsEmptyMatch())
 			{
-			  auto index = match_table->FindMatchIndex(*new_match);
-			  m_Schedule.emplace_back(match_table, index);
+				auto index = match_table->FindMatchIndex(*new_match);
+				m_Schedule.emplace_back(match_table, index);
 			}
 		}
 	}

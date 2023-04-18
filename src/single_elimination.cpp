@@ -42,13 +42,6 @@ SingleElimination::SingleElimination(const YAML::Node& Yaml, const ITournament* 
 
 
 
-SingleElimination::SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament)
-	: MatchTable(new Weightclass(Weightclass_, this), Tournament)
-{
-}
-
-
-
 void SingleElimination::operator >> (YAML::Emitter& Yaml) const
 {
 	if (!IsSubMatchTable())

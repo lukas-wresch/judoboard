@@ -15,6 +15,8 @@ namespace Judoboard
 		DoubleElimination(IFilter* Filter, const ITournament* Tournament = nullptr);
 		DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
 		DoubleElimination(const YAML::Node& Yaml, ITournament* Tournament, const MatchTable* Parent = nullptr);
+		DoubleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
+			: DoubleElimination(new Weightclass(Weightclass_, this), Tournament) {}
 
 		~DoubleElimination() {
 			SetSchedule().clear();
@@ -41,12 +43,21 @@ namespace Judoboard
 		SingleElimination& GetLoserBracket() { return m_LoserBracket; }
 		const SingleElimination& GetLoserBracket() const { return m_LoserBracket; }
 
+		void AddMatchToWinnerBracket(Match* NewMatch);
+		void AddMatchToLoserBracket(Match* NewMatch);
+
 		//Serialization
 		virtual const std::string ToHTML() const override;
 
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
+	protected:
+		virtual void DeleteSchedule() override {
+			m_WinnerBracket.DeleteSchedule();
+			m_LoserBracket.DeleteSchedule();
+			MatchTable::DeleteSchedule();
+		}
 
 	private:
 		SingleElimination m_WinnerBracket;

@@ -137,6 +137,8 @@ namespace Judoboard
 	class MatchTable : public ID
 	{
 		friend class Tournament;
+		friend class Pool;
+		friend class DoubleElimination;
 
 	public:
 		enum class Type
@@ -380,9 +382,12 @@ namespace Judoboard
 
 		void AddMatchesForBestOfThree();
 
-		void DeleteSchedule() {
-			for (auto match : m_Schedule)
-				delete match;
+		virtual void DeleteSchedule() {
+			if (!IsSubMatchTable())
+			{
+				for (auto match : m_Schedule)
+					delete match;
+			}
 			m_Schedule.clear();
 		}
 
