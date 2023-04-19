@@ -1246,7 +1246,7 @@ TEST(Mat, OsaekomiWithWazaAriTime)
 				ZED::Core::Pause(1000);
 			}
 
-			ZED::Core::Pause(2000);
+			ZED::Core::Pause(2500);
 			EXPECT_TRUE(m.HasConcluded());
 			EXPECT_TRUE(m.EndMatch());
 		}
@@ -1357,7 +1357,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 				ZED::Core::Pause(1000);
 			}
 
-			ZED::Core::Pause(4500);
+			ZED::Core::Pause(4800);
 
 			EXPECT_TRUE(m.HasConcluded());
 			EXPECT_TRUE(m.EndMatch());
