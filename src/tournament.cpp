@@ -136,6 +136,13 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 				if (match_table)
 					match_table->AddParticipant(new_judoka, true);//Add with force
 			}
+
+			if (judoka->AgeGroup)
+			{
+				auto age_group = (AgeGroup*)judoka->AgeGroup->pUserData;
+				if (age_group)
+					AssignJudokaToAgeGroup(new_judoka, age_group);
+			}
 		}
 	}
 
