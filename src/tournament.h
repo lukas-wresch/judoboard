@@ -150,7 +150,7 @@ namespace Judoboard
 		const AgeGroup* FindAgeGroup(const UUID& UUID) const { return m_StandingData.FindAgeGroup(UUID); }
 		virtual std::vector<const AgeGroup*> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const override;
 		virtual std::vector<const AgeGroup*> GetAgeGroups() const override;
-		virtual void ListAgeGroups(YAML::Emitter& Yaml) const override;
+		virtual void GetAgeGroupInfo(YAML::Emitter& Yaml, const AgeGroup* AgeGroup) const override;
 
 		//Master schedule / schedule entries
 		bool MoveScheduleEntryUp(const UUID& UUID) override;

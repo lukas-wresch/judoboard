@@ -432,7 +432,7 @@ function Update()
 
 
 
-  AjaxCallback("ajax/age_groups/get", function(response) {
+  AjaxCallback("ajax/age_groups/list", function(response) {
     //console.log(response);
     var res = YAML.parse(response);
 
@@ -447,6 +447,9 @@ function Update()
     var no = 0;
     for (const age of res)
     {
+      if (!age.is_used)
+        continue;
+
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
       var cell1 = row.insertCell(1);

@@ -150,9 +150,15 @@ TEST(Ajax, AgeGroup_List)
 		EXPECT_EQ(yaml[6]["name"].as<std::string>(), "age 1");
 		EXPECT_EQ(yaml[6]["is_used"].as<bool>(), false);
 		EXPECT_EQ(yaml[6]["in_db"].as<bool>(), true);
+		EXPECT_EQ(yaml[6]["num_match_tables"].as<int>(), 0);
+		EXPECT_EQ(yaml[6]["num_matches"].as<int>(), 0);
+		EXPECT_EQ(yaml[6]["num_participants"].as<int>(), 0);
 		EXPECT_EQ(yaml[7]["name"].as<std::string>(), "age 2");
 		EXPECT_EQ(yaml[7]["is_used"].as<bool>(), true);
 		EXPECT_EQ(yaml[7]["in_db"].as<bool>(), false);
+		EXPECT_EQ(yaml[7]["num_match_tables"].as<int>(), 0);
+		EXPECT_EQ(yaml[7]["num_matches"].as<int>(), 0);
+		EXPECT_EQ(yaml[7]["num_participants"].as<int>(), 0);
 	}
 }
 

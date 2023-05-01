@@ -3407,6 +3407,9 @@ std::string Application::Ajax_ListAllAgeGroups() const
 			if (GetTournament())
 				is_used = GetTournament()->FindAgeGroup(age_group->GetUUID());
 
+			if (is_used)
+				GetTournament()->GetAgeGroupInfo(ret, age_group);
+
 			ret << YAML::Key << "is_used" << YAML::Value << is_used;
 			ret << YAML::Key << "in_db"   << YAML::Value << true;
 
@@ -3422,6 +3425,8 @@ std::string Application::Ajax_ListAllAgeGroups() const
 			ret << YAML::BeginMap;
 
 			age_group->ToString(ret);
+
+			GetTournament()->GetAgeGroupInfo(ret, age_group);
 
 			ret << YAML::Key << "is_used" << YAML::Value << true;
 			ret << YAML::Key << "in_db"   << YAML::Value << false;
