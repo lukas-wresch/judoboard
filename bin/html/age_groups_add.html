@@ -81,6 +81,11 @@ function GetAgeGroup(id)
     document.getElementById("name").value    = res.name;
     document.getElementById("min_age").value = res.min_age;
     document.getElementById("max_age").value = res.max_age;
+
+    GetRuleSets(function(resp) {
+      if (typeof res.rules_uuid != 'undefined')
+        document.getElementById("rule").value = res.rules_uuid;
+    });
   });
 
   return false;
@@ -119,9 +124,8 @@ else
     document.getElementById("headline").innerHTML = translate('new_age_group');
     document.getElementById("update").style.display = "none";
     document.getElementById("delete").style.display = "none";
+    GetRuleSets();
 }
-
-GetRuleSets();
 
 document.getElementById("label_gender").innerHTML = translate('gender');
 document.getElementById("both").innerHTML = translate('both');
