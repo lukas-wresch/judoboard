@@ -3344,19 +3344,23 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 	auto age_group = GetDatabase().FindAgeGroup(id);
 
 	if (!age_group)
-		return Error::Type::InvalidID;
+	{
+		age_group = GetTournament()->FindAgeGroup(id);
+
+		if (!age_group)
+			return Error::Type::InvalidID;
+	}
 
 	auto rule = GetDatabase().FindRuleSet(rule_id);
 
 	if (!rule)
 		ZED::Log::Warn("Could not find rule set.");
-	else
-		age_group->SetRuleSet(rule);
 
 	age_group->SetName(name);
 	age_group->SetMinAge(min_age);
 	age_group->SetMaxAge(max_age);
 	age_group->SetGender(gender);
+	age_group->SetRuleSet(rule);
 
 	return Error::Type::NoError;
 }
