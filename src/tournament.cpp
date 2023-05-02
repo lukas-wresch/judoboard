@@ -141,7 +141,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			{
 				auto age_group = (AgeGroup*)judoka->AgeGroup->pUserData;
 				if (age_group)
-					AssignJudokaToAgeGroup(new_judoka, age_group);
+					m_JudokaToAgeGroup.insert({ new_judoka->GetUUID(), age_group->GetUUID() });
+					//AssignJudokaToAgeGroup(new_judoka, age_group);
 			}
 		}
 	}
