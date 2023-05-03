@@ -119,6 +119,7 @@ TEST(Ajax, AgeGroup_Get)
 		EXPECT_EQ(yaml["name"].as<std::string>(), a1->GetName());
 		EXPECT_EQ(yaml["min_age"].as<int>(), a1->GetMinAge());
 		EXPECT_EQ(yaml["max_age"].as<int>(), a1->GetMaxAge());
+		EXPECT_EQ(yaml["in_db"].as<bool>(), true);
 		ASSERT_TRUE(yaml["rules_name"]);
 		EXPECT_EQ(yaml["rules_name"].as<std::string>(), "test");
 		EXPECT_TRUE(yaml["rules_uuid"]);
@@ -130,6 +131,7 @@ TEST(Ajax, AgeGroup_Get)
 		EXPECT_EQ(yaml["name"].as<std::string>(), a2->GetName());
 		EXPECT_EQ(yaml["min_age"].as<int>(), a2->GetMinAge());
 		EXPECT_EQ(yaml["max_age"].as<int>(), a2->GetMaxAge());
+		EXPECT_EQ(yaml["in_db"].as<bool>(), false);
 		EXPECT_FALSE(yaml["rules_name"]);
 		EXPECT_FALSE(yaml["rules_uuid"]);
 	}
