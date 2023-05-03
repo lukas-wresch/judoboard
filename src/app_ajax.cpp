@@ -1967,6 +1967,14 @@ void Application::SetupHttpServer()
 		return Ajax_EditAgeGroup(Request);
 	});
 
+	m_Server.RegisterResource("/ajax/age_groups/import", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_ImportAgeGroup(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/age_groups/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -3363,6 +3371,29 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 	age_group->SetRuleSet(rule);
 
 	return Error::Type::NoError;
+}
+
+
+
+Error Application::Ajax_ImportAgeGroup(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockTillScopeEnd();
+
+	auto age_group = GetTournament()->FindAgeGroup(id);
+
+	if (!age_group)
+		return Error::Type::ItemNotFound;
+
+	//Already in database?
+	if (m_Database.FindAgeGroup(id))
+		return Error::Type::OperationFailed;
+
+	if (!m_Database.AddAgeGroup(age_group))
+		return Error::Type::OperationFailed;
+
+	return Error();//OK
 }
 
 

@@ -77,6 +77,48 @@ TEST(Ajax, AgeGroup_Edit)
 
 
 
+TEST(Ajax, AgeGroup_Import)
+{
+	initialize();
+
+	{
+		Application app;
+
+		Tournament* tourney = new Tournament;
+
+		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
+		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
+
+		tourney->AddAgeGroup(a1);
+		tourney->AddAgeGroup(a2);
+
+		EXPECT_FALSE(app.Ajax_ImportAgeGroup(HttpServer::Request("id="+(std::string)a1->GetUUID())));
+		EXPECT_FALSE(app.Ajax_ImportAgeGroup(HttpServer::Request("id="+(std::string)a2->GetUUID())));
+
+		app.AddTournament(tourney);
+
+		auto start_size = app.GetDatabase().GetAgeGroups().size();
+
+
+		EXPECT_FALSE(app.GetDatabase().FindAgeGroup(*a1));
+		EXPECT_FALSE(app.GetDatabase().FindAgeGroup(*a2));
+
+		EXPECT_TRUE(app.Ajax_ImportAgeGroup(HttpServer::Request("id="+(std::string)a1->GetUUID())));
+
+		EXPECT_EQ(app.GetDatabase().GetAgeGroups().size(), start_size + 1);
+		EXPECT_TRUE(app.GetDatabase().FindAgeGroup(*a1));
+		EXPECT_FALSE(app.GetDatabase().FindAgeGroup(*a2));
+
+		EXPECT_TRUE(app.Ajax_ImportAgeGroup(HttpServer::Request("id="+(std::string)a2->GetUUID())));
+
+		EXPECT_EQ(app.GetDatabase().GetAgeGroups().size(), start_size + 2);
+		EXPECT_TRUE(app.GetDatabase().FindAgeGroup(*a1));
+		EXPECT_TRUE(app.GetDatabase().FindAgeGroup(*a2));
+	}
+}
+
+
+
 TEST(Ajax, AgeGroup_Delete)
 {
 	initialize();

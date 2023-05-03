@@ -145,6 +145,7 @@ namespace Judoboard
 		//Age groups
 		Error Ajax_AddAgeGroup(const HttpServer::Request& Request);
 		Error Ajax_EditAgeGroup(const HttpServer::Request& Request);
+		Error Ajax_ImportAgeGroup(const HttpServer::Request& Request);
 		std::string Ajax_GetAgeGroup(const HttpServer::Request& Request) const;
 		std::string Ajax_ListAllAgeGroups() const;
 		Error Ajax_DeleteAgeGroup(const HttpServer::Request& Request);
