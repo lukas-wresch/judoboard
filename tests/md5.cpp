@@ -2,6 +2,28 @@
 
 
 
+TEST(MD5, AssignAgeGroups)
+{
+	initialize();
+
+	{
+		MD5 file1("test-data/KEM_KT_07052023.md5");//Read MD5 file
+
+		ASSERT_TRUE(file1);
+
+		Database db;
+		Tournament tour_temp(file1, &db);//Convert to native
+
+		for (auto judoka : tour_temp.GetDatabase().GetAllJudokas())
+		{
+			auto age_group = tour_temp.GetAgeGroupOfJudoka(judoka);
+			EXPECT_TRUE(age_group);
+		}
+	}
+}
+
+
+
 TEST(MD5, ReadTestData)
 {
 	initialize();

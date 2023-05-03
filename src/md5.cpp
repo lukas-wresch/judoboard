@@ -154,7 +154,11 @@ MD5::MD5(const Tournament& Tournament)
 		{
 			new_judoka->ClubID = uuid2id(judoka->GetClub()->GetUUID());
 			new_judoka->Club   = (Club*)id2ptr(new_judoka->ClubID);
-			new_judoka->ClubFullname         = new_judoka->Club->Name;
+
+			assert(new_judoka->Club);
+			if (new_judoka->Club)
+				new_judoka->ClubFullname = new_judoka->Club->Name;
+
 			new_judoka->AssociationShortname = new_judoka->ClubFullname.substr(0, 6);//6 characters only
 		}
 
