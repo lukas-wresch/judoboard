@@ -3376,14 +3376,19 @@ std::string Application::Ajax_GetAgeGroup(const HttpServer::Request& Request) co
 	auto guard = LockTillScopeEnd();
 
 	auto age_group = GetDatabase().FindAgeGroup(id);
+	bool in_database = true;
 
 	if (!age_group)
+	{
+		in_database = false;
 		age_group = GetTournament()->FindAgeGroup(id);
+	}
 
 	if (age_group)
 	{
 		ret << YAML::BeginMap;
 		age_group->ToString(ret);
+		ret << YAML::Key << "in_db" << YAML::Value << in_database;
 		ret << YAML::EndMap;
 	}
 
