@@ -111,7 +111,7 @@ namespace Judoboard
 			std::vector<const AgeGroup*> ret;
 			return ret;
 		}
-		virtual void ListAgeGroups(YAML::Emitter& Yaml) const {}
+		virtual void GetAgeGroupInfo(YAML::Emitter& Yaml, const AgeGroup* AgeGroup) const {}
 
 		//Master schedule / schedule entries
 		virtual MatchTable* GetScheduleEntry(const UUID& UUID) { return nullptr; }

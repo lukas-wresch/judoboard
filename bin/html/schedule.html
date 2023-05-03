@@ -41,16 +41,16 @@
     <th style="width: 2.5cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
-  
+
 
 <h2 id="headline_age_groups">Age Groups</h2>
 <table id="age_groups" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
     <th style="width: 0.5cm;" class="no">No.</th>
     <th style="width: 4cm;" id="name">Name</th>
-    <th style="width: 2cm; text-align: center;" id="age_groups_participants">#Participants</th>
+    <th style="width: 2.0cm; text-align: center;" id="age_groups_participants">#Participants</th>
     <th style="width: 3.0cm; text-align: center;" id="age_groups_match_tables">#Match tables</th>
-    <th style="width: 2cm; text-align: center;" id="age_groups_matches" class="num_matches">#Matches</th>
+    <th style="width: 2.0cm; text-align: center;" id="age_groups_matches" class="num_matches">#Matches</th>
     <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -61,10 +61,10 @@
   <tr>
     <th style="width: 0.5cm;" class="no">No.</th>
     <th style="width: 7cm;" id="name">Name</th>
-    <th style="width: 6cm; text-align: center;" class="club">Club</th>
-    <th style="width: 2cm; text-align: center;" id="weight" class="weight">Weight</th>
-    <th style="width: 2cm; text-align: center;" id="matches" class="num_matches">#Matches</th>
-    <th style="width: 2.5cm; text-align: center;" id="age_group" class="age_group">Age group</th>
+    <th style="width: 6.0cm; text-align: center;" class="club">Club</th>
+    <th style="width: 2.0cm; text-align: center;" id="weight" class="weight">Weight</th>
+    <th style="width: 2.0cm; text-align: center;" id="matches" class="num_matches">#Matches</th>
+    <th style="width: 4.5cm; text-align: center;" id="age_group" class="age_group">Age group</th>
     <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -432,7 +432,7 @@ function Update()
 
 
 
-  AjaxCallback("ajax/age_groups/get", function(response) {
+  AjaxCallback("ajax/age_groups/list", function(response) {
     //console.log(response);
     var res = YAML.parse(response);
 
@@ -447,6 +447,9 @@ function Update()
     var no = 0;
     for (const age of res)
     {
+      if (!age.is_used)
+        continue;
+
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
       var cell1 = row.insertCell(1);
@@ -663,7 +666,7 @@ var showHansokumake = false;
 
 
 Update();
-TimerID = window.setInterval(Update, 5000);
+TimerID = window.setInterval(Update, 6000);
 
 
 document.getElementById("headline").innerHTML = translate('schedule');
