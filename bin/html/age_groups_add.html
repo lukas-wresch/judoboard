@@ -82,6 +82,7 @@ function GetAgeGroup(id)
     document.getElementById("name").value    = res.name;
     document.getElementById("min_age").value = res.min_age;
     document.getElementById("max_age").value = res.max_age;
+    document.getElementById("gender").value  = res.gender;
 
     GetRuleSets(function(resp) {
       if (typeof res.rules_uuid != 'undefined')
@@ -108,6 +109,17 @@ function UpdateAgeGroup()
   });
 
   AjaxPost('ajax/age_groups/update?id='+id, params, function() {
+    navigate('age_groups_list.html');
+  });
+
+  return false;
+}
+
+
+
+function ImportAgeGroup()
+{
+  AjaxCallback('ajax/age_groups/import?id='+id, function() {
     navigate('age_groups_list.html');
   });
 
