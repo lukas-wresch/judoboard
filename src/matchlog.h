@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <mutex>
 
 
 namespace YAML
@@ -120,11 +121,30 @@ namespace Judoboard
 		};
 
 
-		void AddEvent(NeutralEvent NewEvent, uint32_t Timestamp) { m_Events.emplace_back(Event(NewEvent, Timestamp)); }
-		void AddEvent(Fighter Whom, BiasedEvent NewEvent, uint32_t Timestamp) { m_Events.emplace_back(Event(Whom, NewEvent, Timestamp)); }
+		MatchLog() = default;
+		MatchLog(const MatchLog& Copy) {
+			std::lock_guard<std::mutex> lock(Copy.m_Mutex);
+			m_Events = Copy.m_Events;
+		}
 
-		auto& GetEvents() const { return m_Events; }
-		size_t GetNumEvent() const { return m_Events.size(); }
+		void AddEvent(NeutralEvent NewEvent, uint32_t Timestamp) {
+			std::lock_guard<std::mutex> lock(m_Mutex);
+			m_Events.emplace_back(Event(NewEvent, Timestamp));
+		}
+		void AddEvent(Fighter Whom, BiasedEvent NewEvent, uint32_t Timestamp) {
+			std::lock_guard<std::mutex> lock(m_Mutex);
+			m_Events.emplace_back(Event(Whom, NewEvent, Timestamp));
+		}
+
+		auto& GetEvents() const
+		{
+			std::lock_guard<std::mutex> lock(m_Mutex);
+			return m_Events;
+		}
+		size_t GetNumEvent() const {
+			std::lock_guard<std::mutex> lock(m_Mutex);
+			return m_Events.size();
+		}
 		
 		void SwapEvents();
 
@@ -173,6 +193,7 @@ namespace Judoboard
 
 
 		std::vector<Event> m_Events;
+		mutable std::mutex m_Mutex;
 	};
 
 

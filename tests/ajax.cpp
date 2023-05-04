@@ -48,6 +48,72 @@ TEST(Ajax, AgeGroup_Edit)
 		EXPECT_EQ(age_groups[6]->GetGender(), Gender::Female);
 		ASSERT_TRUE(age_groups[6]->GetRuleSet());
 		EXPECT_EQ(*age_groups[6]->GetRuleSet(), *r);
+
+
+		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
+		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
+
+		app.GetTournament()->AddAgeGroup(a1);
+		app.GetTournament()->AddAgeGroup(a2);
+
+		EXPECT_TRUE(app.Ajax_EditAgeGroup(HttpServer::Request("id=" + (std::string)a1->GetUUID(), "name=test3&min_age=6&max_age=10&gender=1&rule=" + (std::string)r->GetUUID())));
+
+		EXPECT_EQ(a1->GetName(), "test3");
+		EXPECT_EQ(a1->GetMinAge(), 6);
+		EXPECT_EQ(a1->GetMaxAge(), 10);
+		EXPECT_EQ(a1->GetGender(), Gender::Female);
+		ASSERT_TRUE(a1->GetRuleSet());
+		EXPECT_EQ(*a1->GetRuleSet(), *r);
+
+		EXPECT_TRUE(app.Ajax_EditAgeGroup(HttpServer::Request("id=" + (std::string)a2->GetUUID(), "name=test4&min_age=16&max_age=20&gender=0&rule=0")));
+
+		EXPECT_EQ(a2->GetName(), "test4");
+		EXPECT_EQ(a2->GetMinAge(), 16);
+		EXPECT_EQ(a2->GetMaxAge(), 20);
+		EXPECT_EQ(a2->GetGender(), Gender::Male);
+		EXPECT_FALSE(a2->GetRuleSet());
+	}
+}
+
+
+
+TEST(Ajax, AgeGroup_Import)
+{
+	initialize();
+
+	{
+		Application app;
+
+		Tournament* tourney = new Tournament;
+
+		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
+		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
+
+		tourney->AddAgeGroup(a1);
+		tourney->AddAgeGroup(a2);
+
+		EXPECT_FALSE(app.Ajax_ImportAgeGroup(HttpServer::Request("id="+(std::string)a1->GetUUID())));
+		EXPECT_FALSE(app.Ajax_ImportAgeGroup(HttpServer::Request("id="+(std::string)a2->GetUUID())));
+
+		app.AddTournament(tourney);
+
+		auto start_size = app.GetDatabase().GetAgeGroups().size();
+
+
+		EXPECT_FALSE(app.GetDatabase().FindAgeGroup(*a1));
+		EXPECT_FALSE(app.GetDatabase().FindAgeGroup(*a2));
+
+		EXPECT_TRUE(app.Ajax_ImportAgeGroup(HttpServer::Request("id="+(std::string)a1->GetUUID())));
+
+		EXPECT_EQ(app.GetDatabase().GetAgeGroups().size(), start_size + 1);
+		EXPECT_TRUE(app.GetDatabase().FindAgeGroup(*a1));
+		EXPECT_FALSE(app.GetDatabase().FindAgeGroup(*a2));
+
+		EXPECT_TRUE(app.Ajax_ImportAgeGroup(HttpServer::Request("id="+(std::string)a2->GetUUID())));
+
+		EXPECT_EQ(app.GetDatabase().GetAgeGroups().size(), start_size + 2);
+		EXPECT_TRUE(app.GetDatabase().FindAgeGroup(*a1));
+		EXPECT_TRUE(app.GetDatabase().FindAgeGroup(*a2));
 	}
 }
 
@@ -95,6 +161,7 @@ TEST(Ajax, AgeGroup_Get)
 		EXPECT_EQ(yaml["name"].as<std::string>(), a1->GetName());
 		EXPECT_EQ(yaml["min_age"].as<int>(), a1->GetMinAge());
 		EXPECT_EQ(yaml["max_age"].as<int>(), a1->GetMaxAge());
+		EXPECT_EQ(yaml["in_db"].as<bool>(), true);
 		ASSERT_TRUE(yaml["rules_name"]);
 		EXPECT_EQ(yaml["rules_name"].as<std::string>(), "test");
 		EXPECT_TRUE(yaml["rules_uuid"]);
@@ -106,6 +173,7 @@ TEST(Ajax, AgeGroup_Get)
 		EXPECT_EQ(yaml["name"].as<std::string>(), a2->GetName());
 		EXPECT_EQ(yaml["min_age"].as<int>(), a2->GetMinAge());
 		EXPECT_EQ(yaml["max_age"].as<int>(), a2->GetMaxAge());
+		EXPECT_EQ(yaml["in_db"].as<bool>(), false);
 		EXPECT_FALSE(yaml["rules_name"]);
 		EXPECT_FALSE(yaml["rules_uuid"]);
 	}

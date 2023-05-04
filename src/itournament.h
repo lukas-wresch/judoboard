@@ -35,7 +35,7 @@ namespace Judoboard
 		virtual const Association* GetOrganizer() const { return nullptr; }
 
 		virtual bool AddMatch(Match* NewMatch) { return false; }
-		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
+		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(std::move(NewMatch))); }
 		virtual Match* GetNextMatch(int32_t MatID = -1) const { return nullptr; }//Returns the next match for a given mat if available, otherwise null pointer is returned
 		//const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 

@@ -99,6 +99,8 @@ function GetJudoka(id)
       document.getElementById("delete").style.display = "none";
       query = "all=true";
     }
+    else
+      document.getElementById("import").style.display = "none";
 
     GetClubs(function(response) {
       if (typeof res.club_uuid != 'undefined')

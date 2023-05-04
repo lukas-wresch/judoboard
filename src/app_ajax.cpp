@@ -1967,6 +1967,14 @@ void Application::SetupHttpServer()
 		return Ajax_EditAgeGroup(Request);
 	});
 
+	m_Server.RegisterResource("/ajax/age_groups/import", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_ImportAgeGroup(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/age_groups/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -3344,21 +3352,48 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 	auto age_group = GetDatabase().FindAgeGroup(id);
 
 	if (!age_group)
-		return Error::Type::InvalidID;
+	{
+		age_group = GetTournament()->FindAgeGroup(id);
+
+		if (!age_group)
+			return Error::Type::InvalidID;
+	}
 
 	auto rule = GetDatabase().FindRuleSet(rule_id);
 
 	if (!rule)
 		ZED::Log::Warn("Could not find rule set.");
-	else
-		age_group->SetRuleSet(rule);
 
 	age_group->SetName(name);
 	age_group->SetMinAge(min_age);
 	age_group->SetMaxAge(max_age);
 	age_group->SetGender(gender);
+	age_group->SetRuleSet(rule);
 
 	return Error::Type::NoError;
+}
+
+
+
+Error Application::Ajax_ImportAgeGroup(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockTillScopeEnd();
+
+	auto age_group = GetTournament()->FindAgeGroup(id);
+
+	if (!age_group)
+		return Error::Type::ItemNotFound;
+
+	//Already in database?
+	if (m_Database.FindAgeGroup(id))
+		return Error::Type::OperationFailed;
+
+	if (!m_Database.AddAgeGroup(age_group))
+		return Error::Type::OperationFailed;
+
+	return Error();//OK
 }
 
 
@@ -3372,14 +3407,19 @@ std::string Application::Ajax_GetAgeGroup(const HttpServer::Request& Request) co
 	auto guard = LockTillScopeEnd();
 
 	auto age_group = GetDatabase().FindAgeGroup(id);
+	bool in_database = true;
 
 	if (!age_group)
+	{
+		in_database = false;
 		age_group = GetTournament()->FindAgeGroup(id);
+	}
 
 	if (age_group)
 	{
 		ret << YAML::BeginMap;
 		age_group->ToString(ret);
+		ret << YAML::Key << "in_db" << YAML::Value << in_database;
 		ret << YAML::EndMap;
 	}
 

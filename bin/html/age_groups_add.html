@@ -34,6 +34,7 @@
 
 <button class="add" id="add" onclick="return AddAgeGroup()">New Age Group</button>
 <button class="neutral" style="margin-right: 2cm;" onclick="return UpdateAgeGroup()" id="update">Save</button>
+<button class="neutral" style="margin-right: 2cm;" onclick="return ImportAgeGroup()" id="import"></button>
 <button class="remove" onclick="return DeleteAgeGroup()" id="delete">Delete</button>
 
 </form>
@@ -81,6 +82,15 @@ function GetAgeGroup(id)
     document.getElementById("name").value    = res.name;
     document.getElementById("min_age").value = res.min_age;
     document.getElementById("max_age").value = res.max_age;
+    document.getElementById("gender").value  = res.gender;
+
+    GetRuleSets(function(resp) {
+      if (typeof res.rules_uuid != 'undefined')
+        document.getElementById("rule").value = res.rules_uuid;
+    });
+
+    if (res.in_db)
+      document.getElementById("import").style.display = "none";
   });
 
   return false;
@@ -106,6 +116,17 @@ function UpdateAgeGroup()
 }
 
 
+
+function ImportAgeGroup()
+{
+  AjaxCallback('ajax/age_groups/import?id='+id, function() {
+    navigate('age_groups_list.html');
+  });
+
+  return false;
+}
+
+
 var id = URLDecode(URL, "id");
 
 if (id)
@@ -119,9 +140,8 @@ else
     document.getElementById("headline").innerHTML = translate('new_age_group');
     document.getElementById("update").style.display = "none";
     document.getElementById("delete").style.display = "none";
+    GetRuleSets();
 }
-
-GetRuleSets();
 
 document.getElementById("label_gender").innerHTML = translate('gender');
 document.getElementById("both").innerHTML = translate('both');
@@ -129,6 +149,7 @@ document.getElementById("male").innerHTML = translate('male');
 document.getElementById("female").innerHTML = translate('female');
 document.getElementById("update").innerHTML = translate('save');
 document.getElementById("delete").innerHTML = translate('delete');
-document.getElementById("add").innerHTML = translate('new_age_group');
+document.getElementById("add").innerHTML    = translate('new_age_group');
+document.getElementById("import").innerHTML = translate('import');
 
 </script>
