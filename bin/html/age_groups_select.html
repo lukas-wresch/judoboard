@@ -15,18 +15,18 @@
 function Add(id)
 {
   AjaxCallback("ajax/age_groups/select?id="+id, function(response) {
-    GetAgeGroups();
+    Select_ListAgeGroups();
   });
 }
 
 function Remove(id)
 {
   AjaxCallback("ajax/age_groups/remove?id="+id, function(response) {
-    GetAgeGroups();
+    Select_ListAgeGroups();
   });
 }
 
-function GetAgeGroups()
+function Select_ListAgeGroups()
 {
   AjaxCallback("ajax/age_groups/list", function(response) {
     var res = YAML.parse(response);
@@ -54,7 +54,7 @@ function GetAgeGroups()
   });
 }
 
-GetAgeGroups();
+Select_ListAgeGroups();
 
 document.getElementById("headline").innerHTML = translate('list_of_age_groups');
 document.getElementById("name").innerHTML     = translate('name');

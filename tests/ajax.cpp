@@ -1906,6 +1906,35 @@ TEST(Ajax, MatchTable_Edit)
 
 		ASSERT_EQ(finals.GetName(), "Test4");
 		ASSERT_EQ(finals.IsBestOfThree(), true);
+
+
+
+		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
+		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
+		auto r  = new RuleSet("rules", 30, 60, 40, 30);
+
+		app.GetTournament()->AddAgeGroup(a1);
+		app.GetTournament()->AddAgeGroup(a2);
+		app.GetTournament()->AddRuleSet(r);
+
+
+		EXPECT_TRUE(app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test3&fight_system=4&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true&age_group=" + (std::string)a1->GetUUID())));
+
+		ASSERT_EQ(tables.size(), 1);
+		EXPECT_EQ(tables[0]->GetName(), "Test3");
+		EXPECT_EQ(tables[0]->GetMatID(), 5);
+		ASSERT_TRUE(tables[0]->GetAgeGroup());
+		EXPECT_EQ(*tables[0]->GetAgeGroup(), *a1);
+
+		EXPECT_TRUE(app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test9&fight_system=4&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true&age_group=" + (std::string)a2->GetUUID() + "&rule=" + (std::string)r->GetUUID())));
+
+		ASSERT_EQ(tables.size(), 1);
+		EXPECT_EQ(tables[0]->GetName(), "Test9");
+		EXPECT_EQ(tables[0]->GetMatID(), 5);
+		ASSERT_TRUE(tables[0]->GetAgeGroup());
+		EXPECT_EQ(*tables[0]->GetAgeGroup(), *a2);
+		ASSERT_TRUE(tables[0]->GetRuleSet());
+		EXPECT_EQ(tables[0]->GetRuleSet(), *r);
 	}
 }
 

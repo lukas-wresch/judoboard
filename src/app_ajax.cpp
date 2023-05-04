@@ -3559,7 +3559,11 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	}
 
 	auto age_group = m_Database.FindAgeGroup(age_group_id);
+	if (!age_group)
+		age_group = GetTournament()->FindAgeGroup(age_group_id);
 	auto rule_set  = m_Database.FindRuleSet(rule_set_id);
+	if (!rule_set)
+		rule_set = GetTournament()->FindRuleSet(rule_set_id);
 
 	GetTournament()->Lock();
 
