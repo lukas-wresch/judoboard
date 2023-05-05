@@ -39,31 +39,31 @@
     </td>
 
     <td style="text-align: center; font-size: 18pt; width: 6.9cm; border-right-style: hidden; border-bottom-style: hidden;">
-      <button disabled class="neutral" style="width: 45mm; margin-top: 3mm; margin-right: 8mm; display: none;" id="end_match" onclick="EndMatch()">End match</button>
+      <button disabled class="neutral" style="width: 45mm; margin-top: 3mm; margin-right: 8mm; display: none;" id="end_match" onclick="EndMatch(event)" ontouchstart="EndMatch(event)">End match</button>
     </td>
   </tr>
 
   <tr>
     <td style="text-align: center;">
-      <button class="add" id="add_ippon_white" onclick="SetScore('white', '+ippon');" ontouchstart="SetScore('white', '+ippon');">+Ippon</button>
-      <button class="add" id="add_wazaari_white" style="margin-left: 5mm;" onclick="SetScore('white', '+wazaari');" ontouchstart="SetScore('white', '+wazaari');">+Waza-Ari</button>
+      <button class="add" id="add_ippon_white" onclick="SetScore('white', '+ippon', event);" ontouchstart="SetScore('white', '+ippon', event);">+Ippon</button>
+      <button class="add" id="add_wazaari_white" style="margin-left: 5mm;" onclick="SetScore('white', '+wazaari', event);" ontouchstart="SetScore('white', '+wazaari', event);">+Waza-Ari</button>
       <br/>
-      <button class="remove" id="rem_ippon_white" onclick="SetScore('white', '-ippon');" ontouchstart="SetScore('white', '-ippon');">-Ippon</button>
-      <button class="remove" id="rem_wazaari_white" style="margin-left: 5mm;" onclick="SetScore('white', '-wazaari');" ontouchstart="SetScore('white', '-wazaari');">-Waza-Ari</button>
+      <button class="remove" id="rem_ippon_white" onclick="SetScore('white', '-ippon', event);" ontouchstart="SetScore('white', '-ippon', event);">-Ippon</button>
+      <button class="remove" id="rem_wazaari_white" style="margin-left: 5mm;" onclick="SetScore('white', '-wazaari', event);" ontouchstart="SetScore('white', '-wazaari', event);">-Waza-Ari</button>
       <br/>
-      <button disabled class="neutral" id="white_osaekomi" onclick="Osaekomi('white');" ontouchstart="Osaekomi('white');">Osaekomi</button>
-      <button disabled class="neutral" style="margin-left: 5mm;" id="tokeda1" onclick="Tokeda();" ontouchstart="Tokeda();">Tokeda</button>
+      <button disabled class="neutral" id="white_osaekomi" onclick="Osaekomi('white', event);" ontouchstart="Osaekomi('white', event);">Osaekomi</button>
+      <button disabled class="neutral" style="margin-left: 5mm;" id="tokeda1" onclick="Tokeda(event);" ontouchstart="Tokeda(event);">Tokeda</button>
     </td>
 
     <td style="text-align: center;">
-      <button class="add" id="add_ippon_blue" onclick="SetScore('blue', '+ippon');" ontouchstart="SetScore('blue', '+ippon');">+Ippon</button>
-      <button class="add" id="add_wazaari_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '+wazaari');" ontouchstart="SetScore('blue', '+wazaari');">+Waza-Ari</button>
+      <button class="add" id="add_ippon_blue" onclick="SetScore('blue', '+ippon', event);" ontouchstart="SetScore('blue', '+ippon', event);">+Ippon</button>
+      <button class="add" id="add_wazaari_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '+wazaari', event);" ontouchstart="SetScore('blue', '+wazaari', event);">+Waza-Ari</button>
       <br/>
-      <button class="remove" id="rem_ippon_blue" onclick="SetScore('blue', '-ippon');" ontouchstart="SetScore('blue', '-ippon');">-Ippon</button>
-      <button class="remove" id="rem_wazaari_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '-wazaari');" ontouchstart="SetScore('blue', '-wazaari');">-Waza-Ari</button>
+      <button class="remove" id="rem_ippon_blue" onclick="SetScore('blue', '-ippon', event);" ontouchstart="SetScore('blue', '-ippon', event);">-Ippon</button>
+      <button class="remove" id="rem_wazaari_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '-wazaari', event);" ontouchstart="SetScore('blue', '-wazaari', event);">-Waza-Ari</button>
       <br/>
-      <button disabled class="neutral" id="blue_osaekomi" onclick="Osaekomi('blue');" ontouchstart="Osaekomi('blue');">Osaekomi</button>
-      <button disabled class="neutral" style="margin-left: 5mm;" id="tokeda2" onclick="Tokeda();" ontouchstart="Tokeda();">Tokeda</button>
+      <button disabled class="neutral" id="blue_osaekomi" onclick="Osaekomi('blue', event);" ontouchstart="Osaekomi('blue', event);">Osaekomi</button>
+      <button disabled class="neutral" style="margin-left: 5mm;" id="tokeda2" onclick="Tokeda(event);" ontouchstart="Tokeda(event);">Tokeda</button>
     </td>
 
     <td style="text-align: center; font-size: 18pt; vertical-align: top; border-right-style: hidden; border-bottom-style: hidden;" rowspan="8">
@@ -80,19 +80,19 @@
 
   <tr id="yuko_koka_row" style="text-align: center; display: none;">
     <td>
-      <button class="add" id="add_yuko_white" onclick="SetScore('white', '+yuko');">+Yuko</button>
-      <button class="add" id="add_koka_white" style="margin-left: 5mm;" onclick="SetScore('white', '+koka');">+Koka</button>
+      <button class="add" id="add_yuko_white" onclick="SetScore('white', '+yuko', event);">+Yuko</button>
+      <button class="add" id="add_koka_white" style="margin-left: 5mm;" onclick="SetScore('white', '+koka', event);">+Koka</button>
       <br/>
-      <button class="remove" id="rem_yuko_white" onclick="SetScore('white', '-yuko');">-Yuko</button>
-      <button class="remove" id="rem_koka_white" style="margin-left: 5mm;" onclick="SetScore('white', '-koka');">-Koka</button>
+      <button class="remove" id="rem_yuko_white" onclick="SetScore('white', '-yuko', event);">-Yuko</button>
+      <button class="remove" id="rem_koka_white" style="margin-left: 5mm;" onclick="SetScore('white', '-koka', event);">-Koka</button>
     </td>
 
     <td style="text-align:">
-      <button class="add" id="add_yuko_blue" onclick="SetScore('blue', '+yuko');">+Yuko</button>
-      <button class="add" id="add_koka_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '+koka');">+Koka</button>
+      <button class="add" id="add_yuko_blue" onclick="SetScore('blue', '+yuko', event);">+Yuko</button>
+      <button class="add" id="add_koka_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '+koka', event);">+Koka</button>
       <br/>
-      <button class="remove" id="rem_yuko_blue" onclick="SetScore('blue', '-yuko');">-Yuko</button>
-      <button class="remove" id="rem_koka_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '-koka');">-Koka</button>
+      <button class="remove" id="rem_yuko_blue" onclick="SetScore('blue', '-yuko', event);">-Yuko</button>
+      <button class="remove" id="rem_koka_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '-koka', event);">-Koka</button>
     </td>
   </tr>
 
@@ -107,8 +107,8 @@
 
   <tr>
     <td style="text-align: center;" colspan="2">
-      <button class="neutral" id="hajime" onclick="Hajime()" ontouchstart="Hajime()">Hajime</button>
-      <button disabled class="neutral" id="mate" style="margin-left: 5mm;" onclick="Mate()" ontouchstart="Mate()">Mate</button>
+      <button class="neutral" id="hajime" onclick="Hajime(event)" ontouchstart="Hajime(event)">Hajime</button>
+      <button disabled class="neutral" id="mate" style="margin-left: 5mm;" onclick="Mate(event)" ontouchstart="Mate(event)">Mate</button>
       <button class="additional" id="more" style="margin-left: 44mm" onclick="ToggleMore();">More</button>
     </td>
   </tr>
@@ -117,8 +117,8 @@
     <td colspan="2">
       <div id="div_hansokumake_decision_white" style="display: none; height: 0px; text-align: center;">
         <h2>Hansokumake: <label id="label_hansokumake_desc_white">White</label></h2>
-        <button class="remove" style="width: 4.5cm;"                   onclick="SetScore('white', '+disqualification'); ShowHansokumakeDecision(false, 'white');">Disqualification</button>
-        <button class="add"    style="margin-left: 2cm; width: 4.5cm;" onclick="SetScore('white', '-disqualification'); ShowHansokumakeDecision(false, 'white');">No Disqualification</button>
+        <button class="remove" style="width: 4.5cm;"                   onclick="SetScore('white', '+disqualification', event); ShowHansokumakeDecision(false, 'white');">Disqualification</button>
+        <button class="add"    style="margin-left: 2cm; width: 4.5cm;" onclick="SetScore('white', '-disqualification', event); ShowHansokumakeDecision(false, 'white');">No Disqualification</button>
       </div>
     </td>
   </tr>
@@ -127,8 +127,8 @@
     <td colspan="2">
       <div id="div_hansokumake_decision_blue" style="display: none; height: 0px; text-align: center;">
         <h2>Hansokumake: <label id="label_hansokumake_desc_blue">Blue</label></h2>
-        <button class="remove" style="width: 4.5cm;"                   onclick="SetScore('blue', '+disqualification'); ShowHansokumakeDecision(false, 'blue');">Disqualification</button>
-        <button class="add"    style="margin-left: 2cm; width: 4.5cm;" onclick="SetScore('blue', '-disqualification'); ShowHansokumakeDecision(false, 'blue');">No Disqualification</button>
+        <button class="remove" style="width: 4.5cm;"                   onclick="SetScore('blue', '+disqualification', event); ShowHansokumakeDecision(false, 'blue');">Disqualification</button>
+        <button class="add"    style="margin-left: 2cm; width: 4.5cm;" onclick="SetScore('blue', '-disqualification', event); ShowHansokumakeDecision(false, 'blue');">No Disqualification</button>
       </div>
     </td>
   </tr>
@@ -140,11 +140,11 @@
         <div style="font-size: 18pt;">
           <label>Shidos:</label> <span id="white_shidos">0</span>
         </div>
-        <button class="add" onclick="SetScore('white', '+shido');">+Shido</button>
-        <button class="add" onclick="SetScore('white', '+hansokumake');">+Hansoku-Make</button>
+        <button class="add" onclick="SetScore('white', '+shido', event);">+Shido</button>
+        <button class="add" onclick="SetScore('white', '+hansokumake', event);">+Hansoku-Make</button>
         <br/>
-        <button class="remove" onclick="SetScore('white', '-shido');">-Shido</button>
-        <button class="remove" onclick="SetScore('white', '-hansokumake');">-Hansoku-Make</button>
+        <button class="remove" onclick="SetScore('white', '-shido', event);">-Shido</button>
+        <button class="remove" onclick="SetScore('white', '-hansokumake', event);">-Hansoku-Make</button>
       </div>
     </td>
 
@@ -153,11 +153,11 @@
         <div style="font-size: 18pt;">
           <label>Shidos:</label> <span id="blue_shidos">0</span>
         </div>
-        <button class="add" onclick="SetScore('blue', '+shido');">+Shido</button>
-        <button class="add" onclick="SetScore('blue', '+hansokumake');">+Hansoku-Make</button>
+        <button class="add" onclick="SetScore('blue', '+shido', event);">+Shido</button>
+        <button class="add" onclick="SetScore('blue', '+hansokumake', event);">+Hansoku-Make</button>
         <br/>
-        <button class="remove" onclick="SetScore('blue', '-shido');">-Shido</button>
-        <button class="remove" onclick="SetScore('blue', '-hansokumake');">-Hansoku-Make</button>
+        <button class="remove" onclick="SetScore('blue', '-shido', event);">-Shido</button>
+        <button class="remove" onclick="SetScore('blue', '-hansokumake', event);">-Hansoku-Make</button>
       </div>
     </td>
 
@@ -170,9 +170,9 @@
         <div style="font-size: 16pt;">
           <label class="medical_examiniations">Medical Examinations</label>: <span id="white_medics">0</span></h2>
         </div>
-        <button class="add add_medical_examiniations"       style="width: 5.5cm;" onclick="SetScore('white', '+medic');">+Medical Examination</button>
+        <button class="add add_medical_examiniations"       style="width: 5.5cm;" onclick="SetScore('white', '+medic', event);">+Medical Examination</button>
         <br/>
-        <button class="remove remove_medical_examiniations" style="width: 5.5cm;" onclick="SetScore('white', '-medic');">-Medical Examination</button>
+        <button class="remove remove_medical_examiniations" style="width: 5.5cm;" onclick="SetScore('white', '-medic', event);">-Medical Examination</button>
         <br/>
       </div>
     </td>
@@ -182,9 +182,9 @@
         <div style="font-size: 16pt;">
           <label class="medical_examiniations">Medical Examinations:</label> <span id="blue_medics">0</span></h2>
         </div>
-        <button class="add add_medical_examiniations"    style="width: 5.5cm;" onclick="SetScore('blue', '+medic');">+Medical Examination</button>
+        <button class="add add_medical_examiniations"    style="width: 5.5cm;" onclick="SetScore('blue', '+medic', event);">+Medical Examination</button>
         <br/>
-        <button class="remove remove_medical_examiniations" style="width: 5.5cm;" onclick="SetScore('blue', '-medic');">-Medical Examination</button>
+        <button class="remove remove_medical_examiniations" style="width: 5.5cm;" onclick="SetScore('blue', '-medic', event);">-Medical Examination</button>
         <br/>
       </div>
     </td>
@@ -194,10 +194,10 @@
   <tr id="row_decision" style="display: none;">
     <td colspan="2">
       <div id="div_decision" style="display: none; height: 0px; text-align: center; margin-top: 2mm;">
-        <button class="white"   style="width: 3.5cm;" id="white_wins" onclick="SetScore('white', 'hantei'); ShowHantei(false);">White wins</button>
-        <button class="add"     style="width: 3.5cm;" id="draw" onclick="SetScore('', '+draw'); ShowHantei(false);">Draw</button>
-        <button class="additional" style="width: 3.5cm;" id="blue_wins" onclick="SetScore('blue', 'hantei'); ShowHantei(false);">Blue wins</button>
-        <button class="neutral" style="width: 3.5cm;" id="golden_score" onclick="SetScore('', '+golden_score'); ShowHantei(false); ShowRevokeGoldenScore(true); ">Golden Score</button>
+        <button class="white"   style="width: 3.5cm;" id="white_wins" onclick="SetScore('white', 'hantei', event); ShowHantei(false);">White wins</button>
+        <button class="add"     style="width: 3.5cm;" id="draw" onclick="SetScore('', '+draw', event); ShowHantei(false);">Draw</button>
+        <button class="additional" style="width: 3.5cm;" id="blue_wins" onclick="SetScore('blue', 'hantei', event); ShowHantei(false);">Blue wins</button>
+        <button class="neutral" style="width: 3.5cm;" id="golden_score" onclick="SetScore('', '+golden_score', event); ShowHantei(false); ShowRevokeGoldenScore(true); ">Golden Score</button>
       </div>
     </td>
   </tr>
@@ -266,8 +266,10 @@ function Mate()
 }
 
 
-function SetScore(who, command)
+function SetScore(who, command, event)
 {
+  event.preventDefault();
+
   var url;
   if (who.length >= 1)
     url = 'ajax/mat/' + who + '/' + command + '?id='+id;
@@ -305,8 +307,10 @@ function Tokeda()
 }
 
 
-function StartNextMatch()
+function StartNextMatch(event)
 {
+  event.preventDefault();
+
   AjaxCallback('ajax/mat/start_match?id='+id, function(response) {
     if (response != "ok")
         alert("Error: " + response);
@@ -315,8 +319,10 @@ function StartNextMatch()
 }
 
 
-function EndMatch()
+function EndMatch(event)
 {
+  event.preventDefault();
+
   AjaxCallback('ajax/mat/end_match?id='+id, function(respone) {
     GetJudokaName();
     GetScore();
@@ -834,10 +840,10 @@ function GetJudokaName()
         if (CurrentScore.can_next_match_start && match.current_breaktime >= match.breaktime)
           dis = '';
 
-        cell4.innerHTML = '<button ' + dis + ' class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="StartNextMatch()" ontouchstart="StartNextMatch()">' + translate('start_next_match') + '</button>';
+        cell4.innerHTML = '<button ' + dis + ' class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="StartNextMatch(event)" ontouchstart="StartNextMatch(event)">' + translate('start_next_match') + '</button>';
       }
       else
-        cell4.innerHTML = '<button class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="MoveUp(\'' + match.uuid + '\')" ontouchstart="MoveUp(\'' + match.uuid + '\')">' + translate('push_up') + '</button>';
+        cell4.innerHTML = '<button class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="MoveUp(\'' + match.uuid + '\', event)" ontouchstart="MoveUp(\'' + match.uuid + '\', event)">' + translate('push_up') + '</button>';
 
       i++;
     }
