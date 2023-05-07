@@ -117,7 +117,7 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 	ret += "Tournament date: " + File.GetTournamentDate() + "<br/>";
 	ret += "<br/>";
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	for (auto club : File.GetClubs())
 	{
@@ -177,7 +177,7 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 	ret += "Tournament name: " + File.GetTournamentName() + "<br/>";
 	ret += "Tournament date: " + File.GetTournamentDate() + "<br/>";
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	auto club = GetTournament()->FindClubByName(File.GetClub().Name);
 
@@ -279,7 +279,8 @@ Error Application::CheckPermission(const HttpServer::Request& Request, Account::
 
 	auto value = HttpServer::DecodeURLEncoded(header->Value, "session");
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
+
 	auto account = m_Database.IsLoggedIn(Request.m_RequestInfo.RemoteIP, value);
 
 	if (!account || account->GetAccessLevel() < AccessLevel)
@@ -292,6 +293,8 @@ Error Application::CheckPermission(const HttpServer::Request& Request, Account::
 
 IMat* Application::GetDefaultMat() const
 {
+	auto guard = LockReadForScope();
+
 	for (auto mat : m_Mats)
 		if (mat && mat->GetType() == IMat::Type::LocalMat)
 			return mat;
@@ -306,6 +309,8 @@ IMat* Application::GetDefaultMat() const
 
 IMat* Application::FindMat(uint32_t ID)
 {
+	auto guard = LockReadForScope();
+
 	for (auto mat : m_Mats)
 		if (mat && mat->GetMatID() == ID)
 			return mat;
@@ -317,6 +322,8 @@ IMat* Application::FindMat(uint32_t ID)
 
 const IMat* Application::FindMat(uint32_t ID) const
 {
+	auto guard = LockReadForScope();
+
 	for (auto mat : m_Mats)
 		if (mat && mat->GetMatID() == ID)
 			return mat;
@@ -330,6 +337,8 @@ uint32_t Application::GetHighestMatID() const
 {
 	uint32_t ret = 0;
 
+	auto guard = LockReadForScope();
+
 	for (auto mat : m_Mats)
 		if (mat && mat->GetMatID() > ret)
 			ret = mat->GetMatID();
@@ -341,9 +350,9 @@ uint32_t Application::GetHighestMatID() const
 
 bool Application::CloseMat(uint32_t ID)
 {
-	Lock();
+	LockRead();
 	auto mats_copy = m_Mats;
-	Unlock();
+	UnlockRead();
 
 	for (auto it = mats_copy.begin(); it != mats_copy.end(); ++it)
 	{
@@ -355,9 +364,9 @@ bool Application::CloseMat(uint32_t ID)
 				it = m_Mats.erase(it);
 			}
 
-			Lock();
+			LockWrite();
 			m_Mats = std::move(mats_copy);
-			Unlock();
+			UnlockWrite();
 
 			return true;
 		}
@@ -372,7 +381,7 @@ bool Application::StartLocalMat(uint32_t ID)
 {
 	ZED::Log::Info("Starting local mat");
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	for (; true; ID++)
 	{
@@ -418,7 +427,7 @@ bool Application::StartLocalMat(uint32_t ID)
 
 std::vector<Match> Application::GetNextMatches(uint32_t MatID, bool& Success) const
 {
-	if (!TryLock())//Can we get a lock?
+	if (!TryReadLock())//Can we get a lock?
 	{
 		std::vector<Match> empty;
 		Success = false;
@@ -432,12 +441,12 @@ std::vector<Match> Application::GetNextMatches(uint32_t MatID, bool& Success) co
 	if (!GetTournament())
 	{
 		std::vector<Match> empty;
-		Unlock();
+		UnlockRead();
 		return empty;
 	}
 
 	auto ret = GetTournament()->GetNextMatches(MatID);
-	Unlock();
+	UnlockRead();
 
 	return ret;
 }
@@ -458,6 +467,7 @@ bool Application::AddTournament(Tournament* NewTournament)
 		return false;
 	}
 
+	auto guard = LockWriteForScope();
 	m_Tournaments.emplace_back(NewTournament);
 
 	if (NewTournament->GetStatus() == Status::Scheduled)//Fresh new tournament
@@ -482,8 +492,10 @@ bool Application::DeleteTournament(const UUID& UUID)
 
 			const auto filename = "tournaments/" + (*it)->GetName() + ".yml";
 
+			LockWrite();
 			delete *it;
 			m_Tournaments.erase(it);
+			UnlockWrite();
 
 			return ZED::Core::RemoveFile(filename);
 		}
@@ -496,6 +508,8 @@ bool Application::DeleteTournament(const UUID& UUID)
 
 Tournament* Application::FindTournament(const UUID& UUID)
 {
+	auto guard = LockReadForScope();
+
 	for (auto tournament : m_Tournaments)
 		if (tournament && tournament->GetUUID() == UUID)
 			return tournament;
@@ -506,6 +520,8 @@ Tournament* Application::FindTournament(const UUID& UUID)
 
 const Tournament* Application::FindTournament(const UUID& UUID) const
 {
+	auto guard = LockReadForScope();
+
 	for (auto tournament : m_Tournaments)
 		if (tournament && tournament->GetUUID() == UUID)
 			return tournament;
@@ -516,6 +532,8 @@ const Tournament* Application::FindTournament(const UUID& UUID) const
 
 Tournament* Application::FindTournamentByName(const std::string& Name)
 {
+	auto guard = LockReadForScope();
+
 	for (auto tournament : m_Tournaments)
 		if (tournament && tournament->GetName() == Name)
 			return tournament;
@@ -526,6 +544,8 @@ Tournament* Application::FindTournamentByName(const std::string& Name)
 
 const Tournament* Application::FindTournamentByName(const std::string& Name) const
 {
+	auto guard = LockReadForScope();
+
 	for (auto tournament : m_Tournaments)
 		if (tournament && tournament->GetName() == Name)
 			return tournament;
@@ -583,16 +603,20 @@ void Application::Run()
 	uint32_t runtime = 0;
 	while (IsRunning())
 	{
+		LockRead();
 		for (auto it = m_Mats.begin(); it != m_Mats.end();)
 		{
 			if (*it && !(*it)->IsConnected())
 			{
+				LockWrite();
 				delete *it;
 				it = m_Mats.erase(it);
+				UnlockWrite();
 			}
 			else
 				++it;
 		}
+		UnlockRead();
 
 		ZED::Core::Pause(10 * 1000);
 		runtime += 10;

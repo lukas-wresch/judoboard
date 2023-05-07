@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <mutex>
+#include "../ZED/include/read_write_mutex.h"
 #include "database.h"
 #include "tournament.h"
 #include "account.h"
@@ -18,7 +19,7 @@ namespace Judoboard
 
 
 
-	class Application
+	class Application : public ZED::RecursiveReadWriteMutex//TODO should be private/or private member
 	{
 	public:
 		Application() : m_StartupTimestamp(Timer::GetTimestamp()) {
@@ -195,11 +196,11 @@ namespace Judoboard
 			std::recursive_mutex& m_Mutex;
 		};
 
-		[[nodiscard]]
+		/*[[nodiscard]]
 		ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
 		void Lock()    const { m_mutex.lock(); }
 		void Unlock()  const { m_mutex.unlock(); }
-		bool TryLock() const { return m_mutex.try_lock(); }
+		bool TryLock() const { return m_mutex.try_lock(); }*/
 
 
 		enum class Mode
@@ -221,7 +222,8 @@ namespace Judoboard
 
 		std::vector<IMat*> m_Mats;//List of all mats this application is aware of
 
-		mutable std::recursive_mutex m_mutex;
+		//mutable std::recursive_mutex m_mutex;
+		//ZED::ReadWriteMutex m_mutex;
 
 		mutable volatile bool m_Running = true;
 		const uint32_t m_StartupTimestamp;

@@ -47,6 +47,7 @@
     <ClInclude Include="..\..\ZED\include\image.h" />
     <ClInclude Include="..\..\ZED\include\log.h" />
     <ClInclude Include="..\..\ZED\include\png.h" />
+    <ClInclude Include="..\..\ZED\include\read_write_mutex.h" />
     <ClInclude Include="..\..\ZED\include\renderer.h" />
     <ClInclude Include="..\..\ZED\include\renderer_opengl.h" />
     <ClInclude Include="..\..\ZED\include\renderer_sdl2.h" />
