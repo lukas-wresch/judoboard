@@ -349,10 +349,6 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-#ifdef _DEBUG
-		Sleep(5000);
-#endif
-
 		return GetTournament()->Schedule2String();
 	});
 
@@ -365,10 +361,6 @@ void Application::SetupHttpServer()
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
-
-#ifdef _DEBUG
-		Sleep(5000);
-#endif
 
 		return GetTournament()->Participants2String();
 	});
@@ -398,10 +390,6 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::NotLoggedIn);
 
 		auto guard = LockReadForScope();
-
-#ifdef _DEBUG
-		Sleep(5000);
-#endif
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
@@ -3403,10 +3391,6 @@ std::string Application::Ajax_ListAllAgeGroups() const
 
 	auto guard = LockReadForScope();
 
-#ifdef _DEBUG
-	Sleep(5000);
-#endif
-
 	for (const auto age_group : GetDatabase().GetAgeGroups())
 	{
 		if (age_group)
@@ -4083,10 +4067,6 @@ Error Application::Ajax_MoveMatchDown(const HttpServer::Request& Request)
 std::string Application::Ajax_GetHansokumake() const
 {
 	auto guard = LockReadForScope();
-
-#ifdef _DEBUG
-	Sleep(5000);
-#endif
 
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
