@@ -3457,37 +3457,32 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	IFilter::Type type = (IFilter::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "type"));
 	MatchTable::Type fight_system = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "fight_system"));
 
-	auto guard = LockWriteForScope();
-
-	if (!GetTournament())
-		return Error::Type::TournamentNotOpen;
-
 	MatchTable* new_table = nullptr;
 
 	switch (fight_system)
 	{
 	case MatchTable::Type::RoundRobin:
 	{
-		new_table = new RoundRobin(new Weightclass(0, 0), GetTournament());
+		new_table = new RoundRobin(new Weightclass(0, 0));
 		break;
 	}
 
 	case MatchTable::Type::SingleElimination:
 	{
-		new_table = new SingleElimination(new Weightclass(0, 0), GetTournament());
+		new_table = new SingleElimination(new Weightclass(0, 0));
 		break;
 	}
 
 	case MatchTable::Type::Pool:
-		new_table = new Pool(new Weightclass(0, 0), GetTournament());
+		new_table = new Pool(new Weightclass(0, 0));
 		break;
 
 	case MatchTable::Type::DoubleElimination:
-		new_table = new DoubleElimination(new Weightclass(0, 0), GetTournament());
+		new_table = new DoubleElimination(new Weightclass(0, 0));
 		break;
 
 	case MatchTable::Type::Custom:
-		new_table = new CustomTable(GetTournament());
+		new_table = new CustomTable();
 		break;
 
 	default:
@@ -3497,7 +3492,17 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	if (id)
 		new_table->SetUUID(std::move(id));
 
+	LockWrite();
+
+	if (!GetTournament())
+	{
+		delete new_table;
+		return Error::Type::TournamentNotOpen;
+	}
+
 	GetTournament()->AddMatchTable(new_table);
+
+	UnlockWrite();
 
 	Request.m_Query = "id=" + (std::string)new_table->GetUUID();
 	if (!Ajax_EditMatchTable(Request))
