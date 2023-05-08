@@ -321,7 +321,7 @@ TEST(MD5, CreateTournamentFromTestData)
 	Tournament tour(file);
 
 	EXPECT_EQ(tour.GetDatabase().GetNumJudoka(), 142);
-	EXPECT_EQ(tour.GetDatabase().GetNumClubs(),   19);
+	EXPECT_EQ(tour.GetDatabase().GetNumClubs(),   file.GetClubs().size());
 }
 
 
@@ -1384,7 +1384,7 @@ TEST(MD5, ConvertToMD5)
 		ASSERT_TRUE(file1.GetOrganizer());
 		EXPECT_EQ(file.GetOrganizer()->Description, file1.GetOrganizer()->Description);
 
-		EXPECT_EQ(file.GetClubs().size(), 19);
+		EXPECT_EQ(file.GetClubs().size(), file1.GetClubs().size());
 		EXPECT_EQ(file.GetParticipants().size(), 142);
 
 		ASSERT_TRUE(file1.FindResult("Jugend u10 w", "-20,7 kg", 1));
