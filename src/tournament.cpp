@@ -1034,6 +1034,10 @@ uint32_t Tournament::GetHighestMatIDUsed() const
 		if (match && match->GetMatID() > max)
 			max = match->GetMatID();
 
+	for (auto table : m_MatchTables)
+		if (table && table->GetMatID() > max)
+			max = table->GetMatID();
+
 	return max;
 }
 
