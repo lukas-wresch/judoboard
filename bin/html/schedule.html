@@ -203,12 +203,18 @@ function AssignAgeGroup(judoka_id, age_group_id)
 
 
 
-function Update()
+let updateMasterscheduleRunning = false;
+
+function Update_Masterschedule()
 {
+  updateMasterscheduleRunning = true;
+
   AjaxCallback("ajax/get_masterschedule", function(response) {
     console.log(response);
     var res = YAML.parse(response);
     //console.log(res);
+
+    updateMasterscheduleRunning = false;
 
     var mat_to_display = document.getElementById("display_mat");
     var mat_to_display_selected = mat_to_display.value;
@@ -301,9 +307,11 @@ function Update()
       }
     }
   });
+}
 
 
-
+function Update_Schedule()
+{
   AjaxCallback("ajax/get_schedule", function(response) {
     //console.log(response);
     var res = YAML.parse(response);
@@ -429,9 +437,12 @@ function Update()
       cell7.innerHTML = options;
     }
   });
+}
 
 
 
+function Update_AgeGroups()
+{
   AjaxCallback("ajax/age_groups/list", function(response) {
     //console.log(response);
     var res = YAML.parse(response);
@@ -484,9 +495,12 @@ function Update()
       cell5.style.textAlign = "center";
     }
   });
+}
 
 
 
+function Update_Participants()
+{
   AjaxCallback("ajax/participants/get", function(response) {
     //console.log(response);
     var res = YAML.parse(response);
@@ -572,9 +586,12 @@ function Update()
       cell5.style.textAlign = "center";
     }
   });
+}
 
 
 
+function Update_Hansokumake()
+{
   AjaxCallback("ajax/hansokumake/get", function(response) {
     console.log(response);
     var res = YAML.parse(response);
@@ -662,11 +679,35 @@ function Update()
 }
 
 
+
+let updateRunning = false;
+let updateCounter = 0;
+
+function Update()
+{
+  if (updateRunning)
+    return;
+
+  Update_Masterschedule();
+  Update_Schedule();
+  if (updateCounter%3 == 0)
+    Update_Participants();
+  if (updateCounter%7 == 0)
+    Update_AgeGroups();
+  if (updateCounter%2 == 0)
+    Update_Hansokumake();
+
+  updateCounter++;
+
+  TimerID = setTimeout(Update, 6000);
+}
+
+
 var showHansokumake = false;
 
 
 Update();
-TimerID = window.setInterval(Update, 6000);
+//TimerID = window.setInterval(Update, 6000);
 
 
 document.getElementById("headline").innerHTML = translate('schedule');
