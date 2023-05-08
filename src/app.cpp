@@ -622,7 +622,7 @@ void Application::Run()
 		if (GetTournament() && GetTournament()->IsLocal())
 		{
 			Tournament* tournament = (Tournament*)GetTournament();
-			if (tournament->TimeSinceLastSave() >= 10 * 60 * 1000)//10 minutes
+			if (tournament->IsAutoSave() && tournament->TimeSinceLastSave() >= 10 * 60 * 1000)//10 minutes
 			{
 				ZED::Log::Info("Tournament auto-saved");
 				tournament->Save();
