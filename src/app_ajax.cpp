@@ -690,11 +690,6 @@ void Application::SetupHttpServer()
 		if (!mat->EndMatch())
 			return Error(Error::Type::OperationFailed);
 
-		auto guard = LockReadForScope();
-		//TODO this should only be queued and happend in a separate thread!
-		if (GetTournament())
-			GetTournament()->Save();
-
 		return Error();//OK
 	});
 
@@ -744,7 +739,7 @@ void Application::SetupHttpServer()
 		if (!mat)
 			return Error(Error::Type::MatNotFound);
 
-		auto& list = mat->GetOsaekomiList();
+		auto list = mat->GetOsaekomiList();
 		ZED::CSV ret;
 		for (auto& entry : list)
 			ret << entry.m_Who << entry.m_Time;
@@ -2069,7 +2064,10 @@ void Application::SetupHttpServer()
 		auto guard = LockWriteForScope();
 
 		if (GetTournament())
+		{
 			GetTournament()->Save();
+			ZED::Log::Info("Tournament saved");
+		}
 
 		if (!CloseTournament())
 			return std::string("Could not close tournament");

@@ -382,6 +382,8 @@ bool Tournament::Load(const YAML::Node& yaml)
 		}
 	}
 
+	m_LastSaveTime = Timer::GetTimestamp();
+
 	return true;
 }
 

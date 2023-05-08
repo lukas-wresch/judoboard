@@ -180,7 +180,9 @@ namespace Judoboard
 		virtual std::vector<std::pair<UUID, size_t>> GetLots() const override { return m_AssociationToLotNumber; }
 
 		//Events
-		virtual void OnMatchConcluded(const Match& Match) const override {}
+		virtual void OnMatchConcluded(const Match& Match) const override {
+			ScheduleSave();
+		}
 
 		//Serialization
 		const std::string Schedule2String() const override;
