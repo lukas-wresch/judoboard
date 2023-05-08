@@ -134,7 +134,7 @@ namespace ZED
         {
             std::unique_lock<std::recursive_mutex> lock(m_Mutex);
             while (m_WaitingWriters > 0 ||
-                  ( m_Writing && m_OwnerID != std::this_thread::get_id()) )
+                  ( m_WritingCount > 0 && m_OwnerID != std::this_thread::get_id()) )
                 m_Cond.wait(lock);
             m_ReadCount++;
             m_ReaderIDs[std::this_thread::get_id()]++;
@@ -153,7 +153,7 @@ namespace ZED
         bool TryReadLock() const
         {
             std::unique_lock<std::recursive_mutex> lock(m_Mutex, std::try_to_lock);
-            if (!lock || (m_Writing && m_OwnerID != std::this_thread::get_id()) )
+            if (!lock || (m_WritingCount > 0 && m_OwnerID != std::this_thread::get_id()) )
                 return false;
 
             m_ReadCount++;
@@ -167,21 +167,22 @@ namespace ZED
             std::unique_lock<std::recursive_mutex> lock(m_Mutex);
 
             m_WaitingWriters++;
-            while (m_ReadCount > 0 || (m_Writing && m_OwnerID != std::this_thread::get_id()) )
+            while (m_ReadCount > 0 || (m_WritingCount > 0 && m_OwnerID != std::this_thread::get_id()) )
                 m_Cond.wait(lock);
             m_WaitingWriters--;
 
-            m_Writing = true;
+            m_WritingCount++;
             m_OwnerID = std::this_thread::get_id();
         }
 
         void UnlockWrite()
         {
-            assert(m_Writing);
+            assert(m_WritingCount > 0);
             std::unique_lock<std::recursive_mutex> lock(m_Mutex);
 
-            m_Writing = false;
-            m_OwnerID = std::thread::id();
+            m_WritingCount--;
+            if (m_WritingCount == 0)
+                m_OwnerID = std::thread::id();
 
             if (m_WaitingWriters > 0)
                 m_Cond.notify_all();
@@ -192,16 +193,16 @@ namespace ZED
         bool TryWriteLock()
         {
             std::unique_lock<std::recursive_mutex> lock(m_Mutex, std::try_to_lock);
-            if (!lock || m_ReadCount > 0 || (m_Writing && m_OwnerID != std::this_thread::get_id()) )
+            if (!lock || m_ReadCount > 0 || (m_WritingCount > 0 && m_OwnerID != std::this_thread::get_id()) )
                 return false;
 
-            m_Writing = true;
+            m_WritingCount++;
             m_OwnerID = std::this_thread::get_id();
             return true;
         }
 
     private:
-        bool m_Writing = false;
+        int m_WritingCount = 0;
         int m_WaitingWriters = 0;
         mutable int m_ReadCount = 0;
 

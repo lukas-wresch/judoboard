@@ -3492,7 +3492,7 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	if (id)
 		new_table->SetUUID(std::move(id));
 
-	LockWrite();
+	auto guard = LockWriteForScope();
 
 	if (!GetTournament())
 	{
@@ -3502,13 +3502,10 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 
 	GetTournament()->AddMatchTable(new_table);
 
-	UnlockWrite();
-
 	Request.m_Query = "id=" + (std::string)new_table->GetUUID();
 	if (!Ajax_EditMatchTable(Request))
 		return Error::Type::OperationFailed;
 
-	GetTournament()->Save();
 	return Error();//OK
 }
 
@@ -3516,9 +3513,6 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 
 Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 {
-	if (!GetTournament())
-		return Error::Type::TournamentNotOpen;
-
 	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 	IFilter::Type type = (IFilter::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "type"));
 	MatchTable::Type fight_system = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "fight_system"));
@@ -3528,7 +3522,11 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Body, "age_group");
 	UUID rule_set_id  = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 
+
 	auto guard = LockWriteForScope();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
 
 	auto table = GetTournament()->FindMatchTable(id);
 
@@ -3540,7 +3538,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	{
 		//Re-create match table
 
-		auto color          = table->GetColor();
+		auto color = table->GetColor();
 		auto schedule_index = table->GetScheduleIndex();
 
 		if (!GetTournament()->RemoveMatchTable(*table))
@@ -3562,7 +3560,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	auto age_group = m_Database.FindAgeGroup(age_group_id);
 	if (!age_group)
 		age_group = GetTournament()->FindAgeGroup(age_group_id);
-	auto rule_set  = m_Database.FindRuleSet(rule_set_id);
+	auto rule_set = m_Database.FindRuleSet(rule_set_id);
 	if (!rule_set)
 		rule_set = GetTournament()->FindRuleSet(rule_set_id);
 
@@ -3596,7 +3594,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
 		auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
-		int  gender    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
+		int  gender = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "gender"));
 
 		weightclass->SetMinWeight(Weight(minWeight));
 		weightclass->SetMaxWeight(Weight(maxWeight));
@@ -3610,62 +3608,62 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 	switch (table->GetType())
 	{
-	case MatchTable::Type::RoundRobin:
-	{
-		RoundRobin* round_robin = (RoundRobin*)table;
+		case MatchTable::Type::RoundRobin:
+		{
+			RoundRobin* round_robin = (RoundRobin*)table;
 
-		GetTournament()->Lock();
+			GetTournament()->Lock();
 
-		round_robin->IsBestOfThree(bo3);
+			round_robin->IsBestOfThree(bo3);
 
-		GetTournament()->Unlock();
-		break;
-	}
+			GetTournament()->Unlock();
+			break;
+		}
 
-	case MatchTable::Type::SingleElimination:
-	{
-		SingleElimination* single_table = (SingleElimination*)table;
+		case MatchTable::Type::SingleElimination:
+		{
+			SingleElimination* single_table = (SingleElimination*)table;
 
-		GetTournament()->Lock();
+			GetTournament()->Lock();
 
-		single_table->IsBestOfThree(bo3);
-		single_table->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
-		single_table->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
+			single_table->IsBestOfThree(bo3);
+			single_table->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
+			single_table->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
 
-		GetTournament()->Unlock();
-		break;
-	}
+			GetTournament()->Unlock();
+			break;
+		}
 
-	case MatchTable::Type::Pool:
-	{
-		Pool* pool = (Pool*)table;
+		case MatchTable::Type::Pool:
+		{
+			Pool* pool = (Pool*)table;
 
-		GetTournament()->Lock();
+			GetTournament()->Lock();
 
-		pool->IsBestOfThree(bo3);
-		pool->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
-		pool->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
+			pool->IsBestOfThree(bo3);
+			pool->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
+			pool->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
 
-		GetTournament()->Unlock();
-		break;
-	}
+			GetTournament()->Unlock();
+			break;
+		}
 
-	case MatchTable::Type::DoubleElimination:
-	{
-		DoubleElimination* doubleEli = (DoubleElimination*)table;
+		case MatchTable::Type::DoubleElimination:
+		{
+			DoubleElimination* doubleEli = (DoubleElimination*)table;
 
-		GetTournament()->Lock();
+			GetTournament()->Lock();
 
-		doubleEli->IsBestOfThree(bo3);
-		doubleEli->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
-		doubleEli->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
+			doubleEli->IsBestOfThree(bo3);
+			doubleEli->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
+			doubleEli->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
 
-		GetTournament()->Unlock();
-		break;
-	}
+			GetTournament()->Unlock();
+			break;
+		}
 
-	default:
-		return Error(Error::Type::InternalError);
+		default:
+			return Error(Error::Type::InternalError);
 	}
 
 	if (!GetTournament()->UpdateMatchTable(id))
