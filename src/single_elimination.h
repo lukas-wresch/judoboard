@@ -34,6 +34,8 @@ namespace Judoboard
 			IsBestOfThree(rhs.IsBestOfThree());
 
 			SetSchedule(std::move(rhs.SetSchedule()));
+			for (auto match : GetSchedule())
+				match->SetMatchTable(this);
 		}
 
 		static std::string GetHTMLForm();

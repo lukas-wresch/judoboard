@@ -234,7 +234,7 @@ void Tournament::Reset()
 	if (IsReadonly())
 		return;
 
-  m_Description.clear();
+	m_Description.clear();
   
 	//Clear but don't delete standing data since this could be shared with a database
 	m_StandingData.GetAllJudokas().clear();
