@@ -32,6 +32,8 @@ namespace Judoboard
 		Tournament(const MD5& File, Database* pDatabase = nullptr);
 		~Tournament();
 
+		virtual bool IsLocal() const { return true; }
+
 		void Reset();
 
 		bool Load(const YAML::Node& yaml);
@@ -191,6 +193,14 @@ namespace Judoboard
 			if (!m_AutoSave) return true;
 			return SaveYAML("tournaments/" + m_Name + ".yml");
 		}
+		void ScheduleSave() const
+		{
+			m_LastSaveTime = 0;
+		}
+		uint32_t TimeSinceLastSave() const
+		{
+			return Timer::GetTimestamp() - m_LastSaveTime;
+		}
 
 	private:
 		bool LoadYAML(const std::string& Filename);
@@ -219,6 +229,7 @@ namespace Judoboard
 
 		std::string m_Name;
 		bool m_AutoSave = true;
+		mutable uint32_t m_LastSaveTime = 0;//Timestamp when the file was saved
 		std::string m_Description;
 		bool m_Readonly = false;
 

@@ -214,8 +214,6 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			}
 		}
 	}
-
-	Save();
 }
 
 
@@ -518,6 +516,8 @@ bool Tournament::SaveYAML(const std::string& Filename)
 	yaml << YAML::EndMap;
 	file << yaml.c_str();
 
+	m_LastSaveTime = Timer::GetTimestamp();
+
 	ZED::Log::Info("Tournament " + Filename + " saved successfully");
 	return true;
 }
@@ -687,7 +687,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 		AddMatchTable(new_match_table);
 	}
 
-	Save();
+	ScheduleSave();
 
 	return true;
 }
@@ -767,7 +767,7 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
 		}
 	}
 
-	Save();
+	ScheduleSave();
 	return true;
 }
 
@@ -846,7 +846,7 @@ bool Tournament::MoveMatchUp(const UUID& MatchID, uint32_t MatID)
 	m_Schedule[prev_match_index] = curr_match;
 	m_Schedule[current_index]    = prev_match;
 
-	Save();
+	ScheduleSave();
 
 	return true;
 }
@@ -899,7 +899,7 @@ bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 	m_Schedule[curr_match_index] = next_match;
 	m_Schedule[next_match_index] = curr_match;
 
-	Save();
+	ScheduleSave();
 
 	return true;
 }
@@ -981,8 +981,7 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 
 	if (added)
 		GenerateSchedule();
-	else
-		Save();
+	ScheduleSave();
 
 	return true;
 }
@@ -1368,7 +1367,7 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 		}
 	}
 
-	Save();
+	ScheduleSave();
 	return true;
 }
 
@@ -1406,7 +1405,7 @@ bool Tournament::RemoveAgeGroup(const UUID& UUID)
 			FindAgeGroupForJudoka(*judoka);
 	}
 
-	Save();
+	ScheduleSave();
 	return true;
 }
 
@@ -1434,7 +1433,7 @@ bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* Ag
 	//Add him to his new age group
 	m_JudokaToAgeGroup.insert({ Judoka->GetUUID(), AgeGroup->GetUUID() });
 
-	Save();
+	ScheduleSave();
 	return true;
 }
 
@@ -1698,9 +1697,6 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 
 	auto guard = LockTillScopeEnd();
 
-	bool temp_auto_save = IsAutoSave();
-	EnableAutoSave(false);//Disable temporarily for performance reasons
-
 	//Remove old weightclasses
 	for (const auto& desc : Descriptors)
 	{
@@ -1742,8 +1738,7 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 		}
 	}
 
-	EnableAutoSave(temp_auto_save);
-	Save();
+	ScheduleSave();
 
 	return true;
 }
@@ -1798,7 +1793,7 @@ void Tournament::Disqualify(const Judoka& Judoka)
 	}
 
 	Unlock();
-	Save();
+	ScheduleSave();
 }
 
 
@@ -1834,7 +1829,7 @@ void Tournament::RevokeDisqualification(const Judoka& Judoka)
 	}
 
 	Unlock();
-	Save();
+	ScheduleSave();
 }
 
 
@@ -2251,5 +2246,5 @@ void Tournament::GenerateSchedule()
 
 	Unlock();
 
-	Save();
+	ScheduleSave();
 }

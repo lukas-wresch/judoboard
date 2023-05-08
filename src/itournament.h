@@ -14,6 +14,7 @@ namespace Judoboard
 	class ITournament : public ID
 	{
 	public:
+		virtual bool IsLocal() const = 0;
 		virtual std::string GetName() const { return ""; }//Returns the name of the tournament
 		//const auto& GetSchedule() const { return m_Schedule; }
 		virtual Match* FindMatch(const UUID& UUID) const { return nullptr; }
