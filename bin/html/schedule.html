@@ -26,7 +26,7 @@
 
 <h2 id="headline">Schedule</h2>
 <label style="width:150px;float:left;margin-top:0px;" id="label_mat_display">Show matches on</label>
-  <select style="margin-bottom:20px; width: 200px;" id="display_mat" onchange='Update();'>
+  <select style="margin-bottom:20px; width: 200px;" id="display_mat" onchange='Update_Schedule();'>
   </select>
 
 <table id="schedule" border="1" rules="all" style="margin-bottom: 1cm;">
@@ -78,7 +78,7 @@ function MoveEntryUp(id)
 {
   var mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_up?id=' + id, function() {
-    Update();
+    Update_Masterschedule();
   });
   return false;
 }
@@ -98,7 +98,7 @@ function MoveEntryDown(id)
 function SetEntryMat(id, mat)
 {
   AjaxCallback('ajax/masterschedule/set_mat?id='+id+'&mat='+mat, function() {
-    Update();
+    Update_Masterschedule();
   });
 
   return false;
@@ -110,7 +110,7 @@ function MoveUp(id)
 {
   var mat_to_display = document.getElementById("display_mat").value;
   AjaxCallback('/ajax/match/move_up?id=' + id + '&mat=' + mat_to_display, function() {
-    Update();
+    Update_Schedule();
   });
   return false;
 }
@@ -120,7 +120,7 @@ function MoveDown(id)
 {
   var mat_to_display = document.getElementById("display_mat").value;
   AjaxCallback('/ajax/match/move_down?id=' + id + '&mat=' + mat_to_display, function() {
-    Update();
+    Update_Schedule();
   });
   return false;
 }
@@ -130,7 +130,7 @@ function MoveDown(id)
 function RemoveParticipant(id)
 {
   AjaxCallback('/ajax/participant/remove?id=' + id, function() {
-    Update();
+    Update_Participants();
   });
   return false;
 }
@@ -188,7 +188,7 @@ function RemoveNoDisqualify(fighter, matID)
 function RemoveAgeGroup(id)
 {
   AjaxCallback('/ajax/age_groups/remove?id=' + id, function() {
-    Update();
+    Update_AgeGroups();
   });
   return false;
 }
@@ -197,7 +197,7 @@ function RemoveAgeGroup(id)
 
 function AssignAgeGroup(judoka_id, age_group_id)
 {
-  AjaxCallback('/ajax/tournament/assign_age_group?id=' + judoka_id + '&age=' + age_group_id, Update);
+  AjaxCallback('/ajax/tournament/assign_age_group?id=' + judoka_id + '&age=' + age_group_id, Update_Participants);
   return false;
 }
 
