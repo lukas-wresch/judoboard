@@ -2,6 +2,28 @@
 
 
 
+TEST(MD5, AgeGroups)
+{
+	initialize();
+
+	{
+		MD5 file1("test-data/BEM_U13_2023.md7");//Read MD7 file
+
+		ASSERT_TRUE(file1);
+
+		Database db;
+		Tournament tour_temp(file1, &db);//Convert to native
+
+		ASSERT_EQ(tour_temp.GetAgeGroups().size(), 2);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[0]->GetMinAge(), 10);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[0]->GetMaxAge(), 12);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[1]->GetMinAge(), 10);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[1]->GetMaxAge(), 12);
+	}
+}
+
+
+
 TEST(MD5, AssignAgeGroups)
 {
 	initialize();
