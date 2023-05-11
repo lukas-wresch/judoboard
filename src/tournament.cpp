@@ -407,7 +407,10 @@ bool Tournament::LoadYAML(const std::string& Filename)
 	}
 
 	if (!Load(yaml))
+	{
+		ZED::Log::Error("Failed to load tournament " + Filename);
 		return false;
+	}
 
 	ZED::Log::Info("Tournament " + Filename + " loaded successfully");
 	return true;
@@ -423,7 +426,10 @@ bool Tournament::SaveYAML(const std::string& Filename)
 	std::ofstream file(Filename);
 
 	if (!file)
+	{
+		ZED::Log::Error("Could not open file!");
 		return false;
+	}
 
 	auto guard = LockTillScopeEnd();
 

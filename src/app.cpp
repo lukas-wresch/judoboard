@@ -625,7 +625,8 @@ void Application::Run()
 			if (tournament->IsAutoSave() && tournament->TimeSinceLastSave() >= 10 * 60 * 1000)//10 minutes
 			{
 				ZED::Log::Info("Tournament auto-saved");
-				tournament->Save();
+				if (!tournament->Save())
+					ZED::Log::Error("Failed to save!");
 			}
 		}
 		UnlockRead();
