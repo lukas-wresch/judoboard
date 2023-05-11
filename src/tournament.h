@@ -226,8 +226,8 @@ namespace Judoboard
 			std::recursive_mutex& m_Mutex;
 		};
 
-		[[nodiscard]]
-		ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
+		//[[nodiscard]]
+		//ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
 
 		std::string m_Name;
 		bool m_AutoSave = true;

@@ -270,7 +270,7 @@ bool Tournament::Load(const YAML::Node& yaml)
 		return false;
 	}
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	m_Name = yaml["name"].as<std::string>();
 
@@ -431,7 +431,7 @@ bool Tournament::SaveYAML(const std::string& Filename)
 		return false;
 	}
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	YAML::Emitter yaml;
 
@@ -537,7 +537,7 @@ Status Tournament::GetStatus() const
 	if (IsReadonly())
 		return Status::Concluded;
     
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	if (m_Schedule.size() == 0)
 		return Status::Scheduled;
@@ -574,7 +574,7 @@ Status Tournament::GetStatus() const
 
 bool Tournament::CanCloseTournament() const
 {
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
@@ -591,7 +591,7 @@ void Tournament::DeleteAllMatchResults()
 	if (IsReadonly())
 		return;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
@@ -630,7 +630,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 		return false;
 	}
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	//Do we have the match already?
 	auto schedule = GetSchedule();
@@ -704,7 +704,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 
 Match* Tournament::GetNextMatch(int32_t MatID) const
 {
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
@@ -723,7 +723,7 @@ Match* Tournament::GetNextMatch(int32_t MatID) const
 
 const Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
 {
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	auto schedule = GetSchedule();
 	for (; StartIndex < schedule.size(); StartIndex++)
@@ -748,7 +748,7 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
 	if (IsReadonly())
 		return false;
     
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	if (GetStatus() == Status::Concluded)
 		return false;
@@ -785,7 +785,7 @@ std::vector<Match*> Tournament::GetSchedule() const
 {
 	std::vector<Match*> ret;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	for (auto [table, index] : m_Schedule)
 	{
@@ -801,7 +801,7 @@ std::vector<Match*> Tournament::GetSchedule() const
 
 Match* Tournament::FindMatch(const UUID& UUID) const
 {
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	for (auto table : m_MatchTables)
 		for (auto match : table->GetSchedule())
@@ -824,7 +824,7 @@ bool Tournament::MoveMatchUp(const UUID& MatchID, uint32_t MatID)
 	size_t prev_match_index = 0;
 	size_t current_index = 0;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	auto schedule = GetSchedule();
 	for (; current_index < schedule.size(); current_index++)
@@ -870,7 +870,7 @@ bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 	size_t curr_match_index = 0;
 	bool found = false;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	auto schedule = GetSchedule();
 	for (size_t index = 0; index < m_Schedule.size(); index++)
@@ -918,7 +918,7 @@ std::vector<Match> Tournament::GetNextMatches(uint32_t MatID) const
 {
 	std::vector<Match> ret;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	uint32_t id = 0;
 	for (int i = 0; i < 3; i++)
@@ -941,7 +941,7 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 	if (!Judoka || IsParticipant(*Judoka))
 		return false;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	//Do we have an organizer?
 	if (m_Organizer)
@@ -966,7 +966,6 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 	if (!m_StandingData.AddJudoka(Judoka))
 	{
 		ZED::Log::Warn("Could not add judoka!");
-		Unlock();
 		return false;
 	}
 
@@ -1001,7 +1000,7 @@ bool Tournament::RemoveParticipant(const UUID& UUID)
 	if (IsReadonly())
 		return false;
     
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	const Judoka* deleted_judoka = m_StandingData.FindJudoka(UUID);
 
@@ -1035,7 +1034,7 @@ uint32_t Tournament::GetHighestMatIDUsed() const
 {
 	uint32_t max = 0;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
@@ -1053,7 +1052,7 @@ uint32_t Tournament::GetHighestMatIDUsed() const
 
 bool Tournament::IsMatUsed(uint32_t ID) const
 {
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	auto schedule = GetSchedule();
 	for (const auto match : schedule)
@@ -1070,7 +1069,7 @@ void Tournament::SwapAllFighters()
 	if (IsReadonly())
 		return;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	for (auto match : GetSchedule())
 	{
@@ -1086,7 +1085,7 @@ MatchTable* Tournament::FindMatchTable(const UUID& ID)
 	if (IsReadonly())
 		return nullptr;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	for (auto table : m_MatchTables)
 	{
@@ -1117,7 +1116,7 @@ MatchTable* Tournament::FindMatchTable(const UUID& ID)
 
 const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 {
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	for (auto table : m_MatchTables)
 	{
@@ -1151,7 +1150,7 @@ MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
 	if (IsReadonly())
 		return nullptr;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	for (auto table : m_MatchTables)
 	{
@@ -1169,7 +1168,7 @@ MatchTable* Tournament::FindMatchTableByDescription(const std::string& Descripti
 	if (IsReadonly())
 		return nullptr;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	for (auto table : m_MatchTables)
 	{
@@ -1189,7 +1188,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	if (!NewMatchTable)
 		return;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	if (FindMatchTable(*NewMatchTable))
 		return;//Nothing to add
@@ -1250,7 +1249,7 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 	if (GetStatus() != Status::Scheduled)
 		return false;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	auto matchTable = FindMatchTable(UUID);
 
@@ -1322,7 +1321,7 @@ bool Tournament::RemoveMatchTable(const UUID& UUID)
 	if (IsReadonly())
 		return false;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	auto matchTable = FindMatchTable(UUID);
 
@@ -1356,7 +1355,7 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 	if (!NewAgeGroup)
 		return false;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	if (m_StandingData.FindAgeGroup(NewAgeGroup->GetUUID()))
 		return false;
@@ -1390,7 +1389,7 @@ bool Tournament::RemoveAgeGroup(const UUID& UUID)
 	if (IsReadonly())
 		return false;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	auto age_group_to_remove = m_StandingData.FindAgeGroup(UUID);
 
@@ -1431,7 +1430,7 @@ bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* Ag
 	if (!Judoka || !AgeGroup)
 		return false;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	if (!IsParticipant(*Judoka))
 		return false;
@@ -1455,7 +1454,7 @@ std::vector<const AgeGroup*> Tournament::GetEligableAgeGroupsOfJudoka(const Judo
 {
 	std::vector<const AgeGroup*> ret;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	for (auto age_group : m_StandingData.GetAgeGroups())
 	{
@@ -1472,7 +1471,7 @@ std::vector<const AgeGroup*> Tournament::GetAgeGroups() const
 {
 	std::vector<const AgeGroup*> ret;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	for (auto age_group : m_StandingData.GetAgeGroups())
 		ret.emplace_back(age_group);
@@ -1487,7 +1486,7 @@ void Tournament::GetAgeGroupInfo(YAML::Emitter& Yaml, const AgeGroup* AgeGroup) 
 	if (!AgeGroup)
 		return;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	size_t num_match_tables = 0;
 	size_t num_matches = 0;
@@ -1522,7 +1521,7 @@ bool Tournament::MoveScheduleEntryUp(const UUID& UUID)
 	if (GetStatus() == Status::Concluded)
 		return false;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	uint32_t index = 0;
 	for (; index < m_MatchTables.size(); ++index)
@@ -1553,7 +1552,7 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 	if (GetStatus() == Status::Concluded)
 		return false;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	uint32_t index = 0;
 	for (; index < m_MatchTables.size(); ++index)
@@ -1572,8 +1571,9 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 	if (entry->GetStatus() != Status::Scheduled)//Don't move if already started
 		return false;
 
-	Lock();
+	LockWrite();
 	m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() + 1);
+	UnlockWrite();
 
 	GenerateSchedule();
 	return true;
@@ -1585,7 +1585,7 @@ std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min
 {
 	std::vector<WeightclassDescCollection> ret;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockReadForScope();
 
 	if (AgeGroups.empty())
 	{
@@ -1707,7 +1707,7 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 	if (IsReadonly())
 		return false;
 
-	auto guard = LockTillScopeEnd();
+	auto guard = LockWriteForScope();
 
 	//Remove old weightclasses
 	for (const auto& desc : Descriptors)
@@ -1759,11 +1759,11 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 
 bool Tournament::IsDisqualified(const Judoka& Judoka) const
 {
-	Lock();
+	LockRead();
 
 	bool ret = m_DisqualifiedJudoka.find(Judoka.GetUUID()) != m_DisqualifiedJudoka.cend();
 
-	Unlock();
+	UnlockRead();
 
 	return ret;
 }
@@ -1775,7 +1775,7 @@ void Tournament::Disqualify(const Judoka& Judoka)
 	if (IsReadonly())
 		return;
 
-	Lock();
+	auto guard = LockWriteForScope();
 
 	m_DisqualifiedJudoka.insert(Judoka.GetUUID());
 
@@ -1804,7 +1804,6 @@ void Tournament::Disqualify(const Judoka& Judoka)
 		}
 	}
 
-	Unlock();
 	ScheduleSave();
 }
 
@@ -1817,7 +1816,7 @@ void Tournament::RevokeDisqualification(const Judoka& Judoka)
 	if (!IsDisqualified(Judoka))
 		return;
 
-	Lock();
+	auto guard = LockWriteForScope();
 
 	m_DisqualifiedJudoka.erase(Judoka.GetUUID());
 
@@ -1840,7 +1839,6 @@ void Tournament::RevokeDisqualification(const Judoka& Judoka)
 		}
 	}
 
-	Unlock();
 	ScheduleSave();
 }
 
@@ -1853,7 +1851,7 @@ bool Tournament::PerformLottery()
 	if (GetStatus() != Status::Scheduled)
 		return false;
 
-	Lock();
+	LockWrite();
 
 	std::unordered_set<UUID> clubsforlottery;
 	auto organizer_level = 5;//Default organizer level
@@ -1896,7 +1894,7 @@ bool Tournament::PerformLottery()
 	std::sort(m_AssociationToLotNumber.begin(), m_AssociationToLotNumber.end(),
 		[](const auto& a, const auto& b) { return a.second < b.second; });
 
-	Unlock();
+	UnlockWrite();
 
 	for (auto table : m_MatchTables)
 		table->OnLotteryPerformed();
@@ -1910,6 +1908,8 @@ bool Tournament::PerformLottery()
 
 size_t Tournament::GetLotOfAssociation(const UUID& UUID) const
 {
+	auto guard = LockReadForScope();
+
 	for (auto [assoc, lot] : m_AssociationToLotNumber)
 		if (assoc == UUID)
 			return lot;
@@ -1924,14 +1924,14 @@ const std::string Tournament::Schedule2String() const
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
 
-	Lock();
+	LockRead();
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
 	{
 		if (match)
 			match->ToString(ret);
 	}
-	Unlock();
+	UnlockRead();
 
 	ret << YAML::EndSeq;
 	return ret.c_str();
@@ -1943,7 +1943,7 @@ const std::string Tournament::Participants2String() const
 {
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
-	Lock();
+	LockRead();
 
 	auto schedule = GetSchedule();
 	for (auto judoka : m_StandingData.GetAllJudokas())
@@ -1991,7 +1991,7 @@ const std::string Tournament::Participants2String() const
 		ret << YAML::EndMap;
 	}
 
-	Unlock();
+	UnlockRead();
 	ret << YAML::EndSeq;
 	return ret.c_str();
 }
@@ -2003,7 +2003,7 @@ const std::string Tournament::MasterSchedule2String() const
 	YAML::Emitter ret;
 	ret << YAML::BeginMap;
 
-	Lock();
+	LockRead();
 
 	const auto highest_matID = GetHighestMatIDUsed();
 	ret << YAML::Key << "highest_mat_id" << YAML::Value << highest_matID;
@@ -2075,7 +2075,7 @@ const std::string Tournament::MasterSchedule2String() const
 		ret << YAML::EndSeq;
 	}
 
-	Unlock();
+	UnlockRead();
 
 	ret << YAML::EndMap;//master schedule
 	ret << YAML::EndMap;
@@ -2169,7 +2169,7 @@ void Tournament::GenerateSchedule()
 	if (GetStatus() != Status::Scheduled)
 		return;
 
-	Lock();
+	auto guard = LockWriteForScope();
 
 	m_Schedule.clear();
 
@@ -2255,8 +2255,6 @@ void Tournament::GenerateSchedule()
 				break;
 		}
 	}
-
-	Unlock();
 
 	ScheduleSave();
 }

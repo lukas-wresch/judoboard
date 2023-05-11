@@ -1552,7 +1552,7 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return std::string("No tournament open");
 
-		GetTournament()->Lock();
+		GetTournament()->LockRead();
 		std::string ret;
 		for (auto table : GetTournament()->GetMatchTables())
 		{
@@ -1562,7 +1562,7 @@ void Application::SetupHttpServer()
 			ret += table->ToHTML();
 			ret += "<br/><br/><br/>";
 		}
-		GetTournament()->Unlock();
+		GetTournament()->UnlockRead();
 
 		return ret;
 	});
@@ -3108,6 +3108,9 @@ std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
 
 		if (!club)
 		{
+			assert(GetTournament()->IsLocal());
+			auto guard = GetTournament()->LockReadForScope();
+
 			auto tour = (Tournament*)GetTournament();//TODO: could be remote tournament
 			club = tour->GetDatabase().FindAssociation(id);
 
@@ -3211,13 +3214,13 @@ std::string Application::Ajax_ListClubs(const HttpServer::Request& Request)
 	{
 		Tournament* tour = (Tournament*)GetTournament();//TODO: could be remote tournament
 
-		tour->Lock();
+		tour->LockRead();
 		for (auto club : tour->GetDatabase().GetAllClubs())
 		{
 			if (club)
 				*club >> ret;
 		}
-		tour->Unlock();
+		tour->UnlockRead();
 	}
 
 	for (auto club : m_Database.GetAllClubs())
@@ -3562,7 +3565,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	if (!rule_set)
 		rule_set = GetTournament()->FindRuleSet(rule_set_id);
 
-	GetTournament()->Lock();
+	GetTournament()->LockWrite();
 
 	if (color >= 0)
 		table->SetColor(color);
@@ -3578,7 +3581,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	table->SetRuleSet(rule_set);
 	GetTournament()->AddRuleSet(rule_set);
 
-	GetTournament()->Unlock();
+	GetTournament()->UnlockWrite();
 
 
 	//Update filter
@@ -3610,11 +3613,11 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 		{
 			RoundRobin* round_robin = (RoundRobin*)table;
 
-			GetTournament()->Lock();
+			GetTournament()->LockWrite();
 
 			round_robin->IsBestOfThree(bo3);
 
-			GetTournament()->Unlock();
+			GetTournament()->UnlockWrite();
 			break;
 		}
 
@@ -3622,13 +3625,13 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 		{
 			SingleElimination* single_table = (SingleElimination*)table;
 
-			GetTournament()->Lock();
+			GetTournament()->LockWrite();
 
 			single_table->IsBestOfThree(bo3);
 			single_table->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
 			single_table->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
 
-			GetTournament()->Unlock();
+			GetTournament()->UnlockWrite();
 			break;
 		}
 
@@ -3636,13 +3639,13 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 		{
 			Pool* pool = (Pool*)table;
 
-			GetTournament()->Lock();
+			GetTournament()->LockWrite();
 
 			pool->IsBestOfThree(bo3);
 			pool->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
 			pool->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
 
-			GetTournament()->Unlock();
+			GetTournament()->UnlockWrite();
 			break;
 		}
 
@@ -3650,13 +3653,13 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 		{
 			DoubleElimination* doubleEli = (DoubleElimination*)table;
 
-			GetTournament()->Lock();
+			GetTournament()->LockWrite();
 
 			doubleEli->IsBestOfThree(bo3);
 			doubleEli->IsThirdPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf3") == "true");
 			doubleEli->IsFifthPlaceMatch(HttpServer::DecodeURLEncoded(Request.m_Body, "mf5") == "true");
 
-			GetTournament()->Unlock();
+			GetTournament()->UnlockWrite();
 			break;
 		}
 
@@ -3710,7 +3713,7 @@ std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Re
 		return Error(Error::Type::ItemNotFound);
 
 
-	GetTournament()->Lock();
+	GetTournament()->LockRead();
 
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
@@ -3719,7 +3722,7 @@ std::string Application::Ajax_GetParticipantsFromMatchTable(const HttpServer::Re
 		judoka->ToString(ret);
 
 	ret << YAML::EndSeq;
-	GetTournament()->Unlock();
+	GetTournament()->UnlockRead();
 	
 	return ret.c_str();
 }
@@ -3741,7 +3744,7 @@ std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request
 		return Error(Error::Type::ItemNotFound);
 
 
-	GetTournament()->Lock();
+	GetTournament()->LockRead();
 
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
@@ -3749,7 +3752,7 @@ std::string Application::Ajax_GetMatchesFromMatchTable(const HttpServer::Request
 		match->ToString(ret);
 	ret << YAML::EndSeq;
 
-	GetTournament()->Unlock();
+	GetTournament()->UnlockRead();
 
 	return ret.c_str();
 }
