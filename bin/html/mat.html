@@ -519,13 +519,23 @@ function ShowHansokumakeDecision(show, whom)
 }
 
 
+
+let updateScore = false;
+
 function GetScore()
 {
+  if (updateScore)
+    return;
+
+  updateScore = true;
+
   AjaxCallback("ajax/mat/get_score?id="+id, function(response) {
     console.log(response);
     var res = YAML.parse(response);
 
     CurrentScore = res;
+
+    updateScore = false;
 
     document.getElementById("white_ippon").innerHTML   = res.white.ippon;
     document.getElementById("white_wazaari").innerHTML = res.white.wazaari;
@@ -757,11 +767,21 @@ function GetScore()
 }
 
 
+
+let updateJudokaName = false;
+
 function GetJudokaName()
 {
+  if (updateJudokaName)
+    return;
+
+  updateJudokaName = true;
+
   AjaxCallback("ajax/mat/names_on_mat?id="+id, function(response) {
     console.log(response);
     var res = YAML.parse(response);
+
+    updateJudokaName = false;
 
     document.getElementById("mat").innerHTML = res.mat_name;
     document.getElementById("matchtable").innerHTML = res.match_table_name;
@@ -871,11 +891,21 @@ function GetJudokaName()
 }
 
 
+
+let updateOsaekomiList = false;
+
 function GetOsaekomiList()
 {
+  if (updateOsaekomiList)
+    return;
+
+  updateOsaekomiList = true;
+
   AjaxCallback("ajax/mat/get_osaekomilist?id="+id, function(response) {
     console.log(response);
     var res = response.split(",");
+
+    updateOsaekomiList = false;
 
     var table = document.getElementById("osaekomi_list");
 
