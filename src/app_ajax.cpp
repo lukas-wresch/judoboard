@@ -714,7 +714,7 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
-		auto guard = ScopedReadLock();
+		auto guard = LockReadForScope();
 
 		auto mat = FindMat(id);
 
@@ -736,7 +736,7 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
-		auto guard = ScopedReadLock();
+		auto guard = LockReadForScope();
 
 		auto mat = FindMat(id);
 
