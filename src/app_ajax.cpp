@@ -714,6 +714,8 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		auto guard = ScopedReadLock();
+
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -734,6 +736,8 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		auto guard = ScopedReadLock();
+
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -741,7 +745,7 @@ void Application::SetupHttpServer()
 
 		auto list = mat->GetOsaekomiList();
 		ZED::CSV ret;
-		for (auto& entry : list)
+		for (const auto& entry : list)
 			ret << entry.m_Who << entry.m_Time;
 
 		return ret;
@@ -4136,6 +4140,8 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 	if (id <= 0)
 		return Error(Error::Type::InvalidID);
 
+	auto guard = LockReadForScope();
+
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -4162,7 +4168,7 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 
 	ret << YAML::Key << "match_table_name" << YAML::Value;
 	if (current_match && current_match->GetMatchTable())
-		ret << current_match->GetMatchTable()->GetDescription();
+		ret << current_match->GetMatchTable()->GetDescription();//TODO secure via mutex
 	else
 		ret << "- - -";
 
