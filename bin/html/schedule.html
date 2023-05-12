@@ -207,6 +207,9 @@ let updateMasterscheduleRunning = false;
 
 function Update_Masterschedule()
 {
+  if (updateMasterscheduleRunning)
+    return;
+
   updateMasterscheduleRunning = true;
 
   AjaxCallback("ajax/get_masterschedule", function(response) {
@@ -313,11 +316,21 @@ function Update_Masterschedule()
 }
 
 
+
+let updateScheduleRunning = false;
+
 function Update_Schedule()
 {
+  if (updateScheduleRunning)
+    return;
+
+  updateScheduleRunning = true;
+
   AjaxCallback("ajax/get_schedule", function(response) {
     //console.log(response);
     var res = YAML.parse(response);
+
+    updateScheduleRunning = false;
 
     var table = document.getElementById("schedule");
 
