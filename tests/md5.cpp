@@ -347,8 +347,19 @@ TEST(MD5, CreateTournamentFromTestData2)
 		EXPECT_EQ(db.GetAllJudokas().size(), 0);
 		EXPECT_EQ(db.GetNumClubs(),          0);
 
+		//Check if every color is used
+		int color_count[(int)Color::Name::Max];
+		for (auto& c : color_count)
+			c = 0;
+
 		for (auto table : tour.GetMatchTables())
+		{
 			EXPECT_GE(table->GetScheduleIndex(), 0);
+			color_count[(int)table->GetColor()]++;
+		}
+
+		for (auto& c : color_count)
+			EXPECT_GE(c, 1);//Every color should be used at least once
 
 		for (auto match : tour.GetSchedule())
 			EXPECT_EQ(match->GetMatID(), 1);
