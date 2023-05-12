@@ -427,7 +427,7 @@ bool Tournament::SaveYAML(const std::string& Filename)
 
 	if (!file)
 	{
-		ZED::Log::Error("Could not open file!");
+		ZED::Log::Error("Could not open file: " + Filename);
 		return false;
 	}
 
