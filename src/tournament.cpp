@@ -2065,6 +2065,8 @@ const std::string Tournament::MasterSchedule2String() const
 				ret << YAML::Key << "editable"    << YAML::Value << entry->IsEditable();
 				ret << YAML::Key << "mat_id"      << YAML::Value << entry->GetMatID();
 				ret << YAML::Key << "description" << YAML::Value << entry->GetDescription();
+				ret << YAML::Key << "schedule_size"     << YAML::Value << entry->GetSchedule().size();
+				ret << YAML::Key << "participant_count" << YAML::Value << entry->GetParticipants().size();
 				ret << YAML::EndMap;
 			}
 
