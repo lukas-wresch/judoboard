@@ -2,6 +2,60 @@
 
 
 
+TEST(MD5, AgeGroups2020)
+{
+	initialize();
+
+	{
+		MD5 file1("test-data/Test-cleaned.md5");//Read MD5 file
+
+		ASSERT_TRUE(file1);
+
+		Database db;
+		Tournament tour_temp(file1, &db);//Convert to native
+
+		EXPECT_EQ(tour_temp.GetDatabase().GetYear(), 2020);
+		ASSERT_EQ(tour_temp.GetAgeGroups().size(), 8);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[2]->GetName(), "Jugend u13m");
+		EXPECT_EQ(tour_temp.GetAgeGroups()[2]->GetMinAge(), 10);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[2]->GetMaxAge(), 12);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[3]->GetName(), "Jugend u13w");
+		EXPECT_EQ(tour_temp.GetAgeGroups()[3]->GetMinAge(), 10);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[3]->GetMaxAge(), 12);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[4]->GetName(), "Jugend u15 m");
+		EXPECT_EQ(tour_temp.GetAgeGroups()[4]->GetMinAge(), 12);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[4]->GetMaxAge(), 14);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[5]->GetName(), "Jugend u15 w");
+		EXPECT_EQ(tour_temp.GetAgeGroups()[5]->GetMinAge(), 12);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[5]->GetMaxAge(), 14);
+	}
+}
+
+
+
+TEST(MD5, AgeGroups2023)
+{
+	initialize();
+
+	{
+		MD5 file1("test-data/BEM_U13_2023.md7");//Read MD7 file
+
+		ASSERT_TRUE(file1);
+
+		Database db;
+		Tournament tour_temp(file1, &db);//Convert to native
+
+		EXPECT_EQ(tour_temp.GetDatabase().GetYear(), 2023);
+		ASSERT_EQ(tour_temp.GetAgeGroups().size(), 2);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[0]->GetMinAge(), 10);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[0]->GetMaxAge(), 12);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[1]->GetMinAge(), 10);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[1]->GetMaxAge(), 12);
+	}
+}
+
+
+
 TEST(MD5, AssignAgeGroups)
 {
 	initialize();
