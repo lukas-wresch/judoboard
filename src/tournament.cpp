@@ -209,8 +209,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 			if (!new_match->IsEmptyMatch())
 			{
-			  auto index = match_table->FindMatchIndex(*new_match);
-			  m_Schedule.emplace_back(match_table, index);
+				auto index = match_table->FindMatchIndex(*new_match);
+				m_Schedule.emplace_back(match_table, index);
 			}
 		}
 	}

@@ -322,6 +322,21 @@ TEST(MD5, CreateTournamentFromTestData)
 
 	EXPECT_EQ(tour.GetDatabase().GetNumJudoka(), 142);
 	EXPECT_EQ(tour.GetDatabase().GetNumClubs(),   19);
+
+	//Check alphabetical order
+	for (int i = 0; i < tour.GetDatabase().GetNumJudoka(); i++)
+	{
+		for (int j = i + 1; j < tour.GetDatabase().GetNumJudoka(); j++)
+		{
+			auto j1 = tour.GetDatabase().GetAllJudokas()[i];
+			auto j2 = tour.GetDatabase().GetAllJudokas()[j];
+
+			if (j1->GetLastname() != j2->GetLastname())
+				EXPECT_LT(j1->GetLastname(), j2->GetLastname());
+			else if (j1->GetFirstname() != j2->GetFirstname())
+				EXPECT_LT(j1->GetFirstname(), j2->GetFirstname());
+		}
+	}
 }
 
 

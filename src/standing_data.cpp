@@ -210,7 +210,7 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 			return a->GetLastname() < b->GetLastname();
 		if (a->GetFirstname() != b->GetFirstname())
 			return a->GetFirstname() < b->GetFirstname();
-		return a->GetUUID() < b->GetUUID() ;
+		return a->GetUUID() < b->GetUUID();
 	});
 
 	return true;
