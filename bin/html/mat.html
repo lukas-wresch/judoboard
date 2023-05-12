@@ -991,11 +991,19 @@ function UpdateTimer()
   if (ScoreUpdate_Counter == 0)
   {
     GetScore();
-    GetJudokaName();
     GetOsaekomiList();
-    ScoreUpdate_Counter = 10;
+    ScoreUpdate_Counter = 20;
   }
   else if (ScoreUpdate_Counter == 5)
+  {
+    GetScore();
+  }
+  else if (ScoreUpdate_Counter == 10)
+  {
+    GetJudokaName();
+    GetScore();
+  }
+  else if (ScoreUpdate_Counter == 15)
   {
     GetScore();
   }
