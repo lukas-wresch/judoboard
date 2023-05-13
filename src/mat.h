@@ -54,7 +54,12 @@ namespace Judoboard
 
 		virtual bool HasConcluded() const override;
 
-		virtual const std::vector<OsaekomiEntry>& GetOsaekomiList() const override { return m_OsaekomiList; }
+		virtual std::vector<OsaekomiEntry> GetOsaekomiList() const override {
+			m_mutex.lock();
+			auto copy = m_OsaekomiList;
+			m_mutex.unlock();
+			return copy;
+		}
 
 		virtual ZED::Blob RequestScreenshot() const override;
 

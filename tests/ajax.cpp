@@ -1939,7 +1939,7 @@ TEST(Ajax, MatchTable_Edit)
 
 		auto old_uuid = tables[0]->GetUUID();
 
-		EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&fight_system=3&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+		EXPECT_TRUE(app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&fight_system=3&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")) );
 
 		ASSERT_EQ(tables.size(), 1);
 		EXPECT_EQ(tables[0]->GetUUID(), old_uuid);

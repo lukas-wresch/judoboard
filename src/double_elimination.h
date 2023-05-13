@@ -32,8 +32,8 @@ namespace Judoboard
 		bool IsThirdPlaceMatch() const { return m_WinnerBracket.IsThirdPlaceMatch(); }
 		bool IsFifthPlaceMatch() const { return m_WinnerBracket.IsFifthPlaceMatch(); }
 
-		void IsThirdPlaceMatch(bool Enable) { m_WinnerBracket.IsThirdPlaceMatch(Enable); GenerateSchedule(); }
-		void IsFifthPlaceMatch(bool Enable) { m_WinnerBracket.IsFifthPlaceMatch(Enable); GenerateSchedule(); }
+		void IsThirdPlaceMatch(bool Enable) { m_WinnerBracket.IsThirdPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
+		void IsFifthPlaceMatch(bool Enable) { m_WinnerBracket.IsFifthPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
 
 		SingleElimination& GetWinnerBracket() { return m_WinnerBracket; }
 		const SingleElimination& GetWinnerBracket() const { return m_WinnerBracket; }

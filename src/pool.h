@@ -37,8 +37,8 @@ namespace Judoboard
 		bool IsThirdPlaceMatch() const { return m_Finals.IsThirdPlaceMatch(); }
 		bool IsFifthPlaceMatch() const { return m_Finals.IsFifthPlaceMatch(); }
 
-		void IsThirdPlaceMatch(bool Enable) { m_Finals.IsThirdPlaceMatch(Enable); GenerateSchedule(); }
-		void IsFifthPlaceMatch(bool Enable) { m_Finals.IsFifthPlaceMatch(Enable); GenerateSchedule(); }
+		void IsThirdPlaceMatch(bool Enable) { m_Finals.IsThirdPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
+		void IsFifthPlaceMatch(bool Enable) { m_Finals.IsFifthPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
 
 		void SetPoolCount(uint32_t PoolCount) { m_PoolCount = PoolCount; GenerateSchedule(); }
 		size_t GetPoolCount() const { return m_Pools.size(); }

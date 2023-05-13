@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <random>
+#include <cassert>
 #include "double_elimination.h"
 #include "weightclass.h"
 #include "losersof.h"
@@ -37,6 +38,13 @@ DoubleElimination::DoubleElimination(const YAML::Node& Yaml, ITournament* Tourna
 		m_WinnerBracket = SingleElimination(Yaml["winner_bracket"], Tournament, this);
 	if (Yaml["loser_bracket"])
 		m_LoserBracket = LoserBracket(Yaml["loser_bracket"], Tournament, this);
+
+#ifdef _DEBUG
+	for (auto match : m_WinnerBracket.GetSchedule())
+		assert(match->GetMatchTable() == &m_WinnerBracket);
+	for (auto match : m_LoserBracket.GetSchedule())
+		assert(match->GetMatchTable() == &m_LoserBracket);
+#endif
 }
 
 
