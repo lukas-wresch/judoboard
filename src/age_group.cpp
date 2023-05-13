@@ -46,8 +46,8 @@ AgeGroup::AgeGroup(const MD5::AgeGroup& AgeGroup, const StandingData& StandingDa
 	m_Gender = AgeGroup.Gender;
 
 	auto year = StandingData.GetYear();
-	m_MinAge = year - AgeGroup.MaxBirthyear + 1;
-	m_MaxAge = year - AgeGroup.MinBirthyear + 1;
+	m_MinAge  = year - AgeGroup.MaxBirthyear;
+	m_MaxAge  = year - AgeGroup.MinBirthyear;
 }
 
 

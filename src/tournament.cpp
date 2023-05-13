@@ -83,6 +83,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	}
 
 	//Add weightclasses
+	Color color;
 	for (auto weightclass : File.GetWeightclasses())
 	{
 		MatchTable* new_table = nullptr;
@@ -105,6 +106,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		new_table->IsBestOfThree(weightclass->BestOfThree);
 		new_table->SetMatID(1);//Choose 1 as the default mat
 		new_table->SetScheduleIndex(GetFreeScheduleIndex(1));
+		new_table->SetColor(color);
+		color++;
 
 		weightclass->pUserData = new_table;
 
@@ -209,8 +212,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 			if (!new_match->IsEmptyMatch())
 			{
-			  auto index = match_table->FindMatchIndex(*new_match);
-			  m_Schedule.emplace_back(match_table, index);
+				auto index = match_table->FindMatchIndex(*new_match);
+				m_Schedule.emplace_back(match_table, index);
 			}
 		}
 	}
