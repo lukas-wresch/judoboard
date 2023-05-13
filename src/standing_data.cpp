@@ -71,6 +71,15 @@ void StandingData::operator << (const YAML::Node& Yaml)
 			Judoka* newJudoka = new Judoka(node, this);
 			m_Judokas.emplace_back(newJudoka);
 		}
+
+		std::sort(m_Judokas.begin(), m_Judokas.end(), [](const Judoka* a, const Judoka* b)
+		{
+			if (a->GetLastname() != b->GetLastname())
+				return a->GetLastname() < b->GetLastname();
+			if (a->GetFirstname() != b->GetFirstname())
+				return a->GetFirstname() < b->GetFirstname();
+			return a->GetUUID() < b->GetUUID() ;
+		});
 	}
 
 
@@ -201,7 +210,7 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 			return a->GetLastname() < b->GetLastname();
 		if (a->GetFirstname() != b->GetFirstname())
 			return a->GetFirstname() < b->GetFirstname();
-		return a->GetUUID() < b->GetUUID() ;
+		return a->GetUUID() < b->GetUUID();
 	});
 
 	return true;
