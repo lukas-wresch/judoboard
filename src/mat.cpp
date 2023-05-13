@@ -1957,7 +1957,7 @@ bool Mat::Render(double dt) const
 	UpdateGraphics();
 	
 	auto& renderer = m_Window.GetRenderer();
-	auto guard = m_mutex.LockReadForScope();
+	
 	renderer.Lock();
 	renderer.ClearDisplay();
 	
@@ -1983,6 +1983,7 @@ bool Mat::Render(double dt) const
 			renderer.RenderTransformed(*m_Background, width / 2 - 50, y);
 	}
 
+	m_mutex.LockRead();
 	
 	//Render graphics
 	switch (m_State)
@@ -2289,6 +2290,7 @@ bool Mat::Render(double dt) const
 	renderer.ResetNumDrawCalls();
 #endif
 
+	m_mutex.UnlockRead();
 
 	renderer.UpdateDisplay();
 
@@ -2352,7 +2354,12 @@ bool Mat::Mainloop()
 	Render((double)m_LastFrameTime * 0.001f);
 
 	if (IsDoingAnimation() || AreFightersOnMat())
-		frameTime = 15;
+	{
+		if (m_Window.GetRenderer().GetType() != ZED::Type::OpenGL)
+			frameTime = 15;
+		else
+			frameTime = 100;
+	}
 
 	else
 		ZED::Core::Pause(frameTime);
