@@ -2329,11 +2329,6 @@ bool Mat::Mainloop()
 
 	auto frameStart = Timer::GetTimestamp();
 
-	uint32_t frameTime = 40;//25 FPS when idle
-
-	if (m_Window.GetRenderer().GetType() != ZED::Type::OpenGL)
-		frameTime = 250;
-
 	if (m_State != State::Running && m_Application)
 	{
 		bool success;
@@ -2353,21 +2348,29 @@ bool Mat::Mainloop()
 
 	Render((double)m_LastFrameTime * 0.001f);
 
+	//Calculate frame time
+	uint32_t target_frameTime = 40;//25 FPS when idle
+
 	if (IsDoingAnimation() || AreFightersOnMat())
 	{
 		if (m_Window.GetRenderer().GetType() != ZED::Type::OpenGL)
-			frameTime = 15;
-		else
 		{
-			frameTime = 100;
+			target_frameTime = 100;
 			ZED::Core::Pause(50);
 		}
+		else
+			target_frameTime = 15;
 	}
 
 	else
-		ZED::Core::Pause(frameTime);
+	{
+		if (m_Window.GetRenderer().GetType() != ZED::Type::OpenGL)
+			target_frameTime = 250;
 
-	while (Timer::GetTimestamp() - frameStart < frameTime)
+		ZED::Core::Pause(target_frameTime - (Timer::GetTimestamp() - frameStart));
+	}
+
+	while (Timer::GetTimestamp() - frameStart < target_frameTime)
 	{
 		Process();
 		ZED::Core::Pause(1);
