@@ -2332,7 +2332,7 @@ bool Mat::Mainloop()
 	uint32_t frameTime = 40;//25 FPS when idle
 
 	if (m_Window.GetRenderer().GetType() != ZED::Type::OpenGL)
-		frameTime = 200;
+		frameTime = 250;
 
 	if (m_State != State::Running && m_Application)
 	{
@@ -2358,7 +2358,10 @@ bool Mat::Mainloop()
 		if (m_Window.GetRenderer().GetType() != ZED::Type::OpenGL)
 			frameTime = 15;
 		else
+		{
 			frameTime = 100;
+			ZED::Core::Pause(50);
+		}
 	}
 
 	else
