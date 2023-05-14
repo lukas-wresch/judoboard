@@ -58,7 +58,7 @@ TEST(Judoka, ImportExport_RuleSet)
 {
 	for (int i = 0; i < 1000; i++)
 	{
-		RuleSet r(GetRandomName(), rand() % 200, rand() % 200, rand() % 200, rand() % 200, rand() % 2, rand() % 2, rand() % 2, rand() % 200);
+		RuleSet r(GetRandomName(), rand() % 200, rand() % 200, rand() % 200, rand() % 200, rand() % 2, rand() % 2, rand() % 2, rand() % 200, rand()%2);
 
 		YAML::Emitter yaml;
 		r >> yaml;
@@ -76,6 +76,7 @@ TEST(Judoka, ImportExport_RuleSet)
 		EXPECT_EQ(r.GetMatchTime(), r2.GetMatchTime());
 		EXPECT_EQ(r.GetGoldenScoreTime(), r2.GetGoldenScoreTime());
 		EXPECT_EQ(r.GetBreakTime(),  r2.GetBreakTime());
+		EXPECT_EQ(r.IsExtendBreakTime(), r2.IsExtendBreakTime());
 		EXPECT_EQ(r.GetDescription(), r2.GetDescription());
 	}
 }
