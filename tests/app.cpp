@@ -138,6 +138,46 @@ TEST(App, Tournaments)
 
 
 
+TEST(App, Tournament_With_Ongoing_Match)
+{
+	initialize();
+	Application app;
+
+	Tournament* t = new Tournament("../test-data/tournament-ongoing-match");
+	t->EnableAutoSave(false);
+	app.AddTournament(t);
+	app.OpenTournament(*t);
+
+	EXPECT_TRUE(app.StartLocalMat(1));
+
+	ZED::Core::Pause(3000);
+
+	EXPECT_TRUE(app.GetMats()[0]->AreFightersOnMat());
+}
+
+
+
+TEST(App, Tournament_With_Ongoing_Match2)
+{
+	initialize();
+	Application app;
+
+	EXPECT_TRUE(app.StartLocalMat(1));
+
+	ZED::Core::Pause(2000);
+
+	Tournament* t = new Tournament("../test-data/tournament-ongoing-match");
+	t->EnableAutoSave(false);
+	app.AddTournament(t);
+	app.OpenTournament(*t);
+
+	ZED::Core::Pause(3000);
+
+	EXPECT_TRUE(app.GetMats()[0]->AreFightersOnMat());
+}
+
+
+
 TEST(App, Tournaments_OpenLastTournament)
 {
 	initialize();
