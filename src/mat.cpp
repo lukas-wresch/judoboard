@@ -2367,7 +2367,9 @@ bool Mat::Mainloop()
 		if (m_Window.GetRenderer().GetType() != ZED::Type::OpenGL)
 			target_frameTime = 250;
 
-		ZED::Core::Pause(target_frameTime - (Timer::GetTimestamp() - frameStart));
+		int time_to_pause = target_frameTime - (Timer::GetTimestamp() - frameStart);
+		if (time_to_pause > 0)
+			ZED::Core::Pause(time_to_pause);
 	}
 
 	while (Timer::GetTimestamp() - frameStart < target_frameTime)
