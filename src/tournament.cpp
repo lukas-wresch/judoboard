@@ -746,6 +746,25 @@ const Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
 
 
 
+Match* Tournament::GetNextOngoingMatch(int32_t MatID)
+{
+	auto guard = LockReadForScope();
+
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
+	{
+		if (!match || !match->IsRunning())
+			continue;
+
+		if (MatID < 0 || match->GetMatID() == MatID)
+			return match;
+	}
+
+	return nullptr;
+}
+
+
+
 bool Tournament::RemoveMatch(const UUID& MatchID)
 {
 	if (IsReadonly())
