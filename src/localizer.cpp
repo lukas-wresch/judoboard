@@ -72,6 +72,7 @@ std::string Localizer::Translate(const std::string& English)
 		{
 			auto it = s_de.find(English);
 
+			assert(it != s_de.end());
 			if (it != s_de.end())
 				return it->second;
 			break;
