@@ -257,6 +257,7 @@ TEST(Ajax, RuleSet_Add)
 
 	{
 		Application app;
+		app.GetDatabase().EnableAutoSave(false);
 
 		auto& rule_sets = app.GetDatabase().GetRuleSets();
 		auto count = rule_sets.size();
@@ -285,6 +286,7 @@ TEST(Ajax, RuleSet_Edit)
 
 	{
 		Application app;
+		app.GetDatabase().EnableAutoSave(false);
 
 		auto& rule_sets = app.GetDatabase().GetRuleSets();
 		auto count = rule_sets.size();
