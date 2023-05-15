@@ -39,6 +39,8 @@ void Application::SetupHttpServer()
 
 	m_Server.RegisterResource("/menu.png",   [](auto& Request) { return HttpServer::LoadFile("html/menu.png");   }, HttpServer::ResourceType::Image_PNG, 24*60*60);
 	m_Server.RegisterResource("/winner.png", [](auto& Request) { return HttpServer::LoadFile("html/winner.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
+	m_Server.RegisterResource("/en.png", [](auto& Request) { return HttpServer::LoadFile("html/en.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
+	m_Server.RegisterResource("/de.png", [](auto& Request) { return HttpServer::LoadFile("html/de.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
 
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit", "lots",
@@ -2337,9 +2339,10 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/config/get_setup", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
-		if (!error)
-			return error;
+		//auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		//if (!error)
+			//return error;
+		//Needs to be accessable before login to obtain the language
 
 		return Ajax_GetSetup();
 	});
