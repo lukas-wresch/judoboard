@@ -234,66 +234,6 @@ bool StandingData::DeleteJudoka(const UUID& UUID)
 
 
 
-const std::string StandingData::Judoka2String(std::string SearchString, const ITournament* Tournament) const
-{
-	if (!Tournament)
-		return "";
-	
-	std::transform(SearchString.begin(), SearchString.end(), SearchString.begin(),
-		[](unsigned char c){ return std::tolower(c); });
-
-	YAML::Emitter ret;
-	ret << YAML::BeginSeq;
-
-	for (auto judoka : m_Judokas)
-	{
-		auto name = judoka->GetName(NameStyle::GivenName);
-		std::transform(name.begin(), name.end(), name.begin(),
-			[](unsigned char c){ return std::tolower(c); });
-
-		if (name.find(SearchString) == std::string::npos)
-			continue;
-
-		ret << YAML::BeginMap;
-
-		ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
-		ret << YAML::Key << "name" << YAML::Value << judoka->GetName(NameStyle::GivenName);
-		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
-		ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
-
-		if (judoka->GetClub())
-			ret << YAML::Key << "club" << YAML::Value << judoka->GetClub()->GetName();
-
-		ret << YAML::Key << "is_participant" << YAML::Value << Tournament->IsParticipant(*judoka);
-
-		auto judoka_age_group = Tournament->GetAgeGroupOfJudoka(judoka);
-		if (judoka_age_group)
-			ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
-
-		//Calculate eligable age groups
-		ret << YAML::Key << "age_groups" << YAML::Value;
-		ret << YAML::BeginSeq;
-
-		auto age_groups = Tournament->GetEligableAgeGroupsOfJudoka(judoka);
-		for (auto age_group : age_groups)
-		{
-			ret << YAML::BeginMap;
-			ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
-			ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
-			ret << YAML::EndMap;
-		}
-
-		ret << YAML::EndSeq;
-
-		ret << YAML::EndMap;
-	}
-
-	ret << YAML::EndSeq;
-	return ret.c_str();
-}
-
-
-
 Club* StandingData::AddClub(const MD5::Club& NewClub)
 {
 	auto club_to_update = FindClubByName(NewClub.Name);
@@ -709,6 +649,28 @@ Judoka* StandingData::FindJudoka_SameName(const JudokaData& NewJudoka)
 
 			ret = judoka;
 		}
+	}
+
+	return ret;
+}
+
+
+
+std::vector<const Judoka*> StandingData::SearchJudokas(std::string SearchString) const
+{
+	std::transform(SearchString.begin(), SearchString.end(), SearchString.begin(),
+		[](unsigned char c){ return std::tolower(c); });
+
+	std::vector<const Judoka*> ret;
+
+	for (auto judoka : m_Judokas)
+	{
+		auto name = judoka->GetName(NameStyle::GivenName);
+		std::transform(name.begin(), name.end(), name.begin(),
+			[](unsigned char c){ return std::tolower(c); });
+
+		if (name.find(SearchString) != std::string::npos)
+			ret.push_back(judoka);
 	}
 
 	return ret;

@@ -48,6 +48,8 @@ namespace Judoboard
 		[[nodiscard]] Judoka* FindJudoka_ExactMatch(const JudokaData& NewJudoka);
 		[[nodiscard]] Judoka* FindJudoka_SameName(const JudokaData& NewJudoka);
 
+		[[nodiscard]] std::vector<const Judoka*> SearchJudokas(std::string SearchString) const;
+
 		bool DeleteJudoka(const UUID& UUID);
 
 		//Clubs
@@ -116,10 +118,6 @@ namespace Judoboard
 		std::vector<AgeGroup*>& GetAgeGroups() { return m_AgeGroups; }
 		[[nodiscard]]
 		const std::vector<AgeGroup*>& GetAgeGroups() const { return m_AgeGroups; }
-
-		//Serialization
-		[[nodiscard]]
-		const std::string Judoka2String(std::string SearchString, const ITournament* Tournament) const;
 
 	protected:
 		std::vector<Judoka*> m_Judokas;

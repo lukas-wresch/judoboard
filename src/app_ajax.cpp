@@ -371,10 +371,57 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::NotLoggedIn);
 
 		auto search_string = HttpServer::DecodeURLEncoded(Request.m_Query, "name");
+		bool tournament_search = HttpServer::DecodeURLEncoded(Request.m_Query, "participants") == "true";
 
 		auto guard = LockReadForScope();
 
-		return m_Database.Judoka2String(search_string, GetTournament());
+		std::vector<const Judoka*> judokas;
+		if (tournament_search)
+			judokas = GetTournament()->GetDatabase().SearchJudokas(search_string);
+		else
+			judokas = m_Database.SearchJudokas(search_string);
+
+		YAML::Emitter ret;
+		ret << YAML::BeginSeq;
+
+		for (auto judoka : judokas)
+		{
+			ret << YAML::BeginMap;
+
+			ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
+			ret << YAML::Key << "name" << YAML::Value << judoka->GetName(NameStyle::GivenName);
+			ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
+			ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
+
+			if (judoka->GetClub())
+				ret << YAML::Key << "club" << YAML::Value << judoka->GetClub()->GetName();
+
+			ret << YAML::Key << "is_participant" << YAML::Value << GetTournament()->IsParticipant(*judoka);
+
+			auto judoka_age_group = GetTournament()->GetAgeGroupOfJudoka(judoka);
+			if (judoka_age_group)
+				ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
+
+			//Calculate eligable age groups
+			ret << YAML::Key << "age_groups" << YAML::Value;
+			ret << YAML::BeginSeq;
+
+			auto age_groups = GetTournament()->GetEligableAgeGroupsOfJudoka(judoka);
+			for (auto age_group : age_groups)
+			{
+				ret << YAML::BeginMap;
+				ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
+				ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
+				ret << YAML::EndMap;
+			}
+
+			ret << YAML::EndSeq;
+
+			ret << YAML::EndMap;
+		}
+
+		ret << YAML::EndSeq;
+		return ret.c_str();
 	});
 
 
