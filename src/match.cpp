@@ -674,10 +674,16 @@ void Match::EndMatch()
 {
 	m_State = Status::Concluded;
 
+	const auto &rules = GetRuleSet();
+
+	auto break_time = rules.GetBreakTime();
+	if (rules.IsExtendBreakTime() && m_Result.m_Time/1000 > break_time)
+		break_time = m_Result.m_Time / 1000;
+
 	if (m_White.m_Judoka)
-		m_White.m_Judoka->StartBreak();
+		m_White.m_Judoka->StartBreak(break_time);
 	if (m_Blue.m_Judoka)
-		m_Blue.m_Judoka->StartBreak();
+		m_Blue.m_Judoka->StartBreak(break_time);
 
 	if (GetTournament())
 		GetTournament()->OnMatchConcluded(*this);

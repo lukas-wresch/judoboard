@@ -190,9 +190,7 @@ bool Mat::StartMatch(Match* NewMatch)
 		return false;
 	}
 
-	const auto& rules = NewMatch->GetRuleSet();
-
-	if (NewMatch->GetFighter(Fighter::White)->GetLengthOfBreak() < rules.GetBreakTime() || NewMatch->GetFighter(Fighter::Blue)->GetLengthOfBreak() < rules.GetBreakTime())
+	if (NewMatch->GetFighter(Fighter::White)->NeedsBreak() || NewMatch->GetFighter(Fighter::Blue)->NeedsBreak())
 	{
 		ZED::Log::Warn("Can not start a match since at least one fighter has not had his break yet");
 		return false;

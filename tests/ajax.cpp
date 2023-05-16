@@ -251,6 +251,67 @@ TEST(Ajax, AgeGroups_List2)
 
 
 
+TEST(Ajax, RuleSet_Add)
+{
+	initialize();
+
+	{
+		Application app;
+		app.GetDatabase().EnableAutoSave(false);
+
+		auto& rule_sets = app.GetDatabase().GetRuleSets();
+		auto count = rule_sets.size();
+
+		EXPECT_TRUE(app.Ajax_AddRuleSet(HttpServer::Request("", "name=test&match_time=60&goldenscore_time=120&osaekomi_ippon=5&osaekomi_wazaari=3&yuko=true&koka=true&draw=true&break_time=30&extend_break_time=true")));
+
+		ASSERT_EQ(rule_sets.size(), count + 1);
+		EXPECT_EQ(rule_sets[count]->GetName(), "test");
+		EXPECT_EQ(rule_sets[count]->GetMatchTime(), 60);
+		EXPECT_EQ(rule_sets[count]->GetGoldenScoreTime(), 120);
+		EXPECT_EQ(rule_sets[count]->GetOsaeKomiTime(false), 5);
+		EXPECT_EQ(rule_sets[count]->GetOsaeKomiTime(true),  3);
+		EXPECT_EQ(rule_sets[count]->IsYukoEnabled(), true);
+		EXPECT_EQ(rule_sets[count]->IsKokaEnabled(), true);
+		EXPECT_EQ(rule_sets[count]->IsDrawAllowed(), true);
+		EXPECT_EQ(rule_sets[count]->GetBreakTime(),  30);
+		EXPECT_EQ(rule_sets[count]->IsExtendBreakTime(), true);
+	}
+}
+
+
+
+TEST(Ajax, RuleSet_Edit)
+{
+	initialize();
+
+	{
+		Application app;
+		app.GetDatabase().EnableAutoSave(false);
+
+		auto& rule_sets = app.GetDatabase().GetRuleSets();
+		auto count = rule_sets.size();
+
+		EXPECT_TRUE(app.Ajax_AddRuleSet(HttpServer::Request("", "name=test&match_time=60&goldenscore_time=120&osaekomi_ippon=5&osaekomi_wazaari=3&yuko=true&koka=true&draw=true&break_time=30&extend_break_time=true")));
+
+		ASSERT_EQ(rule_sets.size(), count + 1);
+		
+		EXPECT_TRUE(app.Ajax_EditRuleSet(HttpServer::Request("id=" + (std::string)rule_sets[count]->GetUUID(), "name=test2&match_time=120&goldenscore_time=180&osaekomi_ippon=20&osaekomi_wazaari=13&yuko=false&koka=false&draw=false&break_time=60&extend_break_time=false")));
+
+		EXPECT_EQ(rule_sets[count]->GetName(), "test2");
+		EXPECT_EQ(rule_sets[count]->GetMatchTime(), 120);
+		EXPECT_EQ(rule_sets[count]->GetGoldenScoreTime(), 180);
+		EXPECT_EQ(rule_sets[count]->GetOsaeKomiTime(false), 20);
+		EXPECT_EQ(rule_sets[count]->GetOsaeKomiTime(true),  13);
+		EXPECT_EQ(rule_sets[count]->IsYukoEnabled(), false);
+		EXPECT_EQ(rule_sets[count]->IsKokaEnabled(), false);
+		EXPECT_EQ(rule_sets[count]->IsDrawAllowed(), false);
+		EXPECT_EQ(rule_sets[count]->GetBreakTime(),  60);
+		EXPECT_EQ(rule_sets[count]->IsExtendBreakTime(), false);
+	}
+}
+
+
+
 TEST(Ajax, GetMats)
 {
 	initialize();

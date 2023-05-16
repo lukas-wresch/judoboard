@@ -106,6 +106,14 @@
   </select>
 </div>
 
+<div>
+  <label style="width:200px;float:left;margin-top:4px;" id="label_extend_break_time">Extend Break Time</label>
+  <input type="checkbox" id="extend_break_time" class="switch-input">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="extend_break_time">
+    <span class="toggle-on" id="extend_break_time_enabled">Enabled</span><span class="toggle-off" id="extend_break_time_disabled">Disabled</span>
+  </label>
+</div>
+
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddRuleSet()" id="add">New Rule Set</button>
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateRuleSet()" id="update">Update Rule Set</button>
 <button class="remove" onclick="return DeleteRuleSet()" id="delete"></button>
@@ -118,15 +126,16 @@
 function AddRuleSet()
 {
   var params = URLEncode({
-    name:             document.getElementById("name").value,
-    match_time:       document.getElementById("match_time").value,
-    goldenscore_time: document.getElementById("goldenscore_time").value,
-    osaekomi_ippon:   document.getElementById("osaekomi_ippon").value,
-    osaekomi_wazaari: document.getElementById("osaekomi_wazaari").value,
-    yuko:             document.getElementById("yuko").checked,
-    koka:             document.getElementById("koka").checked,
-    draw:             document.getElementById("draw").checked,
-    break_time:       document.getElementById("break_time").value
+    name:              document.getElementById("name").value,
+    match_time:        document.getElementById("match_time").value,
+    goldenscore_time:  document.getElementById("goldenscore_time").value,
+    osaekomi_ippon:    document.getElementById("osaekomi_ippon").value,
+    osaekomi_wazaari:  document.getElementById("osaekomi_wazaari").value,
+    yuko:              document.getElementById("yuko").checked,
+    koka:              document.getElementById("koka").checked,
+    draw:              document.getElementById("draw").checked,
+    break_time:        document.getElementById("break_time").value,
+    extend_break_time: document.getElementById("extend_break_time").checked,
   });
 
   AjaxPost('ajax/rule/add', params, function() {
@@ -140,15 +149,16 @@ function AddRuleSet()
 function UpdateRuleSet()
 {
   var params = URLEncode({
-    name:             document.getElementById("name").value,
-    match_time:       document.getElementById("match_time").value,
-    goldenscore_time: document.getElementById("goldenscore_time").value,
-    osaekomi_ippon:   document.getElementById("osaekomi_ippon").value,
-    osaekomi_wazaari: document.getElementById("osaekomi_wazaari").value,
-    yuko:             document.getElementById("yuko").checked,
-    koka:             document.getElementById("koka").checked,
-    draw:             document.getElementById("draw").checked,
-    break_time:       document.getElementById("break_time").value
+    name:              document.getElementById("name").value,
+    match_time:        document.getElementById("match_time").value,
+    goldenscore_time:  document.getElementById("goldenscore_time").value,
+    osaekomi_ippon:    document.getElementById("osaekomi_ippon").value,
+    osaekomi_wazaari:  document.getElementById("osaekomi_wazaari").value,
+    yuko:              document.getElementById("yuko").checked,
+    koka:              document.getElementById("koka").checked,
+    draw:              document.getElementById("draw").checked,
+    break_time:        document.getElementById("break_time").value,
+    extend_break_time: document.getElementById("extend_break_time").checked,
   });
 
   AjaxPost('ajax/rule/update?id='+id, params, function() {
@@ -187,6 +197,7 @@ function GetRuleSet(id)
     document.getElementById("koka").checked = res.koka;
     document.getElementById("draw").checked = res.draw;
     document.getElementById("break_time").value = res.break_time;
+    document.getElementById("extend_break_time").value = res.extend_break_time;
   });
 }
 
@@ -207,6 +218,8 @@ document.getElementById("koka_enabled").innerHTML  = translate('enabled');
 document.getElementById("koka_disabled").innerHTML = translate('disabled');
 document.getElementById("draw_enabled").innerHTML  = translate('enabled');
 document.getElementById("draw_disabled").innerHTML = translate('disabled');
+document.getElementById("extend_break_time_enabled").innerHTML  = translate('enabled');
+document.getElementById("extend_break_time_disabled").innerHTML = translate('disabled');
 
 document.getElementById("label_draw").innerHTML       = translate('draw');
 document.getElementById("label_break_time").innerHTML = translate('break_time');
