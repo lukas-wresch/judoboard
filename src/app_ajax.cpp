@@ -377,7 +377,27 @@ void Application::SetupHttpServer()
 
 		std::vector<const Judoka*> judokas;
 		if (tournament_search)
+		{
 			judokas = GetTournament()->GetDatabase().SearchJudokas(search_string);
+
+			auto age_groups = GetTournament()->GetAgeGroups();
+			for (auto it = age_groups.begin(); it != age_groups.end();)
+			{
+				if (ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, (std::string)(*it)->GetUUID())) != 1)
+					it = age_groups.erase(it);
+				else
+					++it;
+			}
+
+			//Remove judokas that don't belong to an age group in the list
+			for (auto it = judokas.begin(); it != judokas.end();)
+			{
+				if (std::find(age_groups.begin(), age_groups.end(), GetTournament()->GetAgeGroupOfJudoka(*it)) == age_groups.end())
+					it = judokas.erase(it);//Not found, remove judoka
+				else
+					++it;
+			}
+		}
 		else
 			judokas = m_Database.SearchJudokas(search_string);
 
