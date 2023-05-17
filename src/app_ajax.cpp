@@ -1789,25 +1789,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		std::string name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-		int match_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "match_time"));
-		int goldenscore_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "goldenscore_time"));
-		int osaekomi_ippon = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_ippon"));
-		int osaekomi_wazaari = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_wazaari"));
-		bool yuko = HttpServer::DecodeURLEncoded(Request.m_Body, "yuko") == "true";
-		bool koka = HttpServer::DecodeURLEncoded(Request.m_Body, "koka") == "true";
-		bool draw = HttpServer::DecodeURLEncoded(Request.m_Body, "draw") == "true";
-		int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
-
-		RuleSet* new_rule_set = new RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time);
-
-		auto guard = LockWriteForScope();
-
-		if (!m_Database.AddRuleSet(new_rule_set))
-			return Error(Error::Type::OperationFailed);
-
-		m_Database.Save();
-		return Error(Error::Type::NoError);//OK
+		return Ajax_AddRuleSet(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/rule/update", [this](auto& Request) -> std::string {
@@ -1815,28 +1797,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		std::string name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-		int match_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "match_time"));
-		int goldenscore_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "goldenscore_time"));
-		int osaekomi_ippon = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_ippon"));
-		int osaekomi_wazaari = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_wazaari"));
-		bool yuko = HttpServer::DecodeURLEncoded(Request.m_Body, "yuko") == "true";
-		bool koka = HttpServer::DecodeURLEncoded(Request.m_Body, "koka") == "true";
-		bool draw = HttpServer::DecodeURLEncoded(Request.m_Body, "draw") == "true";
-		int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
-
-		auto guard = LockWriteForScope();
-
-		auto rule = m_Database.FindRuleSet(id);
-
-		if (!rule)
-			return std::string("Could not find rule set in database");
-
-		*rule = RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time);
-		m_Database.Save();
-		return Error();//OK
+		return Ajax_EditRuleSet(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/rule/get", [this](auto& Request) -> std::string {
@@ -3267,6 +3228,66 @@ std::string Application::Ajax_ListAssociations(const HttpServer::Request& Reques
 
 	ret << YAML::EndSeq;
 	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_AddRuleSet(const HttpServer::Request& Request)
+{
+	std::string name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	int match_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "match_time"));
+	int goldenscore_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "goldenscore_time"));
+	int osaekomi_ippon   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_ippon"));
+	int osaekomi_wazaari = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_wazaari"));
+	bool yuko = HttpServer::DecodeURLEncoded(Request.m_Body, "yuko") == "true";
+	bool koka = HttpServer::DecodeURLEncoded(Request.m_Body, "koka") == "true";
+	bool draw = HttpServer::DecodeURLEncoded(Request.m_Body, "draw") == "true";
+	int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
+	bool extend_break_time = HttpServer::DecodeURLEncoded(Request.m_Body, "extend_break_time") == "true";
+
+	RuleSet* new_rule_set = new RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time, extend_break_time);
+
+	auto guard = LockWriteForScope();
+
+	if (!m_Database.AddRuleSet(new_rule_set))
+		return Error(Error::Type::OperationFailed);
+
+	m_Database.Save();
+	return Error::Type::NoError;//OK
+}
+
+
+
+Error Application::Ajax_EditRuleSet(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	std::string name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	int match_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "match_time"));
+	int goldenscore_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "goldenscore_time"));
+	int osaekomi_ippon   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_ippon"));
+	int osaekomi_wazaari = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_wazaari"));
+	bool yuko = HttpServer::DecodeURLEncoded(Request.m_Body, "yuko") == "true";
+	bool koka = HttpServer::DecodeURLEncoded(Request.m_Body, "koka") == "true";
+	bool draw = HttpServer::DecodeURLEncoded(Request.m_Body, "draw") == "true";
+	int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
+	bool extend_break_time = HttpServer::DecodeURLEncoded(Request.m_Body, "extend_break_time") == "true";
+
+	auto guard = LockWriteForScope();
+
+	auto rule = m_Database.FindRuleSet(id);
+
+	if (!rule)
+	{
+		if (GetTournament())
+			rule = GetTournament()->FindRuleSet(id);
+		if (!rule)
+			return Error::Type::ItemNotFound;
+	}
+
+	*rule = RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time, extend_break_time);
+	m_Database.Save();
+	return Error::Type::NoError;//OK
 }
 
 
