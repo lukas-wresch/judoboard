@@ -353,7 +353,7 @@ void Application::SetupHttpServer()
 	});
 
 
-	m_Server.RegisterResource("/ajax/participants/get", [this](auto& Request) -> std::string {
+	/*m_Server.RegisterResource("/ajax/participants/get", [this](auto& Request) -> std::string {
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
@@ -363,7 +363,7 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::TournamentNotOpen);
 
 		return GetTournament()->Participants2String();
-	});
+	});*/
 
 
 	m_Server.RegisterResource("/ajax/judoka/search", [this](auto& Request) -> std::string {
@@ -371,16 +371,17 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::NotLoggedIn);
 
 		auto search_string = HttpServer::DecodeURLEncoded(Request.m_Query, "name");
-		bool tournament_search = HttpServer::DecodeURLEncoded(Request.m_Query, "participants") == "true";
+		auto tournament_search = HttpServer::DecodeURLEncoded(Request.m_Query, "participants") == "true";
 
-		auto guard = LockReadForScope();
+
+		LockRead();
 
 		std::vector<const Judoka*> judokas;
 		if (tournament_search)
 		{
 			judokas = GetTournament()->GetDatabase().SearchJudokas(search_string);
 
-			auto age_groups = GetTournament()->GetAgeGroups();
+			/*auto age_groups = GetTournament()->GetAgeGroups();
 			for (auto it = age_groups.begin(); it != age_groups.end();)
 			{
 				if (ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, (std::string)(*it)->GetUUID())) != 1)
@@ -396,10 +397,15 @@ void Application::SetupHttpServer()
 					it = judokas.erase(it);//Not found, remove judoka
 				else
 					++it;
-			}
+			}*/
 		}
 		else
 			judokas = m_Database.SearchJudokas(search_string);
+
+		auto schedule = GetTournament()->GetSchedule();
+		
+		UnlockRead();
+
 
 		YAML::Emitter ret;
 		ret << YAML::BeginSeq;
@@ -414,25 +420,40 @@ void Application::SetupHttpServer()
 			ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
 
 			if (judoka->GetClub())
-				ret << YAML::Key << "club" << YAML::Value << judoka->GetClub()->GetName();
-
-			ret << YAML::Key << "is_participant" << YAML::Value << GetTournament()->IsParticipant(*judoka);
-
-			auto judoka_age_group = GetTournament()->GetAgeGroupOfJudoka(judoka);
-			if (judoka_age_group)
-				ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
-
-			//Calculate eligable age groups
-			ret << YAML::Key << "age_groups" << YAML::Value;
-			ret << YAML::BeginSeq;
-
-			auto age_groups = GetTournament()->GetEligableAgeGroupsOfJudoka(judoka);
-			for (auto age_group : age_groups)
 			{
-				ret << YAML::BeginMap;
-				ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
-				ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
-				ret << YAML::EndMap;
+				ret << YAML::Key << "club_uuid" << YAML::Value << (std::string)judoka->GetClub()->GetUUID();
+				ret << YAML::Key << "club_name" << YAML::Value << judoka->GetClub()->GetName();
+			}
+
+			if (tournament_search)
+			{
+				//ret << YAML::Key << "is_participant" << YAML::Value << GetTournament()->IsParticipant(*judoka);
+
+				uint32_t num_matches = 0;
+				for (auto match : schedule)
+				{
+					if (match && match->HasValidFighters() && match->Contains(*judoka))
+						num_matches++;
+				}
+
+				ret << YAML::Key << "num_matches" << YAML::Value << num_matches;
+
+				auto judoka_age_group = GetTournament()->GetAgeGroupOfJudoka(judoka);
+				if (judoka_age_group)
+					ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
+
+				//Calculate eligable age groups
+				ret << YAML::Key << "age_groups" << YAML::Value;
+				ret << YAML::BeginSeq;
+
+				auto age_groups = GetTournament()->GetEligableAgeGroupsOfJudoka(judoka);
+				for (auto age_group : age_groups)
+				{
+					ret << YAML::BeginMap;
+					ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
+					ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
+					ret << YAML::EndMap;
+				}
 			}
 
 			ret << YAML::EndSeq;
