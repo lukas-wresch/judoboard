@@ -126,9 +126,15 @@ namespace Judoboard
 		void SetClub(const Club* NewClub) { m_pClub = NewClub; }
 		void SetNumber(const std::string& NewNumber) { m_Number = NewNumber; }
 
-		void StartBreak() const { m_LastMatch_Timestamp = Timer::GetTimestamp(); }
+		void StartBreak(uint32_t BreakTime) const {//Start break for 'BreakTime' seconds
+			m_LastMatch_Timestamp = Timer::GetTimestamp();
+			m_RequiredBreakTime   = BreakTime;
+		}
 		//Returns the number of seconds this judoka had a break
 		uint32_t GetLengthOfBreak()  const { return (Timer::GetTimestamp() - m_LastMatch_Timestamp) / 1000; }
+		bool NeedsBreak()  const {
+			return GetLengthOfBreak() < m_RequiredBreakTime;
+		}
 
 		void operator >> (YAML::Emitter& Yaml) const;
 		void ToString(YAML::Emitter& Yaml) const;
@@ -159,5 +165,6 @@ namespace Judoboard
 		const Club* m_pClub = nullptr;//Club the judoka belongs to
 
 		mutable uint32_t m_LastMatch_Timestamp = 0;//Timestamp when the last match for this judoka ended to determine break between matches
+		mutable uint32_t m_RequiredBreakTime = 0;//Required break time for this judoka in seconds
 	};
 }

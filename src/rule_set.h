@@ -20,7 +20,7 @@ namespace Judoboard
 
 	public:
 		RuleSet() = default;
-		RuleSet(const std::string& Name, uint32_t MatchTime, int GoldenScoreTime, uint32_t OsaeKomiTime, uint32_t OsaeKomiTime_with_Wazaari, bool Yuko = false, bool Koka = false, bool Draw = false, uint32_t BreakTime = 0);
+		RuleSet(const std::string& Name, uint32_t MatchTime, int GoldenScoreTime, uint32_t OsaeKomiTime, uint32_t OsaeKomiTime_with_Wazaari, bool Yuko = false, bool Koka = false, bool Draw = false, uint32_t BreakTime = 0, bool ExtendBreakTime = false);
 		RuleSet(const YAML::Node& Yaml);
 
 		const std::string& GetName() const { return m_Name; }
@@ -42,6 +42,7 @@ namespace Judoboard
 		int GetMatchTime() const { return m_MatchTime; }
 		int GetGoldenScoreTime() const { return m_GoldenScoreTime; }
 		uint32_t GetBreakTime() const { return m_BreakTime; }
+		bool IsExtendBreakTime() const { return m_IsExtendBreakTime; }
 
 		const std::string GetDescription() const;
 
@@ -61,5 +62,6 @@ namespace Judoboard
 		uint32_t m_OsaeKomiTime_With_WazaAri = 10;//Seconds to achieve a wazaari during osaekomi
 
 		uint32_t m_BreakTime = 0;//Break time in seconds between matches
+		bool m_IsExtendBreakTime = false;//Extend the break time to the match time (with golden score) if the match was longer then the normal break time
 	};
 }
