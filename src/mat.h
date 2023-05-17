@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <thread>
-#include <mutex>
+#include "../ZED/include/read_write_mutex.h"
 #include <functional>
 #include "judoka.h"
 #include "timer.h"
@@ -55,9 +55,9 @@ namespace Judoboard
 		virtual bool HasConcluded() const override;
 
 		virtual std::vector<OsaekomiEntry> GetOsaekomiList() const override {
-			m_mutex.lock();
+			m_mutex.LockRead();
 			auto copy = m_OsaekomiList;
-			m_mutex.unlock();
+			m_mutex.UnlockRead();
 			return copy;
 		}
 
@@ -152,9 +152,9 @@ namespace Judoboard
 
 		virtual void SetName(const std::string& NewName) override
 		{
-			m_mutex.lock();
+			m_mutex.LockWrite();
 			IMat::SetName(NewName);
-			m_mutex.unlock();
+			m_mutex.UnlockWrite();
 		}
 
 
@@ -473,7 +473,8 @@ namespace Judoboard
 		uint32_t m_LastFrameTime = 40;
 
 		std::thread m_Thread;//Thread for running the main loop
-		mutable std::recursive_mutex m_mutex;
+		//mutable std::recursive_mutex m_mutex;
+		mutable ZED::RecursiveReadWriteMutex m_mutex;
 
 		//Graphics
 		mutable std::unordered_map<std::string, GraphicElement> m_Graphics;
