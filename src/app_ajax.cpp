@@ -353,19 +353,6 @@ void Application::SetupHttpServer()
 	});
 
 
-	/*m_Server.RegisterResource("/ajax/participants/get", [this](auto& Request) -> std::string {
-		if (!IsLoggedIn(Request))
-			return Error(Error::Type::NotLoggedIn);
-
-		auto guard = LockReadForScope();
-
-		if (!GetTournament())
-			return Error(Error::Type::TournamentNotOpen);
-
-		return GetTournament()->Participants2String();
-	});*/
-
-
 	m_Server.RegisterResource("/ajax/judoka/search", [this](auto& Request) -> std::string {
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
@@ -373,34 +360,25 @@ void Application::SetupHttpServer()
 		auto search_string = HttpServer::DecodeURLEncoded(Request.m_Query, "name");
 		auto tournament_search = HttpServer::DecodeURLEncoded(Request.m_Query, "participants") == "true";
 
+		//Transform to lower case
+		std::transform(search_string.begin(), search_string.end(), search_string.begin(),
+			[](unsigned char c){ return std::tolower(c); });
+
+		//Split by ' ' character
+		std::vector<std::string> search_string_split;
+		std::istringstream iss(search_string);
+		std::string word;
+
+		while (iss >> word)
+			search_string_split.push_back(word);
 
 		LockRead();
 
-		std::vector<const Judoka*> judokas;
+		std::vector<Judoka*> judokas;
 		if (tournament_search)
-		{
-			judokas = GetTournament()->GetDatabase().SearchJudokas(search_string);
-
-			/*auto age_groups = GetTournament()->GetAgeGroups();
-			for (auto it = age_groups.begin(); it != age_groups.end();)
-			{
-				if (ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, (std::string)(*it)->GetUUID())) != 1)
-					it = age_groups.erase(it);
-				else
-					++it;
-			}
-
-			//Remove judokas that don't belong to an age group in the list
-			for (auto it = judokas.begin(); it != judokas.end();)
-			{
-				if (std::find(age_groups.begin(), age_groups.end(), GetTournament()->GetAgeGroupOfJudoka(*it)) == age_groups.end())
-					it = judokas.erase(it);//Not found, remove judoka
-				else
-					++it;
-			}*/
-		}
+			judokas = GetTournament()->GetDatabase().GetAllJudokas();
 		else
-			judokas = m_Database.SearchJudokas(search_string);
+			judokas = m_Database.GetAllJudokas();
 
 		auto schedule = GetTournament()->GetSchedule();
 		
@@ -412,6 +390,34 @@ void Application::SetupHttpServer()
 
 		for (auto judoka : judokas)
 		{
+			auto to_search = judoka->GetName(NameStyle::GivenName);
+
+			auto club = judoka->GetClub();
+			if (club)
+				to_search += club->GetName();
+
+			auto judoka_age_group = GetTournament()->GetAgeGroupOfJudoka(judoka);
+			if (judoka_age_group)
+				to_search += judoka_age_group->GetName();
+
+			std::transform(to_search.begin(), to_search.end(), to_search.begin(),
+				[](unsigned char c){ return std::tolower(c); });
+
+			//Does the judoka match all the search criteria?
+			bool matches = true;
+			for (const auto& word : search_string_split)
+			{
+				if (to_search.find(word) == std::string::npos)
+				{
+					matches = false;
+					break;
+				}
+			}
+
+			if (!matches)
+				continue;//Does not match search criteria			
+			
+
 			ret << YAML::BeginMap;
 
 			ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
@@ -419,7 +425,7 @@ void Application::SetupHttpServer()
 			ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
 			ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
 
-			if (judoka->GetClub())
+			if (club)
 			{
 				ret << YAML::Key << "club_uuid" << YAML::Value << (std::string)judoka->GetClub()->GetUUID();
 				ret << YAML::Key << "club_name" << YAML::Value << judoka->GetClub()->GetName();
@@ -438,9 +444,11 @@ void Application::SetupHttpServer()
 
 				ret << YAML::Key << "num_matches" << YAML::Value << num_matches;
 
-				auto judoka_age_group = GetTournament()->GetAgeGroupOfJudoka(judoka);
 				if (judoka_age_group)
+				{
 					ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
+					ret << YAML::Key << "age_group_name" << YAML::Value << (std::string)judoka_age_group->GetName();
+				}
 
 				//Calculate eligable age groups
 				ret << YAML::Key << "age_groups" << YAML::Value;
@@ -1827,13 +1835,18 @@ void Application::SetupHttpServer()
 		UUID whiteID = HttpServer::DecodeURLEncoded(Request.m_Body, "white");
 		UUID blueID  = HttpServer::DecodeURLEncoded(Request.m_Body, "blue");
 
-		auto guard = LockWriteForScope();
+		auto guard = LockReadForScope();
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		auto white = m_Database.FindJudoka(whiteID);
-		auto blue  = m_Database.FindJudoka(blueID);
+		auto white = GetTournament().FindJudoka(whiteID);
+		if (!white)
+			white = m_Database.FindJudoka(whiteID);
+
+		auto blue = GetTournament().FindJudoka(blueID);
+		if (!blue)
+			blue = m_Database.FindJudoka(blueID);
 
 		if (!white || !blue)//Judokas exist?
 			return std::string("Judoka not found in database");

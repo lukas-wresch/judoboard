@@ -48,8 +48,6 @@ namespace Judoboard
 		[[nodiscard]] Judoka* FindJudoka_ExactMatch(const JudokaData& NewJudoka);
 		[[nodiscard]] Judoka* FindJudoka_SameName(const JudokaData& NewJudoka);
 
-		[[nodiscard]] std::vector<const Judoka*> SearchJudokas(std::string SearchString) const;
-
 		bool DeleteJudoka(const UUID& UUID);
 
 		//Clubs

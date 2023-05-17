@@ -4,7 +4,7 @@
 
 <div id="div_showParticipantsOnly">
   <label style="width:200px;float:left;margin-top:4px;" id="label_showParticipantsOnly">Show only participants</label>
-  <input type="checkbox" id="showParticipantsOnly" class="switch-input" onclick="ToggleFilter();">
+  <input type="checkbox" id="showParticipantsOnly" class="switch-input" checked onclick="ToggleFilter();">
   <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="showParticipantsOnly">
     <span class="toggle-on" id="showParticipantsOnly_enabled"></span><span class="toggle-off" id="showParticipantsOnly_disabled"></span>
   </label>
@@ -94,7 +94,6 @@ function AddMatch()
 
 function ToggleFilter()
 {
-  filter = !filter;
   Update('white');
   Update('blue');
 }
@@ -103,20 +102,20 @@ function ToggleFilter()
 
 function Update(color)
 {
-  AjaxCallback('ajax/judoka/search?name=' + document.getElementById(color).value, function(response) {
+  AjaxCallback('ajax/judoka/search?participants=' + showParticipantsOnly.checked + '&name=' + document.getElementById(color).value, function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
-    var table = document.getElementById("search_" + color);
+    let table = document.getElementById("search_" + color);
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    var no = 0;
+    let no = 0;
     for (const judoka of res)
     {
-      if (!judoka.is_participant && filter)
-        continue;
+      //if (!judoka.is_participant && filter)
+        //continue;
 
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
@@ -137,10 +136,10 @@ function Update(color)
       cell1.innerHTML = judoka.name;
       cell1.style.fontSize  = "16pt";
 
-      if (typeof judoka.club === 'undefined')
+      if (typeof judoka.club_name === 'undefined')
         cell2.innerHTML = "- - -";
       else
-        cell2.innerHTML = judoka.club;
+        cell2.innerHTML = judoka.club_name;
       cell2.style.fontSize  = "16pt";
 
       cell3.innerHTML = judoka.weight + " kg";
@@ -166,9 +165,6 @@ document.getElementById("blue").oninput = function(e)
 {
   Update("blue");
 };
-
-var filter = false;
-
 
 
 document.getElementById("headline").innerHTML    = translate('new_match');

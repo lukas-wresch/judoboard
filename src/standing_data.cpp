@@ -653,25 +653,3 @@ Judoka* StandingData::FindJudoka_SameName(const JudokaData& NewJudoka)
 
 	return ret;
 }
-
-
-
-std::vector<const Judoka*> StandingData::SearchJudokas(std::string SearchString) const
-{
-	std::transform(SearchString.begin(), SearchString.end(), SearchString.begin(),
-		[](unsigned char c){ return std::tolower(c); });
-
-	std::vector<const Judoka*> ret;
-
-	for (auto judoka : m_Judokas)
-	{
-		auto name = judoka->GetName(NameStyle::GivenName);
-		std::transform(name.begin(), name.end(), name.begin(),
-			[](unsigned char c){ return std::tolower(c); });
-
-		if (name.find(SearchString) != std::string::npos)
-			ret.push_back(judoka);
-	}
-
-	return ret;
-}
