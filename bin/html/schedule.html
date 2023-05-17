@@ -57,6 +57,12 @@
 
 
 <h2 id="headline-participants">Participants</h2>
+
+<div>
+    <label id="label_white" style="width:150px;float:left;margin-top:5px;">Search</label>
+    <input style="margin-bottom:20px;" size="50" id="participants_search" value=""/>
+</div>
+
 <table id="participants" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
     <th style="width: 0.5cm;" class="no">No.</th>
@@ -718,6 +724,10 @@ function Update()
   TimerID = setTimeout(Update, 6000);
 }
 
+document.getElementById("participants_search").oninput = function(e)
+{
+  Update_Participants();
+};
 
 var showHansokumake = false;
 
