@@ -216,10 +216,11 @@ TEST(Database, EmptyDatabaseShouldHaveDefaultRuleSet)
 
 	EXPECT_EQ(d.GetNumAccounts(), 0);
 
-	ASSERT_EQ(d.GetRuleSets().size(), 3);
+	ASSERT_EQ(d.GetRuleSets().size(), 4);
 	EXPECT_EQ(d.GetRuleSets()[0]->GetName(), "Children");
-	EXPECT_EQ(d.GetRuleSets()[1]->GetName(), "Youth");
-	EXPECT_EQ(d.GetRuleSets()[2]->GetName(), "Adults");
+	EXPECT_EQ(d.GetRuleSets()[1]->GetName(), "Youth U13");
+	EXPECT_EQ(d.GetRuleSets()[2]->GetName(), "Youth U15");
+	EXPECT_EQ(d.GetRuleSets()[3]->GetName(), "Adults");
 }
 
 

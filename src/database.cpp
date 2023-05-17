@@ -36,6 +36,7 @@ void Database::Reset()
 
 		AddRuleSet(children);
 		AddRuleSet(youth);
+		AddRuleSet(youth2);
 		AddRuleSet(adults);
 
 		AddAgeGroup(new AgeGroup("U11", 8,  10, children));
