@@ -70,7 +70,7 @@
     <th style="width: 6.0cm; text-align: center;" class="club">Club</th>
     <th style="width: 2.0cm; text-align: center;" id="weight" class="weight">Weight</th>
     <th style="width: 2.0cm; text-align: center;" id="matches" class="num_matches">#Matches</th>
-    <th style="width: 4.5cm; text-align: center;" id="age_group" class="age_group">Age group</th>
+    <th style="width: 5.5cm; text-align: center;" id="age_group" class="age_group">Age group</th>
     <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -573,14 +573,9 @@ function Update_Participants()
 
       cell4.style.textAlign = "center";
       
-      if (judoka.age_groups.length == 0)
+      if (judoka.age_groups.length == 0 && typeof judoka.age_group_uuid === 'undefined')
         cell4.innerHTML = "- - -";
-      else if (judoka.age_groups.length == 1)
-      {
-        cell4.innerHTML = judoka.age_group_name;
-        cell4.style.fontSize = "14pt";
-      }
-      else
+      else if (judoka.age_groups.length >= 2)
       {
         var select = document.createElement("select");
         select.style.width = "4.0cm";
@@ -604,6 +599,11 @@ function Update_Participants()
         }
 
         cell4.appendChild(select);
+      }
+      else
+      {
+        cell4.innerHTML = judoka.age_group_name;
+        cell4.style.fontSize = "14pt";
       }
 
       cell5.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + translate('remove') + "</button>";
