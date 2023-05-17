@@ -1840,11 +1840,11 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		auto white = GetTournament().FindJudoka(whiteID);
+		auto white = GetTournament()->GetDatabase().FindJudoka(whiteID);
 		if (!white)
 			white = m_Database.FindJudoka(whiteID);
 
-		auto blue = GetTournament().FindJudoka(blueID);
+		auto blue = GetTournament()->GetDatabase().FindJudoka(blueID);
 		if (!blue)
 			blue = m_Database.FindJudoka(blueID);
 
