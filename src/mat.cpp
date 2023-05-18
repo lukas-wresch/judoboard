@@ -1237,9 +1237,9 @@ void Mat::NextState(State NextState) const
 	const int score_margin  = (int)(120.0 * m_ScalingFactor);
 	const int score_padding = (int)(200.0 * m_ScalingFactor);
 
-	const int effect_row1 = height/2    + (int)(30.0 * m_ScalingFactor);
-	const int effect_row2 = effect_row1 + (int)(98.0 * m_ScalingFactor);
-	const int effect_row3 = effect_row2 + (int)(96.0 * m_ScalingFactor);
+	const int effect_row1 = height/2    + (int)(38.0 * m_ScalingFactor);
+	const int effect_row2 = effect_row1 + (int)(90.0 * m_ScalingFactor);
+	const int effect_row3 = effect_row2 + (int)(90.0 * m_ScalingFactor);
 
 	auto& renderer = m_Window.GetRenderer();
 
