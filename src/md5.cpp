@@ -349,8 +349,8 @@ MD5::MD5(const Tournament& Tournament)
 
 	//Convert matches
 
-	const auto schedule = Tournament.GetSchedule();
-	for (auto match : schedule)
+	for (auto table : Tournament.GetMatchTables())
+		for (auto match : table->GetSchedule())
 	{
 		Match new_match;
 
@@ -402,6 +402,15 @@ MD5::MD5(const Tournament& Tournament)
 					if (new_match.MatchNo >= 31)
 						new_match.MatchNo = 37;
 				}
+			}
+
+			else if (match_table->GetType() == MatchTable::Type::DoubleElimination)
+			{
+				auto de = (DoubleElimination*)match_table;
+				if (de->GetWinnerBracket().FindMatch(*match))
+					new_match.AreaID = 0;
+				else
+					new_match.AreaID = 1;
 			}
 		}
 

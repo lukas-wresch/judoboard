@@ -243,14 +243,6 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			{
 				auto de = (DoubleElimination*)match_table;
 
-				//MD5 puts 1-8 fighters in 16 scheme, compress it if that's the case
-				if (match.Weightclass->FightSystemID == 1 && match.MatchNo <= 8 &&
-					File.FindParticipantsOfWeightclass(match.AgeGroupID, match.WeightclassID).size() <= 8)
-				{
-					delete new_match;
-					continue;
-				}
-
 				if (match.AreaID == 1 || match.AreaID == 3 || match.AreaID == 4 || match.AreaID == 5)
 					de->AddMatchToLoserBracket(new_match);
 				else
@@ -846,7 +838,7 @@ std::vector<Match*> Tournament::GetSchedule() const
 
 	for (auto [table, index] : m_Schedule)
 	{
-		auto &sub_schedule = table->GetSchedule();
+		auto& sub_schedule = table->GetSchedule();
 		if (index < sub_schedule.size())
 			ret.emplace_back(sub_schedule[index]);
 	}
