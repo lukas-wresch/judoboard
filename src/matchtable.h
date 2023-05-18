@@ -220,6 +220,9 @@ namespace Judoboard
 			void Add(const Judoka* Judoka, const MatchTable* Table) {
 				m_Results.emplace_back(Judoka, Table);
 			}
+			void Add(const Result& NewResult) {
+				m_Results.emplace_back(NewResult);
+			}
 
 			Result* GetResultsOf(const Judoka* Judoka) {
 				for (size_t i = 0; i < m_Results.size(); ++i)

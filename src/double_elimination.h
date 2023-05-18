@@ -34,7 +34,7 @@ namespace Judoboard
 			m_LoserBracket.SetMatID(MatID);
 		}
 
-		virtual Results CalculateResults() const override { return m_WinnerBracket.CalculateResults(); }
+		virtual Results CalculateResults() const override;
 		virtual void GenerateSchedule() override;
 
 		bool IsThirdPlaceMatch() const { return m_LoserBracket.IsFinalMatch(); }

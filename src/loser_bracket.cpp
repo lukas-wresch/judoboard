@@ -287,34 +287,24 @@ MatchTable::Results LoserBracket::CalculateResults() const
 	auto& schedule = GetSchedule();
 
 	//Get final match
-	const Match* lastMatch = schedule[schedule.size() - 1];
-
-	if (lastMatch->HasConcluded())
+	if (IsFinalMatch())
 	{
-		ret.Add(lastMatch->GetWinner(), this);
-		ret.Add(lastMatch->GetLoser(),  this);
+		const Match* lastMatch = schedule[schedule.size() - 1];
+		if (IsThirdPlaceMatch() && schedule.size() >= 2)
+			lastMatch = schedule[schedule.size() - 2];
+
+		if (lastMatch->HasConcluded())
+		{
+			ret.Add(lastMatch->GetWinner(), this);
+			ret.Add(lastMatch->GetLoser(),  this);
+		}
 	}
-	else
-		return ret;
 
 	if (IsThirdPlaceMatch())
 	{
-		const Match* third_place_match = schedule[schedule.size() - 2];
+		const Match* third_place_match = schedule[schedule.size() - 1];
 		ret.Add(third_place_match->GetWinner(), this);
 		ret.Add(third_place_match->GetLoser(),  this);
-	}
-
-	if (IsThirdPlaceMatch() && IsFifthPlaceMatch())
-	{
-		//int offset = 4;
-		//if (IsThirdPlaceMatch())
-		//offset = 5;
-
-		int offset = 5;
-
-		const Match* fifth_place_match = schedule[schedule.size() - offset];
-		ret.Add(fifth_place_match->GetWinner(), this);
-		ret.Add(fifth_place_match->GetLoser(),  this);
 	}
 
 	return ret;

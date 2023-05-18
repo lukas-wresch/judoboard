@@ -101,6 +101,19 @@ size_t DoubleElimination::GetMaxStartPositions() const
 
 
 
+MatchTable::Results DoubleElimination::CalculateResults() const
+{
+	Results ret    = m_WinnerBracket.CalculateResults();
+	Results losers = m_LoserBracket.CalculateResults();
+
+	for (const auto& result : losers)
+		ret.Add(result);
+
+	return ret;
+}
+
+
+
 void DoubleElimination::GenerateSchedule()
 {
 	if (!IsSubMatchTable() && GetStatus() != Status::Scheduled)
