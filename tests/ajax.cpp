@@ -312,6 +312,65 @@ TEST(Ajax, RuleSet_Edit)
 
 
 
+TEST(Ajax, RuleSet_Get)
+{
+	initialize();
+
+	{
+		Application app;
+		app.GetDatabase().EnableAutoSave(false);
+
+		auto& rule_sets = app.GetDatabase().GetRuleSets();
+		auto count = rule_sets.size();
+
+		EXPECT_TRUE(app.Ajax_AddRuleSet(HttpServer::Request("", "name=test&match_time=60&goldenscore_time=120&osaekomi_ippon=5&osaekomi_wazaari=3&yuko=true&koka=true&draw=true&break_time=30&extend_break_time=true")));
+
+		ASSERT_EQ(rule_sets.size(), count + 1);
+
+		auto yaml = YAML::Load( app.Ajax_GetRuleSet(HttpServer::Request("id=" + (std::string)rule_sets[count]->GetUUID())) );
+
+		EXPECT_EQ(rule_sets[count]->GetName(),      yaml["name"].as<std::string>());
+		EXPECT_EQ(rule_sets[count]->GetMatchTime(), yaml["match_time"].as<int>());
+		EXPECT_EQ(rule_sets[count]->GetGoldenScoreTime(),   yaml["golden_score_time"].as<int>());
+		EXPECT_EQ(rule_sets[count]->GetOsaeKomiTime(false), yaml["osaekomi_time"].as<int>());
+		EXPECT_EQ(rule_sets[count]->GetOsaeKomiTime(true),  yaml["osaekomi_with_wazaari_time"].as<int>());
+		EXPECT_EQ(rule_sets[count]->IsYukoEnabled(), yaml["yuko"].as<bool>());
+		EXPECT_EQ(rule_sets[count]->IsKokaEnabled(), yaml["koka"].as<bool>());
+		EXPECT_EQ(rule_sets[count]->IsDrawAllowed(), yaml["draw"].as<bool>());
+		EXPECT_EQ(rule_sets[count]->GetBreakTime(),  yaml["break_time"].as<int>());
+		EXPECT_EQ(rule_sets[count]->IsExtendBreakTime(), yaml["extend_break_time"].as<bool>());
+	}
+}
+
+
+
+TEST(Ajax, RuleSet_List)
+{
+	initialize();
+
+	{
+		Application app;
+		app.GetDatabase().EnableAutoSave(false);
+
+		auto& rule_sets = app.GetDatabase().GetRuleSets();
+		app.GetTournament()->SetDefaultRuleSet(rule_sets[0]);
+
+		auto yaml = YAML::Load( app.Ajax_ListRuleSets() );
+
+		ASSERT_TRUE(yaml.IsMap());
+		EXPECT_EQ((std::string)app.GetTournament()->GetDefaultRuleSet()->GetUUID(), yaml["default"].as<std::string>());
+
+		for (int i = 0; i < rule_sets.size(); i++)
+		{
+			EXPECT_EQ((std::string)rule_sets[i]->GetUUID(), yaml["rules"][i]["uuid"].as<std::string>());
+			EXPECT_EQ(rule_sets[i]->GetName(),              yaml["rules"][i]["name"].as<std::string>());
+			EXPECT_EQ(rule_sets[i]->GetDescription(),       yaml["rules"][i]["desc"].as<std::string>());
+		}
+	}
+}
+
+
+
 TEST(Ajax, GetMats)
 {
 	initialize();
