@@ -1225,6 +1225,18 @@ MD5::Participant* MD5::FindParticipant(int ParticipantID)
 
 
 
+std::vector<const MD5::Participant*> MD5::FindParticipantsOfWeightclass(int AgeGroupID, int WeightclassID) const
+{
+	std::vector<const MD5::Participant*> ret;
+
+	for (auto judoka : m_Participants)
+		if (judoka && judoka->AgeGroupID == AgeGroupID && judoka->WeightclassID == WeightclassID)
+			ret.push_back(judoka);
+	return ret;
+}
+
+
+
 MD5::AgeGroup* MD5::FindAgeGroup(int AgeGroupID)
 {
 	if (AgeGroupID <= -1)
@@ -1398,6 +1410,7 @@ void MD5::Dump() const
 		line += "   Status: "       + std::to_string(match.Status);
 		line += "   Pool: "         + std::to_string(match.Pool);
 		line += "   AreaID: "       + std::to_string(match.AreaID);
+		line += "   MatchNo: "      + std::to_string(match.MatchNo);
 		ZED::Log::Info(line);
 	}
 

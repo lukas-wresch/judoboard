@@ -289,7 +289,8 @@ namespace Judoboard
 			//Typical 1
 			//2 = first round elimination system
 			//9 = final match elimination system
-			//4 = third place match
+			//4 = 3rd place match
+			//5 = 5th place match
 			//Double elimination: 0 = winner bracket, 1 = loser bracket, 2 = semi final, 4 = fifth place match
 		};
 
@@ -340,6 +341,7 @@ namespace Judoboard
 		[[nodiscard]] Club*         FindClub(int ClubID);
 		[[nodiscard]] Club*         FindClubByName(const std::string& Name) const;
 		[[nodiscard]] Participant*  FindParticipant(int ParticipantID);
+		[[nodiscard]] std::vector<const MD5::Participant*> FindParticipantsOfWeightclass(int AgeGroupID, int WeightclassID) const;
 		[[nodiscard]] AgeGroup*     FindAgeGroup(int AgeGroupID);
 		[[nodiscard]] Weightclass*  FindWeightclass(int AgeGroupID, int WeightclassID);
 		[[nodiscard]] const Weightclass* FindWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const;

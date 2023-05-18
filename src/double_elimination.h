@@ -37,11 +37,11 @@ namespace Judoboard
 		virtual Results CalculateResults() const override { return m_WinnerBracket.CalculateResults(); }
 		virtual void GenerateSchedule() override;
 
-		bool IsThirdPlaceMatch() const { return m_WinnerBracket.IsThirdPlaceMatch(); }
-		bool IsFifthPlaceMatch() const { return m_WinnerBracket.IsFifthPlaceMatch(); }
+		bool IsThirdPlaceMatch() const { return m_LoserBracket.IsFinalMatch(); }
+		bool IsFifthPlaceMatch() const { return m_LoserBracket.IsThirdPlaceMatch(); }
 
-		void IsThirdPlaceMatch(bool Enable) { m_WinnerBracket.IsThirdPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
-		void IsFifthPlaceMatch(bool Enable) { m_WinnerBracket.IsFifthPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
+		void IsThirdPlaceMatch(bool Enable) { m_LoserBracket.IsFinalMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
+		void IsFifthPlaceMatch(bool Enable) { m_LoserBracket.IsThirdPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
 
 		SingleElimination& GetWinnerBracket() { return m_WinnerBracket; }
 		const SingleElimination& GetWinnerBracket() const { return m_WinnerBracket; }
