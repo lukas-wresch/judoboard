@@ -51,6 +51,8 @@ TEST(MD5, AgeGroups2023)
 		EXPECT_EQ(tour_temp.GetAgeGroups()[0]->GetMaxAge(), 12);
 		EXPECT_EQ(tour_temp.GetAgeGroups()[1]->GetMinAge(), 10);
 		EXPECT_EQ(tour_temp.GetAgeGroups()[1]->GetMaxAge(), 12);
+
+		EXPECT_GE(tour_temp.GetSchedule().size(), 1);
 	}
 }
 
