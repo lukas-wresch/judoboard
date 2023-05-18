@@ -217,6 +217,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			}
 		}
 	}
+
+	//If there are not matches, create them
+	if (GetSchedule().size() == 0)
+		GenerateSchedule();
 }
 
 
