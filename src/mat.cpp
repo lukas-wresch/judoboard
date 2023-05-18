@@ -155,7 +155,7 @@ bool Mat::Reset()
 
 
 
-bool Mat::StartMatch(Match* NewMatch)
+bool Mat::StartMatch(Match* NewMatch, bool UseForce)
 {
 	if (!NewMatch)
 	{
@@ -177,7 +177,8 @@ bool Mat::StartMatch(Match* NewMatch)
 		return false;
 	}
 
-	if (NewMatch->IsRunning() || NewMatch->HasConcluded())
+	if (!UseForce)
+		if (NewMatch->IsRunning() || NewMatch->HasConcluded())
 	{
 		ZED::Log::Warn("Match is already running or has been concluded");
 		return false;
@@ -189,7 +190,8 @@ bool Mat::StartMatch(Match* NewMatch)
 		return false;
 	}
 
-	if (NewMatch->GetFighter(Fighter::White)->NeedsBreak() || NewMatch->GetFighter(Fighter::Blue)->NeedsBreak())
+	if (!UseForce)
+	  if (NewMatch->GetFighter(Fighter::White)->NeedsBreak() || NewMatch->GetFighter(Fighter::Blue)->NeedsBreak())
 	{
 		ZED::Log::Warn("Can not start a match since at least one fighter has not had his break yet");
 		return false;

@@ -116,7 +116,7 @@ namespace Judoboard
 		virtual const std::vector<Match> GetNextMatches() const { return m_NextMatches; }
 
 		virtual bool CanNextMatchStart() const = 0;
-		virtual bool StartMatch(Match* NewMatch) = 0;//Creates a new match. Both judoka are copied to the mat. Returns false when a match is still progressing and hence a new match can not be started
+		virtual bool StartMatch(Match* NewMatch, bool UseForce = false) = 0;//Creates a new match. Both judoka are copied to the mat. Returns false when a match is still progressing and hence a new match can not be started
 		virtual bool HasConcluded() const = 0;//Returns true if and only if the match has finished and hence EndMatch() can be called
 		virtual bool EndMatch() = 0;//Closes the match that is currently on the mat and resets the scoreboard
 

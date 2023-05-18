@@ -220,13 +220,23 @@ bool Application::OpenTournament(const UUID& UUID)
 	if (!CloseTournament())
 		return false;
 
-	m_CurrentTournament = FindTournament(UUID);
+	auto tournament = FindTournament(UUID);
+	if (!tournament)
+		return false;
 
-	if (m_CurrentTournament)
+	auto guard = LockWriteForScope();
+
+	m_CurrentTournament = tournament;
+
+	//Restart ongoing matches
+	for (auto mat : m_Mats)
 	{
-		m_Database.SetLastTournamentName(m_CurrentTournament->GetName());
-		ZED::Log::Info("Opened tournament " + m_CurrentTournament->GetName());
+		auto match = tournament->GetNextOngoingMatch(mat->GetMatID());
+		mat->StartMatch(match, true);
 	}
+
+	m_Database.SetLastTournamentName(m_CurrentTournament->GetName());
+	ZED::Log::Info("Opened tournament " + m_CurrentTournament->GetName());
 
 	return true;
 }
@@ -413,6 +423,14 @@ bool Application::StartLocalMat(uint32_t ID)
 	new_mat->SetIpponStyle(GetDatabase().GetIpponStyle());
 	new_mat->SetTimerStyle(GetDatabase().GetTimerStyle());
 	new_mat->SetNameStyle(GetDatabase().GetNameStyle());
+
+	//Is there a match already started on that mat?
+	if (GetTournament())
+	{
+		auto ongoing_match = GetTournament()->GetNextOngoingMatch(ID);
+		if (ongoing_match)
+			new_mat->StartMatch(ongoing_match, true);
+	}
 
 	m_Mats.emplace_back(new_mat);
 	UnlockWrite();
