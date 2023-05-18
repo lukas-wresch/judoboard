@@ -64,6 +64,8 @@ namespace Judoboard
 		//Serialization
 		virtual const std::string ToHTML() const override;
 
+		virtual void operator >> (YAML::Emitter& Yaml) const override;
+
 
 	private:
 		size_t GetNumberOfRounds() const

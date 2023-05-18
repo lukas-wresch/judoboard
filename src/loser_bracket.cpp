@@ -29,6 +29,10 @@ LoserBracket::LoserBracket(Weight MinWeight, Weight MaxWeight, const ITournament
 LoserBracket::LoserBracket(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
 	: SingleElimination(Yaml, Tournament, Parent)
 {
+	assert(Yaml.IsMap());
+
+	if (Yaml["final_match"])
+		m_FinalMatch = Yaml["final_match"].as<bool>();
 }
 
 
@@ -40,16 +44,19 @@ LoserBracket::LoserBracket(const MD5::Weightclass& Weightclass_, const ITourname
 
 
 
-/*size_t LoserBracket::GetNumberOfRounds() const
+void LoserBracket::operator >> (YAML::Emitter& Yaml) const
 {
-	if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
-		return 0;
+	if (!IsSubMatchTable())
+		Yaml << YAML::BeginMap;
 
-	auto base_rounds = GetNumberOfBaseRounds();
-	auto additional_rounds = (size_t)std::floor( (base_rounds - 1.0) / 2.0 );
+	MatchTable::operator >>(Yaml);
 
-	return base_rounds + additional_rounds;
-}*/
+	if (m_FinalMatch)
+		Yaml << YAML::Key << "final_match" << YAML::Value << m_FinalMatch;
+
+	if (!IsSubMatchTable())
+		Yaml << YAML::EndMap;
+}
 
 
 
@@ -62,6 +69,8 @@ std::string LoserBracket::GetHTMLForm()
 
 void LoserBracket::GenerateSchedule()
 {
+	if (!IsAutoGenerateSchedule())
+		return;
 	if (!IsSubMatchTable() && GetStatus() != Status::Scheduled)
 		return;
 

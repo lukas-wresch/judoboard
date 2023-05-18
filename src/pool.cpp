@@ -166,6 +166,8 @@ const MatchTable* Pool::FindMatchTable(const UUID& UUID) const
 
 void Pool::GenerateSchedule()
 {
+	if (!IsAutoGenerateSchedule())
+		return;
 	if (!IsSubMatchTable() && GetStatus() != Status::Scheduled)
 		return;
 

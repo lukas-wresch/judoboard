@@ -20,6 +20,14 @@ DoubleElimination::DoubleElimination(IFilter* Filter, const ITournament* Tournam
 {
 	m_WinnerBracket.SetParent(this);
 	m_LoserBracket.SetParent(this);
+
+	//Set filters
+
+	m_WinnerBracket.SetFilter(this->GetFilter());
+
+	auto losers = new LosersOf(m_WinnerBracket);
+	losers->RemoveLast();
+	m_LoserBracket.SetFilter(losers);
 }
 
 
@@ -106,8 +114,9 @@ MatchTable::Results DoubleElimination::CalculateResults() const
 	Results ret    = m_WinnerBracket.CalculateResults();
 	Results losers = m_LoserBracket.CalculateResults();
 
-	for (const auto& result : losers)
-		ret.Add(result);
+	if (losers.GetSize() >= 1)
+		for (const auto& result : losers)
+			ret.Add(result);
 
 	return ret;
 }
@@ -116,6 +125,8 @@ MatchTable::Results DoubleElimination::CalculateResults() const
 
 void DoubleElimination::GenerateSchedule()
 {
+	if (!IsAutoGenerateSchedule())
+		return;
 	if (!IsSubMatchTable() && GetStatus() != Status::Scheduled)
 		return;
 

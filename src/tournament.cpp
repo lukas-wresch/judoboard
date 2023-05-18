@@ -105,6 +105,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			auto de = new DoubleElimination(*weightclass, this);
 			de->IsThirdPlaceMatch(weightclass->MatchForThirdPlace);
 			de->IsFifthPlaceMatch(weightclass->MatchForFifthPlace);
+			delete de->GetLoserBracket().GetFilter();
+			de->GetLoserBracket().SetFilter(new Standard);
 			new_table = de;
 		}
 
@@ -122,6 +124,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		new_table->IsBestOfThree(weightclass->BestOfThree);
 		new_table->SetMatID(1);//Choose 1 as the default mat
 		new_table->SetScheduleIndex(GetFreeScheduleIndex(1));
+		new_table->DeleteSchedule();
+		new_table->AutoGenerateSchedule(false);
 		new_table->SetColor(color);
 		color++;
 
@@ -153,7 +157,16 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			{
 				auto match_table = (MatchTable*)judoka->Weightclass->pUserData;
 				if (match_table)
+				{
 					match_table->AddParticipant(new_judoka, true);//Add with force
+
+					//If double elimination also add as a participant to the loser bracket
+					if (match_table->GetType() == MatchTable::Type::DoubleElimination)
+					{
+						auto de = (DoubleElimination*)match_table;
+						de->GetLoserBracket().AddParticipant(new_judoka, true);
+					}
+				}
 			}
 
 			if (judoka->AgeGroup)
@@ -254,6 +267,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			}
 		}
 	}
+
+	//Re-enabled auto generation
+	for (auto table : m_MatchTables)
+		table->AutoGenerateSchedule(true);
 }
 
 

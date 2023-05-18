@@ -335,6 +335,9 @@ namespace Judoboard
 		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
 		const ITournament* GetTournament() const { return m_Tournament; }
 
+		void AutoGenerateSchedule(bool Enable = true) { m_RegenerateSchedule = Enable; }
+		bool IsAutoGenerateSchedule() const { return m_RegenerateSchedule; }
+
 		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
 
 		//Rule sets
@@ -424,5 +427,7 @@ namespace Judoboard
 		const MatchTable* m_Parent = nullptr;//Is this a match table that is purely used by another match table?
 
 		bool m_BestOfThree = false;
+
+		bool m_RegenerateSchedule = true;
 	};
 }

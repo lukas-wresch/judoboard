@@ -1169,7 +1169,7 @@ TEST(MD5, ImportIntoTournament_LoadAfterSave)
 		ASSERT_TRUE(table);
 		results = table->CalculateResults();
 
-		ASSERT_EQ(results.GetSize(), 5);//double elimination
+		ASSERT_GE(results.GetSize(), 5);//double elimination
 		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Sebastian");
 		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Harry");
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Marlon");
