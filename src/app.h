@@ -100,6 +100,7 @@ namespace Judoboard
 		Error Ajax_AddTournament(const HttpServer::Request& Request);
 		Error Ajax_EditTournament(const HttpServer::Request& Request);
 		std::string Ajax_GetTournament(const HttpServer::Request& Request);
+		std::string Ajax_AssignAgeGroup(const HttpServer::Request& Request);
 		std::string Ajax_ListTournaments();
 		Error Ajax_SwapMatchesOfTournament(const HttpServer::Request& Request);
 

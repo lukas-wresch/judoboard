@@ -1953,21 +1953,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id           = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "age");
-
-		auto judoka    = GetTournament()->FindParticipant(id);
-		auto age_group = GetTournament()->FindAgeGroup(age_group_id);
-
-		if (!judoka || !age_group)
-			return Error(Error::Type::ItemNotFound);
-
-		auto guard = LockWriteForScope();//In case the tournament gets closed at the same time
-
-		if (!GetTournament()->AssignJudokaToAgeGroup(judoka, age_group))
-			return Error(Error::Type::OperationFailed);
-
-		return Error();//OK
+		return Ajax_AssignAgeGroup(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/open", [this](auto& Request) -> std::string {
@@ -2594,6 +2580,27 @@ std::string Application::Ajax_GetTournament(const HttpServer::Request& Request)
 	yaml << YAML::EndMap;
 
 	return yaml.c_str();
+}
+
+
+
+std::string Application::Ajax_AssignAgeGroup(const HttpServer::Request& Request)
+{
+	UUID id           = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "age");
+
+	auto judoka    = GetTournament()->FindParticipant(id);
+	auto age_group = GetTournament()->FindAgeGroup(age_group_id);
+
+	if (!judoka || !age_group)
+		return Error(Error::Type::ItemNotFound);
+
+	auto guard = LockWriteForScope();//In case the tournament gets closed at the same time
+
+	if (!GetTournament()->AssignJudokaToAgeGroup(judoka, age_group))
+		return Error(Error::Type::OperationFailed);
+
+	return Error();//OK
 }
 
 
