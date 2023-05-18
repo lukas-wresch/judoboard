@@ -20,6 +20,7 @@ namespace Judoboard
 		void operator =(const LoserBracket& rhs) = delete;
 		void operator =(LoserBracket&& rhs) noexcept {
 			ID::operator=(rhs);
+			m_FinalMatch = rhs.m_FinalMatch;
 			m_ThirdPlaceMatch = rhs.m_ThirdPlaceMatch;
 			SetRuleSet(rhs.GetOwnRuleSet());
 			SetName(rhs.GetName());

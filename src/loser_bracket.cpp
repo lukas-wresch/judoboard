@@ -53,6 +53,8 @@ void LoserBracket::operator >> (YAML::Emitter& Yaml) const
 
 	if (m_FinalMatch)
 		Yaml << YAML::Key << "final_match" << YAML::Value << m_FinalMatch;
+	if (IsThirdPlaceMatch())
+		Yaml << YAML::Key << "third_place_match" << YAML::Value << IsThirdPlaceMatch();
 
 	if (!IsSubMatchTable())
 		Yaml << YAML::EndMap;
