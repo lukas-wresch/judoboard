@@ -32,6 +32,8 @@ namespace Judoboard
 		Tournament(const MD5& File, Database* pDatabase = nullptr);
 		~Tournament();
 
+		virtual bool IsLocal() const { return true; }
+
 		void Reset();
 
 		bool Load(const YAML::Node& yaml);
@@ -150,7 +152,7 @@ namespace Judoboard
 		const AgeGroup* FindAgeGroup(const UUID& UUID) const { return m_StandingData.FindAgeGroup(UUID); }
 		virtual std::vector<const AgeGroup*> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const override;
 		virtual std::vector<const AgeGroup*> GetAgeGroups() const override;
-		virtual void ListAgeGroups(YAML::Emitter& Yaml) const override;
+		virtual void GetAgeGroupInfo(YAML::Emitter& Yaml, const AgeGroup* AgeGroup) const override;
 
 		//Master schedule / schedule entries
 		bool MoveScheduleEntryUp(const UUID& UUID) override;
@@ -178,7 +180,9 @@ namespace Judoboard
 		virtual std::vector<std::pair<UUID, size_t>> GetLots() const override { return m_AssociationToLotNumber; }
 
 		//Events
-		virtual void OnMatchConcluded(const Match& Match) const override {}
+		virtual void OnMatchConcluded(const Match& Match) const override {
+			ScheduleSave();
+		}
 
 		//Serialization
 		const std::string Schedule2String() const override;
@@ -190,6 +194,14 @@ namespace Judoboard
 		virtual bool Save() override {
 			if (!m_AutoSave) return true;
 			return SaveYAML("tournaments/" + m_Name + ".yml");
+		}
+		void ScheduleSave() const
+		{
+			m_LastSaveTime = 0;
+		}
+		uint32_t TimeSinceLastSave() const
+		{
+			return Timer::GetTimestamp() - m_LastSaveTime;
 		}
 
 	private:
@@ -214,11 +226,12 @@ namespace Judoboard
 			std::recursive_mutex& m_Mutex;
 		};
 
-		[[nodiscard]]
-		ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
+		//[[nodiscard]]
+		//ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
 
 		std::string m_Name;
 		bool m_AutoSave = true;
+		mutable uint32_t m_LastSaveTime = 0;//Timestamp when the file was saved
 		std::string m_Description;
 		bool m_Readonly = false;
 

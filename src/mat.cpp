@@ -413,6 +413,7 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "is_goldenscore"       << YAML::Value << IsGoldenScore();
 	Yaml << YAML::Key << "is_hantei"            << YAML::Value << (GetScoreboard(Fighter::White).m_Hantei || GetScoreboard(Fighter::Blue).m_Hantei);
 
+	m_mutex.lock();
 	if (m_pMatch)
 	{
 		Yaml << YAML::Key << "yuko_enabled" << m_pMatch->GetRuleSet().IsYukoEnabled();
@@ -420,6 +421,7 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "golden_score_enabled" << m_pMatch->GetRuleSet().IsGoldenScoreEnabled();
 		Yaml << YAML::Key << "draw_enabled" << m_pMatch->GetRuleSet().IsDrawAllowed();
 	}
+	m_mutex.unlock();
 
 	Yaml << YAML::EndMap;
 }

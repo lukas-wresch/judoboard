@@ -1,5 +1,6 @@
 #pragma once
 #include <cassert>
+#include "../ZED/include/read_write_mutex.h"
 #include "judoka.h"
 #include "matchtable.h"
 #include "mat.h"
@@ -14,6 +15,7 @@ namespace Judoboard
 	class ITournament : public ID
 	{
 	public:
+		virtual bool IsLocal() const = 0;
 		virtual std::string GetName() const { return ""; }//Returns the name of the tournament
 		//const auto& GetSchedule() const { return m_Schedule; }
 		virtual Match* FindMatch(const UUID& UUID) const { return nullptr; }
@@ -35,7 +37,7 @@ namespace Judoboard
 		virtual const Association* GetOrganizer() const { return nullptr; }
 
 		virtual bool AddMatch(Match* NewMatch) { return false; }
-		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
+		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(std::move(NewMatch))); }
 		virtual Match* GetNextMatch(int32_t MatID = -1) const { return nullptr; }//Returns the next match for a given mat if available, otherwise null pointer is returned
 		//const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 
@@ -111,7 +113,7 @@ namespace Judoboard
 			std::vector<const AgeGroup*> ret;
 			return ret;
 		}
-		virtual void ListAgeGroups(YAML::Emitter& Yaml) const {}
+		virtual void GetAgeGroupInfo(YAML::Emitter& Yaml, const AgeGroup* AgeGroup) const {}
 
 		//Master schedule / schedule entries
 		virtual MatchTable* GetScheduleEntry(const UUID& UUID) { return nullptr; }
@@ -146,12 +148,17 @@ namespace Judoboard
 
 		virtual bool Save() { return false; }
 
-		void Lock()   const { m_mutex.lock(); }
-		void Unlock() const { m_mutex.unlock(); }
+		void LockRead()   const { m_mutex.LockRead(); }
+		void UnlockRead() const { m_mutex.UnlockRead(); }
+		[[nodiscard]] auto LockReadForScope() const { return m_mutex.LockReadForScope(); }
+		void LockWrite()   { m_mutex.LockWrite(); }
+		void UnlockWrite() { m_mutex.UnlockWrite(); }
+		[[nodiscard]] auto LockWriteForScope() { return m_mutex.LockWriteForScope(); }
 
 	protected:
 		StandingData m_StandingData;//Local database for the tournament containing all participants and rule sets
 
-		mutable std::recursive_mutex m_mutex;
+		//mutable std::recursive_mutex m_mutex;
+		ZED::RecursiveReadWriteMutex m_mutex;
 	};
 }

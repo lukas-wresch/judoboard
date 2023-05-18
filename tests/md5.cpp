@@ -2,6 +2,82 @@
 
 
 
+TEST(MD5, AgeGroups2020)
+{
+	initialize();
+
+	{
+		MD5 file1("test-data/Test-cleaned.md5");//Read MD5 file
+
+		ASSERT_TRUE(file1);
+
+		Database db;
+		Tournament tour_temp(file1, &db);//Convert to native
+
+		EXPECT_EQ(tour_temp.GetDatabase().GetYear(), 2020);
+		ASSERT_EQ(tour_temp.GetAgeGroups().size(), 8);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[2]->GetName(), "Jugend u13m");
+		EXPECT_EQ(tour_temp.GetAgeGroups()[2]->GetMinAge(), 10);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[2]->GetMaxAge(), 12);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[3]->GetName(), "Jugend u13w");
+		EXPECT_EQ(tour_temp.GetAgeGroups()[3]->GetMinAge(), 10);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[3]->GetMaxAge(), 12);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[4]->GetName(), "Jugend u15 m");
+		EXPECT_EQ(tour_temp.GetAgeGroups()[4]->GetMinAge(), 12);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[4]->GetMaxAge(), 14);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[5]->GetName(), "Jugend u15 w");
+		EXPECT_EQ(tour_temp.GetAgeGroups()[5]->GetMinAge(), 12);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[5]->GetMaxAge(), 14);
+	}
+}
+
+
+
+TEST(MD5, AgeGroups2023)
+{
+	initialize();
+
+	{
+		MD5 file1("test-data/BEM_U13_2023.md7");//Read MD7 file
+
+		ASSERT_TRUE(file1);
+
+		Database db;
+		Tournament tour_temp(file1, &db);//Convert to native
+
+		EXPECT_EQ(tour_temp.GetDatabase().GetYear(), 2023);
+		ASSERT_EQ(tour_temp.GetAgeGroups().size(), 2);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[0]->GetMinAge(), 10);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[0]->GetMaxAge(), 12);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[1]->GetMinAge(), 10);
+		EXPECT_EQ(tour_temp.GetAgeGroups()[1]->GetMaxAge(), 12);
+	}
+}
+
+
+
+TEST(MD5, AssignAgeGroups)
+{
+	initialize();
+
+	{
+		MD5 file1("test-data/KEM_KT_07052023.md5");//Read MD5 file
+
+		ASSERT_TRUE(file1);
+
+		Database db;
+		Tournament tour_temp(file1, &db);//Convert to native
+
+		for (auto judoka : tour_temp.GetDatabase().GetAllJudokas())
+		{
+			auto age_group = tour_temp.GetAgeGroupOfJudoka(judoka);
+			EXPECT_TRUE(age_group);
+		}
+	}
+}
+
+
+
 TEST(MD5, ReadTestData)
 {
 	initialize();
@@ -299,7 +375,22 @@ TEST(MD5, CreateTournamentFromTestData)
 	Tournament tour(file);
 
 	EXPECT_EQ(tour.GetDatabase().GetNumJudoka(), 142);
-	EXPECT_EQ(tour.GetDatabase().GetNumClubs(),   19);
+	EXPECT_EQ(tour.GetDatabase().GetNumClubs(),   file.GetClubs().size());
+
+	//Check alphabetical order
+	for (int i = 0; i < tour.GetDatabase().GetNumJudoka(); i++)
+	{
+		for (int j = i + 1; j < tour.GetDatabase().GetNumJudoka(); j++)
+		{
+			auto j1 = tour.GetDatabase().GetAllJudokas()[i];
+			auto j2 = tour.GetDatabase().GetAllJudokas()[j];
+
+			if (j1->GetLastname() != j2->GetLastname())
+				EXPECT_LT(j1->GetLastname(), j2->GetLastname());
+			else if (j1->GetFirstname() != j2->GetFirstname())
+				EXPECT_LT(j1->GetFirstname(), j2->GetFirstname());
+		}
+	}
 }
 
 
@@ -325,8 +416,19 @@ TEST(MD5, CreateTournamentFromTestData2)
 		EXPECT_EQ(db.GetAllJudokas().size(), 0);
 		EXPECT_EQ(db.GetNumClubs(),          0);
 
+		//Check if every color is used
+		int color_count[(int)Color::Name::Max];
+		for (auto& c : color_count)
+			c = 0;
+
 		for (auto table : tour.GetMatchTables())
+		{
 			EXPECT_GE(table->GetScheduleIndex(), 0);
+			color_count[(int)table->GetColor()]++;
+		}
+
+		for (auto& c : color_count)
+			EXPECT_GE(c, 1);//Every color should be used at least once
 
 		for (auto match : tour.GetSchedule())
 			EXPECT_EQ(match->GetMatID(), 1);
@@ -1368,7 +1470,7 @@ TEST(MD5, ConvertToMD5)
 		ASSERT_TRUE(file1.GetOrganizer());
 		EXPECT_EQ(file.GetOrganizer()->Description, file1.GetOrganizer()->Description);
 
-		EXPECT_EQ(file.GetClubs().size(), 19);
+		EXPECT_EQ(file.GetClubs().size(), file1.GetClubs().size());
 		EXPECT_EQ(file.GetParticipants().size(), 142);
 
 		ASSERT_TRUE(file1.FindResult("Jugend u10 w", "-20,7 kg", 1));

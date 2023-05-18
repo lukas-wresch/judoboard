@@ -26,7 +26,7 @@
 
 <h2 id="headline">Schedule</h2>
 <label style="width:150px;float:left;margin-top:0px;" id="label_mat_display">Show matches on</label>
-  <select style="margin-bottom:20px; width: 200px;" id="display_mat" onchange='Update();'>
+  <select style="margin-bottom:20px; width: 200px;" id="display_mat" onchange='Update_Schedule();'>
   </select>
 
 <table id="schedule" border="1" rules="all" style="margin-bottom: 1cm;">
@@ -41,16 +41,16 @@
     <th style="width: 2.5cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
-  
+
 
 <h2 id="headline_age_groups">Age Groups</h2>
 <table id="age_groups" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
     <th style="width: 0.5cm;" class="no">No.</th>
     <th style="width: 4cm;" id="name">Name</th>
-    <th style="width: 2cm; text-align: center;" id="age_groups_participants">#Participants</th>
+    <th style="width: 2.0cm; text-align: center;" id="age_groups_participants">#Participants</th>
     <th style="width: 3.0cm; text-align: center;" id="age_groups_match_tables">#Match tables</th>
-    <th style="width: 2cm; text-align: center;" id="age_groups_matches" class="num_matches">#Matches</th>
+    <th style="width: 2.0cm; text-align: center;" id="age_groups_matches" class="num_matches">#Matches</th>
     <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -61,10 +61,10 @@
   <tr>
     <th style="width: 0.5cm;" class="no">No.</th>
     <th style="width: 7cm;" id="name">Name</th>
-    <th style="width: 6cm; text-align: center;" class="club">Club</th>
-    <th style="width: 2cm; text-align: center;" id="weight" class="weight">Weight</th>
-    <th style="width: 2cm; text-align: center;" id="matches" class="num_matches">#Matches</th>
-    <th style="width: 2.5cm; text-align: center;" id="age_group" class="age_group">Age group</th>
+    <th style="width: 6.0cm; text-align: center;" class="club">Club</th>
+    <th style="width: 2.0cm; text-align: center;" id="weight" class="weight">Weight</th>
+    <th style="width: 2.0cm; text-align: center;" id="matches" class="num_matches">#Matches</th>
+    <th style="width: 4.5cm; text-align: center;" id="age_group" class="age_group">Age group</th>
     <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -78,7 +78,7 @@ function MoveEntryUp(id)
 {
   var mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_up?id=' + id, function() {
-    Update();
+    Update_Masterschedule();
   });
   return false;
 }
@@ -88,7 +88,7 @@ function MoveEntryDown(id)
 {
   var mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_down?id=' + id, function() {
-    Update();
+    Update_Masterschedule();
   });
   return false;
 }
@@ -98,7 +98,7 @@ function MoveEntryDown(id)
 function SetEntryMat(id, mat)
 {
   AjaxCallback('ajax/masterschedule/set_mat?id='+id+'&mat='+mat, function() {
-    Update();
+    Update_Masterschedule();
   });
 
   return false;
@@ -110,7 +110,7 @@ function MoveUp(id)
 {
   var mat_to_display = document.getElementById("display_mat").value;
   AjaxCallback('/ajax/match/move_up?id=' + id + '&mat=' + mat_to_display, function() {
-    Update();
+    Update_Schedule();
   });
   return false;
 }
@@ -120,7 +120,7 @@ function MoveDown(id)
 {
   var mat_to_display = document.getElementById("display_mat").value;
   AjaxCallback('/ajax/match/move_down?id=' + id + '&mat=' + mat_to_display, function() {
-    Update();
+    Update_Schedule();
   });
   return false;
 }
@@ -130,7 +130,7 @@ function MoveDown(id)
 function RemoveParticipant(id)
 {
   AjaxCallback('/ajax/participant/remove?id=' + id, function() {
-    Update();
+    Update_Participants();
   });
   return false;
 }
@@ -188,7 +188,7 @@ function RemoveNoDisqualify(fighter, matID)
 function RemoveAgeGroup(id)
 {
   AjaxCallback('/ajax/age_groups/remove?id=' + id, function() {
-    Update();
+    Update_AgeGroups();
   });
   return false;
 }
@@ -197,18 +197,27 @@ function RemoveAgeGroup(id)
 
 function AssignAgeGroup(judoka_id, age_group_id)
 {
-  AjaxCallback('/ajax/tournament/assign_age_group?id=' + judoka_id + '&age=' + age_group_id, Update);
+  AjaxCallback('/ajax/tournament/assign_age_group?id=' + judoka_id + '&age=' + age_group_id, Update_Participants);
   return false;
 }
 
 
 
-function Update()
+let updateMasterscheduleRunning = false;
+
+function Update_Masterschedule()
 {
+  if (updateMasterscheduleRunning)
+    return;
+
+  updateMasterscheduleRunning = true;
+
   AjaxCallback("ajax/get_masterschedule", function(response) {
     console.log(response);
     var res = YAML.parse(response);
     //console.log(res);
+
+    updateMasterscheduleRunning = false;
 
     var mat_to_display = document.getElementById("display_mat");
     var mat_to_display_selected = mat_to_display.value;
@@ -272,9 +281,12 @@ function Update()
             var contents;
 
             if (entry.editable)
-              contents = "<a href=\"#matchtable_add.html?id=" + entry.uuid + "\">" + entry.description + "</a><br/><br/>";
+              contents = "<a href=\"#matchtable_add.html?id=" + entry.uuid + "\">" + entry.description + "</a><br/>";
             else
-              contents = entry.description + "<br/>";
+              contents = entry.description;
+
+            contents += entry.schedule_size + ' ' + translate('matches') + ' / ' + entry.participant_count + ' ' + translate('participants');
+            contents += "<br/>"
 
             contents += "<table><tr><td rowspan=\"2\"><a style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id-1) + ");\"></a></td>";
             contents += "           <td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp('"   + entry.uuid + "');\"></a></td>";
@@ -301,12 +313,24 @@ function Update()
       }
     }
   });
+}
 
 
+
+let updateScheduleRunning = false;
+
+function Update_Schedule()
+{
+  if (updateScheduleRunning)
+    return;
+
+  updateScheduleRunning = true;
 
   AjaxCallback("ajax/get_schedule", function(response) {
     //console.log(response);
     var res = YAML.parse(response);
+
+    updateScheduleRunning = false;
 
     var table = document.getElementById("schedule");
 
@@ -429,10 +453,13 @@ function Update()
       cell7.innerHTML = options;
     }
   });
+}
 
 
 
-  AjaxCallback("ajax/age_groups/get", function(response) {
+function Update_AgeGroups()
+{
+  AjaxCallback("ajax/age_groups/list", function(response) {
     //console.log(response);
     var res = YAML.parse(response);
 
@@ -447,6 +474,9 @@ function Update()
     var no = 0;
     for (const age of res)
     {
+      if (!age.is_used)
+        continue;
+
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
       var cell1 = row.insertCell(1);
@@ -481,9 +511,12 @@ function Update()
       cell5.style.textAlign = "center";
     }
   });
+}
 
 
 
+function Update_Participants()
+{
   AjaxCallback("ajax/participants/get", function(response) {
     //console.log(response);
     var res = YAML.parse(response);
@@ -542,7 +575,7 @@ function Update()
       else
       {
         var select = document.createElement("select");
-        select.style.width = "1.7cm";
+        select.style.width = "4.0cm";
         select.style.fontSize = "14pt";
 
         for (const age_group of judoka.age_groups)
@@ -569,9 +602,12 @@ function Update()
       cell5.style.textAlign = "center";
     }
   });
+}
 
 
 
+function Update_Hansokumake()
+{
   AjaxCallback("ajax/hansokumake/get", function(response) {
     console.log(response);
     var res = YAML.parse(response);
@@ -659,11 +695,35 @@ function Update()
 }
 
 
+
+let updateRunning = false;
+let updateCounter = 0;
+
+function Update()
+{
+  if (updateRunning)
+    return;
+
+  Update_Masterschedule();
+  Update_Schedule();
+  if (updateCounter%3 == 0)
+    Update_Participants();
+  if (updateCounter%7 == 0)
+    Update_AgeGroups();
+  if (updateCounter%2 == 0)
+    Update_Hansokumake();
+
+  updateCounter++;
+
+  TimerID = setTimeout(Update, 6000);
+}
+
+
 var showHansokumake = false;
 
 
 Update();
-TimerID = window.setInterval(Update, 5000);
+//TimerID = window.setInterval(Update, 6000);
 
 
 document.getElementById("headline").innerHTML = translate('schedule');

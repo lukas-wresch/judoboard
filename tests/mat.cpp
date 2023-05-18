@@ -1192,11 +1192,13 @@ TEST(Mat, OsaekomiTime)
 		{
 			Application app;
 			Mat m(1);
+			ZED::Core::Pause(500);
 
 			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 100, 0, time, 20, false, false, false, 0));
 			EXPECT_TRUE(m.StartMatch(&match));
+			ZED::Core::Pause(100);
 
 			m.Hajime();
 			m.Osaekomi(f);
@@ -1246,7 +1248,7 @@ TEST(Mat, OsaekomiWithWazaAriTime)
 				ZED::Core::Pause(1000);
 			}
 
-			ZED::Core::Pause(2000);
+			ZED::Core::Pause(2500);
 			EXPECT_TRUE(m.HasConcluded());
 			EXPECT_TRUE(m.EndMatch());
 		}
@@ -1333,7 +1335,10 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 100, 0, time*2, time, false, false, false, 0));
+
+			ZED::Core::Pause(500);
 			EXPECT_TRUE(m.StartMatch(&match));
+			ZED::Core::Pause(100);
 
 			m.Hajime();
 			m.AddWazaAri(f);
@@ -1357,7 +1362,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 				ZED::Core::Pause(1000);
 			}
 
-			ZED::Core::Pause(4500);
+			ZED::Core::Pause(4850);
 
 			EXPECT_TRUE(m.HasConcluded());
 			EXPECT_TRUE(m.EndMatch());

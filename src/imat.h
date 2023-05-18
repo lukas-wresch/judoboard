@@ -98,7 +98,7 @@ namespace Judoboard
 
 		virtual const std::string& GetName() const { return m_Name; }
 
-		virtual const std::vector<OsaekomiEntry>& GetOsaekomiList() const = 0;
+		virtual std::vector<OsaekomiEntry> GetOsaekomiList() const = 0;
 
 		virtual Type GetType() const = 0;//Returns the type of the mat (local, remote)
 		virtual bool IsOpen()  const = 0;//Returns true if and only if the mat is open (connected and ready to receive commands)
