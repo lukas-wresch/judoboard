@@ -592,7 +592,7 @@ function Update_Participants()
 
         select.onchange = function(e)
         {
-          AssignAgeGroup(judoka.uuid, select.value);
+          AssignAgeGroup(judoka.uuid, this.value);
         }
 
         cell4.appendChild(select);

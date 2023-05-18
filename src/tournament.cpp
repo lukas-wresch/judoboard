@@ -1460,6 +1460,9 @@ bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* Ag
 	if (!m_StandingData.FindAgeGroup(AgeGroup->GetUUID()))
 		return false;
 
+	if (!AgeGroup->IsElgiable(*Judoka, m_StandingData))
+		return false;
+
 	//Remove judoka to the age group he currently belongs to
 	m_JudokaToAgeGroup.erase(Judoka->GetUUID());
 
