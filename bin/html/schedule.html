@@ -59,7 +59,7 @@
 <h2 id="headline-participants">Participants</h2>
 
 <div>
-    <label id="label_white" style="width:150px;float:left;margin-top:5px;">Search</label>
+    <label id="participants_search_label" style="width:150px;float:left;margin-top:5px;">Search</label>
     <input style="margin-bottom:20px;" size="50" id="participants_search" value=""/>
 </div>
 
@@ -554,9 +554,9 @@ function Update_Participants()
       cell0.style.textAlign = "center";
       cell0.style.fontSize  = "14pt";
 
-      cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.name + "</a>";
+      cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.firstname + ' ' + judoka.lastname + '</a>';
       cell1.style.fontSize  = "16pt";
-      cell2.innerHTML = judoka.weight + " kg";
+      cell2.innerHTML = judoka.weight + ' kg';
       cell2.style.textAlign = "center";
       cell2.style.fontSize  = "16pt";
 
@@ -779,3 +779,5 @@ document.getElementById("age_groups_match_tables").innerHTML = '#' + translate('
 document.getElementById("label_mat_display").innerHTML = translate('show_matches_on');
 
 document.getElementById("select_age_groups").innerHTML = translate('select_age_groups');
+
+document.getElementById("participants_search_label").innerHTML = translate('search');

@@ -420,9 +420,10 @@ void Application::SetupHttpServer()
 
 			ret << YAML::BeginMap;
 
-			ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
-			ret << YAML::Key << "name" << YAML::Value << judoka->GetName(NameStyle::GivenName);
-			ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
+			ret << YAML::Key << "uuid"      << YAML::Value << (std::string)judoka->GetUUID();
+			ret << YAML::Key << "firstname" << YAML::Value << judoka->GetFirstname();
+			ret << YAML::Key << "lastname"  << YAML::Value << judoka->GetLastname();
+			ret << YAML::Key << "weight"    << YAML::Value << judoka->GetWeight().ToString();
 			ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
 
 			if (club)
@@ -462,9 +463,9 @@ void Application::SetupHttpServer()
 					ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
 					ret << YAML::EndMap;
 				}
-			}
 
-			ret << YAML::EndSeq;
+				ret << YAML::EndSeq;
+			}
 
 			ret << YAML::EndMap;
 		}
@@ -1310,7 +1311,7 @@ void Application::SetupHttpServer()
 	});
 
 
-	m_Server.RegisterResource("/ajax/judoka/list", [this](auto& Request) -> std::string {
+	/*m_Server.RegisterResource("/ajax/judoka/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1324,7 +1325,7 @@ void Application::SetupHttpServer()
 		}
 		ret << YAML::EndSeq;
 		return ret.c_str();
-	});
+	});*/
 
 
 	m_Server.RegisterResource("/ajax/judoka/update", [this](auto& Request) -> std::string {
