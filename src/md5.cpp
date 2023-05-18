@@ -4,6 +4,7 @@
 #include "tournament.h"
 #include "weightclass.h"
 #include "single_elimination.h"
+#include "double_elimination.h"
 #include "age_group.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/file.h"
@@ -226,6 +227,17 @@ MD5::MD5(const Tournament& Tournament)
 			new_weightclass->MatchForThirdPlace = single_elimination->IsThirdPlaceMatch();
 			new_weightclass->MatchForFifthPlace = single_elimination->IsFifthPlaceMatch();
 		}
+		else if (match_table->GetType() == MatchTable::Type::DoubleElimination)
+		{
+			const auto double_elimination = (Judoboard::DoubleElimination*)match_table;
+
+			new_weightclass->FightSystemID = 1;
+			//if (match_table->GetParticipants().size() > 16)
+				//new_weightclass->FightSystemID = 2;
+
+			new_weightclass->MatchForThirdPlace = double_elimination->IsThirdPlaceMatch();
+			new_weightclass->MatchForFifthPlace = double_elimination->IsFifthPlaceMatch();
+		}
 		else
 			continue;
 
@@ -294,7 +306,8 @@ MD5::MD5(const Tournament& Tournament)
 
 				//new_result.Participant->Rank = new_result.RankID;
 
-				m_Results.emplace_back(new_result);
+				if (result.Judoka)
+					m_Results.emplace_back(new_result);
 			}
 		}
 	}
