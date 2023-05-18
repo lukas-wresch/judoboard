@@ -2584,7 +2584,7 @@ std::string Application::Ajax_GetTournament(const HttpServer::Request& Request)
 
 
 
-std::string Application::Ajax_AssignAgeGroup(const HttpServer::Request& Request)
+Error Application::Ajax_AssignAgeGroup(const HttpServer::Request& Request)
 {
 	UUID id           = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 	UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "age");
@@ -2593,7 +2593,7 @@ std::string Application::Ajax_AssignAgeGroup(const HttpServer::Request& Request)
 	auto age_group = GetTournament()->FindAgeGroup(age_group_id);
 
 	if (!judoka || !age_group)
-		return Error(Error::Type::ItemNotFound);
+		return Error::Type::ItemNotFound;
 
 	auto guard = LockWriteForScope();//In case the tournament gets closed at the same time
 

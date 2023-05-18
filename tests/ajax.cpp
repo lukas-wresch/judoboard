@@ -970,6 +970,53 @@ TEST(Ajax, Judoka_Get)
 
 
 
+TEST(Ajax, Judoka_Assign_AgeGroup)
+{
+	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Application app;
+
+		auto t = new Tournament("deleteMe");
+		t->EnableAutoSave(false);
+
+		app.AddTournament(t);
+
+		auto a1 = new AgeGroup("a1", 0, 0, nullptr);
+		auto a2 = new AgeGroup("a2", 0, 0, nullptr);
+
+		auto j1 = new Judoka("firstname", "lastname");
+		t->AddParticipant(j1);
+
+		auto j2 = new Judoka("firstname", "lastname");
+		auto c1 = new Club("Club 1");
+		j2->SetClub(c1);
+		t->AddParticipant(j2);
+
+		EXPECT_FALSE(app.Ajax_AssignAgeGroup(HttpServer::Request("id="+(std::string)j1->GetUUID() + "&age=" + (std::string)a1->GetUUID())));
+
+		t->AddAgeGroup(a1);
+		t->AddAgeGroup(a2);
+
+		EXPECT_TRUE(app.Ajax_AssignAgeGroup(HttpServer::Request("id="+(std::string)j1->GetUUID() + "&age=" + (std::string)a1->GetUUID())));
+
+		EXPECT_EQ(*t->GetAgeGroupOfJudoka(j1), *a1);
+
+		EXPECT_TRUE(app.Ajax_AssignAgeGroup(HttpServer::Request("id="+(std::string)j2->GetUUID() + "&age=" + (std::string)a2->GetUUID())));
+
+		EXPECT_EQ(*t->GetAgeGroupOfJudoka(j1), *a1);
+		EXPECT_EQ(*t->GetAgeGroupOfJudoka(j2), *a2);
+
+		EXPECT_TRUE(app.Ajax_AssignAgeGroup(HttpServer::Request("id="+(std::string)j1->GetUUID() + "&age=" + (std::string)a2->GetUUID())));
+
+		EXPECT_EQ(*t->GetAgeGroupOfJudoka(j1), *a2);
+		EXPECT_EQ(*t->GetAgeGroupOfJudoka(j2), *a2);
+	}
+}
+
+
+
 TEST(Ajax, Judoka_Edit)
 {
 	initialize();
