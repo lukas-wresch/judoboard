@@ -61,7 +61,7 @@ namespace Judoboard
 		uint32_t m_OsaeKomiTime = 20;//Seconds to achieve an ippon during osaekomi
 		uint32_t m_OsaeKomiTime_With_WazaAri = 10;//Seconds to achieve a wazaari during osaekomi
 
-		uint32_t m_BreakTime = 0;//Break time in seconds between matches.
+		uint32_t m_BreakTime = 0;//Break time in seconds between matches
 		bool m_IsExtendBreakTime = false;//Extend the break time to the match time (with golden score) if the match was longer then the normal break time
 	};
 }

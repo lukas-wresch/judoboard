@@ -59,7 +59,7 @@ TEST(Database, SaveAndLoad)
 		Database d;
 
 		EXPECT_EQ(d.GetNumJudoka(), 0);
-		EXPECT_EQ(d.GetRuleSets().size(), 3);
+		EXPECT_EQ(d.GetRuleSets().size(), 4);
 
 		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
 		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 60, Gender::Female);
@@ -161,7 +161,7 @@ TEST(Database, SaveAndLoad_Umlaut)
 		Database d;
 
 		EXPECT_EQ(d.GetNumJudoka(), 0);
-		EXPECT_EQ(d.GetRuleSets().size(), 3);
+		EXPECT_EQ(d.GetRuleSets().size(), 4);
 
 		Judoka* j1 = new Judoka(u8"S\u00f6ren", u8"K\u00f6nig",  50, Gender::Male);
 
@@ -201,7 +201,7 @@ TEST(Database, OnlyOneDefaultRuleSet)
 		Database d3;
 		d3.Load("temp.csv");
 
-		EXPECT_EQ(d3.GetRuleSets().size(), 3);
+		EXPECT_EQ(d3.GetRuleSets().size(), 4);
 	}
 
 	ZED::Core::RemoveFile("temp.csv");
@@ -216,10 +216,11 @@ TEST(Database, EmptyDatabaseShouldHaveDefaultRuleSet)
 
 	EXPECT_EQ(d.GetNumAccounts(), 0);
 
-	ASSERT_EQ(d.GetRuleSets().size(), 3);
+	ASSERT_EQ(d.GetRuleSets().size(), 4);
 	EXPECT_EQ(d.GetRuleSets()[0]->GetName(), "Children");
-	EXPECT_EQ(d.GetRuleSets()[1]->GetName(), "Youth");
-	EXPECT_EQ(d.GetRuleSets()[2]->GetName(), "Adults");
+	EXPECT_EQ(d.GetRuleSets()[1]->GetName(), "Youth U13");
+	EXPECT_EQ(d.GetRuleSets()[2]->GetName(), "Youth U15");
+	EXPECT_EQ(d.GetRuleSets()[3]->GetName(), "Adults");
 }
 
 
