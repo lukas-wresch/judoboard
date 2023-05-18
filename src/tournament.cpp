@@ -107,7 +107,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		new_table->SetMatID(1);//Choose 1 as the default mat
 		new_table->SetScheduleIndex(GetFreeScheduleIndex(1));
 		new_table->SetColor(color);
-		color++;
+		++color;
 
 		weightclass->pUserData = new_table;
 
@@ -118,7 +118,6 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	for (auto judoka : File.GetParticipants())
 	{
 		Judoka* new_judoka = nullptr;
-		std::string dummy;
 
 		if (pDatabase && pDatabase->FindJudoka_ExactMatch(*judoka))
 			new_judoka = pDatabase->FindJudoka_ExactMatch(*judoka);
