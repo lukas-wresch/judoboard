@@ -153,6 +153,9 @@ bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 	if (!NewParticipant || !m_Filter)
 		return false;
 
+	if (IsSubMatchTable())
+		return false;
+
 	if (!m_Filter->AddParticipant(NewParticipant, Force))
 		return false;
 
