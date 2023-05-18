@@ -144,6 +144,8 @@ namespace Judoboard
 		//Rule sets
 		Error Ajax_AddRuleSet(const HttpServer::Request& Request);
 		Error Ajax_EditRuleSet(const HttpServer::Request& Request);
+		std::string Ajax_GetRuleSet(const HttpServer::Request& Request);
+		std::string Ajax_ListRuleSets();
 
 		//Age groups
 		Error Ajax_AddAgeGroup(const HttpServer::Request& Request);
