@@ -93,7 +93,7 @@ namespace Judoboard
 
 		size_t GetNumberOfBaseRounds() const
 		{
-			auto filter = GetFilter()
+			auto filter = GetFilter();
 			if (!filter || filter->GetParticipants().size() <= 1)
 				return 0;
 
