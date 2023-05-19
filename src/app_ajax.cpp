@@ -2490,6 +2490,8 @@ Error Application::Ajax_EditMatch(const HttpServer::Request& Request)
 		return Error::Type::OperationFailed;
 
 	auto ruleSet = m_Database.FindRuleSet(rule);
+	if (!ruleSet)
+		ruleSet = GetTournament()->FindRuleSet(rule);
 
 	match->SetMatID(matID);
 	match->SetRuleSet(ruleSet);	
