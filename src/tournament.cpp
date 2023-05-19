@@ -11,7 +11,7 @@
 #include "single_elimination.h"
 #include "pool.h"
 #include "double_elimination.h"
-#include "standard.h"
+#include "fixed.h"
 #include "weightclass_generator.h"
 
 
@@ -692,7 +692,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 	else
 	{
 		auto new_match_table = new CustomTable(this);
-		new_match_table->SetFilter(new Standard);
+		new_match_table->SetFilter(new Fixed);
 		new_match_table->AddMatch(NewMatch);
 		new_match_table->SetMatID(NewMatch->GetMatID());
 		AddMatchTable(new_match_table);
