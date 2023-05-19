@@ -1874,6 +1874,36 @@ TEST(Ajax, RemoveDisqualification)
 
 
 
+TEST(Ajax, Match_Edit)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto j1 = new Judoka("a", "b");
+		auto j2 = new Judoka("c", "d");
+
+		auto r1 = new RuleSet("test", 60, 30, 10, 5);
+
+		auto match = new Match(j1, j2, nullptr);
+		app.GetTournament()->AddMatch(match);
+		app.GetTournament()->AddRuleSet(r1);
+
+		EXPECT_TRUE(app.Ajax_EditMatch(HttpServer::Request("id=" + (std::string)match->GetUUID(), "mat=1&rule=" + (std::string)r1->GetUUID())));
+
+		EXPECT_EQ(match->GetMatID(), 1);
+		EXPECT_EQ(match->GetRuleSet().GetUUID(), r1->GetUUID());
+
+		EXPECT_TRUE(app.Ajax_EditMatch(HttpServer::Request("id=" + (std::string)match->GetUUID(), "mat=2&rule=0")));
+
+		EXPECT_EQ(match->GetMatID(), 2);
+		EXPECT_NE(match->GetRuleSet().GetUUID(), *r1);
+	}
+}
+
+
+
 TEST(Ajax, MatchTable_Add)
 {
 	initialize();
