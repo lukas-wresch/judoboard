@@ -195,7 +195,7 @@ namespace ZED
                 own_read_locks = m_ReaderIDs.find(std::this_thread::get_id())->second;
             assert(m_ReadCount >= own_read_locks);
 
-            while (m_ReadCount - own_read_locks > 0 || (m_WritingCount > 0 && m_OwnerID != std::this_thread::get_id()) )
+            while (m_ReadCount - own_read_locks > 0 || m_ReadCount > 0 || (m_WritingCount > 0 && m_OwnerID != std::this_thread::get_id()) )
                 m_Cond.wait(lock);
             m_WaitingWriters--;
 
