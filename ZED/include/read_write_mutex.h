@@ -1,6 +1,7 @@
 #pragma once
 #include <thread>
 #include <mutex>
+#include <shared_mutex>
 #include <condition_variable>
 #include <unordered_map>
 #include <cassert>
@@ -132,43 +133,49 @@ namespace ZED
         //Read access
         void LockRead() const
         {
-            std::unique_lock<std::recursive_mutex> lock(m_Mutex);
-
-            if (HasReadLock() || HasWriteLock())
+            if (HasWriteLock())
                 return;
 
-            while (m_WaitingWriters > 0 ||
-                  ( m_WritingCount > 0 && m_OwnerID != std::this_thread::get_id()) )
-                m_Cond.wait(lock);
+            if (!HasReadLock())
+                mutex_.lock_shared();
+
             m_ReadCount++;
-            m_ReaderIDs[std::this_thread::get_id()] = 1;
+            std::unique_lock<std::recursive_mutex> lock(m_Mutex);
+            m_ReaderIDs[std::this_thread::get_id()]++;
         }
 
         void UnlockRead() const
         {
-            std::unique_lock<std::recursive_mutex> lock(m_Mutex);
+            if (HasWriteLock())
+                return;
 
-            if (m_ReaderIDs[std::this_thread::get_id()] == 0)
+            if (!HasReadLock())
                 return;
 
             assert(m_ReadCount > 0);
-            assert(m_ReaderIDs[std::this_thread::get_id()] == 1);
-            m_ReadCount--;
-            m_ReaderIDs[std::this_thread::get_id()] = 0;
+            assert(m_ReaderIDs[std::this_thread::get_id()] > 0);
 
-            if (m_ReadCount == 0 && m_WaitingWriters > 0)
-                m_Cond.notify_all();
+            m_ReadCount--;
+
+            std::unique_lock<std::recursive_mutex> lock(m_Mutex);
+            m_ReaderIDs[std::this_thread::get_id()]--;
+
+            if (m_ReaderIDs[std::this_thread::get_id()] == 0)
+                mutex_.unlock_shared();
         }
 
         bool TryReadLock() const
         {
-            std::unique_lock<std::recursive_mutex> lock(m_Mutex, std::try_to_lock);
-            if (!lock || (m_WritingCount > 0 && m_OwnerID != std::this_thread::get_id()) )
-                return false;
+            bool success = mutex_.try_lock_shared();
 
-            m_ReadCount++;
-            m_ReaderIDs[std::this_thread::get_id()] = 1;
-            return true;
+            if (success)
+            {
+                m_ReadCount++;
+                std::unique_lock<std::recursive_mutex> lock(m_Mutex);
+                m_ReaderIDs[std::this_thread::get_id()] = 1;
+            }
+
+            return success;
         }
 
         bool HasReadLock() const
@@ -186,18 +193,16 @@ namespace ZED
         //Write access
         void LockWrite()
         {
-            std::unique_lock<std::recursive_mutex> lock(m_Mutex);
+            if (HasWriteLock())
+            {
+                m_WritingCount++;
+                return;
+            }
 
-            m_WaitingWriters++;
+            while (HasReadLock())
+                UnlockRead();
 
-            int own_read_locks = 0;
-            if (HasReadLock())
-                own_read_locks = m_ReaderIDs.find(std::this_thread::get_id())->second;
-            assert(m_ReadCount >= own_read_locks);
-
-            while (m_ReadCount - own_read_locks > 0 || m_ReadCount > 0 || (m_WritingCount > 0 && m_OwnerID != std::this_thread::get_id()) )
-                m_Cond.wait(lock);
-            m_WaitingWriters--;
+            mutex_.lock();
 
             m_WritingCount++;
             m_OwnerID = std::this_thread::get_id();
@@ -206,44 +211,44 @@ namespace ZED
         void UnlockWrite()
         {
             assert(m_WritingCount > 0);
-            std::unique_lock<std::recursive_mutex> lock(m_Mutex);
 
             m_WritingCount--;
-            if (m_WritingCount == 0)
-                m_OwnerID = std::thread::id();
 
-            if (m_WaitingWriters > 0)
-                m_Cond.notify_all();
-            else
-                m_Cond.notify_one();
+            if (m_WritingCount == 0)
+            {
+                mutex_.unlock();
+                m_OwnerID = std::thread::id();
+            }
         }
 
         bool TryWriteLock()
         {
-            std::unique_lock<std::recursive_mutex> lock(m_Mutex, std::try_to_lock);
-            if (!lock || m_ReadCount > 0 || (m_WritingCount > 0 && m_OwnerID != std::this_thread::get_id()) )
-                return false;
+            bool success = mutex_.try_lock();
 
-            m_WritingCount++;
-            m_OwnerID = std::this_thread::get_id();
+            if (success)
+            {
+                m_WritingCount++;
+                m_OwnerID = std::this_thread::get_id();
+            }
             return true;
         }
 
         bool HasWriteLock() const
         {
-            std::unique_lock<std::recursive_mutex> lock(m_Mutex, std::try_to_lock);
             return m_OwnerID == std::this_thread::get_id();
         }
 
     private:
-        int m_WritingCount = 0;
-        int m_WaitingWriters = 0;
-        mutable int m_ReadCount = 0;
+        std::atomic<int> m_WritingCount = 0;
+        //std::atomic<int> m_WaitingWriters = 0;
+        mutable std::atomic<int> m_ReadCount = 0;
 
         mutable std::recursive_mutex m_Mutex;
-        mutable std::condition_variable_any m_Cond;
+        //mutable std::condition_variable_any m_Cond;
 
-        std::thread::id m_OwnerID;
+        mutable std::shared_mutex mutex_;
+
+        std::atomic<std::thread::id> m_OwnerID;
         mutable std::unordered_map<std::thread::id, int> m_ReaderIDs;
     };
 }
