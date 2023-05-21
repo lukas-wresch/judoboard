@@ -71,7 +71,7 @@ namespace Judoboard
 		void EndMatch();
 
 		const MatchTable* GetMatchTable() const { return m_Table; }
-		void SetMatchTable(MatchTable* MatchTable) { m_Table = MatchTable; }
+		void SetMatchTable(const MatchTable* MatchTable) { m_Table = MatchTable; }
 
 		uint32_t GetMatID() const;
 

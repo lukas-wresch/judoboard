@@ -68,6 +68,15 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 
+	protected:
+		virtual void DeleteSchedule() override {
+			for (auto pool : m_Pools)
+				pool->DeleteSchedule();
+			m_Finals.DeleteSchedule();
+			MatchTable::DeleteSchedule();
+		}
+
+
 	private:
 		size_t CalculatePoolCount() const {
 			size_t pool_count = m_PoolCount;
