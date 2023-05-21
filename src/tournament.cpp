@@ -266,8 +266,13 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 				assert(match.Pool <= pool->GetPoolCount());
 
-				if (match.Pool > 0 && match.Pool <= pool->GetPoolCount())
+				if (match.Pool == 0)
+					pool->GetFinals().AddMatch(new_match);
+				else if (match.Pool <= pool->GetPoolCount())
 					pool->GetPool(match.Pool - 1)->AddMatch(new_match);
+				else
+					ZED::Log::Error("Can not import match into pool match table");
+
 				pool->CopyMatchesFromSubtables();
 			}
 			else

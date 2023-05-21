@@ -2640,6 +2640,10 @@ TEST(MD5, ReadPool)
 	file.Dump();
 
 	ASSERT_TRUE(file.GetOrganizer());
+
+	Tournament tourney(file);
+
+	EXPECT_EQ(tourney.GetSchedule().size(), file.GetMatches().size());
 }
 
 
