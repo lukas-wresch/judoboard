@@ -679,8 +679,6 @@ bool Tournament::AddMatch(Match* NewMatch)
 		return false;
 	}
 
-	auto guard = LockWriteForScope();
-
 	//Do we have the match already?
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
@@ -688,6 +686,8 @@ bool Tournament::AddMatch(Match* NewMatch)
 		if (match && match->GetUUID() == NewMatch->GetUUID())
 			return false;
 	}
+
+	auto guard = LockWriteForScope();
 
 	//Do we have the rule set already?
 	if (!m_StandingData.FindRuleSet(NewMatch->GetRuleSet().GetUUID()))

@@ -41,7 +41,7 @@ namespace Judoboard
 		[[nodiscard]]
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
 		[[nodiscard]]
-		std::vector<Match*> GetSchedule() const;
+		virtual std::vector<Match*> GetSchedule() const override;
 		Match* FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
 		virtual const StandingData& GetDatabase() const override { return m_StandingData; }//Returns a database containing all participants
