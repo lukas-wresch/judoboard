@@ -2644,6 +2644,21 @@ TEST(MD5, ReadPool)
 
 
 
+TEST(MD5, ReadPool2)
+{
+	initialize();
+
+	MD5 file("test-data/BEM_U13_2023_with_matches.md7");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	ASSERT_TRUE(file.GetOrganizer());
+}
+
+
+
 TEST(MD5, ReadDoubleElimination)
 {
 	initialize();
