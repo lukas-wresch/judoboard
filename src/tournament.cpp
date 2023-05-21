@@ -89,8 +89,12 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		MatchTable* new_table = nullptr;
 
 		//Round robin
-		if (weightclass->FightSystemID == 13 || weightclass->FightSystemID == 14 || weightclass->FightSystemID == 15 || weightclass->FightSystemID == 16)
+		if (weightclass->FightSystemID == 13 || weightclass->FightSystemID == 14 || weightclass->FightSystemID == 15 || weightclass->FightSystemID == 16 || weightclass->FightSystemID == 17 || weightclass->FightSystemID == 41)
+		{
 			new_table = new RoundRobin(*weightclass, this);
+			if (weightclass->FightSystemID == 41)
+				new_table->IsBestOfThree(true);
+		}
 		else if (weightclass->FightSystemID == 19 ||//Single elimination (single consulation bracket)
 				 weightclass->FightSystemID == 20)  //Single elimination (single consulation bracket)
 		{
@@ -108,6 +112,14 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			delete de->GetLoserBracket().GetFilter();
 			de->GetLoserBracket().SetFilter(new Standard);
 			new_table = de;
+		}
+		else if (weightclass->FightSystemID == 24)//Pool (3+3 system)
+		{
+			auto pool = new Pool(*weightclass, this);
+			pool->SetPoolCount(2);
+			pool->IsThirdPlaceMatch(weightclass->MatchForThirdPlace);
+			pool->IsFifthPlaceMatch(weightclass->MatchForFifthPlace);
+			new_table = pool;
 		}
 
 		if (!new_table)
@@ -247,6 +259,16 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 					de->AddMatchToLoserBracket(new_match);
 				else
 					de->AddMatchToWinnerBracket(new_match);
+			}
+			else if (match_table->GetType() == MatchTable::Type::Pool)
+			{
+				auto pool = (Pool*)match_table;
+
+				assert(match.Pool <= pool->GetPoolCount());
+
+				if (match.Pool > 0 && match.Pool <= pool->GetPoolCount())
+					pool->GetPool(match.Pool - 1)->AddMatch(new_match);
+				pool->CopyMatchesFromSubtables();
 			}
 			else
 				match_table->AddMatch(new_match);

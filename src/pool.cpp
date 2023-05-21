@@ -175,9 +175,6 @@ void Pool::GenerateSchedule()
 
 	m_RecommendedNumMatches_Before_Break = 4;//TODO
 
-	if (!GetFilter() || GetParticipants().size() <= 1)
-		return;
-
 	auto old_pools = std::move(m_Pools);
 	assert(m_Pools.empty());
 
@@ -189,7 +186,10 @@ void Pool::GenerateSchedule()
 	//Distribute participants to pools
 	for (int i = 0; i < pool_count; ++i)
 	{
-		m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
+		if (GetFilter())
+			m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
+		else
+			m_Pools[i] = new RoundRobin(nullptr);
 
 		std::string name = Localizer::Translate("Pool") + " ";
 		name.append(&letters[i % 26], 1);
@@ -312,6 +312,8 @@ void Pool::GenerateSchedule()
 
 void Pool::CopyMatchesFromSubtables()
 {
+	SetSchedule().clear();
+
 	//Add matches from pools
 	size_t index = 0;
 	bool added;

@@ -430,7 +430,7 @@ const std::string SingleElimination::ToHTML() const
 
 	auto& schedule = GetSchedule();
 
-	if (IsThirdPlaceMatch())
+	if (IsThirdPlaceMatch() && schedule.size() >= 2)
 	{
 		ret += "<table width=\"" + std::to_string(width) + "%\" border='1' rules='all' style=\"margin-bottom: 5mm;\">";
 
@@ -446,7 +446,7 @@ const std::string SingleElimination::ToHTML() const
 	}
 
 
-	if (IsFifthPlaceMatch())
+	if (IsFifthPlaceMatch() && schedule.size() >= 6)
 	{
 		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";
 

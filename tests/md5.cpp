@@ -2654,7 +2654,7 @@ TEST(MD5, ReadPool2)
 
 	file.Dump();
 
-	ASSERT_TRUE(file.GetOrganizer());
+	Tournament tourney(file);
 }
 
 

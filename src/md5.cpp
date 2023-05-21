@@ -1418,6 +1418,8 @@ void MD5::Dump() const
 		std::string line = table->Description;
 		line += "   FightSystemID: "        + std::to_string(table->FightSystemID);
 		line += "   FightSystemTypeID: "    + std::to_string(table->FightSystemTypeID);
+		line += "   AgeGroupID: "           + std::to_string(table->AgeGroupID);
+		line += "   "    + table->Description;
 		ZED::Log::Info(line);
 	}
 
@@ -1425,14 +1427,16 @@ void MD5::Dump() const
 	for (const auto& match : m_Matches)
 	{
 		std::string line;
-		line += "   RedID: "        + std::to_string(match.RedID);
-		line += "   WhiteID: "      + std::to_string(match.WhiteID);
-		line += "   StartNoRed: "   + std::to_string(match.StartNoRed);
-		line += "   StartNoWhite: " + std::to_string(match.StartNoWhite);
-		line += "   Status: "       + std::to_string(match.Status);
-		line += "   Pool: "         + std::to_string(match.Pool);
-		line += "   AreaID: "       + std::to_string(match.AreaID);
-		line += "   MatchNo: "      + std::to_string(match.MatchNo);
+		line += "   RedID: "         + std::to_string(match.RedID);
+		line += "   WhiteID: "       + std::to_string(match.WhiteID);
+		line += "   StartNoRed: "    + std::to_string(match.StartNoRed);
+		line += "   StartNoWhite: "  + std::to_string(match.StartNoWhite);
+		line += "   Status: "        + std::to_string(match.Status);
+		line += "   Pool: "          + std::to_string(match.Pool);
+		line += "   AreaID: "        + std::to_string(match.AreaID);
+		line += "   MatchNo: "       + std::to_string(match.MatchNo);
+		line += "   WeightclassID: " + std::to_string(match.WeightclassID);
+		line += "   AgeGroupID: "    + std::to_string(match.AgeGroupID);
 		ZED::Log::Info(line);
 	}
 
@@ -2043,7 +2047,7 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 				//Version 7
 
 				else if (header[i] == "BestOfThree")
-					new_weightclass.BestOfThree = data[i] != "1";			
+					new_weightclass.BestOfThree = data[i] != "1";
 			}
 
 			m_Weightclasses.emplace_back(new Weightclass(new_weightclass));
