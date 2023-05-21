@@ -212,6 +212,7 @@ namespace ZED
         void UnlockWrite()
         {
             assert(m_WritingCount > 0);
+            assert(HasWriteLock());
 
             m_WritingCount--;
 
