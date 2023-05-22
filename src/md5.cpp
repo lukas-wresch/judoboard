@@ -1310,6 +1310,7 @@ const MD5::Weightclass* MD5::FindWeightclass(const std::string& AgeGroup, const 
 
 const MD5::Result* MD5::FindResult(int AgeGroupID, int WeightclassID, int Rank) const
 {
+	assert(Rank >= 1);
 	for (auto& result : m_Results)
 		if (result.AgeGroupID == AgeGroupID && result.WeightclassID == WeightclassID && result.RankNo == Rank)
 			return &result;
@@ -1320,6 +1321,7 @@ const MD5::Result* MD5::FindResult(int AgeGroupID, int WeightclassID, int Rank) 
 
 const MD5::Result* MD5::FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const
 {
+	assert(Rank >= 1);
 	for (auto& result : m_Results)
 		if (result.AgeGroup && result.AgeGroup->Name == AgeGroup && result.Weightclass && result.Weightclass->Description == Weightclass && result.RankNo == Rank)
 			return &result;
