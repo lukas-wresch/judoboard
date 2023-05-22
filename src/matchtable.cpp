@@ -163,7 +163,8 @@ bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 	if (GetTournament())//Add to tournament?
 		((ITournament*)GetTournament())->AddParticipant(NewParticipant);//Const cast
 
-	GenerateSchedule();
+	if (!IsSubMatchTable())
+		GenerateSchedule();
 	return true;
 }
 
@@ -573,6 +574,29 @@ std::string MatchTable::GetHTMLForm()
 
 
 
+const std::string MatchTable::GetHTMLTop() const
+{
+	std::string ret;
+
+	if (!IsSubMatchTable() && GetFilter())
+		ret += "<div style=\"border-style: dashed; border-width: 2px; border-color: #ccc; padding: 0.3cm; margin-bottom: 0.3cm;\">";
+
+	if (!IsSubMatchTable())
+		ret += "<h3>";
+
+	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
+	if (GetMatID() != 0)
+		ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName();
+
+	if (!IsSubMatchTable())
+		ret += "</h3>";
+
+	ret += "<br/><br/>";
+	return ret;
+}
+
+
+
 Match* MatchTable::AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosition)
 {
 	if (!GetJudokaByStartPosition(WhiteStartPosition) || !GetJudokaByStartPosition(BlueStartPosition))
@@ -670,7 +694,7 @@ const std::string MatchTable::ResultsToHTML() const
 	if (results.GetSize() == 0)
 		return ret;
 
-	ret += "</table><br/><br/><table border=\"1\" rules=\"all\">";
+	ret += "<br/><br/><table border=\"1\" rules=\"all\">";
 	ret += "<tr><th style=\"width: 0.5cm; text-align: center;\">#</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name")
 		+ "</th><th style=\"width: 1.0cm;\">" + Localizer::Translate("Wins") + "</th><th style=\"width: 1.0cm;\">"
 		+ Localizer::Translate("Score") + "</th><th style=\"width: 1.3cm;\">" + Localizer::Translate("Time") + "</th></tr>";

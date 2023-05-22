@@ -344,13 +344,7 @@ void Pool::CopyMatchesFromSubtables()
 
 const std::string Pool::ToHTML() const
 {
-	std::string ret;
-
-	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
-
-	ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
-
-	ret += "<br/>";
+	std::string ret = GetHTMLTop();
 
 	for (auto pool : m_Pools)
 		ret += pool->ToHTML() + "<br/><br/>";
@@ -358,6 +352,9 @@ const std::string Pool::ToHTML() const
 	ret += m_Finals.ToHTML();
 
 	//ret += ResultsToHTML();
+
+	if (!IsSubMatchTable())
+		ret += "</div>";
 
 	return ret;
 }

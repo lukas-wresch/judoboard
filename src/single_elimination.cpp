@@ -72,6 +72,16 @@ void SingleElimination::ToString(YAML::Emitter& Yaml) const
 
 size_t SingleElimination::GetNumberOfRounds() const
 {
+	if (GetSchedule().size() >= 3)
+	{
+		auto count = GetSchedule().size();
+		if (IsThirdPlaceMatch())
+			count--;
+		if (IsFifthPlaceMatch())
+			count--;
+		return (size_t)std::ceil(std::log2(count + 1));
+	}
+
 	if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
 		return 0;
 
@@ -349,14 +359,72 @@ MatchTable::Results SingleElimination::CalculateResults() const
 
 
 
+void SingleElimination::ReorderLastMatches()
+{
+	auto& schedule = SetSchedule();
+
+	if (IsFifthPlaceMatch() && schedule.size() >= 6)
+	{
+		//Swap matches so that match for 1st place is still the last one
+		//Expects: S1   S2   1  3 5_1 5_2 5_3
+		//Output:  5_1 5_2 5_3  3  S1  S2   1
+		int offset = 3;
+
+		std::swap(schedule[schedule.size() - 1 - offset - 2], schedule[schedule.size() - 1 - 2]);
+		std::swap(schedule[schedule.size() - 1 - offset - 1], schedule[schedule.size() - 1 - 1]);
+		std::swap(schedule[schedule.size() - 1 - offset],     schedule[schedule.size() - 1]);
+
+		if (IsThirdPlaceMatch())
+			std::swap(schedule[schedule.size() - 1 - offset - 3], schedule[schedule.size() - 1 - 3]);
+	}
+
+	else if (IsFifthPlaceMatch() && !IsThirdPlaceMatch() && schedule.size() >= 4)
+	{
+		//Swap matches so that match for 1st place is still the last one
+		//Expects: S1 S2  1  5
+		//Outputs:  5  S1 S2 1
+
+		std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 3 - 1]);
+		//5 S2 1 S1
+
+		std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 1 - 1]);
+		//5 S2 S1 1
+
+		std::swap(schedule[schedule.size() - 2], schedule[schedule.size() - 2 - 1]);
+		//5 S1 S2 1
+	}
+
+	else if (IsFifthPlaceMatch() && IsThirdPlaceMatch() && schedule.size() >= 5)
+	{
+		//Swap matches so that match for 1st place is still the last one
+		//Expects: S1 S2  1  3 5
+		//Outputs:  5  S1 S2 3 1
+
+		std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 4 - 1]);
+		//5 S2 1 3 S1
+
+		std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 2 - 1]);
+		//5 S2 S1 3 1
+
+		std::swap(schedule[schedule.size() - 3], schedule[schedule.size() - 3 - 1]);
+		//5 S1 S2 3 1
+	}
+
+	else if (IsThirdPlaceMatch() && schedule.size() >= 2)
+	{
+		//Swap matches so that match for 1st place is still the last one
+		//Expects: 1 3
+		//Output:  3 1
+
+		std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 2]);
+	}
+}
+
+
+
 const std::string SingleElimination::ToHTML() const
 {
-	std::string ret;
-
-	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
-
-	if (GetMatID() != 0)
-		ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
+	std::string ret = GetHTMLTop();
 
 	ret += "<table border='1' rules='all'>";
 
@@ -374,7 +442,12 @@ const std::string SingleElimination::ToHTML() const
 		if (IsThirdPlaceMatch() && matchIndex >= GetSchedule().size() - 2)
 			matchIndex++;
 		if (IsFifthPlaceMatch() && matchIndex >= GetSchedule().size() - 5)
-			matchIndex += 3;
+		{
+			if (GetSchedule().size() >= 6)
+				matchIndex += 3;
+			else
+				matchIndex++;//There is only a single match for 5th place
+		}
 
 		if (IsBestOfThree())
 			matchIndex = matchIndex * 3;
@@ -446,7 +519,26 @@ const std::string SingleElimination::ToHTML() const
 	}
 
 
-	if (IsFifthPlaceMatch() && schedule.size() >= 6)
+	if (IsFifthPlaceMatch() && schedule.size() < 6)
+	{
+		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += "<th width=\"" + std::to_string(width) + "%\">" + Localizer::Translate("5th Place Match") + "</th>";
+		ret += "</tr>";
+
+		int offset = 3;
+		if (IsThirdPlaceMatch())
+			offset = 4;
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += RenderMatch(*schedule[schedule.size() - offset - 1]);
+		ret += "</tr>";
+
+		ret += "</table>";
+	}
+
+	else if (IsFifthPlaceMatch() && schedule.size() >= 6)
 	{
 		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";
 
@@ -476,7 +568,10 @@ const std::string SingleElimination::ToHTML() const
 		ret += "</table>";
 	}
 
-	ret += ResultsToHTML();	
+	ret += ResultsToHTML();
+
+	if (!IsSubMatchTable())
+		ret += "</div>";
 
 	return ret;
 }

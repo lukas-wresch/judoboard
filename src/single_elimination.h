@@ -58,6 +58,8 @@ namespace Judoboard
 		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; GenerateSchedule(); }
 		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; GenerateSchedule(); }
 
+		void ReorderLastMatches();//Swaps the last matches so that the final match swaps with 3rd or 5th place match
+
 		//Serialization
 		virtual const std::string ToHTML() const override;
 

@@ -287,6 +287,27 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		}
 	}
 
+	//Re-order matches (for elimination for third and fifth place)
+	for (auto table : m_MatchTables)
+	{
+		if (table->GetType() == MatchTable::Type::Pool)
+		{
+			auto pool = (Pool*)table;
+			pool->GetFinals().ReorderLastMatches();
+			pool->CopyMatchesFromSubtables();
+		}
+		else if (table->GetType() == MatchTable::Type::SingleElimination)
+		{
+			auto se = (SingleElimination*)table;
+			se->ReorderLastMatches();
+		}
+		/*else if (table->GetType() == MatchTable::Type::DoubleElimination)
+		{
+			auto de = (DoubleElimination*)table;
+			de->GetWinnerBracket().ReorderLastMatches();
+		}*/
+	}
+
 	//Re-enabled auto generation
 	for (auto table : m_MatchTables)
 		table->AutoGenerateSchedule(true);

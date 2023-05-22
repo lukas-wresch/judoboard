@@ -2689,16 +2689,16 @@ TEST(MD5, ReadPool3)
 		EXPECT_EQ(file.FindResult(u8"weibliche Jugend U13", "-44 kg", i+1)->Participant->Firstname,
 				  results[i].Judoka->GetFirstname());
 
-	table = tourney.FindMatchTableByDescription(u8"männliche Jugend U13 -34 kg");
+	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -34 kg");
 	results = table->CalculateResults();
 	for (int i = 0; i < 5; i++)
-		EXPECT_EQ(file.FindResult(u8"männliche Jugend U13", "-34 kg", i+1)->Participant->Firstname,
+		EXPECT_EQ(file.FindResult(u8"m\u00e4nnliche Jugend U13", "-34 kg", i+1)->Participant->Firstname,
 			results[i].Judoka->GetFirstname());
 
-	table = tourney.FindMatchTableByDescription(u8"männliche Jugend U13 -37 kg");
+	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -37 kg");
 	results = table->CalculateResults();
 	for (int i = 0; i < 5; i++)
-		EXPECT_EQ(file.FindResult(u8"männliche Jugend U13", "-37 kg", i+1)->Participant->Firstname,
+		EXPECT_EQ(file.FindResult(u8"m\u00e4nnliche Jugend U13", "-37 kg", i+1)->Participant->Firstname,
 			results[i].Judoka->GetFirstname());
 }
 
