@@ -133,7 +133,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			new_table->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
 
 		new_table->SetName(weightclass->Description);
-		new_table->IsBestOfThree(weightclass->BestOfThree);
+		//new_table->IsBestOfThree(weightclass->BestOfThree);
 		new_table->SetMatID(1);//Choose 1 as the default mat
 		new_table->SetScheduleIndex(GetFreeScheduleIndex(1));
 		new_table->DeleteSchedule();
@@ -306,6 +306,11 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			auto de = (DoubleElimination*)table;
 			de->GetWinnerBracket().ReorderLastMatches();
 		}*/
+		else if (table->GetType() == MatchTable::Type::RoundRobin && table->IsBestOfThree())
+		{
+			if (table->GetSchedule().size() == 3)
+				table->SetSchedule()[2]->SetBestOfThree(table->GetSchedule()[0], table->GetSchedule()[1]);
+		}
 	}
 
 	//Re-enabled auto generation
