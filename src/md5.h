@@ -279,8 +279,9 @@ namespace Judoboard
 			//5 = completed match (is elimination match)
 			//0, 2, 4, 5 = ???
 
-			int RedOutMatchID   = -1;
-			int WhiteOutMatchID = -1;
+			int RedOutMatchNo   = -1;
+			int WhiteOutMatchNo = -1;
+			//White or red dropped out (injured) from this match on
 
 			int Pool = 0;//ID of the pool
 			//1 for round robin (sometimes 0!?)

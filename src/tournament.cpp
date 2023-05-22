@@ -223,6 +223,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		table->DeleteSchedule();
 
 	//Add matches
+	std::vector<int> injured_judokas;
 	for (auto& match : File.GetMatches())
 	{
 		Judoka* white = nullptr;
@@ -235,7 +236,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		if (white && blue && *white == *blue)//Filter dummy matches
 			continue;
-
+		
 		Match* new_match = new Match(white, blue, this);
 
 		if (match.Result == 1)//Match completed?
@@ -244,6 +245,23 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 				new_match->SetResult(Match::Result(Fighter::White, (Match::Score)match.ScoreWinner, match.Time));
 			else
 				new_match->SetResult(Match::Result(Fighter::Blue,  (Match::Score)match.ScoreWinner, match.Time));
+		}
+		else if (match.WhiteOutMatchNo >= match.MatchNo)//White injured?
+		{
+			injured_judokas.push_back(match.WhiteID);
+			new_match->SetResult(Match::Result(Fighter::Blue, (Match::Score)match.ScoreWinner, match.Time));
+		}
+		else if (match.RedOutMatchNo >= match.MatchNo)//Red/Blue injured?
+		{
+			injured_judokas.push_back(match.RedID);
+			new_match->SetResult(Match::Result(Fighter::White, (Match::Score)match.ScoreWinner, match.Time));
+		}
+		else//Is one judoka injured?
+		{
+			if (std::find(injured_judokas.begin(), injured_judokas.end(), match.WhiteID) != injured_judokas.end())
+				new_match->SetResult(Match::Result(Fighter::Blue, Match::Score::Ippon, 0));
+			else if (std::find(injured_judokas.begin(), injured_judokas.end(), match.RedID) != injured_judokas.end())
+				new_match->SetResult(Match::Result(Fighter::White, Match::Score::Ippon, 0));
 		}
 
 		if (match.Weightclass && match.Weightclass->pUserData)

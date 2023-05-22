@@ -1085,15 +1085,15 @@ bool MD5::Save(const std::string& Filename) const
 
 			Write_Int(match.Status);
 
-			if (match.RedOutMatchID < 0)
+			if (match.RedOutMatchNo < 0)
 				Write_Line("");
 			else
-				Write_Int(match.RedOutMatchID);
+				Write_Int(match.RedOutMatchNo);
 
-			if (match.WhiteOutMatchID < 0)
+			if (match.WhiteOutMatchNo < 0)
 				Write_Line("");
 			else
-				Write_Int(match.WhiteOutMatchID);
+				Write_Int(match.WhiteOutMatchNo);
 
 			Write_Int(match.Pool);
 			Write_Int(match.ThirdMatchNo);
@@ -2476,13 +2476,13 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 				}
 				else if (header[i] == "RotAusgeschiedenKampfNR")
 				{
-					if (sscanf_s(data[i].c_str(), "%d", &new_match.RedOutMatchID) != 1)
-						ZED::Log::Warn("Could not read RedOutMatchID of match");
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.RedOutMatchNo) != 1)
+						ZED::Log::Warn("Could not read RedOutMatchNo of match");
 				}
 				else if (header[i] == "WeissAusgeschiedenKampfNR")
 				{
-					if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteOutMatchID) != 1)
-						ZED::Log::Warn("Could not read WhiteOutMatchID of match");
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteOutMatchNo) != 1)
+						ZED::Log::Warn("Could not read WhiteOutMatchNo of match");
 				}
 				else if (header[i] == "Pool")
 				{
