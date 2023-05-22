@@ -72,7 +72,7 @@ void SingleElimination::ToString(YAML::Emitter& Yaml) const
 
 size_t SingleElimination::GetNumberOfRounds() const
 {
-	if (GetSchedule().size() >= 3)
+	if (GetSchedule().size() >= 3 && GetSchedule().size() <= 5)
 	{
 		auto count = GetSchedule().size();
 		if (IsThirdPlaceMatch())
