@@ -4,6 +4,7 @@
 #include "tournament.h"
 #include "weightclass.h"
 #include "single_elimination.h"
+#include "double_elimination.h"
 #include "age_group.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/file.h"
@@ -226,6 +227,17 @@ MD5::MD5(const Tournament& Tournament)
 			new_weightclass->MatchForThirdPlace = single_elimination->IsThirdPlaceMatch();
 			new_weightclass->MatchForFifthPlace = single_elimination->IsFifthPlaceMatch();
 		}
+		else if (match_table->GetType() == MatchTable::Type::DoubleElimination)
+		{
+			const auto double_elimination = (Judoboard::DoubleElimination*)match_table;
+
+			new_weightclass->FightSystemID = 1;
+			//if (match_table->GetParticipants().size() > 16)
+				//new_weightclass->FightSystemID = 2;
+
+			new_weightclass->MatchForThirdPlace = double_elimination->IsThirdPlaceMatch();
+			new_weightclass->MatchForFifthPlace = double_elimination->IsFifthPlaceMatch();
+		}
 		else
 			continue;
 
@@ -294,7 +306,8 @@ MD5::MD5(const Tournament& Tournament)
 
 				//new_result.Participant->Rank = new_result.RankID;
 
-				m_Results.emplace_back(new_result);
+				if (result.Judoka)
+					m_Results.emplace_back(new_result);
 			}
 		}
 	}
@@ -336,8 +349,8 @@ MD5::MD5(const Tournament& Tournament)
 
 	//Convert matches
 
-	const auto schedule = Tournament.GetSchedule();
-	for (auto match : schedule)
+	for (auto table : Tournament.GetMatchTables())
+		for (auto match : table->GetSchedule())
 	{
 		Match new_match;
 
@@ -389,6 +402,15 @@ MD5::MD5(const Tournament& Tournament)
 					if (new_match.MatchNo >= 31)
 						new_match.MatchNo = 37;
 				}
+			}
+
+			else if (match_table->GetType() == MatchTable::Type::DoubleElimination)
+			{
+				auto de = (DoubleElimination*)match_table;
+				if (de->GetWinnerBracket().FindMatch(*match))
+					new_match.AreaID = 0;
+				else
+					new_match.AreaID = 1;
 			}
 		}
 
@@ -1225,6 +1247,18 @@ MD5::Participant* MD5::FindParticipant(int ParticipantID)
 
 
 
+std::vector<const MD5::Participant*> MD5::FindParticipantsOfWeightclass(int AgeGroupID, int WeightclassID) const
+{
+	std::vector<const MD5::Participant*> ret;
+
+	for (auto judoka : m_Participants)
+		if (judoka && judoka->AgeGroupID == AgeGroupID && judoka->WeightclassID == WeightclassID)
+			ret.push_back(judoka);
+	return ret;
+}
+
+
+
 MD5::AgeGroup* MD5::FindAgeGroup(int AgeGroupID)
 {
 	if (AgeGroupID <= -1)
@@ -1398,6 +1432,7 @@ void MD5::Dump() const
 		line += "   Status: "       + std::to_string(match.Status);
 		line += "   Pool: "         + std::to_string(match.Pool);
 		line += "   AreaID: "       + std::to_string(match.AreaID);
+		line += "   MatchNo: "      + std::to_string(match.MatchNo);
 		ZED::Log::Info(line);
 	}
 

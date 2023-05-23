@@ -1017,6 +1017,71 @@ TEST(Ajax, Judoka_Assign_AgeGroup)
 
 
 
+TEST(Ajax, Judoka_Search)
+{
+	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Application app;
+		app.GetDatabase().EnableAutoSave(false);
+
+		auto a1 = new AgeGroup("u100", 0, 0, nullptr);
+
+		auto c1 = new Club("c1");
+		auto c2 = new Club("c2");
+		auto c3 = new Club("c3");
+
+		auto j1 = new Judoka("ab", "def");
+		j1->SetClub(c1);
+		auto j2 = new Judoka("hg", "ij");
+		j2->SetClub(c2);
+		auto j3 = new Judoka("kl", "mn");
+		j3->SetClub(c3);
+		auto j4 = new Judoka("op", "qr");
+		j4->SetClub(c1);
+		auto j5 = new Judoka("st", "uv");
+		j5->SetClub(c2);
+
+		app.GetDatabase().AddJudoka(j1);
+		app.GetDatabase().AddJudoka(j2);
+
+		app.GetTournament()->AddAgeGroup(a1);
+		app.GetTournament()->AddParticipant(j3);
+		app.GetTournament()->AddParticipant(j4);
+		app.GetTournament()->AddParticipant(j5);
+
+		auto yaml = YAML::Load( app.Ajax_SearchJudoka(HttpServer::Request("name=ab")) );
+		ASSERT_TRUE(yaml.IsSequence());
+		ASSERT_EQ(yaml.size(), 1);
+		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)j1->GetUUID());
+
+		yaml = YAML::Load( app.Ajax_SearchJudoka(HttpServer::Request("name=st")) );
+		ASSERT_EQ(yaml.size(), 0);
+
+		yaml = YAML::Load( app.Ajax_SearchJudoka(HttpServer::Request("name=c")) );
+		ASSERT_EQ(yaml.size(), 2);
+		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)j1->GetUUID());
+		EXPECT_EQ(yaml[1]["uuid"].as<std::string>(), (std::string)j2->GetUUID());
+
+		yaml = YAML::Load( app.Ajax_SearchJudoka(HttpServer::Request("name=kl&participants=true")) );
+		ASSERT_EQ(yaml.size(), 1);
+		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)j3->GetUUID());
+
+		yaml = YAML::Load( app.Ajax_SearchJudoka(HttpServer::Request("name=c3&participants=true")) );
+		ASSERT_EQ(yaml.size(), 1);
+		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)j3->GetUUID());
+
+		yaml = YAML::Load( app.Ajax_SearchJudoka(HttpServer::Request("name=u100&participants=true")) );
+		ASSERT_EQ(yaml.size(), 3);
+		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)j3->GetUUID());
+		EXPECT_EQ(yaml[1]["uuid"].as<std::string>(), (std::string)j4->GetUUID());
+		EXPECT_EQ(yaml[2]["uuid"].as<std::string>(), (std::string)j5->GetUUID());
+	}
+}
+
+
+
 TEST(Ajax, Judoka_Edit)
 {
 	initialize();

@@ -429,14 +429,14 @@ TEST(App, FullTournament_SingleElimination14)
 		auto mat = app.GetDefaultMat();
 		ASSERT_TRUE(mat);
 
-		ZED::Core::Pause(3000);
+		ZED::Core::Pause(2000);
 
 		for (auto match : tourney->GetSchedule())
 		{
 			ASSERT_TRUE(match);
 			ASSERT_TRUE(mat->StartMatch(match));
 
-			ZED::Core::Pause(1000);
+			ZED::Core::Pause(2000);
 
 			ASSERT_TRUE(mat->AreFightersOnMat());
 
@@ -468,11 +468,11 @@ TEST(App, FullTournament_SingleElimination14)
 					ZED::Core::Pause(11 * 1000);
 				}
 
-				ZED::Core::Pause(12 * 1000);
+				ZED::Core::Pause(11 * 1000);
 			}
 
 			EXPECT_TRUE(mat->EndMatch());
-			ZED::Core::Pause(12 * 1000);
+			ZED::Core::Pause(11 * 1000);
 		}
 
 		ZED::Core::Pause(5000);

@@ -57,6 +57,12 @@
 
 
 <h2 id="headline-participants">Participants</h2>
+
+<div>
+    <label id="participants_search_label" style="width:150px;float:left;margin-top:5px;">Search</label>
+    <input style="margin-bottom:20px;" size="50" id="participants_search" value=""/>
+</div>
+
 <table id="participants" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
     <th style="width: 0.5cm;" class="no">No.</th>
@@ -64,7 +70,7 @@
     <th style="width: 6.0cm; text-align: center;" class="club">Club</th>
     <th style="width: 2.0cm; text-align: center;" id="weight" class="weight">Weight</th>
     <th style="width: 2.0cm; text-align: center;" id="matches" class="num_matches">#Matches</th>
-    <th style="width: 4.5cm; text-align: center;" id="age_group" class="age_group">Age group</th>
+    <th style="width: 5.5cm; text-align: center;" id="age_group" class="age_group">Age group</th>
     <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -517,26 +523,28 @@ function Update_AgeGroups()
 
 function Update_Participants()
 {
-  AjaxCallback("ajax/participants/get", function(response) {
-    //console.log(response);
-    var res = YAML.parse(response);
+  const search = document.getElementById("participants_search").value;
 
-    var table = document.getElementById("participants");
+  AjaxCallback("ajax/judoka/search?participants=true&name=" + search, function(response) {
+    //console.log(response);
+    const res = YAML.parse(response);
+
+    let table = document.getElementById("participants");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    var no = 0;
+    let no = 0;
     for (const judoka of res)
     {
-      var row = table.insertRow(-1);
-      var cell0 = row.insertCell(0);
-      var cell1 = row.insertCell(1);
-      var cell6 = row.insertCell(2);
-      var cell2 = row.insertCell(3);
-      var cell3 = row.insertCell(4);
-      var cell4 = row.insertCell(5);
-      var cell5 = row.insertCell(6);
+      let row = table.insertRow(-1);
+      let cell0 = row.insertCell(0);
+      let cell1 = row.insertCell(1);
+      let cell6 = row.insertCell(2);
+      let cell2 = row.insertCell(3);
+      let cell3 = row.insertCell(4);
+      let cell4 = row.insertCell(5);
+      let cell5 = row.insertCell(6);
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
@@ -546,9 +554,9 @@ function Update_Participants()
       cell0.style.textAlign = "center";
       cell0.style.fontSize  = "14pt";
 
-      cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.name + "</a>";
+      cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.firstname + ' ' + judoka.lastname + '</a>';
       cell1.style.fontSize  = "16pt";
-      cell2.innerHTML = judoka.weight + " kg";
+      cell2.innerHTML = judoka.weight + ' kg';
       cell2.style.textAlign = "center";
       cell2.style.fontSize  = "16pt";
 
@@ -565,14 +573,9 @@ function Update_Participants()
 
       cell4.style.textAlign = "center";
       
-      if (judoka.age_groups.length == 0)
+      if (judoka.age_groups.length == 0 && typeof judoka.age_group_uuid === 'undefined')
         cell4.innerHTML = "- - -";
-      else if (judoka.age_groups.length == 1)
-      {
-        cell4.innerHTML = judoka.age_groups[0].name;
-        cell4.style.fontSize = "14pt";
-      }
-      else
+      else if (judoka.age_groups.length >= 2)
       {
         var select = document.createElement("select");
         select.style.width = "4.0cm";
@@ -592,10 +595,15 @@ function Update_Participants()
 
         select.onchange = function(e)
         {
-          AssignAgeGroup(judoka.uuid, select.value);
+          AssignAgeGroup(judoka.uuid, this.value);
         }
 
         cell4.appendChild(select);
+      }
+      else
+      {
+        cell4.innerHTML = judoka.age_group_name;
+        cell4.style.fontSize = "14pt";
       }
 
       cell5.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + translate('remove') + "</button>";
@@ -718,6 +726,10 @@ function Update()
   TimerID = setTimeout(Update, 6000);
 }
 
+document.getElementById("participants_search").oninput = function(e)
+{
+  Update_Participants();
+};
 
 var showHansokumake = false;
 
@@ -767,3 +779,5 @@ document.getElementById("age_groups_match_tables").innerHTML = '#' + translate('
 document.getElementById("label_mat_display").innerHTML = translate('show_matches_on');
 
 document.getElementById("select_age_groups").innerHTML = translate('select_age_groups');
+
+document.getElementById("participants_search_label").innerHTML = translate('search');
