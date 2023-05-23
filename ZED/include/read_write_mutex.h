@@ -218,8 +218,8 @@ namespace ZED
 
             if (m_WritingCount == 0)
             {
-                mutex_.unlock();
                 m_OwnerID = std::thread::id();
+                mutex_.unlock();
             }
         }
 
@@ -242,15 +242,12 @@ namespace ZED
 
     private:
         std::atomic<int> m_WritingCount = 0;
-        //std::atomic<int> m_WaitingWriters = 0;
         mutable std::atomic<int> m_ReadCount = 0;
-
-        mutable std::recursive_mutex m_Mutex;
-        //mutable std::condition_variable_any m_Cond;
 
         mutable std::shared_mutex mutex_;
 
-        std::atomic<std::thread::id> m_OwnerID;
+        mutable std::recursive_mutex m_Mutex;
+        std::atomic<std::thread::id> m_OwnerID = std::thread::id();
         mutable std::unordered_map<std::thread::id, int> m_ReaderIDs;
     };
 }
