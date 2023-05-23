@@ -4,7 +4,7 @@
 
 <div id="div_showParticipantsOnly">
   <label style="width:200px;float:left;margin-top:4px;" id="label_showParticipantsOnly">Show only participants</label>
-  <input type="checkbox" id="showParticipantsOnly" class="switch-input" onclick="ToggleFilter();">
+  <input type="checkbox" id="showParticipantsOnly" class="switch-input" checked onclick="ToggleFilter();">
   <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="showParticipantsOnly">
     <span class="toggle-on" id="showParticipantsOnly_enabled"></span><span class="toggle-off" id="showParticipantsOnly_disabled"></span>
   </label>
@@ -19,11 +19,11 @@
 <div id="div_search_white">
   <table id="search_white" border="1" rules="all" style="margin-bottom: 1cm;">
     <tr>
-      <th style="width: 0.5cm;" id="no">No.</th>
-      <th style="width: 6.2cm;" id="name">Name</th>
-      <th style="width: 6.2cm;" id="club">Club</th>
-      <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
-      <th style="width: 2cm; text-align: center;" id="birthyear">Birthyear</th>
+      <th style="width: 0.5cm;" class="no">No.</th>
+      <th style="width: 6.2cm;" class="name">Name</th>
+      <th style="width: 6.2cm;" class="club">Club</th>
+      <th style="width: 2cm; text-align: center;" class="weight">Weight</th>
+      <th style="width: 2cm; text-align: center;" class="birthyear">Birthyear</th>
       <th style="width: 5.1cm; text-align: center;" class="options">Options</th>
     </tr>
   </table>
@@ -38,11 +38,11 @@
 <div id="div_search_blue">
   <table id="search_blue" border="1" rules="all" style="margin-bottom: 1cm;">
     <tr>
-      <th style="width: 0.5cm;" id="no">No.</th>
-      <th style="width: 6.2cm;" id="name">Name</th>
-      <th style="width: 6.2cm;" id="club">Club</th>
-      <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
-      <th style="width: 2cm; text-align: center;" id="birthyear">Birthyear</th>
+      <th style="width: 0.5cm;" class="no">No.</th>
+      <th style="width: 6.2cm;" class="name">Name</th>
+      <th style="width: 6.2cm;" class="club">Club</th>
+      <th style="width: 2cm; text-align: center;" class="weight">Weight</th>
+      <th style="width: 2cm; text-align: center;" class="birthyear">Birthyear</th>
       <th style="width: 5.1cm; text-align: center;" class="options">Options</th>
     </tr>
   </table>
@@ -94,7 +94,6 @@ function AddMatch()
 
 function ToggleFilter()
 {
-  filter = !filter;
   Update('white');
   Update('blue');
 }
@@ -103,20 +102,20 @@ function ToggleFilter()
 
 function Update(color)
 {
-  AjaxCallback('ajax/judoka/search?name=' + document.getElementById(color).value, function(response) {
+  AjaxCallback('ajax/judoka/search?participants=' + showParticipantsOnly.checked + '&name=' + document.getElementById(color).value, function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
-    var table = document.getElementById("search_" + color);
+    let table = document.getElementById("search_" + color);
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    var no = 0;
+    let no = 0;
     for (const judoka of res)
     {
-      if (!judoka.is_participant && filter)
-        continue;
+      //if (!judoka.is_participant && filter)
+        //continue;
 
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
@@ -137,10 +136,10 @@ function Update(color)
       cell1.innerHTML = judoka.name;
       cell1.style.fontSize  = "16pt";
 
-      if (typeof judoka.club === 'undefined')
+      if (typeof judoka.club_name === 'undefined')
         cell2.innerHTML = "- - -";
       else
-        cell2.innerHTML = judoka.club;
+        cell2.innerHTML = judoka.club_name;
       cell2.style.fontSize  = "16pt";
 
       cell3.innerHTML = judoka.weight + " kg";
@@ -167,14 +166,23 @@ document.getElementById("blue").oninput = function(e)
   Update("blue");
 };
 
-var filter = false;
 
-
+for (const el of document.getElementsByClassName("no"))
+    el.innerHTML = translate('no');
+for (const el of document.getElementsByClassName("name"))
+    el.innerHTML = translate('name');
+for (const el of document.getElementsByClassName("club"))
+    el.innerHTML = translate('club');
+for (const el of document.getElementsByClassName("weight"))
+    el.innerHTML = translate('weight');
+for (const el of document.getElementsByClassName("birthyear"))
+    el.innerHTML = translate('birthyear');
+for (const el of document.getElementsByClassName("options"))
+    el.innerHTML = translate('options');
 
 document.getElementById("headline").innerHTML    = translate('new_match');
 document.getElementById("label_white").innerHTML = translate('name_white');
 document.getElementById("label_blue").innerHTML  = translate('name_blue');
 document.getElementById("add").innerHTML         = translate('add_match');
-
 
 </script>

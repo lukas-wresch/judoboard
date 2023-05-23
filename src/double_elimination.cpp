@@ -20,6 +20,14 @@ DoubleElimination::DoubleElimination(IFilter* Filter, const ITournament* Tournam
 {
 	m_WinnerBracket.SetParent(this);
 	m_LoserBracket.SetParent(this);
+
+	//Set filters
+
+	m_WinnerBracket.SetFilter(this->GetFilter());
+
+	auto losers = new LosersOf(m_WinnerBracket);
+	losers->RemoveLast();
+	m_LoserBracket.SetFilter(losers);
 }
 
 
@@ -101,8 +109,24 @@ size_t DoubleElimination::GetMaxStartPositions() const
 
 
 
+MatchTable::Results DoubleElimination::CalculateResults() const
+{
+	Results ret    = m_WinnerBracket.CalculateResults();
+	Results losers = m_LoserBracket.CalculateResults();
+
+	if (losers.GetSize() >= 1)
+		for (const auto& result : losers)
+			ret.Add(result);
+
+	return ret;
+}
+
+
+
 void DoubleElimination::GenerateSchedule()
 {
+	if (!IsAutoGenerateSchedule())
+		return;
 	if (!IsSubMatchTable() && GetStatus() != Status::Scheduled)
 		return;
 
@@ -137,6 +161,38 @@ void DoubleElimination::GenerateSchedule()
 		AddMatch(match);
 	for (auto match : m_LoserBracket.GetSchedule())
 		AddMatch(match);
+}
+
+
+
+void DoubleElimination::AddMatchToWinnerBracket(Match* NewMatch)
+{
+	if (!NewMatch)
+		return;
+
+	if (NewMatch->GetFighter(Fighter::White))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)), true);
+	if (NewMatch->GetFighter(Fighter::Blue))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
+
+	m_WinnerBracket.AddMatch(NewMatch);
+	SetSchedule().emplace_back(NewMatch);
+}
+
+
+
+void DoubleElimination::AddMatchToLoserBracket(Match* NewMatch)
+{
+	if (!NewMatch)
+		return;
+
+	if (NewMatch->GetFighter(Fighter::White))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)), true);
+	if (NewMatch->GetFighter(Fighter::Blue))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
+
+	m_LoserBracket.AddMatch(NewMatch);
+	SetSchedule().emplace_back(NewMatch);
 }
 
 
