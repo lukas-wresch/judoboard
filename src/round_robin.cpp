@@ -246,22 +246,29 @@ const std::string RoundRobin::ToHTML() const
 			if (matches.empty())
 				ret += "<td style=\"background-color: #ccc;\"></td>";
 			else
+				ret += "<td style=\"text-align: center;\">";
+
+			for (auto match : matches)
 			{
-				if (matches[0]->IsRunning())
-					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">In Progress</a></td>";
-				else if (!matches[0]->HasConcluded())
-					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">- - -</a></td>";
-				else if (matches[0]->GetWinner()->GetUUID() == fighter->GetUUID())
+				if (match->IsRunning())
+					ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">In Progress</a><br/>";
+				else if (!match->HasConcluded())
+					ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">- - -</a><br/>";
+				else if (match->GetWinner()->GetUUID() == fighter->GetUUID())
 				{
-					const auto& result = matches[0]->GetResult();
-					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
+					const auto& result = match->GetResult();
+					if ((int)result.m_Score > 0)
+						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a><br/>";
 				}
 				else
 				{
-					const auto& result = matches[0]->GetResult();
-					ret += "<td style=\"text-align: center;\"><a href=\"#edit_match.html?id=" + (std::string)matches[0]->GetUUID() + "\">0 (" + Timer::TimestampToString(result.m_Time) + ")</a></td>";
+					const auto& result = match->GetResult();
+					if ((int)result.m_Score > 0)
+						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">0 (" + Timer::TimestampToString(result.m_Time) + ")</a><br/>";
 				}
 			}
+
+			ret += "</td>";
 		}
 
 		const auto result = results.GetResultsOf(fighter);
