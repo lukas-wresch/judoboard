@@ -2332,7 +2332,7 @@ bool Mat::Mainloop()
 
 	auto frameStart = Timer::GetTimestamp();
 
-	if (m_FrameCount%100 == 0 && !AreFightersOnMat() && m_Application)
+	if (m_FrameCount%10 == 0 && m_State != State::Running && m_Application)
 	{
 		bool success;
 		auto nextMatches = m_Application->GetNextMatches(GetMatID(), success);
