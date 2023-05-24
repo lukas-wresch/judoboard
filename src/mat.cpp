@@ -2329,17 +2329,18 @@ bool Mat::Mainloop()
 
 	auto frameStart = Timer::GetTimestamp();
 
-	if (m_State != State::Running && m_Application)
+	if (!AreFightersOnMat() && m_Application)
 	{
 		bool success;
 		auto nextMatches = m_Application->GetNextMatches(GetMatID(), success);
 
 		if (success)
 		{
+			auto guard = m_mutex.LockWriteForScope();
+
 			if (nextMatches.size() == 0 && m_State == State::Waiting)
 				NextState(State::StartUp);
 
-			auto guard = m_mutex.LockWriteForScope();
 			m_NextMatches = std::move(nextMatches);
 		}
 	}
