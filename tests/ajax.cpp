@@ -1167,7 +1167,7 @@ TEST(Ajax, GetNamesOnMat)
 
 		mat->StartMatch(match1);
 
-		ZED::Core::Pause(1000);
+		ZED::Core::Pause(2000);
 
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
@@ -1191,7 +1191,7 @@ TEST(Ajax, GetNamesOnMat)
 		mat->AddIppon(Fighter::White);
 		mat->EndMatch();
 
-		ZED::Core::Pause(1000);
+		ZED::Core::Pause(2000);
 
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
@@ -1211,7 +1211,7 @@ TEST(Ajax, GetNamesOnMat)
 
 		mat->StartMatch(match2);
 
-		ZED::Core::Pause(1000);
+		ZED::Core::Pause(2000);
 
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
@@ -1228,7 +1228,7 @@ TEST(Ajax, GetNamesOnMat)
 		mat->AddIppon(Fighter::White);
 		mat->EndMatch();
 
-		ZED::Core::Pause(1000);
+		ZED::Core::Pause(2000);
 
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 

@@ -31,6 +31,8 @@ bool Mat::Open()
 	if (m_Thread.joinable())
 		m_Thread.join();
 
+	m_FrameCount = 0;
+
 	m_Thread = std::thread([this]()
 	{
 		//m_Window = Window(Application::Name);//Recreate
@@ -91,7 +93,8 @@ bool Mat::Open()
 			Mainloop();
 	});
 
-	while (!m_Window.IsRunning() || !m_Background || !m_Background->IsLoaded())
+	//while (!m_Window.IsRunning() || !m_Background || !m_Background->IsLoaded())
+	while (m_FrameCount == 0)
 		ZED::Core::Pause(100);
 
 	return m_Window.IsRunning();
@@ -2329,17 +2332,18 @@ bool Mat::Mainloop()
 
 	auto frameStart = Timer::GetTimestamp();
 
-	if (m_State != State::Running && m_Application)
+	if (m_FrameCount%10 == 0 && m_State != State::Running && m_Application)
 	{
 		bool success;
 		auto nextMatches = m_Application->GetNextMatches(GetMatID(), success);
 
 		if (success)
 		{
+			auto guard = m_mutex.LockWriteForScope();
+
 			if (nextMatches.size() == 0 && m_State == State::Waiting)
 				NextState(State::StartUp);
 
-			auto guard = m_mutex.LockWriteForScope();
 			m_NextMatches = std::move(nextMatches);
 		}
 	}
@@ -2379,6 +2383,7 @@ bool Mat::Mainloop()
 	}
 
 	m_LastFrameTime = Timer::GetTimestamp() - frameStart;
+	m_FrameCount++;
 
 	return true;
 }
