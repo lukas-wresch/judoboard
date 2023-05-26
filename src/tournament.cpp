@@ -106,7 +106,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			de->IsThirdPlaceMatch(weightclass->MatchForThirdPlace);
 			de->IsFifthPlaceMatch(weightclass->MatchForFifthPlace);
 			delete de->GetLoserBracket().GetFilter();
-			de->GetLoserBracket().SetFilter(new Standard);
+			de->GetLoserBracket().SetFilter(new Fixed);
 			new_table = de;
 		}
 
