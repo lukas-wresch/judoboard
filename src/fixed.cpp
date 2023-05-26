@@ -32,10 +32,10 @@ void Fixed::operator >> (YAML::Emitter& Yaml) const
 
 
 
-/*void Fixed::ToString(YAML::Emitter& Yaml) const
+void Fixed::ToString(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
-}*/
+}
 
 
 

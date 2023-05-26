@@ -3,7 +3,6 @@
 #include "../ZED/include/log.h"
 #include "matchtable.h"
 #include "match.h"
-#include "standard.h"
 #include "weightclass.h"
 #include "fixed.h"
 #include "tournament.h"
@@ -350,10 +349,8 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, co
 				SetFilter(new Weightclass(Yaml["filter"], m_Parent ? m_Parent : this));
 				break;
 			case IFilter::Type::Fixed:
+			case IFilter::Type::Standard://Deprecated
 				SetFilter(new Fixed(Yaml["filter"], m_Parent ? m_Parent : this));
-				break;
-			case IFilter::Type::Standard:
-				SetFilter(new Standard(Yaml["filter"]));
 				break;
 			default:
 				ZED::Log::Error("Unknown filter in match table");
