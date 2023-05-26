@@ -102,6 +102,7 @@ namespace Judoboard
 		Error Ajax_AddTournament(const HttpServer::Request& Request);
 		Error Ajax_EditTournament(const HttpServer::Request& Request);
 		std::string Ajax_GetTournament(const HttpServer::Request& Request);
+		Error Ajax_AssignAgeGroup(const HttpServer::Request& Request);
 		std::string Ajax_ListTournaments();
 		Error Ajax_SwapMatchesOfTournament(const HttpServer::Request& Request);
 
@@ -147,6 +148,8 @@ namespace Judoboard
 		//Rule sets
 		Error Ajax_AddRuleSet(const HttpServer::Request& Request);
 		Error Ajax_EditRuleSet(const HttpServer::Request& Request);
+		std::string Ajax_GetRuleSet(const HttpServer::Request& Request);
+		std::string Ajax_ListRuleSets();
 
 		//Age groups
 		Error Ajax_AddAgeGroup(const HttpServer::Request& Request);

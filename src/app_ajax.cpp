@@ -1752,17 +1752,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		auto guard = LockReadForScope();
-
-		auto rule = m_Database.FindRuleSet(id);
-		if (!rule)
-			return std::string("Could not find rule set in database");
-
-		YAML::Emitter ret;
-		*rule >> ret;
-		return ret.c_str();
+		return Ajax_GetRuleSet(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/rule/list", [this](auto& Request) -> std::string {
@@ -1770,35 +1760,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		auto guard = LockReadForScope();
-
-		auto& rules = m_Database.GetRuleSets();
-		YAML::Emitter ret;
-
-		ret << YAML::BeginMap;
-
-		if (GetTournament() && GetTournament()->GetDefaultRuleSet())
-			ret << YAML::Key << "default" << YAML::Value << (std::string)GetTournament()->GetDefaultRuleSet()->GetUUID();
-
-		ret << YAML::Key << "rules" << YAML::Value;
-		ret << YAML::BeginSeq;
-
-		for (auto rule : rules)
-		{
-			if (rule)
-			{
-				ret << YAML::BeginMap;
-				ret << YAML::Key << "uuid" << YAML::Value << (std::string)rule->GetUUID();
-				ret << YAML::Key << "name" << YAML::Value << (std::string)rule->GetName();
-				ret << YAML::Key << "desc" << YAML::Value << (std::string)rule->GetDescription();
-				ret << YAML::EndMap;
-			}
-		}
-
-		ret << YAML::EndSeq;
-		ret << YAML::EndMap;
-
-		return ret.c_str();
+		return Ajax_ListRuleSets();
 	});
 
 	m_Server.RegisterResource("/ajax/rule/delete", [this](auto& Request) -> std::string {
@@ -1936,21 +1898,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id           = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "age");
-
-		auto judoka    = GetTournament()->FindParticipant(id);
-		auto age_group = GetTournament()->FindAgeGroup(age_group_id);
-
-		if (!judoka || !age_group)
-			return Error(Error::Type::ItemNotFound);
-
-		auto guard = LockWriteForScope();//In case the tournament gets closed at the same time
-
-		if (!GetTournament()->AssignJudokaToAgeGroup(judoka, age_group))
-			return Error(Error::Type::OperationFailed);
-
-		return Error();//OK
+		return Ajax_AssignAgeGroup(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/open", [this](auto& Request) -> std::string {
@@ -2610,6 +2558,27 @@ std::string Application::Ajax_GetTournament(const HttpServer::Request& Request)
 	yaml << YAML::EndMap;
 
 	return yaml.c_str();
+}
+
+
+
+Error Application::Ajax_AssignAgeGroup(const HttpServer::Request& Request)
+{
+	UUID id           = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "age");
+
+	auto judoka    = GetTournament()->FindParticipant(id);
+	auto age_group = GetTournament()->FindAgeGroup(age_group_id);
+
+	if (!judoka || !age_group)
+		return Error::Type::ItemNotFound;
+
+	auto guard = LockWriteForScope();//In case the tournament gets closed at the same time
+
+	if (!GetTournament()->AssignJudokaToAgeGroup(judoka, age_group))
+		return Error(Error::Type::OperationFailed);
+
+	return Error();//OK
 }
 
 
@@ -3388,6 +3357,62 @@ Error Application::Ajax_EditRuleSet(const HttpServer::Request& Request)
 	*rule = RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time, extend_break_time);
 	m_Database.Save();
 	return Error::Type::NoError;//OK
+}
+
+
+
+std::string Application::Ajax_GetRuleSet(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockReadForScope();
+
+	auto rule = m_Database.FindRuleSet(id);
+	if (!rule)
+	{
+		rule = GetTournament()->GetDatabase().FindRuleSet(id);
+		if (!rule)
+			return Error(Error::Type::ItemNotFound);
+	}
+
+	YAML::Emitter ret;
+	*rule >> ret;
+	return ret.c_str();
+}
+
+
+
+std::string Application::Ajax_ListRuleSets()
+{
+	auto guard = LockReadForScope();
+
+	auto& rules = m_Database.GetRuleSets();
+	YAML::Emitter ret;
+
+	ret << YAML::BeginMap;
+
+	if (GetTournament() && GetTournament()->GetDefaultRuleSet())
+		ret << YAML::Key << "default" << YAML::Value << (std::string)GetTournament()->GetDefaultRuleSet()->GetUUID();
+
+	ret << YAML::Key << "rules" << YAML::Value;
+	ret << YAML::BeginSeq;
+
+	for (auto rule : rules)
+	{
+		if (rule)
+		{
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "uuid" << YAML::Value << (std::string)rule->GetUUID();
+			ret << YAML::Key << "name" << YAML::Value << (std::string)rule->GetName();
+			ret << YAML::Key << "desc" << YAML::Value << (std::string)rule->GetDescription();
+			ret << YAML::EndMap;
+		}
+	}
+
+	ret << YAML::EndSeq;
+	ret << YAML::EndMap;
+
+	return ret.c_str();
 }
 
 

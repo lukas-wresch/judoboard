@@ -127,7 +127,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		new_table->DeleteSchedule();
 		new_table->AutoGenerateSchedule(false);
 		new_table->SetColor(color);
-		color++;
+		++color;
 
 		weightclass->pUserData = new_table;
 
@@ -138,7 +138,6 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	for (auto judoka : File.GetParticipants())
 	{
 		Judoka* new_judoka = nullptr;
-		std::string dummy;
 
 		if (pDatabase && pDatabase->FindJudoka_ExactMatch(*judoka))
 			new_judoka = pDatabase->FindJudoka_ExactMatch(*judoka);

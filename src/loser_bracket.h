@@ -96,13 +96,14 @@ namespace Judoboard
 
 		size_t GetNumberOfBaseRounds() const
 		{
-			if (!GetFilter() || GetFilter()->GetParticipants().size() <= 1)
+			auto filter = GetFilter();
+			if (!filter || filter->GetParticipants().size() <= 1)
 				return 0;
 
-			if (GetFilter()->GetParticipants().size() == 2)
+			if (filter->GetParticipants().size() == 2)
 				return 1;
 
-			auto rounds = (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size() + 2));
+			auto rounds = (size_t)std::ceil(std::log2(filter->GetParticipants().size() + 2));
 
 			return rounds;
 		}
