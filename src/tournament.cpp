@@ -11,7 +11,7 @@
 #include "single_elimination.h"
 #include "pool.h"
 #include "double_elimination.h"
-#include "standard.h"
+#include "fixed.h"
 #include "weightclass_generator.h"
 
 
@@ -110,7 +110,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			de->IsThirdPlaceMatch(weightclass->MatchForThirdPlace);
 			de->IsFifthPlaceMatch(weightclass->MatchForFifthPlace);
 			delete de->GetLoserBracket().GetFilter();
-			de->GetLoserBracket().SetFilter(new Standard);
+			de->GetLoserBracket().SetFilter(new Fixed);
 			new_table = de;
 		}
 		else if (weightclass->FightSystemID == 24)//Pool (3+3 system)
@@ -139,7 +139,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		new_table->DeleteSchedule();
 		new_table->AutoGenerateSchedule(false);
 		new_table->SetColor(color);
-		color++;
+		++color;
 
 		weightclass->pUserData = new_table;
 
@@ -150,7 +150,6 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	for (auto judoka : File.GetParticipants())
 	{
 		Judoka* new_judoka = nullptr;
-		std::string dummy;
 
 		if (pDatabase && pDatabase->FindJudoka_ExactMatch(*judoka))
 			new_judoka = pDatabase->FindJudoka_ExactMatch(*judoka);
@@ -334,6 +333,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Re-enabled auto generation
 	for (auto table : m_MatchTables)
 		table->AutoGenerateSchedule(true);
+  
+  //If there are not matches, create them
+	if (GetSchedule().size() == 0)
+		GenerateSchedule();
 }
 
 
@@ -750,8 +753,6 @@ bool Tournament::AddMatch(Match* NewMatch)
 		return false;
 	}
 
-	auto guard = LockWriteForScope();
-
 	//Do we have the match already?
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
@@ -759,6 +760,8 @@ bool Tournament::AddMatch(Match* NewMatch)
 		if (match && match->GetUUID() == NewMatch->GetUUID())
 			return false;
 	}
+
+	auto guard = LockWriteForScope();
 
 	//Do we have the rule set already?
 	if (!m_StandingData.FindRuleSet(NewMatch->GetRuleSet().GetUUID()))
@@ -809,7 +812,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 	else
 	{
 		auto new_match_table = new CustomTable(this);
-		new_match_table->SetFilter(new Standard);
+		new_match_table->SetFilter(new Fixed);
 		new_match_table->AddMatch(NewMatch);
 		new_match_table->SetMatID(NewMatch->GetMatID());
 		AddMatchTable(new_match_table);
@@ -856,6 +859,25 @@ const Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
 			StartIndex++;
 			return schedule[StartIndex-1];
 		}
+	}
+
+	return nullptr;
+}
+
+
+
+Match* Tournament::GetNextOngoingMatch(int32_t MatID)
+{
+	auto guard = LockReadForScope();
+
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
+	{
+		if (!match || !match->IsRunning())
+			continue;
+
+		if (MatID < 0 || match->GetMatID() == MatID)
+			return match;
 	}
 
 	return nullptr;
@@ -1556,6 +1578,9 @@ bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* Ag
 		return false;
 
 	if (!m_StandingData.FindAgeGroup(AgeGroup->GetUUID()))
+		return false;
+
+	if (!AgeGroup->IsElgiable(*Judoka, m_StandingData))
 		return false;
 
 	//Remove judoka to the age group he currently belongs to

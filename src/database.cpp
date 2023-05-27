@@ -29,17 +29,19 @@ void Database::Reset()
 	//No rule set defined and no age groups defined
 	if (m_RuleSets.empty() && m_AgeGroups.empty())
 	{
-		auto children = new RuleSet(Localizer::Translate("Children"), 2*60, 0, 20, 10);
-		auto youth    = new RuleSet(Localizer::Translate("Youth"),    3*60, 0, 20, 10);
-		auto adults   = new RuleSet(Localizer::Translate("Adults"),   4*60, 0, 20, 10);
+		auto children = new RuleSet(Localizer::Translate("Children"),		2*60, 0,    20, 10, false, false, false, 2*60);
+		auto youth    = new RuleSet(Localizer::Translate("Youth") + " U13", 3*60, 0,    20, 10, false, false, false, 3*60);
+		auto youth2   = new RuleSet(Localizer::Translate("Youth") + " U15", 3*60, 3*60, 20, 10, false, false, false, 3*60, true);
+		auto adults   = new RuleSet(Localizer::Translate("Adults"),         4*60, -1,   20, 10, false, false, false, 4*60, true);
 
 		AddRuleSet(children);
 		AddRuleSet(youth);
+		AddRuleSet(youth2);
 		AddRuleSet(adults);
 
 		AddAgeGroup(new AgeGroup("U11", 8,  10, children));
 		AddAgeGroup(new AgeGroup("U13", 10, 12, youth));
-		AddAgeGroup(new AgeGroup("U15", 12, 14, youth));
+		AddAgeGroup(new AgeGroup("U15", 12, 14, youth2));
 		AddAgeGroup(new AgeGroup("U18", 15, 17, adults));
 		AddAgeGroup(new AgeGroup("U21", 17, 20, adults));
 		AddAgeGroup(new AgeGroup(Localizer::Translate("Seniors"), 17, 0, adults));

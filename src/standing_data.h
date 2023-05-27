@@ -117,10 +117,6 @@ namespace Judoboard
 		[[nodiscard]]
 		const std::vector<AgeGroup*>& GetAgeGroups() const { return m_AgeGroups; }
 
-		//Serialization
-		[[nodiscard]]
-		const std::string Judoka2String(std::string SearchString, const ITournament* Tournament) const;
-
 	protected:
 		std::vector<Judoka*> m_Judokas;
 

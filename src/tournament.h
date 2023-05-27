@@ -41,7 +41,7 @@ namespace Judoboard
 		[[nodiscard]]
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
 		[[nodiscard]]
-		std::vector<Match*> GetSchedule() const;
+		virtual std::vector<Match*> GetSchedule() const override;
 		Match* FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
 		virtual const StandingData& GetDatabase() const override { return m_StandingData; }//Returns a database containing all participants
@@ -80,8 +80,9 @@ namespace Judoboard
 
 		bool AddMatch(Match* NewMatch);
 		//bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
-		Match* GetNextMatch(int32_t MatID = -1) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual Match* GetNextMatch(int32_t MatID = -1) const override;//Returns the next match for a given mat if available, otherwise null pointer is returned
 		const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual Match* GetNextOngoingMatch(int32_t MatID) override;//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
 
 		virtual bool RemoveMatch(const UUID& MatchID) override;
 		virtual bool MoveMatchUp(const UUID&  MatchID, uint32_t MatID = 0) override;

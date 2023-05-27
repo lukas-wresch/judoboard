@@ -8,7 +8,7 @@
 
 <script defer type="text/javascript" src="jquery-latest.min.js"></script>
 <script defer type="text/javascript" src="jquery-ui.min.js"></script>
-<script async type="text/javascript" src="yaml.min.js"></script>
+<script type="text/javascript" src="yaml.min.js"></script>
 <meta http-equiv="refresh" content="280">
 </head>
 <body>
@@ -113,14 +113,22 @@ function Login()
 }
 
 
+AjaxCallback("ajax/config/get_setup", function(response) {
+  var res = YAML.parse(response);
+  console.log(response);
+
+  language = res.language;
+
+  document.getElementById("label_username").innerHTML = translate('username');
+  document.getElementById("label_password").innerHTML = translate('password');
+});
+
+
 var challenge;
 
 AjaxCallback('ajax/get_nonce', function(resp) {
   challenge = resp;
 });
-
-document.getElementById("label_username").innerHTML = translate('username');
-document.getElementById("label_password").innerHTML = translate('password');
 
 </script>
 

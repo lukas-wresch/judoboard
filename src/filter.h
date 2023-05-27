@@ -15,7 +15,9 @@ namespace Judoboard
 	public:
 		enum class Type
 		{
-			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser, Standard, LosersOf
+			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser,
+			Standard,//Deprecated, use Fixed
+			LosersOf
 		};
 
 		IFilter(const YAML::Node& Yaml, const MatchTable* Parent);

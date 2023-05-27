@@ -138,6 +138,46 @@ TEST(App, Tournaments)
 
 
 
+TEST(App, Tournament_With_Ongoing_Match)
+{
+	initialize();
+	Application app;
+
+	Tournament* t = new Tournament("../test-data/tournament-ongoing-match");
+	t->EnableAutoSave(false);
+	app.AddTournament(t);
+	app.OpenTournament(*t);
+
+	EXPECT_TRUE(app.StartLocalMat(1));
+
+	ZED::Core::Pause(3000);
+
+	EXPECT_TRUE(app.GetMats()[0]->AreFightersOnMat());
+}
+
+
+
+TEST(App, Tournament_With_Ongoing_Match2)
+{
+	initialize();
+	Application app;
+
+	EXPECT_TRUE(app.StartLocalMat(1));
+
+	ZED::Core::Pause(2000);
+
+	Tournament* t = new Tournament("../test-data/tournament-ongoing-match");
+	t->EnableAutoSave(false);
+	app.AddTournament(t);
+	app.OpenTournament(*t);
+
+	ZED::Core::Pause(3000);
+
+	EXPECT_TRUE(app.GetMats()[0]->AreFightersOnMat());
+}
+
+
+
 TEST(App, Tournaments_OpenLastTournament)
 {
 	initialize();
@@ -235,6 +275,99 @@ TEST(App, Mats)
 	}
 
 	ZED::Core::Pause(5000);
+}
+
+
+
+TEST(App, Mutex)
+{
+	initialize();
+
+	{
+		ZED::RecursiveReadWriteMutex mutex;
+
+		auto read_thread = [&mutex]()
+		{
+			for (int i = 0; i < 1000; i++)
+			{
+				mutex.LockRead();
+				ZED::Core::Pause(1);
+				mutex.UnlockRead();
+				ZED::Core::Pause(1);
+			}
+		};
+
+		auto write_thread = [&mutex]()
+		{
+			for (int i = 0; i < 1000; i++)
+			{
+				mutex.LockWrite();
+				ZED::Core::Pause(1);
+				mutex.UnlockWrite();
+				ZED::Core::Pause(1);
+			}
+		};
+
+		auto double_write_thread = [&mutex]()
+		{
+			for (int i = 0; i < 1000; i++)
+			{
+				mutex.LockWrite();
+				ZED::Core::Pause(1);
+
+				mutex.LockWrite();
+				ZED::Core::Pause(1);
+				mutex.UnlockWrite();
+				ZED::Core::Pause(1);
+
+				mutex.UnlockWrite();
+				ZED::Core::Pause(1);
+			}
+		};
+
+		auto upgrade_thread = [&mutex]()
+		{
+			for (int i = 0; i < 500; i++)
+			{
+				mutex.LockRead();
+				ZED::Core::Pause(1);
+				
+				mutex.LockWrite();
+				ZED::Core::Pause(1);
+				mutex.UnlockWrite();
+				ZED::Core::Pause(1);
+
+				mutex.UnlockRead();
+				ZED::Core::Pause(1);
+			}
+		};
+
+
+		std::thread read_threads[20];
+		std::thread write_threads[5];
+		std::thread upgrade_threads[3];
+		std::thread double_write_threads[3];
+
+		for (auto& thread : read_threads)
+			thread = std::thread(read_thread);
+		for (auto& thread : write_threads)
+			thread = std::thread(write_thread);
+		for (auto& thread : upgrade_threads)
+			thread = std::thread(upgrade_thread);
+		for (auto& thread : double_write_threads)
+			thread = std::thread(double_write_thread);
+
+		ZED::Core::Pause(5000);
+
+		for (auto& thread : read_threads)
+			thread.join();
+		for (auto& thread : write_threads)
+			thread.join();
+		for (auto& thread : upgrade_threads)
+			thread.join();
+		for (auto& thread : double_write_threads)
+			thread.join();
+	}
 }
 
 
@@ -389,17 +522,16 @@ TEST(App, FullTournament_SingleElimination14)
 		auto mat = app.GetDefaultMat();
 		ASSERT_TRUE(mat);
 
-		ZED::Core::Pause(3000);
+		ZED::Core::Pause(2000);
 
 		for (auto match : tourney->GetSchedule())
 		{
 			ASSERT_TRUE(match);
-			ASSERT_TRUE(mat->StartMatch(match));
-
+			ASSERT_TRUE(mat->StartMatch(match));			
 			ZED::Core::Pause(1000);
 
 			ASSERT_TRUE(mat->AreFightersOnMat());
-
+			
 			mat->Hajime();
 
 			ZED::Core::Pause(1000);
@@ -428,11 +560,11 @@ TEST(App, FullTournament_SingleElimination14)
 					ZED::Core::Pause(11 * 1000);
 				}
 
-				ZED::Core::Pause(12 * 1000);
+				ZED::Core::Pause(11 * 1000);
 			}
 
 			EXPECT_TRUE(mat->EndMatch());
-			ZED::Core::Pause(12 * 1000);
+			ZED::Core::Pause(11 * 1000);
 		}
 
 		ZED::Core::Pause(5000);

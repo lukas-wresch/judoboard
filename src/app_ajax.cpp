@@ -39,6 +39,8 @@ void Application::SetupHttpServer()
 
 	m_Server.RegisterResource("/menu.png",   [](auto& Request) { return HttpServer::LoadFile("html/menu.png");   }, HttpServer::ResourceType::Image_PNG, 24*60*60);
 	m_Server.RegisterResource("/winner.png", [](auto& Request) { return HttpServer::LoadFile("html/winner.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
+	m_Server.RegisterResource("/en.png", [](auto& Request) { return HttpServer::LoadFile("html/en.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
+	m_Server.RegisterResource("/de.png", [](auto& Request) { return HttpServer::LoadFile("html/de.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
 
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit", "lots",
@@ -353,28 +355,11 @@ void Application::SetupHttpServer()
 	});
 
 
-	m_Server.RegisterResource("/ajax/participants/get", [this](auto& Request) -> std::string {
-		if (!IsLoggedIn(Request))
-			return Error(Error::Type::NotLoggedIn);
-
-		auto guard = LockReadForScope();
-
-		if (!GetTournament())
-			return Error(Error::Type::TournamentNotOpen);
-
-		return GetTournament()->Participants2String();
-	});
-
-
 	m_Server.RegisterResource("/ajax/judoka/search", [this](auto& Request) -> std::string {
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
-		auto search_string = HttpServer::DecodeURLEncoded(Request.m_Query, "name");
-
-		auto guard = LockReadForScope();
-
-		return m_Database.Judoka2String(search_string, GetTournament());
+		return Ajax_SearchJudoka(Request);
 	});
 
 
@@ -480,32 +465,6 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::ItemNotFound);
 
 		entry->SetMatID(mat);
-		return Error();//OK
-	});
-
-
-	m_Server.RegisterResource("/ajax/match/set_rule", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-
-		UUID id   = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-		UUID rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
-
-		auto guard = LockWriteForScope();
-
-		if (!GetTournament())
-			return std::string("No tournament open");
-
-		auto match = GetTournament()->FindMatch(id);
-		auto ruleSet = m_Database.FindRuleSet(rule);
-
-		if (!match)
-			return std::string("Could not find match");
-		if (!ruleSet)
-			return std::string("Could not find rule set");
-
-		match->SetRuleSet(ruleSet);
 		return Error();//OK
 	});
 
@@ -1214,7 +1173,7 @@ void Application::SetupHttpServer()
 	});
 
 
-	m_Server.RegisterResource("/ajax/judoka/list", [this](auto& Request) -> std::string {
+	/*m_Server.RegisterResource("/ajax/judoka/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
@@ -1228,7 +1187,7 @@ void Application::SetupHttpServer()
 		}
 		ret << YAML::EndSeq;
 		return ret.c_str();
-	});
+	});*/
 
 
 	m_Server.RegisterResource("/ajax/judoka/update", [this](auto& Request) -> std::string {
@@ -1739,13 +1698,18 @@ void Application::SetupHttpServer()
 		UUID whiteID = HttpServer::DecodeURLEncoded(Request.m_Body, "white");
 		UUID blueID  = HttpServer::DecodeURLEncoded(Request.m_Body, "blue");
 
-		auto guard = LockWriteForScope();
+		auto guard = LockReadForScope();
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		auto white = m_Database.FindJudoka(whiteID);
-		auto blue  = m_Database.FindJudoka(blueID);
+		auto white = GetTournament()->GetDatabase().FindJudoka(whiteID);
+		if (!white)
+			white = m_Database.FindJudoka(whiteID);
+
+		auto blue = GetTournament()->GetDatabase().FindJudoka(blueID);
+		if (!blue)
+			blue = m_Database.FindJudoka(blueID);
 
 		if (!white || !blue)//Judokas exist?
 			return std::string("Judoka not found in database");
@@ -1756,29 +1720,12 @@ void Application::SetupHttpServer()
 	});
 
 
-	m_Server.RegisterResource("/ajax/match/set_mat", [this](auto& Request) -> std::string {
+	m_Server.RegisterResource("/ajax/match/edit", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
 
-		UUID matchID = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
-
-		if (matID < 0)
-			return Error(Error::Type::InvalidID);
-
-		auto guard = LockWriteForScope();
-
-		if (!GetTournament())
-			return Error(Error::Type::TournamentNotOpen);
-
-		auto match = GetTournament()->FindMatch(matchID);
-
-		if (!match)
-			return Error(Error::Type::ItemNotFound);
-
-		match->SetMatID(matID);
-		return Error();//OK
+		return Ajax_EditMatch(Request);
 	});
 
 
@@ -1789,25 +1736,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		std::string name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-		int match_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "match_time"));
-		int goldenscore_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "goldenscore_time"));
-		int osaekomi_ippon = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_ippon"));
-		int osaekomi_wazaari = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_wazaari"));
-		bool yuko = HttpServer::DecodeURLEncoded(Request.m_Body, "yuko") == "true";
-		bool koka = HttpServer::DecodeURLEncoded(Request.m_Body, "koka") == "true";
-		bool draw = HttpServer::DecodeURLEncoded(Request.m_Body, "draw") == "true";
-		int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
-
-		RuleSet* new_rule_set = new RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time);
-
-		auto guard = LockWriteForScope();
-
-		if (!m_Database.AddRuleSet(new_rule_set))
-			return Error(Error::Type::OperationFailed);
-
-		m_Database.Save();
-		return Error(Error::Type::NoError);//OK
+		return Ajax_AddRuleSet(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/rule/update", [this](auto& Request) -> std::string {
@@ -1815,28 +1744,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		std::string name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
-		int match_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "match_time"));
-		int goldenscore_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "goldenscore_time"));
-		int osaekomi_ippon = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_ippon"));
-		int osaekomi_wazaari = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_wazaari"));
-		bool yuko = HttpServer::DecodeURLEncoded(Request.m_Body, "yuko") == "true";
-		bool koka = HttpServer::DecodeURLEncoded(Request.m_Body, "koka") == "true";
-		bool draw = HttpServer::DecodeURLEncoded(Request.m_Body, "draw") == "true";
-		int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
-
-		auto guard = LockWriteForScope();
-
-		auto rule = m_Database.FindRuleSet(id);
-
-		if (!rule)
-			return std::string("Could not find rule set in database");
-
-		*rule = RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time);
-		m_Database.Save();
-		return Error();//OK
+		return Ajax_EditRuleSet(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/rule/get", [this](auto& Request) -> std::string {
@@ -1844,17 +1752,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-		auto guard = LockReadForScope();
-
-		auto rule = m_Database.FindRuleSet(id);
-		if (!rule)
-			return std::string("Could not find rule set in database");
-
-		YAML::Emitter ret;
-		*rule >> ret;
-		return ret.c_str();
+		return Ajax_GetRuleSet(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/rule/list", [this](auto& Request) -> std::string {
@@ -1862,35 +1760,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		auto guard = LockReadForScope();
-
-		auto& rules = m_Database.GetRuleSets();
-		YAML::Emitter ret;
-
-		ret << YAML::BeginMap;
-
-		if (GetTournament() && GetTournament()->GetDefaultRuleSet())
-			ret << YAML::Key << "default" << YAML::Value << (std::string)GetTournament()->GetDefaultRuleSet()->GetUUID();
-
-		ret << YAML::Key << "rules" << YAML::Value;
-		ret << YAML::BeginSeq;
-
-		for (auto rule : rules)
-		{
-			if (rule)
-			{
-				ret << YAML::BeginMap;
-				ret << YAML::Key << "uuid" << YAML::Value << (std::string)rule->GetUUID();
-				ret << YAML::Key << "name" << YAML::Value << (std::string)rule->GetName();
-				ret << YAML::Key << "desc" << YAML::Value << (std::string)rule->GetDescription();
-				ret << YAML::EndMap;
-			}
-		}
-
-		ret << YAML::EndSeq;
-		ret << YAML::EndMap;
-
-		return ret.c_str();
+		return Ajax_ListRuleSets();
 	});
 
 	m_Server.RegisterResource("/ajax/rule/delete", [this](auto& Request) -> std::string {
@@ -2028,21 +1898,7 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 
-		UUID id           = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-		UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "age");
-
-		auto judoka    = GetTournament()->FindParticipant(id);
-		auto age_group = GetTournament()->FindAgeGroup(age_group_id);
-
-		if (!judoka || !age_group)
-			return Error(Error::Type::ItemNotFound);
-
-		auto guard = LockWriteForScope();//In case the tournament gets closed at the same time
-
-		if (!GetTournament()->AssignJudokaToAgeGroup(judoka, age_group))
-			return Error(Error::Type::OperationFailed);
-
-		return Error();//OK
+		return Ajax_AssignAgeGroup(Request);
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/open", [this](auto& Request) -> std::string {
@@ -2337,9 +2193,10 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/config/get_setup", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
-		if (!error)
-			return error;
+		//auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		//if (!error)
+			//return error;
+		//Needs to be accessable before login to obtain the language
 
 		return Ajax_GetSetup();
 	});
@@ -2547,6 +2404,39 @@ Error Application::Ajax_UpdatePassword(Account* Account, const HttpServer::Reque
 
 
 
+Error Application::Ajax_EditMatch(const HttpServer::Request& Request)
+{
+	UUID matchID = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
+	UUID rule = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
+
+	if (matID < 0)
+		return Error::Type::InvalidID;
+
+	auto guard = LockWriteForScope();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	auto match = GetTournament()->FindMatch(matchID);
+
+	if (!match)
+		return Error::Type::ItemNotFound;
+	if (match->HasConcluded() || match->IsRunning())
+		return Error::Type::OperationFailed;
+
+	auto ruleSet = m_Database.FindRuleSet(rule);
+	if (!ruleSet)
+		ruleSet = GetTournament()->FindRuleSet(rule);
+
+	match->SetMatID(matID);
+	match->SetRuleSet(ruleSet);	
+
+	return Error();//OK
+}
+
+
+
 Error Application::Ajax_AddTournament(const HttpServer::Request& Request)
 {
 	auto name         = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
@@ -2668,6 +2558,27 @@ std::string Application::Ajax_GetTournament(const HttpServer::Request& Request)
 	yaml << YAML::EndMap;
 
 	return yaml.c_str();
+}
+
+
+
+Error Application::Ajax_AssignAgeGroup(const HttpServer::Request& Request)
+{
+	UUID id           = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	UUID age_group_id = HttpServer::DecodeURLEncoded(Request.m_Query, "age");
+
+	auto judoka    = GetTournament()->FindParticipant(id);
+	auto age_group = GetTournament()->FindAgeGroup(age_group_id);
+
+	if (!judoka || !age_group)
+		return Error::Type::ItemNotFound;
+
+	auto guard = LockWriteForScope();//In case the tournament gets closed at the same time
+
+	if (!GetTournament()->AssignJudokaToAgeGroup(judoka, age_group))
+		return Error(Error::Type::OperationFailed);
+
+	return Error();//OK
 }
 
 
@@ -3007,6 +2918,125 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 
 
 
+std::string Application::Ajax_SearchJudoka(const HttpServer::Request& Request)
+{
+	auto search_string = HttpServer::DecodeURLEncoded(Request.m_Query, "name");
+	auto tournament_search = HttpServer::DecodeURLEncoded(Request.m_Query, "participants") == "true";
+
+	//Transform to lower case
+	std::transform(search_string.begin(), search_string.end(), search_string.begin(),
+		[](unsigned char c) { return std::tolower(c); });
+
+	//Split by ' ' character
+	std::vector<std::string> search_string_split;
+	std::istringstream iss(search_string);
+	std::string word;
+
+	while (iss >> word)
+		search_string_split.push_back(word);
+
+	LockRead();
+
+	std::vector<Judoka*> judokas;
+	if (tournament_search)
+		judokas = GetTournament()->GetDatabase().GetAllJudokas();
+	else
+		judokas = m_Database.GetAllJudokas();
+
+	auto schedule = GetTournament()->GetSchedule();
+
+	UnlockRead();
+
+
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
+	for (auto judoka : judokas)
+	{
+		auto to_search = judoka->GetName(NameStyle::GivenName);
+
+		auto club = judoka->GetClub();
+		if (club)
+			to_search += club->GetName();
+
+		auto judoka_age_group = GetTournament()->GetAgeGroupOfJudoka(judoka);
+		if (judoka_age_group)
+			to_search += judoka_age_group->GetName();
+
+		std::transform(to_search.begin(), to_search.end(), to_search.begin(),
+			[](unsigned char c) { return std::tolower(c); });
+
+		//Does the judoka match all the search criteria?
+		bool matches = true;
+		for (const auto& word : search_string_split)
+		{
+			if (to_search.find(word) == std::string::npos)
+			{
+				matches = false;
+				break;
+			}
+		}
+
+		if (!matches)
+			continue;//Does not match search criteria			
+
+
+		ret << YAML::BeginMap;
+
+		ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
+		ret << YAML::Key << "firstname" << YAML::Value << judoka->GetFirstname();
+		ret << YAML::Key << "lastname" << YAML::Value << judoka->GetLastname();
+		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
+		ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
+
+		if (club)
+		{
+			ret << YAML::Key << "club_uuid" << YAML::Value << (std::string)judoka->GetClub()->GetUUID();
+			ret << YAML::Key << "club_name" << YAML::Value << judoka->GetClub()->GetName();
+		}
+
+		if (tournament_search)
+		{
+			uint32_t num_matches = 0;
+			for (auto match : schedule)
+			{
+				if (match && match->HasValidFighters() && match->Contains(*judoka))
+					num_matches++;
+			}
+
+			ret << YAML::Key << "num_matches" << YAML::Value << num_matches;
+
+			if (judoka_age_group)
+			{
+				ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
+				ret << YAML::Key << "age_group_name" << YAML::Value << (std::string)judoka_age_group->GetName();
+			}
+
+			//Calculate eligable age groups
+			ret << YAML::Key << "age_groups" << YAML::Value;
+			ret << YAML::BeginSeq;
+
+			auto age_groups = GetTournament()->GetEligableAgeGroupsOfJudoka(judoka);
+			for (auto age_group : age_groups)
+			{
+				ret << YAML::BeginMap;
+				ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
+				ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
+				ret << YAML::EndMap;
+			}
+
+			ret << YAML::EndSeq;
+		}
+
+		ret << YAML::EndMap;
+	}
+
+	ret << YAML::EndSeq;
+	return ret.c_str();
+}
+
+
+
 Error Application::Ajax_ImportJudoka(const HttpServer::Request& Request)
 {
 	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
@@ -3266,6 +3296,122 @@ std::string Application::Ajax_ListAssociations(const HttpServer::Request& Reques
 				club->ToString(ret);
 
 	ret << YAML::EndSeq;
+	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_AddRuleSet(const HttpServer::Request& Request)
+{
+	std::string name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	int match_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "match_time"));
+	int goldenscore_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "goldenscore_time"));
+	int osaekomi_ippon   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_ippon"));
+	int osaekomi_wazaari = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_wazaari"));
+	bool yuko = HttpServer::DecodeURLEncoded(Request.m_Body, "yuko") == "true";
+	bool koka = HttpServer::DecodeURLEncoded(Request.m_Body, "koka") == "true";
+	bool draw = HttpServer::DecodeURLEncoded(Request.m_Body, "draw") == "true";
+	int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
+	bool extend_break_time = HttpServer::DecodeURLEncoded(Request.m_Body, "extend_break_time") == "true";
+
+	RuleSet* new_rule_set = new RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time, extend_break_time);
+
+	auto guard = LockWriteForScope();
+
+	if (!m_Database.AddRuleSet(new_rule_set))
+		return Error(Error::Type::OperationFailed);
+
+	m_Database.Save();
+	return Error::Type::NoError;//OK
+}
+
+
+
+Error Application::Ajax_EditRuleSet(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	std::string name = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
+	int match_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "match_time"));
+	int goldenscore_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "goldenscore_time"));
+	int osaekomi_ippon   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_ippon"));
+	int osaekomi_wazaari = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomi_wazaari"));
+	bool yuko = HttpServer::DecodeURLEncoded(Request.m_Body, "yuko") == "true";
+	bool koka = HttpServer::DecodeURLEncoded(Request.m_Body, "koka") == "true";
+	bool draw = HttpServer::DecodeURLEncoded(Request.m_Body, "draw") == "true";
+	int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
+	bool extend_break_time = HttpServer::DecodeURLEncoded(Request.m_Body, "extend_break_time") == "true";
+
+	auto guard = LockWriteForScope();
+
+	auto rule = m_Database.FindRuleSet(id);
+
+	if (!rule)
+	{
+		if (GetTournament())
+			rule = GetTournament()->FindRuleSet(id);
+		if (!rule)
+			return Error::Type::ItemNotFound;
+	}
+
+	*rule = RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time, extend_break_time);
+	m_Database.Save();
+	return Error::Type::NoError;//OK
+}
+
+
+
+std::string Application::Ajax_GetRuleSet(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockReadForScope();
+
+	auto rule = m_Database.FindRuleSet(id);
+	if (!rule)
+	{
+		rule = GetTournament()->GetDatabase().FindRuleSet(id);
+		if (!rule)
+			return Error(Error::Type::ItemNotFound);
+	}
+
+	YAML::Emitter ret;
+	*rule >> ret;
+	return ret.c_str();
+}
+
+
+
+std::string Application::Ajax_ListRuleSets()
+{
+	auto guard = LockReadForScope();
+
+	auto& rules = m_Database.GetRuleSets();
+	YAML::Emitter ret;
+
+	ret << YAML::BeginMap;
+
+	if (GetTournament() && GetTournament()->GetDefaultRuleSet())
+		ret << YAML::Key << "default" << YAML::Value << (std::string)GetTournament()->GetDefaultRuleSet()->GetUUID();
+
+	ret << YAML::Key << "rules" << YAML::Value;
+	ret << YAML::BeginSeq;
+
+	for (auto rule : rules)
+	{
+		if (rule)
+		{
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "uuid" << YAML::Value << (std::string)rule->GetUUID();
+			ret << YAML::Key << "name" << YAML::Value << (std::string)rule->GetName();
+			ret << YAML::Key << "desc" << YAML::Value << (std::string)rule->GetDescription();
+			ret << YAML::EndMap;
+		}
+	}
+
+	ret << YAML::EndSeq;
+	ret << YAML::EndMap;
+
 	return ret.c_str();
 }
 

@@ -2351,5 +2351,106 @@ TEST(Mat, BreakTime)
 		ZED::Core::Pause(3800);
 
 		EXPECT_TRUE(m.StartMatch(&match2));
+
+		delete rule_set;
+		delete j1;
+		delete j2;
+		delete j3;
+	}
+}
+
+
+
+TEST(Mat, BreakTime_Extended)
+{
+	initialize();
+
+	{
+		Application app;
+		Mat m(1);
+
+		RuleSet* rule_set = new RuleSet("Test", 30, 10, 30, 20, false, false, false, 5, false);
+
+		Judoka* j1 = new Judoka("Needs", "Break");
+		Judoka* j2 = new Judoka("White", "LastnameW");
+		Judoka* j3 = new Judoka("Blue",  "LastnameB");
+
+		Match match(j1, j2, nullptr);
+		match.SetMatID(1);
+		match.SetRuleSet(rule_set);
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.Hajime();
+		ZED::Core::Pause(10 * 1000);
+		m.AddIppon((Fighter)(rand()%2));
+
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+
+		Match match2(j1, j3, nullptr, 1);
+		match2.SetRuleSet(rule_set);
+
+		for (int k = 0; k < 4; k++)
+		{
+			EXPECT_FALSE(m.StartMatch(&match2));
+			ZED::Core::Pause(1000);
+		}
+
+		ZED::Core::Pause(3000);
+
+		EXPECT_TRUE(m.StartMatch(&match2));
+
+		delete rule_set;
+		delete j1;
+		delete j2;
+		delete j3;
+	}
+}
+
+
+
+TEST(Mat, BreakTime_Extended2)
+{
+	initialize();
+
+	{
+		Application app;
+		Mat m(1);
+
+		RuleSet* rule_set = new RuleSet("Test", 30, 10, 30, 20, false, false, false, 5, true);
+
+		Judoka* j1 = new Judoka("Needs", "Break");
+		Judoka* j2 = new Judoka("White", "LastnameW");
+		Judoka* j3 = new Judoka("Blue",  "LastnameB");
+
+		Match match(j1, j2, nullptr);
+		match.SetMatID(1);
+		match.SetRuleSet(rule_set);
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.Hajime();
+		ZED::Core::Pause(10 * 1000);
+		m.AddIppon((Fighter)(rand()%2));
+
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+
+		Match match2(j1, j3, nullptr, 1);
+		match2.SetRuleSet(rule_set);
+
+		for (int k = 0; k < 9; k++)
+		{
+			EXPECT_FALSE(m.StartMatch(&match2));
+			ZED::Core::Pause(1000);
+		}
+
+		ZED::Core::Pause(3000);
+
+		EXPECT_TRUE(m.StartMatch(&match2));
+
+		delete rule_set;
+		delete j1;
+		delete j2;
+		delete j3;
 	}
 }

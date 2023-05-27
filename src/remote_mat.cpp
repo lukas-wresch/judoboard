@@ -82,7 +82,7 @@ bool RemoteMat::CanNextMatchStart() const
 
 
 
-bool RemoteMat::StartMatch(Match* NewMatch)
+bool RemoteMat::StartMatch(Match* NewMatch, bool UseForce)
 {
 	if (!NewMatch)
 	{

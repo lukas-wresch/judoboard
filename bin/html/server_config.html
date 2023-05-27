@@ -172,7 +172,10 @@ function UpdateConfig()
     nameStyle:   document.getElementById("nameStyle").value,
   });
 
-  AjaxPost("ajax/config/set_setup", params);
+  AjaxPost("ajax/config/set_setup", params, function(){
+    if (language != document.getElementById("language").value)
+      location.reload();
+  });
 }
 
 
@@ -196,6 +199,7 @@ function GetStatus()
       document.getElementById("version").innerHTML = res.version;
       document.getElementById("uptime").innerHTML  = NiceLargeTime(res.uptime);
       document.getElementById("language").value = res.language;
+      language = res.language;
       document.getElementById("port").value = res.port;
       document.getElementById("ipponStyle").value = res.ippon_style;
       document.getElementById("timerStyle").value = res.timer_style;

@@ -9,6 +9,7 @@ namespace Judoboard
 	{
 	public:
 		Fixed(const IFilter& Source);
+		Fixed(const MatchTable* Parent = nullptr) : IFilter(Parent) {}
 		Fixed(const YAML::Node& Yaml, const MatchTable* Parent);
 
 		virtual Type GetType() const override { return Type::Fixed; }
@@ -19,7 +20,7 @@ namespace Judoboard
 
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
-		//virtual void ToString(YAML::Emitter& Yaml) const override;
+		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	private:
 	};

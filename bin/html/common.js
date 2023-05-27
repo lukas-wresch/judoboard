@@ -67,6 +67,7 @@ var lang_en = {
     ippon_revoked:  [ "Ippon revoked!", "Ippon zur&uuml;ckgenommen!" ],
     judo_passport_number:  [ "Judo Passport Number", "Judopassnummer" ],
     koka_revoked:  [ "Koka revoked!", "Koka zur&uuml;ckgenommen!" ],
+    language: [ "language", "Sprache" ],
     list_associations:  [ "List Associations", "Verb&auml;nde anzeigen" ],
     list_clubs:  [ "List Clubs", "Vereine anzeigen" ],
     list_judokas:  [ "List Judokas", "Judokas anzeigen" ],
@@ -136,6 +137,7 @@ var lang_en = {
     rule_sets:  [ "Rule Sets", "Regelwerke" ],
     remove:  [ "Remove", "Entfernen" ],
     running:   [ "Running", "am K&auml;mpfen" ],
+    search:  [ "Search", "Suchen" ],
     shutdown_confirm:  [ "Are you sure you want to shutdown Judoboard?", "Soll Judoboard wirklich heruntergefahren werden?" ],
     start:  [ "Start", "Starten" ],
     start_next_match:  [ "Start Next Match", "Kampf starten" ],
@@ -184,6 +186,8 @@ var lang_en = {
 
 
 
+var language = 0;
+
 function translate(keyword)
 {
   console.log("Translating " + keyword);
@@ -191,7 +195,7 @@ function translate(keyword)
   var ret = eval('lang_en.' + keyword);
 
   if (typeof ret == 'object')
-    return ret[1];
+    return ret[language];
   return keyword;
 }
 

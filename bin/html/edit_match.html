@@ -19,13 +19,13 @@
 
 <div>
   <label id="label_mat" style="width:150px;float:left;margin-top:5px;">Mat</label>
-  <select style="padding-top:5px;margin-bottom:20px;width: 3.5cm;" id="mat" onchange="return SetMat();">
+  <select style="padding-top:5px;margin-bottom:20px;width: 3.5cm;" id="mat">
   </select>
 </div>
 
 <div>
   <label id="label_rule" style="width:150px;float:left;margin-top:5px;">Rule Set</label>
-  <select style="padding-top:5px;margin-bottom:20px;width: 5.0cm;" id="rule" onchange="return SetRuleSet();">
+  <select style="padding-top:5px;margin-bottom:20px;width: 5.0cm;" id="rule">
   </select>
 </div>
 
@@ -36,22 +36,23 @@
     <p style="padding-top:5px;margin-bottom:20px;" id="status">- - -</p>
   </div>
 
-<div>
+  <div>
     <label id="label_winner" style="width:150px;float:left; margin-top:5px; margin-left: 5px;">Winner</label>
     <p style="padding-top:5px;margin-bottom:20px;" id="winner">- - -</p>
-</div>
+  </div>
 
-<div>
+  <div>
     <label id="label_score" style="width:150px;float:left;margin-top:5px; margin-left: 5px;">Score</label>
     <p style="padding-top:5px;margin-bottom:20px;" id="score">0</p>
-</div>
+  </div>
 
-<div>
+  <div>
     <label id="label_time" style="width:150px;float:left;margin-top:5px; margin-left: 5px;">Time</label>
     <p style="padding-top:5px;margin-bottom:20px;" id="time">0:00</p>
-</div>
+  </div>
 </div>
 
+<button id="save" class="add" style="margin-top: 1cm;" onclick="return SaveMatch();">Save</button>
 <div id="div_delete" style="display: none; margin-top: 5mm;">
   <button id="delete" class="remove" onclick="return DeleteMatch();">Delete Match</button>
 </div>
@@ -144,27 +145,15 @@ function GetMatch()
 
 
 
-function SetMat()
+function SaveMatch()
 {
   var params = URLEncode({
-    mat: document.getElementById("mat").value
-  });
-
-  AjaxPost('ajax/match/set_mat?id='+id, params, function() {
-  });
-
-  return false;
-}
-
-
-
-function SetRuleSet()
-{
-  var params = URLEncode({
+    mat:  document.getElementById("mat").value,
     rule: document.getElementById("rule").value
   });
 
-  AjaxPost('ajax/match/set_rule?id='+id, params, function() {
+  AjaxPost('ajax/match/edit?id='+id, params, function() {
+    navigate('schedule.html');
   });
 
   return false;
@@ -305,6 +294,7 @@ document.getElementById("label_status").innerHTML = translate('status');
 document.getElementById("label_winner").innerHTML = translate('winner');
 document.getElementById("label_score").innerHTML  = translate('score');
 document.getElementById("label_time").innerHTML   = translate('time');
+document.getElementById("save").innerHTML         = translate('save');
 document.getElementById("delete").innerHTML       = translate('delete_match');
 
 document.getElementById("matchlog").innerHTML     = translate('match_log');

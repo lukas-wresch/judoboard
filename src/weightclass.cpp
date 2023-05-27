@@ -13,10 +13,8 @@ using namespace Judoboard;
 
 
 Weightclass::Weightclass(Weight MinWeight, Weight MaxWeight, const MatchTable* Parent)
-	: IFilter(Parent)
+	: IFilter(Parent), m_MinWeight(MinWeight), m_MaxWeight(MaxWeight)
 {
-	m_MinWeight = MinWeight;
-	m_MaxWeight = MaxWeight;
 }
 
 

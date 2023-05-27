@@ -17,7 +17,7 @@ namespace Judoboard
 	public:
 		virtual bool IsLocal() const = 0;
 		virtual std::string GetName() const { return ""; }//Returns the name of the tournament
-		//const auto& GetSchedule() const { return m_Schedule; }
+		virtual std::vector<Match*> GetSchedule() const { std::vector<Match*> ret; return ret; }
 		virtual Match* FindMatch(const UUID& UUID) const { return nullptr; }
 		//[[nodiscard]]
 		//Match* FindMatch(const Match& Match) const { return FindMatch(Match.GetUUID()); }
@@ -40,6 +40,7 @@ namespace Judoboard
 		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(std::move(NewMatch))); }
 		virtual Match* GetNextMatch(int32_t MatID = -1) const { return nullptr; }//Returns the next match for a given mat if available, otherwise null pointer is returned
 		//const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual Match* GetNextOngoingMatch(int32_t MatID) { return nullptr; }//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
 
 		virtual std::vector<Match> GetNextMatches(uint32_t MatID) const = 0;
 
@@ -141,6 +142,7 @@ namespace Judoboard
 
 		//Serialization
 		virtual const std::string Schedule2String() const { return ""; }
+		[[deprecated]]
 		virtual const std::string Participants2String() const { return ""; }
 		virtual const std::string MasterSchedule2String() const { return ""; }
 
