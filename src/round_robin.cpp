@@ -232,33 +232,41 @@ const std::string RoundRobin::ToHTML() const
 			ret += "<td style=\"text-align: center;\">" + std::to_string(i + 1) + "</td>";
 			ret += "<td>" + fighter->GetName(NameStyle::GivenName) + "<br/>(" + fighter->GetWeight().ToString() + " kg)</td>";
 
-			if (matches.empty())
-				ret += "<td style=\"background-color: #ccc;\"></td>";
-			else
-				ret += "<td style=\"text-align: center;\">";
-
-			for (auto match : matches)
+			for (size_t j = 0; j < GetMaxStartPositions(); ++j)
 			{
-				if (match->IsRunning())
-					ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">In Progress</a><br/>";
-				else if (!match->HasConcluded())
-					ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">- - -</a><br/>";
-				else if (match->GetWinner()->GetUUID() == fighter->GetUUID())
-				{
-					const auto& result = match->GetResult();
-					if ((int)result.m_Score > 0)
-						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a><br/>";
-				}
-				else
-				{
-					const auto& result = match->GetResult();
-					if ((int)result.m_Score > 0)
-						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">0 (" + Timer::TimestampToString(result.m_Time) + ")</a><br/>";
-				}
-			}
+				auto enemy = GetJudokaByStartPosition(j);
+				if (!enemy)
+					continue;
 
-			ret += "</td>";
-		}
+				auto matches = FindMatches(*fighter, *enemy);
+
+				if (matches.empty())
+					ret += "<td style=\"background-color: #ccc;\"></td>";
+				else
+					ret += "<td style=\"text-align: center;\">";
+
+				for (auto match : matches)
+				{
+					if (match->IsRunning())
+						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">In Progress</a><br/>";
+					else if (!match->HasConcluded())
+						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">- - -</a><br/>";
+					else if (match->GetWinner()->GetUUID() == fighter->GetUUID())
+					{
+						const auto& result = match->GetResult();
+						if ((int)result.m_Score > 0)
+							ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a><br/>";
+					}
+					else
+					{
+						const auto& result = match->GetResult();
+						if ((int)result.m_Score > 0)
+							ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">0 (" + Timer::TimestampToString(result.m_Time) + ")</a><br/>";
+					}
+				}
+
+				ret += "</td>";
+			}
 
 			const auto result = results.GetResultsOf(fighter);
 			if (result)
