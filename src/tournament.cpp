@@ -262,6 +262,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Re-enabled auto generation
 	for (auto table : m_MatchTables)
 		table->AutoGenerateSchedule(true);
+  
+  //If there are not matches, create them
+	if (GetSchedule().size() == 0)
+		GenerateSchedule();
 }
 
 
