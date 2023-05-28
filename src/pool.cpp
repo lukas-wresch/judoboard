@@ -293,6 +293,7 @@ void Pool::GenerateSchedule()
 	auto color  = m_Finals.GetColor();
 	auto name   = m_Finals.GetName();
 	auto mat_id = m_Finals.GetMatID();
+	auto bo3    = m_Finals.IsBestOfThree();
 
 	m_Finals = SingleElimination(final_input);
 	m_Finals.SetName(Localizer::Translate("Finals"));
@@ -303,6 +304,7 @@ void Pool::GenerateSchedule()
 	if (!name.empty())
 		m_Finals.SetName(name);
 	m_Finals.SetMatID(mat_id);
+	m_Finals.IsBestOfThree(bo3);
 
 
 	CopyMatchesFromSubtables();
