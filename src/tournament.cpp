@@ -284,7 +284,10 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 				assert(match.Pool <= pool->GetPoolCount());
 
 				if (match.Pool == 0)
-					pool->GetFinals().AddMatch(new_match);
+				{
+					if (match.Status != 0)
+						pool->GetFinals().AddMatch(new_match);
+				}
 				else if (match.Pool <= pool->GetPoolCount())
 					pool->GetPool(match.Pool - 1)->AddMatch(new_match);
 				else
@@ -310,8 +313,16 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (table->GetType() == MatchTable::Type::Pool)
 		{
 			auto pool = (Pool*)table;
-			pool->GetFinals().ReorderLastMatches();
-			pool->CopyMatchesFromSubtables();
+			if (pool->GetFinals().GetSchedule().empty())
+			{
+				pool->GetFinals().GenerateSchedule();
+				pool->CopyMatchesFromSubtables();
+
+				for (auto match : pool->GetFinals().GetSchedule())
+					m_Schedule.emplace_back(table, table->FindMatchIndex(*match));
+			}
+			else
+				pool->GetFinals().ReorderLastMatches();
 		}
 		else if (table->GetType() == MatchTable::Type::SingleElimination)
 		{
@@ -334,7 +345,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	for (auto table : m_MatchTables)
 		table->AutoGenerateSchedule(true);
   
-  //If there are not matches, create them
+	//If there are not matches, create them
 	if (GetSchedule().size() == 0)
 		GenerateSchedule();
 }
