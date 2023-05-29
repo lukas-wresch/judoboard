@@ -53,7 +53,7 @@ function AddAgeGroup()
   });
 
   AjaxPost('ajax/age_groups/add', params, function() {    
-    navigate('age_groups_list.html');
+    goBack();
   });
 
   return false;
@@ -65,7 +65,7 @@ function DeleteAgeGroup()
   if (confirm(translate('delete_age_group_confirm')))
   {
     AjaxCallback('ajax/age_groups/delete?id='+id, function() {
-      navigate('age_groups_list.html');
+      goBack();
     });
   }
 
@@ -109,7 +109,7 @@ function UpdateAgeGroup()
   });
 
   AjaxPost('ajax/age_groups/update?id='+id, params, function() {
-    navigate('age_groups_list.html');
+    goBack();
   });
 
   return false;
@@ -120,7 +120,7 @@ function UpdateAgeGroup()
 function ImportAgeGroup()
 {
   AjaxCallback('ajax/age_groups/import?id='+id, function() {
-    navigate('age_groups_list.html');
+    goBack();
   });
 
   return false;

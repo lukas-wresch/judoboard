@@ -36,7 +36,7 @@ function AddClub()
   });
 
   AjaxPost('ajax/club/add', params, function() {
-    navigate("club_list.html");
+    goBack();
   });
 
   return false;
@@ -52,7 +52,7 @@ function UpdateClub()
   });
 
   AjaxPost('ajax/club/edit?id='+id, params, function() {
-    navigate("club_list.html");
+    goBack();
   });
 
   return false;
@@ -62,7 +62,7 @@ function UpdateClub()
 function DeleteClub()
 {
   AjaxCallback('ajax/club/delete?id='+id, function() {
-    navigate("club_list.html");
+    goBack();
   });
 
   return false;
