@@ -2882,6 +2882,8 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 
 	auto judoka = m_Database.FindJudoka(id);
 
+	bool is_participant = false;
+
 	if (!judoka)
 	{
 		//Search for participant
@@ -2892,7 +2894,11 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 
 		if (!judoka)
 			return Error(Error::Type::ItemNotFound);
+
+		is_participant = true;
 	}
+
+	bool weight_changed = judoka->GetWeight() != Weight(weight);
 
 	judoka->SetFirstname(firstname);
 	judoka->SetLastname(lastname);
@@ -2905,13 +2911,13 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 	if (!number.empty())
 		judoka->SetNumber(number);
 
-	if (GetDatabase().FindClub(clubID))
+	if (GetTournament()->GetDatabase().FindClub(clubID))
+		judoka->SetClub(GetTournament()->GetDatabase().FindClub(clubID));
+	else if (GetDatabase().FindClub(clubID))
 		judoka->SetClub(GetDatabase().FindClub(clubID));
-	else
-	{
-		auto tour = (Tournament*)GetTournament();//TODO could be remote tournament
-		judoka->SetClub(tour->GetDatabase().FindClub(clubID));
-	}
+
+	if (is_participant && weight_changed)
+		GetTournament()->OnUpdateParticipant(*judoka);
 
 	return Error();//OK
 }
@@ -3817,7 +3823,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 			return Error(Error::Type::InternalError);
 	}
 
-	if (!GetTournament()->UpdateMatchTable(id))
+	if (!GetTournament()->OnUpdateMatchTable(id))
 		return Error(Error::Type::OperationFailed);
 	return Error();//OK
 }

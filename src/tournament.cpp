@@ -1308,12 +1308,43 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 			m_Schedule.emplace_back(NewMatchTable, i);
 	}
 
-	UpdateMatchTable(*NewMatchTable);
+	OnUpdateMatchTable(*NewMatchTable);
 }
 
 
 
-bool Tournament::UpdateMatchTable(const UUID& UUID)
+bool Tournament::OnUpdateParticipant(const UUID& UUID)
+{
+	if (IsReadonly())
+		return false;
+	if (GetStatus() != Status::Scheduled)
+		return false;
+
+	auto judoka = FindParticipant(UUID);
+
+	if (!judoka)
+		return false;
+
+	auto guard = LockWriteForScope();
+
+	for (auto table : m_MatchTables)
+	{
+		if (!table) continue;
+
+		if (!table->IsElgiable(*judoka))//No longer eligable?
+			table->RemoveParticipant(judoka);
+		else//eligable?
+			table->AddParticipant(judoka);
+	}
+
+	GenerateSchedule();
+
+	return true;
+}
+
+
+
+bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 {
 	if (IsReadonly())
 		return false;

@@ -2876,10 +2876,14 @@ TEST(Ajax, UpdateWeight)
 		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j1->GetUUID(), "firstname=a&lastname=b&weight=21&gender=0")));
 		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j2->GetUUID(), "firstname=a&lastname=b&weight=22&gender=0")));
 
-		EXPECT_EQ(tables[0]->GetSchedule().size(), 2);
+		EXPECT_EQ(tables[0]->GetSchedule().size(), 1);
 
 		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j3->GetUUID(), "firstname=a&lastname=b&weight=23&gender=0")));
 
 		EXPECT_EQ(tables[0]->GetSchedule().size(), 3);
+
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j4->GetUUID(), "firstname=a&lastname=b&weight=24&gender=0")));
+
+		EXPECT_EQ(tables[0]->GetSchedule().size(), 6);
 	}
 }
