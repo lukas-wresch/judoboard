@@ -156,11 +156,46 @@ void DoubleElimination::GenerateSchedule()
 
 	m_LoserBracket.GenerateSchedule();
 
-	//Add matches
-	for (auto match : m_WinnerBracket.GetSchedule())
-		AddMatch(match);
-	for (auto match : m_LoserBracket.GetSchedule())
-		AddMatch(match);
+	if (m_WinnerBracket.GetNumberOfRounds() == 4)
+	{
+		for (size_t i = 0; i < 8 + 4; i++)
+			AddMatch(m_WinnerBracket.GetSchedule()[i]);
+		for (size_t i = 0; i < 4 + 2; i++)
+			AddMatch(m_LoserBracket.GetSchedule()[i]);
+
+		for (size_t i = 8 + 4; i < 8 + 4 + 2; i++)
+			AddMatch(m_WinnerBracket.GetSchedule()[i]);
+
+		for (size_t i = 4 + 2; i < m_LoserBracket.GetSchedule().size(); i++)
+			AddMatch(m_LoserBracket.GetSchedule()[i]);
+		for (size_t i = 8 + 4 + 2; i < m_WinnerBracket.GetSchedule().size(); i++)
+			AddMatch(m_WinnerBracket.GetSchedule()[i]);
+	}
+
+	else if (m_WinnerBracket.GetNumberOfRounds() == 5)
+	{
+		for (size_t i = 0; i < 16 + 8 + 4; i++)
+			AddMatch(m_WinnerBracket.GetSchedule()[i]);
+		for (size_t i = 0; i < 4 + 4 + 2; i++)
+			AddMatch(m_LoserBracket.GetSchedule()[i]);
+
+		for (size_t i = 16 + 8 + 4; i < 16 + 8 + 4 + 2; i++)
+			AddMatch(m_WinnerBracket.GetSchedule()[i]);
+
+		for (size_t i = 4 + 4 + 2; i < m_LoserBracket.GetSchedule().size(); i++)
+			AddMatch(m_LoserBracket.GetSchedule()[i]);
+		for (size_t i = 16 + 8 + 4 + 2; i < m_WinnerBracket.GetSchedule().size(); i++)
+			AddMatch(m_WinnerBracket.GetSchedule()[i]);
+	}
+
+	else
+	{
+		//Add matches
+		for (auto match : m_WinnerBracket.GetSchedule())
+			AddMatch(match);
+		for (auto match : m_LoserBracket.GetSchedule())
+			AddMatch(match);
+	}
 }
 
 
