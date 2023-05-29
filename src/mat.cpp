@@ -1556,12 +1556,16 @@ void Mat::UpdateGraphics() const
 		name += " (" + m_NextMatches[0].GetMatchTable()->GetDescription() + ")";
 
 	m_Graphics["next_match"].UpdateTexture(renderer, name, ZED::Color(255, 0, 0), ZED::FontSize::Huge);
+	while (m_Graphics["next_match"]->GetWidth() > width)
+		m_Graphics["next_match"].Shorten(renderer);
 
 	name = Localizer::Translate("Next Match");
 	if (m_NextMatches.size() >= 2 && m_NextMatches[1].GetMatchTable())
 		name += " (" + m_NextMatches[1].GetMatchTable()->GetDescription() + ")";
 
 	m_Graphics["following_match"].UpdateTexture(renderer, name, ZED::Color(255, 0, 0), ZED::FontSize::Huge);
+	while (m_Graphics["following_match"]->GetWidth() > width)
+		m_Graphics["following_match"].Shorten(renderer);
 
 	m_Graphics["mat_name"].UpdateTexture(renderer, GetName(), ZED::Color(255, 255, 255), ZED::FontSize::Middle);
 
