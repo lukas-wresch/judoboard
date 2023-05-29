@@ -246,7 +246,7 @@ const std::string DoubleElimination::ToHTML() const
 
 	ret += m_LoserBracket.ToHTML();
 
-	//ret += ResultsToHTML();
+	ret += ResultsToHTML();
 
 	return ret;
 }

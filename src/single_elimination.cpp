@@ -476,7 +476,8 @@ const std::string SingleElimination::ToHTML() const
 		ret += "</table>";
 	}
 
-	ret += ResultsToHTML();	
+	if (!IsSubMatchTable())
+		ret += ResultsToHTML();	
 
 	return ret;
 }
