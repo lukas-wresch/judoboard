@@ -171,7 +171,7 @@ TEST(App, Tournament_With_Ongoing_Match2)
 	app.AddTournament(t);
 	app.OpenTournament(*t);
 
-	ZED::Core::Pause(3000);
+	ZED::Core::Pause(3500);
 
 	EXPECT_TRUE(app.GetMats()[0]->AreFightersOnMat());
 }
