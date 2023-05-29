@@ -2832,3 +2832,54 @@ TEST(Ajax, Tournament_Edit)
 	ZED::Core::RemoveFile("tournaments/test.yml");
 	ZED::Core::RemoveFile("tournaments/test2.yml");
 }
+
+
+
+TEST(Ajax, UpdateWeight)
+{
+	initialize();
+
+	{
+		Application app;
+
+		Judoka* j1 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female);
+		Judoka* j3 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female);
+		Judoka* j4 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female);
+		Judoka* j5 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female);
+		Judoka* j6 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female);
+		Judoka* j7 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female);
+		Judoka* j8 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female);
+
+		app.GetTournament()->AddParticipant(j1);
+		app.GetTournament()->AddParticipant(j2);
+		app.GetTournament()->AddParticipant(j3);
+		app.GetTournament()->AddParticipant(j4);
+		app.GetTournament()->AddParticipant(j5);
+		app.GetTournament()->AddParticipant(j6);
+		app.GetTournament()->AddParticipant(j7);
+		app.GetTournament()->AddParticipant(j8);
+
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=1&minWeight=20&maxWeight=30")));
+
+		ASSERT_EQ(tables.size(), 1);
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
+		EXPECT_EQ(tables[0]->GetName(), "Test");
+		EXPECT_EQ(tables[0]->GetMatID(), 1);
+		ASSERT_TRUE(tables[0]->GetFilter());
+
+
+
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j1->GetUUID(), "firstname=a&lastname=b&weight=21&gender=0")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j2->GetUUID(), "firstname=a&lastname=b&weight=22&gender=0")));
+
+		EXPECT_EQ(tables[0]->GetSchedule().size(), 2);
+
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j3->GetUUID(), "firstname=a&lastname=b&weight=23&gender=0")));
+
+		EXPECT_EQ(tables[0]->GetSchedule().size(), 3);
+	}
+}
