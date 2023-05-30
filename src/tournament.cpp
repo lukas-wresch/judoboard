@@ -1327,6 +1327,16 @@ bool Tournament::OnUpdateParticipant(const UUID& UUID)
 
 	auto guard = LockWriteForScope();
 
+	//Is the current age group still fine?
+	auto current_age_group = GetAgeGroupOfJudoka(judoka);
+	if (current_age_group && !current_age_group->IsElgiable(*judoka, GetDatabase()))
+	{
+		m_JudokaToAgeGroup.erase(judoka->GetUUID());//Remove judoka to the age group he currently belongs to
+		FindAgeGroupForJudoka(*judoka);//Try to find a new one
+	}
+	else if (!current_age_group)
+		FindAgeGroupForJudoka(*judoka);//Try to find one
+
 	for (auto table : m_MatchTables)
 	{
 		if (!table) continue;
