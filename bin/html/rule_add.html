@@ -162,7 +162,7 @@ function UpdateRuleSet()
   });
 
   AjaxPost('ajax/rule/update?id='+id, params, function() {
-    navigate("rule_list.html");
+    goBack();
   });
 
   return false;
@@ -174,7 +174,7 @@ function DeleteRuleSet()
   if (confirm(translate('delete_rules_confirm')))
   {
     AjaxCallback('ajax/rule/delete?id='+id, function() {
-      navigate("rule_list.html");
+      goBack();
     });
   }
 

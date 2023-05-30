@@ -373,9 +373,14 @@ function Color(index)
 
 
 
+var g_LastURL = "#";
+
+
 function navigate(url)
 {
   window.clearInterval(TimerID);
+
+  g_LastURL = URL;
 
   window.location = '/#' + url;
   URL = url;
@@ -385,6 +390,14 @@ function navigate(url)
 
   return false;
 }
+
+
+
+function goBack()
+{
+  navigate(g_LastURL);
+}
+
 
 
 window.onhashchange = function(e)
