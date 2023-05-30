@@ -379,7 +379,7 @@ namespace Judoboard
 	protected:
 		MatchTable(IFilter* Filter, const ITournament* Tournament, const MatchTable* Parent = nullptr)
 			: m_Filter(Filter), m_Tournament(Tournament), m_Parent(Parent) {
-			if (!m_Filter->GetParent())
+			if (m_Filter && !m_Filter->GetParent())
 				m_Filter->SetParent(this);
 		}
 		MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent);
