@@ -2867,7 +2867,7 @@ TEST(Ajax, UpdateWeight)
 
 		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test1&mat=1&minWeight=20&maxWeight=30")));
 		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test2&mat=1&minWeight=20&maxWeight=30&age_group=" + (std::string)a1->GetUUID())));
-		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test3&mat=1&minWeight=20&maxWeight=30&gender=0")));
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test3&mat=1&minWeight=20&maxWeight=50&gender=0")));
 
 		ASSERT_EQ(tables.size(), 3);
 		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
@@ -2894,15 +2894,15 @@ TEST(Ajax, UpdateWeight)
 
 		EXPECT_EQ(tables[1]->GetSchedule().size(), 0);
 
-		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j5->GetUUID(), "firstname=a&lastname=b&weight=24&birthyear=1900")));
-		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j6->GetUUID(), "firstname=a&lastname=b&weight=24&birthyear=1900")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j5->GetUUID(), "firstname=a&lastname=b&weight=24&gender=1&birthyear=1900")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j6->GetUUID(), "firstname=a&lastname=b&weight=24&gender=1&birthyear=1900")));
 
 		EXPECT_EQ(tables[1]->GetSchedule().size(), 1);
 
 		EXPECT_EQ(tables[2]->GetSchedule().size(), 0);
 
-		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j7->GetUUID(), "firstname=a&lastname=b&weight=24&gender=0")));
-		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j8->GetUUID(), "firstname=a&lastname=b&weight=24&gender=0")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j7->GetUUID(), "firstname=a&lastname=b&weight=40&gender=0")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j8->GetUUID(), "firstname=a&lastname=b&weight=40&gender=0")));
 
 		EXPECT_EQ(tables[2]->GetSchedule().size(), 1);
 	}
