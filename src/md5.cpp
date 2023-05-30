@@ -1259,6 +1259,30 @@ std::vector<const MD5::Participant*> MD5::FindParticipantsOfWeightclass(int AgeG
 
 
 
+std::vector<MD5::Match> MD5::FindMatchesOfWeightclass(int AgeGroupID, int WeightclassID) const
+{
+	std::vector<MD5::Match> ret;
+
+	for (const auto& match : m_Matches)
+		if (match.AgeGroupID == AgeGroupID && match.WeightclassID == WeightclassID)
+			ret.push_back(match);
+	return ret;
+}
+
+
+
+std::vector<MD5::Match> MD5::FindMatchesOfWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const
+{
+	std::vector<MD5::Match> ret;
+
+	for (const auto& match : m_Matches)
+		if (match.AgeGroup && match.AgeGroup->Name == AgeGroup && match.Weightclass && match.Weightclass->Description == Weightclass)
+			ret.push_back(match);
+	return ret;
+}
+
+
+
 MD5::AgeGroup* MD5::FindAgeGroup(int AgeGroupID)
 {
 	if (AgeGroupID <= -1)

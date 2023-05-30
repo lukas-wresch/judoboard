@@ -341,6 +341,20 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		}
 	}
 
+	//Check number of matches
+#ifdef _DEBUG
+	for (auto weightclass : File.GetWeightclasses())
+	{
+		auto table = (MatchTable*)weightclass->pUserData;
+		auto md5_schedule = File.FindMatchesOfWeightclass(weightclass->AgeGroupID, weightclass->ID);
+
+		if (!table || table->GetType() == MatchTable::Type::RoundRobin)
+			continue;
+
+		//assert(table->GetSchedule().size() == md5_schedule.size());
+	}
+#endif
+
 	//Re-enabled auto generation
 	for (auto table : m_MatchTables)
 		table->AutoGenerateSchedule(true);

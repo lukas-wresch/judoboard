@@ -346,6 +346,8 @@ namespace Judoboard
 		[[nodiscard]] Club*         FindClubByName(const std::string& Name) const;
 		[[nodiscard]] Participant*  FindParticipant(int ParticipantID);
 		[[nodiscard]] std::vector<const MD5::Participant*> FindParticipantsOfWeightclass(int AgeGroupID, int WeightclassID) const;
+		[[nodiscard]] std::vector<MD5::Match> FindMatchesOfWeightclass(int AgeGroupID, int WeightclassID) const;
+		[[nodiscard]] std::vector<MD5::Match> FindMatchesOfWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const;
 		[[nodiscard]] AgeGroup*     FindAgeGroup(int AgeGroupID);
 		[[nodiscard]] Weightclass*  FindWeightclass(int AgeGroupID, int WeightclassID);
 		[[nodiscard]] const Weightclass* FindWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const;
