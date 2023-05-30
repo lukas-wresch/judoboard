@@ -2898,7 +2898,9 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 		is_participant = true;
 	}
 
-	bool weight_changed = judoka->GetWeight() != Weight(weight);
+	bool weight_changed    = judoka->GetWeight()    != Weight(weight);
+	bool gender_changed    = judoka->GetGender()    != gender;
+	bool birthyear_changed = judoka->GetBirthyear() != birthyear;
 
 	judoka->SetFirstname(firstname);
 	judoka->SetLastname(lastname);
@@ -2916,7 +2918,7 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 	else if (GetDatabase().FindClub(clubID))
 		judoka->SetClub(GetDatabase().FindClub(clubID));
 
-	if (is_participant && weight_changed)
+	if (is_participant && (weight_changed || gender_changed || birthyear_changed))
 		GetTournament()->OnUpdateParticipant(*judoka);
 
 	return Error();//OK
