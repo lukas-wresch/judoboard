@@ -2842,14 +2842,14 @@ TEST(Ajax, UpdateWeight)
 	{
 		Application app;
 
-		Judoka* j1 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female);
-		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female);
-		Judoka* j3 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female);
-		Judoka* j4 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female);
-		Judoka* j5 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female);
-		Judoka* j6 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female);
-		Judoka* j7 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female);
-		Judoka* j8 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female);
+		Judoka* j1 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female, 2000);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female, 2000);
+		Judoka* j3 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female, 2000);
+		Judoka* j4 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female, 2000);
+		Judoka* j5 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female, 2000);
+		Judoka* j6 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female, 2000);
+		Judoka* j7 = new Judoka("Firstname1", "Lastname1", 40, Gender::Female, 2000);
+		Judoka* j8 = new Judoka("Firstname2", "Lastname2", 40, Gender::Female, 2000);
 
 		app.GetTournament()->AddParticipant(j1);
 		app.GetTournament()->AddParticipant(j2);
@@ -2860,12 +2860,16 @@ TEST(Ajax, UpdateWeight)
 		app.GetTournament()->AddParticipant(j7);
 		app.GetTournament()->AddParticipant(j8);
 
+		auto a1 =  new AgeGroup("Age", 100, 200, nullptr);
+		app.GetTournament()->AddAgeGroup(a1);
 
 		auto& tables = app.GetTournament()->GetMatchTables();
 
 		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=1&minWeight=20&maxWeight=30")));
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=1&minWeight=20&maxWeight=30&gender=0")));
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=1&minWeight=20&maxWeight=30&age_group=" + (std::string)a1->GetUUID())));
 
-		ASSERT_EQ(tables.size(), 1);
+		ASSERT_EQ(tables.size(), 3);
 		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
 		EXPECT_EQ(tables[0]->GetName(), "Test");
 		EXPECT_EQ(tables[0]->GetMatID(), 1);
@@ -2885,5 +2889,19 @@ TEST(Ajax, UpdateWeight)
 		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j4->GetUUID(), "firstname=a&lastname=b&weight=24&gender=0")));
 
 		EXPECT_EQ(tables[0]->GetSchedule().size(), 6);
+
+		EXPECT_EQ(tables[1]->GetSchedule().size(), 0);
+
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j5->GetUUID(), "firstname=a&lastname=b&weight=24&gender=1")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j6->GetUUID(), "firstname=a&lastname=b&weight=24&gender=1")));
+
+		EXPECT_EQ(tables[1]->GetSchedule().size(), 1);
+
+		EXPECT_EQ(tables[2]->GetSchedule().size(), 0);
+
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j7->GetUUID(), "firstname=a&lastname=b&weight=24&birthyear=1900")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j8->GetUUID(), "firstname=a&lastname=b&weight=24&birthyear=1900")));
+
+		EXPECT_EQ(tables[2]->GetSchedule().size(), 1);
 	}
 }
