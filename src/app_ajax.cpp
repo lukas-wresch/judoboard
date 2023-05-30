@@ -2922,6 +2922,7 @@ std::string Application::Ajax_SearchJudoka(const HttpServer::Request& Request)
 {
 	auto search_string = HttpServer::DecodeURLEncoded(Request.m_Query, "name");
 	auto tournament_search = HttpServer::DecodeURLEncoded(Request.m_Query, "participants") == "true";
+	auto all_search = HttpServer::DecodeURLEncoded(Request.m_Query, "all") == "true";
 
 	//Transform to lower case
 	std::transform(search_string.begin(), search_string.end(), search_string.begin(),
@@ -2938,7 +2939,25 @@ std::string Application::Ajax_SearchJudoka(const HttpServer::Request& Request)
 	LockRead();
 
 	std::vector<Judoka*> judokas;
-	if (tournament_search)
+	if (all_search)
+	{
+		judokas = GetTournament()->GetDatabase().GetAllJudokas();
+		for (auto judoka : m_Database.GetAllJudokas())
+		{
+			if (std::find(judokas.begin(), judokas.end(), judoka) == judokas.end())
+				judokas.push_back(judoka);
+		}
+
+		std::sort(judokas.begin(), judokas.end(), [](const Judoka* a, const Judoka* b)
+		{
+			if (a->GetLastname() != b->GetLastname())
+				return a->GetLastname() < b->GetLastname();
+			if (a->GetFirstname() != b->GetFirstname())
+				return a->GetFirstname() < b->GetFirstname();
+			return a->GetUUID() < b->GetUUID() ;
+		});
+	}
+	else if (tournament_search)
 		judokas = GetTournament()->GetDatabase().GetAllJudokas();
 	else
 		judokas = m_Database.GetAllJudokas();
@@ -2995,38 +3014,40 @@ std::string Application::Ajax_SearchJudoka(const HttpServer::Request& Request)
 			ret << YAML::Key << "club_name" << YAML::Value << judoka->GetClub()->GetName();
 		}
 
-		if (tournament_search)
+		uint32_t num_matches = 0;
+		for (auto match : schedule)
 		{
-			uint32_t num_matches = 0;
-			for (auto match : schedule)
-			{
-				if (match && match->HasValidFighters() && match->Contains(*judoka))
-					num_matches++;
-			}
-
-			ret << YAML::Key << "num_matches" << YAML::Value << num_matches;
-
-			if (judoka_age_group)
-			{
-				ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
-				ret << YAML::Key << "age_group_name" << YAML::Value << (std::string)judoka_age_group->GetName();
-			}
-
-			//Calculate eligable age groups
-			ret << YAML::Key << "age_groups" << YAML::Value;
-			ret << YAML::BeginSeq;
-
-			auto age_groups = GetTournament()->GetEligableAgeGroupsOfJudoka(judoka);
-			for (auto age_group : age_groups)
-			{
-				ret << YAML::BeginMap;
-				ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
-				ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
-				ret << YAML::EndMap;
-			}
-
-			ret << YAML::EndSeq;
+			if (match && match->HasValidFighters() && match->Contains(*judoka))
+				num_matches++;
 		}
+
+		ret << YAML::Key << "num_matches" << YAML::Value << num_matches;
+
+		if (judoka_age_group)
+		{
+			ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
+			ret << YAML::Key << "age_group_name" << YAML::Value << (std::string)judoka_age_group->GetName();
+		}
+
+
+		LockRead();
+		ret << YAML::Key << "is_participant" << YAML::Value << GetTournament()->IsParticipant(*judoka);
+		auto age_groups = GetTournament()->GetEligableAgeGroupsOfJudoka(judoka);
+		UnlockRead();
+
+		//Calculate eligable age groups
+		ret << YAML::Key << "age_groups" << YAML::Value;
+		ret << YAML::BeginSeq;
+
+		for (auto age_group : age_groups)
+		{
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
+			ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
+			ret << YAML::EndMap;
+		}
+
+		ret << YAML::EndSeq;
 
 		ret << YAML::EndMap;
 	}

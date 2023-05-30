@@ -59,6 +59,8 @@ namespace Judoboard
 		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; GenerateSchedule(); }
 
 		void ReorderLastMatches();//Swaps the last matches so that the final match swaps with 3rd or 5th place match
+    
+		size_t GetNumberOfRounds() const;
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
@@ -71,8 +73,5 @@ namespace Judoboard
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;
-
-	private:
-		size_t GetNumberOfRounds() const;
 	};
 }

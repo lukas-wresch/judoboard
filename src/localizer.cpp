@@ -41,6 +41,9 @@ void Localizer::Initialize(Language NewLanguage)
 			s_de["Score"]  = u8"Unterwertung";
 			s_de["Time"]   = u8"Zeit";
 
+			s_de["Not enough permissions"] = u8"Nicht genug Rechte f\u00fcr diesen Vorgang";
+			s_de["Operation failed"]       = u8"Vorgang fehlgeschlagen";
+
 			s_de["Weightclass"] = "Gewichtsklasse";
 			s_de["Current Match"] = "Aktueller Kampf";
 			s_de["Next Match"]    = u8"N\u00e4chster Kampf";

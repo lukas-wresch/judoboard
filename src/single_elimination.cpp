@@ -568,10 +568,8 @@ const std::string SingleElimination::ToHTML() const
 		ret += "</table>";
 	}
 
-	ret += ResultsToHTML();
-
 	if (!IsSubMatchTable())
-		ret += "</div>";
+		ret += ResultsToHTML() + "</div>";
 
 	return ret;
 }

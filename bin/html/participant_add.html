@@ -61,25 +61,25 @@ function RemoveParticipant(id)
 
 function Update()
 {
-  AjaxCallback('ajax/judoka/search?name=' + document.getElementById("name").value, function(response) {
+  AjaxCallback('ajax/judoka/search?all=true&name=' + document.getElementById("name").value, function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    let res = YAML.parse(response);
 
-    var table = document.getElementById("judokas");
+    let table = document.getElementById("judokas");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    var no = 0;
+    let no = 0;
     for (const judoka of res)
     {
-      var row = table.insertRow(-1);
-      var cell0 = row.insertCell(0);
-      var cell1 = row.insertCell(1);
-      var cell2 = row.insertCell(2);
-      var cell3 = row.insertCell(3);
-      var cell4 = row.insertCell(4);
-      var cell5 = row.insertCell(5);
+      let row = table.insertRow(-1);
+      let cell0 = row.insertCell(0);
+      let cell1 = row.insertCell(1);
+      let cell2 = row.insertCell(2);
+      let cell3 = row.insertCell(3);
+      let cell4 = row.insertCell(4);
+      let cell5 = row.insertCell(5);
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
@@ -89,13 +89,13 @@ function Update()
       cell0.style.textAlign = "center";
       cell0.style.fontSize  = "16pt";
 
-      cell1.innerHTML = judoka.name;
+      cell1.innerHTML = judoka.firstname + ' ' + judoka.lastname;
       cell1.style.fontSize  = "16pt";
 
-      if (typeof judoka.club === 'undefined')
+      if (typeof judoka.club_name === 'undefined')
         cell2.innerHTML = "- - -";
       else
-        cell2.innerHTML = judoka.club;
+        cell2.innerHTML = judoka.club_name;
       cell2.style.fontSize  = "16pt";
 
       cell3.innerHTML = judoka.weight + " kg";
