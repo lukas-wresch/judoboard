@@ -2905,7 +2905,7 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 	judoka->SetWeight(Weight(weight));
 	judoka->SetGender(gender);
 
-	if (birthyear > 1900 && birthyear < 2100)
+	if (birthyear > 1800 && birthyear < 2200)
 		judoka->SetBirthyear(birthyear);
 
 	if (!number.empty())

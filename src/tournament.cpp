@@ -1361,7 +1361,8 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 	if (matchTable->GetStatus() != Status::Scheduled)//Can safely recalculate the match table
 		return false;
 
-	for (auto judoka : matchTable->GetParticipants())
+	auto participants = matchTable->GetParticipants();
+	for (auto judoka : participants)
 		if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
 			matchTable->RemoveParticipant(judoka);
 

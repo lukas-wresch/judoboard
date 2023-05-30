@@ -2865,42 +2865,44 @@ TEST(Ajax, UpdateWeight)
 
 		auto& tables = app.GetTournament()->GetMatchTables();
 
-		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=1&minWeight=20&maxWeight=30")));
-		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=1&minWeight=20&maxWeight=30&gender=0")));
-		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=1&minWeight=20&maxWeight=30&age_group=" + (std::string)a1->GetUUID())));
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test1&mat=1&minWeight=20&maxWeight=30")));
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test2&mat=1&minWeight=20&maxWeight=30&age_group=" + (std::string)a1->GetUUID())));
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test3&mat=1&minWeight=20&maxWeight=30&gender=0")));
 
 		ASSERT_EQ(tables.size(), 3);
 		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
-		EXPECT_EQ(tables[0]->GetName(), "Test");
+		EXPECT_EQ(tables[0]->GetName(), "Test1");
 		EXPECT_EQ(tables[0]->GetMatID(), 1);
+		EXPECT_EQ(tables[1]->GetName(), "Test2");
+		EXPECT_EQ(tables[2]->GetName(), "Test3");
 		ASSERT_TRUE(tables[0]->GetFilter());
 
 
 
-		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j1->GetUUID(), "firstname=a&lastname=b&weight=21&gender=0")));
-		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j2->GetUUID(), "firstname=a&lastname=b&weight=22&gender=0")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j1->GetUUID(), "firstname=a&lastname=b&weight=21&gender=1")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j2->GetUUID(), "firstname=a&lastname=b&weight=22&gender=1")));
 
 		EXPECT_EQ(tables[0]->GetSchedule().size(), 1);
 
-		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j3->GetUUID(), "firstname=a&lastname=b&weight=23&gender=0")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j3->GetUUID(), "firstname=a&lastname=b&weight=23&gender=1")));
 
 		EXPECT_EQ(tables[0]->GetSchedule().size(), 3);
 
-		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j4->GetUUID(), "firstname=a&lastname=b&weight=24&gender=0")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j4->GetUUID(), "firstname=a&lastname=b&weight=24&gender=1")));
 
 		EXPECT_EQ(tables[0]->GetSchedule().size(), 6);
 
 		EXPECT_EQ(tables[1]->GetSchedule().size(), 0);
 
-		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j5->GetUUID(), "firstname=a&lastname=b&weight=24&gender=1")));
-		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j6->GetUUID(), "firstname=a&lastname=b&weight=24&gender=1")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j5->GetUUID(), "firstname=a&lastname=b&weight=24&birthyear=1900")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j6->GetUUID(), "firstname=a&lastname=b&weight=24&birthyear=1900")));
 
 		EXPECT_EQ(tables[1]->GetSchedule().size(), 1);
 
 		EXPECT_EQ(tables[2]->GetSchedule().size(), 0);
 
-		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j7->GetUUID(), "firstname=a&lastname=b&weight=24&birthyear=1900")));
-		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j8->GetUUID(), "firstname=a&lastname=b&weight=24&birthyear=1900")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j7->GetUUID(), "firstname=a&lastname=b&weight=24&gender=0")));
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id=" + (std::string)j8->GetUUID(), "firstname=a&lastname=b&weight=24&gender=0")));
 
 		EXPECT_EQ(tables[2]->GetSchedule().size(), 1);
 	}
