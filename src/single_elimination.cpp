@@ -144,6 +144,9 @@ void SingleElimination::GenerateSchedule()
 	{
 		for (int j = 0; j < 2; j++)
 			create_pair(1 + j);
+
+		SetSchedule()[0]->SetTag(Match::Tag::Semi());
+		SetSchedule()[1]->SetTag(Match::Tag::Semi());
 	}
 
 	else if (rounds == 3)//8 participants hardcoded
@@ -228,6 +231,12 @@ void SingleElimination::GenerateSchedule()
 			auto match2 = lastRound[i+1];
 
 			auto new_match = AddMatchForWinners(match1, match2);
+
+			if (round == rounds - 1)//Last round
+				new_match->SetTag(Match::Tag::Finals());
+			else if (round == rounds - 2)
+				new_match->SetTag(Match::Tag::Semi());
+
 			nextRound.emplace_back(new_match);
 		}
 	}
@@ -244,6 +253,8 @@ void SingleElimination::GenerateSchedule()
 		auto third_place = CreateAutoMatch(nullptr, nullptr);
 		third_place->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
 		third_place->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
+
+		third_place->SetTag(Match::Tag::Third());
 
 		//Swap matches so that match for 1st place is still the last one
 		std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 2]);

@@ -21,6 +21,7 @@ namespace Judoboard
 		friend class Tournament;
 		friend class Mat;
 		friend class MatchTable;
+		friend class SingleElimination;
 
 	public:
 		enum class Score
@@ -48,6 +49,51 @@ namespace Judoboard
 			Winner m_Winner = Winner::Draw;
 			Score  m_Score  = Score::Draw;
 			uint32_t m_Time = 0;//Match time in milliseconds
+		};
+
+
+		struct Tag
+		{
+			static Tag Finals() {
+				Tag ret;
+				ret.finals = true;
+				return ret;
+			}
+
+			static Tag Semi() {
+				Tag ret;
+				ret.semi = true;
+				return ret;
+			}
+
+			static Tag Third() {
+				Tag ret;
+				ret.third = true;
+				return ret;
+			}
+
+			bool IsNormal() const { return value == 0; }
+
+			bool operator ==(const Tag& rhs) const {
+				return value == rhs.value;
+			}
+
+			union
+			{
+				uint8_t value = 0;
+
+				struct
+				{
+					bool finals : 1;
+					bool semi   : 1;
+					bool third  : 1;
+					bool fifth  : 1;
+					bool reserved1 : 1;
+					bool reserved2 : 1;
+					bool reserved3 : 1;
+					bool reserved4 : 1;
+				};
+			};
 		};
 
 
@@ -137,7 +183,9 @@ namespace Judoboard
 
 		uint32_t GetCurrentBreaktime() const;
 
-		bool IsBestOfThree()   const { return m_White.m_Type == DependencyType::BestOfThree; }
+		bool IsBestOfThree() const { return m_White.m_Type == DependencyType::BestOfThree; }
+
+		Tag GetTag() const { return m_Tag; }
 
 		//Serialize
 		void ToString(YAML::Emitter& Yaml) const;
@@ -153,6 +201,8 @@ namespace Judoboard
 
 		void SetState(Status NewState) { m_State = NewState; }
 		void SetResult(const Result& Result) { m_Result = Result; SetState(Status::Concluded); }
+		void SetTag(Tag NewTag) { m_Tag = NewTag; }
+
 
 		DependentJudoka m_White;
 		DependentJudoka m_Blue;
@@ -169,5 +219,7 @@ namespace Judoboard
 		const ITournament* m_Tournament = nullptr;
 
 		uint32_t m_MatID = 0;
+
+		Tag m_Tag;
 	};
 }
