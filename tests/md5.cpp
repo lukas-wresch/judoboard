@@ -2667,7 +2667,7 @@ TEST(MD5, ReadPool2)
 	auto table = tourney.FindMatchTableByDescription(u8"weibliche Jugend U13 -44 kg");
 	auto md5_table = file.FindMatchesOfWeightclass(u8"weibliche Jugend U13", "-44 kg");
 
-	EXPECT_EQ(table->GetSchedule().size(), md5_table.size());
+	EXPECT_EQ(table->GetSchedule().size(), md5_table.size() - 4);//4 dummy matches
 
 
 	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -34 kg");

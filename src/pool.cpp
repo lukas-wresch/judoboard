@@ -306,6 +306,17 @@ void Pool::GenerateSchedule()
 	m_Finals.SetMatID(mat_id);
 	m_Finals.IsBestOfThree(bo3);
 
+	//Four or less get forwarded, need to a fifth place match manually
+	if (pool_count * m_TakeTop <= 4 && IsFifthPlaceMatch())
+	{
+		assert(pool_count == 2);//TODO
+		assert(m_TakeTop == 2);//TODO
+		m_Finals.AddMatch(new Match(DependentJudoka(DependencyType::TakeRank3, *m_Pools[0]),
+									DependentJudoka(DependencyType::TakeRank3, *m_Pools[1]), GetTournament()));
+
+		//TODO do the more general case and give this match a tag
+	}
+
 
 	CopyMatchesFromSubtables();
 }
