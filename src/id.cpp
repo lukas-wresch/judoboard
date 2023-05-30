@@ -10,6 +10,7 @@ using namespace Judoboard;
 
 
 std::unordered_set<UUID> ID::s_UsedUUIDs;
+std::mutex ID::s_Mutex;
 
 
 
@@ -22,14 +23,18 @@ ID::ID()
 
 ID::~ID()
 {
+	s_Mutex.lock();
 	s_UsedUUIDs.erase(m_UUID);
+	s_Mutex.unlock();
 }
 
 
 
 void ID::Reset()
 {
+	s_Mutex.lock();
 	s_UsedUUIDs.clear();
+	s_Mutex.unlock();
 }
 
 
@@ -59,11 +64,14 @@ const UUID ID::GenerateUUID()
 		ZED::SHA256 hash(entropyInput);
 		const UUID uuid(hash);
 
+		s_Mutex.lock();
 		if (s_UsedUUIDs.find(uuid) == s_UsedUUIDs.end())//Check if there is a collision
 		{
 			s_UsedUUIDs.insert(uuid);
+			s_Mutex.unlock();
 			return uuid;//No collision, uuid can be used
 		}
+		s_Mutex.unlock();
 	}
 
 	return std::string();

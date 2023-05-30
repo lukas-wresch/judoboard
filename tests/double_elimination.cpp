@@ -542,6 +542,118 @@ TEST(DoubleElimination, Count16)
 	ASSERT_EQ(winner_schedule.size(), 8 + 4 + 2 + 1);
 	ASSERT_EQ(loser_schedule.size(),  4 + 4 + 2 + 2);
 
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[0]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[1]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[2]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[3]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[4]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[5]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[6]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[7]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[8]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[9]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[10]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[11]));
+
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[12]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[13]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[14]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[15]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[16]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[17]));
+
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[18]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[19]));
+
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[20]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[21]));
+
+	delete t;
+}
+
+
+
+TEST(DoubleElimination, Count32)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	Judoka* j[33];
+	bool has_match[33];
+	const size_t count = 32;
+
+	for (int i = 1; i <= count; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		has_match[i] = false;
+		t->AddParticipant(j[i]);
+	}
+
+	DoubleElimination* group = new DoubleElimination(0, 200);
+	group->SetMatID(1);
+	t->AddMatchTable(group);
+
+	for (int i = 0; i < count; ++i)
+		group->SetStartPosition(j[i+1], i);
+
+	EXPECT_EQ(group->GetMaxStartPositions(), count);
+
+	auto& winner_schedule = group->GetWinnerBracket().GetSchedule();
+	auto& loser_schedule  = group->GetLoserBracket() .GetSchedule();
+
+	//EXPECT_TRUE(loser_schedule[0]->Contains(*j[1]));
+
+	ASSERT_EQ(winner_schedule.size(), 16 + 8 + 4 + 2 + 1);
+	ASSERT_EQ(loser_schedule.size(),  8 + 8 + 4 + 4 + 2 + 2);
+
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[0]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[1]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[2]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[3]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[4]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[5]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[6]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[7]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[8]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[9]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[10]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[11]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[12]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[13]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[14]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[15]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[16]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[17]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[18]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[19]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[20]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[21]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[22]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[23]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[24]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[25]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[26]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[27]));
+
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[28]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[29]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[30]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[31]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[32]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[33]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[34]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[35]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[36]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[37]));
+
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[38]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[39]));
+
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[40]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[41]));
+
 	delete t;
 }
 

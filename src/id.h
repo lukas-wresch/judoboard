@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <unordered_set>
+#include <mutex>
 #include "../ZED/include/blob.h"
 
 
@@ -91,6 +92,7 @@ namespace Judoboard
 		UUID m_UUID;
 
 		static std::unordered_set<UUID> s_UsedUUIDs;
+		static std::mutex s_Mutex;
 	};
 }
 

@@ -58,6 +58,8 @@ namespace Judoboard
 		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; GenerateSchedule(); }
 		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; GenerateSchedule(); }
 
+		size_t GetNumberOfRounds() const;
+
 		//Serialization
 		virtual const std::string ToHTML() const override;
 
@@ -69,8 +71,5 @@ namespace Judoboard
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;
-
-	private:
-		size_t GetNumberOfRounds() const;
 	};
 }
