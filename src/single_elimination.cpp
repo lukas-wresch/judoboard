@@ -409,7 +409,7 @@ MatchTable::Results SingleElimination::CalculateResults() const
 	else
 		return ret;
 
-	if (IsThirdPlaceMatch() && !m_FifthPlaceMatches.empty())
+	if (IsThirdPlaceMatch() && !m_ThirdPlaceMatches.empty())
 	{
 		const Match* third_place_match = m_ThirdPlaceMatches[m_ThirdPlaceMatches.size() - 1];
 		ret.Add(third_place_match->GetWinner(), this);
