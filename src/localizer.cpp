@@ -33,6 +33,7 @@ void Localizer::Initialize(Language NewLanguage)
 
 			//German
 			s_de["No."]    = u8"Nr.";
+			s_de["Name"]   = u8"Name";
 			s_de["Mat"]    = u8"Matte";
 			s_de["White"]  = u8"Wei\u00df";
 			s_de["Blue"]   = u8"Blau";
