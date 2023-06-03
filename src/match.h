@@ -74,7 +74,7 @@ namespace Judoboard
 
 			static Tag Fifth() {
 				Tag ret;
-				ret.third = true;
+				ret.fifth = true;
 				return ret;
 			}
 
@@ -197,6 +197,7 @@ namespace Judoboard
 		bool IsBestOfThree() const { return m_White.m_Type == DependencyType::BestOfThree; }
 
 		Tag GetTag() const { return m_Tag; }
+		void SetTag(Tag NewTag) { m_Tag = NewTag; }
 
 		//Serialize
 		void ToString(YAML::Emitter& Yaml) const;
@@ -212,7 +213,6 @@ namespace Judoboard
 
 		void SetState(Status NewState) { m_State = NewState; }
 		void SetResult(const Result& Result) { m_Result = Result; SetState(Status::Concluded); }
-		void SetTag(Tag NewTag) { m_Tag = NewTag; }
 
 
 		DependentJudoka m_White;
