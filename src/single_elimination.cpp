@@ -101,10 +101,21 @@ const std::vector<Match*> SingleElimination::GetSchedule() const
 {
 	std::vector<Match*> ret = MatchTable::GetSchedule();
 
-	for (auto match : m_ThirdPlaceMatches)
-		ret.emplace_back(match);
+	//Move last match to the end
+	Match* final_match = nullptr;
+	if (!ret.empty())
+	{
+		final_match = ret.back();
+		ret.pop_back();
+	}
+
 	for (auto match : m_FifthPlaceMatches)
 		ret.emplace_back(match);
+	for (auto match : m_ThirdPlaceMatches)
+		ret.emplace_back(match);
+
+	if (final_match)
+		ret.push_back(final_match);
 
 	return ret;
 }
@@ -300,7 +311,7 @@ void SingleElimination::GenerateSchedule()
 	
 
 	//Add additional matches for 5th place
-	if (IsFifthPlaceMatch() && schedule.size() >= 8)
+	if (IsFifthPlaceMatch() && schedule.size() >= 7)
 	{
 		int offset = 3;//Final and two semi finals
 		//if (IsThirdPlaceMatch())
@@ -398,24 +409,18 @@ MatchTable::Results SingleElimination::CalculateResults() const
 	else
 		return ret;
 
-	if (IsThirdPlaceMatch())
+	if (IsThirdPlaceMatch() && !m_FifthPlaceMatches.empty())
 	{
-		const Match* third_place_match = schedule[schedule.size() - 2];
+		const Match* third_place_match = m_ThirdPlaceMatches[m_ThirdPlaceMatches.size() - 1];
 		ret.Add(third_place_match->GetWinner(), this);
 		ret.Add(third_place_match->GetLoser(),  this);
 	}
 
-	if (IsThirdPlaceMatch() && IsFifthPlaceMatch())
+	if (IsThirdPlaceMatch() && IsFifthPlaceMatch() && !m_FifthPlaceMatches.empty())
 	{
-		//int offset = 4;
-		//if (IsThirdPlaceMatch())
-		//offset = 5;
-
-		int offset = 5;
-
-		const Match* fifth_place_match = schedule[schedule.size() - offset];
+		const Match* fifth_place_match = m_FifthPlaceMatches[m_FifthPlaceMatches.size() - 1];
 		ret.Add(fifth_place_match->GetWinner(), this);
-		ret.Add(fifth_place_match->GetLoser(),  this);
+		ret.Add(fifth_place_match->GetLoser(), this);
 	}
 
 	return ret;
