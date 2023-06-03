@@ -72,10 +72,21 @@ namespace Judoboard
 				return ret;
 			}
 
+			static Tag Fifth() {
+				Tag ret;
+				ret.third = true;
+				return ret;
+			}
+
 			bool IsNormal() const { return value == 0; }
 
 			bool operator ==(const Tag& rhs) const {
 				return value == rhs.value;
+			}
+			Tag operator &(const Tag& rhs) const {
+				Tag ret;
+				ret.value = this->value | rhs.value;
+				return ret;
 			}
 
 			union

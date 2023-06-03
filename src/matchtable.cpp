@@ -451,12 +451,14 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 		}
 	}
 
-	if (!m_Schedule.empty())
+	auto schedule = GetSchedule();
+
+	if (!schedule.empty())
 	{
 		Yaml << YAML::Key << "matches";
 		Yaml << YAML::BeginSeq;
 
-		for (auto match : m_Schedule)
+		for (auto match : schedule)
 			*match >> Yaml;
 
 		Yaml << YAML::EndSeq;

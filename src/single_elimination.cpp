@@ -38,6 +38,23 @@ SingleElimination::SingleElimination(const YAML::Node& Yaml, const ITournament* 
 		m_ThirdPlaceMatch = Yaml["third_place_match"].as<bool>();
 	if (Yaml["fifth_place_match"])
 		m_FifthPlaceMatch = Yaml["fifth_place_match"].as<bool>();
+
+	auto& schedule = SetSchedule();
+	for (auto it = schedule.begin(); it != schedule.end();)
+	{
+		if ((*it)->GetTag().third)
+		{
+			m_ThirdPlaceMatches.emplace_back(*it);
+			it = schedule.erase(it);
+		}
+		else if ((*it)->GetTag().fifth)
+		{
+			m_FifthPlaceMatches.emplace_back(*it);
+			it = schedule.erase(it);
+		}
+		else
+			++it;
+	}
 }
 
 
@@ -76,6 +93,20 @@ size_t SingleElimination::GetNumberOfRounds() const
 		return 0;
 
 	return (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size()));
+}
+
+
+
+const std::vector<Match*> SingleElimination::GetSchedule() const
+{
+	std::vector<Match*> ret = MatchTable::GetSchedule();
+
+	for (auto match : m_ThirdPlaceMatches)
+		ret.emplace_back(match);
+	for (auto match : m_FifthPlaceMatches)
+		ret.emplace_back(match);
+
+	return ret;
 }
 
 
@@ -250,14 +281,21 @@ void SingleElimination::GenerateSchedule()
 		auto match1 = schedule[schedule.size() - 3];
 		auto match2 = schedule[schedule.size() - 2];
 
-		auto third_place = CreateAutoMatch(nullptr, nullptr);
-		third_place->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
-		third_place->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
+		//auto third_place = CreateAutoMatch(nullptr, nullptr);
+		//third_place->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
+		//third_place->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
 
+		Match* third_place = new Match(DependentJudoka(DependencyType::TakeLoser, *match1),
+									   DependentJudoka(DependencyType::TakeLoser, *match2),
+									   GetTournament(), GetMatID());
+
+		third_place->SetMatchTable(this);
 		third_place->SetTag(Match::Tag::Third());
 
+		m_ThirdPlaceMatches.emplace_back(third_place);
+
 		//Swap matches so that match for 1st place is still the last one
-		std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 2]);
+		//std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 2]);
 	}
 	
 
@@ -265,8 +303,8 @@ void SingleElimination::GenerateSchedule()
 	if (IsFifthPlaceMatch() && schedule.size() >= 8)
 	{
 		int offset = 3;//Final and two semi finals
-		if (IsThirdPlaceMatch())
-			offset = 4;
+		//if (IsThirdPlaceMatch())
+			//offset = 4;
 
 		auto match1 = schedule[schedule.size() - 1 - offset - 3];
 		auto match2 = schedule[schedule.size() - 1 - offset - 2];
@@ -274,28 +312,53 @@ void SingleElimination::GenerateSchedule()
 		auto match4 = schedule[schedule.size() - 1 - offset];
 
 		//Order gets fixed at the end
-		auto semi2 = CreateAutoMatch(nullptr, nullptr);
+		/*auto semi2 = CreateAutoMatch(nullptr, nullptr);
 		auto fifth = CreateAutoMatch(nullptr, nullptr);
-		auto semi1 = CreateAutoMatch(nullptr, nullptr);
+		auto semi1 = CreateAutoMatch(nullptr, nullptr);*/
 
-		semi1->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
+		Match* semi1 = new Match(DependentJudoka(DependencyType::TakeLoser, *match1),
+								 DependentJudoka(DependencyType::TakeLoser, *match2),
+								 GetTournament(), GetMatID());
+
+		Match* semi2 = new Match(DependentJudoka(DependencyType::TakeLoser, *match3),
+								 DependentJudoka(DependencyType::TakeLoser, *match4),
+								 GetTournament(), GetMatID());
+
+		Match* fifth = new Match(DependentJudoka(DependencyType::TakeWinner, *semi1),
+								 DependentJudoka(DependencyType::TakeWinner, *semi2),
+								 GetTournament(), GetMatID());
+
+		semi1->SetMatchTable(this);
+		semi1->SetTag(Match::Tag::Fifth() & Match::Tag::Semi());
+
+		semi2->SetMatchTable(this);
+		semi2->SetTag(Match::Tag::Fifth() & Match::Tag::Semi());
+
+		fifth->SetMatchTable(this);
+		fifth->SetTag(Match::Tag::Fifth() & Match::Tag::Finals());
+
+		m_FifthPlaceMatches.emplace_back(semi1);
+		m_FifthPlaceMatches.emplace_back(semi2);
+		m_FifthPlaceMatches.emplace_back(fifth);
+
+		/*semi1->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
 		semi1->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
 
 		semi2->SetDependency(Fighter::White, DependencyType::TakeLoser, match3);
 		semi2->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match4);
 
 		fifth->SetDependency(Fighter::White, DependencyType::TakeWinner, semi1);
-		fifth->SetDependency(Fighter::Blue,  DependencyType::TakeWinner, semi2);
+		fifth->SetDependency(Fighter::Blue,  DependencyType::TakeWinner, semi2);*/
 
 		//Swap matches so that match for 1st place is still the last one
-		offset = 3;
+		//offset = 3;
 
-		std::swap(schedule[schedule.size() - 1 - offset - 2], schedule[schedule.size() - 1 - 2]);
+		/*std::swap(schedule[schedule.size() - 1 - offset - 2], schedule[schedule.size() - 1 - 2]);
 		std::swap(schedule[schedule.size() - 1 - offset - 1], schedule[schedule.size() - 1 - 1]);
 		std::swap(schedule[schedule.size() - 1 - offset],     schedule[schedule.size() - 1]);
 
 		if (IsThirdPlaceMatch())
-			std::swap(schedule[schedule.size() - 1 - offset - 3], schedule[schedule.size() - 1 - 3]);
+			std::swap(schedule[schedule.size() - 1 - offset - 3], schedule[schedule.size() - 1 - 3]);*/
 	}
 
 
