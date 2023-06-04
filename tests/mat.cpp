@@ -1543,7 +1543,7 @@ TEST(Mat, TokedaAfterMate)
 
 		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
-		match.SetRuleSet(new RuleSet("Test", 3, 0, 2, 2, false, false, false, 0));
+		match.SetRuleSet(new RuleSet("Test", 1, 0, 2, 2, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();

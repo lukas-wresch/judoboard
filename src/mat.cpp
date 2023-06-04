@@ -1085,6 +1085,21 @@ void Mat::Tokeda()
 		m_Graphics["effect_osaekomi_" + Fighter2String(osaekomi_holder)].AddAnimation(Animation::CreateLinear(0.0, 0.0, -55.0, [](auto& g) { return g.m_a > 0.0; }));
 		m_Graphics["effect_tokeda_"   + Fighter2String(osaekomi_holder)].StopAllAnimations().SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
 	}
+
+	else if (IsOutOfTime() && WasMateRecent())//Tokeda after mate?
+	{
+		assert(m_OsaekomiList.size() >= 1);
+
+		if (!m_OsaekomiList.empty())
+			m_OsaekomiList[m_OsaekomiList.size() - 1].m_Time--;
+
+		AddEvent(MatchLog::NeutralEvent::Tokeda);
+
+		const auto osaekomi_holder = GetOsaekomiHolder();
+		SetScoreboard(osaekomi_holder).m_Ippon = 0;
+
+		m_Graphics["effect_tokeda_"  + Fighter2String(osaekomi_holder)].StopAllAnimations().SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
+	}
 }
 
 
