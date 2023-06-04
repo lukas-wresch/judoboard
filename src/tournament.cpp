@@ -235,8 +235,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		if (white && blue && *white == *blue)//Filter dummy matches
 			continue;
-		if (!white && !blue)//Filter dummy matches
-			continue;
+		//if (!white && !blue)//Filter dummy matches
+			//continue;
 		
 		Match* new_match = new Match(white, blue, this);
 
