@@ -1531,6 +1531,51 @@ TEST(Mat, Tokeda)
 
 
 
+TEST(Mat, TokedaAfterMate)
+{
+	initialize();
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		EXPECT_TRUE(m.Open());
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		match.SetRuleSet(new RuleSet("Test", 3, 0, 10, 10, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.Hajime();
+
+		ZED::Core::Pause(1000);
+
+		m.Osaekomi(f);
+		EXPECT_TRUE(m.IsOsaekomi());
+		EXPECT_TRUE(m.IsOsaekomiRunning());
+
+		ZED::Core::Pause(3000);
+
+		m.Tokeda();
+
+		ZED::Core::Pause(1000);
+
+		EXPECT_FALSE(m.IsOsaekomi());
+		EXPECT_FALSE(m.IsOsaekomiRunning());
+
+		ASSERT_EQ(m.GetOsaekomiList().size(), 1);
+		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, f);
+		EXPECT_LE(std::abs((int)m.GetOsaekomiList()[0].m_Time - 2000), 50);
+
+		m.AddIppon(f);
+
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
 TEST(Mat, OsaekomiTokedaOsaekomi)
 {
 	initialize();
