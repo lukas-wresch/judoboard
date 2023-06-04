@@ -403,6 +403,7 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "is_hajime"   << YAML::Value << IsHajime();
 	Yaml << YAML::Key << "is_osaekomi" << YAML::Value << IsOsaekomi();
 
+	Yaml << YAML::Key << "was_mate_recent"      << YAML::Value << WasMateRecent();
 	Yaml << YAML::Key << "are_fighters_on_mat"  << YAML::Value << AreFightersOnMat();
 	Yaml << YAML::Key << "can_next_match_start" << YAML::Value << CanNextMatchStart();
 	Yaml << YAML::Key << "has_concluded"        << YAML::Value << HasConcluded();
