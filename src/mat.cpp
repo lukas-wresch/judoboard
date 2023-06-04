@@ -452,15 +452,24 @@ void Mat::Hajime()
 			m_Graphics["sonomama"].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -70.0, [](auto& g) { return g.m_a > 0.0; }));
 		}
 
-		else if (!IsOutOfTime())//Normal hajime
+		else if (!IsOutOfTime() || WasMateRecent())//Normal hajime
 		{
+			bool hajime_after_match_end = false;
+
+			if (IsOutOfTime() && WasMateRecent())
+			{
+				hajime_after_match_end = true;
+				m_HajimeTimer = GetMaxMatchTime();//Reset timer
+			}
+
 			m_HajimeTimer.Start();
 			m_OsaekomiTimer[0].Reset();
 			m_OsaekomiTimer[1].Reset();
 
 			AddEvent(MatchLog::NeutralEvent::Hajime);
 
-			m_Graphics["hajime"].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0, [](auto& g) { return g.m_a > 0.0; }));
+			if (!hajime_after_match_end)
+				m_Graphics["hajime"].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0, [](auto& g) { return g.m_a > 0.0; }));
 			m_Graphics["mate"].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -90.0, [](auto& g) { return g.m_a > 0.0; }));
 
 			m_Graphics["osaekomi_text"].StopAllAnimations().SetPosition(0, 0, 255);
@@ -478,18 +487,14 @@ void Mat::Mate()
 {
 	auto guard = m_mutex.LockWriteForScope();
 
-	if (AreFightersOnMat() && (IsHajime() || IsOsaekomi()) )//Mate can also be called during sonomama
+	if (AreFightersOnMat() && (IsHajime() || IsOsaekomi()))//Mate can also be called during sonomama
 	{
 		m_HajimeTimer.Pause();
+		m_MateTimestamp = Timer::GetTimestamp();
 
 		//Don't overflow timer
 		if (IsOutOfTime())
-		{
-			if (!IsGoldenScore() && m_pMatch && m_HajimeTimer > m_pMatch->GetRuleSet().GetMatchTime() * 1000)
-				m_HajimeTimer = m_pMatch->GetRuleSet().GetMatchTime() * 1000;
-			else if (IsGoldenScore() && m_pMatch && m_HajimeTimer > m_pMatch->GetRuleSet().GetMatchTime() * 1000)
-				m_HajimeTimer = m_pMatch->GetRuleSet().GetGoldenScoreTime() * 1000;
-		}
+			m_HajimeTimer = GetMaxMatchTime();
 
 		if (IsOsaekomi())//Mate during osaekomi?
 		{
@@ -1033,7 +1038,27 @@ void Mat::Osaekomi(Fighter Whom)
 			m_Graphics["effect_osaekomi_" + Fighter2String(!Whom)].StopAllAnimations().SetAlpha(0);
 			m_Graphics["effect_osaekomi_" + Fighter2String(Whom) ].StopAllAnimations().SetAlpha(255);
 		}
+
+		else if (!IsHajime() && WasMateRecent())
+		{
+			Hajime();
+			Osaekomi(Whom);
+		}
 	}
+}
+
+
+
+uint32_t Mat::GetMaxMatchTime()
+{
+	auto guard = m_mutex.LockReadForScope();
+
+	if (!m_pMatch)
+		return 0;
+
+	if (!IsGoldenScore())
+		return m_pMatch->GetRuleSet().GetMatchTime() * 1000;
+	return m_pMatch->GetRuleSet().GetGoldenScoreTime() * 1000;
 }
 
 

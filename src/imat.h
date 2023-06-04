@@ -134,6 +134,7 @@ namespace Judoboard
 		//Commands by judge
 		virtual void Hajime() = 0;//Starts/continues the match. If an osaekomi is running this commands acts as an yoshi
 		virtual void Mate() = 0;//Pauses the match. If an osaekomi is running this commands will stop the osaekomi
+		virtual bool WasMateRecent() const = 0;//Returns true if and only if mate command was issued recently.
 		virtual void Sonomama() = 0;//Sonomama. Pauses the match and osaekomi
 
 		virtual void AddIppon(Fighter Whom) = 0;//Adds an ippon on the scoreaboard for fighter 'Whom'

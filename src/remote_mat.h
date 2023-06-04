@@ -44,6 +44,7 @@ namespace Judoboard
 		//Commands by judge
 		virtual void Hajime() override {}
 		virtual void Mate() override {}
+		virtual bool WasMateRecent() const override { return AreFightersOnMat() && Timer::GetTimestamp() - /*m_MateTimestamp*/0 < 3000; }
 		virtual void Sonomama() override {}
 
 		virtual void AddIppon(Fighter Whom) override;
