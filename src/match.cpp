@@ -122,6 +122,9 @@ Match::Match(const YAML::Node& Yaml, MatchTable* MatchTable, const ITournament* 
 		assert(m_Blue.m_DependentMatchTable);
 	}
 
+	if (Yaml["tag"])
+		m_Tag.value = Yaml["tag"].as<uint32_t>();
+
 	if (Yaml["log"])
 		m_Log << Yaml["log"];
 }
@@ -170,6 +173,9 @@ void Match::operator >>(YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "dependent_match_table_white" << YAML::Value << (std::string)m_White.m_DependentMatchTable->GetUUID();
 	if (m_Blue.m_DependentMatchTable)
 		Yaml << YAML::Key << "dependent_match_table_blue"  << YAML::Value << (std::string)m_Blue.m_DependentMatchTable->GetUUID();
+
+	if (!m_Tag.IsNormal())
+		Yaml << YAML::Key << "tag" << YAML::Value << (uint32_t)m_Tag.value;
 
 	if (HasConcluded() || IsRunning())
 	{

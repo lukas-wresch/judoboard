@@ -377,7 +377,9 @@ MD5::MD5(const Tournament& Tournament)
 				{
 					if (!table->IsThirdPlaceMatch() && !table->IsFifthPlaceMatch())
 					{
-						if (new_match.MatchNo == 15)
+						//if (new_match.MatchNo == 15)
+							//new_match.MatchNo = 19;
+						if (match->GetTag().finals)
 							new_match.MatchNo = 19;
 					}
 
@@ -387,11 +389,19 @@ MD5::MD5(const Tournament& Tournament)
 							//;//wrong export
 						//if (new_match.MatchNo == 16)
 							//;//wrong export
-						if (new_match.MatchNo == 17)//Fifth
+						/*if (new_match.MatchNo == 17)//Fifth
 							new_match.MatchNo = 21;
 						if (new_match.MatchNo == 18)//Third
 							new_match.MatchNo = 20;
 						if (new_match.MatchNo == 19)//Final
+							new_match.MatchNo = 19;*/
+
+						Judoboard::Match::Tag fifth_final = Judoboard::Match::Tag::Fifth() & Judoboard::Match::Tag::Finals();
+						if (match->GetTag() == fifth_final)
+							new_match.MatchNo = 21;
+						else if (match->GetTag().third)
+							new_match.MatchNo = 20;
+						else if (match->GetTag().finals)
 							new_match.MatchNo = 19;
 					}
 				}

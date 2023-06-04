@@ -127,6 +127,21 @@ TEST(Match, ExportImport)
 		ASSERT_EQ(match->HasConcluded(), match2.HasConcluded());
 		ASSERT_EQ(match->IsRunning(),    match2.IsRunning());
 	}
+
+
+	Match match(nullptr, nullptr, nullptr, 0);
+
+	match.SetTag(Match::Tag::Finals());
+	EXPECT_EQ((int)match.GetTag().value, 1);
+
+	match.SetTag(Match::Tag::Semi());
+	EXPECT_EQ((int)match.GetTag().value, 2);
+
+	match.SetTag(Match::Tag::Third());
+	EXPECT_EQ((int)match.GetTag().value, 4);
+
+	match.SetTag(Match::Tag::Fifth());
+	EXPECT_EQ((int)match.GetTag().value, 8);
 }
 
 
