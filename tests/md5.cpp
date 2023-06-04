@@ -2673,13 +2673,13 @@ TEST(MD5, ReadPool2)
 	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -34 kg");
 	md5_table = file.FindMatchesOfWeightclass(u8"m\u00e4nnliche Jugend U13", "-34 kg");
 
-	EXPECT_EQ(table->GetSchedule().size(), md5_table.size());
+	EXPECT_EQ(table->GetSchedule().size(), md5_table.size() - 4);//4 dummy matches
 
 
 	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -37 kg");
 	md5_table = file.FindMatchesOfWeightclass(u8"m\u00e4nnliche Jugend U13", "-37 kg");
 
-	EXPECT_EQ(table->GetSchedule().size(), md5_table.size());
+	EXPECT_EQ(table->GetSchedule().size(), md5_table.size() - 4);//4 dummy matches
 }
 
 

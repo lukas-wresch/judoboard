@@ -326,7 +326,9 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			auto pool = (Pool*)table;
 			if (pool->GetFinals().GetSchedule().empty())
 			{
-				pool->GetFinals().GenerateSchedule();
+				//pool->GetFinals().GenerateSchedule();
+				pool->AutoGenerateSchedule(true);
+				pool->GenerateSchedule();
 				pool->CopyMatchesFromSubtables();
 
 				for (auto match : pool->GetFinals().GetSchedule())

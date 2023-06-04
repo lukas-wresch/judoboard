@@ -311,10 +311,14 @@ void Pool::GenerateSchedule()
 	{
 		assert(pool_count == 2);//TODO
 		assert(m_TakeTop == 2);//TODO
-		m_Finals.AddMatch(new Match(DependentJudoka(DependencyType::TakeRank3, *m_Pools[0]),
-									DependentJudoka(DependencyType::TakeRank3, *m_Pools[1]), GetTournament()));
 
-		//TODO do the more general case and give this match a tag
+		auto fifth_place_match = new Match(DependentJudoka(DependencyType::TakeRank3, *m_Pools[0]),
+										   DependentJudoka(DependencyType::TakeRank3, *m_Pools[1]), GetTournament());
+		fifth_place_match->SetTag(Match::Tag::Fifth() & Match::Tag::Finals());
+
+		m_Finals.AddMatch(fifth_place_match);
+
+		//TODO do the more general case
 	}
 
 
