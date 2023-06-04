@@ -349,7 +349,8 @@ void Pool::CopyMatchesFromSubtables()
 
 
 	//Add matches for single elimination phase
-	for (auto match : m_Finals.GetSchedule())
+	auto final_schedule = m_Finals.GetSchedule();
+	for (auto match : final_schedule)
 		AddMatch(match);
 }
 

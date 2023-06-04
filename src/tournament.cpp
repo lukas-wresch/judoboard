@@ -288,7 +288,16 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 				if (match.Pool == 0)
 				{
 					if (match.Status != 0)
+					{
+						if (match.AreaID == 9)
+							new_match->SetTag(Match::Tag::Finals());
+						else if (match.AreaID == 4)
+							new_match->SetTag(Match::Tag::Third());
+						else if (match.AreaID == 5)
+							new_match->SetTag(Match::Tag::Fifth());
+
 						pool->GetFinals().AddMatch(new_match);
+					}
 				}
 				else if (match.Pool <= pool->GetPoolCount())
 					pool->GetPool(match.Pool - 1)->AddMatch(new_match);
@@ -323,13 +332,13 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 				for (auto match : pool->GetFinals().GetSchedule())
 					m_Schedule.emplace_back(table, table->FindMatchIndex(*match));
 			}
-			else
-				pool->GetFinals().ReorderLastMatches();
+			//else
+				//pool->GetFinals().ReorderLastMatches();
 		}
 		else if (table->GetType() == MatchTable::Type::SingleElimination)
 		{
 			auto se = (SingleElimination*)table;
-			se->ReorderLastMatches();
+			//se->ReorderLastMatches();
 		}
 		/*else if (table->GetType() == MatchTable::Type::DoubleElimination)
 		{

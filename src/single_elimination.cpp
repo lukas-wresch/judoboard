@@ -438,6 +438,33 @@ MatchTable::Results SingleElimination::CalculateResults() const
 
 
 
+bool SingleElimination::AddMatch(Match* NewMatch)
+{
+	if (!NewMatch)
+		return false;
+
+	if (NewMatch->GetFighter(Fighter::White))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)), true);
+	if (NewMatch->GetFighter(Fighter::Blue))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
+
+	if (IsSubMatchTable())
+		NewMatch->SetMatchTable(GetParent());
+	else
+		NewMatch->SetMatchTable(this);
+
+	if (NewMatch->GetTag().third)
+		m_ThirdPlaceMatches.emplace_back(NewMatch);
+	else if (NewMatch->GetTag().fifth)
+		m_FifthPlaceMatches.emplace_back(NewMatch);
+	else
+		SetSchedule().emplace_back(NewMatch);
+
+	return true;
+}
+
+
+
 void SingleElimination::ReorderLastMatches()
 {
 	auto& schedule = SetSchedule();

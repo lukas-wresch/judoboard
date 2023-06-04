@@ -2704,18 +2704,21 @@ TEST(MD5, ReadPool3)
 
 	auto table = tourney.FindMatchTableByDescription(u8"weibliche Jugend U13 -44 kg");
 	auto results = table->CalculateResults();
+	ASSERT_GE(results.GetSize(), 5);
 	for (int i = 0; i < 5; i++)
 		EXPECT_EQ(file.FindResult(u8"weibliche Jugend U13", "-44 kg", i+1)->Participant->Firstname,
 				  results[i].Judoka->GetFirstname());
 
 	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -34 kg");
 	results = table->CalculateResults();
+	ASSERT_GE(results.GetSize(), 5);
 	for (int i = 0; i < 5; i++)
 		EXPECT_EQ(file.FindResult(u8"m\u00e4nnliche Jugend U13", "-34 kg", i+1)->Participant->Firstname,
 			results[i].Judoka->GetFirstname());
 
 	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -37 kg");
 	results = table->CalculateResults();
+	ASSERT_GE(results.GetSize(), 5);
 	for (int i = 0; i < 5; i++)
 		EXPECT_EQ(file.FindResult(u8"m\u00e4nnliche Jugend U13", "-37 kg", i+1)->Participant->Firstname,
 			results[i].Judoka->GetFirstname());

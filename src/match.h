@@ -196,7 +196,7 @@ namespace Judoboard
 
 		bool IsBestOfThree() const { return m_White.m_Type == DependencyType::BestOfThree; }
 
-		Tag GetTag() const { return m_Tag; }
+		Tag  GetTag() const { return m_Tag; }
 		void SetTag(Tag NewTag) { m_Tag = NewTag; }
 
 		//Serialize

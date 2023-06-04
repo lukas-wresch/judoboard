@@ -67,13 +67,15 @@ namespace Judoboard
 		virtual Results CalculateResults() const override;
 		virtual void GenerateSchedule() override;
 
+		virtual bool AddMatch(Match* NewMatch) override;
+
 		bool IsThirdPlaceMatch() const { return m_ThirdPlaceMatch; }
 		bool IsFifthPlaceMatch() const { return m_FifthPlaceMatch; }
 
 		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; GenerateSchedule(); }
 		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; GenerateSchedule(); }
 
-		void ReorderLastMatches();//Swaps the last matches so that the final match swaps with 3rd or 5th place match
+		[[deprecated]] void ReorderLastMatches();//Swaps the last matches so that the final match swaps with 3rd or 5th place match
     
 		size_t GetNumberOfRounds() const;
 
