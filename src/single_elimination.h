@@ -49,6 +49,21 @@ namespace Judoboard
 			return (int)pow(2, rounds);
 		}
 
+		virtual void DeleteSchedule() override {
+			if (!IsSubMatchTable())
+			{
+				for (auto match : m_ThirdPlaceMatches)
+					delete match;
+				for (auto match : m_FifthPlaceMatches)
+					delete match;
+			}
+			m_ThirdPlaceMatches.clear();
+			m_FifthPlaceMatches.clear();
+			MatchTable::DeleteSchedule();
+		}
+
+		virtual const std::vector<Match*> GetSchedule() const override;
+
 		virtual Results CalculateResults() const override;
 		virtual void GenerateSchedule() override;
 
@@ -68,6 +83,9 @@ namespace Judoboard
 
 	protected:
 		std::string RenderMatch(const Match& match, std::string style = "") const;
+
+		std::vector<Match*> m_ThirdPlaceMatches;
+		std::vector<Match*> m_FifthPlaceMatches;
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;

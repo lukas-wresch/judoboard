@@ -341,6 +341,10 @@ TEST(SingleElimination, Count4)
 	EXPECT_EQ(*group->GetSchedule()[1]->GetFighter(Fighter::White), *j2);
 	EXPECT_EQ(*group->GetSchedule()[1]->GetFighter(Fighter::Blue),  *j4);
 
+	EXPECT_EQ(group->GetSchedule()[0]->GetTag(), Match::Tag::Semi());
+	EXPECT_EQ(group->GetSchedule()[1]->GetTag(), Match::Tag::Semi());
+	EXPECT_EQ(group->GetSchedule()[2]->GetTag(), Match::Tag::Finals());
+
 	Mat m(1);
 
 	for (auto match : group->GetSchedule())
@@ -1059,6 +1063,10 @@ TEST(SingleElimination, Count4_ExportImport)
 
 	EXPECT_EQ(group2.GetSchedule()[2]->GetDependentMatches()[0]->GetUUID(), group2.GetSchedule()[0]->GetUUID());
 	EXPECT_EQ(group2.GetSchedule()[2]->GetDependentMatches()[1]->GetUUID(), group2.GetSchedule()[1]->GetUUID());
+
+	EXPECT_EQ(group2.GetSchedule()[0]->GetTag(), Match::Tag::Semi());
+	EXPECT_EQ(group2.GetSchedule()[1]->GetTag(), Match::Tag::Semi());
+	EXPECT_EQ(group2.GetSchedule()[2]->GetTag(), Match::Tag::Finals());
 }
 
 
