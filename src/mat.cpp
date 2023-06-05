@@ -1105,11 +1105,13 @@ void Mat::Tokeda()
 			m_Graphics["osaekomi_bar"].m_width = 0;//To force an update
 			UpdateOsaekomiGraphics();
 
+			//Shift hajime timer for lost time
+			m_HajimeTimer.Shift(Timer::GetTimestamp() - m_MateTimestamp);
 			//Since mate was called by mistake
 			Hajime();//Has to be called at the end since it resets the osaekomi timer
 
 			m_Graphics["effect_tokeda_" + Fighter2String(osaekomi_holder)].StopAllAnimations().SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
-			m_Graphics["effect_ippon_" + Fighter2String(osaekomi_holder)].SetAlpha(0);
+			m_Graphics["effect_ippon_"  + Fighter2String(osaekomi_holder)].SetAlpha(0);
 
 			m_Graphics["hajime"].SetAlpha(0);
 			m_Graphics["mate"].SetAlpha(0);
