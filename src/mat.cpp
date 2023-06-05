@@ -1089,33 +1089,35 @@ void Mat::Tokeda()
 
 	else if (AreFightersOnMat() && WasMateRecent())//Tokeda after mate?
 	{
-		assert(m_OsaekomiList.size() >= 1);
-
 		const auto osaekomi_holder = GetOsaekomiHolder();
+		if (m_OsaekomiTimer[(int)osaekomi_holder].GetElapsedTime() >= EndTimeOfOsaekomi() * 1000)
+		{
+			assert(m_OsaekomiList.size() >= 1);
 
-		if (!m_OsaekomiList.empty())
-			m_OsaekomiList[m_OsaekomiList.size() - 1].m_Time--;
-		m_OsaekomiTimer[(int)osaekomi_holder].Shift(-1);
+			if (!m_OsaekomiList.empty())
+				m_OsaekomiList[m_OsaekomiList.size() - 1].m_Time--;
+			m_OsaekomiTimer[(int)osaekomi_holder].Shift(-1);
 
-		AddEvent(MatchLog::NeutralEvent::Tokeda);
+			AddEvent(MatchLog::NeutralEvent::Tokeda);
 
-		SetScoreboard(osaekomi_holder).m_Ippon = 0;
+			SetScoreboard(osaekomi_holder).m_Ippon = 0;
 
-		m_Graphics["osaekomi_bar"].m_width = 0;//To force an update
-		UpdateOsaekomiGraphics();
+			m_Graphics["osaekomi_bar"].m_width = 0;//To force an update
+			UpdateOsaekomiGraphics();
 
-		//Since mate was called by mistake
-		Hajime();//Has to be called at the end since it resets the osaekomi timer
+			//Since mate was called by mistake
+			Hajime();//Has to be called at the end since it resets the osaekomi timer
 
-		m_Graphics["effect_tokeda_" + Fighter2String(osaekomi_holder)].StopAllAnimations().SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
-		m_Graphics["effect_ippon_"  + Fighter2String(osaekomi_holder)].SetAlpha(0);
+			m_Graphics["effect_tokeda_" + Fighter2String(osaekomi_holder)].StopAllAnimations().SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
+			m_Graphics["effect_ippon_" + Fighter2String(osaekomi_holder)].SetAlpha(0);
 
-		m_Graphics["hajime"].SetAlpha(0);
-		m_Graphics["mate"].SetAlpha(0);
+			m_Graphics["hajime"].SetAlpha(0);
+			m_Graphics["mate"].SetAlpha(0);
 
-		m_Graphics["osaekomi_text"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0));
-		m_Graphics["osaekomi_bar_border"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0));
-		m_Graphics["osaekomi_bar"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0));
+			m_Graphics["osaekomi_text"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0));
+			m_Graphics["osaekomi_bar_border"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0));
+			m_Graphics["osaekomi_bar"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0));
+		}
 	}
 }
 
