@@ -1135,7 +1135,10 @@ void Mat::Process()
 	{
 		m_mutex.LockWrite();
 
-		m_OsaekomiList.emplace_back(OsaekomiEntry(GetOsaekomiHolder(), m_OsaekomiTimer[(int)GetOsaekomiHolder()].GetElapsedTime()));
+		auto osaekomi_time = m_OsaekomiTimer[(int)GetOsaekomiHolder()].GetElapsedTime();
+		if (osaekomi_time > EndTimeOfOsaekomi() * 1000)
+			osaekomi_time = EndTimeOfOsaekomi() * 1000;
+		m_OsaekomiList.emplace_back(OsaekomiEntry(GetOsaekomiHolder(), osaekomi_time));
 
 		UpdateGraphics();
 
@@ -1155,7 +1158,6 @@ void Mat::Process()
 	if (IsOutOfTime() && IsHajime())
 		Mate();
 }
-
 
 
 

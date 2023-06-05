@@ -1565,7 +1565,7 @@ TEST(Mat, TokedaAfterMate)
 
 		ASSERT_EQ(m.GetOsaekomiList().size(), 1);
 		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, f);
-		EXPECT_LE(std::abs((int)m.GetOsaekomiList()[0].m_Time - 1999), 50);
+		EXPECT_EQ(m.GetOsaekomiList()[0].m_Time, 1999);
 		EXPECT_FALSE(m.HasConcluded());
 		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 0);
 
