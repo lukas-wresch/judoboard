@@ -1562,6 +1562,14 @@ TEST(Mat, TokedaAfterMate)
 		EXPECT_FALSE(m.IsOsaekomi());
 		EXPECT_FALSE(m.IsOsaekomiRunning());
 
+		m.Mate();
+
+		EXPECT_LE(std::abs((int)m.GetTimeElapsed() - 3500), 50);
+
+		EXPECT_FALSE(m.IsHajime());
+		EXPECT_FALSE(m.IsOsaekomi());
+		EXPECT_FALSE(m.IsOsaekomiRunning());
+
 		ASSERT_EQ(m.GetOsaekomiList().size(), 1);
 		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, f);
 		EXPECT_EQ(m.GetOsaekomiList()[0].m_Time, 1999);
