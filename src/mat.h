@@ -434,6 +434,7 @@ namespace Judoboard
 		//Processing
 		void Process();
 		void UpdateGraphics() const;
+		void UpdateOsaekomiGraphics() const;
 		void RenderScore(double dt) const;
 		void RenderTimer(double dt) const;
 		void RenderShidos(double dt) const;

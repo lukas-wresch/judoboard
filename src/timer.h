@@ -14,8 +14,10 @@ public:
 
 	void Start();
 	void Pause();
-	void Reset();
+	void Reset() { Set(0); }
+	void Set(uint32_t Time);
 	void Stop();//Same as Pause() followed by Reset()
+	void Shift(int TimeShift);
 
 	bool IsRunning() const { return m_Running; }
 

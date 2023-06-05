@@ -473,9 +473,9 @@ void Mat::Hajime()
 				m_Graphics["hajime"].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0, [](auto& g) { return g.m_a > 0.0; }));
 			m_Graphics["mate"].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -90.0, [](auto& g) { return g.m_a > 0.0; }));
 
-			m_Graphics["osaekomi_text"].StopAllAnimations().SetPosition(0, 0, 255);
-			m_Graphics["osaekomi_bar_border"].StopAllAnimations().SetPosition(0, 0, 0);
-			m_Graphics["osaekomi_bar"].StopAllAnimations().SetPosition(0, 0, 0);
+			//m_Graphics["osaekomi_text"].StopAllAnimations().SetPosition(0, 0, 255);
+			//m_Graphics["osaekomi_bar_border"].StopAllAnimations().SetPosition(0, 0, 0);
+			//m_Graphics["osaekomi_bar"].StopAllAnimations().SetPosition(0, 0, 0);
 		}
 	}
 
@@ -1087,19 +1087,35 @@ void Mat::Tokeda()
 		m_Graphics["effect_tokeda_"   + Fighter2String(osaekomi_holder)].StopAllAnimations().SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
 	}
 
-	else if (IsOutOfTime() && WasMateRecent())//Tokeda after mate?
+	else if (AreFightersOnMat() && WasMateRecent())//Tokeda after mate?
 	{
 		assert(m_OsaekomiList.size() >= 1);
 
+		const auto osaekomi_holder = GetOsaekomiHolder();
+
 		if (!m_OsaekomiList.empty())
 			m_OsaekomiList[m_OsaekomiList.size() - 1].m_Time--;
+		m_OsaekomiTimer[(int)osaekomi_holder].Shift(-1);
 
 		AddEvent(MatchLog::NeutralEvent::Tokeda);
 
-		const auto osaekomi_holder = GetOsaekomiHolder();
 		SetScoreboard(osaekomi_holder).m_Ippon = 0;
 
-		m_Graphics["effect_tokeda_"  + Fighter2String(osaekomi_holder)].StopAllAnimations().SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["osaekomi_bar"].m_width = 0;//To force an update
+		UpdateOsaekomiGraphics();
+
+		//Since mate was called by mistake
+		Hajime();//Has to be called at the end since it resets the osaekomi timer
+
+		m_Graphics["effect_tokeda_" + Fighter2String(osaekomi_holder)].StopAllAnimations().SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0, [](auto& g) { return g.m_a > 0.0; }));
+		m_Graphics["effect_ippon_"  + Fighter2String(osaekomi_holder)].SetAlpha(0);
+
+		m_Graphics["hajime"].SetAlpha(0);
+		m_Graphics["mate"].SetAlpha(0);
+
+		m_Graphics["osaekomi_text"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0));
+		m_Graphics["osaekomi_bar_border"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0));
+		m_Graphics["osaekomi_bar"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0));
 	}
 }
 
@@ -1143,6 +1159,7 @@ void Mat::Process()
 		UpdateGraphics();
 
 		m_OsaekomiTimer[(int)GetOsaekomiHolder()].Pause();
+		m_OsaekomiTimer[(int)GetOsaekomiHolder()].Set(osaekomi_time);
 		m_IsOsaekomi = false;
 
 		if (GetScoreboard(GetOsaekomiHolder()).m_WazaAri == 1)
@@ -1796,40 +1813,7 @@ void Mat::UpdateGraphics() const
 			
 			//Update osaekomi
 			if (IsOsaekomi())
-			{
-				const int osaekomi_max_width = width;
-				const int osaekomi_y = height/2 + (int)(340.0*m_ScalingFactor);
-
-				Fighter fighter = GetOsaekomiHolder();
-				auto& osaekomi_text = m_Graphics["osaekomi_text"];
-				auto& osaekomi_bar  = m_Graphics["osaekomi_bar"];
-
-				osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
-
-				const int new_width = m_OsaekomiTimer[(int)fighter].GetElapsedTime() * osaekomi_max_width / (EndTimeOfOsaekomi() * 1000);
-
-				if (osaekomi_text && new_width > osaekomi_bar.m_width || osaekomi_bar.m_a <= 0.0)
-				{
-					if (osaekomi_text)
-					{
-						const int new_text_x = new_width - osaekomi_text->GetWidth() - 2;
-						osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
-					}
-
-					m_Graphics["osaekomi_bar_border"].SetPosition(0, osaekomi_y, 255);
-					m_Graphics["osaekomi_bar_border"].m_width  = new_width + 5;
-					m_Graphics["osaekomi_bar_border"].m_height = (int)(100.0 * m_ScalingFactor) + 10;
-					m_Graphics["osaekomi_bar_border"].m_color  = ZED::Color(0, 0, 0);
-
-
-					osaekomi_bar.SetPosition(0, osaekomi_y + 5, 255);
-
-					//osaekomi_bar.m_color = ZED::Color(30, 150, 30);
-					osaekomi_bar.m_color = ZED::Color(255, 0, 0);
-					osaekomi_bar.m_width = new_width;
-					osaekomi_bar.m_height = (int)(100.0 * m_ScalingFactor);
-				}
-			}
+				UpdateOsaekomiGraphics();
 
 			//Update text effects
 			if (m_Graphics["timer"])
@@ -1849,6 +1833,51 @@ void Mat::UpdateGraphics() const
 		}
 	}
 	break;
+	}
+}
+
+
+
+void Mat::UpdateOsaekomiGraphics() const
+{
+	auto guard = m_mutex.LockWriteForScope();
+
+	auto& renderer = m_Window.GetRenderer();
+
+	const unsigned int width  = renderer.GetWidth();
+	const unsigned int height = renderer.GetHeight();
+
+	const int osaekomi_max_width = width;
+	const int osaekomi_y = height/2 + (int)(340.0*m_ScalingFactor);
+
+	Fighter fighter = GetOsaekomiHolder();
+	auto& osaekomi_text = m_Graphics["osaekomi_text"];
+	auto& osaekomi_bar  = m_Graphics["osaekomi_bar"];
+
+	osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
+
+	const int new_width = m_OsaekomiTimer[(int)fighter].GetElapsedTime() * osaekomi_max_width / (EndTimeOfOsaekomi() * 1000);
+
+	if (osaekomi_text && new_width > osaekomi_bar.m_width || osaekomi_bar.m_a <= 0.0)
+	{
+		if (osaekomi_text)
+		{
+			const int new_text_x = new_width - osaekomi_text->GetWidth() - 2;
+			osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
+		}
+
+		m_Graphics["osaekomi_bar_border"].SetPosition(0, osaekomi_y, 255);
+		m_Graphics["osaekomi_bar_border"].m_width  = new_width + 5;
+		m_Graphics["osaekomi_bar_border"].m_height = (int)(100.0 * m_ScalingFactor) + 10;
+		m_Graphics["osaekomi_bar_border"].m_color  = ZED::Color(0, 0, 0);
+
+
+		osaekomi_bar.SetPosition(0, osaekomi_y + 5, 255);
+
+		//osaekomi_bar.m_color = ZED::Color(30, 150, 30);
+		osaekomi_bar.m_color = ZED::Color(255, 0, 0);
+		osaekomi_bar.m_width = new_width;
+		osaekomi_bar.m_height = (int)(100.0 * m_ScalingFactor);
 	}
 }
 
