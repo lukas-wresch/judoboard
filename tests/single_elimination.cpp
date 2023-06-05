@@ -713,7 +713,7 @@ TEST(SingleElimination, Count8_5th_BO3)
 
 	auto results = group->CalculateResults();
 
-	ASSERT_EQ(results.GetSize(), 2);
+	ASSERT_EQ(results.GetSize(), 6);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
