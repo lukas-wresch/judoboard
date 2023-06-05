@@ -17,7 +17,8 @@ void MatchTable::SetMatID(int32_t MatID)
 {
 	m_MatID = MatID;
 
-	for (auto match : m_Schedule)
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
 		if (match)
 			match->SetMatID(MatID);
 }
@@ -26,7 +27,8 @@ void MatchTable::SetMatID(int32_t MatID)
 
 bool MatchTable::HasConcluded() const
 {
-	for (auto match : m_Schedule)
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
 		if (match && !match->HasConcluded())
 			return false;
 	return true;
@@ -36,7 +38,8 @@ bool MatchTable::HasConcluded() const
 
 Match* MatchTable::FindMatch(const UUID& UUID) const
 {
-	for (auto match : m_Schedule)
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
 		if (match && match->GetUUID() == UUID)
 			return match;
 	return nullptr;
@@ -46,8 +49,9 @@ Match* MatchTable::FindMatch(const UUID& UUID) const
 
 size_t MatchTable::FindMatchIndex(const UUID& UUID) const
 {
-	for (size_t i = 0; i < m_Schedule.size(); ++i)
-		if (m_Schedule[i] && m_Schedule[i]->GetUUID() == UUID)
+	auto schedule = GetSchedule();
+	for (size_t i = 0; i < schedule.size(); ++i)
+		if (schedule[i] && schedule[i]->GetUUID() == UUID)
 			return i;
 	return -1;
 }
@@ -102,13 +106,15 @@ bool MatchTable::IsIncluded(const Judoka& Fighter) const
 
 Status MatchTable::GetStatus() const
 {
-	if (m_Schedule.size() == 0)
+	auto schedule = GetSchedule();
+
+	if (schedule.size() == 0)
 		return Status::Scheduled;
 
 	bool one_match_finished = false;
 	bool all_matches_finished = true;
 
-	for (auto match : m_Schedule)
+	for (auto match : schedule)
 	{
 		if (match->IsEmptyMatch() || match->IsBestOfThree())
 			continue;
@@ -220,7 +226,9 @@ const std::vector<const Match*> MatchTable::FindMatches(const Judoka& Fighter1, 
 {
 	std::vector<const Match*> ret;
 
-	for (auto match : m_Schedule)
+	auto schedule = GetSchedule();
+
+	for (auto match : schedule)
 	{
 		if (!match->HasValidFighters())
 			continue;
@@ -636,6 +644,7 @@ Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
 
 void MatchTable::AddMatchesForBestOfThree()
 {
+	//TODO don't access m_Schedule directly!
 	auto schedule_copy = std::move(m_Schedule);
 
 	auto length = schedule_copy.size();
