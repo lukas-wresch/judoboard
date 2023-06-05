@@ -558,6 +558,8 @@ bool Tournament::LoadYAML(const std::string& Filename)
 		ZED::Log::Warn("Could not open file " + Filename);
 		return false;
 	}
+	else
+		ZED::Log::Info("Opening file " + Filename);
 
 	YAML::Node yaml = YAML::LoadFile(Filename);
 
