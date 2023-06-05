@@ -366,6 +366,14 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		//assert(table->GetSchedule().size() == md5_schedule.size());
 	}
+
+	//Check for duplicates
+	auto schedule = GetSchedule();
+	for (size_t i = 0; i < schedule.size(); ++i)
+		for (size_t j = i + 1; j < schedule.size(); ++j)
+	{
+		assert(schedule[i]->GetUUID() != schedule[j]->GetUUID());
+	}
 #endif
 
 	//Re-enabled auto generation
