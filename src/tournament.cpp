@@ -377,6 +377,16 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	{
 		assert(schedule[i]->GetUUID() != schedule[j]->GetUUID());
 	}
+
+	//Check for invalids
+	for (auto match : schedule)
+	{
+		//assert(!match->IsCompletelyEmptyMatch());
+		/*if (!match->GetFighter(Fighter::White))
+			assert(match->GetDependentMatchOf(Fighter::White) || match->GetDependentMatchTableOf(Fighter::White));
+		if (!match->GetFighter(Fighter::Blue))
+			assert(match->GetDependentMatchOf(Fighter::Blue)  || match->GetDependentMatchTableOf(Fighter::Blue));*/
+	}
 #endif
 
 	//Re-enabled auto generation
@@ -527,6 +537,23 @@ bool Tournament::Load(const YAML::Node& yaml)
 		}
 	}
 
+#ifdef _DEBUG
+	//Check for invalids
+	for (auto table : m_MatchTables)
+	{
+		auto schedule = table->GetSchedule();
+
+		for (auto match : schedule)
+		{
+			assert(!match->IsCompletelyEmptyMatch());
+			/*if (!match->GetFighter(Fighter::White))
+				assert(match->GetDependentMatchOf(Fighter::White) || match->GetDependentMatchTableOf(Fighter::White));
+			if (!match->GetFighter(Fighter::Blue))
+				assert(match->GetDependentMatchOf(Fighter::Blue)  || match->GetDependentMatchTableOf(Fighter::Blue));*/
+		}
+	}
+#endif
+
 	m_Schedule.clear();
 
 	if (yaml["schedule"] && yaml["schedule"].IsSequence())
@@ -541,6 +568,7 @@ bool Tournament::Load(const YAML::Node& yaml)
 #endif
 
 			UUID id = node.as<std::string>();
+			
 			for (auto table : m_MatchTables)
 			{
 				auto index = table->FindMatchIndex(id);
