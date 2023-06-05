@@ -191,6 +191,7 @@ namespace Judoboard
 		const std::string MasterSchedule2String() const override;
 
 		virtual void GenerateSchedule() override;
+		void BuildSchedule();
 
 		virtual bool Save() override {
 			if (!m_AutoSave) return true;

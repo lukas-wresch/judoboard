@@ -312,8 +312,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			//Add to schedule
 			if (!new_match->IsEmptyMatch())
 			{
-				auto index = match_table->FindMatchIndex(*new_match);
-				m_Schedule.emplace_back(match_table, index);
+				//auto index = match_table->FindMatchIndex(*new_match);
+				//m_Schedule.emplace_back(match_table, index);
 			}
 		}
 	}
@@ -331,8 +331,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 				pool->GenerateSchedule();
 				pool->CopyMatchesFromSubtables();
 
-				for (auto match : pool->GetFinals().GetSchedule())
-					m_Schedule.emplace_back(table, table->FindMatchIndex(*match));
+				//for (auto match : pool->GetFinals().GetSchedule())
+					//m_Schedule.emplace_back(table, table->FindMatchIndex(*match));
 			}
 			//else
 				//pool->GetFinals().ReorderLastMatches();
@@ -353,6 +353,9 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 				table->SetSchedule()[2]->SetBestOfThree(table->GetSchedule()[0], table->GetSchedule()[1]);
 		}
 	}
+
+	//Build schedule
+	BuildSchedule();
 
 	//Check number of matches
 #ifdef _DEBUG
@@ -2366,13 +2369,22 @@ void Tournament::GenerateSchedule()
 
 	auto guard = LockWriteForScope();
 
-	m_Schedule.clear();
-
 	for (auto table : m_MatchTables)
 	{
 		if (table)
 			table->GenerateSchedule();
 	}
+
+	BuildSchedule();
+}
+
+
+
+void Tournament::BuildSchedule()
+{
+	auto guard = LockWriteForScope();
+
+	m_Schedule.clear();
 
 	//Check if there is a schedule index that is not used
 	//so that we can move match tables up
