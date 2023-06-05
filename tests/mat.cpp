@@ -2205,12 +2205,12 @@ TEST(Mat, GoldenScore2)
 
 	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
-	match.SetRuleSet(new RuleSet("Test", 10, 0, 30, 20, false, false, true, 0));
+	match.SetRuleSet(new RuleSet("Test", 2, 0, 30, 20, false, false, true, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
 
 	m.Hajime();
 
-	ZED::Core::Pause(11 * 1000);
+	ZED::Core::Pause(3000);
 	EXPECT_TRUE(m.IsOutOfTime());
 
 	EXPECT_FALSE(m.HasConcluded());
@@ -2220,6 +2220,8 @@ TEST(Mat, GoldenScore2)
 	m.Hajime();
 
 	EXPECT_TRUE(m.IsOutOfTime());
+
+	ZED::Core::Pause(100);
 
 	EXPECT_FALSE(m.HasConcluded());
 	EXPECT_FALSE(m.EndMatch());
