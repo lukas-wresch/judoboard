@@ -615,7 +615,9 @@ Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
 
 void MatchTable::AddMatchesForBestOfThree()
 {
-	auto schedule_copy = std::move(m_Schedule);
+	auto schedule_copy = GetSchedule();
+
+	m_Schedule.clear();
 
 	auto length = schedule_copy.size();
 	for (size_t i = 0; i < length; ++i)
