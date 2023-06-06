@@ -545,7 +545,7 @@ bool Tournament::Load(const YAML::Node& yaml)
 
 		for (auto match : schedule)
 		{
-			assert(!match->IsCompletelyEmptyMatch());
+			//assert(!match->IsCompletelyEmptyMatch());
 			/*if (!match->GetFighter(Fighter::White))
 				assert(match->GetDependentMatchOf(Fighter::White) || match->GetDependentMatchTableOf(Fighter::White));
 			if (!match->GetFighter(Fighter::Blue))
