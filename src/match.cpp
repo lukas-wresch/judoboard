@@ -613,9 +613,9 @@ const std::vector<const Match*> Match::GetDependentMatches() const
 bool Match::IsEmptyMatch() const
 {
 	if (m_White.m_DependentMatchTable)
-		return false;
+		return !GetFighter(Fighter::Blue);
 	if (m_Blue.m_DependentMatchTable)
-		return false;
+		return !GetFighter(Fighter::White);
 
 	/*if (m_White.m_DependentMatchTable && !m_White.m_DependentMatchTable->HasConcluded())
 		return !GetFighter(Fighter::Blue);
