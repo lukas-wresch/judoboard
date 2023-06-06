@@ -2459,16 +2459,6 @@ void Tournament::BuildSchedule()
 
 				for (uint32_t i = 0; i < num;)
 				{
-					/*if (schedule.size() > 0)
-					{
-						auto match = schedule.front();
-						if (!match->IsEmptyMatch())
-							m_Schedule.push_back(match);
-
-						schedule.erase(schedule.begin());
-						done = false;
-					}*/
-
 					if (index < table->GetSchedule().size())
 					{
 						auto match = table->GetSchedule()[index];
