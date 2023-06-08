@@ -721,6 +721,23 @@ bool Tournament::SaveYAML(const std::string& Filename)
 	for (auto match : schedule)
 		yaml << (std::string)match->GetUUID();
 
+#ifdef _DEBUG
+	for (const auto& match : schedule)
+	{
+		UUID id = match->GetUUID();
+		bool found = false;
+
+		for (auto table : m_MatchTables)
+		{
+			auto index = table->FindMatchIndex(id);
+			if (index != SIZE_MAX)
+				found = true;
+		}
+
+		assert(found);
+	}
+#endif
+
 	yaml << YAML::EndSeq;
 
 	yaml << YAML::EndMap;
