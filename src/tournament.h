@@ -106,7 +106,6 @@ namespace Judoboard
 
 		//Match tables
 		void AddMatchTable(MatchTable* NewMatchTable);
-		bool UpdateMatchTable(const UUID& UUID);//Calling this function we recalculate the given match table
 		bool RemoveMatchTable(const UUID& UUID);
 		const std::vector<MatchTable*>& GetMatchTables() const { return m_MatchTables; }
 		virtual MatchTable* FindMatchTable(const UUID& ID) override;
@@ -184,6 +183,8 @@ namespace Judoboard
 		virtual void OnMatchConcluded(const Match& Match) const override {
 			ScheduleSave();
 		}
+		virtual bool OnUpdateParticipant(const UUID& UUID) override;//Calling this function we recalculate the given judoka
+		virtual bool OnUpdateMatchTable(const UUID& UUID) override;//Calling this function we recalculate the given match table
 
 		//Serialization
 		const std::string Schedule2String() const override;

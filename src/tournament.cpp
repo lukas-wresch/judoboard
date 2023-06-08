@@ -1475,12 +1475,53 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 			m_Schedule.emplace_back(NewMatchTable, i);
 	}
 
-	UpdateMatchTable(*NewMatchTable);
+	OnUpdateMatchTable(*NewMatchTable);
 }
 
 
 
-bool Tournament::UpdateMatchTable(const UUID& UUID)
+bool Tournament::OnUpdateParticipant(const UUID& UUID)
+{
+	if (IsReadonly())
+		return false;
+	if (GetStatus() != Status::Scheduled)
+		return false;
+
+	auto judoka = FindParticipant(UUID);
+
+	if (!judoka)
+		return false;
+
+	auto guard = LockWriteForScope();
+
+	//Is the current age group still fine?
+	auto current_age_group = GetAgeGroupOfJudoka(judoka);
+	if (current_age_group && !current_age_group->IsElgiable(*judoka, GetDatabase()))
+	{
+		m_JudokaToAgeGroup.erase(judoka->GetUUID());//Remove judoka to the age group he currently belongs to
+		FindAgeGroupForJudoka(*judoka);//Try to find a new one
+	}
+	else if (!current_age_group)
+		FindAgeGroupForJudoka(*judoka);//Try to find one
+
+	for (auto table : m_MatchTables)
+	{
+		if (!table) continue;
+
+		if (!table->IsElgiable(*judoka))//No longer eligable?
+			table->RemoveParticipant(judoka);
+		else//eligable?
+			table->AddParticipant(judoka);
+	}
+
+	GenerateSchedule();
+
+	return true;
+}
+
+
+
+bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 {
 	if (IsReadonly())
 		return false;
@@ -1497,7 +1538,8 @@ bool Tournament::UpdateMatchTable(const UUID& UUID)
 	if (matchTable->GetStatus() != Status::Scheduled)//Can safely recalculate the match table
 		return false;
 
-	for (auto judoka : matchTable->GetParticipants())
+	auto participants = matchTable->GetParticipants();
+	for (auto judoka : participants)
 		if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
 			matchTable->RemoveParticipant(judoka);
 

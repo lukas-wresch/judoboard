@@ -162,6 +162,9 @@ bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 	if (!NewParticipant || !m_Filter)
 		return false;
 
+	if (FindParticipant(*NewParticipant))
+		return false;
+
 	if (!m_Filter->AddParticipant(NewParticipant, Force))
 		return false;
 
@@ -644,8 +647,9 @@ Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
 
 void MatchTable::AddMatchesForBestOfThree()
 {
-	//TODO don't access m_Schedule directly!
-	auto schedule_copy = std::move(m_Schedule);
+	auto schedule_copy = GetSchedule();
+
+	m_Schedule.clear();
 
 	auto length = schedule_copy.size();
 	for (size_t i = 0; i < length; ++i)
@@ -657,7 +661,7 @@ void MatchTable::AddMatchesForBestOfThree()
 		auto match3 = new Match(*match1);
 		match3->SetBestOfThree(match1, match2);
 
-		m_Schedule.push_back(match1);
+		m_Schedule.emplace_back(match1);
 		m_Schedule.emplace_back(match2);
 		m_Schedule.emplace_back(match3);
 	}

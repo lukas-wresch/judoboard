@@ -385,7 +385,32 @@ void SingleElimination::GenerateSchedule()
 
 	//Add additional matches for best of three
 	if (IsBestOfThree())
+	{
 		AddMatchesForBestOfThree();
+
+		//3rd and 5th place matches are now in the main schedule
+		//move them back into their separate vectors
+
+		m_ThirdPlaceMatches.clear();
+		m_FifthPlaceMatches.clear();
+
+		auto& schedule = SetSchedule();
+		for (auto it = schedule.begin(); it != schedule.end();)
+		{
+			if ((*it)->GetTag().third)
+			{
+				m_ThirdPlaceMatches.push_back(*it);
+				it = schedule.erase(it);
+			}
+			else if ((*it)->GetTag().fifth)
+			{
+				m_FifthPlaceMatches.push_back(*it);
+				it = schedule.erase(it);
+			}
+			else
+				++it;
+		}
+	}
 }
 
 
