@@ -1254,6 +1254,19 @@ TEST(SingleElimination, Count8_3rd_5th)
 	EXPECT_EQ(results[4].Judoka->GetUUID(), j[4]->GetUUID());
 	EXPECT_EQ(results[5].Judoka->GetUUID(), j[3]->GetUUID());
 
+	//Test move operator
+	auto schedule = group->GetSchedule();
+	auto schedule_count = group->GetSchedule().size();
+
+	SingleElimination moved(nullptr, nullptr);
+	moved = std::move(*group);
+	
+	ASSERT_EQ(moved.GetSchedule().size(), schedule_count);
+	for (size_t i = 0; i < schedule_count; ++i)
+	{
+		EXPECT_EQ(*moved.GetSchedule()[i], *schedule[i]);
+	}
+
 	delete t;
 }
 
