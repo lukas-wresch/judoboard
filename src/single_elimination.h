@@ -36,6 +36,9 @@ namespace Judoboard
 			IsBestOfThree(rhs.IsBestOfThree());
 
 			SetSchedule(std::move(rhs.SetSchedule()));
+			m_ThirdPlaceMatches = std::move(rhs.m_ThirdPlaceMatches);
+			m_FifthPlaceMatches = std::move(rhs.m_FifthPlaceMatches);
+
 			for (auto match : GetSchedule())
 				match->SetMatchTable(this);
 		}
@@ -67,12 +70,14 @@ namespace Judoboard
 		virtual Results CalculateResults() const override;
 		virtual void GenerateSchedule() override;
 
+		virtual bool AddMatch(Match* NewMatch) override;
+
 		bool IsThirdPlaceMatch() const { return m_ThirdPlaceMatch; }
 		bool IsFifthPlaceMatch() const { return m_FifthPlaceMatch; }
 
 		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; GenerateSchedule(); }
 		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; GenerateSchedule(); }
-
+    
 		size_t GetNumberOfRounds() const;
 
 		//Serialization

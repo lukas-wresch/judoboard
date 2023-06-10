@@ -2642,6 +2642,86 @@ TEST(MD5, ReadPool)
 	file.Dump();
 
 	ASSERT_TRUE(file.GetOrganizer());
+
+	Tournament tourney(file);
+
+	EXPECT_EQ(tourney.GetSchedule().size(), file.GetMatches().size());
+}
+
+
+
+TEST(MD5, ReadPool2)
+{
+	initialize();
+
+	MD5 file("test-data/BEM_U13_2023_with_matches.md7");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	Tournament tourney(file);
+
+	//EXPECT_EQ(tourney.GetSchedule().size(), file.GetMatches().size());
+
+	auto table = tourney.FindMatchTableByDescription(u8"weibliche Jugend U13 -44 kg");
+	auto md5_table = file.FindMatchesOfWeightclass(u8"weibliche Jugend U13", "-44 kg");
+
+	EXPECT_EQ(table->GetSchedule().size(), md5_table.size() - 4);//4 dummy matches
+
+
+	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -34 kg");
+	md5_table = file.FindMatchesOfWeightclass(u8"m\u00e4nnliche Jugend U13", "-34 kg");
+
+	EXPECT_EQ(table->GetSchedule().size(), md5_table.size() - 4);//4 dummy matches
+
+
+	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -37 kg");
+	md5_table = file.FindMatchesOfWeightclass(u8"m\u00e4nnliche Jugend U13", "-37 kg");
+
+	EXPECT_EQ(table->GetSchedule().size(), md5_table.size() - 4);//4 dummy matches
+}
+
+
+
+TEST(MD5, ReadPool3)
+{
+	initialize();
+
+	MD5 file("test-data/BEM_U13_2023_complete.md7");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	ASSERT_TRUE(file.GetOrganizer());
+
+	Tournament tourney(file);
+
+	//EXPECT_EQ(tourney.GetSchedule().size(), file.GetMatches().size());
+
+	//Compare results of pools
+
+	auto table = tourney.FindMatchTableByDescription(u8"weibliche Jugend U13 -44 kg");
+	auto results = table->CalculateResults();
+	ASSERT_GE(results.GetSize(), 5);
+	for (int i = 0; i < 5; i++)
+		EXPECT_EQ(file.FindResult(u8"weibliche Jugend U13", "-44 kg", i+1)->Participant->Firstname,
+				  results[i].Judoka->GetFirstname());
+
+	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -34 kg");
+	results = table->CalculateResults();
+	ASSERT_GE(results.GetSize(), 5);
+	for (int i = 0; i < 5; i++)
+		EXPECT_EQ(file.FindResult(u8"m\u00e4nnliche Jugend U13", "-34 kg", i+1)->Participant->Firstname,
+			results[i].Judoka->GetFirstname());
+
+	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -37 kg");
+	results = table->CalculateResults();
+	ASSERT_GE(results.GetSize(), 5);
+	for (int i = 0; i < 5; i++)
+		EXPECT_EQ(file.FindResult(u8"m\u00e4nnliche Jugend U13", "-37 kg", i+1)->Participant->Firstname,
+			results[i].Judoka->GetFirstname());
 }
 
 

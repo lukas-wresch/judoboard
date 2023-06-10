@@ -453,14 +453,36 @@ MatchTable::Results SingleElimination::CalculateResults() const
 
 
 
+bool SingleElimination::AddMatch(Match* NewMatch)
+{
+	if (!NewMatch)
+		return false;
+
+	if (NewMatch->GetFighter(Fighter::White))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)), true);
+	if (NewMatch->GetFighter(Fighter::Blue))
+		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
+
+	if (IsSubMatchTable())
+		NewMatch->SetMatchTable(GetParent());
+	else
+		NewMatch->SetMatchTable(this);
+
+	if (NewMatch->GetTag().third)
+		m_ThirdPlaceMatches.emplace_back(NewMatch);
+	else if (NewMatch->GetTag().fifth)
+		m_FifthPlaceMatches.emplace_back(NewMatch);
+	else
+		SetSchedule().emplace_back(NewMatch);
+
+	return true;
+}
+
+
+
 const std::string SingleElimination::ToHTML() const
 {
-	std::string ret;
-
-	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
-
-	if (GetMatID() != 0)
-		ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
+	std::string ret = GetHTMLTop();
 
 	ret += "<table border='1' rules='all'>";
 
@@ -478,7 +500,12 @@ const std::string SingleElimination::ToHTML() const
 		if (IsThirdPlaceMatch() && matchIndex >= GetSchedule().size() - 2)
 			matchIndex++;
 		if (IsFifthPlaceMatch() && matchIndex >= GetSchedule().size() - 5)
-			matchIndex += 3;
+		{
+			if (GetSchedule().size() >= 6)
+				matchIndex += 3;
+			else
+				matchIndex++;//There is only a single match for 5th place
+		}
 
 		if (IsBestOfThree())
 			matchIndex = matchIndex * 3;
@@ -532,9 +559,7 @@ const std::string SingleElimination::ToHTML() const
 	ret += "</table>";
 
 
-	auto& schedule = GetSchedule();
-
-	if (IsThirdPlaceMatch())
+	if (IsThirdPlaceMatch() && m_ThirdPlaceMatches.size() >= 1)
 	{
 		ret += "<table width=\"" + std::to_string(width) + "%\" border='1' rules='all' style=\"margin-bottom: 5mm;\">";
 
@@ -543,14 +568,14 @@ const std::string SingleElimination::ToHTML() const
 		ret += "</tr>";
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += RenderMatch(*schedule[schedule.size() - 2]);
+		ret += RenderMatch(*m_ThirdPlaceMatches[m_ThirdPlaceMatches.size() - 1]);
 		ret += "</tr>";
 
 		ret += "</table>";
 	}
 
 
-	if (IsFifthPlaceMatch())
+	else if (IsFifthPlaceMatch() && m_FifthPlaceMatches.size() >= 3)
 	{
 		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";
 
@@ -558,30 +583,42 @@ const std::string SingleElimination::ToHTML() const
 		ret += "<th colspan=\"2\" width=\"" + std::to_string(width*2) + "%\">" + Localizer::Translate("5th Place Match") + "</th>";
 		ret += "</tr>";
 
-		int offset = 4;
-		if (IsThirdPlaceMatch())
-			offset = 5;
-
 		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += RenderMatch(*schedule[schedule.size() - offset - 2], "border-left-style: hidden; border-right-style: hidden;");
+		ret += RenderMatch(*m_FifthPlaceMatches[m_FifthPlaceMatches.size() - 3], "border-left-style: hidden; border-right-style: hidden;");
 		ret += "<td style=\"border-bottom-style: hidden; border-right-style: hidden;\"></td>";
 		ret += "</tr>";
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
 		ret += "<td style=\"border-bottom-style: hidden; border-left-style: hidden;\"></td>";
-		ret += RenderMatch(*schedule[schedule.size() - offset], "border-right-style: hidden;");
+		ret += RenderMatch(*m_FifthPlaceMatches[m_FifthPlaceMatches.size() - 2], "border-right-style: hidden;");
 		ret += "</tr>";
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += RenderMatch(*schedule[schedule.size() - offset - 1], "border-left-style: hidden;");
+		ret += RenderMatch(*m_FifthPlaceMatches[m_FifthPlaceMatches.size() - 1], "border-left-style: hidden;");
 		ret += "<td style=\"border-bottom-style: hidden; border-right-style: hidden;\"></td>";
 		ret += "</tr>";
 
 		ret += "</table>";
 	}
 
+
+	if (IsFifthPlaceMatch() && m_FifthPlaceMatches.size() >= 1)
+	{
+		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += "<th width=\"" + std::to_string(width) + "%\">" + Localizer::Translate("5th Place Match") + "</th>";
+		ret += "</tr>";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += RenderMatch(*m_FifthPlaceMatches[m_FifthPlaceMatches.size() - 1]);
+		ret += "</tr>";
+
+		ret += "</table>";
+	}
+
 	if (!IsSubMatchTable())
-		ret += ResultsToHTML();	
+		ret += ResultsToHTML() + "</div>";
 
 	return ret;
 }

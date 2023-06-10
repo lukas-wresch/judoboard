@@ -89,8 +89,12 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		MatchTable* new_table = nullptr;
 
 		//Round robin
-		if (weightclass->FightSystemID == 13 || weightclass->FightSystemID == 14 || weightclass->FightSystemID == 15 || weightclass->FightSystemID == 16)
+		if (weightclass->FightSystemID == 13 || weightclass->FightSystemID == 14 || weightclass->FightSystemID == 15 || weightclass->FightSystemID == 16 || weightclass->FightSystemID == 17 || weightclass->FightSystemID == 41)
+		{
 			new_table = new RoundRobin(*weightclass, this);
+			if (weightclass->FightSystemID == 41)
+				new_table->IsBestOfThree(true);
+		}
 		else if (weightclass->FightSystemID == 19 ||//Single elimination (single consulation bracket)
 				 weightclass->FightSystemID == 20)  //Single elimination (single consulation bracket)
 		{
@@ -109,6 +113,14 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			de->GetLoserBracket().SetFilter(new Fixed);
 			new_table = de;
 		}
+		else if (weightclass->FightSystemID == 24)//Pool (3+3 system)
+		{
+			auto pool = new Pool(*weightclass, this);
+			pool->SetPoolCount(2);
+			pool->IsThirdPlaceMatch(weightclass->MatchForThirdPlace);
+			pool->IsFifthPlaceMatch(weightclass->MatchForFifthPlace);
+			new_table = pool;
+		}
 
 		if (!new_table)
 		{
@@ -121,7 +133,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			new_table->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
 
 		new_table->SetName(weightclass->Description);
-		new_table->IsBestOfThree(weightclass->BestOfThree);
+		//new_table->IsBestOfThree(weightclass->BestOfThree);
 		new_table->SetMatID(1);//Choose 1 as the default mat
 		new_table->SetScheduleIndex(GetFreeScheduleIndex(1));
 		new_table->DeleteSchedule();
@@ -210,6 +222,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		table->DeleteSchedule();
 
 	//Add matches
+	std::vector<int> injured_judokas;
 	for (auto& match : File.GetMatches())
 	{
 		Judoka* white = nullptr;
@@ -222,7 +235,9 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		if (white && blue && *white == *blue)//Filter dummy matches
 			continue;
-
+		//if (!white && !blue)//Filter dummy matches
+			//continue;
+		
 		Match* new_match = new Match(white, blue, this);
 
 		if (match.Result == 1)//Match completed?
@@ -231,6 +246,23 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 				new_match->SetResult(Match::Result(Fighter::White, (Match::Score)match.ScoreWinner, match.Time));
 			else
 				new_match->SetResult(Match::Result(Fighter::Blue,  (Match::Score)match.ScoreWinner, match.Time));
+		}
+		else if (match.WhiteOutMatchNo >= match.MatchNo)//White injured?
+		{
+			injured_judokas.push_back(match.WhiteID);
+			new_match->SetResult(Match::Result(Fighter::Blue, (Match::Score)match.ScoreWinner, match.Time));
+		}
+		else if (match.RedOutMatchNo >= match.MatchNo)//Red/Blue injured?
+		{
+			injured_judokas.push_back(match.RedID);
+			new_match->SetResult(Match::Result(Fighter::White, (Match::Score)match.ScoreWinner, match.Time));
+		}
+		else//Is one judoka injured?
+		{
+			if (std::find(injured_judokas.begin(), injured_judokas.end(), match.WhiteID) != injured_judokas.end())
+				new_match->SetResult(Match::Result(Fighter::Blue, Match::Score::Ippon, 0));
+			else if (std::find(injured_judokas.begin(), injured_judokas.end(), match.RedID) != injured_judokas.end())
+				new_match->SetResult(Match::Result(Fighter::White, Match::Score::Ippon, 0));
 		}
 
 		if (match.Weightclass && match.Weightclass->pUserData)
@@ -247,23 +279,108 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 				else
 					de->AddMatchToWinnerBracket(new_match);
 			}
+			else if (match_table->GetType() == MatchTable::Type::Pool)
+			{
+				auto pool = (Pool*)match_table;
+
+				assert(match.Pool <= pool->GetPoolCount());
+
+				if (match.Pool == 0)
+				{
+					if (match.Status != 0)
+					{
+						if (match.AreaID == 9)
+							new_match->SetTag(Match::Tag::Finals());
+						else if (match.AreaID == 4)
+							new_match->SetTag(Match::Tag::Third());
+						else if (match.AreaID == 5)
+							new_match->SetTag(Match::Tag::Fifth());
+
+						pool->GetFinals().AddMatch(new_match);
+					}
+				}
+				else if (match.Pool <= pool->GetPoolCount())
+					pool->GetPool(match.Pool - 1)->AddMatch(new_match);
+				else
+					ZED::Log::Error("Can not import match into pool match table");
+
+				pool->CopyMatchesFromSubtables();
+			}
 			else
 				match_table->AddMatch(new_match);
-
-			//Add to schedule
-			if (!new_match->IsEmptyMatch())
-			{
-				auto index = match_table->FindMatchIndex(*new_match);
-				m_Schedule.emplace_back(match_table, index);
-			}
 		}
 	}
+
+	//Re-order matches (for elimination for third and fifth place)
+	for (auto table : m_MatchTables)
+	{
+		if (table->GetType() == MatchTable::Type::Pool)
+		{
+			auto pool = (Pool*)table;
+			if (pool->GetFinals().GetSchedule().empty())
+			{
+				//pool->GetFinals().GenerateSchedule();
+				pool->AutoGenerateSchedule(true);
+				pool->GenerateSchedule();
+				pool->CopyMatchesFromSubtables();
+
+				//for (auto match : pool->GetFinals().GetSchedule())
+					//m_Schedule.emplace_back(table, table->FindMatchIndex(*match));
+			}
+			//else
+				//pool->GetFinals().ReorderLastMatches();
+		}
+		else if (table->GetType() == MatchTable::Type::SingleElimination)
+		{
+			auto se = (SingleElimination*)table;
+			//se->ReorderLastMatches();
+		}
+		/*else if (table->GetType() == MatchTable::Type::DoubleElimination)
+		{
+			auto de = (DoubleElimination*)table;
+			de->GetWinnerBracket().ReorderLastMatches();
+		}*/
+		else if (table->GetType() == MatchTable::Type::RoundRobin && table->IsBestOfThree())
+		{
+			if (table->GetSchedule().size() == 3)
+				table->SetSchedule()[2]->SetBestOfThree(table->GetSchedule()[0], table->GetSchedule()[1]);
+		}
+	}
+
+	//Build schedule
+	BuildSchedule();
+
+	//Check number of matches
+#ifdef _DEBUG
+	for (auto weightclass : File.GetWeightclasses())
+	{
+		auto table = (MatchTable*)weightclass->pUserData;
+		auto md5_schedule = File.FindMatchesOfWeightclass(weightclass->AgeGroupID, weightclass->ID);
+
+		if (!table || table->GetType() == MatchTable::Type::RoundRobin)
+			continue;
+
+		//assert(table->GetSchedule().size() == md5_schedule.size());
+	}
+
+	//Check for duplicates
+	auto schedule = GetSchedule();
+	for (size_t i = 0; i < schedule.size(); ++i)
+		for (size_t j = i + 1; j < schedule.size(); ++j)
+	{
+		assert(schedule[i]->GetUUID() != schedule[j]->GetUUID());
+	}
+
+	//Check for invalids
+	for (auto match : schedule)
+		assert(!match->IsEmptyMatch());
+#endif
 
 	//Re-enabled auto generation
 	for (auto table : m_MatchTables)
 		table->AutoGenerateSchedule(true);
   
-  //If there are not matches, create them
+	//If there are not matches, create them
 	if (GetSchedule().size() == 0)
 		GenerateSchedule();
 }
@@ -421,6 +538,7 @@ bool Tournament::Load(const YAML::Node& yaml)
 #endif
 
 			UUID id = node.as<std::string>();
+			
 			for (auto table : m_MatchTables)
 			{
 				auto index = table->FindMatchIndex(id);
@@ -449,6 +567,8 @@ bool Tournament::LoadYAML(const std::string& Filename)
 		ZED::Log::Warn("Could not open file " + Filename);
 		return false;
 	}
+	else
+		ZED::Log::Info("Opening file " + Filename);
 
 	YAML::Node yaml = YAML::LoadFile(Filename);
 
@@ -570,6 +690,26 @@ bool Tournament::SaveYAML(const std::string& Filename)
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
 		yaml << (std::string)match->GetUUID();
+
+#ifdef _DEBUG
+	for (const auto& match : schedule)
+	{
+		assert(!match->IsEmptyMatch());
+		assert(!match->IsCompletelyEmptyMatch());
+
+		UUID id = match->GetUUID();
+		bool found = false;
+
+		for (auto table : m_MatchTables)
+		{
+			auto index = table->FindMatchIndex(id);
+			if (index != SIZE_MAX)
+				found = true;
+		}
+
+		assert(found);
+	}
+#endif
 
 	yaml << YAML::EndSeq;
 
@@ -2289,13 +2429,22 @@ void Tournament::GenerateSchedule()
 
 	auto guard = LockWriteForScope();
 
-	m_Schedule.clear();
-
 	for (auto table : m_MatchTables)
 	{
 		if (table)
 			table->GenerateSchedule();
 	}
+
+	BuildSchedule();
+}
+
+
+
+void Tournament::BuildSchedule()
+{
+	auto guard = LockWriteForScope();
+
+	m_Schedule.clear();
 
 	//Check if there is a schedule index that is not used
 	//so that we can move match tables up
@@ -2342,16 +2491,6 @@ void Tournament::GenerateSchedule()
 
 				for (uint32_t i = 0; i < num;)
 				{
-					/*if (schedule.size() > 0)
-					{
-						auto match = schedule.front();
-						if (!match->IsEmptyMatch())
-							m_Schedule.push_back(match);
-
-						schedule.erase(schedule.begin());
-						done = false;
-					}*/
-
 					if (index < table->GetSchedule().size())
 					{
 						auto match = table->GetSchedule()[index];

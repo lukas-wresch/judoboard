@@ -2216,7 +2216,7 @@ TEST(Ajax, MatchTable_Edit)
 		EXPECT_EQ(((RoundRobin*)tables[0])->IsBestOfThree(), true);
 
 
-		EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&fight_system=4&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+		EXPECT_TRUE(app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&fight_system=4&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")));
 
 		ASSERT_EQ(tables.size(), 1);
 		EXPECT_EQ(tables[0]->GetUUID(), old_uuid);
@@ -2230,12 +2230,12 @@ TEST(Ajax, MatchTable_Edit)
 		EXPECT_EQ( ((Weightclass*) tables[0]->GetFilter())->GetGender(), Gender::Male);
 		EXPECT_EQ(((RoundRobin*)tables[0])->IsBestOfThree(), true);
 
-		EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)(((Pool*)tables[0])->GetFinals()).GetUUID(), "name=Test4&fight_system=3&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+		EXPECT_TRUE(app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)(((Pool*)tables[0])->GetFinals()).GetUUID(), "name=Test4&fight_system=3&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")));
 
 		auto& finals = ((Pool*)tables[0])->GetFinals();
 
-		ASSERT_EQ(finals.GetName(), "Test4");
-		ASSERT_EQ(finals.IsBestOfThree(), true);
+		EXPECT_EQ(finals.GetName(), "Test4");
+		EXPECT_EQ(finals.IsBestOfThree(), true);
 
 
 

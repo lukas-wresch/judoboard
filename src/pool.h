@@ -15,6 +15,8 @@ namespace Judoboard
 		Pool(IFilter* Filter, const ITournament* Tournament = nullptr);
 		Pool(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
 		Pool(const YAML::Node& Yaml, ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
+		Pool(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
+			: Pool(new Weightclass(Weightclass_, this), Tournament) {}
 
 		~Pool() {
 			SetSchedule().clear();
@@ -71,7 +73,8 @@ namespace Judoboard
 	protected:
 		virtual void DeleteSchedule() override {
 			for (auto pool : m_Pools)
-				pool->DeleteSchedule();
+				if (pool)
+					pool->DeleteSchedule();
 			m_Finals.DeleteSchedule();
 			MatchTable::DeleteSchedule();
 		}

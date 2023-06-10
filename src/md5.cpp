@@ -1095,15 +1095,15 @@ bool MD5::Save(const std::string& Filename) const
 
 			Write_Int(match.Status);
 
-			if (match.RedOutMatchID < 0)
+			if (match.RedOutMatchNo < 0)
 				Write_Line("");
 			else
-				Write_Int(match.RedOutMatchID);
+				Write_Int(match.RedOutMatchNo);
 
-			if (match.WhiteOutMatchID < 0)
+			if (match.WhiteOutMatchNo < 0)
 				Write_Line("");
 			else
-				Write_Int(match.WhiteOutMatchID);
+				Write_Int(match.WhiteOutMatchNo);
 
 			Write_Int(match.Pool);
 			Write_Int(match.ThirdMatchNo);
@@ -1269,6 +1269,30 @@ std::vector<const MD5::Participant*> MD5::FindParticipantsOfWeightclass(int AgeG
 
 
 
+std::vector<MD5::Match> MD5::FindMatchesOfWeightclass(int AgeGroupID, int WeightclassID) const
+{
+	std::vector<MD5::Match> ret;
+
+	for (const auto& match : m_Matches)
+		if (match.AgeGroupID == AgeGroupID && match.WeightclassID == WeightclassID)
+			ret.push_back(match);
+	return ret;
+}
+
+
+
+std::vector<MD5::Match> MD5::FindMatchesOfWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const
+{
+	std::vector<MD5::Match> ret;
+
+	for (const auto& match : m_Matches)
+		if (match.AgeGroup && match.AgeGroup->Name == AgeGroup && match.Weightclass && match.Weightclass->Description == Weightclass)
+			ret.push_back(match);
+	return ret;
+}
+
+
+
 MD5::AgeGroup* MD5::FindAgeGroup(int AgeGroupID)
 {
 	if (AgeGroupID <= -1)
@@ -1320,6 +1344,7 @@ const MD5::Weightclass* MD5::FindWeightclass(const std::string& AgeGroup, const 
 
 const MD5::Result* MD5::FindResult(int AgeGroupID, int WeightclassID, int Rank) const
 {
+	assert(Rank >= 1);
 	for (auto& result : m_Results)
 		if (result.AgeGroupID == AgeGroupID && result.WeightclassID == WeightclassID && result.RankNo == Rank)
 			return &result;
@@ -1330,6 +1355,7 @@ const MD5::Result* MD5::FindResult(int AgeGroupID, int WeightclassID, int Rank) 
 
 const MD5::Result* MD5::FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const
 {
+	assert(Rank >= 1);
 	for (auto& result : m_Results)
 		if (result.AgeGroup && result.AgeGroup->Name == AgeGroup && result.Weightclass && result.Weightclass->Description == Weightclass && result.RankNo == Rank)
 			return &result;
@@ -1428,6 +1454,8 @@ void MD5::Dump() const
 		std::string line = table->Description;
 		line += "   FightSystemID: "        + std::to_string(table->FightSystemID);
 		line += "   FightSystemTypeID: "    + std::to_string(table->FightSystemTypeID);
+		line += "   AgeGroupID: "           + std::to_string(table->AgeGroupID);
+		line += "   "    + table->Description;
 		ZED::Log::Info(line);
 	}
 
@@ -1435,14 +1463,16 @@ void MD5::Dump() const
 	for (const auto& match : m_Matches)
 	{
 		std::string line;
-		line += "   RedID: "        + std::to_string(match.RedID);
-		line += "   WhiteID: "      + std::to_string(match.WhiteID);
-		line += "   StartNoRed: "   + std::to_string(match.StartNoRed);
-		line += "   StartNoWhite: " + std::to_string(match.StartNoWhite);
-		line += "   Status: "       + std::to_string(match.Status);
-		line += "   Pool: "         + std::to_string(match.Pool);
-		line += "   AreaID: "       + std::to_string(match.AreaID);
-		line += "   MatchNo: "      + std::to_string(match.MatchNo);
+		line += "   RedID: "         + std::to_string(match.RedID);
+		line += "   WhiteID: "       + std::to_string(match.WhiteID);
+		line += "   StartNoRed: "    + std::to_string(match.StartNoRed);
+		line += "   StartNoWhite: "  + std::to_string(match.StartNoWhite);
+		line += "   Status: "        + std::to_string(match.Status);
+		line += "   Pool: "          + std::to_string(match.Pool);
+		line += "   AreaID: "        + std::to_string(match.AreaID);
+		line += "   MatchNo: "       + std::to_string(match.MatchNo);
+		line += "   WeightclassID: " + std::to_string(match.WeightclassID);
+		line += "   AgeGroupID: "    + std::to_string(match.AgeGroupID);
 		ZED::Log::Info(line);
 	}
 
@@ -2053,7 +2083,7 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 				//Version 7
 
 				else if (header[i] == "BestOfThree")
-					new_weightclass.BestOfThree = data[i] != "1";			
+					new_weightclass.BestOfThree = data[i] != "1";
 			}
 
 			m_Weightclasses.emplace_back(new Weightclass(new_weightclass));
@@ -2480,13 +2510,13 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 				}
 				else if (header[i] == "RotAusgeschiedenKampfNR")
 				{
-					if (sscanf_s(data[i].c_str(), "%d", &new_match.RedOutMatchID) != 1)
-						ZED::Log::Warn("Could not read RedOutMatchID of match");
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.RedOutMatchNo) != 1)
+						ZED::Log::Warn("Could not read RedOutMatchNo of match");
 				}
 				else if (header[i] == "WeissAusgeschiedenKampfNR")
 				{
-					if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteOutMatchID) != 1)
-						ZED::Log::Warn("Could not read WhiteOutMatchID of match");
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteOutMatchNo) != 1)
+						ZED::Log::Warn("Could not read WhiteOutMatchNo of match");
 				}
 				else if (header[i] == "Pool")
 				{

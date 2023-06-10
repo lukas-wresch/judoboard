@@ -388,6 +388,8 @@ namespace Judoboard
 
 		static std::string GetHTMLForm();
 
+		const std::string GetHTMLTop() const;
+
 		Match* AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosition);
 		Match* CreateAutoMatch(const DependentJudoka& White, const DependentJudoka& Blue);
 		Match* AddMatchForWinners(Match* Match1, Match* Match2);

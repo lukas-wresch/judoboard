@@ -198,87 +198,89 @@ void RoundRobin::operator >> (YAML::Emitter& Yaml) const
 
 const std::string RoundRobin::ToHTML() const
 {
-	std::string ret;
-
-	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
-
-	if (GetMatID() != 0)
-		ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
+	std::string ret = GetHTMLTop();
 
 	if (!GetFilter())
 		return ret;
 
-	ret += R"(<table width="50%" border="1" rules="all"><tr><th style="text-align: center;">)" + Localizer::Translate("No.")
-		+ "</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name") + "</th>";
-
-	for (size_t i = 0; i < GetMaxStartPositions(); ++i)
+	if (!GetSchedule().empty())
 	{
-		auto fighter = GetJudokaByStartPosition(i);
+		ret += R"(<table width="50%" border="1" rules="all"><tr><th style="text-align: center;">)" + Localizer::Translate("No.")
+			+ "</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name") + "</th>";
 
-		if (fighter)
-			ret += "<th>vs " + fighter->GetName(NameStyle::GivenName) + "</th>";
-	}
-
-	ret += "<th style=\"text-align: center; width: 2.0cm;\">Total</th>";
-	ret += "</tr>";
-
-	auto results = CalculateResults();
-
-	for (size_t i = 0; i < GetMaxStartPositions(); ++i)
-	{
-		auto fighter = GetJudokaByStartPosition(i);
-
-		if (!fighter)
-			continue;
-
-		ret += "<tr>";
-		ret += "<td style=\"text-align: center;\">" + std::to_string(i+1) + "</td>";
-		ret += "<td>" + fighter->GetName(NameStyle::GivenName) + "<br/>(" + fighter->GetWeight().ToString() + " kg)</td>";
-
-		for (size_t j = 0; j < GetMaxStartPositions(); ++j)
+		for (size_t i = 0; i < GetMaxStartPositions(); ++i)
 		{
-			auto enemy = GetJudokaByStartPosition(j);
-			if (!enemy)
-				continue;
+			auto fighter = GetJudokaByStartPosition(i);
 
-			auto matches = FindMatches(*fighter, *enemy);
-
-			if (matches.empty())
-				ret += "<td style=\"background-color: #ccc;\"></td>";
-			else
-				ret += "<td style=\"text-align: center;\">";
-
-			for (auto match : matches)
-			{
-				if (match->IsRunning())
-					ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">In Progress</a><br/>";
-				else if (!match->HasConcluded())
-					ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">- - -</a><br/>";
-				else if (match->GetWinner()->GetUUID() == fighter->GetUUID())
-				{
-					const auto& result = match->GetResult();
-					if ((int)result.m_Score > 0)
-						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a><br/>";
-				}
-				else
-				{
-					const auto& result = match->GetResult();
-					if ((int)result.m_Score > 0)
-						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">0 (" + Timer::TimestampToString(result.m_Time) + ")</a><br/>";
-				}
-			}
-
-			ret += "</td>";
+			if (fighter)
+				ret += "<th>vs " + fighter->GetName(NameStyle::GivenName) + "</th>";
 		}
 
-		const auto result = results.GetResultsOf(fighter);
-		if (result)
-			ret += "<td style=\"text-align: center;\">" + std::to_string(result->Wins) + " : " + std::to_string(result->Score) + "<br/>(" + Timer::TimestampToString(result->Time) + ")</td>";
-
+		ret += "<th style=\"text-align: center; width: 2.0cm;\">Total</th>";
 		ret += "</tr>";
+
+		auto results = CalculateResults();
+
+		for (size_t i = 0; i < GetMaxStartPositions(); ++i)
+		{
+			auto fighter = GetJudokaByStartPosition(i);
+
+			if (!fighter)
+				continue;
+
+			ret += "<tr>";
+			ret += "<td style=\"text-align: center;\">" + std::to_string(i + 1) + "</td>";
+			ret += "<td>" + fighter->GetName(NameStyle::GivenName) + "<br/>(" + fighter->GetWeight().ToString() + " kg)</td>";
+
+			for (size_t j = 0; j < GetMaxStartPositions(); ++j)
+			{
+				auto enemy = GetJudokaByStartPosition(j);
+				if (!enemy)
+					continue;
+
+				auto matches = FindMatches(*fighter, *enemy);
+
+				if (matches.empty())
+					ret += "<td style=\"background-color: #ccc;\"></td>";
+				else
+					ret += "<td style=\"text-align: center;\">";
+
+				for (auto match : matches)
+				{
+					if (match->IsRunning())
+						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">In Progress</a><br/>";
+					else if (!match->HasConcluded())
+						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">- - -</a><br/>";
+					else if (match->GetWinner()->GetUUID() == fighter->GetUUID())
+					{
+						const auto& result = match->GetResult();
+						if ((int)result.m_Score > 0)
+							ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">" + std::to_string((int)result.m_Score) + " (" + Timer::TimestampToString(result.m_Time) + ")</a><br/>";
+					}
+					else
+					{
+						const auto& result = match->GetResult();
+						if ((int)result.m_Score > 0)
+							ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">0 (" + Timer::TimestampToString(result.m_Time) + ")</a><br/>";
+					}
+				}
+
+				ret += "</td>";
+			}
+
+			const auto result = results.GetResultsOf(fighter);
+			if (result)
+				ret += "<td style=\"text-align: center;\">" + std::to_string(result->Wins) + " : " + std::to_string(result->Score) + "<br/>(" + Timer::TimestampToString(result->Time) + ")</td>";
+
+			ret += "</tr>";
+		}
+
+		ret += "</table>";
+		ret += ResultsToHTML();
 	}
 
-	ret += ResultsToHTML();
+	if (!IsSubMatchTable())
+		ret += "</div>";
 
 	return ret;
 }

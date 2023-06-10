@@ -174,9 +174,12 @@ namespace Judoboard
 			//14 = 2 participants (best of 3?)
 			//15 = round robin?
 			//16 = round robin (5 participants)
+			//17 = round robin (5 participants)
+			//41 = round robin (2 participants, best of three)
 			//19 = Single elimination (single consulation bracket, 16 system)
 			//20 = Single elimination (single consulation bracket, 32 system)
 			//24 = pooled (6 participants) 3+3 pool
+			//26 = ??? (pool?)
 			int FightSystemTypeID = 1;//Unknown field, always 1
 
 			bool MatchForThirdPlace = false;
@@ -276,8 +279,9 @@ namespace Judoboard
 			//5 = completed match (is elimination match)
 			//0, 2, 4, 5 = ???
 
-			int RedOutMatchID   = -1;
-			int WhiteOutMatchID = -1;
+			int RedOutMatchNo   = -1;
+			int WhiteOutMatchNo = -1;
+			//White or red dropped out (injured) from this match on
 
 			int Pool = 0;//ID of the pool
 			//1 for round robin (sometimes 0!?)
@@ -342,6 +346,8 @@ namespace Judoboard
 		[[nodiscard]] Club*         FindClubByName(const std::string& Name) const;
 		[[nodiscard]] Participant*  FindParticipant(int ParticipantID);
 		[[nodiscard]] std::vector<const MD5::Participant*> FindParticipantsOfWeightclass(int AgeGroupID, int WeightclassID) const;
+		[[nodiscard]] std::vector<MD5::Match> FindMatchesOfWeightclass(int AgeGroupID, int WeightclassID) const;
+		[[nodiscard]] std::vector<MD5::Match> FindMatchesOfWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const;
 		[[nodiscard]] AgeGroup*     FindAgeGroup(int AgeGroupID);
 		[[nodiscard]] Weightclass*  FindWeightclass(int AgeGroupID, int WeightclassID);
 		[[nodiscard]] const Weightclass* FindWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const;

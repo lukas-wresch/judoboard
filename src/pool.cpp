@@ -175,9 +175,6 @@ void Pool::GenerateSchedule()
 
 	m_RecommendedNumMatches_Before_Break = 4;//TODO
 
-	if (!GetFilter() || GetParticipants().size() <= 1)
-		return;
-
 	auto old_pools = std::move(m_Pools);
 	assert(m_Pools.empty());
 
@@ -189,7 +186,10 @@ void Pool::GenerateSchedule()
 	//Distribute participants to pools
 	for (int i = 0; i < pool_count; ++i)
 	{
-		m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
+		if (GetFilter())
+			m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
+		else
+			m_Pools[i] = new RoundRobin(nullptr);
 
 		std::string name = Localizer::Translate("Pool") + " ";
 		name.append(&letters[i % 26], 1);
@@ -293,6 +293,7 @@ void Pool::GenerateSchedule()
 	auto color  = m_Finals.GetColor();
 	auto name   = m_Finals.GetName();
 	auto mat_id = m_Finals.GetMatID();
+	auto bo3    = m_Finals.IsBestOfThree();
 
 	m_Finals = SingleElimination(final_input);
 	m_Finals.SetName(Localizer::Translate("Finals"));
@@ -303,6 +304,22 @@ void Pool::GenerateSchedule()
 	if (!name.empty())
 		m_Finals.SetName(name);
 	m_Finals.SetMatID(mat_id);
+	m_Finals.IsBestOfThree(bo3);
+
+	//Four or less get forwarded, need to a fifth place match manually
+	if (pool_count * m_TakeTop <= 4 && IsFifthPlaceMatch())
+	{
+		assert(pool_count == 2);//TODO
+		assert(m_TakeTop == 2);//TODO
+
+		auto fifth_place_match = new Match(DependentJudoka(DependencyType::TakeRank3, *m_Pools[0]),
+										   DependentJudoka(DependencyType::TakeRank3, *m_Pools[1]), GetTournament());
+		fifth_place_match->SetTag(Match::Tag::Fifth() & Match::Tag::Finals());
+
+		m_Finals.AddMatch(fifth_place_match);
+
+		//TODO do the more general case
+	}
 
 
 	CopyMatchesFromSubtables();
@@ -312,6 +329,8 @@ void Pool::GenerateSchedule()
 
 void Pool::CopyMatchesFromSubtables()
 {
+	SetSchedule().clear();
+
 	//Add matches from pools
 	size_t index = 0;
 	bool added;
@@ -334,7 +353,8 @@ void Pool::CopyMatchesFromSubtables()
 
 
 	//Add matches for single elimination phase
-	for (auto match : m_Finals.GetSchedule())
+	auto final_schedule = m_Finals.GetSchedule();
+	for (auto match : final_schedule)
 		AddMatch(match);
 }
 
@@ -342,13 +362,7 @@ void Pool::CopyMatchesFromSubtables()
 
 const std::string Pool::ToHTML() const
 {
-	std::string ret;
-
-	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
-
-	ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
-
-	ret += "<br/>";
+	std::string ret = GetHTMLTop();
 
 	for (auto pool : m_Pools)
 		ret += pool->ToHTML() + "<br/><br/>";
@@ -356,6 +370,9 @@ const std::string Pool::ToHTML() const
 	ret += m_Finals.ToHTML();
 
 	//ret += ResultsToHTML();
+
+	if (!IsSubMatchTable())
+		ret += "</div>";
 
 	return ret;
 }
