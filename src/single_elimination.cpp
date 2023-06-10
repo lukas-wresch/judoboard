@@ -89,16 +89,6 @@ void SingleElimination::ToString(YAML::Emitter& Yaml) const
 
 size_t SingleElimination::GetNumberOfRounds() const
 {
-	if (GetSchedule().size() >= 3 && GetSchedule().size() <= 5)
-	{
-		auto count = GetSchedule().size();
-		if (IsThirdPlaceMatch())
-			count--;
-		if (IsFifthPlaceMatch())
-			count--;
-		return (size_t)std::ceil(std::log2(count + 1));
-	}
-
 	if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
 		return 0;
 
@@ -490,69 +480,6 @@ bool SingleElimination::AddMatch(Match* NewMatch)
 
 
 
-void SingleElimination::ReorderLastMatches()
-{
-	auto& schedule = SetSchedule();
-
-	if (IsFifthPlaceMatch() && schedule.size() >= 6)
-	{
-		//Swap matches so that match for 1st place is still the last one
-		//Expects: S1   S2   1  3 5_1 5_2 5_3
-		//Output:  5_1 5_2 5_3  3  S1  S2   1
-		int offset = 3;
-
-		std::swap(schedule[schedule.size() - 1 - offset - 2], schedule[schedule.size() - 1 - 2]);
-		std::swap(schedule[schedule.size() - 1 - offset - 1], schedule[schedule.size() - 1 - 1]);
-		std::swap(schedule[schedule.size() - 1 - offset],     schedule[schedule.size() - 1]);
-
-		if (IsThirdPlaceMatch())
-			std::swap(schedule[schedule.size() - 1 - offset - 3], schedule[schedule.size() - 1 - 3]);
-	}
-
-	else if (IsFifthPlaceMatch() && !IsThirdPlaceMatch() && schedule.size() >= 4)
-	{
-		//Swap matches so that match for 1st place is still the last one
-		//Expects: S1 S2  1  5
-		//Outputs:  5  S1 S2 1
-
-		std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 3 - 1]);
-		//5 S2 1 S1
-
-		std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 1 - 1]);
-		//5 S2 S1 1
-
-		std::swap(schedule[schedule.size() - 2], schedule[schedule.size() - 2 - 1]);
-		//5 S1 S2 1
-	}
-
-	else if (IsFifthPlaceMatch() && IsThirdPlaceMatch() && schedule.size() >= 5)
-	{
-		//Swap matches so that match for 1st place is still the last one
-		//Expects: S1 S2  1  3 5
-		//Outputs:  5  S1 S2 3 1
-
-		std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 4 - 1]);
-		//5 S2 1 3 S1
-
-		std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 2 - 1]);
-		//5 S2 S1 3 1
-
-		std::swap(schedule[schedule.size() - 3], schedule[schedule.size() - 3 - 1]);
-		//5 S1 S2 3 1
-	}
-
-	else if (IsThirdPlaceMatch() && schedule.size() >= 2)
-	{
-		//Swap matches so that match for 1st place is still the last one
-		//Expects: 1 3
-		//Output:  3 1
-
-		std::swap(schedule[schedule.size() - 1], schedule[schedule.size() - 2]);
-	}
-}
-
-
-
 const std::string SingleElimination::ToHTML() const
 {
 	std::string ret = GetHTMLTop();
@@ -632,9 +559,7 @@ const std::string SingleElimination::ToHTML() const
 	ret += "</table>";
 
 
-	auto& schedule = GetSchedule();
-
-	if (IsThirdPlaceMatch() && schedule.size() >= 2)
+	if (IsThirdPlaceMatch() && m_ThirdPlaceMatches.size() >= 1)
 	{
 		ret += "<table width=\"" + std::to_string(width) + "%\" border='1' rules='all' style=\"margin-bottom: 5mm;\">";
 
@@ -643,33 +568,14 @@ const std::string SingleElimination::ToHTML() const
 		ret += "</tr>";
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += RenderMatch(*schedule[schedule.size() - 2]);
+		ret += RenderMatch(*m_ThirdPlaceMatches[m_ThirdPlaceMatches.size() - 1]);
 		ret += "</tr>";
 
 		ret += "</table>";
 	}
 
 
-	if (IsFifthPlaceMatch() && schedule.size() < 6)
-	{
-		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";
-
-		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += "<th width=\"" + std::to_string(width) + "%\">" + Localizer::Translate("5th Place Match") + "</th>";
-		ret += "</tr>";
-
-		int offset = 3;
-		if (IsThirdPlaceMatch())
-			offset = 4;
-
-		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += RenderMatch(*schedule[schedule.size() - offset - 1]);
-		ret += "</tr>";
-
-		ret += "</table>";
-	}
-
-	else if (IsFifthPlaceMatch() && schedule.size() >= 6)
+	else if (IsFifthPlaceMatch() && m_FifthPlaceMatches.size() >= 3)
 	{
 		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";
 
@@ -677,23 +583,35 @@ const std::string SingleElimination::ToHTML() const
 		ret += "<th colspan=\"2\" width=\"" + std::to_string(width*2) + "%\">" + Localizer::Translate("5th Place Match") + "</th>";
 		ret += "</tr>";
 
-		int offset = 4;
-		if (IsThirdPlaceMatch())
-			offset = 5;
-
 		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += RenderMatch(*schedule[schedule.size() - offset - 2], "border-left-style: hidden; border-right-style: hidden;");
+		ret += RenderMatch(*m_FifthPlaceMatches[m_FifthPlaceMatches.size() - 3], "border-left-style: hidden; border-right-style: hidden;");
 		ret += "<td style=\"border-bottom-style: hidden; border-right-style: hidden;\"></td>";
 		ret += "</tr>";
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
 		ret += "<td style=\"border-bottom-style: hidden; border-left-style: hidden;\"></td>";
-		ret += RenderMatch(*schedule[schedule.size() - offset], "border-right-style: hidden;");
+		ret += RenderMatch(*m_FifthPlaceMatches[m_FifthPlaceMatches.size() - 2], "border-right-style: hidden;");
 		ret += "</tr>";
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += RenderMatch(*schedule[schedule.size() - offset - 1], "border-left-style: hidden;");
+		ret += RenderMatch(*m_FifthPlaceMatches[m_FifthPlaceMatches.size() - 1], "border-left-style: hidden;");
 		ret += "<td style=\"border-bottom-style: hidden; border-right-style: hidden;\"></td>";
+		ret += "</tr>";
+
+		ret += "</table>";
+	}
+
+
+	if (IsFifthPlaceMatch() && m_FifthPlaceMatches.size() >= 1)
+	{
+		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += "<th width=\"" + std::to_string(width) + "%\">" + Localizer::Translate("5th Place Match") + "</th>";
+		ret += "</tr>";
+
+		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += RenderMatch(*m_FifthPlaceMatches[m_FifthPlaceMatches.size() - 1]);
 		ret += "</tr>";
 
 		ret += "</table>";

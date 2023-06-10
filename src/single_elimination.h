@@ -77,8 +77,6 @@ namespace Judoboard
 
 		void IsThirdPlaceMatch(bool Enable) { m_ThirdPlaceMatch = Enable; GenerateSchedule(); }
 		void IsFifthPlaceMatch(bool Enable) { m_FifthPlaceMatch = Enable; GenerateSchedule(); }
-
-		[[deprecated]] void ReorderLastMatches();//Swaps the last matches so that the final match swaps with 3rd or 5th place match
     
 		size_t GetNumberOfRounds() const;
 

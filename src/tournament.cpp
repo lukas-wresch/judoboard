@@ -308,13 +308,6 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			}
 			else
 				match_table->AddMatch(new_match);
-
-			//Add to schedule
-			if (!new_match->IsEmptyMatch())
-			{
-				//auto index = match_table->FindMatchIndex(*new_match);
-				//m_Schedule.emplace_back(match_table, index);
-			}
 		}
 	}
 
@@ -380,13 +373,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 	//Check for invalids
 	for (auto match : schedule)
-	{
-		//assert(!match->IsCompletelyEmptyMatch());
-		/*if (!match->GetFighter(Fighter::White))
-			assert(match->GetDependentMatchOf(Fighter::White) || match->GetDependentMatchTableOf(Fighter::White));
-		if (!match->GetFighter(Fighter::Blue))
-			assert(match->GetDependentMatchOf(Fighter::Blue)  || match->GetDependentMatchTableOf(Fighter::Blue));*/
-	}
+		assert(!match->IsEmptyMatch());
 #endif
 
 	//Re-enabled auto generation
@@ -536,23 +523,6 @@ bool Tournament::Load(const YAML::Node& yaml)
 				m_MatchTables.push_back(new_table);
 		}
 	}
-
-#ifdef _DEBUG
-	//Check for invalids
-	for (auto table : m_MatchTables)
-	{
-		auto schedule = table->GetSchedule();
-
-		for (auto match : schedule)
-		{
-			//assert(!match->IsCompletelyEmptyMatch());
-			/*if (!match->GetFighter(Fighter::White))
-				assert(match->GetDependentMatchOf(Fighter::White) || match->GetDependentMatchTableOf(Fighter::White));
-			if (!match->GetFighter(Fighter::Blue))
-				assert(match->GetDependentMatchOf(Fighter::Blue)  || match->GetDependentMatchTableOf(Fighter::Blue));*/
-		}
-	}
-#endif
 
 	m_Schedule.clear();
 
@@ -724,6 +694,9 @@ bool Tournament::SaveYAML(const std::string& Filename)
 #ifdef _DEBUG
 	for (const auto& match : schedule)
 	{
+		assert(!match->IsEmptyMatch());
+		assert(!match->IsCompletelyEmptyMatch());
+
 		UUID id = match->GetUUID();
 		bool found = false;
 
