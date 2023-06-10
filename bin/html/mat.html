@@ -1,15 +1,15 @@
 <div style="margin-left: 0.5cm; font-size: 20pt;">
   <label id="mat"></label> - <label id="time"></label>: <span id="hajimetime"></span><br/>
-  <label id="matchtable_label"></label>: <label id="matchtable"></label>
+  <label class="matchtable_label"></label>: <label id="matchtable"></label>
 </div>
 
-<table border="1" rules="all" style="margin-top: 3mm; margin-bottom: 0mm; width: 23.0cm;">
+<table border="1" rules="all" style="margin-top: 3mm; margin-bottom: 0mm; width: 30.0cm;">
   <tr id="next_matches_row" style="display:none;">
     <td style="text-align: center; font-size: 16pt; width: 100%;">
       <div id="next_matches_div" style="display:none; height: 0px;">
       <table width="100%" id="next_matches_table" border="0" rules="all">
-        <tr><td id="next_matches" style="width: 13.07cm; text-align: center; font-size: 16pt;" colspan="2"></td>
-        <td id="label_break"></td><td></td></tr>
+        <tr><td id="next_matches" style="width: 13.6cm; text-align: center; font-size: 16pt;" colspan="2"></td>
+        <td class="matchtable_label"></td><td id="label_break"></td><td></td></tr>
       </table>
       </div>
     </td>
@@ -779,25 +779,25 @@ function GetJudokaName()
 
   AjaxCallback("ajax/mat/names_on_mat?id="+id, function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    let res = YAML.parse(response);
 
     updateJudokaName = false;
 
     document.getElementById("mat").innerHTML = res.mat_name;
     document.getElementById("matchtable").innerHTML = res.match_table_name;
 
-    var name1 = res.white_name;
+    let name1 = res.white_name;
     if (name1.length > 20)
       name1 = name1.substr(0, 20) + ".";
 
-    var name2 = res.blue_name;
+    let name2 = res.blue_name;
     if (name2.length > 20)
       name2 = name2.substr(0, 20) + ".";
 
-    var white_name;
-    var blue_name;
+    let white_name;
+    let blue_name;
 
-    var hidden = 'hidden="" ';
+    let hidden = 'hidden="" ';
     if (CurrentScore.has_concluded && CurrentScore.winner == 0)
       hidden = '';
     white_name = name1 + '<img src="winner.png" id="winner_white" ' + hidden + 'style="width: 5mm; margin-top: 1.5mm; margin-left: 2mm;">';
@@ -815,42 +815,46 @@ function GetJudokaName()
       document.getElementById("blue_name").innerHTML  = blue_name;
     }
 
-    var table = document.getElementById("next_matches_table");
+    let table = document.getElementById("next_matches_table");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    var i = 0;
+    let i = 0;
     for (const match of res.next_matches)
     {
-      var row = table.insertRow(-1);
+      let row = table.insertRow(-1);
 
-      var cell1 = row.insertCell(0);
-      var cell2 = row.insertCell(1);
-      var cell3 = row.insertCell(2);
-      var cell4 = row.insertCell(3);
+      let cell1 = row.insertCell(0);
+      let cell2 = row.insertCell(1);
+      let cell3 = row.insertCell(2);
+      let cell4 = row.insertCell(3);
+      let cell5 = row.insertCell(4);
 
       cell1.innerHTML = match.white_name;
       cell2.innerHTML = match.blue_name;
       cell1.style = "width: 7.4cm;";
       cell2.style = "width: 7.4cm; background-color: rgba(30, 30, 255, 1.0); color: white;";
 
-      var current_breaktime = Math.floor(match.current_breaktime/60) + ':' + zeroPad(Math.floor(match.current_breaktime)%60, 2);
-      var breaktime         = Math.floor(match.breaktime/60) + ':' + zeroPad(Math.floor(match.breaktime)%60, 2);
+      if (typeof match.match_table_desc !== 'undefined')
+        cell3.innerHTML = match.match_table_desc;
+
+      let current_breaktime = Math.floor(match.current_breaktime/60) + ':' + zeroPad(Math.floor(match.current_breaktime)%60, 2);
+      let breaktime         = Math.floor(match.breaktime/60) + ':' + zeroPad(Math.floor(match.breaktime)%60, 2);
 
       if (match.current_breaktime >= 10*60)
-        cell3.innerHTML = '- - -';
+        cell4.innerHTML = '- - -';
       else if (match.breaktime > 0)
-        cell3.innerHTML = current_breaktime + ' / ' + breaktime;
+        cell4.innerHTML = current_breaktime + ' / ' + breaktime;
       else
-        cell3.innerHTML = current_breaktime;
+        cell4.innerHTML = current_breaktime;
 
       if (match.current_breaktime < match.breaktime)
       {
         if (match.current_breaktime + 30 > match.breaktime)
-          cell3.style.backgroundColor = "#ff6d";
+          cell4.style.backgroundColor = "#ff6d";
         else
-          cell3.style.backgroundColor = "#e33d";
+          cell4.style.backgroundColor = "#e33d";
       }
 
 
@@ -860,10 +864,10 @@ function GetJudokaName()
         if (CurrentScore.can_next_match_start && match.current_breaktime >= match.breaktime)
           dis = '';
 
-        cell4.innerHTML = '<button ' + dis + ' class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="StartNextMatch(event)" ontouchstart="StartNextMatch(event)">' + translate('start_next_match') + '</button>';
+        cell5.innerHTML = '<button ' + dis + ' class="neutral" style="width: 50mm; margin-top: 1mm;" onclick="StartNextMatch(event)" ontouchstart="StartNextMatch(event)">' + translate('start_next_match') + '</button>';
       }
       else
-        cell4.innerHTML = '<button class="neutral" style="width: 40mm; margin-top: 1mm;" onclick="MoveUp(\'' + match.uuid + '\', event)" ontouchstart="MoveUp(\'' + match.uuid + '\', event)">' + translate('push_up') + '</button>';
+        cell5.innerHTML = '<button class="neutral" style="width: 50mm; margin-top: 1mm;" onclick="MoveUp(\'' + match.uuid + '\', event)" ontouchstart="MoveUp(\'' + match.uuid + '\', event)">' + translate('push_up') + '</button>';
 
       i++;
     }
@@ -1031,11 +1035,11 @@ document.getElementById("next_matches").innerHTML  = translate('next_matches');
 document.getElementById("osaekomi_time").innerHTML = translate('time');
 document.getElementById("osaekomi_for").innerHTML  = translate('for');
 
-document.getElementById("matchtable_label").innerHTML  = translate('match_table');
-
 document.getElementById("label_hansokumake_desc_white").innerHTML = translate('white');
 document.getElementById("label_hansokumake_desc_blue" ).innerHTML = translate('blue');
 
+for (const el of document.getElementsByClassName("matchtable_label"))
+    el.innerHTML = translate('match_table');
 for (const el of document.getElementsByClassName("medical_examiniations"))
     el.innerHTML = translate('medical_examiniations');
 for (const el of document.getElementsByClassName("add_medical_examiniations"))
