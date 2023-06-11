@@ -79,5 +79,7 @@ namespace Judoboard
 		std::vector<Account*> m_Accounts;
 		std::vector<Account::Nonce> m_OpenNonces;
 		mutable std::unordered_map<std::string, std::pair<Account::Nonce, const Account*>> m_ClosedNonces;
+
+		mutable ZED::RecursiveReadWriteMutex m_Mutex;
 	};
 }

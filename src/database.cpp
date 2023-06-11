@@ -15,6 +15,8 @@ using namespace Judoboard;
 
 void Database::Reset()
 {
+	auto guard = m_Mutex.LockWriteForScope();
+
 	StandingData::Reset();
 
 	m_CurrentTournament.clear();
@@ -52,6 +54,8 @@ void Database::Reset()
 
 bool Database::Load(const std::string& Filename)
 {
+	auto guard = m_Mutex.LockWriteForScope();
+
 	m_Filename = Filename;
 	std::ifstream file(Filename);
 	if (!file)
@@ -105,6 +109,8 @@ bool Database::Load(const std::string& Filename)
 
 bool Database::Save(const std::string& Filename) const
 {
+	auto guard = m_Mutex.LockReadForScope();
+
 	if (Filename[0] == '\0')
 		return false;
 
@@ -197,6 +203,8 @@ Judoka* Database::UpdateOrAdd(const JudokaData& NewJudoka, bool ParseOnly, std::
 
 const Account* Database::AddAccount(Account* NewAccount)
 {
+	auto guard = m_Mutex.LockWriteForScope();
+
 	m_Accounts.push_back(NewAccount);
 
 	Save();
@@ -208,6 +216,8 @@ const Account* Database::AddAccount(Account* NewAccount)
 
 const Account* Database::FindAccount(const std::string& Username) const
 {
+	auto guard = m_Mutex.LockReadForScope();
+
 	for (auto account : m_Accounts)
 		if (account && account->GetUsername() == Username)
 			return account;
@@ -219,6 +229,8 @@ const Account* Database::FindAccount(const std::string& Username) const
 
 bool Database::DeleteAccount(const std::string& Username)
 {
+	auto guard = m_Mutex.LockWriteForScope();
+
 	for (auto it = m_Accounts.begin(); it != m_Accounts.end(); ++it)
 	{
 		if (*it && (*it)->GetUsername() == Username)
@@ -236,6 +248,8 @@ bool Database::DeleteAccount(const std::string& Username)
 
 const Account::Nonce& Database::CreateNonce(uint32_t IP, uint16_t RemotePort)
 {
+	auto guard = m_Mutex.LockWriteForScope();
+
 	m_OpenNonces.emplace_back(IP, RemotePort);
 	return m_OpenNonces[m_OpenNonces.size()-1];
 }
@@ -244,6 +258,8 @@ const Account::Nonce& Database::CreateNonce(uint32_t IP, uint16_t RemotePort)
 
 bool Database::DoLogin(const std::string& Username, uint32_t IP, const std::string& Response)
 {
+	auto guard = m_Mutex.LockWriteForScope();
+
 	auto account = FindAccount(Username);
 	if (!account)
 		return false;
@@ -271,6 +287,8 @@ bool Database::DoLogin(const std::string& Username, uint32_t IP, const std::stri
 
 const Account* Database::IsLoggedIn(uint32_t IP, const std::string& Response) const
 {
+	auto guard = m_Mutex.LockWriteForScope();
+
 	auto item = m_ClosedNonces.find(Response);
 
 	if (item == m_ClosedNonces.end())
@@ -297,6 +315,8 @@ const Account* Database::IsLoggedIn(uint32_t IP, const std::string& Response) co
 
 const std::vector<std::pair<Account::Nonce, const Account*>> Database::GetNonces()
 {
+	auto guard = m_Mutex.LockWriteForScope();
+
 	std::vector<std::pair<Account::Nonce, const Account*>> ret;
 
 	for (auto nonce = m_OpenNonces.cbegin(); nonce != m_OpenNonces.cend();)
