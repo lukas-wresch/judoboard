@@ -1130,7 +1130,7 @@ TEST(Ajax, Judoka_Edit_Participant)
 		j2->SetClub(c1);
 		t->AddParticipant(j2);
 
-		EXPECT_EQ((std::string)app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID(), "firstname=first2&lastname=last2&weight=12,5&gender=1&birthyear=2001&number=A1234&club=" + (std::string)c1->GetUUID())), "ok");
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID(), "firstname=first2&lastname=last2&weight=12,5&gender=1&birthyear=2001&number=A1234&club=" + (std::string)c1->GetUUID())));
 
 		EXPECT_EQ(j1->GetFirstname(), "first2");
 		EXPECT_EQ(j1->GetLastname(),  "last2");
@@ -1140,6 +1140,29 @@ TEST(Ajax, Judoka_Edit_Participant)
 		EXPECT_EQ(j1->GetNumber(), "A1234");
 		ASSERT_TRUE(j1->GetClub());
 		EXPECT_EQ(*j1->GetClub(), *c1);
+
+
+		app.GetDatabase().AddJudoka(new Judoka(*j1));
+
+		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID(), "firstname=first3&lastname=last3&weight=13,5&gender=0&birthyear=2002&number=A12345&club=" + (std::string)c1->GetUUID())));
+
+		EXPECT_EQ(j1->GetFirstname(), "first3");
+		EXPECT_EQ(j1->GetLastname(),  "last3");
+		EXPECT_EQ(j1->GetWeight(),  Weight("13,5"));
+		EXPECT_EQ(j1->GetGender(),  Gender::Male);
+		EXPECT_EQ(j1->GetBirthyear(), 2002);
+		EXPECT_EQ(j1->GetNumber(), "A12345");
+		ASSERT_TRUE(j1->GetClub());
+		EXPECT_EQ(*j1->GetClub(), *c1);
+
+		EXPECT_EQ(app.GetDatabase().GetAllJudokas()[0]->GetFirstname(), "first3");
+		EXPECT_EQ(app.GetDatabase().GetAllJudokas()[0]->GetLastname(),  "last3");
+		EXPECT_EQ(app.GetDatabase().GetAllJudokas()[0]->GetWeight(),  Weight("13,5"));
+		EXPECT_EQ(app.GetDatabase().GetAllJudokas()[0]->GetGender(),  Gender::Male);
+		EXPECT_EQ(app.GetDatabase().GetAllJudokas()[0]->GetBirthyear(), 2002);
+		EXPECT_EQ(app.GetDatabase().GetAllJudokas()[0]->GetNumber(), "A12345");
+		ASSERT_TRUE(app.GetDatabase().GetAllJudokas()[0]->GetClub());
+		EXPECT_EQ(*app.GetDatabase().GetAllJudokas()[0]->GetClub(), *c1);		
 	}
 }
 
