@@ -2878,48 +2878,62 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 	if (!firstname.size() || !lastname.size() || (gender != Gender::Male && gender != Gender::Female))
 		return Error::Type::InvalidInput;
 
+	auto change_judoka = [&](Judoka* judoka) {
+		if (!judoka)
+			return;
+
+		judoka->SetFirstname(firstname);
+		judoka->SetLastname(lastname);
+		judoka->SetWeight(Weight(weight));
+		judoka->SetGender(gender);
+
+		if (birthyear > 1800 && birthyear < 2200)
+			judoka->SetBirthyear(birthyear);
+
+		if (!number.empty())
+			judoka->SetNumber(number);
+
+		if (GetTournament()->GetDatabase().FindClub(clubID))
+			judoka->SetClub(GetTournament()->GetDatabase().FindClub(clubID));
+		else if (GetDatabase().FindClub(clubID))
+			judoka->SetClub(GetDatabase().FindClub(clubID));
+	};
+
+
 	auto guard = LockWriteForScope();
 
 	auto judoka = m_Database.FindJudoka(id);
 
-	bool is_participant = false;
+	bool success = false;
 
-	if (!judoka)
+	if (judoka)
 	{
-		//Search for participant
-		if (!GetTournament())
-			return Error(Error::Type::ItemNotFound);
+		change_judoka(judoka);
+		success = true;
+	}
+	
 
+	//Search for participant
+	if (GetTournament())
+	{
 		judoka = GetTournament()->FindParticipant(id);
 
-		if (!judoka)
-			return Error(Error::Type::ItemNotFound);
+		if (judoka)
+		{
+			change_judoka(judoka);
+			success = true;
 
-		is_participant = true;
+			bool weight_changed = judoka->GetWeight() != Weight(weight);
+			bool gender_changed = judoka->GetGender() != gender;
+			bool birthyear_changed = judoka->GetBirthyear() != birthyear;
+
+			if (weight_changed || gender_changed || birthyear_changed)
+				GetTournament()->OnUpdateParticipant(*judoka);
+		}
 	}
 
-	bool weight_changed    = judoka->GetWeight()    != Weight(weight);
-	bool gender_changed    = judoka->GetGender()    != gender;
-	bool birthyear_changed = judoka->GetBirthyear() != birthyear;
-
-	judoka->SetFirstname(firstname);
-	judoka->SetLastname(lastname);
-	judoka->SetWeight(Weight(weight));
-	judoka->SetGender(gender);
-
-	if (birthyear > 1800 && birthyear < 2200)
-		judoka->SetBirthyear(birthyear);
-
-	if (!number.empty())
-		judoka->SetNumber(number);
-
-	if (GetTournament()->GetDatabase().FindClub(clubID))
-		judoka->SetClub(GetTournament()->GetDatabase().FindClub(clubID));
-	else if (GetDatabase().FindClub(clubID))
-		judoka->SetClub(GetDatabase().FindClub(clubID));
-
-	if (is_participant && (weight_changed || gender_changed || birthyear_changed))
-		GetTournament()->OnUpdateParticipant(*judoka);
+	if (!success)
+		return Error(Error::Type::ItemNotFound);	
 
 	return Error();//OK
 }
