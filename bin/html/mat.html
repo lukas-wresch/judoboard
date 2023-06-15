@@ -823,8 +823,15 @@ function GetJudokaName()
     let i = 0;
     for (const match of res.next_matches)
     {
-      let row = table.insertRow(-1);
+      if (typeof match.match_table_desc !== 'undefined')
+      {
+        let row = table.insertRow(-1);
+        let cell1 = row.insertCell(0);
+        cell1.colSpan  = '2';
+        cell1.innerHTML = match.match_table_desc;
+      }
 
+      let row = table.insertRow(-1);
       let cell1 = row.insertCell(0);
       let cell2 = row.insertCell(1);
       let cell3 = row.insertCell(2);
@@ -836,13 +843,10 @@ function GetJudokaName()
       cell1.style = "width: 7.4cm;";
       cell2.style = "width: 7.4cm; background-color: rgba(30, 30, 255, 1.0); color: white;";
 
-      if (typeof match.match_table_desc !== 'undefined')
-        cell3.innerHTML = match.match_table_desc;
-
       let current_breaktime = Math.floor(match.current_breaktime/60) + ':' + zeroPad(Math.floor(match.current_breaktime)%60, 2);
       let breaktime         = Math.floor(match.breaktime/60) + ':' + zeroPad(Math.floor(match.breaktime)%60, 2);
 
-      if (match.current_breaktime >= 10*60)
+      if (match.current_breaktime >= 60*60)
         cell4.innerHTML = '- - -';
       else if (match.breaktime > 0)
         cell4.innerHTML = current_breaktime + ' / ' + breaktime;
