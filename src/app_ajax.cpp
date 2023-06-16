@@ -2910,8 +2910,7 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 	{
 		change_judoka(judoka);
 		success = true;
-	}
-	
+	}	
 
 	//Search for participant
 	if (GetTournament())
@@ -2920,12 +2919,12 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 
 		if (judoka)
 		{
-			change_judoka(judoka);
-			success = true;
-
 			bool weight_changed = judoka->GetWeight() != Weight(weight);
 			bool gender_changed = judoka->GetGender() != gender;
 			bool birthyear_changed = judoka->GetBirthyear() != birthyear;
+
+			change_judoka(judoka);
+			success = true;
 
 			if (weight_changed || gender_changed || birthyear_changed)
 				GetTournament()->OnUpdateParticipant(*judoka);
