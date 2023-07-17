@@ -685,6 +685,29 @@ TEST(Ajax, SwapMatches)
 
 
 
+TEST(Ajax, Sound_ListFiles)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto yaml = YAML::Load(app.Ajax_ListSoundFiles());
+
+		ASSERT_TRUE(yaml.IsSequence());
+
+		std::vector<std::string> filenames = { "airhorn.wav", "alert.wav", "gong sabi.wav", "gong.wav", "gong2.wav", "high gong.wav", "low gong.wav", "spooky gong.wav", "tiger gong.wav", "wind chime.wav" };
+
+		int i = 0;
+		for (auto node : yaml)
+		{
+			EXPECT_EQ(node["filename"].as<std::string>(), filenames[i++]);
+		}
+	}
+}
+
+
+
 TEST(Ajax, Setup_Set)
 {
 	initialize();

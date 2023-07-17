@@ -1,24 +1,30 @@
+266566__gowlermusic__gong-hit.wav
+gong
 https://freesound.org/people/GowlerMusic/sounds/266566
 This work is licensed under the Attribution 4.0 License.
 
 
 610378__strangehorizon__tiger_gong_hit
+tiger gong
 https://freesound.org/people/strangehorizon/sounds/610378/
 public domain
 
 
 
 266567__gowlermusic__alert-tone
+alert
 https://freesound.org/people/GowlerMusic/sounds/266567/
 This work is licensed under the Attribution 4.0 License.
 
 
 411090__inspectorj__wind-chime-gamelan-gong-a.wav
+wind chime
 https://freesound.org/people/InspectorJ/sounds/411090/
 This work is licensed under the Attribution 4.0 License.
 
 
 209917__veiler__gong-sabi-2
+gong sabi
 https://freesound.org/people/Veiler/sounds/209917/
 Public Domain
 
@@ -30,29 +36,39 @@ Public Domain
 
 
 121800__boss-music__gong
+low gong
 https://freesound.org/people/BOSS%20MUSIC/sounds/121800/
 Public Domain
 
 
 
 86773__juskiddink__gong
+gong2
 https://freesound.org/people/juskiddink/sounds/86773/
 This work is licensed under the Attribution 4.0 License.
 
 
 
 486629__jenszygar__gong-brilliant-paiste-32
+long gong
 https://freesound.org/people/JensZygar/sounds/486629/
 Public Domain
 
 
 
 361494__tec_studio__gong-002.wav
+high gong
 https://freesound.org/people/tec_studio/sounds/361494/
 Public Domain
 
 
 
 414208__jacksonacademyashmore__airhorn
+airhorn
 https://freesound.org/people/jacksonacademyashmore/sounds/414208/
 Public Domain
+
+
+207167__veiler__spooky-gong
+https://pixabay.com/de/sound-effects/spooky-gongwav-14904/
+https://pixabay.com/de/service/terms/
