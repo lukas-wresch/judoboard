@@ -9,7 +9,8 @@
       <div id="next_matches_div" style="display:none; height: 0px;">
       <table width="100%" id="next_matches_table" border="0" rules="all">
         <tr>
-          <td id="next_matches" style="width: 13.6cm; text-align: center; font-size: 16pt;" colspan="2"></td>
+          <td></td>
+          <td id="next_matches" style="width: 14.15cm; text-align: center; font-size: 16pt;" colspan="2"></td>
           <td></td>
         </tr>
       </table>
@@ -826,6 +827,7 @@ function GetJudokaName()
     for (const match of res.next_matches)
     {
       let row1  = table.insertRow(-1);
+      let cell0 = row1.insertCell(-1);
       let cell1 = row1.insertCell(-1);
       let cell2 = row1.insertCell(-1);
 
@@ -837,12 +839,17 @@ function GetJudokaName()
       let cell4 = row2.insertCell(-1);
 
       let cell5 = row1.insertCell(-1);
+
+      cell0.rowSpan  = '2';
       cell5.rowSpan  = '2';
+
+      cell0.innerHTML = (i+1) + '.';
 
       cell3.innerHTML = match.white_name;
       cell4.innerHTML = match.blue_name;
-      cell3.style = "width: 7.4cm;";
-      cell4.style = "width: 7.4cm; background-color: rgba(30, 30, 255, 1.0); color: white;";
+      cell0.style = "width: 0.75cm; font-size: 24pt;";
+      cell3.style = "width: 6.10cm;";
+      cell4.style = "width: 6.95cm; background-color: rgba(30, 30, 255, 1.0); color: white;";
 
       let current_breaktime = Math.floor(match.current_breaktime/60) + ':' + zeroPad(Math.floor(match.current_breaktime)%60, 2);
       let breaktime         = Math.floor(match.breaktime/60) + ':' + zeroPad(Math.floor(match.breaktime)%60, 2);
