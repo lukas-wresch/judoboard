@@ -109,6 +109,10 @@ function Login()
       window.location = '/';
     });
 
+  AjaxCallback('ajax/get_nonce', function(resp) {
+    challenge = resp;
+  });
+
   return false;
 }
 

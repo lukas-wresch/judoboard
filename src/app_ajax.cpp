@@ -4383,6 +4383,9 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 		else
 			ret << "- - -";
 
+		if (match.GetMatchTable())
+			ret << YAML::Key << "match_table_desc" << YAML::Value <<match.GetMatchTable()->GetDescription();
+
 		ret << YAML::EndMap;
 	}
 
