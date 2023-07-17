@@ -95,6 +95,7 @@ namespace Judoboard
 
 		virtual void Hajime() override;
 		virtual void Mate() override;
+		virtual bool WasMateRecent() const override { return AreFightersOnMat() && Timer::GetTimestamp() - m_MateTimestamp < 3000; }
 		virtual void Sonomama() override;
 
 		virtual void AddIppon(Fighter Whom) override;
@@ -132,6 +133,8 @@ namespace Judoboard
 
 		virtual void Osaekomi(Fighter Whom) override;
 		virtual void Tokeda() override;
+
+		uint32_t GetMaxMatchTime();
 
 		//Serialization
 		virtual void ToString(YAML::Emitter& Yaml) const override;
@@ -431,6 +434,7 @@ namespace Judoboard
 		//Processing
 		void Process();
 		void UpdateGraphics() const;
+		void UpdateOsaekomiGraphics() const;
 		void RenderScore(double dt) const;
 		void RenderTimer(double dt) const;
 		void RenderShidos(double dt) const;
@@ -457,6 +461,8 @@ namespace Judoboard
 
 		Timer m_HajimeTimer;
 		Timer m_OsaekomiTimer[2];
+		uint32_t m_MateTimestamp = 0;//Timestam of last mate command
+
 		std::vector<OsaekomiEntry> m_OsaekomiList;
 		bool m_IsOsaekomi = false;
 		Fighter m_OsaekomiHolder = Fighter::White;

@@ -59,9 +59,9 @@ void Timer::Pause()
 
 
 
-void Timer::Reset()
+void Timer::Set(uint32_t Time)
 {
-	m_TimeElapsed = 0;
+	m_TimeElapsed = Time;
 }
 
 
@@ -70,6 +70,13 @@ void Timer::Stop()
 {
 	m_TimeElapsed = 0;
 	m_Running = false;
+}
+
+
+
+void Timer::Shift(int TimeShift)
+{
+	m_TimeElapsed += TimeShift;
 }
 
 

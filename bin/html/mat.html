@@ -643,7 +643,7 @@ function GetScore()
 
     OsaekomiBlueTimer_Running = res.blue.is_osaekomi_running;
 
-    if (res.is_osaekomi)
+    if (res.is_osaekomi || (res.was_mate_recent && (OsaekomiWhiteTimer > 0 || OsaekomiBlueTimer > 0 ) ))
     {
       document.getElementById("tokeda1").disabled = false;
       document.getElementById("tokeda2").disabled = false;
@@ -698,12 +698,12 @@ function GetScore()
       else
         document.getElementById("hajime").innerHTML = "Hajime";
 
-      if (res.white.is_osaekomi_running)
+      if (res.white.is_osaekomi_running || res.was_mate_recent)
         document.getElementById("blue_osaekomi").disabled = false;
       else
         document.getElementById("blue_osaekomi").disabled = true;
 
-      if (res.blue.is_osaekomi_running)
+      if (res.blue.is_osaekomi_running || res.was_mate_recent)
         document.getElementById("white_osaekomi").disabled = false;
       else
         document.getElementById("white_osaekomi").disabled = true;
