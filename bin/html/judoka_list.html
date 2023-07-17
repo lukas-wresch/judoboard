@@ -2,6 +2,11 @@
 
 <button class="add" id="add" style="margin-bottom: 1cm;" onclick="navigate('judoka_add.html')">New Judoka</button> 
 
+<div>
+    <label id="search_label" style="width:150px;float:left;margin-top:5px;">Search</label>
+    <input style="margin-bottom:20px;" size="50" id="search" value="" oninput="GetJudokaList();"/>
+</div>
+
 <table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
     <th style="width: 4.8cm;" id="firstname">Firstname</th>
@@ -18,24 +23,24 @@
 
 function GetJudokaList()
 {
-  AjaxCallback("ajax/judoka/list", function(response) {
+  AjaxCallback("ajax/judoka/search?name=" + document.getElementById("search").value, function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
-    var table = document.getElementById("list");
+    let table = document.getElementById("list");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
     for (const judoka of res)
     {
-      var row = table.insertRow(-1);
-      var cell1 = row.insertCell(0);
-      var cell2 = row.insertCell(1);
-      var cell6 = row.insertCell(2);
-      var cell3 = row.insertCell(3);
-      var cell4 = row.insertCell(4);
-      var cell5 = row.insertCell(5);
+      let row = table.insertRow(-1);
+      let cell1 = row.insertCell(0);
+      let cell2 = row.insertCell(1);
+      let cell6 = row.insertCell(2);
+      let cell3 = row.insertCell(3);
+      let cell4 = row.insertCell(4);
+      let cell5 = row.insertCell(5);
 
       cell1.style.fontSize  = "16pt";
       cell1.innerHTML = judoka.firstname;
@@ -49,7 +54,6 @@ function GetJudokaList()
         cell6.innerHTML = "- - -";
 
       cell3.style.fontSize  = "16pt";
-      console.log(judoka);
       cell3.innerHTML = judoka.weight + " kg";
 
 
@@ -76,5 +80,6 @@ document.getElementById("weight").innerHTML    = translate('weight');
 document.getElementById("gender").innerHTML    = translate('gender');
 document.getElementById("club").innerHTML      = translate('club');
 document.getElementById("options").innerHTML   = translate('options');
+document.getElementById("search_label").innerHTML = translate('search');
 
 </script>

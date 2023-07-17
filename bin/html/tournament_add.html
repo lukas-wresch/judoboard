@@ -48,6 +48,7 @@
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return DownloadTournament()" id="download">Download Tournament</button>
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return ExportTournament()"   id="export">Export to MD5</button>
 <br/>
+<button class="remove"  style="margin-top: 0.8cm;" onclick="return SwapTournament()"   id="swap">Swap Fighters</button>
 <button class="remove"  style="margin-top: 0.8cm;" onclick="return EmptyTournament()"  id="empty">Delete Match Results</button>
 <button class="remove"  style="margin-top: 0.8cm;" onclick="return DeleteTournament()" id="delete">Delete Tournament</button>
 
@@ -88,6 +89,22 @@ function UpdateTournament()
   AjaxPost('ajax/tournament/update?id='+id, params, function() {
     navigate("tournament_list.html");
   });
+
+  return false;
+}
+
+
+function SwapTournament()
+{
+  if (confirm(translate('swap_tournament_confirm')))
+  {
+    AjaxCallback('ajax/tournament/swap_fighters?id='+id, function(response) {
+      if (response == "ok")
+        navigate("tournament_list.html");
+      else
+        alert("Error: " + response);
+    });
+  }
 
   return false;
 }
@@ -190,6 +207,7 @@ else
   document.getElementById("div_status").style.display = "none";
   document.getElementById("download").style.display = "none";
   document.getElementById("export").style.display = "none";
+  document.getElementById("swap").style.display = "none";
   document.getElementById("empty").style.display = "none";
   document.getElementById("delete").style.display = "none";
 

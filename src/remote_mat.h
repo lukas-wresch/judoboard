@@ -21,12 +21,12 @@ namespace Judoboard
 
 		virtual bool IsConnected() const override;
 
-		virtual const std::vector<OsaekomiEntry>& GetOsaekomiList() const override { return m_OsaekomiList; };
+		virtual std::vector<OsaekomiEntry> GetOsaekomiList() const override { return m_OsaekomiList; };
 
 		virtual bool AreFightersOnMat() const override;
 
 		virtual bool CanNextMatchStart() const override;
-		virtual bool StartMatch(Match* NewMatch) override;
+		virtual bool StartMatch(Match* NewMatch, bool UseForce = false) override;
 		virtual bool HasConcluded() const override;
 		virtual bool EndMatch() override;
 
@@ -44,6 +44,7 @@ namespace Judoboard
 		//Commands by judge
 		virtual void Hajime() override {}
 		virtual void Mate() override {}
+		virtual bool WasMateRecent() const override { return AreFightersOnMat() && Timer::GetTimestamp() - /*m_MateTimestamp*/0 < 3000; }
 		virtual void Sonomama() override {}
 
 		virtual void AddIppon(Fighter Whom) override;

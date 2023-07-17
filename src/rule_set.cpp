@@ -8,7 +8,8 @@ using namespace Judoboard;
 
 
 
-RuleSet::RuleSet(const std::string& Name, uint32_t MatchTime, int GoldenScoreTime, uint32_t OsaeKomiTime, uint32_t OsaeKomiTime_with_Wazaari, bool Yuko, bool Koka, bool Draw, uint32_t BreakTime) : m_Name(Name)
+RuleSet::RuleSet(const std::string& Name, uint32_t MatchTime, int GoldenScoreTime, uint32_t OsaeKomiTime, uint32_t OsaeKomiTime_with_Wazaari, bool Yuko, bool Koka, bool Draw, uint32_t BreakTime, bool ExtendBreakTime)
+	: m_Name(Name)
 {
 	m_Yuko = Yuko;
 	m_Koka = Koka;
@@ -23,6 +24,7 @@ RuleSet::RuleSet(const std::string& Name, uint32_t MatchTime, int GoldenScoreTim
 	m_OsaeKomiTime_With_WazaAri = OsaeKomiTime_with_Wazaari;
 
 	m_BreakTime = BreakTime;
+	m_IsExtendBreakTime = ExtendBreakTime;
 }
 
 
@@ -44,6 +46,8 @@ RuleSet::RuleSet(const YAML::Node& Yaml)
 		m_OsaeKomiTime_With_WazaAri = Yaml["osaekomi_with_wazaari_time"].as<int>();
 	if (Yaml["break_time"])
 		m_BreakTime = Yaml["break_time"].as<int>();
+	if (Yaml["extend_break_time"])
+		m_IsExtendBreakTime = Yaml["extend_break_time"].as<bool>();
 
 	if (Yaml["yuko"])
 		m_Yuko = Yaml["yuko"].as<bool>();
@@ -67,6 +71,7 @@ void RuleSet::operator >> (YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "osaekomi_time" << YAML::Value << m_OsaeKomiTime;
 	Yaml << YAML::Key << "osaekomi_with_wazaari_time" << YAML::Value << m_OsaeKomiTime_With_WazaAri;
 	Yaml << YAML::Key << "break_time" << YAML::Value << m_BreakTime;
+	Yaml << YAML::Key << "extend_break_time" << YAML::Value << m_IsExtendBreakTime;
 
 	Yaml << YAML::Key << "yuko" << YAML::Value << m_Yuko;
 	Yaml << YAML::Key << "koka" << YAML::Value << m_Koka;

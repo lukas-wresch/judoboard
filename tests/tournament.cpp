@@ -25,14 +25,14 @@ TEST(Tournament, DontDuplicateParticipants)
 		tourney.EnableAutoSave(false);
 
 		EXPECT_TRUE(tourney.AddParticipant(j1));
-		EXPECT_TRUE(tourney.GetParticipants().size() == 1);
+		EXPECT_EQ(tourney.GetParticipants().size(), 1);
 		EXPECT_FALSE(tourney.AddParticipant(j1));
-		EXPECT_TRUE(tourney.GetParticipants().size() == 1);
+		EXPECT_EQ(tourney.GetParticipants().size(), 1);
 
 		EXPECT_TRUE(tourney.AddParticipant(j2));
-		EXPECT_TRUE(tourney.GetParticipants().size() == 2);
+		EXPECT_EQ(tourney.GetParticipants().size(), 2);
 		EXPECT_FALSE(tourney.AddParticipant(j2));
-		EXPECT_TRUE(tourney.GetParticipants().size() == 2);
+		EXPECT_EQ(tourney.GetParticipants().size(), 2);
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
@@ -474,11 +474,11 @@ TEST(Tournament, ParticipantHasSameIDAsInDatabase)
 	EXPECT_EQ(j1->GetUUID(), tourney.FindParticipant(j1->GetUUID())->GetUUID());
 	//tourney gets saved now
 
-	tourney.EnableAutoSave(false);
+	tourney.Save();
 
 
 	Tournament t("deleteMe");
-	t.EnableAutoSave(false);
+	
 	EXPECT_EQ(t.GetParticipants().size(), 1);
 	ASSERT_TRUE(t.FindParticipant(j1->GetUUID()));
 	EXPECT_EQ(j1->GetUUID(), t.FindParticipant(j1->GetUUID())->GetUUID());
@@ -520,6 +520,8 @@ TEST(Tournament, Lottery)
 		EXPECT_LE(lot1, 1);
 		EXPECT_LE(lot2, 1);
 		EXPECT_NE(lot1, lot2);
+
+		tourney.Save();
 
 		Tournament tourney2("deleteMe");
 		EXPECT_EQ(tourney.GetLotOfAssociation(*c1), tourney2.GetLotOfAssociation(*c1));
@@ -650,6 +652,8 @@ TEST(Tournament, LotteryTier)
 		EXPECT_TRUE(tourney.AddParticipant(j1));
 		EXPECT_TRUE(tourney.AddParticipant(j2));
 
+		tourney.Save();
+
 		Tournament tourney2("deleteMe");
 		EXPECT_EQ(tourney2.GetLotteryTier(), tier);
 	}
@@ -729,8 +733,7 @@ TEST(Tournament, CanNotAddParticipantOfWrongAssociation)
 	EXPECT_EQ(*tourney.GetOrganizer(), *club1);
 	EXPECT_TRUE(tourney.AddParticipant(j1));
 
-	//tourney gets saved now
-	tourney.EnableAutoSave(false);
+	tourney.Save();
 
 
 	Tournament t("deleteMe");
@@ -757,12 +760,10 @@ TEST(Tournament, HasDefaultRuleSet)
 	EXPECT_TRUE(tourney.AddParticipant(new Judoka("temp", "temp", 50)));
 	tourney.Reset();
 
-	tourney.EnableAutoSave(false);
+	tourney.Save();
 
 
 	Tournament t("deleteMe");
-	//t.ConnectToDatabase(d);
-	t.EnableAutoSave(false);
 
 	ASSERT_FALSE(t.GetDefaultRuleSet());
 
@@ -785,13 +786,11 @@ TEST(Tournament, HasDefaultRuleSet2)
 	Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
 	tourney.SetDefaultRuleSet(rules);
 	EXPECT_TRUE(tourney.AddParticipant(new Judoka("temp", "temp", 50)));
-	tourney.Reset();
 
-	tourney.EnableAutoSave(false);
+	tourney.Save();
 
 
 	Tournament t("deleteMe");
-	t.EnableAutoSave(false);
 
 	ASSERT_TRUE(t.GetDefaultRuleSet());
 	ASSERT_TRUE(d.FindRuleSetByName("Default"));
@@ -868,16 +867,14 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 		m->SetRuleSet(d.FindRuleSetByName("Test"));
 		tourney.AddMatch(m);
 
-		tourney.EnableAutoSave(false);
+		tourney.Save();
 
 
 		Tournament t("deleteMe");
-		//t.ConnectToDatabase(d);
 		t.EnableAutoSave(false);
 
 		ASSERT_TRUE(t.FindRuleSetByName("Test"));
 		ASSERT_TRUE(d.FindRuleSetByName("Test"));
-		//EXPECT_EQ(t.FindRuleSetByName("Test")->GetID(), d.FindRuleSetByName("Test")->GetID());
 		EXPECT_EQ(t.FindRuleSetByName("Test")->GetUUID(), d.FindRuleSetByName("Test")->GetUUID());
 	}
 
@@ -977,6 +974,63 @@ TEST(Tournament, TestData_Randori2022)
 
 		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Leni");
 		EXPECT_EQ(results[2].Wins, 0);
+		EXPECT_EQ(results[2].Score, 0);
+	}
+
+	ZED::Core::RemoveFile("tournaments/randori-2022.yml");
+}
+
+
+
+TEST(Tournament, SwapMatches_Randori2022)
+{
+	initialize();
+
+	{
+		Tournament t("../test-data/randori-2022");
+
+		EXPECT_EQ(t.GetDatabase().GetYear(), 2022);
+
+		ASSERT_EQ(t.GetMatchTables().size(), 3);
+
+		t.SwapAllFighters();
+
+		auto results = t.GetMatchTables()[0]->CalculateResults();
+		ASSERT_EQ(results.GetSize(), 3);
+		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Joris");
+		EXPECT_EQ(results[0].Wins,   2);
+		EXPECT_EQ(results[0].Score, 17);
+
+		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Richard");
+		EXPECT_EQ(results[1].Wins,  1);
+		EXPECT_EQ(results[1].Score, 7);
+
+		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Theo");
+		EXPECT_EQ(results[2].Wins,  0);
+		EXPECT_EQ(results[2].Score, 0);
+
+		results = t.GetMatchTables()[1]->CalculateResults();
+		ASSERT_EQ(results.GetSize(), 2);
+		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Tom");
+		EXPECT_EQ(results[0].Wins,   2);
+		EXPECT_EQ(results[0].Score, 20);
+
+		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Julius");
+		EXPECT_EQ(results[1].Wins,  0);
+		EXPECT_EQ(results[1].Score, 0);
+
+		results = t.GetMatchTables()[2]->CalculateResults();
+		ASSERT_EQ(results.GetSize(), 3);
+		EXPECT_EQ(results[0].Judoka->GetFirstname(), "Leni");
+		EXPECT_EQ(results[0].Wins,  2);
+		EXPECT_EQ(results[0].Score, 8);
+
+		EXPECT_EQ(results[1].Judoka->GetFirstname(), "Clara");
+		EXPECT_EQ(results[1].Wins,   1);
+		EXPECT_EQ(results[1].Score, 10);
+
+		EXPECT_EQ(results[2].Judoka->GetFirstname(), "Maja");
+		EXPECT_EQ(results[2].Wins,  0);
 		EXPECT_EQ(results[2].Score, 0);
 	}
 
@@ -1127,11 +1181,10 @@ TEST(Tournament, SaveAndLoad_MatchTableConnection)
 		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(155)));
 		tourney->GenerateSchedule();
 
-		tourney->EnableAutoSave(false);
+		tourney->Save();
 
 
 		Tournament t("deleteMe");
-		t.EnableAutoSave(false);
 
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		EXPECT_EQ(t.GetDescription(), tourney->GetDescription());
@@ -1178,10 +1231,9 @@ TEST(Tournament, SaveAndLoad_AgeGroups)
 		EXPECT_TRUE(tourney.AddParticipant(j2));
 		EXPECT_TRUE(tourney.AddParticipant(j3));
 		EXPECT_TRUE(tourney.AddParticipant(j4));
-
+		tourney.Save();
 
 		Tournament t("deleteMe");
-		t.EnableAutoSave(false);
 
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		ASSERT_EQ(t.GetParticipants().size(), 4);
@@ -1227,10 +1279,9 @@ TEST(Tournament, SaveAndLoad_Clubs)
 		EXPECT_TRUE(tourney.AddParticipant(&j2));
 		EXPECT_TRUE(tourney.AddParticipant(&j3));
 		EXPECT_TRUE(tourney.AddParticipant(&j4));
-
+		tourney.Save();
 
 		Tournament t("deleteMe");
-		t.EnableAutoSave(false);
 
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		ASSERT_EQ(t.GetParticipants().size(), 4);
@@ -1286,28 +1337,17 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 		tourney->AddMatch(new Match(j1, j4, tourney, 2));
 		tourney->GenerateSchedule();
 
-		tourney->EnableAutoSave(false);
+		tourney->Save();
 
 
 		Tournament t("deleteMe");
-		t.EnableAutoSave(false);
+		
 		EXPECT_EQ(t.GetParticipants().size(), 4);
 		ASSERT_EQ(t.GetMatchTables().size(), 4);
 		EXPECT_EQ(t.GetSchedule().size(), 4);
 
 		ASSERT_EQ(t.GetMatchTables()[0]->GetSchedule().size(), 1);
 		ASSERT_EQ(t.GetMatchTables()[1]->GetSchedule().size(), 1);
-
-		EXPECT_TRUE(t.GetMatchTables()[0]->GetSchedule()[0]->IsAutoGenerated());
-		EXPECT_TRUE(t.GetMatchTables()[1]->GetSchedule()[0]->IsAutoGenerated());
-
-		for (auto match : t.GetSchedule())
-		{
-			if (match->GetMatID() == 2)
-				EXPECT_FALSE(match->IsAutoGenerated());
-			else
-				EXPECT_TRUE(match->IsAutoGenerated());
-		}
 
 		delete tourney;
 	}
@@ -1396,7 +1436,7 @@ TEST(Tournament, ChangeScheduleIndexAfterChangingMat)
 
 		Tournament* tourney = new Tournament("deleteMe", d.FindRuleSetByName("Default"));
 		tourney->Reset();
-		tourney->EnableAutoSave(false);
+		tourney->Save();
 
 		EXPECT_TRUE(tourney->AddParticipant(j1));
 		EXPECT_TRUE(tourney->AddParticipant(j2));
@@ -1474,8 +1514,9 @@ TEST(Tournament, SaveAndLoad_SingleElimination)
 		ASSERT_EQ(tourney->GetMatchTables().size(), 1);
 		ASSERT_EQ(tourney->GetSchedule().size(), 3);
 
+		tourney->Save();
+
 		Tournament t("deleteMe");
-		t.EnableAutoSave(false);
 
 		EXPECT_EQ(t.GetParticipants().size(), 4);
 		ASSERT_EQ(t.GetMatchTables().size(), 1);
@@ -1525,10 +1566,11 @@ TEST(Tournament, SaveAndLoad_DoubleElimination)
 
 		EXPECT_EQ(tourney->GetParticipants().size(), 4);
 		ASSERT_EQ(tourney->GetMatchTables().size(), 1);
-		//ASSERT_EQ(tourney->GetSchedule().size(), 3);
+		ASSERT_EQ(tourney->GetSchedule().size(), 4);
+
+		tourney->Save();
 
 		Tournament t("deleteMe");
-		t.EnableAutoSave(false);
 
 		EXPECT_EQ(t.GetParticipants().size(), 4);
 		ASSERT_EQ(t.GetMatchTables().size(), 1);
@@ -1537,6 +1579,7 @@ TEST(Tournament, SaveAndLoad_DoubleElimination)
 		EXPECT_TRUE(t.GetSchedule()[0]->GetMatchTable());
 		EXPECT_TRUE(t.GetSchedule()[1]->GetMatchTable());
 		EXPECT_TRUE(t.GetSchedule()[2]->GetMatchTable());
+		EXPECT_TRUE(t.GetSchedule()[3]->GetMatchTable());
 
 		delete tourney;
 	}

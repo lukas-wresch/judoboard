@@ -29,6 +29,10 @@ LoserBracket::LoserBracket(Weight MinWeight, Weight MaxWeight, const ITournament
 LoserBracket::LoserBracket(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
 	: SingleElimination(Yaml, Tournament, Parent)
 {
+	assert(Yaml.IsMap());
+
+	if (Yaml["final_match"])
+		m_FinalMatch = Yaml["final_match"].as<bool>();
 }
 
 
@@ -40,16 +44,21 @@ LoserBracket::LoserBracket(const MD5::Weightclass& Weightclass_, const ITourname
 
 
 
-/*size_t LoserBracket::GetNumberOfRounds() const
+void LoserBracket::operator >> (YAML::Emitter& Yaml) const
 {
-	if (!GetFilter() || GetFilter()->GetParticipants().size() == 0)
-		return 0;
+	if (!IsSubMatchTable())
+		Yaml << YAML::BeginMap;
 
-	auto base_rounds = GetNumberOfBaseRounds();
-	auto additional_rounds = (size_t)std::floor( (base_rounds - 1.0) / 2.0 );
+	MatchTable::operator >>(Yaml);
 
-	return base_rounds + additional_rounds;
-}*/
+	if (m_FinalMatch)
+		Yaml << YAML::Key << "final_match" << YAML::Value << m_FinalMatch;
+	if (IsThirdPlaceMatch())
+		Yaml << YAML::Key << "third_place_match" << YAML::Value << IsThirdPlaceMatch();
+
+	if (!IsSubMatchTable())
+		Yaml << YAML::EndMap;
+}
 
 
 
@@ -62,6 +71,8 @@ std::string LoserBracket::GetHTMLForm()
 
 void LoserBracket::GenerateSchedule()
 {
+	if (!IsAutoGenerateSchedule())
+		return;
 	if (!IsSubMatchTable() && GetStatus() != Status::Scheduled)
 		return;
 
@@ -287,34 +298,24 @@ MatchTable::Results LoserBracket::CalculateResults() const
 	auto& schedule = GetSchedule();
 
 	//Get final match
-	const Match* lastMatch = schedule[schedule.size() - 1];
-
-	if (lastMatch->HasConcluded())
+	if (IsFinalMatch())
 	{
-		ret.Add(lastMatch->GetWinner(), this);
-		ret.Add(lastMatch->GetLoser(),  this);
+		const Match* lastMatch = schedule[schedule.size() - 1];
+		if (IsThirdPlaceMatch() && schedule.size() >= 2)
+			lastMatch = schedule[schedule.size() - 2];
+
+		if (lastMatch->HasConcluded())
+		{
+			ret.Add(lastMatch->GetWinner(), this);
+			ret.Add(lastMatch->GetLoser(),  this);
+		}
 	}
-	else
-		return ret;
 
 	if (IsThirdPlaceMatch())
 	{
-		const Match* third_place_match = schedule[schedule.size() - 2];
+		const Match* third_place_match = schedule[schedule.size() - 1];
 		ret.Add(third_place_match->GetWinner(), this);
 		ret.Add(third_place_match->GetLoser(),  this);
-	}
-
-	if (IsThirdPlaceMatch() && IsFifthPlaceMatch())
-	{
-		//int offset = 4;
-		//if (IsThirdPlaceMatch())
-		//offset = 5;
-
-		int offset = 5;
-
-		const Match* fifth_place_match = schedule[schedule.size() - offset];
-		ret.Add(fifth_place_match->GetWinner(), this);
-		ret.Add(fifth_place_match->GetLoser(),  this);
 	}
 
 	return ret;
@@ -474,7 +475,8 @@ const std::string LoserBracket::ToHTML() const
 		ret += "</table>";
 	}*/
 
-	ret += ResultsToHTML();	
+	if (!IsSubMatchTable())
+		ret += ResultsToHTML();	
 
 	return ret;
 }

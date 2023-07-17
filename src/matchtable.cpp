@@ -3,7 +3,6 @@
 #include "../ZED/include/log.h"
 #include "matchtable.h"
 #include "match.h"
-#include "standard.h"
 #include "weightclass.h"
 #include "fixed.h"
 #include "tournament.h"
@@ -14,19 +13,12 @@ using namespace Judoboard;
 
 
 
-MatchTable::~MatchTable()
-{
-	for (auto match : m_Schedule)
-		delete match;
-}
-
-
-
 void MatchTable::SetMatID(int32_t MatID)
 {
 	m_MatID = MatID;
 
-	for (auto match : m_Schedule)
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
 		if (match)
 			match->SetMatID(MatID);
 }
@@ -35,7 +27,8 @@ void MatchTable::SetMatID(int32_t MatID)
 
 bool MatchTable::HasConcluded() const
 {
-	for (auto match : m_Schedule)
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
 		if (match && !match->HasConcluded())
 			return false;
 	return true;
@@ -45,7 +38,8 @@ bool MatchTable::HasConcluded() const
 
 Match* MatchTable::FindMatch(const UUID& UUID) const
 {
-	for (auto match : m_Schedule)
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
 		if (match && match->GetUUID() == UUID)
 			return match;
 	return nullptr;
@@ -55,8 +49,9 @@ Match* MatchTable::FindMatch(const UUID& UUID) const
 
 size_t MatchTable::FindMatchIndex(const UUID& UUID) const
 {
-	for (size_t i = 0; i < m_Schedule.size(); ++i)
-		if (m_Schedule[i] && m_Schedule[i]->GetUUID() == UUID)
+	auto schedule = GetSchedule();
+	for (size_t i = 0; i < schedule.size(); ++i)
+		if (schedule[i] && schedule[i]->GetUUID() == UUID)
 			return i;
 	return -1;
 }
@@ -111,13 +106,15 @@ bool MatchTable::IsIncluded(const Judoka& Fighter) const
 
 Status MatchTable::GetStatus() const
 {
-	if (m_Schedule.size() == 0)
+	auto schedule = GetSchedule();
+
+	if (schedule.size() == 0)
 		return Status::Scheduled;
 
 	bool one_match_finished = false;
 	bool all_matches_finished = true;
 
-	for (auto match : m_Schedule)
+	for (auto match : schedule)
 	{
 		if (match->IsEmptyMatch() || match->IsBestOfThree())
 			continue;
@@ -149,7 +146,11 @@ bool MatchTable::AddMatch(Match* NewMatch)
 	if (NewMatch->GetFighter(Fighter::Blue))
 		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
 
-	NewMatch->SetMatchTable(this);
+	if (IsSubMatchTable())
+		NewMatch->SetMatchTable(GetParent());
+	else
+		NewMatch->SetMatchTable(this);
+
 	m_Schedule.emplace_back(NewMatch);
 	return true;
 }
@@ -161,13 +162,17 @@ bool MatchTable::AddParticipant(Judoka* NewParticipant, bool Force)
 	if (!NewParticipant || !m_Filter)
 		return false;
 
+	if (FindParticipant(*NewParticipant))
+		return false;
+
 	if (!m_Filter->AddParticipant(NewParticipant, Force))
 		return false;
 
 	if (GetTournament())//Add to tournament?
 		((ITournament*)GetTournament())->AddParticipant(NewParticipant);//Const cast
 
-	GenerateSchedule();
+	if (!IsSubMatchTable())
+		GenerateSchedule();
 	return true;
 }
 
@@ -224,7 +229,9 @@ const std::vector<const Match*> MatchTable::FindMatches(const Judoka& Fighter1, 
 {
 	std::vector<const Match*> ret;
 
-	for (auto match : m_Schedule)
+	auto schedule = GetSchedule();
+
+	for (auto match : schedule)
 	{
 		if (!match->HasValidFighters())
 			continue;
@@ -354,10 +361,8 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, co
 				SetFilter(new Weightclass(Yaml["filter"], m_Parent ? m_Parent : this));
 				break;
 			case IFilter::Type::Fixed:
+			case IFilter::Type::Standard://Deprecated
 				SetFilter(new Fixed(Yaml["filter"], m_Parent ? m_Parent : this));
-				break;
-			case IFilter::Type::Standard:
-				SetFilter(new Standard(Yaml["filter"]));
 				break;
 			default:
 				ZED::Log::Error("Unknown filter in match table");
@@ -458,12 +463,14 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 		}
 	}
 
-	if (!m_Schedule.empty())
+	auto schedule = GetSchedule();
+
+	if (!schedule.empty())
 	{
 		Yaml << YAML::Key << "matches";
 		Yaml << YAML::BeginSeq;
 
-		for (auto match : m_Schedule)
+		for (auto match : schedule)
 			*match >> Yaml;
 
 		Yaml << YAML::EndSeq;
@@ -577,6 +584,29 @@ std::string MatchTable::GetHTMLForm()
 
 
 
+const std::string MatchTable::GetHTMLTop() const
+{
+	std::string ret;
+
+	if (!IsSubMatchTable() && GetFilter())
+		ret += "<div style=\"border-style: dashed; border-width: 2px; border-color: #ccc; padding: 0.3cm; margin-bottom: 0.3cm;\">";
+
+	if (!IsSubMatchTable())
+		ret += "<h3>";
+
+	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
+	if (GetMatID() != 0)
+		ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName();
+
+	if (!IsSubMatchTable())
+		ret += "</h3>";
+
+	ret += "<br/><br/>";
+	return ret;
+}
+
+
+
 Match* MatchTable::AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosition)
 {
 	if (!GetJudokaByStartPosition(WhiteStartPosition) || !GetJudokaByStartPosition(BlueStartPosition))
@@ -593,7 +623,6 @@ Match* MatchTable::AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosit
 Match* MatchTable::CreateAutoMatch(const DependentJudoka& White, const DependentJudoka& Blue)
 {
 	Match* new_match = new Match(White, Blue, GetTournament(), GetMatID());
-	new_match->SetAutoGenerated();
 	new_match->SetMatchTable(this);
 	m_Schedule.emplace_back(new_match);
 	return new_match;
@@ -618,7 +647,9 @@ Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
 
 void MatchTable::AddMatchesForBestOfThree()
 {
-	auto schedule_copy = std::move(m_Schedule);
+	auto schedule_copy = GetSchedule();
+
+	m_Schedule.clear();
 
 	auto length = schedule_copy.size();
 	for (size_t i = 0; i < length; ++i)
@@ -630,7 +661,7 @@ void MatchTable::AddMatchesForBestOfThree()
 		auto match3 = new Match(*match1);
 		match3->SetBestOfThree(match1, match2);
 
-		m_Schedule.push_back(match1);
+		m_Schedule.emplace_back(match1);
 		m_Schedule.emplace_back(match2);
 		m_Schedule.emplace_back(match3);
 	}
@@ -675,7 +706,7 @@ const std::string MatchTable::ResultsToHTML() const
 	if (results.GetSize() == 0)
 		return ret;
 
-	ret += "</table><br/><br/><table border=\"1\" rules=\"all\">";
+	ret += "<br/><br/><table border=\"1\" rules=\"all\">";
 	ret += "<tr><th style=\"width: 0.5cm; text-align: center;\">#</th><th style=\"width: 5.0cm;\">" + Localizer::Translate("Name")
 		+ "</th><th style=\"width: 1.0cm;\">" + Localizer::Translate("Wins") + "</th><th style=\"width: 1.0cm;\">"
 		+ Localizer::Translate("Score") + "</th><th style=\"width: 1.3cm;\">" + Localizer::Translate("Time") + "</th></tr>";

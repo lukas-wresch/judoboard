@@ -14,6 +14,12 @@
 <nav id="menu" class="menu">
 
   <section class="menu-section">
+  <h3 class="menu-section-title" id="navi_language"></h3>
+    <img src="en.png" width="20%" onclick="localStorage.setItem('language', 0); location.reload();">
+    <img src="de.png" width="20%" onclick="localStorage.setItem('language', 1); location.reload();">
+  </section>
+
+  <section class="menu-section">
     <h3 class="menu-section-title" id="navi_tournament">Tournament</h3>
     <ul class="menu-section-list">
       <li><a id="navi_schedule" href="#schedule.html">Schedule</a></li>
@@ -163,32 +169,49 @@ else
   $( "#main" ).load('schedule.html');
   //navigate('schedule.html');
 
-document.getElementById("navi_tournament").innerHTML = translate('tournament');
+const storage_language = localStorage.getItem("language");
+if (typeof storage_language != 'object')
+    language = storage_language;
 
-document.getElementById("navi_schedule").innerHTML = translate('schedule');
-document.getElementById("navi_new_participant").innerHTML = translate('new_participant');
-document.getElementById("navi_label_mats").innerHTML = translate('mats');
-document.getElementById("navi_new_match").innerHTML = translate('new_match');
-document.getElementById("navi_lots").innerHTML = translate('lots');
+AjaxCallback("ajax/config/get_setup", function(response) {
+  var res = YAML.parse(response);
+  console.log(response);
 
-document.getElementById("navi_configure_mats").innerHTML = translate('settings');
+  const storage_language = localStorage.getItem("language");
+  console.log(typeof storage_language);
+  if (typeof storage_language != 'object')
+    language = storage_language;
+  else
+    language = res.language;
 
-document.getElementById("navi_show_mats").innerHTML = translate('show_mats');
+  document.getElementById("navi_language").innerHTML = translate('language');
+  document.getElementById("navi_tournament").innerHTML = translate('tournament');
 
-document.getElementById("navi_database").innerHTML = translate('database');
-document.getElementById("navi_change_password").innerHTML = translate('change_password');
-document.getElementById("navi_add_judoka").innerHTML = translate('new_judoka');
-document.getElementById("navi_list_judoka").innerHTML = translate('list_judokas');
-document.getElementById("navi_list_account").innerHTML = translate('list_accounts');
-document.getElementById("navi_list_rule").innerHTML = translate('rule_sets');
-document.getElementById("navi_list_tournament").innerHTML = translate('tournaments');
-document.getElementById("navi_list_club").innerHTML = translate('list_clubs');
-document.getElementById("navi_list_association").innerHTML = translate('list_associations');
+  document.getElementById("navi_schedule").innerHTML = translate('schedule');
+  document.getElementById("navi_new_participant").innerHTML = translate('new_participant');
+  document.getElementById("navi_label_mats").innerHTML = translate('mats');
+  document.getElementById("navi_new_match").innerHTML = translate('new_match');
+  document.getElementById("navi_lots").innerHTML = translate('lots');
 
-document.getElementById("navi_list_class").innerHTML = translate('match_tables');
-document.getElementById("navi_list_age").innerHTML = translate('age_groups');
+  document.getElementById("navi_configure_mats").innerHTML = translate('settings');
 
-document.getElementById("navi_server_config").innerHTML = translate('configuration');
+  document.getElementById("navi_show_mats").innerHTML = translate('show_mats');
+
+  document.getElementById("navi_database").innerHTML = translate('database');
+  document.getElementById("navi_change_password").innerHTML = translate('change_password');
+  document.getElementById("navi_add_judoka").innerHTML = translate('new_judoka');
+  document.getElementById("navi_list_judoka").innerHTML = translate('list_judokas');
+  document.getElementById("navi_list_account").innerHTML = translate('list_accounts');
+  document.getElementById("navi_list_rule").innerHTML = translate('rule_sets');
+  document.getElementById("navi_list_tournament").innerHTML = translate('tournaments');
+  document.getElementById("navi_list_club").innerHTML = translate('list_clubs');
+  document.getElementById("navi_list_association").innerHTML = translate('list_associations');
+
+  document.getElementById("navi_list_class").innerHTML = translate('match_tables');
+  document.getElementById("navi_list_age").innerHTML = translate('age_groups');
+
+  document.getElementById("navi_server_config").innerHTML = translate('configuration');
+});
 
 
 AjaxCallback("/ajax/get_status", function(response) {

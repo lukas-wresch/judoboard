@@ -12,6 +12,8 @@ namespace Judoboard
 
 		RemoteTournament(const std::string& Host, uint16_t Port);
 
+		virtual bool IsLocal() const { return false; }
+
 		virtual std::vector<Match> GetNextMatches(uint32_t MatID) const override;
 
 		virtual bool IsParticipant(const Judoka& Judoka) const override;

@@ -21,13 +21,73 @@ TEST(Match, NoDoubleEvents)
 	mat.Mate();
 
 	auto log = match->GetLog();
-	EXPECT_EQ(log.GetNumEvent(), 3);//Start, hajime, mate
+	ASSERT_EQ(log.GetNumEvent(), 3);//Start, hajime, mate
 	EXPECT_EQ(log.GetEvents()[0].m_Event, MatchLog::NeutralEvent::StartMatch);
 	EXPECT_EQ(log.GetEvents()[1].m_Event, MatchLog::NeutralEvent::Hajime);
 	EXPECT_EQ(log.GetEvents()[2].m_Event, MatchLog::NeutralEvent::Mate);
 
 	mat.AddIppon(Fighter::White);
 	mat.EndMatch();
+
+	delete match;
+}
+
+
+
+TEST(Match, SwapEvents)
+{
+	initialize();
+
+	Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+
+	Match* match = new Match(&j1, &j2, nullptr, 1);
+	Mat mat(1);
+
+	EXPECT_EQ(*match->GetFighter(Fighter::White), j1);
+	EXPECT_EQ(*match->GetFighter(Fighter::Blue),  j2);
+
+	EXPECT_TRUE(mat.StartMatch(match));
+
+	mat.Hajime();
+
+	mat.AddIppon(Fighter::White);
+	mat.RemoveIppon(Fighter::White);
+	mat.AddIppon(Fighter::Blue);
+
+	mat.Mate();
+	mat.EndMatch();
+
+	auto& log = match->GetLog();
+	ASSERT_EQ(log.GetNumEvent(), 7);
+	EXPECT_EQ(log.GetEvents()[0].m_Event, MatchLog::NeutralEvent::StartMatch);
+	EXPECT_EQ(log.GetEvents()[1].m_Event, MatchLog::NeutralEvent::Hajime);
+	EXPECT_EQ(log.GetEvents()[2].m_BiasedEvent, MatchLog::BiasedEvent::AddIppon);
+	EXPECT_EQ(log.GetEvents()[2].m_Group, MatchLog::EventGroup::White);
+	EXPECT_EQ(log.GetEvents()[3].m_Event, MatchLog::NeutralEvent::Mate);
+	EXPECT_EQ(log.GetEvents()[4].m_BiasedEvent, MatchLog::BiasedEvent::RemoveIppon);
+	EXPECT_EQ(log.GetEvents()[4].m_Group, MatchLog::EventGroup::White);
+	EXPECT_EQ(log.GetEvents()[5].m_BiasedEvent, MatchLog::BiasedEvent::AddIppon);
+	EXPECT_EQ(log.GetEvents()[5].m_Group, MatchLog::EventGroup::Blue);
+	EXPECT_EQ(log.GetEvents()[6].m_Event, MatchLog::NeutralEvent::EndMatch);
+
+	match->SwapFighters();
+	EXPECT_EQ(*match->GetFighter(Fighter::White), j2);
+	EXPECT_EQ(*match->GetFighter(Fighter::Blue),  j1);
+
+	ASSERT_EQ(log.GetNumEvent(), 7);
+	EXPECT_EQ(log.GetEvents()[0].m_Event, MatchLog::NeutralEvent::StartMatch);
+	EXPECT_EQ(log.GetEvents()[1].m_Event, MatchLog::NeutralEvent::Hajime);
+	EXPECT_EQ(log.GetEvents()[2].m_BiasedEvent, MatchLog::BiasedEvent::AddIppon);
+	EXPECT_EQ(log.GetEvents()[2].m_Group, MatchLog::EventGroup::Blue);
+	EXPECT_EQ(log.GetEvents()[3].m_Event, MatchLog::NeutralEvent::Mate);
+	EXPECT_EQ(log.GetEvents()[4].m_BiasedEvent, MatchLog::BiasedEvent::RemoveIppon);
+	EXPECT_EQ(log.GetEvents()[4].m_Group, MatchLog::EventGroup::Blue);
+	EXPECT_EQ(log.GetEvents()[5].m_BiasedEvent, MatchLog::BiasedEvent::AddIppon);
+	EXPECT_EQ(log.GetEvents()[5].m_Group, MatchLog::EventGroup::White);
+	EXPECT_EQ(log.GetEvents()[6].m_Event, MatchLog::NeutralEvent::EndMatch);
+
+	delete match;
 }
 
 
@@ -67,6 +127,21 @@ TEST(Match, ExportImport)
 		ASSERT_EQ(match->HasConcluded(), match2.HasConcluded());
 		ASSERT_EQ(match->IsRunning(),    match2.IsRunning());
 	}
+
+
+	Match match(nullptr, nullptr, nullptr, 0);
+
+	match.SetTag(Match::Tag::Finals());
+	EXPECT_EQ((int)match.GetTag().value, 1);
+
+	match.SetTag(Match::Tag::Semi());
+	EXPECT_EQ((int)match.GetTag().value, 2);
+
+	match.SetTag(Match::Tag::Third());
+	EXPECT_EQ((int)match.GetTag().value, 4);
+
+	match.SetTag(Match::Tag::Fifth());
+	EXPECT_EQ((int)match.GetTag().value, 8);
 }
 
 

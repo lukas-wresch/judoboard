@@ -71,6 +71,15 @@ void StandingData::operator << (const YAML::Node& Yaml)
 			Judoka* newJudoka = new Judoka(node, this);
 			m_Judokas.emplace_back(newJudoka);
 		}
+
+		std::sort(m_Judokas.begin(), m_Judokas.end(), [](const Judoka* a, const Judoka* b)
+		{
+			if (a->GetLastname() != b->GetLastname())
+				return a->GetLastname() < b->GetLastname();
+			if (a->GetFirstname() != b->GetFirstname())
+				return a->GetFirstname() < b->GetFirstname();
+			return a->GetUUID() < b->GetUUID() ;
+		});
 	}
 
 
@@ -201,7 +210,7 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 			return a->GetLastname() < b->GetLastname();
 		if (a->GetFirstname() != b->GetFirstname())
 			return a->GetFirstname() < b->GetFirstname();
-		return a->GetUUID() < b->GetUUID() ;
+		return a->GetUUID() < b->GetUUID();
 	});
 
 	return true;
@@ -221,66 +230,6 @@ bool StandingData::DeleteJudoka(const UUID& UUID)
 	}
 
 	return false;
-}
-
-
-
-const std::string StandingData::Judoka2String(std::string SearchString, const ITournament* Tournament) const
-{
-	if (!Tournament)
-		return "";
-	
-	std::transform(SearchString.begin(), SearchString.end(), SearchString.begin(),
-		[](unsigned char c){ return std::tolower(c); });
-
-	YAML::Emitter ret;
-	ret << YAML::BeginSeq;
-
-	for (auto judoka : m_Judokas)
-	{
-		auto name = judoka->GetName(NameStyle::GivenName);
-		std::transform(name.begin(), name.end(), name.begin(),
-			[](unsigned char c){ return std::tolower(c); });
-
-		if (name.find(SearchString) == std::string::npos)
-			continue;
-
-		ret << YAML::BeginMap;
-
-		ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
-		ret << YAML::Key << "name" << YAML::Value << judoka->GetName(NameStyle::GivenName);
-		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
-		ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
-
-		if (judoka->GetClub())
-			ret << YAML::Key << "club" << YAML::Value << judoka->GetClub()->GetName();
-
-		ret << YAML::Key << "is_participant" << YAML::Value << Tournament->IsParticipant(*judoka);
-
-		auto judoka_age_group = Tournament->GetAgeGroupOfJudoka(judoka);
-		if (judoka_age_group)
-			ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
-
-		//Calculate eligable age groups
-		ret << YAML::Key << "age_groups" << YAML::Value;
-		ret << YAML::BeginSeq;
-
-		auto age_groups = Tournament->GetEligableAgeGroupsOfJudoka(judoka);
-		for (auto age_group : age_groups)
-		{
-			ret << YAML::BeginMap;
-			ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
-			ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
-			ret << YAML::EndMap;
-		}
-
-		ret << YAML::EndSeq;
-
-		ret << YAML::EndMap;
-	}
-
-	ret << YAML::EndSeq;
-	return ret.c_str();
 }
 
 

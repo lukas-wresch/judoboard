@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <thread>
-#include <mutex>
+#include "../ZED/include/read_write_mutex.h"
 #include <functional>
 #include "judoka.h"
 #include "timer.h"
@@ -55,7 +55,12 @@ namespace Judoboard
 
 		virtual bool HasConcluded() const override;
 
-		virtual const std::vector<OsaekomiEntry>& GetOsaekomiList() const override { return m_OsaekomiList; }
+		virtual std::vector<OsaekomiEntry> GetOsaekomiList() const override {
+			m_mutex.LockRead();
+			auto copy = m_OsaekomiList;
+			m_mutex.UnlockRead();
+			return copy;
+		}
 
 		virtual ZED::Blob RequestScreenshot() const override;
 
@@ -86,11 +91,12 @@ namespace Judoboard
 		const Window& GetWindow() const { return m_Window; }
 
 		//Commands by judge
-		virtual bool StartMatch(Match* NewMatch) override;
+		virtual bool StartMatch(Match* NewMatch, bool UseForce = false) override;
 		virtual bool EndMatch() override;
 
 		virtual void Hajime() override;
 		virtual void Mate() override;
+		virtual bool WasMateRecent() const override { return AreFightersOnMat() && Timer::GetTimestamp() - m_MateTimestamp < 3000; }
 		virtual void Sonomama() override;
 
 		virtual void AddIppon(Fighter Whom) override;
@@ -129,6 +135,8 @@ namespace Judoboard
 		virtual void Osaekomi(Fighter Whom) override;
 		virtual void Tokeda() override;
 
+		uint32_t GetMaxMatchTime();
+
 		//Serialization
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
@@ -148,9 +156,9 @@ namespace Judoboard
 
 		virtual void SetName(const std::string& NewName) override
 		{
-			m_mutex.lock();
+			m_mutex.LockWrite();
 			IMat::SetName(NewName);
-			m_mutex.unlock();
+			m_mutex.UnlockWrite();
 		}
 
 
@@ -427,6 +435,7 @@ namespace Judoboard
 		//Processing
 		void Process();
 		void UpdateGraphics() const;
+		void UpdateOsaekomiGraphics() const;
 		void RenderScore(double dt) const;
 		void RenderTimer(double dt) const;
 		void RenderShidos(double dt) const;
@@ -453,6 +462,8 @@ namespace Judoboard
 
 		Timer m_HajimeTimer;
 		Timer m_OsaekomiTimer[2];
+		uint32_t m_MateTimestamp = 0;//Timestam of last mate command
+
 		std::vector<OsaekomiEntry> m_OsaekomiList;
 		bool m_IsOsaekomi = false;
 		Fighter m_OsaekomiHolder = Fighter::White;
@@ -469,7 +480,8 @@ namespace Judoboard
 		uint32_t m_LastFrameTime = 40;
 
 		std::thread m_Thread;//Thread for running the main loop
-		mutable std::recursive_mutex m_mutex;
+		//mutable std::recursive_mutex m_mutex;
+		mutable ZED::RecursiveReadWriteMutex m_mutex;
 
 		//Graphics
 		mutable std::unordered_map<std::string, GraphicElement> m_Graphics;
@@ -481,5 +493,7 @@ namespace Judoboard
     mutable ZED::Sound m_Sound;//Sound signal
 
 		double m_ScalingFactor = 1.0;//Should be 1.0 for 1080p screen, smaller for smaller screen and > 1.0 for larger screens
+
+		mutable volatile uint32_t m_FrameCount = 0;
 	};
 }

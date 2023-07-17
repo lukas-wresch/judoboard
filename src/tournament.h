@@ -32,6 +32,8 @@ namespace Judoboard
 		Tournament(const MD5& File, Database* pDatabase = nullptr);
 		~Tournament();
 
+		virtual bool IsLocal() const { return true; }
+
 		void Reset();
 
 		bool Load(const YAML::Node& yaml);
@@ -39,7 +41,7 @@ namespace Judoboard
 		[[nodiscard]]
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
 		[[nodiscard]]
-		std::vector<Match*> GetSchedule() const;
+		virtual std::vector<Match*> GetSchedule() const override;
 		Match* FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
 		virtual const StandingData& GetDatabase() const override { return m_StandingData; }//Returns a database containing all participants
@@ -78,8 +80,9 @@ namespace Judoboard
 
 		bool AddMatch(Match* NewMatch);
 		//bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
-		Match* GetNextMatch(int32_t MatID = -1) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual Match* GetNextMatch(int32_t MatID = -1) const override;//Returns the next match for a given mat if available, otherwise null pointer is returned
 		const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual Match* GetNextOngoingMatch(int32_t MatID) override;//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
 
 		virtual bool RemoveMatch(const UUID& MatchID) override;
 		virtual bool MoveMatchUp(const UUID&  MatchID, uint32_t MatID = 0) override;
@@ -99,9 +102,10 @@ namespace Judoboard
 		uint32_t GetHighestMatIDUsed() const;//Returns the highest ID of all mats that are used in the tournament. Returns zero if no mats are used
 		bool IsMatUsed(uint32_t ID) const;
 
+		void SwapAllFighters();//Swaps the white with the blue fighter of all matches
+
 		//Match tables
 		void AddMatchTable(MatchTable* NewMatchTable);
-		bool UpdateMatchTable(const UUID& UUID);//Calling this function we recalculate the given match table
 		bool RemoveMatchTable(const UUID& UUID);
 		const std::vector<MatchTable*>& GetMatchTables() const { return m_MatchTables; }
 		virtual MatchTable* FindMatchTable(const UUID& ID) override;
@@ -148,7 +152,7 @@ namespace Judoboard
 		const AgeGroup* FindAgeGroup(const UUID& UUID) const { return m_StandingData.FindAgeGroup(UUID); }
 		virtual std::vector<const AgeGroup*> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const override;
 		virtual std::vector<const AgeGroup*> GetAgeGroups() const override;
-		virtual void ListAgeGroups(YAML::Emitter& Yaml) const override;
+		virtual void GetAgeGroupInfo(YAML::Emitter& Yaml, const AgeGroup* AgeGroup) const override;
 
 		//Master schedule / schedule entries
 		bool MoveScheduleEntryUp(const UUID& UUID) override;
@@ -176,7 +180,11 @@ namespace Judoboard
 		virtual std::vector<std::pair<UUID, size_t>> GetLots() const override { return m_AssociationToLotNumber; }
 
 		//Events
-		virtual void OnMatchConcluded(const Match& Match) const override {}
+		virtual void OnMatchConcluded(const Match& Match) const override {
+			ScheduleSave();
+		}
+		virtual bool OnUpdateParticipant(const UUID& UUID) override;//Calling this function we recalculate the given judoka
+		virtual bool OnUpdateMatchTable(const UUID& UUID) override;//Calling this function we recalculate the given match table
 
 		//Serialization
 		const std::string Schedule2String() const override;
@@ -184,10 +192,19 @@ namespace Judoboard
 		const std::string MasterSchedule2String() const override;
 
 		virtual void GenerateSchedule() override;
+		void BuildSchedule();
 
 		virtual bool Save() override {
 			if (!m_AutoSave) return true;
 			return SaveYAML("tournaments/" + m_Name + ".yml");
+		}
+		void ScheduleSave() const
+		{
+			m_LastSaveTime = 0;
+		}
+		uint32_t TimeSinceLastSave() const
+		{
+			return Timer::GetTimestamp() - m_LastSaveTime;
 		}
 
 	private:
@@ -212,11 +229,12 @@ namespace Judoboard
 			std::recursive_mutex& m_Mutex;
 		};
 
-		[[nodiscard]]
-		ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
+		//[[nodiscard]]
+		//ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
 
 		std::string m_Name;
 		bool m_AutoSave = true;
+		mutable uint32_t m_LastSaveTime = 0;//Timestamp when the file was saved
 		std::string m_Description;
 		bool m_Readonly = false;
 

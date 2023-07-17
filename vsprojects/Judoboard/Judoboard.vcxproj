@@ -208,7 +208,6 @@
     <ClCompile Include="..\..\src\rule_set.cpp" />
     <ClCompile Include="..\..\src\single_elimination.cpp" />
     <ClCompile Include="..\..\src\splitter.cpp" />
-    <ClCompile Include="..\..\src\standard.cpp" />
     <ClCompile Include="..\..\src\standing_data.cpp" />
     <ClCompile Include="..\..\src\take_top_ranks.cpp" />
     <ClCompile Include="..\..\src\timer.cpp" />
@@ -261,7 +260,6 @@
     <ClInclude Include="..\..\src\schedule_entry.h" />
     <ClInclude Include="..\..\src\single_elimination.h" />
     <ClInclude Include="..\..\src\splitter.h" />
-    <ClInclude Include="..\..\src\standard.h" />
     <ClInclude Include="..\..\src\standing_data.h" />
     <ClInclude Include="..\..\src\take_top_ranks.h" />
     <ClInclude Include="..\..\src\timer.h" />

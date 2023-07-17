@@ -4,6 +4,7 @@
 #include "judoboard.h"
 #include "match.h"
 #include "judoka.h"
+#include "filter.h"
 
 
 
@@ -137,6 +138,8 @@ namespace Judoboard
 	class MatchTable : public ID
 	{
 		friend class Tournament;
+		friend class Pool;
+		friend class DoubleElimination;
 
 	public:
 		enum class Type
@@ -218,10 +221,13 @@ namespace Judoboard
 			void Add(const Judoka* Judoka, const MatchTable* Table) {
 				m_Results.emplace_back(Judoka, Table);
 			}
+			void Add(const Result& NewResult) {
+				m_Results.emplace_back(NewResult);
+			}
 
 			Result* GetResultsOf(const Judoka* Judoka) {
 				for (size_t i = 0; i < m_Results.size(); ++i)
-					if (m_Results[i].Judoka && *m_Results[i].Judoka == *Judoka)
+					if (m_Results[i].Judoka && Judoka && *m_Results[i].Judoka == *Judoka)
 						return &m_Results[i];
 				return nullptr;
 			}
@@ -275,7 +281,9 @@ namespace Judoboard
 		MatchTable(MatchTable&) = delete;
 		MatchTable(const MatchTable&) = delete;
 
-		~MatchTable();
+		virtual ~MatchTable() {
+			DeleteSchedule();
+		}
 
 		virtual Type GetType() const { return Type::Unknown; }
 		virtual bool IsEditable() const { return true; }
@@ -328,6 +336,9 @@ namespace Judoboard
 		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
 		const ITournament* GetTournament() const { return m_Tournament; }
 
+		void AutoGenerateSchedule(bool Enable = true) { m_RegenerateSchedule = Enable; }
+		bool IsAutoGenerateSchedule() const { return m_RegenerateSchedule; }
+
 		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
 
 		//Rule sets
@@ -367,12 +378,17 @@ namespace Judoboard
 
 	protected:
 		MatchTable(IFilter* Filter, const ITournament* Tournament, const MatchTable* Parent = nullptr)
-			: m_Filter(Filter), m_Tournament(Tournament), m_Parent(Parent) {}
+			: m_Filter(Filter), m_Tournament(Tournament), m_Parent(Parent) {
+			if (m_Filter && !m_Filter->GetParent())
+				m_Filter->SetParent(this);
+		}
 		MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent);
 
 		virtual void GenerateSchedule() = 0;
 
 		static std::string GetHTMLForm();
+
+		const std::string GetHTMLTop() const;
 
 		Match* AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosition);
 		Match* CreateAutoMatch(const DependentJudoka& White, const DependentJudoka& Blue);
@@ -380,9 +396,12 @@ namespace Judoboard
 
 		void AddMatchesForBestOfThree();
 
-		void DeleteSchedule() {
-			for (auto match : m_Schedule)
-				delete match;
+		virtual void DeleteSchedule() {
+			if (!IsSubMatchTable())
+			{
+				for (auto match : m_Schedule)
+					delete match;
+			}
 			m_Schedule.clear();
 		}
 
@@ -414,5 +433,7 @@ namespace Judoboard
 		const MatchTable* m_Parent = nullptr;//Is this a match table that is purely used by another match table?
 
 		bool m_BestOfThree = false;
+
+		bool m_RegenerateSchedule = true;
 	};
 }

@@ -15,6 +15,8 @@ namespace Judoboard
 		Pool(IFilter* Filter, const ITournament* Tournament = nullptr);
 		Pool(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
 		Pool(const YAML::Node& Yaml, ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
+		Pool(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
+			: Pool(new Weightclass(Weightclass_, this), Tournament) {}
 
 		~Pool() {
 			SetSchedule().clear();
@@ -37,8 +39,8 @@ namespace Judoboard
 		bool IsThirdPlaceMatch() const { return m_Finals.IsThirdPlaceMatch(); }
 		bool IsFifthPlaceMatch() const { return m_Finals.IsFifthPlaceMatch(); }
 
-		void IsThirdPlaceMatch(bool Enable) { m_Finals.IsThirdPlaceMatch(Enable); GenerateSchedule(); }
-		void IsFifthPlaceMatch(bool Enable) { m_Finals.IsFifthPlaceMatch(Enable); GenerateSchedule(); }
+		void IsThirdPlaceMatch(bool Enable) { m_Finals.IsThirdPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
+		void IsFifthPlaceMatch(bool Enable) { m_Finals.IsFifthPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
 
 		void SetPoolCount(uint32_t PoolCount) { m_PoolCount = PoolCount; GenerateSchedule(); }
 		size_t GetPoolCount() const { return m_Pools.size(); }
@@ -66,6 +68,16 @@ namespace Judoboard
 
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
 		virtual void ToString(YAML::Emitter& Yaml) const override;
+
+
+	protected:
+		virtual void DeleteSchedule() override {
+			for (auto pool : m_Pools)
+				if (pool)
+					pool->DeleteSchedule();
+			m_Finals.DeleteSchedule();
+			MatchTable::DeleteSchedule();
+		}
 
 
 	private:

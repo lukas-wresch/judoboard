@@ -20,6 +20,7 @@ namespace Judoboard
 		void operator =(const LoserBracket& rhs) = delete;
 		void operator =(LoserBracket&& rhs) noexcept {
 			ID::operator=(rhs);
+			m_FinalMatch = rhs.m_FinalMatch;
 			m_ThirdPlaceMatch = rhs.m_ThirdPlaceMatch;
 			SetRuleSet(rhs.GetOwnRuleSet());
 			SetName(rhs.GetName());
@@ -34,6 +35,8 @@ namespace Judoboard
 			IsBestOfThree(rhs.IsBestOfThree());
 
 			SetSchedule(std::move(rhs.SetSchedule()));
+			for (auto match : GetSchedule())
+				match->SetMatchTable(this);
 		}
 
 		static std::string GetHTMLForm();
@@ -61,6 +64,8 @@ namespace Judoboard
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
+
+		virtual void operator >> (YAML::Emitter& Yaml) const override;
 
 
 	private:
@@ -91,13 +96,14 @@ namespace Judoboard
 
 		size_t GetNumberOfBaseRounds() const
 		{
-			if (!GetFilter() || GetFilter()->GetParticipants().size() <= 1)
+			auto filter = GetFilter();
+			if (!filter || filter->GetParticipants().size() <= 1)
 				return 0;
 
-			if (GetFilter()->GetParticipants().size() == 2)
+			if (filter->GetParticipants().size() == 2)
 				return 1;
 
-			auto rounds = (size_t)std::ceil(std::log2(GetFilter()->GetParticipants().size() + 2));
+			auto rounds = (size_t)std::ceil(std::log2(filter->GetParticipants().size() + 2));
 
 			return rounds;
 		}

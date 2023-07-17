@@ -98,7 +98,7 @@ namespace Judoboard
 
 		virtual const std::string& GetName() const { return m_Name; }
 
-		virtual const std::vector<OsaekomiEntry>& GetOsaekomiList() const = 0;
+		virtual std::vector<OsaekomiEntry> GetOsaekomiList() const = 0;
 
 		virtual Type GetType() const = 0;//Returns the type of the mat (local, remote)
 		virtual bool IsOpen()  const = 0;//Returns true if and only if the mat is open (connected and ready to receive commands)
@@ -116,7 +116,7 @@ namespace Judoboard
 		virtual const std::vector<Match> GetNextMatches() const { return m_NextMatches; }
 
 		virtual bool CanNextMatchStart() const = 0;
-		virtual bool StartMatch(Match* NewMatch) = 0;//Creates a new match. Both judoka are copied to the mat. Returns false when a match is still progressing and hence a new match can not be started
+		virtual bool StartMatch(Match* NewMatch, bool UseForce = false) = 0;//Creates a new match. Both judoka are copied to the mat. Returns false when a match is still progressing and hence a new match can not be started
 		virtual bool HasConcluded() const = 0;//Returns true if and only if the match has finished and hence EndMatch() can be called
 		virtual bool EndMatch() = 0;//Closes the match that is currently on the mat and resets the scoreboard
 
@@ -134,6 +134,7 @@ namespace Judoboard
 		//Commands by judge
 		virtual void Hajime() = 0;//Starts/continues the match. If an osaekomi is running this commands acts as an yoshi
 		virtual void Mate() = 0;//Pauses the match. If an osaekomi is running this commands will stop the osaekomi
+		virtual bool WasMateRecent() const = 0;//Returns true if and only if mate command was issued recently.
 		virtual void Sonomama() = 0;//Sonomama. Pauses the match and osaekomi
 
 		virtual void AddIppon(Fighter Whom) = 0;//Adds an ippon on the scoreaboard for fighter 'Whom'

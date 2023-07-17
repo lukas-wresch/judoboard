@@ -13,6 +13,7 @@
 #include <uchar.h>
 #endif
 
+#include <thread>
 #include <chrono>
 #include <sstream>
 #include <iomanip>
@@ -196,11 +197,12 @@ double Core::CurrentTime()
 
 void Core::Pause(uint32_t Milliseconds)
 {
-#ifdef _WIN32
+	std::this_thread::sleep_for((std::chrono::milliseconds)Milliseconds);
+/*#ifdef _WIN32
 	Sleep(Milliseconds);
 #else
 	usleep(Milliseconds * 1000);
-#endif
+#endif*/
 }
 
 

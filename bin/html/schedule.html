@@ -26,7 +26,7 @@
 
 <h2 id="headline">Schedule</h2>
 <label style="width:150px;float:left;margin-top:0px;" id="label_mat_display">Show matches on</label>
-  <select style="margin-bottom:20px; width: 200px;" id="display_mat" onchange='Update();'>
+  <select style="margin-bottom:20px; width: 200px;" id="display_mat" onchange='Update_Schedule();'>
   </select>
 
 <table id="schedule" border="1" rules="all" style="margin-bottom: 1cm;">
@@ -41,30 +41,36 @@
     <th style="width: 2.5cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
-  
+
 
 <h2 id="headline_age_groups">Age Groups</h2>
 <table id="age_groups" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
     <th style="width: 0.5cm;" class="no">No.</th>
     <th style="width: 4cm;" id="name">Name</th>
-    <th style="width: 2cm; text-align: center;" id="age_groups_participants">#Participants</th>
+    <th style="width: 2.0cm; text-align: center;" id="age_groups_participants">#Participants</th>
     <th style="width: 3.0cm; text-align: center;" id="age_groups_match_tables">#Match tables</th>
-    <th style="width: 2cm; text-align: center;" id="age_groups_matches" class="num_matches">#Matches</th>
+    <th style="width: 2.0cm; text-align: center;" id="age_groups_matches" class="num_matches">#Matches</th>
     <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
 
 
 <h2 id="headline-participants">Participants</h2>
+
+<div>
+    <label id="participants_search_label" style="width:150px;float:left;margin-top:5px;">Search</label>
+    <input style="margin-bottom:20px;" size="50" id="participants_search" value=""/>
+</div>
+
 <table id="participants" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
     <th style="width: 0.5cm;" class="no">No.</th>
     <th style="width: 7cm;" id="name">Name</th>
-    <th style="width: 6cm; text-align: center;" class="club">Club</th>
-    <th style="width: 2cm; text-align: center;" id="weight" class="weight">Weight</th>
-    <th style="width: 2cm; text-align: center;" id="matches" class="num_matches">#Matches</th>
-    <th style="width: 2.5cm; text-align: center;" id="age_group" class="age_group">Age group</th>
+    <th style="width: 6.0cm; text-align: center;" class="club">Club</th>
+    <th style="width: 2.0cm; text-align: center;" id="weight" class="weight">Weight</th>
+    <th style="width: 2.0cm; text-align: center;" id="matches" class="num_matches">#Matches</th>
+    <th style="width: 5.5cm; text-align: center;" id="age_group" class="age_group">Age group</th>
     <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -78,7 +84,7 @@ function MoveEntryUp(id)
 {
   var mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_up?id=' + id, function() {
-    Update();
+    Update_Masterschedule();
   });
   return false;
 }
@@ -88,7 +94,7 @@ function MoveEntryDown(id)
 {
   var mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_down?id=' + id, function() {
-    Update();
+    Update_Masterschedule();
   });
   return false;
 }
@@ -98,7 +104,7 @@ function MoveEntryDown(id)
 function SetEntryMat(id, mat)
 {
   AjaxCallback('ajax/masterschedule/set_mat?id='+id+'&mat='+mat, function() {
-    Update();
+    Update_Masterschedule();
   });
 
   return false;
@@ -110,7 +116,7 @@ function MoveUp(id)
 {
   var mat_to_display = document.getElementById("display_mat").value;
   AjaxCallback('/ajax/match/move_up?id=' + id + '&mat=' + mat_to_display, function() {
-    Update();
+    Update_Schedule();
   });
   return false;
 }
@@ -120,7 +126,7 @@ function MoveDown(id)
 {
   var mat_to_display = document.getElementById("display_mat").value;
   AjaxCallback('/ajax/match/move_down?id=' + id + '&mat=' + mat_to_display, function() {
-    Update();
+    Update_Schedule();
   });
   return false;
 }
@@ -130,7 +136,7 @@ function MoveDown(id)
 function RemoveParticipant(id)
 {
   AjaxCallback('/ajax/participant/remove?id=' + id, function() {
-    Update();
+    Update_Participants();
   });
   return false;
 }
@@ -188,7 +194,7 @@ function RemoveNoDisqualify(fighter, matID)
 function RemoveAgeGroup(id)
 {
   AjaxCallback('/ajax/age_groups/remove?id=' + id, function() {
-    Update();
+    Update_AgeGroups();
   });
   return false;
 }
@@ -197,18 +203,27 @@ function RemoveAgeGroup(id)
 
 function AssignAgeGroup(judoka_id, age_group_id)
 {
-  AjaxCallback('/ajax/tournament/assign_age_group?id=' + judoka_id + '&age=' + age_group_id, Update);
+  AjaxCallback('/ajax/tournament/assign_age_group?id=' + judoka_id + '&age=' + age_group_id, Update_Participants);
   return false;
 }
 
 
 
-function Update()
+let updateMasterscheduleRunning = false;
+
+function Update_Masterschedule()
 {
+  if (updateMasterscheduleRunning)
+    return;
+
+  updateMasterscheduleRunning = true;
+
   AjaxCallback("ajax/get_masterschedule", function(response) {
     console.log(response);
     var res = YAML.parse(response);
     //console.log(res);
+
+    updateMasterscheduleRunning = false;
 
     var mat_to_display = document.getElementById("display_mat");
     var mat_to_display_selected = mat_to_display.value;
@@ -272,9 +287,12 @@ function Update()
             var contents;
 
             if (entry.editable)
-              contents = "<a href=\"#matchtable_add.html?id=" + entry.uuid + "\">" + entry.description + "</a><br/><br/>";
+              contents = "<a href=\"#matchtable_add.html?id=" + entry.uuid + "\">" + entry.description + "</a><br/>";
             else
-              contents = entry.description + "<br/>";
+              contents = entry.description;
+
+            contents += entry.schedule_size + ' ' + translate('matches') + ' / ' + entry.participant_count + ' ' + translate('participants');
+            contents += "<br/>"
 
             contents += "<table><tr><td rowspan=\"2\"><a style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id-1) + ");\"></a></td>";
             contents += "           <td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp('"   + entry.uuid + "');\"></a></td>";
@@ -301,12 +319,24 @@ function Update()
       }
     }
   });
+}
 
 
+
+let updateScheduleRunning = false;
+
+function Update_Schedule()
+{
+  if (updateScheduleRunning)
+    return;
+
+  updateScheduleRunning = true;
 
   AjaxCallback("ajax/get_schedule", function(response) {
     //console.log(response);
     var res = YAML.parse(response);
+
+    updateScheduleRunning = false;
 
     var table = document.getElementById("schedule");
 
@@ -402,7 +432,7 @@ function Update()
       cell6.style.fontSize  = "16pt";
       cell6.style.textAlign = "center";
 
-      if (match.state == 1 || match.state == 2 || match.current_breaktime >= 10*60 || match.current_breaktime == 0)
+      if (match.state == 1 || match.state == 2 || match.current_breaktime >= 60*60 || match.current_breaktime == 0)
         cell6.innerHTML = '- - -';
       else
       {
@@ -429,10 +459,13 @@ function Update()
       cell7.innerHTML = options;
     }
   });
+}
 
 
 
-  AjaxCallback("ajax/age_groups/get", function(response) {
+function Update_AgeGroups()
+{
+  AjaxCallback("ajax/age_groups/list", function(response) {
     //console.log(response);
     var res = YAML.parse(response);
 
@@ -447,6 +480,9 @@ function Update()
     var no = 0;
     for (const age of res)
     {
+      if (!age.is_used)
+        continue;
+
       var row = table.insertRow(-1);
       var cell0 = row.insertCell(0);
       var cell1 = row.insertCell(1);
@@ -481,29 +517,34 @@ function Update()
       cell5.style.textAlign = "center";
     }
   });
+}
 
 
 
-  AjaxCallback("ajax/participants/get", function(response) {
+function Update_Participants()
+{
+  const search = document.getElementById("participants_search").value;
+
+  AjaxCallback("ajax/judoka/search?participants=true&name=" + search, function(response) {
     //console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
-    var table = document.getElementById("participants");
+    let table = document.getElementById("participants");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    var no = 0;
+    let no = 0;
     for (const judoka of res)
     {
-      var row = table.insertRow(-1);
-      var cell0 = row.insertCell(0);
-      var cell1 = row.insertCell(1);
-      var cell6 = row.insertCell(2);
-      var cell2 = row.insertCell(3);
-      var cell3 = row.insertCell(4);
-      var cell4 = row.insertCell(5);
-      var cell5 = row.insertCell(6);
+      let row = table.insertRow(-1);
+      let cell0 = row.insertCell(0);
+      let cell1 = row.insertCell(1);
+      let cell6 = row.insertCell(2);
+      let cell2 = row.insertCell(3);
+      let cell3 = row.insertCell(4);
+      let cell4 = row.insertCell(5);
+      let cell5 = row.insertCell(6);
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
@@ -513,9 +554,9 @@ function Update()
       cell0.style.textAlign = "center";
       cell0.style.fontSize  = "14pt";
 
-      cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.name + "</a>";
+      cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.firstname + ' ' + judoka.lastname + '</a>';
       cell1.style.fontSize  = "16pt";
-      cell2.innerHTML = judoka.weight + " kg";
+      cell2.innerHTML = judoka.weight + ' kg';
       cell2.style.textAlign = "center";
       cell2.style.fontSize  = "16pt";
 
@@ -532,17 +573,12 @@ function Update()
 
       cell4.style.textAlign = "center";
       
-      if (judoka.age_groups.length == 0)
+      if (judoka.age_groups.length == 0 && typeof judoka.age_group_uuid === 'undefined')
         cell4.innerHTML = "- - -";
-      else if (judoka.age_groups.length == 1)
-      {
-        cell4.innerHTML = judoka.age_groups[0].name;
-        cell4.style.fontSize = "14pt";
-      }
-      else
+      else if (judoka.age_groups.length >= 2)
       {
         var select = document.createElement("select");
-        select.style.width = "1.7cm";
+        select.style.width = "4.0cm";
         select.style.fontSize = "14pt";
 
         for (const age_group of judoka.age_groups)
@@ -559,19 +595,27 @@ function Update()
 
         select.onchange = function(e)
         {
-          AssignAgeGroup(judoka.uuid, select.value);
+          AssignAgeGroup(judoka.uuid, this.value);
         }
 
         cell4.appendChild(select);
+      }
+      else
+      {
+        cell4.innerHTML = judoka.age_group_name;
+        cell4.style.fontSize = "14pt";
       }
 
       cell5.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveParticipant('"+judoka.uuid+"')\">" + translate('remove') + "</button>";
       cell5.style.textAlign = "center";
     }
   });
+}
 
 
 
+function Update_Hansokumake()
+{
   AjaxCallback("ajax/hansokumake/get", function(response) {
     console.log(response);
     var res = YAML.parse(response);
@@ -659,11 +703,39 @@ function Update()
 }
 
 
+
+let updateRunning = false;
+let updateCounter = 0;
+
+function Update()
+{
+  if (updateRunning)
+    return;
+
+  Update_Masterschedule();
+  Update_Schedule();
+  if (updateCounter%3 == 0)
+    Update_Participants();
+  if (updateCounter%7 == 0)
+    Update_AgeGroups();
+  if (updateCounter%2 == 0)
+    Update_Hansokumake();
+
+  updateCounter++;
+
+  TimerID = setTimeout(Update, 6000);
+}
+
+document.getElementById("participants_search").oninput = function(e)
+{
+  Update_Participants();
+};
+
 var showHansokumake = false;
 
 
 Update();
-TimerID = window.setInterval(Update, 5000);
+//TimerID = window.setInterval(Update, 6000);
 
 
 document.getElementById("headline").innerHTML = translate('schedule');
@@ -707,3 +779,5 @@ document.getElementById("age_groups_match_tables").innerHTML = '#' + translate('
 document.getElementById("label_mat_display").innerHTML = translate('show_matches_on');
 
 document.getElementById("select_age_groups").innerHTML = translate('select_age_groups');
+
+document.getElementById("participants_search_label").innerHTML = translate('search');

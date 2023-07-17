@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <mutex>
+#include "../ZED/include/read_write_mutex.h"
 #include "database.h"
 #include "tournament.h"
 #include "account.h"
@@ -18,7 +19,7 @@ namespace Judoboard
 
 
 
-	class Application
+	class Application : public ZED::RecursiveReadWriteMutex//TODO should be private/or private member
 	{
 	public:
 		Application() : m_StartupTimestamp(Timer::GetTimestamp()) {
@@ -95,11 +96,15 @@ namespace Judoboard
 		//General
 		Error Ajax_UpdatePassword(Account* Account, const HttpServer::Request& Request);
 
+		Error Ajax_EditMatch(const HttpServer::Request& Request);
+
 		//Tournaments
 		Error Ajax_AddTournament(const HttpServer::Request& Request);
 		Error Ajax_EditTournament(const HttpServer::Request& Request);
 		std::string Ajax_GetTournament(const HttpServer::Request& Request);
+		Error Ajax_AssignAgeGroup(const HttpServer::Request& Request);
 		std::string Ajax_ListTournaments();
+		Error Ajax_SwapMatchesOfTournament(const HttpServer::Request& Request);
 
 		//Mat
 		std::string Ajax_GetMats() const;
@@ -124,8 +129,9 @@ namespace Judoboard
 
 		//Judoka
 		Error Ajax_AddJudoka(const HttpServer::Request& Request);
-		std::string Ajax_GetJudoka(const HttpServer::Request& Request);
 		Error Ajax_EditJudoka(const HttpServer::Request& Request);
+		std::string Ajax_GetJudoka(const HttpServer::Request& Request);
+		std::string Ajax_SearchJudoka(const HttpServer::Request& Request);
 		Error Ajax_ImportJudoka(const HttpServer::Request& Request);
 		Error Ajax_DeleteJudoka(const HttpServer::Request& Request);
 
@@ -140,10 +146,15 @@ namespace Judoboard
 		std::string Ajax_ListAssociations(const HttpServer::Request& Request);
 
 		//Rule sets
+		Error Ajax_AddRuleSet(const HttpServer::Request& Request);
+		Error Ajax_EditRuleSet(const HttpServer::Request& Request);
+		std::string Ajax_GetRuleSet(const HttpServer::Request& Request);
+		std::string Ajax_ListRuleSets();
 
 		//Age groups
 		Error Ajax_AddAgeGroup(const HttpServer::Request& Request);
 		Error Ajax_EditAgeGroup(const HttpServer::Request& Request);
+		Error Ajax_ImportAgeGroup(const HttpServer::Request& Request);
 		std::string Ajax_GetAgeGroup(const HttpServer::Request& Request) const;
 		std::string Ajax_ListAllAgeGroups() const;
 		Error Ajax_DeleteAgeGroup(const HttpServer::Request& Request);
@@ -193,11 +204,11 @@ namespace Judoboard
 			std::recursive_mutex& m_Mutex;
 		};
 
-		[[nodiscard]]
+		/*[[nodiscard]]
 		ScopedLock LockTillScopeEnd() const { return ScopedLock(m_mutex); }
 		void Lock()    const { m_mutex.lock(); }
 		void Unlock()  const { m_mutex.unlock(); }
-		bool TryLock() const { return m_mutex.try_lock(); }
+		bool TryLock() const { return m_mutex.try_lock(); }*/
 
 
 		enum class Mode
@@ -219,7 +230,8 @@ namespace Judoboard
 
 		std::vector<IMat*> m_Mats;//List of all mats this application is aware of
 
-		mutable std::recursive_mutex m_mutex;
+		//mutable std::recursive_mutex m_mutex;
+		//ZED::ReadWriteMutex m_mutex;
 
 		mutable volatile bool m_Running = true;
 		const uint32_t m_StartupTimestamp;

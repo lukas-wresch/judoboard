@@ -341,6 +341,10 @@ TEST(SingleElimination, Count4)
 	EXPECT_EQ(*group->GetSchedule()[1]->GetFighter(Fighter::White), *j2);
 	EXPECT_EQ(*group->GetSchedule()[1]->GetFighter(Fighter::Blue),  *j4);
 
+	EXPECT_EQ(group->GetSchedule()[0]->GetTag(), Match::Tag::Semi());
+	EXPECT_EQ(group->GetSchedule()[1]->GetTag(), Match::Tag::Semi());
+	EXPECT_EQ(group->GetSchedule()[2]->GetTag(), Match::Tag::Finals());
+
 	Mat m(1);
 
 	for (auto match : group->GetSchedule())
@@ -632,6 +636,84 @@ TEST(SingleElimination, Count8_BO3)
 	auto results = group->CalculateResults();
 
 	ASSERT_EQ(results.GetSize(), 2);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());
+	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
+	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
+
+	delete t;
+}
+
+
+
+TEST(SingleElimination, Count8_5th_BO3)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	SingleElimination* group = new SingleElimination(0, 200);
+	group->SetMatID(1);
+	t->AddMatchTable(group);
+
+	Judoka* j[8];
+	bool has_match[8];
+
+	for (int i = 0; i < 8; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		t->AddParticipant(j[i]);
+		has_match[i] = false;
+	}
+
+	group->IsThirdPlaceMatch(true);
+	group->IsFifthPlaceMatch(true);
+
+	ASSERT_EQ(group->GetParticipants().size(), 8);
+	ASSERT_EQ(group->GetSchedule().size(), 7 + 1 + 3);
+
+	group->IsBestOfThree(true);
+
+	ASSERT_EQ(group->GetParticipants().size(), 8);
+	ASSERT_EQ(group->GetSchedule().size(), 11*3);
+
+	for (auto match : group->GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		for (int i = 0; i < 8; ++i)
+		{
+			if (match->GetFighter(Fighter::White)->GetUUID() == j[i]->GetUUID())
+				has_match[i] = true;
+			if (match->GetFighter(Fighter::Blue )->GetUUID() == j[i]->GetUUID())
+				has_match[i] = true;
+		}
+	}
+
+	for (int i = 0; i < 8; ++i)
+		EXPECT_TRUE(has_match[i]);
+
+	Mat m(1);
+
+	for (auto match : group->GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+		if (match->HasConcluded())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = group->CalculateResults();
+
+	ASSERT_EQ(results.GetSize(), 6);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[7]->GetUUID());
 	//EXPECT_EQ(results[1].Judoka->GetUUID(), j2->GetUUID());
 	//EXPECT_EQ(results[2].Judoka->GetUUID(), j1->GetUUID());
@@ -1059,6 +1141,10 @@ TEST(SingleElimination, Count4_ExportImport)
 
 	EXPECT_EQ(group2.GetSchedule()[2]->GetDependentMatches()[0]->GetUUID(), group2.GetSchedule()[0]->GetUUID());
 	EXPECT_EQ(group2.GetSchedule()[2]->GetDependentMatches()[1]->GetUUID(), group2.GetSchedule()[1]->GetUUID());
+
+	EXPECT_EQ(group2.GetSchedule()[0]->GetTag(), Match::Tag::Semi());
+	EXPECT_EQ(group2.GetSchedule()[1]->GetTag(), Match::Tag::Semi());
+	EXPECT_EQ(group2.GetSchedule()[2]->GetTag(), Match::Tag::Finals());
 }
 
 
@@ -1245,6 +1331,19 @@ TEST(SingleElimination, Count8_3rd_5th)
 	EXPECT_EQ(results[3].Judoka->GetUUID(), j[5]->GetUUID());
 	EXPECT_EQ(results[4].Judoka->GetUUID(), j[4]->GetUUID());
 	EXPECT_EQ(results[5].Judoka->GetUUID(), j[3]->GetUUID());
+
+	//Test move operator
+	auto schedule = group->GetSchedule();
+	auto schedule_count = group->GetSchedule().size();
+
+	SingleElimination moved(nullptr, nullptr);
+	moved = std::move(*group);
+	
+	ASSERT_EQ(moved.GetSchedule().size(), schedule_count);
+	for (size_t i = 0; i < schedule_count; ++i)
+	{
+		EXPECT_EQ(*moved.GetSchedule()[i], *schedule[i]);
+	}
 
 	delete t;
 }

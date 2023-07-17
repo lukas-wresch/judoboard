@@ -12,10 +12,14 @@ namespace Judoboard
 
 	class IFilter : public ID
 	{
+		friend class MatchTable;
+
 	public:
 		enum class Type
 		{
-			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser, Standard, LosersOf
+			Weightclass, Fixed, Splitter, TakeTopRanks, Fuser, Mixer, Reverser,
+			Standard,//Deprecated, use Fixed
+			LosersOf
 		};
 
 		IFilter(const YAML::Node& Yaml, const MatchTable* Parent);
@@ -78,6 +82,9 @@ namespace Judoboard
 
 
 	private:
+		void SetParent(const MatchTable* Parent) { m_Parent = Parent; }
+
+
 		mutable std::unordered_map<size_t, const DependentJudoka> m_Participants;//List of all participants that are in the match table
 
 		const AgeGroup* m_pAgeGroup = nullptr;//Age group for the matches (if available)

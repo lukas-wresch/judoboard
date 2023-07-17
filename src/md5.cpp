@@ -4,6 +4,7 @@
 #include "tournament.h"
 #include "weightclass.h"
 #include "single_elimination.h"
+#include "double_elimination.h"
 #include "age_group.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/file.h"
@@ -154,7 +155,11 @@ MD5::MD5(const Tournament& Tournament)
 		{
 			new_judoka->ClubID = uuid2id(judoka->GetClub()->GetUUID());
 			new_judoka->Club   = (Club*)id2ptr(new_judoka->ClubID);
-			new_judoka->ClubFullname         = new_judoka->Club->Name;
+
+			assert(new_judoka->Club);
+			if (new_judoka->Club)
+				new_judoka->ClubFullname = new_judoka->Club->Name;
+
 			new_judoka->AssociationShortname = new_judoka->ClubFullname.substr(0, 6);//6 characters only
 		}
 
@@ -221,6 +226,17 @@ MD5::MD5(const Tournament& Tournament)
 
 			new_weightclass->MatchForThirdPlace = single_elimination->IsThirdPlaceMatch();
 			new_weightclass->MatchForFifthPlace = single_elimination->IsFifthPlaceMatch();
+		}
+		else if (match_table->GetType() == MatchTable::Type::DoubleElimination)
+		{
+			const auto double_elimination = (Judoboard::DoubleElimination*)match_table;
+
+			new_weightclass->FightSystemID = 1;
+			//if (match_table->GetParticipants().size() > 16)
+				//new_weightclass->FightSystemID = 2;
+
+			new_weightclass->MatchForThirdPlace = double_elimination->IsThirdPlaceMatch();
+			new_weightclass->MatchForFifthPlace = double_elimination->IsFifthPlaceMatch();
 		}
 		else
 			continue;
@@ -290,7 +306,8 @@ MD5::MD5(const Tournament& Tournament)
 
 				//new_result.Participant->Rank = new_result.RankID;
 
-				m_Results.emplace_back(new_result);
+				if (result.Judoka)
+					m_Results.emplace_back(new_result);
 			}
 		}
 	}
@@ -332,8 +349,8 @@ MD5::MD5(const Tournament& Tournament)
 
 	//Convert matches
 
-	const auto schedule = Tournament.GetSchedule();
-	for (auto match : schedule)
+	for (auto table : Tournament.GetMatchTables())
+		for (auto match : table->GetSchedule())
 	{
 		Match new_match;
 
@@ -360,7 +377,9 @@ MD5::MD5(const Tournament& Tournament)
 				{
 					if (!table->IsThirdPlaceMatch() && !table->IsFifthPlaceMatch())
 					{
-						if (new_match.MatchNo == 15)
+						//if (new_match.MatchNo == 15)
+							//new_match.MatchNo = 19;
+						if (match->GetTag().finals)
 							new_match.MatchNo = 19;
 					}
 
@@ -370,11 +389,19 @@ MD5::MD5(const Tournament& Tournament)
 							//;//wrong export
 						//if (new_match.MatchNo == 16)
 							//;//wrong export
-						if (new_match.MatchNo == 17)//Fifth
+						/*if (new_match.MatchNo == 17)//Fifth
 							new_match.MatchNo = 21;
 						if (new_match.MatchNo == 18)//Third
 							new_match.MatchNo = 20;
 						if (new_match.MatchNo == 19)//Final
+							new_match.MatchNo = 19;*/
+
+						Judoboard::Match::Tag fifth_final = Judoboard::Match::Tag::Fifth() & Judoboard::Match::Tag::Finals();
+						if (match->GetTag() == fifth_final)
+							new_match.MatchNo = 21;
+						else if (match->GetTag().third)
+							new_match.MatchNo = 20;
+						else if (match->GetTag().finals)
 							new_match.MatchNo = 19;
 					}
 				}
@@ -385,6 +412,15 @@ MD5::MD5(const Tournament& Tournament)
 					if (new_match.MatchNo >= 31)
 						new_match.MatchNo = 37;
 				}
+			}
+
+			else if (match_table->GetType() == MatchTable::Type::DoubleElimination)
+			{
+				auto de = (DoubleElimination*)match_table;
+				if (de->GetWinnerBracket().FindMatch(*match))
+					new_match.AreaID = 0;
+				else
+					new_match.AreaID = 1;
 			}
 		}
 
@@ -1059,15 +1095,15 @@ bool MD5::Save(const std::string& Filename) const
 
 			Write_Int(match.Status);
 
-			if (match.RedOutMatchID < 0)
+			if (match.RedOutMatchNo < 0)
 				Write_Line("");
 			else
-				Write_Int(match.RedOutMatchID);
+				Write_Int(match.RedOutMatchNo);
 
-			if (match.WhiteOutMatchID < 0)
+			if (match.WhiteOutMatchNo < 0)
 				Write_Line("");
 			else
-				Write_Int(match.WhiteOutMatchID);
+				Write_Int(match.WhiteOutMatchNo);
 
 			Write_Int(match.Pool);
 			Write_Int(match.ThirdMatchNo);
@@ -1221,6 +1257,42 @@ MD5::Participant* MD5::FindParticipant(int ParticipantID)
 
 
 
+std::vector<const MD5::Participant*> MD5::FindParticipantsOfWeightclass(int AgeGroupID, int WeightclassID) const
+{
+	std::vector<const MD5::Participant*> ret;
+
+	for (auto judoka : m_Participants)
+		if (judoka && judoka->AgeGroupID == AgeGroupID && judoka->WeightclassID == WeightclassID)
+			ret.push_back(judoka);
+	return ret;
+}
+
+
+
+std::vector<MD5::Match> MD5::FindMatchesOfWeightclass(int AgeGroupID, int WeightclassID) const
+{
+	std::vector<MD5::Match> ret;
+
+	for (const auto& match : m_Matches)
+		if (match.AgeGroupID == AgeGroupID && match.WeightclassID == WeightclassID)
+			ret.push_back(match);
+	return ret;
+}
+
+
+
+std::vector<MD5::Match> MD5::FindMatchesOfWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const
+{
+	std::vector<MD5::Match> ret;
+
+	for (const auto& match : m_Matches)
+		if (match.AgeGroup && match.AgeGroup->Name == AgeGroup && match.Weightclass && match.Weightclass->Description == Weightclass)
+			ret.push_back(match);
+	return ret;
+}
+
+
+
 MD5::AgeGroup* MD5::FindAgeGroup(int AgeGroupID)
 {
 	if (AgeGroupID <= -1)
@@ -1272,6 +1344,7 @@ const MD5::Weightclass* MD5::FindWeightclass(const std::string& AgeGroup, const 
 
 const MD5::Result* MD5::FindResult(int AgeGroupID, int WeightclassID, int Rank) const
 {
+	assert(Rank >= 1);
 	for (auto& result : m_Results)
 		if (result.AgeGroupID == AgeGroupID && result.WeightclassID == WeightclassID && result.RankNo == Rank)
 			return &result;
@@ -1282,6 +1355,7 @@ const MD5::Result* MD5::FindResult(int AgeGroupID, int WeightclassID, int Rank) 
 
 const MD5::Result* MD5::FindResult(const std::string& AgeGroup, const std::string& Weightclass, int Rank) const
 {
+	assert(Rank >= 1);
 	for (auto& result : m_Results)
 		if (result.AgeGroup && result.AgeGroup->Name == AgeGroup && result.Weightclass && result.Weightclass->Description == Weightclass && result.RankNo == Rank)
 			return &result;
@@ -1380,6 +1454,8 @@ void MD5::Dump() const
 		std::string line = table->Description;
 		line += "   FightSystemID: "        + std::to_string(table->FightSystemID);
 		line += "   FightSystemTypeID: "    + std::to_string(table->FightSystemTypeID);
+		line += "   AgeGroupID: "           + std::to_string(table->AgeGroupID);
+		line += "   "    + table->Description;
 		ZED::Log::Info(line);
 	}
 
@@ -1387,13 +1463,16 @@ void MD5::Dump() const
 	for (const auto& match : m_Matches)
 	{
 		std::string line;
-		line += "   RedID: "        + std::to_string(match.RedID);
-		line += "   WhiteID: "      + std::to_string(match.WhiteID);
-		line += "   StartNoRed: "   + std::to_string(match.StartNoRed);
-		line += "   StartNoWhite: " + std::to_string(match.StartNoWhite);
-		line += "   Status: "       + std::to_string(match.Status);
-		line += "   Pool: "         + std::to_string(match.Pool);
-		line += "   AreaID: "       + std::to_string(match.AreaID);
+		line += "   RedID: "         + std::to_string(match.RedID);
+		line += "   WhiteID: "       + std::to_string(match.WhiteID);
+		line += "   StartNoRed: "    + std::to_string(match.StartNoRed);
+		line += "   StartNoWhite: "  + std::to_string(match.StartNoWhite);
+		line += "   Status: "        + std::to_string(match.Status);
+		line += "   Pool: "          + std::to_string(match.Pool);
+		line += "   AreaID: "        + std::to_string(match.AreaID);
+		line += "   MatchNo: "       + std::to_string(match.MatchNo);
+		line += "   WeightclassID: " + std::to_string(match.WeightclassID);
+		line += "   AgeGroupID: "    + std::to_string(match.AgeGroupID);
 		ZED::Log::Info(line);
 	}
 
@@ -1453,25 +1532,46 @@ void MD5::Dump() const
 
 bool MD5::Parse(ZED::Blob&& Data)
 {
+	if (Data.ReadByte() != 0x00)
+	{
+		ZED::Log::Warn("Data is not a MD5 file");
+		return false;
+	}
+
 	if (ReadLine(Data) != "MMW98")
 	{
 		ZED::Log::Warn("Data is not a MD5 file");
 		return false;
 	}
 
-	if (ReadLine(Data) != "3")
+	int unknown = Data.ReadByte();//'3' in MD5, 'F' in MD7
+
+	if (unknown != 0x33 && unknown != 0x46)
 	{
 		ZED::Log::Warn("Data is not a MD5 file");
 		return false;
 	}
 
-	if (ReadLine(Data) != "Version 51")
+	if (Data.ReadByte() != 0x00)
+	{
+		ZED::Log::Warn("Data is not a MD5 file");
+		return false;
+	}
+
+	auto version = ReadLine(Data);
+	if (version != "Version 51" && version != "Version 70")
 	{
 		ZED::Log::Warn("Data is not a MD5 file");
 		return false;
 	}
 
 	m_FileDate = ReadLine(Data);
+
+	if (ReadLine(Data) != "")
+	{
+		ZED::Log::Warn("Data is not a MD5 file");
+		return false;
+	}
 
 	bool is_ok = true;
 	bool found_end = false;
@@ -1510,8 +1610,18 @@ bool MD5::Parse(ZED::Blob&& Data)
 		else if (line == "Ergebnis")
 			is_ok &= ReadResult(Data);
 
-		else if (newline)
-			continue;
+		//For Version 7
+		else if (line == "PlanungsElement")
+			is_ok &= ReadTable(Data);
+		else if (line == "Pause")
+			is_ok &= ReadTable(Data);
+		else if (line == "InfoSeite")
+			is_ok &= ReadTable(Data);
+		else if (line == "Kampflog")
+			is_ok &= ReadTable(Data);
+		else if (line == "Matte")
+			is_ok &= ReadTable(Data);
+		
 		else if (line == "\\\\end")
 		{
 			found_end = true;
@@ -1606,6 +1716,10 @@ bool MD5::ReadTournamentData(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -1714,6 +1828,10 @@ bool MD5::ReadRankScore(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -1759,6 +1877,10 @@ bool MD5::ReadAgeGroups(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -1866,12 +1988,16 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
 	{
 		bool newline;
-		auto Line = ReadLine(Data,&newline);		
+		auto Line = ReadLine(Data, &newline);
 			
 		data.emplace_back(RemoveControlCharacters(Line));
 
@@ -1953,6 +2079,11 @@ bool MD5::ReadWeightclasses(ZED::Blob& Data)
 					if (sscanf_s(data[i].c_str(), "%d", &new_weightclass.MaxPooled) != 1)
 						ZED::Log::Warn("Could not read MaxPooled of weightclass");
 				}
+
+				//Version 7
+
+				else if (header[i] == "BestOfThree")
+					new_weightclass.BestOfThree = data[i] != "1";
 			}
 
 			m_Weightclasses.emplace_back(new Weightclass(new_weightclass));
@@ -1972,6 +2103,10 @@ bool MD5::ReadRelationClubAssociation(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2022,6 +2157,10 @@ bool MD5::ReadLottery(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2066,6 +2205,10 @@ bool MD5::ReadLotteryScheme(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2117,6 +2260,10 @@ bool MD5::ReadLotterySchemaLine(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2171,6 +2318,10 @@ bool MD5::ReadRelationParticipantMatchTable(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2224,6 +2375,10 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2355,13 +2510,13 @@ bool MD5::ReadMatchData(ZED::Blob& Data)
 				}
 				else if (header[i] == "RotAusgeschiedenKampfNR")
 				{
-					if (sscanf_s(data[i].c_str(), "%d", &new_match.RedOutMatchID) != 1)
-						ZED::Log::Warn("Could not read RedOutMatchID of match");
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.RedOutMatchNo) != 1)
+						ZED::Log::Warn("Could not read RedOutMatchNo of match");
 				}
 				else if (header[i] == "WeissAusgeschiedenKampfNR")
 				{
-					if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteOutMatchID) != 1)
-						ZED::Log::Warn("Could not read WhiteOutMatchID of match");
+					if (sscanf_s(data[i].c_str(), "%d", &new_match.WhiteOutMatchNo) != 1)
+						ZED::Log::Warn("Could not read WhiteOutMatchNo of match");
 				}
 				else if (header[i] == "Pool")
 				{
@@ -2402,6 +2557,10 @@ bool MD5::ReadResult(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2500,10 +2659,49 @@ bool MD5::ReadResult(ZED::Blob& Data)
 
 
 
+bool MD5::ReadTable(ZED::Blob& Data, std::function<bool(std::vector<std::string>&&, std::vector<std::string>&&)> Parse)
+{
+	int data_count;
+	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
+	std::vector<std::string> data;
+	int data_written = 0;
+
+	while (!Data.EndReached())
+	{
+		bool newline;
+		auto Line = ReadLine(Data, &newline);
+
+		data.emplace_back(Line);
+
+		if (data.size() >= header.size())//Have we read the entire data block?
+		{
+			if (Parse && Parse(std::move(header), std::move(data)))
+				data_written++;
+
+			data.clear();
+		}
+
+		if (newline)
+			return data_written == data_count;
+	}
+
+	return false;
+}
+
+
+
 bool MD5::ReadParticipants(ZED::Blob& Data)
 {
 	int data_count;
 	auto header = ReadHeader(Data, data_count);
+
+	if (data_count == 0)
+		return true;
+
 	std::vector<std::string> data;
 
 	while (!Data.EndReached())
@@ -2752,6 +2950,8 @@ std::vector<std::string> MD5::ReadHeader(ZED::Blob& Data, int& DataCount)
 {
 	std::vector<std::string> header;
 
+	int headerCount = ReadInt(Data);//Read number of header entries
+
 	while (!Data.EndReached())
 	{
 		bool newline;
@@ -2760,6 +2960,7 @@ std::vector<std::string> MD5::ReadHeader(ZED::Blob& Data, int& DataCount)
 		header.emplace_back(Line);
 		if (newline)
 		{
+			assert(header.size() == headerCount);
 			DataCount = ReadInt(Data);//Read number of data entries
 			return header;
 		}
@@ -2779,27 +2980,31 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pNewLine)
 		*pNewLine = false;
 
 	bool carry_return = false;
-	bool newline      = false;
-	bool eof          = false;
+	//bool eof          = false;
+
+	int length = Data.ReadByte();
 
 	std::string Line;
 	while (!Data.EndReached())
 	{
 		char c = Data.ReadByte();//Returns 0x00 when the end of the data stream is reached
 
-		if (c == '\0' && Line.length() >= 1)
-			return Line;
-		else if (c == '\0')
+		//End of string reached without null-terminator?
+		if (c != '\0' && pNewLine && *pNewLine && Line.length() >= length)
+		{
+			Data.SeekReadCursor(-1);
+			break;
+		}
+
+		if (c == '\0'/* && Line.length() >= 1*/)
+			break;
+		/*else if (c == '\0')
 		{
 			if (eof)
-			{
-				//if (pDoubleZero)
-					//*pDoubleZero = true;
 				return "";
-			}
 			eof = true;
 			continue;
-		}
+		}*/
 		else if (c == 0x01)//Start of Heading
 			continue;
 		else if (c == 0x02)//Start of text
@@ -2861,39 +3066,49 @@ std::string MD5::ReadLine(ZED::Blob& Data, bool* pNewLine)
 		else if (c == '\r')
 		{
 			carry_return = true;
-			if (Line.empty())
-				Line += c;
+			//if (Line.empty())
+				//Line += c;
 		}
 		else if (c == '\n')
 		{
-			newline = true;
 			if (pNewLine && carry_return)
 				*pNewLine = true;
 		}
 		else//Printable character
 		{
-			if (Line.length() == 1 && Line[0] == '\r')
-				Line.clear();
+			//if (Line.length() == 1 && Line[0] == '\r')
+				//Line.clear();
 			Line += c;
 		}
 	}
+
+	assert(Line.length() == length);
 
 	return Line;
 }
 
 
 
-int MD5::ReadInt(ZED::Blob& Data)
+int MD5::ReadInt(ZED::Blob& Data, bool* pNewLine)
 {
 	int ret = 0;
+	bool carry_return = false;
+
 	while (!Data.EndReached())
 	{
 		unsigned char c = Data.ReadByte();//Returns 0x00 when the end of the data stream is reached
 
-		if (c == '\0')
+		if (ret == 0 && c == '\r')
+			carry_return = true;
+		else if (ret == 0 && c == '\n' && carry_return)
+		{
+			if (pNewLine)
+				*pNewLine = true;
+		}
+		else if (c == '\0' && (ret != 0 || carry_return))
 			return ret;
-
-		ret = (ret << 8) + c;
+		else
+			ret = (ret << 8) + c;
 	}
 
 	return -1;

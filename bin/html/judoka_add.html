@@ -99,6 +99,8 @@ function GetJudoka(id)
       document.getElementById("delete").style.display = "none";
       query = "all=true";
     }
+    else
+      document.getElementById("import").style.display = "none";
 
     GetClubs(function(response) {
       if (typeof res.club_uuid != 'undefined')
@@ -122,7 +124,7 @@ function UpdateJudoka()
   });
 
   AjaxPost('ajax/judoka/update?id='+id, params, function() {
-    navigate('judoka_list.html');
+    goBack();
   });
 
   return false;
@@ -144,7 +146,7 @@ function ImportJudoka()
 
   AjaxPost('ajax/judoka/update?id='+id, params, function() {
     AjaxCallback('ajax/judoka/import?id='+id, function(response) {
-        navigate('judoka_list.html');
+        goBack();
     });
   });
 
@@ -158,7 +160,7 @@ function DeleteJudoka()
   if (confirm(translate('delete_judoka_confirm')))
   {
     AjaxCallback('ajax/judoka/delete?id='+id, function(response) {
-      navigate('judoka_list.html');
+      goBack();
     });
   }
 

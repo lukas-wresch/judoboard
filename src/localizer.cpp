@@ -33,6 +33,7 @@ void Localizer::Initialize(Language NewLanguage)
 
 			//German
 			s_de["No."]    = u8"Nr.";
+			s_de["Name"]   = u8"Name";
 			s_de["Mat"]    = u8"Matte";
 			s_de["White"]  = u8"Wei\u00df";
 			s_de["Blue"]   = u8"Blau";
@@ -40,6 +41,9 @@ void Localizer::Initialize(Language NewLanguage)
 			s_de["Wins"]   = u8"Siege";
 			s_de["Score"]  = u8"Unterwertung";
 			s_de["Time"]   = u8"Zeit";
+
+			s_de["Not enough permissions"] = u8"Nicht genug Rechte f\u00fcr diesen Vorgang";
+			s_de["Operation failed"]       = u8"Vorgang fehlgeschlagen";
 
 			s_de["Weightclass"] = "Gewichtsklasse";
 			s_de["Current Match"] = "Aktueller Kampf";
@@ -72,6 +76,7 @@ std::string Localizer::Translate(const std::string& English)
 		{
 			auto it = s_de.find(English);
 
+			assert(it != s_de.end());
 			if (it != s_de.end())
 				return it->second;
 			break;

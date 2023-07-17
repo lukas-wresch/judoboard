@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <functional>
 #include "judoboard.h"
 #include "../ZED/include/blob.h"
 
@@ -173,9 +174,12 @@ namespace Judoboard
 			//14 = 2 participants (best of 3?)
 			//15 = round robin?
 			//16 = round robin (5 participants)
+			//17 = round robin (5 participants)
+			//41 = round robin (2 participants, best of three)
 			//19 = Single elimination (single consulation bracket, 16 system)
 			//20 = Single elimination (single consulation bracket, 32 system)
 			//24 = pooled (6 participants) 3+3 pool
+			//26 = ??? (pool?)
 			int FightSystemTypeID = 1;//Unknown field, always 1
 
 			bool MatchForThirdPlace = false;
@@ -189,6 +193,10 @@ namespace Judoboard
 
 			std::string Identifier;
 			std::string ForReference = "T";
+
+
+			//Version 7
+			bool BestOfThree = false;
 
 			mutable void* pUserData = nullptr;
 		};
@@ -271,8 +279,9 @@ namespace Judoboard
 			//5 = completed match (is elimination match)
 			//0, 2, 4, 5 = ???
 
-			int RedOutMatchID   = -1;
-			int WhiteOutMatchID = -1;
+			int RedOutMatchNo   = -1;
+			int WhiteOutMatchNo = -1;
+			//White or red dropped out (injured) from this match on
 
 			int Pool = 0;//ID of the pool
 			//1 for round robin (sometimes 0!?)
@@ -284,7 +293,9 @@ namespace Judoboard
 			//Typical 1
 			//2 = first round elimination system
 			//9 = final match elimination system
-			//4 = third place match
+			//4 = 3rd place match
+			//5 = 5th place match
+			//Double elimination: 0 = winner bracket, 1 = loser bracket, 2 = semi final, 4 = fifth place match
 		};
 
 		struct Result
@@ -334,6 +345,9 @@ namespace Judoboard
 		[[nodiscard]] Club*         FindClub(int ClubID);
 		[[nodiscard]] Club*         FindClubByName(const std::string& Name) const;
 		[[nodiscard]] Participant*  FindParticipant(int ParticipantID);
+		[[nodiscard]] std::vector<const MD5::Participant*> FindParticipantsOfWeightclass(int AgeGroupID, int WeightclassID) const;
+		[[nodiscard]] std::vector<MD5::Match> FindMatchesOfWeightclass(int AgeGroupID, int WeightclassID) const;
+		[[nodiscard]] std::vector<MD5::Match> FindMatchesOfWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const;
 		[[nodiscard]] AgeGroup*     FindAgeGroup(int AgeGroupID);
 		[[nodiscard]] Weightclass*  FindWeightclass(int AgeGroupID, int WeightclassID);
 		[[nodiscard]] const Weightclass* FindWeightclass(const std::string& AgeGroup, const std::string& Weightclass) const;
@@ -374,7 +388,7 @@ namespace Judoboard
 		bool Parse(ZED::Blob&& Data);
 		std::string ReadLine(ZED::Blob& Data, bool* pNewLine = nullptr);
 		std::string RemoveControlCharacters(std::string& Str);//Removes all ASCII and Latin1 control characters
-		int ReadInt(ZED::Blob& Data);
+		int ReadInt(ZED::Blob& Data, bool* pNewLine = nullptr);
 
 		std::vector<std::string> ReadHeader(ZED::Blob& Data, int& DataCount);
 
@@ -392,6 +406,9 @@ namespace Judoboard
 		bool ReadRelationParticipantMatchTable(ZED::Blob& Data);
 		bool ReadMatchData(ZED::Blob& Data);
 		bool ReadResult(ZED::Blob& Data);
+		bool ReadLog(ZED::Blob& Data);
+
+		bool ReadTable(ZED::Blob& Data, std::function<bool(std::vector<std::string>&&, std::vector<std::string>&&)> Parse = nullptr);
 
 
 		std::vector<Association*> m_Associations;
