@@ -4145,7 +4145,7 @@ Error Application::Ajax_PlaySoundFile(const HttpServer::Request& Request)
 
 	mat->PlaySoundFile();
 
-	Sleep(20 * 1000);
+	ZED::Core::Pause(20 * 1000);
 
 	mat->SetSoundFilename(temp);
 
