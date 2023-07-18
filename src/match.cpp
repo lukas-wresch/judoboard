@@ -667,18 +667,18 @@ const RuleSet& Match::GetRuleSet() const
 
 uint32_t Match::GetCurrentBreaktime() const
 {
-	uint32_t break1 = 0, break2 = 0;
-	if (m_White.m_Judoka)
-		break1 = m_White.m_Judoka->GetLengthOfBreak();
-	if (m_Blue.m_Judoka)
-		break2 = m_Blue.m_Judoka->GetLengthOfBreak();
+	uint32_t breakW = 0, breakB = 0;
+	if (GetFighter(Fighter::White))
+		breakW = GetFighter(Fighter::White)->GetLengthOfBreak();
+	if (GetFighter(Fighter::Blue))
+		breakB = GetFighter(Fighter::Blue)->GetLengthOfBreak();
 
-	if (break1 == 0)
-		return break2;
-	if (break2 == 0)
-		return break1;
+	if (breakW == 0)
+		return breakB;
+	if (breakB == 0)
+		return breakW;
 
-	return std::min(break1, break2);
+	return std::min(breakW, breakB);
 }
 
 
