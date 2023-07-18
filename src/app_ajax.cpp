@@ -4084,6 +4084,24 @@ std::string Application::Ajax_ListLots()
 
 
 
+std::string Application::Ajax_ListSoundFiles()
+{
+	YAML::Emitter ret;
+	ret << YAML::BeginSeq;
+
+	ZED::Core::Indexer([&](const std::string& Filename) {
+		ret << YAML::BeginMap;
+		ret << YAML::Key << "filename" << YAML::Value << Filename;
+		ret << YAML::EndMap;
+		return true;
+	}, "assets/sounds/*.wav");
+
+	ret << YAML::EndSeq;
+	return ret.c_str();
+}
+
+
+
 std::string Application::Ajax_GetSetup()
 {
 	YAML::Emitter ret;

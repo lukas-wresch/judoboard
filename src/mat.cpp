@@ -95,13 +95,7 @@ bool Mat::Open()
 		ZED::Log::Info("Logo loaded");
 			
 		if (!m_Sound)
-		{
-			m_Sound = std::move(ZED::Sound("assets/sounds/" + GetSoundFilename() + ".wav"));
-			if (m_Sound)
-				ZED::Log::Info("Sound file loaded");
-			else
-				ZED::Log::Warn("Could not load sound file");
-		}
+			SetSoundFilename(GetSoundFilename());//Load sound file
 
 		while (m_Window.IsRunning())
 			Mainloop();
