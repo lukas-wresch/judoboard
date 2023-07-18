@@ -56,7 +56,7 @@ bool RemoteMat::IsConnected() const
 
 
 
-const std::vector<IMat::OsaekomiEntry> RemoteMat::GetOsaekomiList() const
+std::vector<IMat::OsaekomiEntry> RemoteMat::GetOsaekomiList() const
 {
 	std::string response = SendRequest("/ajax/mat/get_osaekomilist?id=" + std::to_string(GetMatID()));
 
@@ -146,10 +146,10 @@ bool RemoteMat::HasConcluded() const
 bool RemoteMat::EndMatch()
 {
 	//Used to keep the judoka data in sync
-	if (m_pMatch && m_pMatch->GetFighter(Fighter::White))
+	/*if (m_pMatch && m_pMatch->GetFighter(Fighter::White))
 		m_pMatch->GetFighter(Fighter::White)->StartBreak();
 	if (m_pMatch && m_pMatch->GetFighter(Fighter::Blue))
-		m_pMatch->GetFighter(Fighter::Blue)->StartBreak();
+		m_pMatch->GetFighter(Fighter::Blue)->StartBreak();*/
 
 	const bool ret = SendCommand("/ajax/mat/end_match?id=" + std::to_string(GetMatID()));
 

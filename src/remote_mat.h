@@ -21,7 +21,7 @@ namespace Judoboard
 
 		virtual bool IsConnected() const override;
 
-		virtual std::vector<OsaekomiEntry> GetOsaekomiList() const override { return m_OsaekomiList; };
+		virtual std::vector<OsaekomiEntry> GetOsaekomiList() const override;
 
 		virtual bool AreFightersOnMat() const override;
 

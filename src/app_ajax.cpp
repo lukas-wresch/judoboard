@@ -2410,9 +2410,9 @@ void Application::SetupHttpServer()
 		if (!rule_set)
 			return "Not found";
 
-		ZED::CSV csv;
-		*rule_set >> csv;
-		return csv;
+		YAML::Emitter yaml;
+		*rule_set >> yaml;
+		return yaml.c_str();
 	});
 
 	m_Server.RegisterResource("/ajax/master/post_match_result", [this](auto& Request) -> std::string {
@@ -2456,13 +2456,14 @@ void Application::SetupHttpServer()
 			ZED::Core::Pause(100);
 		}
 
-		ZED::CSV match_data;
-		match_data << next_matches.size();//TODO add number of matches to send
+		YAML::Emitter ret;
+		ret << YAML::BeginSeq;
 
 		for (auto match : next_matches)
-			*match >> match_data;
+			match >> ret;
 
-		return match_data;
+		ret << YAML::EndSeq;
+		return ret.c_str();
 	});
 }
 

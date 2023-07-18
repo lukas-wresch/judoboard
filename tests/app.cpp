@@ -818,7 +818,7 @@ TEST(App, MasterSlaveForceClose)
 	tourney->EnableAutoSave(false);
 	EXPECT_TRUE(master.AddTournament(tourney));
 
-	master.OpenTournament(master.FindTournamentIndex(tournament_name));
+	master.OpenTournament(*tourney);
 
 	tourney->AddParticipant(&j1);
 	tourney->AddParticipant(&j2);
@@ -827,8 +827,8 @@ TEST(App, MasterSlaveForceClose)
 	tourney->AddParticipant(&j5);
 	tourney->AddParticipant(&j6);
 
-	MatchTable* m1 = new Weightclass(tourney, 0, 49);
-	MatchTable* m2 = new Weightclass(tourney, 50, 100);
+	MatchTable* m1 = new RoundRobin( 0,  49, Gender::Unknown, tourney);
+	MatchTable* m2 = new RoundRobin(50, 100, Gender::Unknown, tourney);
 	m1->SetMatID(1);
 	m2->SetMatID(2);
 	tourney->AddMatchTable(m1);
@@ -882,8 +882,8 @@ TEST(App, MasterSlaveFullTournament)
 	tourney->AddParticipant(&j5);
 	tourney->AddParticipant(&j6);
 
-	MatchTable* m1 = new Weightclass(tourney, 0, 49);
-	MatchTable* m2 = new Weightclass(tourney, 50, 100);
+	MatchTable* m1 = new RoundRobin( 0,  49, Gender::Unknown, tourney);
+	MatchTable* m2 = new RoundRobin(50, 100, Gender::Unknown, tourney);
 	m1->SetMatID(2);
 	m2->SetMatID(2);
 	tourney->AddMatchTable(m1);

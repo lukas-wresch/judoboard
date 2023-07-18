@@ -126,7 +126,8 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 	tourney->EnableAutoSave(false);
 	EXPECT_TRUE(master.AddTournament(tourney));
 
-	master.OpenTournament(master.FindTournamentIndex(tournament_name));
+	ASSERT_TRUE(master.FindTournamentByName(tournament_name));
+	EXPECT_TRUE(master.OpenTournament(master.FindTournamentByName(tournament_name)->GetUUID()));
 
 	tourney->AddParticipant(&j1);
 	tourney->AddParticipant(&j2);
@@ -135,8 +136,8 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 	tourney->AddParticipant(&j5);
 	tourney->AddParticipant(&j6);
 
-	MatchTable* m1 = new Weightclass(tourney, 0, 49);
-	MatchTable* m2 = new Weightclass(tourney, 50, 100);
+	MatchTable* m1 = new RoundRobin(0, 49);
+	MatchTable* m2 = new RoundRobin(50, 100);
 	m1->SetMatID(1);
 	m2->SetMatID(2);
 	tourney->AddMatchTable(m1);
@@ -193,7 +194,7 @@ TEST(RemoteMat, StartMatch)
 	master.GetDatabase().AddJudoka(j1);
 	master.GetDatabase().AddJudoka(j2);
 
-	Match match(nullptr, j1, j2);
+	Match match(j1, j2, nullptr);
 	match.SetMatID(1);
 	EXPECT_TRUE(m->StartMatch(&match));
 
@@ -240,7 +241,7 @@ TEST(RemoteMat, SendRuleSet)
 	master.GetDatabase().AddJudoka(j2);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match match(nullptr, j1, j2);
+	Match match(j1, j2, nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(rules);
 
@@ -273,7 +274,7 @@ TEST(RemoteMat, SendHajime)
 	master.GetDatabase().AddJudoka(j2);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match match(nullptr, j1, j2);
+	Match match(j1, j2, nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(rules);
 
@@ -309,7 +310,7 @@ TEST(RemoteMat, CorrectWinner)
 			master.GetDatabase().AddJudoka(j1);
 			master.GetDatabase().AddJudoka(j2);
 
-			Match* match = new Match(nullptr, j1, j2);
+			Match* match = new Match(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -344,9 +345,9 @@ TEST(RemoteMat, CorrectWinner)
 			ZED::Core::Pause(500);
 
 			if (i == 4)
-				EXPECT_EQ(match->GetMatchResult().m_Winner, Winner::Draw);
+				EXPECT_EQ(match->GetResult().m_Winner, Winner::Draw);
 			else
-				EXPECT_EQ(match->GetMatchResult().m_Winner, Fighter2Winner(f));
+				EXPECT_EQ(match->GetResult().m_Winner, Fighter2Winner(f));
 		}
 	}
 }
@@ -371,7 +372,7 @@ TEST(RemoteMat, ForceClose)
 
 	ZED::Core::Pause(500);
 
-	Match match(nullptr, &j1, &j2);
+	Match match(&j1, &j2, nullptr);
 	match.SetMatID(1);
 	EXPECT_TRUE(m->StartMatch(&match));
 }
@@ -396,7 +397,7 @@ TEST(RemoteMat, RemoveIpponShouldRecoverPreviousWazaari)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -441,7 +442,7 @@ TEST(RemoteMat, RemoveWazariShouldRemoveIppon)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -486,7 +487,7 @@ TEST(RemoteMat, Scores)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -531,7 +532,7 @@ TEST(RemoteMat, Shido)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -605,7 +606,7 @@ TEST(RemoteMat, ShidoDoesntEndGoldenScore)
 		auto rules = new RuleSet("Test", 5, 60, 30, 20, false, true, true, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -658,7 +659,7 @@ TEST(RemoteMat, ScoreEndsGoldenScore)
 			auto rules = new RuleSet("Test", 5, 60, 30, 20, true, true, true, 0);
 			master.GetDatabase().AddRuleSet(rules);
 
-			Match* match = new Match(nullptr, j1, j2);
+			Match* match = new Match(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -682,7 +683,7 @@ TEST(RemoteMat, ScoreEndsGoldenScore)
 
 			EXPECT_FALSE(m->IsHajime());
 			EXPECT_TRUE(m->EndMatch());
-			EXPECT_EQ(match->GetMatchResult().m_Winner, Fighter2Winner(f));
+			EXPECT_EQ(match->GetResult().m_Winner, Fighter2Winner(f));
 		}
 	}
 }
@@ -707,7 +708,7 @@ TEST(RemoteMat, ShidosResultInIndirectHansokumake)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -751,7 +752,7 @@ TEST(RemoteMat, HansokumakeResultsInDirectHansokumake)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -797,7 +798,7 @@ TEST(RemoteMat, DirectHansokumakeDoesNotConcludeMatch)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -835,7 +836,7 @@ TEST(RemoteMat, DirectHansokumakeAndDisqDoesConcludeMatch)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -870,7 +871,7 @@ TEST(RemoteMat, Gachi)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -903,7 +904,7 @@ TEST(RemoteMat, GachiResultsInMate)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -940,7 +941,7 @@ TEST(RemoteMat, DoubleIppon)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -989,7 +990,7 @@ TEST(RemoteMat, DoubleIpponFightersKeepWazaari)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1041,7 +1042,7 @@ TEST(RemoteMat, DoubleIpponDuringGoldenScore)
 		auto rules = new RuleSet("Test", 1, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1092,7 +1093,7 @@ TEST(RemoteMat, DoubleIpponDuringGoldenScoreFightersKeepWazaari)
 		auto rules = new RuleSet("Test", 1, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1150,7 +1151,7 @@ TEST(RemoteMat, IpponResultsInMate)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1185,7 +1186,7 @@ TEST(RemoteMat, HansokumakeResultsInMate)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1224,7 +1225,7 @@ TEST(RemoteMat, ThirdShidoIsHansokumake)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1267,7 +1268,7 @@ TEST(RemoteMat, DoubleHansokumake)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1295,8 +1296,8 @@ TEST(RemoteMat, DoubleHansokumake)
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());
 
-		EXPECT_TRUE(match->GetMatchResult().m_Winner == Judoboard::Winner::Draw);
-		EXPECT_TRUE((int)match->GetMatchResult().m_Score == 0);
+		EXPECT_TRUE(match->GetResult().m_Winner == Judoboard::Winner::Draw);
+		EXPECT_TRUE((int)match->GetResult().m_Score == 0);
 	}
 }
 
@@ -1324,7 +1325,7 @@ TEST(RemoteMat, DoubleGachi)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1341,8 +1342,8 @@ TEST(RemoteMat, DoubleGachi)
 
 		ZED::Core::Pause(100);
 
-		EXPECT_EQ(match->GetMatchResult().m_Winner, Judoboard::Winner::Draw);
-		EXPECT_EQ((int)match->GetMatchResult().m_Score, 0);
+		EXPECT_EQ(match->GetResult().m_Winner, Judoboard::Winner::Draw);
+		EXPECT_EQ((int)match->GetResult().m_Score, 0);
 	}
 }
 
@@ -1366,7 +1367,7 @@ TEST(RemoteMat, Hansokumake)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1415,7 +1416,7 @@ TEST(RemoteMat, MedicalExaminiations)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1493,7 +1494,7 @@ TEST(RemoteMat, MatchTime)
 		auto rules = new RuleSet("Test" + std::to_string(time), time, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1540,7 +1541,7 @@ TEST(RemoteMat, GoldenScoreTime)
 		auto rules = new RuleSet("Test" + std::to_string(time), 5, time, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1598,7 +1599,7 @@ TEST(RemoteMat, OsaekomiTime)
 			auto rules = new RuleSet("Test", 100, 0, time, 20, false, false, false, 0);
 			master.GetDatabase().AddRuleSet(rules);
 
-			Match* match = new Match(nullptr, j1, j2);
+			Match* match = new Match(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -1649,7 +1650,7 @@ TEST(RemoteMat, OsaekomiWithWazaAriTime)
 			auto rules = new RuleSet("Test", 100, 0, 100, time, false, false, false, 0);
 			master.GetDatabase().AddRuleSet(rules);
 
-			Match* match = new Match(nullptr, j1, j2);
+			Match* match = new Match(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -1698,7 +1699,7 @@ TEST(RemoteMat, OsaekomiUkeGainsIppon)
 		auto rules = new RuleSet("Test", 100, 0, 100, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1716,8 +1717,8 @@ TEST(RemoteMat, OsaekomiUkeGainsIppon)
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());
 
-		EXPECT_TRUE(match->GetMatchResult().m_Winner == !f);
-		EXPECT_TRUE(match->GetMatchResult().m_Score  == Match::Score::Ippon);
+		EXPECT_TRUE(match->GetResult().m_Winner == !f);
+		EXPECT_TRUE(match->GetResult().m_Score  == Match::Score::Ippon);
 	}
 }
 
@@ -1744,7 +1745,7 @@ TEST(RemoteMat, OsaekomiToriGivesUp)
 		auto rules = new RuleSet("Test", 100, 0, 100, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1762,8 +1763,8 @@ TEST(RemoteMat, OsaekomiToriGivesUp)
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());
 
-		EXPECT_TRUE(match->GetMatchResult().m_Winner == !f);
-		EXPECT_TRUE(match->GetMatchResult().m_Score  == Match::Score::Ippon);
+		EXPECT_TRUE(match->GetResult().m_Winner == !f);
+		EXPECT_TRUE(match->GetResult().m_Score  == Match::Score::Ippon);
 	}
 }
 
@@ -1793,7 +1794,7 @@ TEST(RemoteMat, OsaekomiWithWazaAriRemoved)
 			auto rules = new RuleSet("Test", 100, 0, time*2, time, false, false, false, 0);
 			master.GetDatabase().AddRuleSet(rules);
 
-			Match* match = new Match(nullptr, j1, j2);
+			Match* match = new Match(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -1859,7 +1860,7 @@ TEST(RemoteMat, OsaekomiTillEndDuringGoldenScore)
 			auto rules = new RuleSet("Test", 5, 60, 2*time, time, false, false, false, 0);
 			master.GetDatabase().AddRuleSet(rules);
 
-			Match* match = new Match(nullptr, j1, j2);
+			Match* match = new Match(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -1912,7 +1913,7 @@ TEST(RemoteMat, Sonomama)
 		auto rules = new RuleSet("Test", 500, 0, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1983,7 +1984,7 @@ TEST(RemoteMat, Tokeda)
 		auto rules = new RuleSet("Test", 500, 0, 20, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2080,7 +2081,7 @@ TEST(RemoteMat, OsaekomiSwitch)
 		auto rules = new RuleSet("Test", 500, 0, 25, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2153,7 +2154,7 @@ TEST(RemoteMat, MatchContinuesDuringOsaekomi)
 		auto rules = new RuleSet("Test", 10, 0, 10, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2204,7 +2205,7 @@ TEST(RemoteMat, Yuko)
 		auto rules = new RuleSet("Test", 60, 60, 30, 20, true, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2255,7 +2256,7 @@ TEST(RemoteMat, Yuko2)
 		auto rules = new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2314,7 +2315,7 @@ TEST(RemoteMat, ShidoForToriDuringOsaekomi)
 		auto rules = new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2368,7 +2369,7 @@ TEST(RemoteMat, MateDuringSonomama)
 		auto rules = new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2426,7 +2427,7 @@ TEST(RemoteMat, HansokumakeDuringOsaekomi)
 			auto rules = new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0);
 			master.GetDatabase().AddRuleSet(rules);
 
-			Match* match = new Match(nullptr, j1, j2);
+			Match* match = new Match(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -2481,7 +2482,7 @@ TEST(RemoteMat, Koka)
 		auto rules = new RuleSet("Test", 60, 60, 30, 20, false, true, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2529,7 +2530,7 @@ TEST(RemoteMat, Koka2)
 		auto rules = new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2575,7 +2576,7 @@ TEST(RemoteMat, WazariAwaseteIppon)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -2636,7 +2637,7 @@ TEST(RemoteMat, GoldenScore)
 	auto rules = new RuleSet("Test", 10, 10, 30, 20, false, false, true, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match* match = new Match(nullptr, j1, j2);
+	Match* match = new Match(j1, j2, nullptr);
 	match->SetMatID(1);
 	match->SetRuleSet(rules);
 	master.GetTournament()->AddMatch(match);
@@ -2688,7 +2689,7 @@ TEST(RemoteMat, GoldenScore2)
 	auto rules = new RuleSet("Test", 10, 0, 30, 20, false, false, true, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match* match = new Match(nullptr, j1, j2);
+	Match* match = new Match(j1, j2, nullptr);
 	match->SetMatID(1);
 	match->SetRuleSet(rules);
 	master.GetTournament()->AddMatch(match);
@@ -2735,7 +2736,7 @@ TEST(RemoteMat, GoldenScoreResetTime)
 	auto rules = new RuleSet("Test", 5, 5, 30, 20, false, false, true, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match* match = new Match(nullptr, j1, j2);
+	Match* match = new Match(j1, j2, nullptr);
 	match->SetMatID(1);
 	match->SetRuleSet(rules);
 	master.GetTournament()->AddMatch(match);
@@ -2780,7 +2781,7 @@ TEST(RemoteMat, GoldenScoreKeepsShidosAndMedicalExaminations)
 	auto rules = new RuleSet("Test", 5, 5, 30, 20, false, false, true, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match* match = new Match(nullptr, j1, j2);
+	Match* match = new Match(j1, j2, nullptr);
 	match->SetMatID(1);
 	match->SetRuleSet(rules);
 	master.GetTournament()->AddMatch(match);
@@ -2834,7 +2835,7 @@ TEST(RemoteMat, Draw)
 	auto rules = new RuleSet("Test", 10, 60, 30, 20, false, false, true, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match* match = new Match(nullptr, j1, j2);
+	Match* match = new Match(j1, j2, nullptr);
 	match->SetMatID(1);
 	match->SetRuleSet(rules);
 	master.GetTournament()->AddMatch(match);
@@ -2878,7 +2879,7 @@ TEST(RemoteMat, Draw2)
 	auto rules = new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match* match = new Match(nullptr, j1, j2);
+	Match* match = new Match(j1, j2, nullptr);
 	match->SetMatID(1);
 	match->SetRuleSet(rules);
 	master.GetTournament()->AddMatch(match);
@@ -2931,7 +2932,7 @@ TEST(RemoteMat, Hantei)
 		auto rules = new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2951,9 +2952,9 @@ TEST(RemoteMat, Hantei)
 		//EXPECT_TRUE(m->HasConcluded());
 		//EXPECT_TRUE(m->EndMatch());
 
-		EXPECT_TRUE(match->GetMatchResult().m_Winner == Fighter2Winner(f));
-		EXPECT_TRUE(match->GetMatchResult().m_Score  == Match::Score::Hantei);
-		EXPECT_TRUE(match->GetMatchResult().m_Score  == (Match::Score)1);
+		EXPECT_TRUE(match->GetResult().m_Winner == Fighter2Winner(f));
+		EXPECT_TRUE(match->GetResult().m_Score  == Match::Score::Hantei);
+		EXPECT_TRUE(match->GetResult().m_Score  == (Match::Score)1);
 	}
 }
 
@@ -2983,7 +2984,7 @@ TEST(RemoteMat, BreakTime)
 		master.GetDatabase().AddJudoka(j2);
 		master.GetDatabase().AddJudoka(j3);
 
-		Match* match = new Match(nullptr, j1, j2);
+		Match* match = new Match(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rule_set);
 		master.GetTournament()->AddMatch(match);
@@ -2999,7 +3000,7 @@ TEST(RemoteMat, BreakTime)
 		EXPECT_TRUE(m->EndMatch());
 		ZED::Core::Pause(100);
 
-		Match* match2 = new Match(nullptr, j1, j3);
+		Match* match2 = new Match(j1, j3, nullptr);
 		match2->SetMatID(1);
 		match2->SetRuleSet(rule_set);
 		master.GetTournament()->AddMatch(match2);

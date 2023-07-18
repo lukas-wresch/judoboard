@@ -25,12 +25,14 @@ std::vector<Match> RemoteTournament::GetNextMatches(uint32_t MatID) const
 		return ret;
 	}
 
-	ZED::CSV csv(response);
-	int count;
-	csv >> count;
-	for (int i = 0; i < count; i++)
+	YAML::Node yaml = YAML::Load(response);
+
+	if (!yaml)
+		return ret;
+
+	for (const auto& node : yaml)
 	{
-		ret.emplace_back(Match(csv, (RemoteTournament*)this));
+		ret.emplace_back(node, nullptr, (RemoteTournament*)this);
 	}
 	
 	return ret;
@@ -117,8 +119,12 @@ const RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID) const
 		return nullptr;
 	}
 
-	ZED::CSV csv(response);
-	RuleSet* rule_set = new RuleSet(csv);
+	YAML::Node yaml = YAML::Load(response);
+
+	if (!yaml)
+		return nullptr;
+
+	RuleSet* rule_set = new RuleSet(yaml);
 	m_StandingData.AddRuleSet(rule_set);//Add to cache
 
 	return rule_set;
@@ -136,8 +142,12 @@ RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID)
 		return nullptr;
 	}
 
-	ZED::CSV csv(response);
-	RuleSet* rule_set = new RuleSet(csv);
+	YAML::Node yaml = YAML::Load(response);
+
+	if (!yaml)
+		return nullptr;
+
+	RuleSet* rule_set = new RuleSet(yaml);
 	m_StandingData.AddRuleSet(rule_set);//Add to cache
 
 	return rule_set;
