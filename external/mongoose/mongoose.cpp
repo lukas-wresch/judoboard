@@ -57,10 +57,8 @@
 #include <stdio.h>
 
 #if defined(_WIN32) && !defined(__SYMBIAN32__) // Windows specific
-//#define _WIN32_WINNT _WIN32_WINNT_NT4 // To make it link in VS2005
-#define _WIN32_WINNT _WIN32_WINNT_VISTA
-//#include <windows.h>
-#include <winsock2.h>
+#define _WIN32_WINNT 0x0400 // To make it link in VS2005
+#include <windows.h>
 
 #ifndef PATH_MAX
 #define PATH_MAX MAX_PATH
@@ -175,8 +173,7 @@ typedef struct DIR {
 #else    // UNIX  specific
 #include <sys/wait.h>
 #include <sys/socket.h>
-//#include <sys/select.h>
-#include <sys/poll.h>
+#include <sys/select.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/time.h>
@@ -431,9 +428,8 @@ static void sockaddr_to_string(char *buf, size_t len, const union usa *usa)
             (void *) &usa->sin.sin_addr :
             (void *) &usa->sin6.sin6_addr, buf, len);
 #elif defined(_WIN32)
-  // Only Windows Vista (and newer) have inet_ntop()
+  // Only Windoze Vista (and newer) have inet_ntop()
   strncpy(buf, inet_ntoa(usa->sin.sin_addr), len);
-  //strncpy(buf, inet_ntop(usa->sin.sin_addr), len);
 #else
   inet_ntop(usa->sa.sa_family, (void *) &usa->sin.sin_addr, buf, len);
 #endif
@@ -482,32 +478,23 @@ static void cry(struct mg_connection *conn, const char *fmt, ...)
   conn->request_info.log_message = NULL;
 }
 
-
-
 // Return fake connection structure. Used for logging, if connection
 // is not applicable at the moment of logging.
 static struct mg_connection *fc(struct mg_context *ctx)
 {
-    static struct mg_connection fake_connection;
-    fake_connection.ctx = ctx;
-    return &fake_connection;
+  static struct mg_connection fake_connection;
+  fake_connection.ctx = ctx;
+  return &fake_connection;
 }
-
-
 
 const char *mg_version(void)
 {
   return MONGOOSE_VERSION;
 }
 
-
-
-const struct mg_request_info *mg_get_request_info(struct mg_connection *conn)
-{
+const struct mg_request_info *mg_get_request_info(struct mg_connection *conn) {
   return &conn->request_info;
 }
-
-
 
 static void mg_strlcpy(char *dst, const char *src, size_t n)
 {
@@ -3485,8 +3472,6 @@ static void handle_request(struct mg_connection* conn)
   }*/
 }
 
-
-
 static void close_all_listening_sockets(struct mg_context *ctx)
 {
   struct socket *sp, *tmp;
@@ -3497,8 +3482,6 @@ static void close_all_listening_sockets(struct mg_context *ctx)
     free(sp);
   }
 }
-
-
 
 // Valid listening port specification is: [ip_address:]port[s]
 // Examples: 80, 443s, 127.0.0.1:3128,1.2.3.4:8080s
@@ -3705,44 +3688,31 @@ static int check_acl(struct mg_context *ctx, const union usa *usa)
   return allowed == '+';
 }
 
-
-
-static void add_to_set(SOCKET fd, fd_set& set, int& max_fd)
+static void add_to_set(SOCKET fd, fd_set *set, int *max_fd)
 {
-#ifndef _WIN32
-    //FD_SET() has a shitty implementation under Linux/OpenBSD an crashes when fd is larger than 1024
-    if (fd >= FD_SETSIZE)
-    {
-        ZED::Log::Error("add_to_set() can not add socket to FD_SET");
-        return;
-    }
-#endif
-    FD_SET(fd, &set);
-    if (fd > (SOCKET)max_fd)
-        max_fd = (int) fd;
+  FD_SET(fd, set);
+  if (fd > (SOCKET) *max_fd)
+    *max_fd = (int) fd;
 }
 
-
-
 #if !defined(_WIN32)
-static int set_uid_option(struct mg_context *ctx)
-{
+static int set_uid_option(struct mg_context *ctx) {
   struct passwd *pw;
   const char *uid = ctx->config[RUN_AS_USER];
   int success = 0;
 
-  if (uid == NULL)
+  if (uid == NULL) {
     success = 1;
-  else
-  {
-    if ((pw = getpwnam(uid)) == NULL)
+  } else {
+    if ((pw = getpwnam(uid)) == NULL) {
       cry(fc(ctx), "%s: unknown user [%s]", __func__, uid);
-    else if (setgid(pw->pw_gid) == -1)
+    } else if (setgid(pw->pw_gid) == -1) {
       cry(fc(ctx), "%s: setgid(%s): %s", __func__, uid, strerror(errno));
-    else if (setuid(pw->pw_uid) == -1)
+    } else if (setuid(pw->pw_uid) == -1) {
       cry(fc(ctx), "%s: setuid(%s): %s", __func__, uid, strerror(errno));
-    else
+    } else {
       success = 1;
+    }
   }
 
   return success;
@@ -3907,21 +3877,16 @@ static void reset_per_request_attributes(struct mg_connection *conn)
   conn->must_close = 0;
 }
 
+static void close_socket_gracefully(SOCKET sock) {
+  char buf[MG_BUF_LEN];
+  struct linger linger;
+  int n;
 
-
-static void close_socket_gracefully(SOCKET sock)
-{
-  //Set linger option to avoid socket hanging out after close. This prevent
-  //ephemeral port exhaust problem under high QPS.
-  //struct linger linger;
-  //linger.l_onoff = 1;
-  //linger.l_linger = 1;
-  //setsockopt(sock, SOL_SOCKET, SO_LINGER, (char*)&linger, sizeof(linger));
-
-  //first clear any errors, which can cause close to fail
-  int err = 1;
-  socklen_t len = sizeof(err);
-  getsockopt(sock, SOL_SOCKET, SO_ERROR, (char*)&err, &len);
+  // Set linger option to avoid socket hanging out after close. This prevent
+  // ephemeral port exhaust problem under high QPS.
+  linger.l_onoff = 1;
+  linger.l_linger = 1;
+  setsockopt(sock, SOL_SOCKET, SO_LINGER, (char*)&linger, sizeof(linger));
 
   // Send FIN to the client
   shutdown(sock, SHUT_WR);
@@ -3932,42 +3897,32 @@ static void close_socket_gracefully(SOCKET sock)
   // behaviour is seen on Windows, when client keeps sending data
   // when server decide to close the connection; then when client
   // does recv() it gets no data back.
-  char buf[MG_BUF_LEN];
-  auto start_time = time(NULL);
-  while (pull(NULL, sock, NULL, buf, sizeof(buf)) > 0)
+  do
   {
-      ZED::Core::Pause(100);
-      if (time(NULL) - start_time > 5)//Waited for more than 5 seconds?
-          break;
-  }
+    n = pull(NULL, sock, NULL, buf, sizeof(buf));
+  } while (n > 0);
 
   // Now we know that our FIN is ACK-ed, safe to close
   closesocket(sock);
 }
 
-
-
 static void close_connection(struct mg_connection *conn)
 {
-    if (conn->ssl)
-    {
-        SSL_free(conn->ssl);
-        conn->ssl = NULL;
-    }
+  if (conn->ssl)
+  {
+    SSL_free(conn->ssl);
+    conn->ssl = NULL;
+  }
 
-    if (conn->client.sock != INVALID_SOCKET)
-        close_socket_gracefully(conn->client.sock);
+  if (conn->client.sock != INVALID_SOCKET)
+    close_socket_gracefully(conn->client.sock);
 }
-
-
 
 void mg_close_connection(struct mg_connection *conn)
 {
-    close_connection(conn);
-    free(conn);
+  close_connection(conn);
+  free(conn);
 }
-
-
 
 struct mg_connection* mg_connect(struct mg_context *ctx, const char *host, int port, int use_ssl)
 {
@@ -4071,27 +4026,25 @@ FILE* mg_fetch(struct mg_context *ctx, const char *url, const char *path, char *
   return fp;
 }
 
-
-
 static void discard_current_request_from_buffer(struct mg_connection *conn)
 {
-    char* buffered = conn->buf + conn->request_len;
-    int buffered_len = conn->data_len - conn->request_len;
-    assert(buffered_len >= 0);
+  char *buffered;
+  int buffered_len, body_len;
 
-    int body_len;
-    if (conn->content_len <= 0)
-        body_len = 0;// Protect from negative Content-Length, too
-    else if (conn->content_len < (int64_t) buffered_len)
-        body_len = (int) conn->content_len;
-    else
-        body_len = buffered_len;
+  buffered = conn->buf + conn->request_len;
+  buffered_len = conn->data_len - conn->request_len;
+  assert(buffered_len >= 0);
 
-    conn->data_len -= conn->request_len + body_len;
-    memmove(conn->buf, conn->buf + conn->request_len + body_len, (size_t) conn->data_len);
+  if (conn->content_len <= 0)
+    body_len = 0;// Protect from negative Content-Length, too
+  else if (conn->content_len < (int64_t) buffered_len)
+    body_len = (int) conn->content_len;
+  else
+    body_len = buffered_len;
+
+  conn->data_len -= conn->request_len + body_len;
+  memmove(conn->buf, conn->buf + conn->request_len + body_len, (size_t) conn->data_len);
 }
-
-
 
 static int is_valid_uri(const char *uri)
 {
@@ -4100,14 +4053,13 @@ static int is_valid_uri(const char *uri)
   return uri[0] == '/' || (uri[0] == '*' && uri[1] == '\0');
 }
 
-
-
 static void process_new_connection(struct mg_connection *conn)
 {
     struct mg_request_info *ri = &conn->request_info;
+    int keep_alive_enabled;
     const char *cl;
 
-    int keep_alive_enabled = !strcmp(conn->ctx->config[ENABLE_KEEP_ALIVE], "yes");
+    keep_alive_enabled = !strcmp(conn->ctx->config[ENABLE_KEEP_ALIVE], "yes");
 
     do
     {
@@ -4153,36 +4105,34 @@ static void process_new_connection(struct mg_connection *conn)
 // Worker threads take accepted socket from the queue
 static int consume_socket(struct mg_context *ctx, struct socket *sp)
 {
-    pthread_mutex_lock(&ctx->mutex);
-    //ZED::Log::Debug(("going idle"));
+  pthread_mutex_lock(&ctx->mutex);
+  ZED::Log::Debug(("going idle"));
 
-    // If the queue is empty, wait. We're idle at this point.
-    while (ctx->sq_head == ctx->sq_tail && ctx->stop_flag == 0)
-        pthread_cond_wait(&ctx->sq_full, &ctx->mutex);
+  // If the queue is empty, wait. We're idle at this point.
+  while (ctx->sq_head == ctx->sq_tail && ctx->stop_flag == 0)
+    pthread_cond_wait(&ctx->sq_full, &ctx->mutex);
 
-    // If we're stopping, sq_head may be equal to sq_tail.
-    if (ctx->sq_head > ctx->sq_tail)
+  // If we're stopping, sq_head may be equal to sq_tail.
+  if (ctx->sq_head > ctx->sq_tail)
+  {
+    // Copy socket from the queue and increment tail
+    *sp = ctx->queue[ctx->sq_tail % ARRAY_SIZE(ctx->queue)];
+    ctx->sq_tail++;
+    ZED::Log::Debug("grabbed socket, going busy " +  std::to_string(sp->sock));
+
+    // Wrap pointers if needed
+    while (ctx->sq_tail > (int) ARRAY_SIZE(ctx->queue))
     {
-        // Copy socket from the queue and increment tail
-        *sp = ctx->queue[ctx->sq_tail % ARRAY_SIZE(ctx->queue)];
-        ctx->sq_tail++;
-        //ZED::Log::Debug("grabbed socket, going busy " +  std::to_string(sp->sock));
-
-        // Wrap pointers if needed
-        while (ctx->sq_tail > (int) ARRAY_SIZE(ctx->queue))
-        {
-            ctx->sq_tail -= ARRAY_SIZE(ctx->queue);
-            ctx->sq_head -= ARRAY_SIZE(ctx->queue);
-        }
+      ctx->sq_tail -= ARRAY_SIZE(ctx->queue);
+      ctx->sq_head -= ARRAY_SIZE(ctx->queue);
     }
+  }
 
-    pthread_cond_signal(&ctx->sq_empty);
-    pthread_mutex_unlock(&ctx->mutex);
+  pthread_cond_signal(&ctx->sq_empty);
+  pthread_mutex_unlock(&ctx->mutex);
 
-    return !ctx->stop_flag;
+  return !ctx->stop_flag;
 }
-
-
 
 static void worker_thread(struct mg_context *ctx)
 {
@@ -4229,161 +4179,135 @@ static void worker_thread(struct mg_context *ctx)
     assert(ctx->num_threads >= 0);
     pthread_mutex_unlock(&ctx->mutex);
 
-    //ZED::Log::Debug("worker exiting");
+    ZED::Log::Debug("worker exiting");
 }
-
-
 
 // Master thread adds accepted socket to a queue
 static void produce_socket(struct mg_context *ctx, const struct socket *sp)
 {
-    pthread_mutex_lock(&ctx->mutex);
+  pthread_mutex_lock(&ctx->mutex);
 
-    // If the queue is full, wait
-    while (ctx->stop_flag == 0 && ctx->sq_head - ctx->sq_tail >= (int) ARRAY_SIZE(ctx->queue))
-        pthread_cond_wait(&ctx->sq_empty, &ctx->mutex);
+  // If the queue is full, wait
+  while (ctx->stop_flag == 0 && ctx->sq_head - ctx->sq_tail >= (int) ARRAY_SIZE(ctx->queue))
+    pthread_cond_wait(&ctx->sq_empty, &ctx->mutex);
 
-    if (ctx->sq_head - ctx->sq_tail < (int) ARRAY_SIZE(ctx->queue))
-    {
-        // Copy socket to the queue and increment head
-        ctx->queue[ctx->sq_head % ARRAY_SIZE(ctx->queue)] = *sp;
-        ctx->sq_head++;
-        //ZED::Log::Debug("queued socket " + std::to_string(sp->sock));
-    }
+  if (ctx->sq_head - ctx->sq_tail < (int) ARRAY_SIZE(ctx->queue))
+  {
+    // Copy socket to the queue and increment head
+    ctx->queue[ctx->sq_head % ARRAY_SIZE(ctx->queue)] = *sp;
+    ctx->sq_head++;
+    ZED::Log::Debug("queued socket " + std::to_string(sp->sock));
+  }
 
-    pthread_cond_signal(&ctx->sq_full);
-    pthread_mutex_unlock(&ctx->mutex);
+  pthread_cond_signal(&ctx->sq_full);
+  pthread_mutex_unlock(&ctx->mutex);
 }
-
-
 
 static void accept_new_connection(const struct socket *listener, struct mg_context *ctx)
 {
-    struct socket accepted;
+  struct socket accepted;
+  char src_addr[20];
 
-    socklen_t len = sizeof(accepted.rsa);
-    accepted.lsa = listener->lsa;
-    accepted.sock = accept(listener->sock, &accepted.rsa.sa, &len);
-    if (accepted.sock != INVALID_SOCKET)
+  socklen_t len = sizeof(accepted.rsa);
+  accepted.lsa = listener->lsa;
+  accepted.sock = accept(listener->sock, &accepted.rsa.sa, &len);
+  if (accepted.sock != INVALID_SOCKET)
+  {
+    int allowed = check_acl(ctx, &accepted.rsa);
+    if (allowed)
     {
-        int allowed = check_acl(ctx, &accepted.rsa);
-        if (allowed)
-        {
-            // Put accepted socket structure into the queue
-            //ZED::Log::Debug("accepted socket " + std::to_string(accepted.sock));
-            accepted.is_ssl = listener->is_ssl;
-            produce_socket(ctx, &accepted);
-        }
-        else
-        {
-            char src_addr[20];
-            sockaddr_to_string(src_addr, sizeof(src_addr), &accepted.rsa);
-            cry(fc(ctx), "%s: %s is not allowed to connect", __func__, src_addr);
-            closesocket(accepted.sock);
-        }
+      // Put accepted socket structure into the queue
+      ZED::Log::Debug("accepted socket " + std::to_string(accepted.sock));
+      accepted.is_ssl = listener->is_ssl;
+      produce_socket(ctx, &accepted);
     }
+    else
+    {
+      sockaddr_to_string(src_addr, sizeof(src_addr), &accepted.rsa);
+      cry(fc(ctx), "%s: %s is not allowed to connect", __func__, src_addr);
+      closesocket(accepted.sock);
+    }
+  }
 }
-
-
 
 static void master_thread(struct mg_context *ctx)
 {
-    if (!ctx)
-        return;
+  fd_set read_set;
+  struct timeval tv;
+  struct socket *sp;
+  int max_fd;
 
-    // Increase priority of the master thread
+  // Increase priority of the master thread
 #if defined(_WIN32)
-    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+  SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
 #endif
   
 #if defined(ISSUE_317)
-    struct sched_param sched_param;
-    sched_param.sched_priority = sched_get_priority_max(SCHED_RR);
-    pthread_setschedparam(pthread_self(), SCHED_RR, &sched_param);
+  struct sched_param sched_param;
+  sched_param.sched_priority = sched_get_priority_max(SCHED_RR);
+  pthread_setschedparam(pthread_self(), SCHED_RR, &sched_param);
 #endif
 
-    while (ctx->stop_flag == 0 && ctx->listening_sockets)
+  while (ctx->stop_flag == 0)
+  {
+    FD_ZERO(&read_set);
+    max_fd = -1;
+
+    // Add listening sockets to the read set
+    for (sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
+      add_to_set(sp->sock, &read_set, &max_fd);
+
+    tv.tv_sec = 0;
+    tv.tv_usec = 200 * 1000;
+
+    if (select(max_fd + 1, &read_set, NULL, NULL, &tv) < 0)
     {
-        /*fd_set read_set;
-        FD_ZERO(&read_set);
-        int max_fd = -1;
-
-        //Add listening sockets to the read set
-        for (struct socket* sp = ctx->listening_sockets; sp != nullptr; sp = sp->next)
-            add_to_set(sp->sock, read_set, max_fd);
-
-        struct timeval tv;
-        tv.tv_sec = 0;
-        tv.tv_usec = 200 * 1000;*/
-
-        pollfd set;
-        set.fd = ctx->listening_sockets->sock;
-        set.events = POLLRDNORM;
-
 #ifdef _WIN32
-        if (WSAPoll(&set, 1, 200) > 0)
-#else
-        if (poll(&set, 1, 200) > 0)
-#endif
-
-        //if (select(max_fd + 1, &read_set, NULL, NULL, &tv) < 0)
-        //{
-#ifdef _WIN32
-        // On windows, if read_set and write_set are empty,
-        // select() returns "Invalid parameter" error
-        // (at least on my Windows XP Pro). So in this case, we sleep here.
-        //mg_sleep(1000);
+      // On windows, if read_set and write_set are empty,
+      // select() returns "Invalid parameter" error
+      // (at least on my Windows XP Pro). So in this case, we sleep here.
+      mg_sleep(1000);
 #endif // _WIN32
-        //}
-        //else
-        {
-            accept_new_connection(ctx->listening_sockets, ctx);
-
-            /*for (struct socket* sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
-            {
-#ifndef _WIN32
-                //Under Linux FD_ISSET() crashes when the the first argument is too high
-                if (sp->sock >= FD_SETSIZE)
-                {
-                    ZED::Log::Error("Socket id too high!");
-                    break;
-                }
-#endif
-                if (ctx->stop_flag == 0 && FD_ISSET(sp->sock, &read_set))
-                    accept_new_connection(sp, ctx);
-            }*/
-        }
     }
-    ZED::Log::Debug("stopping workers");
+    else
+    {
+      for (sp = ctx->listening_sockets; sp != NULL; sp = sp->next)
+      {
+        if (ctx->stop_flag == 0 && FD_ISSET(sp->sock, &read_set))
+          accept_new_connection(sp, ctx);
+      }
+    }
+  }
+  ZED::Log::Debug("stopping workers");
 
-    // Stop signal received: somebody called mg_stop. Quit.
-    close_all_listening_sockets(ctx);
+  // Stop signal received: somebody called mg_stop. Quit.
+  close_all_listening_sockets(ctx);
 
-    // Wakeup workers that are waiting for connections to handle.
-    pthread_cond_broadcast(&ctx->sq_full);
+  // Wakeup workers that are waiting for connections to handle.
+  pthread_cond_broadcast(&ctx->sq_full);
 
-    // Wait until all threads finish
-    pthread_mutex_lock(&ctx->mutex);
-    while (ctx->num_threads > 0)
-        pthread_cond_wait(&ctx->cond, &ctx->mutex);
-    pthread_mutex_unlock(&ctx->mutex);
+  // Wait until all threads finish
+  pthread_mutex_lock(&ctx->mutex);
+  while (ctx->num_threads > 0)
+    pthread_cond_wait(&ctx->cond, &ctx->mutex);
+  pthread_mutex_unlock(&ctx->mutex);
 
-    ZED::Log::Debug("all workers stopped");
+  ZED::Log::Debug("all workers stopped");
 
-    // All threads exited, no sync is needed. Destroy mutex and condvars
-    pthread_mutex_destroy(&ctx->mutex);
-    pthread_cond_destroy(&ctx->cond);
-    pthread_cond_destroy(&ctx->sq_empty);
-    pthread_cond_destroy(&ctx->sq_full);
+  // All threads exited, no sync is needed. Destroy mutex and condvars
+  pthread_mutex_destroy(&ctx->mutex);
+  pthread_cond_destroy(&ctx->cond);
+  pthread_cond_destroy(&ctx->sq_empty);
+  pthread_cond_destroy(&ctx->sq_full);
 
 #if !defined(NO_SSL)
-    uninitialize_ssl(ctx);
+  uninitialize_ssl(ctx);
 #endif
 
-    // Signal mg_stop() that we're done
-    ctx->stop_flag = 2;
+  // Signal mg_stop() that we're done
+  ctx->stop_flag = 2;
 
-    ZED::Log::Debug("exiting");
+  ZED::Log::Debug("exiting");
 }
 
 
@@ -4397,17 +4321,14 @@ static void free_context(struct mg_context *ctx)
     for (int i = 0; i < NUM_OPTIONS; i++)
     {
         if (ctx->config[i])
-        {
             free(ctx->config[i]);
-            ctx->config[i] = nullptr;
-        }
     }
 
   // Deallocate SSL context
     if (ctx->ssl_ctx)
         SSL_CTX_free(ctx->ssl_ctx);
   
-    if (ctx->client_ssl_ctx)
+  if (ctx->client_ssl_ctx)
         SSL_CTX_free(ctx->client_ssl_ctx);
   
 #ifndef NO_SSL
@@ -4423,7 +4344,6 @@ static void free_context(struct mg_context *ctx)
 
 void mg_stop(struct mg_context *ctx)
 {
-    ZED::Log::Debug("mg_stop() called");
     ctx->stop_flag = 1;
 
     // Wait until mg_fini() stops
@@ -4436,7 +4356,6 @@ void mg_stop(struct mg_context *ctx)
         i++;
     }
 
-    ZED::Log::Debug("Freeing mongoose context");
     mg_sleep(100);
     free_context(ctx);
 
