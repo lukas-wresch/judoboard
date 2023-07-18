@@ -1,6 +1,13 @@
 #pragma once
 #include <vector>
-#include "../ZED/include/csv.h"
+#include <mutex>
+
+
+namespace YAML
+{
+	class Emitter;
+	class Node;
+}
 
 
 
@@ -80,7 +87,7 @@ namespace Judoboard
 	public:
 		enum class EventGroup
 		{
-			White, Blue, Neutral
+			White, Blue, Neutral = 2
 		};
 
 		enum class NeutralEvent
@@ -110,21 +117,41 @@ namespace Judoboard
 			RemoveNoDisqualification,
 			AddGachi,
 			RemoveGachi,
+			HanteiRevoked
 		};
 
 
-		void AddEvent(NeutralEvent NewEvent, uint32_t Timestamp) { m_Events.emplace_back(Event(NewEvent, Timestamp)); }
-		void AddEvent(Fighter Whom, BiasedEvent NewEvent, uint32_t Timestamp) { m_Events.emplace_back(Event(Whom, NewEvent, Timestamp)); }
+		MatchLog() = default;
+		MatchLog(const MatchLog& Copy) {
+			std::lock_guard<std::mutex> lock(Copy.m_Mutex);
+			m_Events = Copy.m_Events;
+		}
 
-		auto& GetEvents() const { return m_Events; }
-		size_t GetNumEvent() const { return m_Events.size(); }
-		//const Event* GetEvent(uint32_t Index) const { if (Index < m_Events.size()) return &m_Events[Index]; return nullptr; }
+		void AddEvent(NeutralEvent NewEvent, uint32_t Timestamp) {
+			std::lock_guard<std::mutex> lock(m_Mutex);
+			m_Events.emplace_back(Event(NewEvent, Timestamp));
+		}
+		void AddEvent(Fighter Whom, BiasedEvent NewEvent, uint32_t Timestamp) {
+			std::lock_guard<std::mutex> lock(m_Mutex);
+			m_Events.emplace_back(Event(Whom, NewEvent, Timestamp));
+		}
+
+		auto& GetEvents() const
+		{
+			std::lock_guard<std::mutex> lock(m_Mutex);
+			return m_Events;
+		}
+		size_t GetNumEvent() const {
+			std::lock_guard<std::mutex> lock(m_Mutex);
+			return m_Events.size();
+		}
+		
+		void SwapEvents();
 
 		const std::string ToString() const;
 
-		void operator << (ZED::CSV& Stream);
-		void operator >> (ZED::CSV& Stream) const;
-
+		void operator << (const YAML::Node& Yaml);
+		void operator >> (YAML::Emitter& Yaml) const;
 
 	private:
 		struct Event
@@ -166,6 +193,7 @@ namespace Judoboard
 
 
 		std::vector<Event> m_Events;
+		mutable std::mutex m_Mutex;
 	};
 
 
@@ -177,5 +205,14 @@ namespace Judoboard
 	inline bool operator == (MatchLog::EventGroup g, Fighter f)
 	{
 		return (int)f == (int)g;
+	}
+
+	inline MatchLog::EventGroup operator ! (MatchLog::EventGroup g)
+	{
+		if (g == MatchLog::EventGroup::White)
+			return MatchLog::EventGroup::Blue;
+		else if (g == MatchLog::EventGroup::Blue)
+			return MatchLog::EventGroup::White;
+		return MatchLog::EventGroup::Neutral;
 	}
 }

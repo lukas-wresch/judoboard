@@ -40,7 +40,48 @@ TEST(Mat, QuickClose)
 		Application app;
 		Mat m(1);
 	}
-	EXPECT_TRUE(ZED::Core::CurrentTimestamp() - time < 1500);
+	EXPECT_LE(std::abs((long)(ZED::Core::CurrentTimestamp() - time)), 2000);
+}
+
+
+
+TEST(Mat, LoadConfig)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.GetDatabase().SetIpponStyle(Mat::IpponStyle::SpelledOut);
+		app.GetDatabase().SetTimerStyle(Mat::TimerStyle::Full);
+		app.GetDatabase().SetNameStyle(NameStyle::GivenName);
+
+		app.StartLocalMat(1);
+
+		auto mat = app.GetDefaultMat();
+
+		EXPECT_EQ(mat->GetIpponStyle(), Mat::IpponStyle::SpelledOut);
+		EXPECT_EQ(mat->GetTimerStyle(), Mat::TimerStyle::Full);
+		EXPECT_EQ(mat->GetNameStyle(), NameStyle::GivenName);
+
+		mat->Close();
+	}
+
+	{
+		Application app;
+		app.GetDatabase().SetIpponStyle(Mat::IpponStyle::SingleDigit);
+		app.GetDatabase().SetTimerStyle(Mat::TimerStyle::HundredsMS);
+		app.GetDatabase().SetNameStyle(NameStyle::FamilyName);
+
+		app.CloseMat(1);
+		app.StartLocalMat(1);
+
+		auto mat = app.GetDefaultMat();
+
+		EXPECT_EQ(mat->GetIpponStyle(), Mat::IpponStyle::SingleDigit);
+		EXPECT_EQ(mat->GetTimerStyle(), Mat::TimerStyle::HundredsMS);
+		EXPECT_EQ(mat->GetNameStyle(), NameStyle::FamilyName);
+	}
 }
 
 
@@ -76,7 +117,8 @@ TEST(Mat, ForcedCloseDuringMatch)
 	tourney->EnableAutoSave(false);
 	EXPECT_TRUE(app.AddTournament(tourney));
 
-	app.OpenTournament(app.FindTournamentIndex(tournament_name));
+	ASSERT_TRUE(app.FindTournamentByName(tournament_name));
+	EXPECT_TRUE(app.OpenTournament(app.FindTournamentByName(tournament_name)->GetUUID()));
 
 	tourney->AddParticipant(&j1);
 	tourney->AddParticipant(&j2);
@@ -85,8 +127,8 @@ TEST(Mat, ForcedCloseDuringMatch)
 	tourney->AddParticipant(&j5);
 	tourney->AddParticipant(&j6);
 
-	MatchTable* m1 = new Weightclass(tourney, 0, 49);
-	MatchTable* m2 = new Weightclass(tourney, 50, 100);
+	MatchTable* m1 = new RoundRobin(0, 49);
+	MatchTable* m2 = new RoundRobin(50, 100);
 	m1->SetMatID(1);
 	m2->SetMatID(1);
 	tourney->AddMatchTable(m1);
@@ -122,33 +164,38 @@ TEST(Mat, ForcedCloseDuringMatch)
 TEST(Mat, StartMatch)
 {
 	initialize();
-	Application app;
-	Mat m(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
-	match.SetMatID(1);
-	EXPECT_TRUE(m.StartMatch(&match));
-
-	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	for (int i = 0; i < 10; ++i)
 	{
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 0);
-		EXPECT_TRUE(m.GetScoreboard(f).m_WazaAri == 0);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Yuko == 0);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Koka == 0);
+		Application app;
+		Mat m(1);
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 0);
-		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
-		EXPECT_TRUE(m.GetScoreboard(f).m_MedicalExamination == 0);
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(&match));
+		EXPECT_TRUE(m.AreFightersOnMat());
 
-		EXPECT_FALSE(m.GetScoreboard(f).m_Hantei);
+		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+		{
+			EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 0);
+			EXPECT_EQ(m.GetScoreboard(f).m_WazaAri, 0);
+			EXPECT_EQ(m.GetScoreboard(f).m_Yuko, 0);
+			EXPECT_EQ(m.GetScoreboard(f).m_Koka, 0);
+
+			EXPECT_EQ(m.GetScoreboard(f).m_Shido, 0);
+			EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
+			EXPECT_EQ(m.GetScoreboard(f).m_MedicalExamination, 0);
+
+			EXPECT_FALSE(m.GetScoreboard(f).m_Hantei);
+		}
+
+		EXPECT_FALSE(m.HasConcluded());
+		EXPECT_FALSE(m.EndMatch());
+		m.AddIppon(Fighter::White);
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+		EXPECT_FALSE(m.HasConcluded());
 	}
-
-	EXPECT_FALSE(m.HasConcluded());
-	EXPECT_FALSE(m.EndMatch());
-	m.AddIppon(Fighter::White);
-	EXPECT_TRUE(m.HasConcluded());
-	EXPECT_TRUE(m.EndMatch());
-	EXPECT_FALSE(m.HasConcluded());
 }
 
 
@@ -163,11 +210,12 @@ TEST(Mat, CorrectWinner)
 			Application app;
 			Mat m(1);
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
-			match.SetRuleSet(new RuleSet("Test", 5, 0, 30, 20, true, true, true, 0));
+			match.SetRuleSet(new RuleSet("Test", 2, 0, 30, 20, true, true, true, 0));
 
 			EXPECT_TRUE(m.StartMatch(&match));
+			EXPECT_TRUE(m.AreFightersOnMat());
 			m.Hajime();
 					
 			if (i == 0)
@@ -186,7 +234,7 @@ TEST(Mat, CorrectWinner)
 				m.AddNoDisqualification(!f);
 			}
 
-			ZED::Core::Pause(5500);
+			ZED::Core::Pause(2200);
 
 			if (i == 4)
 				m.SetAsDraw();
@@ -194,9 +242,12 @@ TEST(Mat, CorrectWinner)
 			EXPECT_TRUE(m.EndMatch());
 
 			if (i == 4)
-				EXPECT_EQ(match.GetMatchResult().m_Winner, Winner::Draw);
+				EXPECT_EQ(match.GetResult().m_Winner, Winner::Draw);
 			else
-				EXPECT_EQ(match.GetMatchResult().m_Winner, Fighter2Winner(f));
+				EXPECT_EQ(match.GetResult().m_Winner, Fighter2Winner(f));
+
+			if (i != 0 && i != 5)
+				EXPECT_EQ(match.GetResult().m_Time, 2000);
 		}
 	}
 }
@@ -211,7 +262,7 @@ TEST(Mat, ForceClose)
 
 	ZED::Core::Pause(500);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	EXPECT_TRUE(m.StartMatch(&match));
 }
@@ -227,7 +278,7 @@ TEST(Mat, RemoveIpponShouldRecoverPreviousWazaari)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -240,8 +291,42 @@ TEST(Mat, RemoveIpponShouldRecoverPreviousWazaari)
 
 		EXPECT_FALSE(m.IsHajime());
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon   == 0);
-		EXPECT_TRUE(m.GetScoreboard(f).m_WazaAri == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon,   0);
+		EXPECT_EQ(m.GetScoreboard(f).m_WazaAri, 1);
+
+		m.AddIppon(f);
+
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
+TEST(Mat, RemoveIpponShouldRecoverPreviousWazaari2)
+{
+	initialize();
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.AddWazaAri(f);
+		m.AddWazaAri(f);
+
+		m.RemoveIppon(f);
+
+		EXPECT_FALSE(m.HasConcluded());
+
+		EXPECT_FALSE(m.IsHajime());
+
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon,   0);
+		EXPECT_EQ(m.GetScoreboard(f).m_WazaAri, 1);
 
 		m.AddIppon(f);
 
@@ -261,7 +346,7 @@ TEST(Mat, RemoveWazariShouldRemoveIppon)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -274,8 +359,8 @@ TEST(Mat, RemoveWazariShouldRemoveIppon)
 
 		EXPECT_FALSE(m.IsHajime());
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon   == 0);
-		EXPECT_TRUE(m.GetScoreboard(f).m_WazaAri == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon,   0);
+		EXPECT_EQ(m.GetScoreboard(f).m_WazaAri, 1);
 
 		m.AddIppon(f);
 
@@ -295,22 +380,22 @@ TEST(Mat, Scores)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 0);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 0);
 		m.AddIppon(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 1);
 		m.RemoveIppon(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 0);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 0);
 
 				
-		EXPECT_TRUE(m.GetScoreboard(f).m_WazaAri == 0);
+		EXPECT_EQ(m.GetScoreboard(f).m_WazaAri, 0);
 		m.AddWazaAri(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_WazaAri == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_WazaAri, 1);
 		m.RemoveWazaAri(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_WazaAri == 0);
+		EXPECT_EQ(m.GetScoreboard(f).m_WazaAri, 0);
 
 
 		m.AddIppon(f);
@@ -329,45 +414,45 @@ TEST(Mat, Shido)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 0);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 0);
 		m.AddShido(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 1);
 		m.RemoveShido(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 0);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 0);
 		m.AddShido(f);
 
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 1);
 		m.AddShido(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 2);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 2);
 		m.RemoveShido(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 1);
 		m.AddShido(f);
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 2);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 2);
 		m.AddShido(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 3);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 3);
 		m.RemoveShido(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 2);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 2);
 		m.AddShido(f);
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 3);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 3);
 		m.AddShido(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 3);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 3);
 		EXPECT_TRUE(m.GetScoreboard(f).m_HansokuMake);
 
 		m.RemoveShido(f);
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 2);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 2);
 		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
 
 		m.AddShido(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Shido == 3);
+		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 3);
 		EXPECT_TRUE(m.GetScoreboard(f).m_HansokuMake);
 
 		EXPECT_TRUE(m.EndMatch());
@@ -384,14 +469,14 @@ TEST(Mat, ShidoDoesntEndGoldenScore)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
-		match.SetRuleSet(new RuleSet("Test", 5, 60, 30, 20, false, false, true, 0));
+		match.SetRuleSet(new RuleSet("Test", 2, 60, 30, 20, false, false, true, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 
-		ZED::Core::Pause(6 * 1000);
+		ZED::Core::Pause(2500);
 		EXPECT_TRUE(m.IsOutOfTime());
 
 		EXPECT_FALSE(m.HasConcluded());
@@ -422,14 +507,14 @@ TEST(Mat, ScoreEndsGoldenScore)
 			Application app;
 			Mat m(1);
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
-			match.SetRuleSet(new RuleSet("Test", 5, 60, 30, 20, true, true, true, 0));
+			match.SetRuleSet(new RuleSet("Test", 2, 60, 30, 20, true, true, true, 0));
 
 			EXPECT_TRUE(m.StartMatch(&match));
 			m.Hajime();
 
-			ZED::Core::Pause(5500);
+			ZED::Core::Pause(2500);
 
 			EXPECT_TRUE(m.EnableGoldenScore());
 			m.Hajime();
@@ -445,7 +530,7 @@ TEST(Mat, ScoreEndsGoldenScore)
 
 			EXPECT_FALSE(m.IsHajime());
 			EXPECT_TRUE(m.EndMatch());
-			EXPECT_EQ(match.GetMatchResult().m_Winner, Fighter2Winner(f));
+			EXPECT_EQ(match.GetResult().m_Winner, Fighter2Winner(f));
 		}
 	}
 }
@@ -461,7 +546,7 @@ TEST(Mat, ShidosResultInIndirectHansokumake)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -475,10 +560,10 @@ TEST(Mat, ShidosResultInIndirectHansokumake)
 		auto& events = match.GetLog().GetEvents();
 
 		EXPECT_TRUE(events[events.size() - 3].m_BiasedEvent == MatchLog::BiasedEvent::AddHansokuMake_Indirect);
-		EXPECT_TRUE(events[events.size() - 3].m_Group == f);
+		EXPECT_EQ(events[events.size() - 3].m_Group, f);
 
 		EXPECT_TRUE(events[events.size() - 2].m_BiasedEvent == MatchLog::BiasedEvent::AddIppon);
-		EXPECT_TRUE(events[events.size() - 2].m_Group == !f);
+		EXPECT_EQ(events[events.size() - 2].m_Group, !f);
 	}
 }
 
@@ -493,7 +578,7 @@ TEST(Mat, HansokumakeResultsInDirectHansokumake)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -506,13 +591,13 @@ TEST(Mat, HansokumakeResultsInDirectHansokumake)
 		auto& events = match.GetLog().GetEvents();
 
 		EXPECT_TRUE(events[events.size() - 4].m_BiasedEvent == MatchLog::BiasedEvent::AddHansokuMake_Direct);
-		EXPECT_TRUE(events[events.size() - 4].m_Group == f);
+		EXPECT_EQ(events[events.size() - 4].m_Group, f);
 
 		EXPECT_TRUE(events[events.size() - 3].m_BiasedEvent == MatchLog::BiasedEvent::AddIppon);
-		EXPECT_TRUE(events[events.size() - 3].m_Group == !f);
+		EXPECT_EQ(events[events.size() - 3].m_Group, !f);
 
 		EXPECT_TRUE(events[events.size() - 2].m_BiasedEvent == MatchLog::BiasedEvent::AddDisqualification);
-		EXPECT_TRUE(events[events.size() - 2].m_Group == f);
+		EXPECT_EQ(events[events.size() - 2].m_Group, f);
 	}
 }
 
@@ -527,7 +612,7 @@ TEST(Mat, DirectHansokumakeDoesNotConcludeMatch)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -550,7 +635,7 @@ TEST(Mat, DirectHansokumakeAndDisqDoesConcludeMatch)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -574,7 +659,7 @@ TEST(Mat, DisqualificationCanBeRemoved)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -610,7 +695,7 @@ TEST(Mat, Gachi)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -632,7 +717,7 @@ TEST(Mat, GachiResultsInMate)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -658,7 +743,7 @@ TEST(Mat, DoubleIppon)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -692,7 +777,7 @@ TEST(Mat, DoubleIpponFightersKeepWazaari)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -730,7 +815,7 @@ TEST(Mat, DoubleIpponDuringGoldenScore)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 1, 60, 30, 20, false, false, false, 0));
 
@@ -768,7 +853,7 @@ TEST(Mat, DoubleIpponDuringGoldenScoreFightersKeepWazaari)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 1, 60, 30, 20, false, false, false, 0));
 
@@ -811,7 +896,7 @@ TEST(Mat, IpponResultsInMate)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -835,7 +920,7 @@ TEST(Mat, HansokumakeResultsInMate)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -863,7 +948,7 @@ TEST(Mat, ThirdShidoIsHansokumake)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -895,7 +980,7 @@ TEST(Mat, DoubleHansokumake)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -917,8 +1002,8 @@ TEST(Mat, DoubleHansokumake)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetMatchResult().m_Winner == Judoboard::Winner::Draw);
-		EXPECT_TRUE((int)match.GetMatchResult().m_Score == 0);
+		EXPECT_EQ(match.GetResult().m_Winner, Judoboard::Winner::Draw);
+		EXPECT_EQ((int)match.GetResult().m_Score, 0);
 	}
 }
 
@@ -937,7 +1022,7 @@ TEST(Mat, DoubleGachi)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -948,8 +1033,8 @@ TEST(Mat, DoubleGachi)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetMatchResult().m_Winner == Judoboard::Winner::Draw);
-		EXPECT_TRUE((int)match.GetMatchResult().m_Score == 0);
+		EXPECT_TRUE(match.GetResult().m_Winner == Judoboard::Winner::Draw);
+		EXPECT_TRUE((int)match.GetResult().m_Score == 0);
 	}
 }
 
@@ -963,7 +1048,7 @@ TEST(Mat, Hansokumake)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -1000,7 +1085,7 @@ TEST(Mat, MedicalExaminiations)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -1039,12 +1124,12 @@ TEST(Mat, MatchTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 120; time <= 5*60 ; time += 80 + rand()%60)
+	for (int time = 120; time <= 4*60 + 30 ; time += 100 + rand()%60)
 	{
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", time, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1068,19 +1153,19 @@ TEST(Mat, GoldenScoreTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 30; time <= 3 * 60; time += 60 + rand() % 50)
+	for (int time = 50; time <= 3 * 60; time += 65 + rand() % 50)
 	{
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
-		match.SetRuleSet(new RuleSet("Test", 5, time, 30, 20, false, false, false, 0));
+		match.SetRuleSet(new RuleSet("Test", 2, time, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 
-		ZED::Core::Pause(6 * 1000);
+		ZED::Core::Pause(3000);
 		m.EnableGoldenScore();
 		m.Hajime();
 
@@ -1101,17 +1186,19 @@ TEST(Mat, OsaekomiTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time <= 30; time += 6 + rand() % 8)
+	for (int time = 5; time <= 30; time += 6 + rand() % 8)
 	{
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 		{
 			Application app;
 			Mat m(1);
+			ZED::Core::Pause(500);
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 100, 0, time, 20, false, false, false, 0));
 			EXPECT_TRUE(m.StartMatch(&match));
+			ZED::Core::Pause(100);
 
 			m.Hajime();
 			m.Osaekomi(f);
@@ -1137,14 +1224,14 @@ TEST(Mat, OsaekomiWithWazaAriTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time <= 25; time += 5 + rand() % 8)
+	for (int time = 5; time <= 25; time += 5 + rand() % 8)
 	{
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 		{
 			Application app;
 			Mat m(1);
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 100, 0, 100, time, false, false, false, 0));
 			EXPECT_TRUE(m.StartMatch(&match));
@@ -1161,7 +1248,7 @@ TEST(Mat, OsaekomiWithWazaAriTime)
 				ZED::Core::Pause(1000);
 			}
 
-			ZED::Core::Pause(2000);
+			ZED::Core::Pause(2500);
 			EXPECT_TRUE(m.HasConcluded());
 			EXPECT_TRUE(m.EndMatch());
 		}
@@ -1179,7 +1266,7 @@ TEST(Mat, OsaekomiUkeGainsIppon)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 100, 0, 100, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1187,7 +1274,7 @@ TEST(Mat, OsaekomiUkeGainsIppon)
 		m.Hajime();
 		m.Osaekomi(f);
 
-		ZED::Core::Pause(5000);
+		ZED::Core::Pause(2000);
 
 		m.AddIppon(!f);
 
@@ -1195,8 +1282,8 @@ TEST(Mat, OsaekomiUkeGainsIppon)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetMatchResult().m_Winner == !f);
-		EXPECT_TRUE(match.GetMatchResult().m_Score  == Match::Score::Ippon);
+		EXPECT_TRUE(match.GetResult().m_Winner == !f);
+		EXPECT_TRUE(match.GetResult().m_Score  == Match::Score::Ippon);
 	}
 }
 
@@ -1211,7 +1298,7 @@ TEST(Mat, OsaekomiToriGivesUp)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 100, 0, 100, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1219,7 +1306,7 @@ TEST(Mat, OsaekomiToriGivesUp)
 		m.Hajime();
 		m.Osaekomi(f);
 
-		ZED::Core::Pause(5000);
+		ZED::Core::Pause(2000);
 
 		m.AddGachi(f);
 
@@ -1227,8 +1314,8 @@ TEST(Mat, OsaekomiToriGivesUp)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetMatchResult().m_Winner == !f);
-		EXPECT_TRUE(match.GetMatchResult().m_Score  == Match::Score::Ippon);
+		EXPECT_EQ(match.GetResult().m_Winner, !f);
+		EXPECT_EQ(match.GetResult().m_Score, Match::Score::Ippon);
 	}
 }
 
@@ -1238,17 +1325,20 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time <= 25; time += 5 + rand() % 8)
+	for (int time = 5; time <= 25; time += 6 + rand() % 8)
 	{
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 		{
 			Application app;
 			Mat m(1);
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 100, 0, time*2, time, false, false, false, 0));
+
+			ZED::Core::Pause(500);
 			EXPECT_TRUE(m.StartMatch(&match));
+			ZED::Core::Pause(100);
 
 			m.Hajime();
 			m.AddWazaAri(f);
@@ -1264,7 +1354,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 
 			m.RemoveWazaAri(f);
 
-			for (int k = 0; k < time - 1; k++)
+			for (int k = 0; k < time - 2; k++)
 			{
 				EXPECT_FALSE(m.IsOutOfTime());
 				EXPECT_FALSE(m.HasConcluded());
@@ -1272,7 +1362,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 				ZED::Core::Pause(1000);
 			}
 
-			ZED::Core::Pause(3000);
+			ZED::Core::Pause(4850);
 
 			EXPECT_TRUE(m.HasConcluded());
 			EXPECT_TRUE(m.EndMatch());
@@ -1290,20 +1380,20 @@ TEST(Mat, OsaekomiTillEndDuringGoldenScore)
 	//and now get cancelled after reaching the wazaari time
 
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time <= 25; time += 5 + rand() % 8)
+	for (int time = 5; time <= 25; time += 6 + rand() % 8)
 	{
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 		{
 			Application app;
 			Mat m(1);
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
-			match.SetRuleSet(new RuleSet("Test", 5, 60, 2*time, time, false, false, false, 0));
+			match.SetRuleSet(new RuleSet("Test", 1, 60, 2*time, time, false, false, false, 0));
 			EXPECT_TRUE(m.StartMatch(&match));
 
 			m.Hajime();
-			ZED::Core::Pause(6000);
+			ZED::Core::Pause(1500);
 
 			m.EnableGoldenScore();
 			m.Hajime();
@@ -1318,7 +1408,7 @@ TEST(Mat, OsaekomiTillEndDuringGoldenScore)
 				ZED::Core::Pause(1000);
 			}
 
-			ZED::Core::Pause(2000);
+			ZED::Core::Pause(2500);
 			EXPECT_TRUE(m.HasConcluded());
 			EXPECT_TRUE(m.EndMatch());
 		}
@@ -1335,9 +1425,9 @@ TEST(Mat, Sonomama)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
-		match.SetRuleSet(new RuleSet("Test", 500, 0, 30, 20, false, false, false, 0));
+		match.SetRuleSet(new RuleSet("Test", 500, 0, 15, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
@@ -1347,33 +1437,33 @@ TEST(Mat, Sonomama)
 		m.Sonomama();
 		EXPECT_TRUE(m.IsOsaekomi());
 		EXPECT_FALSE(m.IsOsaekomiRunning());
-		EXPECT_TRUE(m.GetOsaekomiHolder() == f);
+		EXPECT_EQ(m.GetOsaekomiHolder(), f);
 
 		ZED::Core::Pause(5000);
 		m.Hajime();
 		EXPECT_TRUE(m.IsOsaekomi());
 		EXPECT_TRUE(m.IsOsaekomiRunning());
-		EXPECT_TRUE(m.GetOsaekomiHolder() == f);
+		EXPECT_EQ(m.GetOsaekomiHolder(), f);
 
 		ZED::Core::Pause(5000);
 		m.Sonomama();
 		EXPECT_TRUE(m.IsOsaekomi());
 		EXPECT_FALSE(m.IsOsaekomiRunning());
-		EXPECT_TRUE(m.GetOsaekomiHolder() == f);
+		EXPECT_EQ(m.GetOsaekomiHolder(), f);
 
-		ZED::Core::Pause(25 * 1000);
+		ZED::Core::Pause(10 * 1000);
 
 		m.Hajime();
 		EXPECT_TRUE(m.IsOsaekomi());
 		EXPECT_TRUE(m.IsOsaekomiRunning());
-		EXPECT_TRUE(m.GetOsaekomiHolder() == f);
-		ZED::Core::Pause(5000);
+		EXPECT_EQ(m.GetOsaekomiHolder(), f);
+		ZED::Core::Pause(3000);
 
 		EXPECT_FALSE(m.HasConcluded());
 
-		ZED::Core::Pause(16 * 1000);
+		ZED::Core::Pause(5 * 1000);
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 1);
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 	}
@@ -1391,7 +1481,7 @@ TEST(Mat, Tokeda)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 500, 0, 20, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1404,9 +1494,9 @@ TEST(Mat, Tokeda)
 		EXPECT_FALSE(m.IsOsaekomi());
 		EXPECT_FALSE(m.IsOsaekomiRunning());
 
-		EXPECT_TRUE(m.GetOsaekomiList().size() == 1);
-		EXPECT_TRUE(m.GetOsaekomiList()[0].m_Who == f);
-		EXPECT_TRUE(std::abs((int)m.GetOsaekomiList()[0].m_Time - 5000) < 20);
+		ASSERT_EQ(m.GetOsaekomiList().size(), 1);
+		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, f);
+		EXPECT_LE(std::abs((int)m.GetOsaekomiList()[0].m_Time - 5000), 50);
 
 		ZED::Core::Pause(5000);
 		m.Osaekomi(f);
@@ -1418,9 +1508,9 @@ TEST(Mat, Tokeda)
 		EXPECT_FALSE(m.IsOsaekomi());
 		EXPECT_FALSE(m.IsOsaekomiRunning());
 
-		EXPECT_TRUE(m.GetOsaekomiList().size() == 2);
-		EXPECT_TRUE(m.GetOsaekomiList()[1].m_Who == f);
-		EXPECT_TRUE(std::abs((int)m.GetOsaekomiList()[1].m_Time - 5000) < 20);
+		ASSERT_EQ(m.GetOsaekomiList().size(), 2);
+		EXPECT_EQ(m.GetOsaekomiList()[1].m_Who, f);
+		EXPECT_LE(std::abs((int)m.GetOsaekomiList()[1].m_Time - 5000), 50);
 
 		ZED::Core::Pause(10 * 1000);
 
@@ -1431,9 +1521,87 @@ TEST(Mat, Tokeda)
 
 		EXPECT_FALSE(m.HasConcluded());
 
-		ZED::Core::Pause(6 * 1000);
+		ZED::Core::Pause(6000);
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 1);
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
+TEST(Mat, OsaekomiTokedaOsaekomi)
+{
+	initialize();
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		match.SetRuleSet(new RuleSet("Test", 500, 0, 10, 10, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.Hajime();
+		m.Osaekomi(f);
+
+		ZED::Core::Pause(3 * 1000);
+
+		m.Tokeda();
+		m.Osaekomi(!f);
+
+		EXPECT_TRUE(m.IsOsaekomi());
+		EXPECT_TRUE(m.IsOsaekomiRunning());
+
+		ZED::Core::Pause(3 * 1000);
+		m.Tokeda();
+
+		EXPECT_FALSE(m.IsOsaekomiRunning());
+
+		ASSERT_EQ(m.GetOsaekomiList().size(), 2);
+		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, f);
+		EXPECT_EQ(m.GetOsaekomiList()[1].m_Who, !f);
+
+		m.AddIppon(f);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 1);
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
+TEST(Mat, TokedaDuringSonomama)
+{
+	initialize();
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		match.SetRuleSet(new RuleSet("Test", 500, 0, 10, 10, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.Hajime();
+		m.Osaekomi(f);
+
+		ZED::Core::Pause(3 * 1000);
+
+		m.Sonomama();
+		m.Tokeda();
+		m.Hajime();
+
+		EXPECT_FALSE(m.IsOsaekomi());
+		EXPECT_FALSE(m.IsOsaekomiRunning());
+
+		ASSERT_EQ(m.GetOsaekomiList().size(), 1);
+		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, f);
+
+		m.AddIppon(f);
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 	}
@@ -1449,25 +1617,25 @@ TEST(Mat, OsaekomiSwitch)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
-		match.SetRuleSet(new RuleSet("Test", 500, 0, 25, 20, false, false, false, 0));
+		match.SetRuleSet(new RuleSet("Test", 500, 0, 12, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 		m.Osaekomi(f);
 
-		ZED::Core::Pause(10 * 1000);
+		ZED::Core::Pause(5 * 1000);
 		m.Osaekomi(!f);
 		EXPECT_TRUE(m.IsOsaekomi());
 		EXPECT_TRUE(m.IsOsaekomiRunning());
 
-		ZED::Core::Pause(10 * 1000);
+		ZED::Core::Pause(5 * 1000);
 		m.Osaekomi(f);
 		EXPECT_TRUE(m.IsOsaekomi());
 		EXPECT_TRUE(m.IsOsaekomiRunning());
 
-		ZED::Core::Pause(10 * 1000);
+		ZED::Core::Pause(5 * 1000);
 
 		EXPECT_FALSE(m.IsOsaekomiRunning());
 
@@ -1481,6 +1649,45 @@ TEST(Mat, OsaekomiSwitch)
 }
 
 
+
+TEST(Mat, OsaekomiSwitchDuringSonomama)
+{
+	initialize();
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		match.SetRuleSet(new RuleSet("Test", 500, 0, 5, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.Hajime();
+		m.Osaekomi(f);
+
+		ZED::Core::Pause(3 * 1000);
+		m.Sonomama();
+		m.Osaekomi(!f);
+		m.Hajime();
+		EXPECT_TRUE(m.IsOsaekomi());
+		EXPECT_TRUE(m.IsOsaekomiRunning());
+
+		ZED::Core::Pause(5 * 1000);
+
+		EXPECT_FALSE(m.IsOsaekomiRunning());
+
+		ASSERT_EQ(m.GetOsaekomiList().size(), 1);
+		EXPECT_EQ(m.GetOsaekomiList()[0].m_Who, !f);
+
+		EXPECT_EQ(m.GetScoreboard(!f).m_Ippon, 1);
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
 TEST(Mat, MatchContinuesDuringOsaekomi)
 {
 	initialize();
@@ -1489,7 +1696,7 @@ TEST(Mat, MatchContinuesDuringOsaekomi)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 10, 0, 10, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1507,7 +1714,7 @@ TEST(Mat, MatchContinuesDuringOsaekomi)
 		}
 
 		ZED::Core::Pause(2000);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 1);
+		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 1);
 		EXPECT_TRUE(m.IsOutOfTime());
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
@@ -1524,21 +1731,21 @@ TEST(Mat, Yuko)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, true, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
 
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Yuko == 0);
+		EXPECT_EQ(m.GetScoreboard(f).m_Yuko, 0);
 		for (int k = 1; k < 25; k++)
 		{
 			m.AddYuko(f);
-			EXPECT_TRUE(m.GetScoreboard(f).m_Yuko == k);
+			EXPECT_EQ(m.GetScoreboard(f).m_Yuko, k);
 		}
 		for (int k = 1; k < 25; k++)
 			m.RemoveYuko(f);
-		EXPECT_TRUE(m.GetScoreboard(f).m_Yuko == 0);
+		EXPECT_EQ(m.GetScoreboard(f).m_Yuko, 0);
 
 		m.AddIppon(f);
 
@@ -1556,22 +1763,22 @@ TEST(Mat, Yuko2)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
 
 
-		EXPECT_TRUE(m.GetScoreboard(f).m_Yuko == 0);
+		EXPECT_EQ(m.GetScoreboard(f).m_Yuko, 0);
 		for (int k = 1; k < 25; k++)
 		{
 			m.AddYuko(f);
-			EXPECT_TRUE(m.GetScoreboard(f).m_Yuko == 0);
+			EXPECT_EQ(m.GetScoreboard(f).m_Yuko, 0);
 		}
 		for (int k = 1; k < 25; k++)
 		{
 			m.RemoveYuko(f);
-			EXPECT_TRUE(m.GetScoreboard(f).m_Yuko == 0);
+			EXPECT_EQ(m.GetScoreboard(f).m_Yuko, 0);
 		}
 
 		m.AddIppon(f);
@@ -1600,7 +1807,7 @@ TEST(Mat, ShidoForToriDuringOsaekomi)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1630,7 +1837,7 @@ TEST(Mat, ShidoForToriDuringOsaekomi)
 TEST(Mat, MateDuringSonomama)
 {
 	//Mate can indeed be called during sonomama in the case the judges want to give a hansokumake
-	//or to discuss somethiong with the other judges in give tori a shido
+	//or to discuss something with the other judges or to give tori a shido
 
 	initialize();
 	for (Fighter osaekomi_holder = Fighter::White; osaekomi_holder <= Fighter::Blue; osaekomi_holder++)
@@ -1640,7 +1847,7 @@ TEST(Mat, MateDuringSonomama)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1683,7 +1890,7 @@ TEST(Mat, HansokumakeDuringOsaekomi)
 
 			EXPECT_TRUE(m.Open());
 
-			Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
 			EXPECT_TRUE(m.StartMatch(&match));
@@ -1707,8 +1914,8 @@ TEST(Mat, HansokumakeDuringOsaekomi)
 
 
 			EXPECT_TRUE(m.EndMatch());
-			EXPECT_TRUE(match.GetMatchResult().m_Winner == !hansokumake_committer);
-			EXPECT_TRUE(match.GetMatchResult().m_Score  == Match::Score::Ippon);
+			EXPECT_TRUE(match.GetResult().m_Winner == !hansokumake_committer);
+			EXPECT_TRUE(match.GetResult().m_Score  == Match::Score::Ippon);
 		}
 	}
 }
@@ -1723,7 +1930,7 @@ TEST(Mat, Koka)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, true, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1755,7 +1962,7 @@ TEST(Mat, Koka2)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(new RuleSet("Test", 60, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -1789,7 +1996,7 @@ TEST(Mat, WazariAwaseteIppon)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
 		EXPECT_TRUE(m.StartMatch(&match));
 
@@ -1825,20 +2032,55 @@ TEST(Mat, WazariAwaseteIppon)
 
 
 
+TEST(Mat, GoldenScore_Revoke)
+{
+	initialize();
+	Application app;
+	Mat m(1);
+
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+	match.SetMatID(1);
+	match.SetRuleSet(new RuleSet("Test", 2, 10, 30, 20, false, false, true, 0));
+	EXPECT_TRUE(m.StartMatch(&match));
+
+	m.Hajime();
+
+	ZED::Core::Pause(2500);
+	EXPECT_TRUE(m.IsOutOfTime());
+
+	EXPECT_FALSE(m.HasConcluded());
+
+	m.EnableGoldenScore();
+	m.EnableGoldenScore(false);
+
+	EXPECT_TRUE(m.IsOutOfTime());
+	EXPECT_EQ(m.GetTimeElapsed(), 2000);
+
+	EXPECT_FALSE(m.HasConcluded());
+	EXPECT_FALSE(m.EndMatch());
+
+	m.Hantei(Fighter::White);
+
+	EXPECT_TRUE(m.HasConcluded());
+	EXPECT_TRUE(m.EndMatch());
+}
+
+
+
 TEST(Mat, GoldenScore)
 {
 	initialize();
 	Application app;
 	Mat m(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
-	match.SetRuleSet(new RuleSet("Test", 10, 10, 30, 20, false, false, true, 0));
+	match.SetRuleSet(new RuleSet("Test", 2, 10, 30, 20, false, false, true, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
 
 	m.Hajime();
 
-	ZED::Core::Pause(11 * 1000);
+	ZED::Core::Pause(2500);
 	EXPECT_TRUE(m.IsOutOfTime());
 
 	EXPECT_FALSE(m.HasConcluded());
@@ -1869,7 +2111,7 @@ TEST(Mat, GoldenScore2)
 	Application app;
 	Mat m(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 10, 0, 30, 20, false, false, true, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
@@ -1904,7 +2146,7 @@ TEST(Mat, GoldenScoreResetTime)
 	Application app;
 	Mat m(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 5, 5, 30, 20, false, false, true, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
@@ -1934,7 +2176,9 @@ TEST(Mat, GoldenScoreKeepsShidosAndMedicalExaminations)
 	Application app;
 	Mat m(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	ZED::Core::Pause(100);
+
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 5, 5, 30, 20, false, false, true, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
@@ -1973,7 +2217,7 @@ TEST(Mat, Draw)
 	Application app;
 	Mat m(1);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 10, 60, 30, 20, false, false, true, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
@@ -2005,10 +2249,12 @@ TEST(Mat, Draw2)
 	Application app;
 	Mat m(1, &app);
 
-	Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0));
 	EXPECT_TRUE(m.StartMatch(&match));
+	EXPECT_TRUE(m.AreFightersOnMat());
+	ZED::Core::Pause(1000);
 
 	m.Hajime();
 
@@ -2042,14 +2288,14 @@ TEST(Mat, Hantei)
 		Application app;
 		Mat m(1);
 
-		Match match(nullptr, new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"));
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
 		match.SetMatID(1);
-		match.SetRuleSet(new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0));
+		match.SetRuleSet(new RuleSet("Test", 2, 60, 30, 20, false, false, false, 0));
 		EXPECT_TRUE(m.StartMatch(&match));
 
 		m.Hajime();
 
-		ZED::Core::Pause(11 * 1000);
+		ZED::Core::Pause(3000);
 		EXPECT_TRUE(m.IsOutOfTime());
 
 		EXPECT_FALSE(m.HasConcluded());
@@ -2059,9 +2305,9 @@ TEST(Mat, Hantei)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetMatchResult().m_Winner == Fighter2Winner(f));
-		EXPECT_TRUE(match.GetMatchResult().m_Score  == Match::Score::Hantei);
-		EXPECT_TRUE(match.GetMatchResult().m_Score  == (Match::Score)1);
+		EXPECT_TRUE(match.GetResult().m_Winner == Fighter2Winner(f));
+		EXPECT_TRUE(match.GetResult().m_Score  == Match::Score::Hantei);
+		EXPECT_TRUE(match.GetResult().m_Score  == (Match::Score)1);
 	}
 }
 
@@ -2071,7 +2317,7 @@ TEST(Mat, BreakTime)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 55; time <= 3 * 60; time += 60 + rand() % 60)
+	for (int time = 60; time <= 180; time += 95 + rand() % 30)
 	{
 		Application app;
 		Mat m(1);
@@ -2082,7 +2328,7 @@ TEST(Mat, BreakTime)
 		Judoka* j2 = new Judoka("White", "LastnameW");
 		Judoka* j3 = new Judoka("Blue",  "LastnameB");
 
-		Match match(nullptr, j1, j2);
+		Match match(j1, j2, nullptr);
 		match.SetMatID(1);
 		match.SetRuleSet(rule_set);
 		EXPECT_TRUE(m.StartMatch(&match));
@@ -2093,17 +2339,118 @@ TEST(Mat, BreakTime)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		Match match2(nullptr, j1, j3, 1);
+		Match match2(j1, j3, nullptr, 1);
 		match2.SetRuleSet(rule_set);
 
-		for (int k = 0; k < time-1; k++)
+		for (int k = 0; k < time-2; k++)
 		{
 			EXPECT_FALSE(m.StartMatch(&match2));
 			ZED::Core::Pause(1000);
 		}
 
-		ZED::Core::Pause(2500);
+		ZED::Core::Pause(3800);
 
 		EXPECT_TRUE(m.StartMatch(&match2));
+
+		delete rule_set;
+		delete j1;
+		delete j2;
+		delete j3;
+	}
+}
+
+
+
+TEST(Mat, BreakTime_Extended)
+{
+	initialize();
+
+	{
+		Application app;
+		Mat m(1);
+
+		RuleSet* rule_set = new RuleSet("Test", 30, 10, 30, 20, false, false, false, 5, false);
+
+		Judoka* j1 = new Judoka("Needs", "Break");
+		Judoka* j2 = new Judoka("White", "LastnameW");
+		Judoka* j3 = new Judoka("Blue",  "LastnameB");
+
+		Match match(j1, j2, nullptr);
+		match.SetMatID(1);
+		match.SetRuleSet(rule_set);
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.Hajime();
+		ZED::Core::Pause(10 * 1000);
+		m.AddIppon((Fighter)(rand()%2));
+
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+
+		Match match2(j1, j3, nullptr, 1);
+		match2.SetRuleSet(rule_set);
+
+		for (int k = 0; k < 4; k++)
+		{
+			EXPECT_FALSE(m.StartMatch(&match2));
+			ZED::Core::Pause(1000);
+		}
+
+		ZED::Core::Pause(3000);
+
+		EXPECT_TRUE(m.StartMatch(&match2));
+
+		delete rule_set;
+		delete j1;
+		delete j2;
+		delete j3;
+	}
+}
+
+
+
+TEST(Mat, BreakTime_Extended2)
+{
+	initialize();
+
+	{
+		Application app;
+		Mat m(1);
+
+		RuleSet* rule_set = new RuleSet("Test", 30, 10, 30, 20, false, false, false, 5, true);
+
+		Judoka* j1 = new Judoka("Needs", "Break");
+		Judoka* j2 = new Judoka("White", "LastnameW");
+		Judoka* j3 = new Judoka("Blue",  "LastnameB");
+
+		Match match(j1, j2, nullptr);
+		match.SetMatID(1);
+		match.SetRuleSet(rule_set);
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.Hajime();
+		ZED::Core::Pause(10 * 1000);
+		m.AddIppon((Fighter)(rand()%2));
+
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+
+		Match match2(j1, j3, nullptr, 1);
+		match2.SetRuleSet(rule_set);
+
+		for (int k = 0; k < 9; k++)
+		{
+			EXPECT_FALSE(m.StartMatch(&match2));
+			ZED::Core::Pause(1000);
+		}
+
+		ZED::Core::Pause(3000);
+
+		EXPECT_TRUE(m.StartMatch(&match2));
+
+		delete rule_set;
+		delete j1;
+		delete j2;
+		delete j3;
 	}
 }

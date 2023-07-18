@@ -1,5 +1,5 @@
 #pragma once
-#include "matchtable.h"
+#include "round_robin.h"
 
 
 
@@ -10,25 +10,27 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		CustomTable(const ITournament* Tournament);
-		CustomTable(ZED::CSV& Stream, ITournament* Tournament);
+		CustomTable(const ITournament* Tournament = nullptr);
+		CustomTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent = nullptr) : MatchTable(Yaml, Tournament, Parent) {}
 
 		static std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::Custom; }
+		virtual std::string GetDescription() const override { return GetName(); }
 
-		virtual Status GetStatus() const override;
-
-		virtual std::vector<Result> CalculateResults() const override;
-
-		virtual bool IsElgiable(const Judoka& Fighter) const override { return false; }//Don't add judoka automatically
 		virtual void GenerateSchedule() override {}
 
-		//Serialization
-		virtual const std::string ToHTML() const override;
-		virtual const std::string ToString() const override;
+		virtual Results CalculateResults() const override {
+			Results ret;
+			return ret;
+		}
 
-		virtual void operator >> (ZED::CSV& Stream) const override;
+		virtual size_t GetMaxStartPositions() const { return 0; }
+
+		//Serialization
+		virtual void operator >> (YAML::Emitter& Yaml) const;
+		virtual const std::string ToHTML() const override;
+		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 
 	private:

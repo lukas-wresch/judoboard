@@ -56,7 +56,7 @@ bool RemoteMat::IsConnected() const
 
 
 
-const std::vector<IMat::OsaekomiEntry>& RemoteMat::GetOsaekomiList() const
+const std::vector<IMat::OsaekomiEntry> RemoteMat::GetOsaekomiList() const
 {
 	std::string response = SendRequest("/ajax/mat/get_osaekomilist?id=" + std::to_string(GetMatID()));
 
@@ -109,7 +109,7 @@ bool RemoteMat::CanNextMatchStart() const
 
 
 
-bool RemoteMat::StartMatch(Match* NewMatch)
+bool RemoteMat::StartMatch(Match* NewMatch, bool UseForce)
 {
 	if (!NewMatch)
 	{
@@ -117,10 +117,10 @@ bool RemoteMat::StartMatch(Match* NewMatch)
 		return false;
 	}
 
-	ZED::CSV csv;
-	*NewMatch >> csv;
+	YAML::Emitter yaml;
+	*NewMatch >> yaml;
 
-	const bool ret = PostData("/ajax/slave/start_match?id=" + std::to_string(GetMatID()), csv);
+	const bool ret = PostData("/ajax/slave/start_match?id=" + std::to_string(GetMatID()), yaml);
 
 	if (ret)
 		m_pMatch = NewMatch;
@@ -390,12 +390,12 @@ ZED::HttpClient::Packet RemoteMat::SendRequest(const std::string& URL) const
 
 
 
-bool RemoteMat::PostData(const std::string& URL, const ZED::CSV& Data) const
+bool RemoteMat::PostData(const std::string& URL, const YAML::Emitter& Data) const
 {
 	ZED::Log::Debug("Posting data: " + URL);
 
 	ZED::HttpClient client(m_Hostname, m_Port);
-	std::string response = client.POST(URL, Data, "Cookie: token=test");
+	std::string response = client.POST(URL, Data.c_str(), "Cookie: token=test");
 	return response == "ok";
 }
 

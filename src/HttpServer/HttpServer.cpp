@@ -64,10 +64,10 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
 
         if (Connection->content_len > 0)
         {
-            ZED::Blob body((size_t)Connection->content_len);
+            ZED::Blob body((size_t)Connection->content_len + 1);
             //char* body = new char[(size_t)Connection->content_len + 1];
             mg_read(Connection, body, (size_t)Connection->content_len);
-            //body[Connection->content_len] = '\0';
+            body[Connection->content_len] = '\0';
             request_body = std::move(body);
             //delete[] body;
         }
@@ -103,32 +103,27 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
             MIMEType = "image/jpeg";
         else if (Type == ResourceType::Image_PNG)
             MIMEType = "image/png";
+        else if (Type == ResourceType::Binary)
+            MIMEType = "application/octet-stream";
 
+
+        mg_printf(Connection,
+            "HTTP/1.1 200 OK\r\n"
+            "Connection: Keep-Alive\r\n"
+            "Keep-Alive: timeout=60, max=1000\r\n"
+            "Content-Type: %s;\r\n"
+            "Content-Length: %d\r\n",
+            MIMEType.c_str(), content.GetSize());//Always set Content-Length
 
         if (request.m_ResponseHeader.length() > 0)
         {
-            mg_printf(Connection,
-                "HTTP/1.1 200 OK\r\n"
-                "Connection: Keep-Alive\r\n"
-                "Keep-Alive: timeout=60, max=1000\r\n"
-                "Content-Type: %s;\r\n"
-                "Content-Length: %d\r\n"//Always set Content-Length
-                "%s\r\n"
-                "\r\n",
-                MIMEType.c_str(), content.GetSize(), request.m_ResponseHeader.c_str());
+            mg_printf(Connection, request.m_ResponseHeader.c_str());
+            mg_printf(Connection, "\r\n");
         }
-        else
-        {
-            mg_printf(Connection,
-                "HTTP/1.1 200 OK\r\n"
-                "Connection: Keep-Alive\r\n"
-                "Keep-Alive: timeout=60, max=1000\r\n"
-                "Content-Type: %s;\r\n"
-                "Content-Length: %d\r\n"//Always set Content-Length
-                "\r\n",
-                MIMEType.c_str(), content.GetSize());
-        }
-
+        if (item != m_Resources.end() && item->second.m_CacheAgeInSeconds > 0)
+            mg_printf(Connection, "Cache-Control: max-age=%d\r\n", item->second.m_CacheAgeInSeconds);
+        
+        mg_printf(Connection, "\r\n");
         mg_write(Connection, content, content.GetSize());
     }
 
@@ -147,7 +142,11 @@ HttpServer::HttpServer(uint16_t Port) : m_Port(Port)
 #endif
 
     //const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", nullptr };
-    const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", "num_threads", "12", nullptr};
+#ifdef _DEBUG
+    const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", "num_threads", "10", nullptr};
+#else
+    const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", "num_threads", "25", nullptr};
+#endif
 
     m_Context = mg_start([](mg_event Event, mg_connection* Connection) { ((HttpServer*)Connection->ctx->user_data)->Callback(Event, Connection); }, this, options);
 }
@@ -172,7 +171,7 @@ HttpServer::~HttpServer()
 
 
 
-void HttpServer::RegisterResource(const std::string& URI, std::function<ZED::Blob(Request&)> Callback, ResourceType Type)
+void HttpServer::RegisterResource(const std::string& URI, std::function<ZED::Blob(Request&)> Callback, ResourceType Type, uint32_t Cache)
 {
-    m_Resources.insert({ URI, Resource(Type, Callback) });
+    m_Resources.insert({ URI, Resource(Type, Callback, Cache) });
 }

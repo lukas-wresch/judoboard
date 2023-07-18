@@ -220,6 +220,7 @@ bool Window::OpenWindow()
 
 	if (!m_Renderer->Init(m_Hwnd))
 	{
+		m_Renderer->Unlock();
 		ZED::Log::Error("Failed to create renderer");
 		return false;
 	}

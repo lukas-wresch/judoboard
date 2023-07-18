@@ -3,6 +3,9 @@
 #include "../ZED/include/log.h"
 #include "../ZED/include/sha512.h"
 #include "database.h"
+#include "localizer.h"
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 
 
 
@@ -14,12 +17,35 @@ void Database::Reset()
 {
 	StandingData::Reset();
 
+	m_CurrentTournament.clear();
+
 	for (auto account : m_Accounts)
 		delete account;
 
 	m_Accounts.clear();
 	m_OpenNonces.clear();
 	m_ClosedNonces.clear();
+
+	//No rule set defined and no age groups defined
+	if (m_RuleSets.empty() && m_AgeGroups.empty())
+	{
+		auto children = new RuleSet(Localizer::Translate("Children"),		2*60, 0,    20, 10, false, false, false, 2*60);
+		auto youth    = new RuleSet(Localizer::Translate("Youth") + " U13", 3*60, 0,    20, 10, false, false, false, 3*60);
+		auto youth2   = new RuleSet(Localizer::Translate("Youth") + " U15", 3*60, 3*60, 20, 10, false, false, false, 3*60, true);
+		auto adults   = new RuleSet(Localizer::Translate("Adults"),         4*60, -1,   20, 10, false, false, false, 4*60, true);
+
+		AddRuleSet(children);
+		AddRuleSet(youth);
+		AddRuleSet(youth2);
+		AddRuleSet(adults);
+
+		AddAgeGroup(new AgeGroup("U11", 8,  10, children));
+		AddAgeGroup(new AgeGroup("U13", 10, 12, youth));
+		AddAgeGroup(new AgeGroup("U15", 12, 14, youth2));
+		AddAgeGroup(new AgeGroup("U18", 15, 17, adults));
+		AddAgeGroup(new AgeGroup("U21", 17, 20, adults));
+		AddAgeGroup(new AgeGroup(Localizer::Translate("Seniors"), 17, 0, adults));
+	}
 }
 
 
@@ -27,9 +53,16 @@ void Database::Reset()
 bool Database::Load(const std::string& Filename)
 {
 	m_Filename = Filename;
-	std::ifstream File(Filename, std::ios::binary);
+	std::ifstream file(Filename);
+	if (!file)
+	{
+		ZED::Log::Warn("Could not open file " + Filename);
+		return false;
+	}
 
-	if (!File)
+	YAML::Node yaml = YAML::LoadFile(Filename);
+
+	if (!yaml)
 	{
 		ZED::Log::Warn("Could not open file " + Filename);
 		return false;
@@ -37,36 +70,33 @@ bool Database::Load(const std::string& Filename)
 
 	Reset();
 
-	ZED::CSV csv(File);
-
-	uint32_t version = 0;
-	csv >> version;
-
-	if (version != 1)
+	if (!yaml["version"] || yaml["version"].as<int>() != 1)
 	{
 		ZED::Log::Error("File format is too new for this application to read. Please update this application");
 		return false;
 	}
 
-	StandingData::operator<<(csv);
+	if (yaml["last_tournament_name"])
+		m_CurrentTournament = yaml["last_tournament_name"].as<std::string>();
+	if (yaml["language"])
+		Localizer::SetLanguage((Language)yaml["language"].as<int>());
+	if (yaml["port"])
+		SetServerPort(yaml["port"].as<int>());
+	if (yaml["ippon_style"])
+		SetIpponStyle((Mat::IpponStyle)yaml["ippon_style"].as<int>());
+	if (yaml["timer_style"])
+		SetTimerStyle((Mat::TimerStyle)yaml["timer_style"].as<int>());
+	if (yaml["name_style"])
+		SetNameStyle((NameStyle)yaml["name_style"].as<int>());
 
-	uint32_t accountCount = 0;
-	csv >> accountCount;
+	//Read standing data
+	StandingData::operator <<(yaml);
 
-	for (uint32_t i = 0; i < accountCount; i++)
+	if (yaml["accounts"] && yaml["accounts"].IsSequence())
 	{
-		std::string username, password;
-
-		csv >> username >> password;
-
-		Account::AccessLevel accessLevel = Account::AccessLevel::None;
-		csv >> accessLevel;
-
-		AddAccount(Account(username, password, accessLevel));
+		for (const auto& account : yaml["accounts"])
+			AddAccount(Account(account));
 	}
-
-	if (m_RuleSets.empty())//No rule set defined
-		AddRuleSet(new RuleSet);//Add default rule set
 
 	return true;
 }
@@ -78,88 +108,82 @@ bool Database::Save(const std::string& Filename) const
 	if (Filename[0] == '\0')
 		return false;
 
-	m_Filename = Filename;
-	std::ofstream File(Filename, std::ios::binary);
+	std::ofstream file(Filename);
 
-	if (!File)
+	if (!file)
 	{
 		ZED::Log::Error("Could not save file " + Filename);
 		return false;
 	}
 
-	ZED::CSV csv;
+	YAML::Emitter yaml;
 
-	csv << 1;//Version
+	yaml << YAML::BeginMap;
+	yaml << YAML::Key << "version" << YAML::Value << "1";
+
+	yaml << YAML::Key << "last_tournament_name" << YAML::Value << m_CurrentTournament;
+	yaml << YAML::Key << "language" << YAML::Value << (int)Localizer::GetLanguage();
+	yaml << YAML::Key << "port" << YAML::Value << GetServerPort();
+	yaml << YAML::Key << "ippon_style" << YAML::Value << (int)GetIpponStyle();
+	yaml << YAML::Key << "timer_style" << YAML::Value << (int)GetTimerStyle();
+	yaml << YAML::Key << "name_style"  << YAML::Value << (int)GetNameStyle();
 	
-	StandingData::operator>>(csv);
+	StandingData::operator >>(yaml);
 
-	csv << m_Accounts.size();
+	yaml << YAML::Key << "accounts";
+	yaml << YAML::Value;
+	yaml << YAML::BeginSeq;
 
 	for (auto account : m_Accounts)
 	{
 		if (account)
-		{
-			csv << account->GetUsername();
-			csv << account->GetPassword();
-			csv << account->GetAccessLevel();
-		}
+			*account >> yaml;
 	}
 
-	csv >> File;
+	yaml << YAML::EndSeq;
+	yaml << YAML::EndMap;
+	file << yaml.c_str();
 	return true;
 }
 
 
 
-Judoka* Database::UpdateOrAdd(const MD5::Participant& NewJudoka)
+Judoka* Database::UpdateOrAdd(const JudokaData& NewJudoka, bool ParseOnly, std::string& Output)
 {
-	DM4::Participant dm4_judoka(NewJudoka);
-
-	std::string output;
-	auto ret = UpdateOrAdd(dm4_judoka, false, output);
-	ZED::Log::Debug(output);
-
-	return ret;
-}
-
-
-
-Judoka* Database::UpdateOrAdd(const DM4::Participant& NewJudoka, bool ParseOnly, std::string& Output)
-{
-	auto old_judoka = FindJudoka_DM4_ExactMatch(NewJudoka);
+	auto old_judoka = FindJudoka_ExactMatch(NewJudoka);
 
 	if (old_judoka)//Exact match
 		return old_judoka;
 
 	else//No exact match
 	{
-		old_judoka = FindJudoka_DM4_SameName(NewJudoka);
+		/*old_judoka = FindJudoka_SameName(NewJudoka);
 
 		if (old_judoka)//Found someone with the right name but incorrect club/birthyear
 		{
-			Output += "Updating information of judoka: " + old_judoka->GetName() + "<br/>";
+			Output += "Updating information of judoka: " + old_judoka->GetName(NameStyle::GivenName) + "<br/>";
 
 			if (!ParseOnly)
 			{
-				if (NewJudoka.Club)
-					old_judoka->SetClub(FindClubByName(NewJudoka.Club->Name));
-				if (NewJudoka.Birthyear > 0)
-					old_judoka->SetBirthyear(NewJudoka.Birthyear);
-				if (NewJudoka.Weight > 0)
-					old_judoka->SetWeight(NewJudoka.Weight);
+				if (FindClubByName(NewJudoka.m_ClubName))
+					old_judoka->SetClub(FindClubByName(NewJudoka.m_ClubName));
+				if (NewJudoka.m_Birthyear > 0)
+					old_judoka->SetBirthyear(NewJudoka.m_Birthyear);
+				if (NewJudoka.m_Weight > 0)
+					old_judoka->SetWeight(NewJudoka.m_Weight);
 			}
 
 			return old_judoka;
-		}
+		}*/
 
-		else//We don't have a judoka with this name
+		//else//We don't have a judoka with this name
 		{
 			//Add to database
-			Output += "Adding judoka: " + NewJudoka.Firstname + " " + NewJudoka.Lastname + "<br/>";
+			Output += "Adding judoka: " + NewJudoka.m_Firstname + " " + NewJudoka.m_Lastname + "<br/>";
 
 			if (!ParseOnly)
 			{
-				auto new_judoka = new Judoka(NewJudoka);
+				auto new_judoka = new Judoka(NewJudoka, this);
 				AddJudoka(new_judoka);
 				return new_judoka;
 			}

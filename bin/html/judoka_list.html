@@ -2,13 +2,19 @@
 
 <button class="add" id="add" style="margin-bottom: 1cm;" onclick="navigate('judoka_add.html')">New Judoka</button> 
 
+<div>
+    <label id="search_label" style="width:150px;float:left;margin-top:5px;">Search</label>
+    <input style="margin-bottom:20px;" size="50" id="search" value="" oninput="GetJudokaList();"/>
+</div>
+
 <table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
-    <th style="width: 4cm;" id="firstname">Firstname</th>
-    <th style="width: 4cm;" id="lastname">Lastname</th>
+    <th style="width: 4.8cm;" id="firstname">Firstname</th>
+    <th style="width: 4.8cm;" id="lastname">Lastname</th>
+    <th style="width: 5.5cm;" id="club">Club</th>
     <th style="width: 2cm;" id="weight">Weight</th>
     <th style="width: 2cm;" id="gender">Gender</th>
-    <th style="width: 2cm;"></th>
+    <th style="width: 4.2cm;" id="options">Options</th>
   </tr>
 </table>
 
@@ -17,44 +23,48 @@
 
 function GetJudokaList()
 {
-  AjaxCallback("ajax/judoka/list", function(response) {
+  AjaxCallback("ajax/judoka/search?name=" + document.getElementById("search").value, function(response) {
     console.log(response);
-    var res = response.split(",");
+    const res = YAML.parse(response);
 
-    if (res.length < 4)
-      return;
-
-    var table = document.getElementById("list");
+    let table = document.getElementById("list");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    for (var i=0; i < res.length;)
+    for (const judoka of res)
     {
-      var row = table.insertRow(-1);
-      var cell1 = row.insertCell(0);
-      var cell2 = row.insertCell(1);
-      var cell3 = row.insertCell(2);
-      var cell4 = row.insertCell(3);
-      var cell5 = row.insertCell(4);
+      let row = table.insertRow(-1);
+      let cell1 = row.insertCell(0);
+      let cell2 = row.insertCell(1);
+      let cell6 = row.insertCell(2);
+      let cell3 = row.insertCell(3);
+      let cell4 = row.insertCell(4);
+      let cell5 = row.insertCell(5);
 
-      var id = res[i++];
-      cell1.innerHTML = res[i++];
-      cell2.innerHTML = res[i++];
-      cell3.innerHTML = res[i++] + " kg";
-      var gender    = res[i++];
-      var birthyear = res[i++];
-      var clubID    = res[i++];
+      cell1.style.fontSize  = "16pt";
+      cell1.innerHTML = judoka.firstname;
+      cell2.style.fontSize  = "16pt";
+      cell2.innerHTML = judoka.lastname;
 
-
-      if (gender == 0)
-        cell4.innerHTML = lang.male;
+      cell6.style.fontSize  = "14pt";
+      if (typeof judoka.club_name !== 'undefined')
+        cell6.innerHTML = judoka.club_name;
       else
-        cell4.innerHTML = lang.female;
+        cell6.innerHTML = "- - -";
+
+      cell3.style.fontSize  = "16pt";
+      cell3.innerHTML = judoka.weight + " kg";
+
+
+      if (judoka.gender == 0)
+        cell4.innerHTML = translate('male');
+      else
+        cell4.innerHTML = translate('female');
       
 
-      //cell5.innerHTML = "<a href=\"#judoka_edit.html?id="+id+"\">Edit Judoka</a>";
-      cell5.innerHTML = "<button class=\"white\" style=\"width: 3.3cm; height: 9mm; margin-right: 5mm;\" onclick=navigate(\"judoka_add.html?id="+id+"\");>Edit Judoka</button>";
+      cell5.innerHTML = "<button class=\"white\" style=\"width: 3.8cm; height: 9mm; margin-right: 0mm;\" onclick=navigate(\"judoka_add.html?id="+judoka.uuid+"\");>"+ translate('edit_judoka') +"</button>";
+      cell5.style.textAlign = "center";
     }
   });
 }
@@ -62,11 +72,14 @@ function GetJudokaList()
 
 GetJudokaList();
 
-document.getElementById("headline").innerHTML = lang.list_of_all_judokas;
-document.getElementById("add").innerHTML      = lang.new_judoka;
-document.getElementById("firstname").innerHTML = lang.firstname;
-document.getElementById("lastname").innerHTML  = lang.lastname;
-document.getElementById("weight").innerHTML    = lang.weight;
-document.getElementById("gender").innerHTML    = lang.gender;
+document.getElementById("headline").innerHTML  = translate('list_of_all_judokas');
+document.getElementById("add").innerHTML       = translate('new_judoka');
+document.getElementById("firstname").innerHTML = translate('firstname');
+document.getElementById("lastname").innerHTML  = translate('lastname');
+document.getElementById("weight").innerHTML    = translate('weight');
+document.getElementById("gender").innerHTML    = translate('gender');
+document.getElementById("club").innerHTML      = translate('club');
+document.getElementById("options").innerHTML   = translate('options');
+document.getElementById("search_label").innerHTML = translate('search');
 
 </script>

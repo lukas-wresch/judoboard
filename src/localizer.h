@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <map>
+#include "judoboard.h"
 
 
 
@@ -17,9 +18,13 @@ namespace Judoboard
 	{
 	public:
 		static std::string Translate(const std::string& English);
+		static std::string Gender2ShortForm(Gender Gender);
 		static void SetLanguage(Language NewLanguage) {
 			s_CurrentLanguage = NewLanguage;
 			Initialize(NewLanguage);
+		}
+		static Language GetLanguage() {
+			return s_CurrentLanguage;
 		}
 
 	private:

@@ -1,4 +1,5 @@
-#include "../ZED/include/core.h"
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include "club.h"
 
 
@@ -7,32 +8,12 @@ using namespace Judoboard;
 
 
 
-Club::Club(const std::string& Name) : m_Name(Name)
-{	
+Club::Club(const std::string& Name, const Association* ParentAssociation) : Association(Name, ParentAssociation)
+{
 }
 
 
 
-Club::Club(ZED::CSV& Stream)
+Club::Club(const YAML::Node& Yaml, const StandingData* StandingData) : Association(Yaml, StandingData)
 {
-	std::string uuid;
-	Stream >> m_Name >> uuid;
-	SetUUID(std::move(uuid));
-}
-
-
-
-Club::Club(const MD5::Club& Club)
-{
-	m_Name = Club.Name;
-}
-
-
-
-void Club::operator >> (ZED::CSV& Stream) const
-{
-	Stream << m_Name;
-	Stream << (std::string)GetUUID();
-
-	Stream.AddNewline();//Also needed to flush the stream
 }

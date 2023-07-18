@@ -7,19 +7,48 @@
     <input style="margin-bottom:20px;" type="text" id="name" value="" size="30" maxlength="64"/>
 </div>
 
+<div>
+    <label style="width:200px;float:left; margin-top:4px;" id="label_year"></label>
+    <input style="margin-bottom:20px;" type="number" id="year" />
+</div>
+
 <div id="div_status">
     <label style="width:200px; float:left; margin-top:4px;" id="label_status">Status</label>
     <p style="padding-top:5px; margin-bottom:20px;" id="status">- - -</p>
 </div>
 
 <div>
-  <label style="width:200px; float:left; margin-top:4px;" id="label_rules">Default Rule Set</label>
-  <select style="margin-bottom:20px; width: 1.8cm;" id="rule">
+  <label style="width:200px; float:left; margin-top:4px;" id="label_rules"></label>
+  <select style="margin-bottom:20px; width: 3.5cm;" id="rule">
   </select>
 </div>
 
+<div>
+  <label style="width:200px;float:left;margin-top:5px;" id="label_organizer">Organizer</label>
+  <select style="margin-bottom:20px;" id="clubs">
+  </select>
+</div>
+
+<div>
+  <label style="width: 200px;float:left;margin-top:4px;" id="label_readonly"></label>
+  <input type="checkbox" id="readonly" class="switch-input">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="readonly">
+    <span class="toggle-on" id="readonly_enabled"></span><span class="toggle-off" id="readonly_disabled"></span>
+  </label>
+</div>
+
+<div>
+  <label style="width:200px;float:left;margin-top:5px;" id="label_description"></label>
+  <textarea style="margin-bottom:20px;" cols="30" rows="3" id="description"/>
+</div>
+
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddTournament()" id="add">New Tournament</button>
-<button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateTournament()" id="update">Update Tournament</button>
+<button class="add" style="margin-top: 0.8cm;" onclick="return UpdateTournament()" id="update">Save Tournament</button>
+<br/>
+<button class="neutral" style="margin-top: 0.8cm;" onclick="return DownloadTournament()" id="download">Download Tournament</button>
+<button class="neutral" style="margin-top: 0.8cm;" onclick="return ExportTournament()"   id="export">Export to MD5</button>
+<br/>
+<button class="remove"  style="margin-top: 0.8cm;" onclick="return SwapTournament()"   id="swap">Swap Fighters</button>
 <button class="remove"  style="margin-top: 0.8cm;" onclick="return EmptyTournament()"  id="empty">Delete Match Results</button>
 <button class="remove"  style="margin-top: 0.8cm;" onclick="return DeleteTournament()" id="delete">Delete Tournament</button>
 
@@ -32,7 +61,10 @@ function AddTournament()
 {
   var params = URLEncode({
     name:        document.getElementById("name").value,
-    rules:       document.getElementById("rules").value
+    year:        document.getElementById("year").value,
+    rules:       document.getElementById("rule").value,
+    organizer:   document.getElementById("clubs").value,
+    description: document.getElementById("description").value,
   });
 
   AjaxPost('ajax/tournament/add', params, function() {
@@ -47,7 +79,11 @@ function UpdateTournament()
 {
   var params = URLEncode({
     name:        document.getElementById("name").value,
-    rules:       document.getElementById("rules").value
+    year:        document.getElementById("year").value,
+    rules:       document.getElementById("rule").value,
+    organizer:   document.getElementById("clubs").value,
+    description: document.getElementById("description").value,
+    readonly:    document.getElementById("readonly").checked,
   });
 
   AjaxPost('ajax/tournament/update?id='+id, params, function() {
@@ -58,9 +94,25 @@ function UpdateTournament()
 }
 
 
+function SwapTournament()
+{
+  if (confirm(translate('swap_tournament_confirm')))
+  {
+    AjaxCallback('ajax/tournament/swap_fighters?id='+id, function(response) {
+      if (response == "ok")
+        navigate("tournament_list.html");
+      else
+        alert("Error: " + response);
+    });
+  }
+
+  return false;
+}
+
+
 function EmptyTournament()
 {
-  if (confirm(lang.empty_tournament_confirm))
+  if (confirm(translate('empty_tournament_confirm')))
   {
     AjaxCallback('ajax/tournament/empty?id='+id, function(response) {
       if (response == "ok")
@@ -76,7 +128,7 @@ function EmptyTournament()
 
 function DeleteTournament()
 {
-  if (confirm(lang.delete_tournament_confirm))
+  if (confirm(translate('delete_tournament_confirm')))
   {
     AjaxCallback('ajax/tournament/delete?id='+id, function(response) {
       if (response == "ok")
@@ -90,55 +142,88 @@ function DeleteTournament()
 }
 
 
+function DownloadTournament()
+{
+  window.location.href ='ajax/tournament/download?id='+id;
+  return false;
+}
+
+
+function ExportTournament()
+{
+  window.location.href ='ajax/tournament/export-md5?id='+id;
+  return false;
+}
+
+
 function GetTournament(id)
 {
   AjaxCallback("ajax/tournament/get?id="+id, function(response) {
-    var res = response.split(",");
+    var res = YAML.parse(response);
     console.log(response);
 
-    var status = res[3];
-    var rules  = res[4];
+    if (res.status == 0)
+      document.getElementById("status").innerHTML = translate('scheduled');
+    else if (res.status == 1)
+      document.getElementById("status").innerHTML = translate('running');
+    else if (res.status == 2)
+      document.getElementById("status").innerHTML = translate('concluded');
 
-    if (status == 0)
-      document.getElementById("status").innerHTML = lang.scheduled;
-    else if (status == 1)
-      document.getElementById("status").innerHTML = lang.running;
-    else if (status == 2)
-      document.getElementById("status").innerHTML = lang.concluded;
-
-    document.getElementById("name").value  = res[0];
+    document.getElementById("name").value = res.name;
+    document.getElementById("year").value = res.year;
+    document.getElementById("description").value = res.description;
+    document.getElementById("readonly").checked = res.is_locked;
 
     GetRuleSets(function() {
-      console.log(rules);
-      document.getElementById("rule").value = rules;
+      if (typeof res.rule_set_uuid !== 'undefined')
+        document.getElementById("rule").value = res.rule_set_uuid;
     });
+
+    GetAssociations(function() {
+      if (typeof res.organizer_uuid !== 'undefined')
+        document.getElementById("clubs").value = res.organizer_uuid;
+    }, 'also_clubs=true');
   });
 }
 
 
-
-document.getElementById("add").innerHTML    = lang.new_tournament;
-document.getElementById("update").innerHTML = lang.update_tournament;
-document.getElementById("label_name").innerHTML             = lang.name;
-
+document.getElementById("year").value = new Date().getFullYear();
 
 var id = URLDecode(URL, "id");
 
 if (id)
 {
-  document.getElementById("headline").innerHTML = lang.update_tournament;
+  document.getElementById("headline").innerHTML = translate('update_tournament');
+  document.getElementById("update").innerHTML = translate('save');
   document.getElementById("add").style.display = "none";
   GetTournament(id);
 }
 else
 {
-  document.getElementById("headline").innerHTML = lang.new_tournament;
+  document.getElementById("headline").innerHTML = translate('new_tournament');
+  document.getElementById("add").innerHTML    = translate('new_tournament');
+
   document.getElementById("update").style.display = "none";
   document.getElementById("div_status").style.display = "none";
+  document.getElementById("download").style.display = "none";
+  document.getElementById("export").style.display = "none";
+  document.getElementById("swap").style.display = "none";
   document.getElementById("empty").style.display = "none";
   document.getElementById("delete").style.display = "none";
 
   GetRuleSets();
+  GetAssociations(undefined, 'also_clubs=true');
 }
+
+document.getElementById("label_organizer").innerHTML = translate('organizer');
+document.getElementById("label_rules").innerHTML = translate('default_rule_set');
+
+document.getElementById("label_name").innerHTML = translate('name');
+document.getElementById("label_year").innerHTML = translate('year');
+
+document.getElementById("label_readonly").innerHTML = translate('readonly');
+document.getElementById("readonly_enabled").innerHTML = translate('enabled');
+document.getElementById("readonly_disabled").innerHTML = translate('disabled');
+document.getElementById("label_description").innerHTML = translate('description');
 
 </script>

@@ -47,7 +47,6 @@ TEST(ID, CheckUniqueness)
 	for (int i = 0; i < size; i++)
 		for (int j = i+1; j < size; j++)
 	{
-		ASSERT_NE(ids[i]->GetID(),   ids[j]->GetID());
 		ASSERT_NE(ids[i]->GetUUID(), ids[j]->GetUUID());
 	}
 

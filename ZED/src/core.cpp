@@ -13,6 +13,7 @@
 #include <uchar.h>
 #endif
 
+#include <thread>
 #include <chrono>
 #include <sstream>
 #include <iomanip>
@@ -125,15 +126,21 @@ std::string Core::int2hex(unsigned int value, unsigned int width)
 
 int Core::ToInt(const std::string& Number)
 {
+	int ret = -1;
+
+	if (Number.empty())
+		return ret;
+
 	try
 	{
-		int ret = std::stoi(Number);
-		return ret;
+		ret = std::stoi(Number);
 	}
 	catch (...)
 	{
 		return -1;
 	}
+
+	return ret;
 }
 
 
@@ -190,11 +197,12 @@ double Core::CurrentTime()
 
 void Core::Pause(uint32_t Milliseconds)
 {
-#ifdef _WIN32
+	std::this_thread::sleep_for((std::chrono::milliseconds)Milliseconds);
+/*#ifdef _WIN32
 	Sleep(Milliseconds);
 #else
 	usleep(Milliseconds * 1000);
-#endif
+#endif*/
 }
 
 

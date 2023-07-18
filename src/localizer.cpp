@@ -33,6 +33,7 @@ void Localizer::Initialize(Language NewLanguage)
 
 			//German
 			s_de["No."]    = u8"Nr.";
+			s_de["Name"]   = u8"Name";
 			s_de["Mat"]    = u8"Matte";
 			s_de["White"]  = u8"Wei\u00df";
 			s_de["Blue"]   = u8"Blau";
@@ -41,11 +42,22 @@ void Localizer::Initialize(Language NewLanguage)
 			s_de["Score"]  = u8"Unterwertung";
 			s_de["Time"]   = u8"Zeit";
 
+			s_de["Not enough permissions"] = u8"Nicht genug Rechte f\u00fcr diesen Vorgang";
+			s_de["Operation failed"]       = u8"Vorgang fehlgeschlagen";
+
 			s_de["Weightclass"] = "Gewichtsklasse";
-			s_de["Next Match"]  = u8"N\u00e4chster Kampf";
+			s_de["Current Match"] = "Aktueller Kampf";
+			s_de["Next Match"]    = u8"N\u00e4chster Kampf";
 			s_de["Following Matches"] = u8"Nachfolgende K\u00e4mpfe";
-			s_de["Following Match"] = "Nachfolgender Kampf";
+			s_de["Following Match"]   = "Nachfolgender Kampf";
 			s_de["Default"] = "Standard";
+			s_de["Round"]   = "Runde";
+			s_de["Finals"]  = "Finalrunde";
+
+			s_de["Children"] = "Kinder";
+			s_de["Youth"]    = "Jugendliche";
+			s_de["Adults"]   = "Erwachsene";
+			s_de["Seniors"]  = "Senioren";
 			
 			break;
 		}
@@ -64,6 +76,7 @@ std::string Localizer::Translate(const std::string& English)
 		{
 			auto it = s_de.find(English);
 
+			assert(it != s_de.end());
 			if (it != s_de.end())
 				return it->second;
 			break;
@@ -71,4 +84,29 @@ std::string Localizer::Translate(const std::string& English)
 	}
 
 	return English;
+}
+
+
+
+std::string Localizer::Gender2ShortForm(Gender Gender)
+{
+	switch (s_CurrentLanguage)
+	{
+	case Language::German:
+	{
+		if (Gender == Gender::Male)
+			return  "m";
+		else if (Gender == Gender::Female)
+			return "w";
+		return "";
+	}
+
+	case Language::English:
+	default:
+		if (Gender == Gender::Male)
+			return  "m";
+		else if (Gender == Gender::Female)
+			return "f";
+		return "";
+	}
 }

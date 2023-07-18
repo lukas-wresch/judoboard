@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <unordered_set>
+#include <mutex>
 #include "../ZED/include/blob.h"
 
 
@@ -18,9 +19,19 @@ namespace Judoboard
 		UUID(UUID&& org) noexcept : m_UUID(std::move(org.m_UUID)) {}
 
 		explicit operator const std::string& () const { return m_UUID; }
+		explicit operator bool () const { return !m_UUID.empty(); }
 
 		bool operator == (const UUID& rhs) const noexcept { return m_UUID == rhs.m_UUID; }
 		bool operator != (const UUID& rhs) const noexcept { return m_UUID != rhs.m_UUID; }
+
+		bool operator == (const std::string& rhs) const noexcept { return m_UUID == rhs; }
+		bool operator != (const std::string& rhs) const noexcept { return m_UUID != rhs; }
+
+		bool operator < (const UUID& rhs) const noexcept { return m_UUID < rhs.m_UUID; }
+		bool operator < (const std::string& rhs) const noexcept { return m_UUID < rhs; }
+
+		bool operator > (const UUID& rhs) const noexcept { return m_UUID > rhs.m_UUID; }
+		bool operator > (const std::string& rhs) const noexcept { return m_UUID > rhs; }
 
 		void operator = (UUID&& NewUUID) noexcept { m_UUID = std::move(NewUUID.m_UUID); }
 
@@ -36,34 +47,52 @@ namespace Judoboard
 	};
 
 
+	inline bool operator == (const std::string& lhs, const UUID& rhs) noexcept
+	{
+		return lhs == (std::string)rhs;
+	}
+
+
 
 	class ID
 	{
+		friend class Application;
+
 	public:
 		ID();
-		ID(ZED::Blob& Stream);
 		~ID();
+
+		ID(ID& rhs) : m_UUID(rhs.m_UUID) {}
+		ID(const ID& rhs) : m_UUID(rhs.m_UUID) {}
+		ID(ID&& rhs) noexcept : m_UUID(std::move(rhs.m_UUID)) {}
+
+		ID& operator =(const ID& rhs)
+		{
+			m_UUID = rhs.m_UUID;
+			return *this;
+		}
 
 		static const UUID GenerateUUID();
 		static void Reset();
 
-		uint32_t GetID() const { return m_ID; }
 		const UUID& GetUUID() const { return m_UUID; }
+
+		bool operator == (const UUID& rhs) const noexcept { return m_UUID == rhs.m_UUID; }
+		bool operator != (const UUID& rhs) const noexcept { return m_UUID != rhs.m_UUID; }
 
 		operator const UUID& () const { return m_UUID; }
 
+		explicit operator bool () const { return (bool)m_UUID; }
+
 	protected:
 		void SetUUID(std::string&& UUID) { m_UUID = std::move(UUID); }
-		//void SetUUID(const std::string& UUID) { m_UUID = UUID; }
+		void SetUUID(UUID&& UUID)        { m_UUID = std::move(UUID); }
 
 	private:
-		void SetID(uint32_t ID) { m_ID = ID; }
-
-		uint32_t m_ID = 0;
 		UUID m_UUID;
 
-		static uint32_t s_NextID;
 		static std::unordered_set<UUID> s_UsedUUIDs;
+		static std::mutex s_Mutex;
 	};
 }
 

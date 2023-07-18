@@ -72,9 +72,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\bin\$(Configuration);$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+    <IncludePath>..\..\external;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\bin\$(Configuration);..\..\external;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
     <TargetName>$(ProjectName)_Debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -85,17 +85,18 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+    <IncludePath>..\..\external;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\bin;..\..\external;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
     <TargetName>$(ProjectName)_Debug</TargetName>
     <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>..\..\bin\$(Configuration);$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+    <LibraryPath>..\..\bin;..\..\external;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
+    <IncludePath>..\..\external;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -113,6 +114,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <AdditionalDependencies>yaml-cpp\yaml-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -147,6 +149,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>yaml-cpp\yaml-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -164,35 +167,53 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>yaml-cpp\yaml-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\external\mongoose\mongoose.cpp" />
     <ClCompile Include="..\..\src\account.cpp" />
+    <ClCompile Include="..\..\src\age_group.cpp" />
     <ClCompile Include="..\..\src\app.cpp" />
     <ClCompile Include="..\..\src\app_ajax.cpp" />
+    <ClCompile Include="..\..\src\association.cpp" />
     <ClCompile Include="..\..\src\club.cpp" />
     <ClCompile Include="..\..\src\customtable.cpp" />
     <ClCompile Include="..\..\src\database.cpp" />
     <ClCompile Include="..\..\src\dm4.cpp" />
+    <ClCompile Include="..\..\src\dmf.cpp" />
+    <ClCompile Include="..\..\src\double_elimination.cpp" />
     <ClCompile Include="..\..\src\error.cpp" />
+    <ClCompile Include="..\..\src\filter.cpp" />
+    <ClCompile Include="..\..\src\fixed.cpp" />
+    <ClCompile Include="..\..\src\fuser.cpp" />
     <ClCompile Include="..\..\src\HttpServer\HttpServer.cpp" />
     <ClCompile Include="..\..\src\id.cpp" />
     <ClCompile Include="..\..\src\judoka.cpp" />
     <ClCompile Include="..\..\src\localizer.cpp" />
+    <ClCompile Include="..\..\src\losersof.cpp" />
+    <ClCompile Include="..\..\src\loser_bracket.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\mat.cpp" />
     <ClCompile Include="..\..\src\match.cpp" />
     <ClCompile Include="..\..\src\matchlog.cpp" />
     <ClCompile Include="..\..\src\matchtable.cpp" />
     <ClCompile Include="..\..\src\md5.cpp" />
+    <ClCompile Include="..\..\src\mixer.cpp" />
+    <ClCompile Include="..\..\src\pool.cpp" />
     <ClCompile Include="..\..\src\remote_mat.cpp" />
     <ClCompile Include="..\..\src\remote_tournament.cpp" />
+    <ClCompile Include="..\..\src\reverser.cpp" />
+    <ClCompile Include="..\..\src\round_robin.cpp" />
     <ClCompile Include="..\..\src\rule_set.cpp" />
+    <ClCompile Include="..\..\src\single_elimination.cpp" />
+    <ClCompile Include="..\..\src\splitter.cpp" />
     <ClCompile Include="..\..\src\standing_data.cpp" />
+    <ClCompile Include="..\..\src\take_top_ranks.cpp" />
     <ClCompile Include="..\..\src\timer.cpp" />
     <ClCompile Include="..\..\src\tournament.cpp" />
     <ClCompile Include="..\..\src\weightclass.cpp" />
+    <ClCompile Include="..\..\src\weightclass_generator.cpp" />
     <ClCompile Include="..\..\src\window_linux.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -203,35 +224,50 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\account.h" />
+    <ClInclude Include="..\..\src\age_group.h" />
     <ClInclude Include="..\..\src\app.h" />
+    <ClInclude Include="..\..\src\association.h" />
     <ClInclude Include="..\..\src\club.h" />
     <ClInclude Include="..\..\src\customtable.h" />
     <ClInclude Include="..\..\src\database.h" />
     <ClInclude Include="..\..\src\dm4.h" />
+    <ClInclude Include="..\..\src\dmf.h" />
+    <ClInclude Include="..\..\src\double_elimination.h" />
     <ClInclude Include="..\..\src\error.h" />
+    <ClInclude Include="..\..\src\filter.h" />
+    <ClInclude Include="..\..\src\fixed.h" />
+    <ClInclude Include="..\..\src\fuser.h" />
     <ClInclude Include="..\..\src\id.h" />
     <ClInclude Include="..\..\src\imat.h" />
     <ClInclude Include="..\..\src\itournament.h" />
     <ClInclude Include="..\..\src\judoboard.h" />
     <ClInclude Include="..\..\src\judoka.h" />
     <ClInclude Include="..\..\src\localizer.h" />
+    <ClInclude Include="..\..\src\losersof.h" />
+    <ClInclude Include="..\..\src\loser_bracket.h" />
     <ClInclude Include="..\..\src\mat.h" />
     <ClInclude Include="..\..\src\match.h" />
     <ClInclude Include="..\..\src\matchlog.h" />
     <ClInclude Include="..\..\src\matchtable.h" />
     <ClInclude Include="..\..\src\md5.h" />
-    <ClInclude Include="..\..\src\pause.h" />
+    <ClInclude Include="..\..\src\mixer.h" />
+    <ClInclude Include="..\..\src\pool.h" />
     <ClInclude Include="..\..\src\remote_mat.h" />
     <ClInclude Include="..\..\src\remote_tournament.h" />
+    <ClInclude Include="..\..\src\reverser.h" />
+    <ClInclude Include="..\..\src\round_robin.h" />
     <ClInclude Include="..\..\src\rule_set.h" />
     <ClInclude Include="..\..\src\schedule_entry.h" />
+    <ClInclude Include="..\..\src\single_elimination.h" />
+    <ClInclude Include="..\..\src\splitter.h" />
     <ClInclude Include="..\..\src\standing_data.h" />
+    <ClInclude Include="..\..\src\take_top_ranks.h" />
     <ClInclude Include="..\..\src\timer.h" />
     <ClInclude Include="..\..\src\tournament.h" />
     <ClInclude Include="..\..\src\virtual_mat.h" />
     <ClInclude Include="..\..\src\weightclass.h" />
+    <ClInclude Include="..\..\src\weightclass_generator.h" />
     <ClInclude Include="..\..\src\window.h" />
-    <ClInclude Include="src\HttpServer\HttpServer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\.gitattributes" />
@@ -245,7 +281,14 @@
     <None Include="..\..\bin\html\account_change_password.html" />
     <None Include="..\..\bin\html\account_list.html" />
     <None Include="..\..\bin\html\add_match.html" />
+    <None Include="..\..\bin\html\age_groups_add.html" />
+    <None Include="..\..\bin\html\age_groups_list.html" />
+    <None Include="..\..\bin\html\age_groups_select.html" />
+    <None Include="..\..\bin\html\association_add.html" />
+    <None Include="..\..\bin\html\association_list.html" />
     <None Include="..\..\bin\html\judoka_add.html" />
+    <None Include="..\..\bin\html\lots.html" />
+    <None Include="..\..\bin\html\matchtable_creator.html" />
     <None Include="..\..\bin\html\matchtable_list.html" />
     <None Include="..\..\bin\html\club_add.html" />
     <None Include="..\..\bin\html\club_list.html" />

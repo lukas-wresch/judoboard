@@ -2452,8 +2452,8 @@ TEST(RemoteMat, HansokumakeDuringOsaekomi)
 
 
 			EXPECT_TRUE(m->EndMatch());
-			EXPECT_TRUE(match->GetMatchResult().m_Winner == !hansokumake_committer);
-			EXPECT_TRUE(match->GetMatchResult().m_Score  == Match::Score::Ippon);
+			EXPECT_EQ(match->GetResult().m_Winner, !hansokumake_committer);
+			EXPECT_EQ(match->GetResult().m_Score,  Match::Score::Ippon);
 		}
 	}
 }

@@ -3,6 +3,8 @@
 #include "../ZED/include/sha512.h"
 #include "account.h"
 #include "timer.h"
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 
 
 
@@ -64,9 +66,35 @@ bool Account::Nonce::HasExpired() const
 
 
 
+Account::Account(const YAML::Node& Yaml)
+{
+	if (Yaml["uuid"])
+		SetUUID(Yaml["uuid"].as<std::string>());
+	if (Yaml["username"])
+		m_Username = Yaml["username"].as<std::string>();
+	if (Yaml["password"])
+		m_Password = Yaml["password"].as<std::string>();
+	if (Yaml["access_level"])
+		m_AccessLevel = (AccessLevel)Yaml["access_level"].as<int>();
+}
+
+
+
 bool Account::Verify(const Nonce& Nonce, const std::string& Response) const
 {
 	return ZED::SHA512(m_Username + Nonce.GetChallenge() + m_Password) == Response;
+}
+
+
+
+void Account::operator >> (YAML::Emitter& Yaml) const
+{
+	Yaml << YAML::BeginMap;
+	Yaml << YAML::Key << "uuid"      << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "username" << YAML::Value << m_Username;
+	Yaml << YAML::Key << "password"  << YAML::Value << m_Password;
+	Yaml << YAML::Key << "access_level"    << YAML::Value << (int)m_AccessLevel;
+	Yaml << YAML::EndMap;
 }
 
 

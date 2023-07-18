@@ -1,8 +1,11 @@
 #include <fstream>
 #include <random>
+#define YAML_CPP_STATIC_DEFINE
+#include "yaml-cpp/yaml.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/sha512.h"
 #include "standing_data.h"
+#include "itournament.h"
 
 
 
@@ -12,55 +15,162 @@ using namespace Judoboard;
 
 void StandingData::Reset()
 {
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 		delete judoka;
 	m_Judokas.clear();
 
 	for (auto rule : m_RuleSets)
 		delete rule;
 	m_RuleSets.clear();
+
+	for (auto age_group : m_AgeGroups)
+		delete age_group;
+	m_AgeGroups.clear();
+
+	m_Year = 0;
 }
 
 
 
-void StandingData::operator << (ZED::CSV& Stream)
+void StandingData::operator << (const YAML::Node& Yaml)
 {
-	uint32_t judokaCount = 0;
-	Stream >> judokaCount;
+	if (Yaml["year"])
+		m_Year = Yaml["year"].as<uint32_t>();
 
-	for (uint32_t i = 0; i < judokaCount; i++)
+
+	if (Yaml["associations"] && Yaml["associations"].IsSequence())
 	{
-		Judoka* newJudoka = new Judoka(Stream);
-		m_Judokas.insert({ newJudoka->GetID(), newJudoka });
+		m_Associations.clear();
+
+		for (const auto& node : Yaml["associations"])
+		{
+			Association* newAssoc = new Association(node, this);
+			m_Associations.emplace_back(newAssoc);
+		}
 	}
 
-	uint32_t ruleSetsCount = 0;
-	Stream >> ruleSetsCount;
 
-	for (uint32_t i = 0; i < ruleSetsCount; i++)
+	if (Yaml["clubs"] && Yaml["clubs"].IsSequence())
 	{
-		auto new_rule_set = new RuleSet(Stream);
-		m_RuleSets.emplace_back(new_rule_set);
+		m_Clubs.clear();
+
+		for (const auto& node : Yaml["clubs"])
+		{
+			Club* newClub = new Club(node, this);
+			m_Clubs.emplace_back(newClub);
+		}
+	}
+
+
+	if (Yaml["judoka"] && Yaml["judoka"].IsSequence())
+	{
+		m_Judokas.clear();
+
+		for (const auto& node : Yaml["judoka"])
+		{
+			Judoka* newJudoka = new Judoka(node, this);
+			m_Judokas.emplace_back(newJudoka);
+		}
+
+		std::sort(m_Judokas.begin(), m_Judokas.end(), [](const Judoka* a, const Judoka* b)
+		{
+			if (a->GetLastname() != b->GetLastname())
+				return a->GetLastname() < b->GetLastname();
+			if (a->GetFirstname() != b->GetFirstname())
+				return a->GetFirstname() < b->GetFirstname();
+			return a->GetUUID() < b->GetUUID() ;
+		});
+	}
+
+
+	if (Yaml["rule_sets"] && Yaml["rule_sets"].IsSequence())
+	{
+		m_RuleSets.clear();
+
+		for (const auto& node : Yaml["rule_sets"])
+		{
+			auto new_rule_set = new RuleSet(node);
+			m_RuleSets.emplace_back(new_rule_set);
+		}
+	}
+
+
+	if (Yaml["age_groups"] && Yaml["age_groups"].IsSequence())
+	{
+		m_AgeGroups.clear();
+
+		for (const auto& node : Yaml["age_groups"])
+		{
+			auto new_age_group = new AgeGroup(node, *this);
+			m_AgeGroups.emplace_back(new_age_group);
+		}
 	}
 }
 
 
 
-void StandingData::operator >> (ZED::CSV& Stream) const
+void StandingData::operator >> (YAML::Emitter& Yaml) const
 {
-	Stream << m_Judokas.size();
+	if (m_Year > 0)//No the default (current) year?
+		Yaml << YAML::Key << "year" << YAML::Value << m_Year;
 
-	for (auto [id, judoka] : m_Judokas)
+	Yaml << YAML::Key << "associations";
+	Yaml << YAML::Value;
+	Yaml << YAML::BeginSeq;
+
+	for (auto assoc : m_Associations)
+	{
+		if (assoc)
+			*assoc >> Yaml;
+	}
+
+	Yaml << YAML::EndSeq;
+
+	Yaml << YAML::Key << "clubs";
+	Yaml << YAML::Value;
+	Yaml << YAML::BeginSeq;
+
+	for (auto club : m_Clubs)
+	{
+		if (club)
+			*club >> Yaml;
+	}
+
+	Yaml << YAML::EndSeq;
+
+	Yaml << YAML::Key << "judoka";
+	Yaml << YAML::Value;
+	Yaml << YAML::BeginSeq;
+
+	for (auto judoka : m_Judokas)
 	{
 		if (judoka)
-			*judoka >> Stream;
+			*judoka >> Yaml;
 	}
 
-	Stream << m_RuleSets.size();
+	Yaml << YAML::EndSeq;
+	
+	//Export rule sets
+	Yaml << YAML::Key << "rule_sets";
+	Yaml << YAML::Value;
+	Yaml << YAML::BeginSeq;
 
 	for (auto rule : m_RuleSets)
 		if (rule)
-			*rule >> Stream;
+			*rule >> Yaml;
+
+	Yaml << YAML::EndSeq;
+
+	//Export age groups
+	Yaml << YAML::Key << "age_groups";
+	Yaml << YAML::Value;
+	Yaml << YAML::BeginSeq;
+
+	for (auto age_group : m_AgeGroups)
+		if (age_group)
+			*age_group >> Yaml;
+
+	Yaml << YAML::EndSeq;
 }
 
 
@@ -71,7 +181,18 @@ void StandingData::AddMD5File(const MD5& File)
 		AddClub(new Club(*club));
 
 	for (auto judoka : File.GetParticipants())
-		AddJudoka(new Judoka(*judoka));
+		AddJudoka(new Judoka(JudokaData(*judoka), this));
+}
+
+
+
+uint32_t StandingData::GetYear() const
+{
+	if (m_Year != 0)
+		return m_Year;
+
+	auto date = ZED::Core::GetDate();
+	return date.year;
 }
 
 
@@ -81,17 +202,27 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 	if (!NewJudoka)
 		return false;
 
-	m_Judokas.insert({ NewJudoka->GetID(), NewJudoka });
+	m_Judokas.emplace_back(NewJudoka);
+
+	std::sort(m_Judokas.begin(), m_Judokas.end(), [](const Judoka* a, const Judoka* b)
+	{
+		if (a->GetLastname() != b->GetLastname())
+			return a->GetLastname() < b->GetLastname();
+		if (a->GetFirstname() != b->GetFirstname())
+			return a->GetFirstname() < b->GetFirstname();
+		return a->GetUUID() < b->GetUUID();
+	});
+
 	return true;
 }
 
 
 
-bool StandingData::DeleteJudoka(uint32_t ID)
+bool StandingData::DeleteJudoka(const UUID& UUID)
 {
 	for (auto it = m_Judokas.begin(); it != m_Judokas.end(); ++it)
 	{
-		if (it->first == ID)
+		if (*it && (*it)->GetUUID() == UUID)
 		{
 			m_Judokas.erase(it);
 			return true;
@@ -99,23 +230,6 @@ bool StandingData::DeleteJudoka(uint32_t ID)
 	}
 
 	return false;
-}
-
-
-
-const std::string StandingData::JudokaToJSON() const
-{
-	std::string ret = "[";
-
-	for (auto [id, judoka] : m_Judokas)
-	{
-		if (ret.length() > 1)
-			ret += ",";
-		ret += "{\"label\":\"" + judoka->GetName() + " (" + std::to_string(judoka->GetWeight()) +" kg)\", \"value\":\"" + std::to_string(id) + "\"}";
-	}
-
-	ret += "]";
-	return ret;
 }
 
 
@@ -138,7 +252,7 @@ Club* StandingData::AddClub(const MD5::Club& NewClub)
 		new_club = nullptr;
 	}
 
-	return nullptr;
+	return new_club;
 }
 
 
@@ -151,30 +265,10 @@ bool StandingData::AddClub(Club* NewClub)
 	if (FindClub(NewClub->GetUUID()))
 		return false;
 
+	AddAssociation(const_cast<Association*>(NewClub->GetParent()));
+
 	m_Clubs.emplace_back(NewClub);
 	return true;
-}
-
-
-
-Club* StandingData::FindClub(uint32_t ID)
-{
-	for (auto club : m_Clubs)
-		if (club && club->GetID() == ID)
-			return club;
-
-	return nullptr;
-}
-
-
-
-const Club* StandingData::FindClub(uint32_t ID) const
-{
-	for (auto club : m_Clubs)
-		if (club && club->GetID() == ID)
-			return club;
-
-	return nullptr;
 }
 
 
@@ -223,110 +317,173 @@ const Club* StandingData::FindClubByName(const std::string& Name) const
 
 
 
-RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName)
+bool StandingData::DeleteClub(const UUID& UUID)
 {
-	RuleSet* ret = nullptr;
-	m_Mutex.lock();
-
-	for (auto rule : m_RuleSets)
-		if (rule && rule->GetName() == RuleSetName)
+	for (auto club = m_Clubs.begin(); club != m_Clubs.end(); ++club)
+		if (*club && (*club)->GetUUID() == UUID)
 		{
-			ret = rule;
-			break;
+			//Check if there is any judoka associated to this club
+			for (auto judoka : m_Judokas)
+			{
+				if (judoka->GetClub() && *judoka->GetClub() == UUID)
+					return false;
+			}
+
+			m_Clubs.erase(club);
+			return true;
 		}
 
-	m_Mutex.unlock();
-	return ret;
+	return false;
+}
+
+
+
+bool StandingData::AddAssociation(Association* NewAssociation)
+{
+	if (!NewAssociation)
+		return false;
+
+	if (FindAssociation(NewAssociation->GetUUID()))
+		return false;
+
+	//Add recursively
+	AddAssociation(const_cast<Association*>(NewAssociation->GetParent()));
+
+	m_Associations.emplace_back(NewAssociation);
+
+	//std::sort would normally order the vector by memory address :-(
+	std::sort(m_Associations.begin(), m_Associations.end(), [](auto a, auto b) { return *a < *b; });
+
+	return true;
+}
+
+
+
+Association* StandingData::FindAssociation(const UUID& UUID)
+{
+	for (auto assoc : m_Associations)
+		if (assoc && assoc->GetUUID() == UUID)
+			return assoc;
+
+	return nullptr;
+}
+
+
+
+const Association* StandingData::FindAssociation(const UUID& UUID) const
+{
+	for (auto assoc : m_Associations)
+		if (assoc && assoc->GetUUID() == UUID)
+			return assoc;
+
+	return nullptr;
+}
+
+
+
+const Association* StandingData::FindAssociationByName(const std::string& Name) const
+{
+	for (auto assoc : m_Associations)
+		if (assoc && assoc->GetName() == Name)
+			return assoc;
+
+	return nullptr;
+}
+
+
+
+bool StandingData::DeleteAssociation(const UUID& UUID)
+{
+	for (auto assoc = m_Associations.begin(); assoc != m_Associations.end(); ++assoc)
+		if (*assoc && (*assoc)->GetUUID() == UUID)
+		{
+			//Check if this association has childen
+			for (auto possible_child : m_Associations)
+				if (possible_child->GetParent() && *possible_child->GetParent() == UUID)
+					return false;
+
+			m_Associations.erase(assoc);
+			return true;
+		}
+
+	return false;
+}
+
+
+
+bool StandingData::AssociationHasChildren(const Association* Association) const
+{
+	if (!Association)
+		return false;
+
+	for (auto assoc : m_Associations)
+	{
+		if (assoc && assoc->GetParent() && *assoc->GetParent() == *Association)
+			return true;
+	}
+
+	return false;
+}
+
+
+
+RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName)
+{
+	for (auto rule : m_RuleSets)
+		if (rule && rule->GetName() == RuleSetName)
+			return rule;
+
+	return nullptr;
 }
 
 
 
 const RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName) const
 {
-	const RuleSet* ret = nullptr;
-	m_Mutex.lock();
-
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetName() == RuleSetName)
-		{
-			ret = rule;
-			break;
-		}
+			return rule;
 
-	m_Mutex.unlock();
-	return ret;
+	return nullptr;
 }
 
 
 
 RuleSet* StandingData::FindRuleSet(const UUID& UUID)
 {
-	RuleSet* ret = nullptr;
-	m_Mutex.lock();
-
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetUUID() == UUID)
-		{
-			ret = rule;
-			break;
-		}
+			return rule;
 
-	m_Mutex.unlock();
-	return ret;
+	return nullptr;
 }
 
 
 
 const RuleSet* StandingData::FindRuleSet(const UUID& UUID) const
 {
-	const RuleSet* ret = nullptr;
-	m_Mutex.lock();
-
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetUUID() == UUID)
-		{
-			ret = rule;
-			break;
-		}
+			return rule;
 
-	m_Mutex.unlock();
-	return ret;
+	return nullptr;
 }
 
 
 
-RuleSet* StandingData::FindRuleSet(uint32_t ID)
+bool StandingData::DeleteRuleSet(const UUID& UUID)
 {
-	RuleSet* ret = nullptr;
-	m_Mutex.lock();
-
-	for (auto rule : m_RuleSets)
-		if (rule && rule->GetID() == ID)
+	for (auto it = m_RuleSets.begin(); it != m_RuleSets.end(); ++it)
+	{
+		if ((*it)->GetUUID() == UUID)
 		{
-			ret = rule;
-			break;
+			delete *it;
+			m_RuleSets.erase(it);
+			return true;
 		}
+	}
 
-	m_Mutex.unlock();
-	return ret;
-}
-
-
-
-const RuleSet* StandingData::FindRuleSet(uint32_t ID) const
-{
-	const RuleSet* ret = nullptr;
-	m_Mutex.lock();
-
-	for (auto rule : m_RuleSets)
-		if (rule && rule->GetID() == ID)
-		{
-			ret = rule;
-			break;
-		}
-
-	m_Mutex.unlock();
-	return ret;
+	return false;
 }
 
 
@@ -336,40 +493,87 @@ bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
 	if (!NewRuleSet || FindRuleSet(NewRuleSet->GetUUID()))
 		return false;
 
-	m_Mutex.lock();
 	m_RuleSets.emplace_back(NewRuleSet);
-	m_Mutex.unlock();
-
 	return true;
 }
 
 
 
-Judoka* StandingData::FindJudoka(uint32_t ID)
+AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName)
 {
-	auto item = m_Judokas.find(ID);
-	if (item == m_Judokas.end())
-		return nullptr;
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetName() == AgeGroupName)
+			return age_group;
 
-	return item->second;
+	return nullptr;
 }
 
 
 
-const Judoka* StandingData::FindJudoka(uint32_t ID) const
+const AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName) const
 {
-	auto item = m_Judokas.find(ID);
-	if (item == m_Judokas.end())
-		return nullptr;
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetName() == AgeGroupName)
+			return age_group;
 
-	return item->second;
+	return nullptr;
+}
+
+
+
+AgeGroup* StandingData::FindAgeGroup(const UUID& UUID)
+{
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetUUID() == UUID)
+			return age_group;
+
+	return nullptr;
+}
+
+
+
+const AgeGroup* StandingData::FindAgeGroup(const UUID& UUID) const
+{
+	for (auto age_group : m_AgeGroups)
+		if (age_group && age_group->GetUUID() == UUID)
+			return age_group;
+
+	return nullptr;
+}
+
+
+
+bool StandingData::AddAgeGroup(AgeGroup* NewAgeGroup)
+{
+	if (!NewAgeGroup || FindAgeGroup(NewAgeGroup->GetUUID()))
+		return false;
+
+	m_AgeGroups.emplace_back(NewAgeGroup);
+	return true;
+}
+
+
+
+bool StandingData::RemoveAgeGroup(const UUID& UUID)
+{
+	for (auto it = m_AgeGroups.begin(); it != m_AgeGroups.end(); ++it)
+	{
+		if ((*it)->GetUUID() == UUID)
+		{
+			delete *it;
+			m_AgeGroups.erase(it);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 
 
 Judoka* StandingData::FindJudoka(const UUID& UUID)
 {
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 	{
 		if (judoka && judoka->GetUUID() == UUID)
 			return judoka;
@@ -382,7 +586,7 @@ Judoka* StandingData::FindJudoka(const UUID& UUID)
 
 const Judoka* StandingData::FindJudoka(const UUID& UUID) const
 {
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 	{
 		if (judoka && judoka->GetUUID() == UUID)
 			return judoka;
@@ -393,18 +597,30 @@ const Judoka* StandingData::FindJudoka(const UUID& UUID) const
 
 
 
-Judoka* StandingData::FindJudoka_DM4_ExactMatch(const DM4::Participant& NewJudoka)
+const Judoka* StandingData::FindJudokaByName(const std::string& Name) const
+{
+	for (auto judoka : m_Judokas)
+	{
+		if (judoka && judoka->GetName(NameStyle::GivenName) == Name)
+			return judoka;
+	}
+
+	return nullptr;
+}
+
+
+
+Judoka* StandingData::FindJudoka_ExactMatch(const JudokaData& NewJudoka)
 {
 	Judoka* ret = nullptr;
 
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 	{
-		if (judoka && judoka->GetFirstname()  == NewJudoka.Firstname
-			       && judoka->GetLastname()   == NewJudoka.Lastname
-				   && judoka->GetGender()     == NewJudoka.Gender
-				   //&& (judoka->GetWeight()    == NewJudoka.Weight || judoka->GetWeight() == 0 || NewJudoka.Weight < 0)
-			       && (judoka->GetBirthyear() == NewJudoka.Birthyear || judoka->GetBirthyear() == 0 || NewJudoka.Birthyear < 0)
-				   && (!judoka->GetClub() || !NewJudoka.Club || judoka->GetClub()->GetName() == NewJudoka.Club->Name) )
+		if (judoka && judoka->GetFirstname()  == NewJudoka.m_Firstname
+			&& judoka->GetLastname()   == NewJudoka.m_Lastname
+			&& judoka->GetGender()     == NewJudoka.m_Gender
+			&& (judoka->GetBirthyear() == NewJudoka.m_Birthyear || judoka->GetBirthyear() == 0 || NewJudoka.m_Birthyear == 0)
+			&& (!judoka->GetClub() || judoka->GetClub()->GetName() == NewJudoka.m_ClubName) )
 		{
 			if (ret)//Have we found one?
 				return nullptr;//Then this is not an exact match
@@ -418,13 +634,15 @@ Judoka* StandingData::FindJudoka_DM4_ExactMatch(const DM4::Participant& NewJudok
 
 
 
-Judoka* StandingData::FindJudoka_DM4_SameName(const DM4::Participant& NewJudoka)
+Judoka* StandingData::FindJudoka_SameName(const JudokaData& NewJudoka)
 {
 	Judoka* ret = nullptr;
 
-	for (auto [id, judoka] : m_Judokas)
+	for (auto judoka : m_Judokas)
 	{
-		if (judoka && judoka->GetFirstname() == NewJudoka.Firstname && judoka->GetLastname() == NewJudoka.Lastname && judoka->GetGender() == NewJudoka.Gender)
+		if (judoka && judoka->GetFirstname() == NewJudoka.m_Firstname
+				   && judoka->GetLastname()  == NewJudoka.m_Lastname
+				   && judoka->GetGender()    == NewJudoka.m_Gender)
 		{
 			if (ret)//Have we found one?
 				return nullptr;//Then this is not an exact match

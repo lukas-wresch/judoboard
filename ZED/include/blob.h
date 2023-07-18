@@ -82,6 +82,7 @@ namespace ZED
 
 		DLLEXPORT size_t OutputTo(void* Data, size_t BytesToRead);//Reads BytesToRead many bytes and puts them in Data. Returns the number of bytes actually read
 		DLLEXPORT uint8_t ReadByte();
+		DLLEXPORT void SeekReadCursor(int Offset);
 		DLLEXPORT void Append(const void* Data, size_t BytesToWrite);
 		DLLEXPORT bool InsertAt(size_t Index, const void* Data, size_t BytesToWrite);
 		template <typename T>
@@ -106,6 +107,7 @@ namespace ZED
 
 		operator void*  () { return m_Data; }
 		operator uint8_t* () { return m_Data; }
+		explicit operator char* () { return (char*)m_Data; }
 
 		operator const void* () const { return m_Data; }
 		operator const uint8_t* () const { return m_Data; }

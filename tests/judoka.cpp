@@ -7,66 +7,142 @@ TEST(Judoka, Basic)
 	initialize();
 	Judoka j("Firstname", "Lastname", 50, Gender::Male);
 
-	EXPECT_TRUE(j.GetGender() == Gender::Male);
-	EXPECT_TRUE(j.GetWeight() == 50);
-
-	EXPECT_EQ(j.GetName(), std::string("Firstname Lastname"));
+	EXPECT_EQ(j.GetGender(), Gender::Male);
+	EXPECT_EQ(j.GetWeight(), Weight(50));
+	EXPECT_EQ(j.GetNumber(), "");
+	EXPECT_EQ(j.GetName(NameStyle::GivenName), std::string("Firstname Lastname"));
 
 	j.SetWeight(80);
-	EXPECT_TRUE(j.GetWeight() == 80);
+	EXPECT_EQ(j.GetWeight(), Weight(80));
 
 	j.SetGender(Gender::Female);
-	EXPECT_TRUE(j.GetGender() == Gender::Female);
+	EXPECT_EQ(j.GetGender(), Gender::Female);
 
 	j.SetFirstname("New");
 	j.SetLastname("Name");
-	EXPECT_EQ(j.GetName(), std::string("New Name"));
+	EXPECT_EQ(j.GetName(NameStyle::GivenName), std::string("New Name"));
+
+	j.SetNumber("ABC123");
+	EXPECT_EQ(j.GetNumber(), "ABC123");
 }
+
 
 
 TEST(Judoka, ImportExport)
 {
-	for (int i = 0; i < 1000 * 10; i++)
+	for (int i = 0; i < 1000; i++)
 	{
 		Judoka j(GetRandomName(), GetRandomName(), rand()%200, (Gender)(rand()%2));
+		if (rand()%2 == 0)
+			j.SetWeight(Weight( std::to_string(rand() % 100) + "," + std::to_string(rand() % 100) ));
+		j.SetNumber("ABC123");
 
-		ZED::CSV csv;
-		j >> csv;
+		YAML::Emitter yaml;
+		j >> yaml;
 
-		Judoka j2(csv);
+		Judoka j2(YAML::Load(yaml.c_str()), nullptr);
 
-		EXPECT_TRUE(j.GetName() == j2.GetName());
-		EXPECT_TRUE(j.GetGender() == j2.GetGender());
-		EXPECT_TRUE(j.GetWeight() == j2.GetWeight());
-		EXPECT_TRUE(j.GetAge() == j2.GetAge());
-		EXPECT_TRUE(j.GetUUID() == j2.GetUUID());
-		EXPECT_TRUE(j.GetLengthOfBreak() == j2.GetLengthOfBreak());
+		ASSERT_EQ(j.GetName(NameStyle::GivenName), j2.GetName(NameStyle::GivenName));
+		ASSERT_EQ(j.GetGender(), j2.GetGender());
+		ASSERT_EQ(j.GetWeight(), j2.GetWeight());
+		ASSERT_EQ(j.GetAge(),  j2.GetAge());
+		ASSERT_EQ(j.GetUUID(), j2.GetUUID());
+		ASSERT_EQ(j.GetLengthOfBreak(), j2.GetLengthOfBreak());
+		ASSERT_EQ(j.GetNumber(), j2.GetNumber());
 	}
 }
 
 
+
 TEST(Judoka, ImportExport_RuleSet)
 {
-	for (int i = 0; i < 1000 * 10; i++)
+	for (int i = 0; i < 1000; i++)
 	{
-		RuleSet r(GetRandomName(), rand() % 200, rand() % 200, rand() % 200, rand() % 200, rand() % 2, rand() % 2, rand() % 2, rand() % 200);
+		RuleSet r(GetRandomName(), rand() % 200, rand() % 200, rand() % 200, rand() % 200, rand() % 2, rand() % 2, rand() % 2, rand() % 200, rand()%2);
 
-		ZED::CSV csv;
-		r >> csv;
+		YAML::Emitter yaml;
+		r >> yaml;
 
-		RuleSet r2(csv);
+		RuleSet r2(YAML::Load(yaml.c_str()));
 
-		EXPECT_TRUE(r.GetName() == r2.GetName());
-		EXPECT_TRUE(r.IsYukoEnabled() == r2.IsYukoEnabled());
-		EXPECT_TRUE(r.IsKokaEnabled() == r2.IsKokaEnabled());
-		EXPECT_TRUE(r.IsGoldenScoreEnabled() == r2.IsGoldenScoreEnabled());
-		EXPECT_TRUE(r.GetUUID() == r2.GetUUID());
-		EXPECT_TRUE(r.IsDrawAllowed() == r2.IsDrawAllowed());
-		EXPECT_TRUE(r.GetOsaeKomiTime(true)  == r2.GetOsaeKomiTime(true));
-		EXPECT_TRUE(r.GetOsaeKomiTime(false) == r2.GetOsaeKomiTime(false));
-		EXPECT_TRUE(r.GetMatchTime() == r2.GetMatchTime());
-		EXPECT_TRUE(r.GetGoldenScoreTime() == r2.GetGoldenScoreTime());
-		EXPECT_TRUE(r.GetBreakTime() ==   r2.GetBreakTime());
-		EXPECT_TRUE(r.GetDescription() == r2.GetDescription());
+		EXPECT_EQ(r.GetName(), r2.GetName());
+		EXPECT_EQ(r.IsYukoEnabled(), r2.IsYukoEnabled());
+		EXPECT_EQ(r.IsKokaEnabled(), r2.IsKokaEnabled());
+		EXPECT_EQ(r.IsGoldenScoreEnabled(), r2.IsGoldenScoreEnabled());
+		EXPECT_EQ(r.GetUUID(), r2.GetUUID());
+		EXPECT_EQ(r.IsDrawAllowed(), r2.IsDrawAllowed());
+		EXPECT_EQ(r.GetOsaeKomiTime(true),  r2.GetOsaeKomiTime(true));
+		EXPECT_EQ(r.GetOsaeKomiTime(false), r2.GetOsaeKomiTime(false));
+		EXPECT_EQ(r.GetMatchTime(), r2.GetMatchTime());
+		EXPECT_EQ(r.GetGoldenScoreTime(), r2.GetGoldenScoreTime());
+		EXPECT_EQ(r.GetBreakTime(),  r2.GetBreakTime());
+		EXPECT_EQ(r.IsExtendBreakTime(), r2.IsExtendBreakTime());
+		EXPECT_EQ(r.GetDescription(), r2.GetDescription());
 	}
+}
+
+
+
+TEST(Judoka, Weight)
+{
+	initialize();
+
+	Weight w(123);
+	EXPECT_EQ((uint32_t)w, 123 * 1000);
+
+	Weight w2("12,3");
+	EXPECT_EQ((uint32_t)w2, 12 * 1000 + 300);
+	EXPECT_EQ(w2.ToString(), "12,3 ");
+
+	Weight w3("12.3");
+	EXPECT_EQ((uint32_t)w3, 12 * 1000 + 300);
+	EXPECT_EQ(w3.ToString(), "12,3 ");
+
+	Weight w4("12");
+	EXPECT_EQ((uint32_t)w4, 12 * 1000);
+	EXPECT_EQ(w4.ToString(), "12");
+
+	YAML::Emitter yaml;
+	w2 >> yaml;
+	w2 = Weight(YAML::Load(yaml.c_str()));
+	EXPECT_EQ((uint32_t)w2, 12 * 1000 + 300);
+	EXPECT_EQ(w2.ToString(), "12,3 ");
+
+	Weight w5("10,3 ");
+	EXPECT_EQ((uint32_t)w5, 10 * 1000 + 300);
+	EXPECT_EQ(w5.ToString(), "10,3 ");
+}
+
+
+
+TEST(Judoka, WeightWithGrams)
+{
+	initialize();
+
+	Weight w(123);
+	EXPECT_EQ((uint32_t)w, 123 * 1000);
+
+	Weight w2("12,03");
+	EXPECT_EQ((uint32_t)w2, 12 * 1000 + 30);
+	EXPECT_EQ(w2.ToString(), "12,0 ");
+
+	Weight w3("12.003");
+	EXPECT_EQ((uint32_t)w3, 12 * 1000 + 3);
+	EXPECT_EQ(w3.ToString(), "12,0 ");
+
+	Weight w4("12");
+	EXPECT_EQ((uint32_t)w4, 12 * 1000);
+	EXPECT_EQ(w4.ToString(), "12");
+
+	YAML::Emitter yaml;
+	w2 >> yaml;
+	w2 = Weight(YAML::Load(yaml.c_str()));
+	EXPECT_EQ((uint32_t)w2, 12 * 1000 + 30);
+	EXPECT_EQ(w2.ToString(), "12,0 ");
+
+	YAML::Emitter yaml2;
+	w3 >> yaml2;
+	w3 = Weight(YAML::Load(yaml2.c_str()));
+	EXPECT_EQ((uint32_t)w3, 12 * 1000 + 3);
+	EXPECT_EQ(w3.ToString(), "12,0 ");
 }

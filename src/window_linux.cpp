@@ -107,7 +107,7 @@ bool Judoboard::Window::OpenWindow()
 	gtk_main_iteration();
 
 
-	if (!m_Renderer->Init(m_Hwnd))
+	if (!m_Renderer || !m_Renderer->Init(m_Hwnd))
 		return false;
 
 

@@ -13,9 +13,57 @@
 <br/>
 
 <div style="margin-top: 2cm;">
-    <label style="width:150px;float:left;" id="label_uptime">Uptime</label>
-    <span  id="uptime">???</span>
+    <label style="width:200px;float:left;" id="label_version">Judoboard version</label>
+    <span  id="version"></span>
 </div>
+
+<div style="margin-top: 5mm;">
+    <label style="width:200px;float:left;" id="label_uptime">Uptime</label>
+    <span  id="uptime"></span>
+</div>
+
+<div style="margin-top: 5mm;">
+  <label style="width:200px;float:left;" id="label_language">Language</label>
+  <select style="margin-bottom:0px;" id="language">
+    <option value="0" id="english">English</option>
+    <option value="1" id="german">German</option>
+  </select>
+</div>
+
+<div style="margin-top: 5mm;">
+  <label style="width:200px;float:left;" id="label_port">Server port</label>
+  <input style="margin-bottom:0px;" type="number" id="port" value="" min="1" max="65535" />
+</div>
+
+<div style="margin-top: 5mm;">
+  <label style="width:200px;float:left;" id="label_ipponStyle">Ippon/Waza-Ari Style</label>
+  <select id="ipponStyle">
+    <option selected value="0" id="two_digits">Two Digits</option>
+    <option value="1" id="single_digit">One Digit</option>
+    <option value="2" id="spelled_out">Spelled Out</option>
+  </select>
+</div>
+
+<div style="margin-top: 5mm;">
+  <label style="width:200px;float:left;" id="label_timerStyle">Timer Style</label>
+  <select id="timerStyle">
+    <option selected value="0" id="with_hundred">With Hundreds (1:23:4)</option>
+    <option value="1" id="only_seconds">Only seconds (1:23)</option>
+    <option value="2" id="full">Completely (1:23.456)</option>
+  </select>
+</div>
+
+<div style="margin-top: 5mm;">
+  <label style="width:200px;float:left;" id="label_nameStyle">Name Style</label>
+  <select id="nameStyle">
+    <option selected value="0" id="given_name_first">Give name first</option>
+    <option value="1" id="family_name_first">Family name first</option>
+  </select>
+</div>
+
+<br/>
+
+<button class="neutral" style="margin-right: 2cm;" onclick="return UpdateConfig()" id="update">Save</button>
 
 <br/>
 
@@ -26,6 +74,16 @@
 <button style="margin-top: 8mm;" class="remove" onclick="return RunTestscreen()">Run Testscreen</button>
 
 <button style="margin-top: 8mm;" class="remove" onclick="return Update()">Update</button>
+
+<div style="margin-top: 15mm;">
+    <label style="width:200px;float:left;margin-top:4px;" id="label_command">Command</label>
+    <input style="margin-bottom:20px;" type="text" id="command" value="" size="43" maxlength="64"/>
+</div>
+
+<button class="neutral" style="margin-right: 2cm;" onclick="return ExecuteCommand()" id="execute">Execute</button>
+<br/>
+
+<textarea style="margin-top: 5mm;" id="command_output" rows="10" cols="70"/>
 
 <script>
 
@@ -77,7 +135,7 @@ function ConnectToMaster()
 
 function Shutdown()
 {
-  if (confirm(lang.shutdown_confirm))
+  if (confirm(translate('shutdown_confirm')))
   {
     Ajax("ajax/config/shutdown");
   }
@@ -104,21 +162,55 @@ function Update()
 }
 
 
-
-function GetUptime()
+function UpdateConfig()
 {
-  AjaxCallback("ajax/config/uptime", function(response) {
-    var res = response.split(",");
+  var params = URLEncode({
+    language:    document.getElementById("language").value,
+    port:        document.getElementById("port").value,
+    ipponStyle:  document.getElementById("ipponStyle").value,
+    timerStyle:  document.getElementById("timerStyle").value,
+    nameStyle:   document.getElementById("nameStyle").value,
+  });
 
-    if (res.length < 1)
-      return;
+  AjaxPost("ajax/config/set_setup", params, function(){
+    if (language != document.getElementById("language").value)
+      location.reload();
+  });
+}
 
-    var uptime = res[0];
 
-    document.getElementById("uptime").innerHTML = NiceLargeTime(uptime);
+function ExecuteCommand()
+{
+  AjaxCallback("ajax/config/execute?cmd=" + document.getElementById("command").value, function(response) {
+    console.log(response);
+    document.getElementById("command_output").innerHTML = response;
+  });
+}
+
+
+function GetStatus()
+{
+  AjaxCallback("ajax/config/get_setup", function(response) {
+    var res = YAML.parse(response);
+    console.log(response);
+
+    if (document.getElementById("version").innerHTML == "")
+    {
+      document.getElementById("version").innerHTML = res.version;
+      document.getElementById("uptime").innerHTML  = NiceLargeTime(res.uptime);
+      document.getElementById("language").value = res.language;
+      language = res.language;
+      document.getElementById("port").value = res.port;
+      document.getElementById("ipponStyle").value = res.ippon_style;
+      document.getElementById("timerStyle").value = res.timer_style;
+      document.getElementById("nameStyle").value  = res.name_style;
+    }
+    else
+      document.getElementById("uptime").innerHTML = NiceLargeTime(res.uptime);
   });
 }
 
 
 
-GetUptime();
+GetStatus();
+TimerID = window.setInterval(GetStatus, 1000);

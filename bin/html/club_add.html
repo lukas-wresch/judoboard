@@ -3,13 +3,24 @@
 <form>
 
 <div>
-    <label style="width:200px;float:left; margin-top:4px;" id="label_name">Name</label>
+    <label style="width:150px;float:left; margin-top:4px;" id="label_name">Name</label>
     <input style="margin-bottom:20px;" type="text" id="name" value="" size="30" maxlength="64"/>
 </div>
 
+<div>
+    <label style="width:150px;float:left; margin-top:4px;" id="label_shortname">Short Name</label>
+    <input style="margin-bottom:20px;" type="text" id="shortname" value="" size="20" maxlength="64"/>
+</div>
+
+<div>
+  <label style="width:150px;float:left;margin-top:5px;" id="label_parent">Parent</label>
+  <select style="margin-bottom:20px;" id="clubs">
+  </select>
+</div>
 
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddClub()" id="add">New Club</button>
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateClub()" id="update">Update Club</button>
+<button class="remove" onclick="return DeleteClub()" id="delete">Delete</button>
 
 </form>
 
@@ -19,11 +30,13 @@
 function AddClub()
 {
   var params = URLEncode({
-    name:             document.getElementById("name").value
+    name:             document.getElementById("name").value,
+    shortname:        document.getElementById("shortname").value,
+    parent:           document.getElementById("clubs").value,
   });
 
   AjaxPost('ajax/club/add', params, function() {
-    navigate("club_list.html");
+    goBack();
   });
 
   return false;
@@ -33,11 +46,23 @@ function AddClub()
 function UpdateClub()
 {
   var params = URLEncode({
-    name:             document.getElementById("name").value
+    name:             document.getElementById("name").value,
+    shortname:        document.getElementById("shortname").value,
+    parent:           document.getElementById("clubs").value,
   });
 
-  AjaxPost('ajax/club/update?id='+id, params, function() {
-    navigate("club_list.html");
+  AjaxPost('ajax/club/edit?id='+id, params, function() {
+    goBack();
+  });
+
+  return false;
+}
+
+
+function DeleteClub()
+{
+  AjaxCallback('ajax/club/delete?id='+id, function() {
+    goBack();
   });
 
   return false;
@@ -47,31 +72,52 @@ function UpdateClub()
 function GetClub(id)
 {
   AjaxCallback("ajax/club/get?id="+id, function(response) {
-    var res = response.split(",");
     console.log(response);
+    var res = YAML.parse(response);
 
-    document.getElementById("name").value = res[0];
+    document.getElementById("name").value      = res.name;
+    document.getElementById("shortname").value = res.short_name;
+
+    GetAssociations(function(response) {
+      if (typeof res.parent_uuid != 'undefined')
+        document.getElementById("clubs").value = res.parent_uuid;
+    }, 'only_children=true');
   });
 }
 
 
+function DeleteClub()
+{
+  if (confirm(translate('delete_club_confirm')))
+  {
+    Ajax('ajax/club/delete?id='+id);
+    navigate('club_list.html');
+  }
 
-document.getElementById("add").innerHTML    = lang.new_club;
-document.getElementById("update").innerHTML = lang.update_club;
-document.getElementById("label_name").innerHTML             = lang.name;
+  return false;
+}
+
+
+
+document.getElementById("add").innerHTML        = translate('new_club');
+document.getElementById("update").innerHTML     = translate('update_club');
+document.getElementById("label_name").innerHTML = translate('name');
 
 var id = URLDecode(URL, "id");
 
 if (id)
 {
-  document.getElementById("headline").innerHTML = lang.update_club;
-  document.getElementById("add").style.display = "none";
+  document.getElementById("headline").innerHTML = translate('update_club');
+  document.getElementById("add").style.display  = "none";
   GetClub(id);
 }
 else
 {
-  document.getElementById("headline").innerHTML = lang.new_club;
+  document.getElementById("headline").innerHTML   = translate('new_club');
   document.getElementById("update").style.display = "none";
+  document.getElementById("delete").style.display = "none";
+
+  GetAssociations(undefined, 'only_children=true');
 }
 
 </script>

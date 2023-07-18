@@ -14,10 +14,10 @@ RemoteTournament::RemoteTournament(const std::string& Host, uint16_t Port) : m_H
 
 
 
-std::vector<const Match*> RemoteTournament::GetNextMatches(uint32_t MatID) const
+std::vector<Match> RemoteTournament::GetNextMatches(uint32_t MatID) const
 {
 	auto response = Request2Master("/ajax/master/get_next_matches?id=" + std::to_string(MatID));
-	std::vector<const Match*> ret;
+	std::vector<Match> ret;
 
 	if (response.length() == 0)
 	{
@@ -30,8 +30,7 @@ std::vector<const Match*> RemoteTournament::GetNextMatches(uint32_t MatID) const
 	csv >> count;
 	for (int i = 0; i < count; i++)
 	{
-		Match* next_match = new Match(csv, (RemoteTournament*)this);
-		ret.emplace_back(next_match);
+		ret.emplace_back(Match(csv, (RemoteTournament*)this));
 	}
 	
 	return ret;
@@ -72,14 +71,13 @@ Judoka* RemoteTournament::FindParticipant(const UUID& UUID)
 		return nullptr;
 	}
 
-	ZED::CSV csv(response);
-	Judoka* judoka = new Judoka(csv);
+	YAML::Node yaml = YAML::Load(response);
 
-	uint32_t timestampOfLastMatch = 0;
-	csv >> timestampOfLastMatch;
-	judoka->GetTimestampOfLastMatch(timestampOfLastMatch);
+	if (!yaml)
+		return nullptr;
 
-	m_StandingData.AddJudoka(judoka);//Add to cache
+	Judoka* judoka = new Judoka(yaml, &m_StandingData);//TODO replace by pointer to real standing data
+	m_StandingData.AddJudoka(judoka);
 
 	return judoka;
 }
@@ -96,8 +94,12 @@ const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 		return nullptr;
 	}
 
-	ZED::CSV csv(response);
-	Judoka* judoka = new Judoka(csv);
+	YAML::Node yaml = YAML::Load(response);
+
+	if (!yaml)
+		return nullptr;
+
+	Judoka* judoka = new Judoka(yaml, &m_StandingData);//TODO replace by pointer to real standing data
 	m_StandingData.AddJudoka(judoka);
 
 	return judoka;
@@ -145,7 +147,7 @@ RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID)
 
 void RemoteTournament::OnMatchConcluded(const Match& Match) const
 {
-	ZED::CSV result;
+	YAML::Emitter result;
 	Match >> result;
 
 	Post2Master("/ajax/master/post_match_result", result);
@@ -165,7 +167,7 @@ std::string RemoteTournament::Request2Master(const std::string& URL) const
 		ZED::Log::Info("Could not connect to master server: " + m_Hostname + ":" + std::to_string(m_Port));
 		return "";
 	}
-	else if (std::count(response.begin(), response.end(), ',') < 3)
+	else if (std::count(response.begin(), response.end(), ':') < 2)
 	{
 		ZED::Log::Warn("Invalid response: " + response);
 		return "";
@@ -176,12 +178,12 @@ std::string RemoteTournament::Request2Master(const std::string& URL) const
 
 
 
-bool RemoteTournament::Post2Master(const std::string& URL, const ZED::CSV& Data) const
+bool RemoteTournament::Post2Master(const std::string& URL, const YAML::Emitter& Data) const
 {
 	ZED::Log::Debug("Posting data to master: " + URL);
 
 	ZED::HttpClient client(m_Hostname, m_Port);
-	std::string response = client.POST(URL, Data, "token=test");
+	std::string response = client.POST(URL, Data.c_str(), "token=test");
 
 	if (response.length() == 0 || response != "ok")
 	{

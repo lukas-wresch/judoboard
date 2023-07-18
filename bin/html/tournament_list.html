@@ -1,18 +1,23 @@
-<h2>List of Tournaments</h2>
+<h2 id="headline"></h2>
 
-<button class="add" style="margin-bottom: 1cm;" onclick="navigate('tournament_add.html')" id="new_tournament">New Tournament</button>
+<button class="add" style="margin-bottom: 1cm;" onclick="navigate('tournament_add.html')" id="new_tournament"></button>
 
 <form style="display: inline;" action="/upload/md5" method="post" id="upload_form" enctype="multipart/form-data">
     <input id="file" name="file" type="file" accept="text/*.*" onchange="document.getElementById('upload_form').submit();" hidden/>
-    <button class="add" id="add" onclick="document.getElementById('file').click(); return false;">Upload MD5 File</button>
+    <button class="add" id="upload_md5_file" onclick="document.getElementById('file').click(); return false;"></button>
+</form>
+
+<form style="display: inline;" action="/upload/yml" method="post" id="upload_form2" enctype="multipart/form-data">
+    <input id="file2" name="file" type="file" accept="text/*.*" onchange="document.getElementById('upload_form2').submit();" hidden/>
+    <button class="add" id="add" onclick="document.getElementById('file2').click(); return false;">Upload Tournament</button>
 </form>
 
 <table id="list" border="1" rules="all" style="margin-bottom: 1cm;">
   <tr>
-    <th style="width: 4cm;" id="name">Name</th>
-    <th style="width: 4cm;" id="description">Description</th>
-    <th style="width: 4cm;" id="status">Status</th>
-    <th style="width: 3cm;" id="options">Options</th>
+    <th style="width: 4cm;" id="name"></th>
+    <th style="width: 4cm;" id="description"></th>
+    <th style="width: 4cm;" id="status"></th>
+    <th style="width: 3cm;" id="options"></th>
   </tr>
 </table>
 
@@ -22,17 +27,14 @@ function GetTournaments()
 {
   AjaxCallback("ajax/tournament/list", function(response) {
     console.log(response);
-    var res = response.split(",");
-
-    if (res.length < 4)
-      return;
+    var res = YAML.parse(response);
 
     var table = document.getElementById("list");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
 
-    for (var i=0; i < res.length; i+=5)
+    for (const tour of res)
     {
       var row = table.insertRow(-1);
       var cell1 = row.insertCell(0);
@@ -40,27 +42,30 @@ function GetTournaments()
       var cell3 = row.insertCell(2);
       var cell4 = row.insertCell(3);
 
-      cell1.innerHTML = res[i+0];
+      cell1.innerHTML = tour.name;
 
-      cell2.innerHTML = res[i+1] + " " + lang.participants + "<br/>" + res[i+2] + " " + lang.matches;
+      cell2.innerHTML = tour.num_participants + " " + translate('participants') + "<br/>" + tour.num_matches + " " + translate('matches');
 
-      if (res[i+3] == 0)
-        cell3.innerHTML = lang.scheduled;
-      else if (res[i+3] == 1)
+      if (tour.status == 0)
+        cell3.innerHTML = translate('scheduled');
+      else if (tour.status == 1)
       {
-        cell3.innerHTML = lang.running;
+        cell3.innerHTML = translate('running');
         cell3.style.color = "red";
       }
-      else if (res[i+3] == 2)
+      else if (tour.status == 2)
       {
-        cell3.innerHTML = lang.concluded;
+        cell3.innerHTML = translate('concluded');
         cell3.style.color = "green";
       }
 
-      if (res[i+4] == 0)
-        cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenTournament(" + i/5 + ");\">Open</button>" + "<button class=\"neutral\" onclick=\"navigate('tournament_add.html?id=" + i/5 + "');\">Edit</button>";
+      if (tour.is_locked)
+        cell3.innerHTML += "<br/>" + translate('readonly');
+
+      if (!tour.is_open)
+        cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenTournament('" + tour.uuid + "');\">"+ translate('open') +"</button>" + "<button class=\"neutral\" onclick=\"navigate('tournament_add.html?id=" + tour.uuid + "');\">"+ translate('edit') +"</button>";
       else
-        cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseTournament(" + i/5 + ");\">Close</button>";
+        cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseTournament('" + tour.uuid + "');\">"+ translate('close') +"</button>";
     }
   });
 }
@@ -86,5 +91,15 @@ function CloseTournament(id)
 }
 
 GetTournaments();
+
+document.getElementById("headline").innerHTML        = translate('list_of_tournaments');
+
+document.getElementById("new_tournament").innerHTML  = translate('new_tournament');
+document.getElementById("upload_md5_file").innerHTML = translate('upload_md5_file');
+
+document.getElementById("name").innerHTML        = translate('name');
+document.getElementById("description").innerHTML = translate('description');
+document.getElementById("status").innerHTML      = translate('status');
+document.getElementById("options").innerHTML     = translate('options');
 
 </script>

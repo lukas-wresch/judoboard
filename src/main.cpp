@@ -1,31 +1,53 @@
 #include <iostream>
+#include <csignal>
 #include "app.h"
 #include "database.h"
 #include "tournament.h"
 #include "weightclass.h"
+#include "round_robin.h"
+#include "standing_data.h"
 #include "../ZED/include/log.h"
 
 
 
-Judoboard::Judoka CreateRandomJudoka()
+Judoboard::Application* g_app = nullptr;//Used for signal handling
+
+
+
+Judoboard::Judoka CreateRandomJudoka(const Judoboard::StandingData* db)
 {
 	const std::string firstname_male[] =
-	{ "Ben", "Friedrich", "Phillipp", "Tim", "Lukas", "Marco", "Peter", "Martin", "Detlef", "Andreas", "Dominik", "Mathias", "Stephan", u8"Sören", "Eric", "Finn", "Felix", "Julian", "Maximilian" };
+	{ "Ben", "Friedrich", "Phillipp", "Tim", "Lukas", "Marco", "Peter", "Martin", "Detlef", "Andreas", "Dominik", "Mathias", "Stephan", u8"S\u00f6ren", "Eric", "Finn", "Felix", "Julian", "Maximilian", "Jannik"};
 	const std::string firstname_female[] =
-	{ "Emma", "Stephanie", "Julia", "Jana", "Uta", "Petra", "Sophie", "Kerstin", "Lena", "Jennifer", "Kathrin", "Katherina", "Anna", "Carla", "Paulina" };
+	{ "Emma", "Stephanie", "Julia", "Jana", "Uta", "Petra", "Sophie", "Kerstin", "Lena", "Jennifer", "Kathrin", "Katherina", "Anna", "Carla", "Paulina", "Clara", "Hanna" };
 	const std::string lastname[] =
-	{ "Ehrlichmann", "Dresdner", "Biermann", "Fisher", "Vogler", "Pfaff", "Eberhart", "Frankfurter", u8"König", "Pabst", "Ziegler", "Hartmann", "Pabst", "Kortig", "Schweitzer", "Luft", "Wexler", "Kaufmann", u8"Frühauf", "Bieber", "Schumacher", u8"Müncher", "Schmidt", "Meier", "Fischer", "Weber", "Meyer", "Wagner", "Becker", "Schulz", "Hoffmann" };
+	{ "Ehrlichmann", "Dresdner", "Biermann", "Fisher", "Vogler", "Pfaff", "Eberhart", "Frankfurter", u8"K\u00f6nig", "Pabst", "Ziegler", "Hartmann", "Pabst", "Kortig", "Schweitzer", "Luft", "Wexler", "Kaufmann", u8"Fr\u00fchauf", "Bieber", "Schumacher", u8"M\u00fcncher", "Schmidt", "Meier", "Fischer", "Weber", "Meyer", "Wagner", "Becker", "Schulz", "Hoffmann" };
+
+	Judoboard::Judoka ret("", "");
 
 	if (rand() & 1)
 	{
 		auto fname = firstname_male[rand() % (sizeof(firstname_male) / sizeof(firstname_male[0]) - 1)];
 		auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
-		return Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Male);
+		ret = Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Male);
+	}
+	else
+	{
+		auto fname = firstname_female[rand() % (sizeof(firstname_female) / sizeof(firstname_female[0]) - 1)];
+		auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
+		ret = Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Female);
 	}
 
-	auto fname = firstname_female[rand() % (sizeof(firstname_female) / sizeof(firstname_female[0]) - 1)];
-	auto lname = lastname[rand() % (sizeof(lastname) / sizeof(std::string) - 1)];
-	return Judoboard::Judoka(fname, lname, 25 + rand() % 60, Judoboard::Gender::Female);
+	ret.SetBirthyear(1990 + rand()%25);
+
+	if (db && db->GetAllClubs().size() >= 1)
+	{
+		int club_index = rand() % db->GetAllClubs().size();
+		auto club = db->GetAllClubs()[club_index];
+		ret.SetClub(club);
+	}
+
+	return ret;
 }
 
 
@@ -78,7 +100,19 @@ int main(int argc, char** argv)
 
 	if (version)
 	{
+#ifdef _WIN32
+		if (AttachConsole(ATTACH_PARENT_PROCESS) || AllocConsole())
+		{
+			FILE* temp;
+			freopen_s(&temp, "CONOUT$", "w", stdout);
+			freopen_s(&temp, "CONOUT$", "w", stderr);
+		}
+#endif
 		std::cout << Judoboard::Application::Version;
+
+#ifdef _WIN32
+		FreeConsole();
+#endif
 		return 0;
 	}
 
@@ -98,15 +132,20 @@ int main(int argc, char** argv)
 		mat->SetFullscreen();
 		ZED::Core::Pause(5000);
 
+		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
+		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
+		app.GetDatabase().AddClub(new Judoboard::Club("Senne"));
+
 		srand(ZED::Core::CurrentTimestamp());
-		auto j1 = CreateRandomJudoka();
-		auto j2 = CreateRandomJudoka();
-		Judoboard::Match match(nullptr, &j1, &j2, mat->GetMatID());
+		auto j1 = CreateRandomJudoka(&app.GetDatabase());
+		auto j2 = CreateRandomJudoka(&app.GetDatabase());
+		Judoboard::Match match(&j1, &j2, nullptr, mat->GetMatID());
 		//Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, true, true);
 		Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, false, false);
+		Judoboard::AgeGroup age_group("U18", 15, 18, &rules);
 		match.SetRuleSet(&rules);
-		Judoboard::Weightclass* table = new Judoboard::Weightclass(nullptr, 10, 100);
-		table->SetName(Judoboard::Localizer::Translate("Weightclass") + " -100 kg");
+		Judoboard::RoundRobin* table = new Judoboard::RoundRobin(new Judoboard::Weightclass(10, 100));
+		table->SetAgeGroup(&age_group);
 		match.SetMatchTable(table);
 
 		mat->StartMatch(&match);
@@ -160,9 +199,7 @@ int main(int argc, char** argv)
 
 		Judoboard::Mat* mat = (Judoboard::Mat*)app.GetDefaultMat();
 
-#ifndef _DEBUG
 		mat->GetWindow().Fullscreen();
-#endif
 		ZED::Core::Pause(5000);
 
 		srand(ZED::Core::CurrentTimestamp());
@@ -170,15 +207,20 @@ int main(int argc, char** argv)
 		auto tourney = new Judoboard::Tournament("Demo Tournament");
 		tourney->EnableAutoSave(false);
 
-		auto m1 = new Judoboard::Weightclass(tourney, 0, 120);
-		tourney->AddMatchTable(m1);
+		auto rule_set  = Judoboard::RuleSet("Demo", 180, 60, 20, 10);
+		auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set);
+
+		auto m1 = new Judoboard::RoundRobin(new Judoboard::Weightclass(0, 120));
 		m1->SetMatID(1);
+		m1->SetAgeGroup(&age_group);
+		tourney->AddMatchTable(m1);
+
+		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
+		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
+		app.GetDatabase().AddClub(new Judoboard::Club("Senne"));
 
 		for (int i = 0; i < 5; i++)
-		{
-			//app.GetDatabase().AddJudoka(CreateRandomJudoka());
-			tourney->AddParticipant(new Judoboard::Judoka(CreateRandomJudoka()));
-		}
+			tourney->AddParticipant(new Judoboard::Judoka(CreateRandomJudoka(&app.GetDatabase())));
 
 		app.AddTournament(tourney);
 
@@ -198,7 +240,7 @@ int main(int argc, char** argv)
 
 			mat->Hajime();
 
-			ZED::Core::Pause(6000);
+			ZED::Core::Pause(5000 + rand()%1500);
 
 			while (!mat->HasConcluded())
 			{
@@ -283,6 +325,51 @@ int main(int argc, char** argv)
 	//if (app.GetTournamentList().size() == 0)
 		//app.AddTournament(new Judoboard::Tournament("Test Tournament", app.GetDatabase().FindRuleSet("Default")));
 
+
+#ifdef _DEBUG
+	if (app.GetDatabase().GetNumJudoka() < 5)
+	{
+		auto inter = new Judoboard::Association("International", nullptr);
+
+		auto de = new Judoboard::Association("Deutschland", inter);
+
+		auto dn = new Judoboard::Association("Deutschland-Nord", de);
+		auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+
+		auto nord  = new Judoboard::Association("Nord", dn);
+		auto west  = new Judoboard::Association("West", dn);
+		auto nost  = new Judoboard::Association("Nordost", dn);
+		auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
+		auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+
+		auto nieder  = new Judoboard::Association("Niedersachsen", nord);
+		auto hamburg = new Judoboard::Association("Hamburg", nord);
+		auto berlin  = new Judoboard::Association("Berlin", nost);
+		auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+
+		app.GetDatabase().AddAssociation(nieder);
+		app.GetDatabase().AddAssociation(hamburg);
+		app.GetDatabase().AddAssociation(berlin);
+		app.GetDatabase().AddAssociation(nrw);
+
+		auto detmold = new Judoboard::Association("Detmold", nrw);
+
+		auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+
+
+		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen", biegue));
+		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede", biegue));
+		app.GetDatabase().AddClub(new Judoboard::Club("Senne", biegue));
+
+		ZED::Log::Debug("Adding debug judoka");
+
+		for (int i = 0; i < 50; i++)
+			app.GetDatabase().AddJudoka(CreateRandomJudoka(&app.GetDatabase()));
+
+		app.GetDatabase().Save();
+	}
+#endif
+
 	ZED::Core::Pause(3000);
 
 #ifdef WIN32
@@ -291,15 +378,16 @@ int main(int argc, char** argv)
 #endif
 #endif
 
-#ifdef _DEBUG
-	if (app.GetDatabase().GetNumJudoka() < 5)
-	{
-		ZED::Log::Debug("Adding debug judoka");
-
-		for (int i = 0; i < 30; i++)
-			app.GetDatabase().AddJudoka(CreateRandomJudoka());
-	}
-#endif
+	//Register single handler
+	g_app = &app;
+	signal(SIGINT, [](int signum) {
+		if (g_app)
+			g_app->Shutdown();
+	});
+	signal(SIGTERM, [](int signum) {
+		if (g_app)
+			g_app->Shutdown();
+	});
 
 	ZED::Log::Info("Application has started");
 	app.Run();

@@ -7,10 +7,17 @@
 <script type="text/javascript" src="common.js"></script>
 <script type="text/javascript" src="slideout.min.js"></script>
 <script type="text/javascript" src="jquery-ui.min.js"></script>
+<script type="text/javascript" src="yaml.min.js"></script>
 </head>
 <body>
 
 <nav id="menu" class="menu">
+
+  <section class="menu-section">
+  <h3 class="menu-section-title" id="navi_language"></h3>
+    <img src="en.png" width="20%" onclick="localStorage.setItem('language', 0); location.reload();">
+    <img src="de.png" width="20%" onclick="localStorage.setItem('language', 1); location.reload();">
+  </section>
 
   <section class="menu-section">
     <h3 class="menu-section-title" id="navi_tournament">Tournament</h3>
@@ -19,6 +26,7 @@
       <li><a id="navi_list_class" href="#matchtable_list.html">List Classes</a></li>
       <li><a id="navi_new_participant" href="#participant_add.html">New Participant</a></li>
       <li><a id="navi_new_match" href="#add_match.html">New Match</a></li>
+      <li><a id="navi_lots" href="#lots.html">Lots</a></li>
     </ul>
   </section>
 
@@ -47,9 +55,11 @@
       <li><a id="navi_add_judoka" style="display: none;" href="#judoka_add.html">New Judoka</a></li>
       <li><a id="navi_list_judoka" style="display: none;" href="#judoka_list.html">List Judokas</a></li>
       <li><a id="navi_list_club"   style="display: none;" href="#club_list.html">List Clubs</a></li>
-      <li><a id="navi_list_account" style="display: none;" href="#account_list.html">List Accounts</a></li>
-      <li><a id="navi_list_tournament" style="display: none;" href="#tournament_list.html">Tournaments</a></li>
+      <li><a id="navi_list_association" style="display: none;" href="#association_list.html">List Associations</a></li>
+      <li><a id="navi_list_tournament"  style="display: none;" href="#tournament_list.html">Tournaments</a></li>
+      <li><a id="navi_list_age"  style="display: none;" href="#age_groups_list.html">Age Groups</a></li>
       <li><a id="navi_list_rule" style="display: none;" href="#rule_list.html">Rule Sets</a></li>
+      <li><a id="navi_list_account" style="display: none;" href="#account_list.html">List Accounts</a></li>
     </ul>
   </section>
 
@@ -111,12 +121,12 @@ function ShowMats()
   if (Streaming)
   {
     StreamTimer = window.setInterval(Stream, 800);
-    $("#navi_show_mats").text(lang.hide_mats);
+    $("#navi_show_mats").text(translate('hide_mats'));
   }
   else
   {
     window.clearInterval(StreamTimer);
-    $("#navi_show_mats").text(lang.show_mats);
+    $("#navi_show_mats").text(translate('show_mats'));
   }
 
   return false;
@@ -127,19 +137,16 @@ function Update_MatCount()
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
     console.log(response);
-    var res = response.split(",");
-
-    if (res.length < 2)
-      return;
-
+    var res = YAML.parse(response);
+    
     var matlist = document.getElementById("navi_mats");
 
     matlist.innerHTML = "";
 
-    for (var i=1; i < res.length; i+=5)
+    for (const mat of res.mats)
     {
-      if ( (res[i+1] == 1 || res[i+1] == 3) && res[i+2] == 1)//Local or remote mat and is open
-        matlist.innerHTML += "<li><a href=\"#mat.html?id=" + res[i] + "\">" + lang.mat + " " + res[i] + "</a></li>"
+      if (typeof mat.is_open !== 'undefined' && mat.is_open)
+        matlist.innerHTML += "<li><a href=\"#mat.html?id=" + mat.id + "\">" + translate('mat') + " " + mat.id + "</a></li>"
     }
   });
 }
@@ -162,27 +169,49 @@ else
   $( "#main" ).load('schedule.html');
   //navigate('schedule.html');
 
-document.getElementById("navi_tournament").innerHTML = lang.tournament;
+const storage_language = localStorage.getItem("language");
+if (typeof storage_language != 'object')
+    language = storage_language;
 
-document.getElementById("navi_schedule").innerHTML = lang.schedule;
-document.getElementById("navi_new_participant").innerHTML = lang.new_participant;
-document.getElementById("navi_label_mats").innerHTML = lang.mats;
-document.getElementById("navi_new_match").innerHTML = lang.new_match;
+AjaxCallback("ajax/config/get_setup", function(response) {
+  var res = YAML.parse(response);
+  console.log(response);
 
-document.getElementById("navi_configure_mats").innerHTML = lang.settings;
+  const storage_language = localStorage.getItem("language");
+  console.log(typeof storage_language);
+  if (typeof storage_language != 'object')
+    language = storage_language;
+  else
+    language = res.language;
 
-document.getElementById("navi_show_mats").innerHTML = lang.show_mats;
+  document.getElementById("navi_language").innerHTML = translate('language');
+  document.getElementById("navi_tournament").innerHTML = translate('tournament');
 
-document.getElementById("navi_database").innerHTML = lang.database;
-document.getElementById("navi_change_password").innerHTML = lang.change_password;
-document.getElementById("navi_add_judoka").innerHTML = lang.new_judoka;
-document.getElementById("navi_list_judoka").innerHTML = lang.list_judokas;
-document.getElementById("navi_list_account").innerHTML = lang.list_accounts;
-document.getElementById("navi_list_rule").innerHTML = lang.rule_sets;
-document.getElementById("navi_list_tournament").innerHTML = lang.tournaments;
-document.getElementById("navi_list_club").innerHTML = lang.list_clubs;
+  document.getElementById("navi_schedule").innerHTML = translate('schedule');
+  document.getElementById("navi_new_participant").innerHTML = translate('new_participant');
+  document.getElementById("navi_label_mats").innerHTML = translate('mats');
+  document.getElementById("navi_new_match").innerHTML = translate('new_match');
+  document.getElementById("navi_lots").innerHTML = translate('lots');
 
-document.getElementById("navi_list_class").innerHTML = lang.match_tables;
+  document.getElementById("navi_configure_mats").innerHTML = translate('settings');
+
+  document.getElementById("navi_show_mats").innerHTML = translate('show_mats');
+
+  document.getElementById("navi_database").innerHTML = translate('database');
+  document.getElementById("navi_change_password").innerHTML = translate('change_password');
+  document.getElementById("navi_add_judoka").innerHTML = translate('new_judoka');
+  document.getElementById("navi_list_judoka").innerHTML = translate('list_judokas');
+  document.getElementById("navi_list_account").innerHTML = translate('list_accounts');
+  document.getElementById("navi_list_rule").innerHTML = translate('rule_sets');
+  document.getElementById("navi_list_tournament").innerHTML = translate('tournaments');
+  document.getElementById("navi_list_club").innerHTML = translate('list_clubs');
+  document.getElementById("navi_list_association").innerHTML = translate('list_associations');
+
+  document.getElementById("navi_list_class").innerHTML = translate('match_tables');
+  document.getElementById("navi_list_age").innerHTML = translate('age_groups');
+
+  document.getElementById("navi_server_config").innerHTML = translate('configuration');
+});
 
 
 AjaxCallback("/ajax/get_status", function(response) {
@@ -193,9 +222,11 @@ AjaxCallback("/ajax/get_status", function(response) {
         $("#navi_add_judoka").show();
         $("#navi_list_judoka").show();
         $("#navi_list_club").show();
+        $("#navi_list_association").show();
         $("#navi_list_account").show();
         $("#navi_list_tournament").show();
         $("#navi_list_rule").show();
+        $("#navi_list_age").show();
     }
 
     if (status >= 3)
