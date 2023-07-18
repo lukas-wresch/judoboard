@@ -1179,10 +1179,10 @@ void Mat::Process()
 		else
 			AddIppon(GetOsaekomiHolder());
       
-    m_mutex.UnlockWrite();
+		m_mutex.UnlockWrite();
     
-    if (IsSoundEnabled())
-		  m_Sound.Play();
+		if (IsSoundEnabled())
+			PlaySoundFile();
 	}
 
 	m_mutex.UnlockRead();
@@ -1191,7 +1191,7 @@ void Mat::Process()
 	{
 		Mate();
 		if (IsSoundEnabled())
-			m_Sound.Play();
+			PlaySoundFile();
 	}
 }
 

@@ -176,6 +176,7 @@ namespace Judoboard
 
 		//Sound
 		std::string Ajax_ListSoundFiles();
+		Error Ajax_PlaySoundFile(const HttpServer::Request& Request);
 
 		//Config
 		std::string Ajax_GetSetup();

@@ -696,7 +696,7 @@ TEST(Ajax, Sound_ListFiles)
 
 		ASSERT_TRUE(yaml.IsSequence());
 
-		std::vector<std::string> filenames = { "airhorn.wav", "alert.wav", "gong sabi.wav", "gong.wav", "gong2.wav", "high gong.wav", "low gong.wav", "spooky gong.wav", "tiger gong.wav", "wind chime.wav" };
+		std::vector<std::string> filenames = { "airhorn", "alert", "gong sabi", "gong", "gong2", "high gong", "low gong", "spooky gong", "tiger gong", "wind chime" };
 
 		int i = 0;
 		for (auto node : yaml)

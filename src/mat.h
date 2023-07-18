@@ -174,6 +174,9 @@ namespace Judoboard
 
 
 	private:
+		virtual void PlaySoundFile() const override { m_Sound.Play(); }
+
+
 		Scoreboard& SetScoreboard(Fighter Whom)
 		{
 			if (Whom == Fighter::White)

@@ -199,6 +199,8 @@ namespace Judoboard
 		virtual void SetSoundFilename(const std::string& NewFilename) { m_SoundFilename = NewFilename; }
 
 	protected:
+		virtual void PlaySoundFile() const {}
+
 		std::vector<Match> m_NextMatches;
 
 	private:

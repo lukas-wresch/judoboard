@@ -42,8 +42,9 @@
 <div>
   <label style="width:250px;float:left;margin-top:4px;" id="label_sound_filename">Sound Type</label>
   <select style="margin-bottom:20px;" id="sound_filename">
-    <option selected value="test">test</option>
   </select>
+
+  <button class="neutral" style="margin-left: 0.8cm;" onclick="return PlaySound()" id="play_sound">Play Sound</button>
 </div>
 
 <div>
@@ -81,9 +82,16 @@ function CloseMat()
 }
 
 
+function PlaySound()
+{
+  AjaxCallback('/ajax/config/play_sound_file?id=' + id + '&filename=' + document.getElementById("sound_filename").value);
+  return false;
+}
+
+
 function UpdateMat()
 {
-  var params = URLEncode({
+  let params = URLEncode({
     id:              document.getElementById("id").value,
     name:            document.getElementById("name").value,
     ipponStyle:      document.getElementById("ipponStyle").value,
@@ -106,7 +114,7 @@ function GetMat(id)
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    let res = YAML.parse(response);
 
     for (const mat of res.mats)
     {
@@ -121,9 +129,9 @@ function GetMat(id)
       }
     }
 
-    for (var i=1; i <= res.highest_mat_id; i++)
+    for (let i=1; i <= res.highest_mat_id; i++)
     {
-      var option = document.createElement("option");
+      let option = document.createElement("option");
       option.text  = i;
       option.value = i;
       document.getElementById("id").add(option);
@@ -136,7 +144,21 @@ function GetMat(id)
 
 
 var id = URLDecode(URL, "id");
-GetMat(id);
+
+AjaxCallback("ajax/config/list_sound_files", function(response) {
+  console.log(response);
+  let res = YAML.parse(response);
+
+  for (const sound of res)
+  {
+    let option = document.createElement("option");
+    option.text  = sound.filename;
+    option.value = sound.filename;
+    document.getElementById("sound_filename").add(option);
+  }
+
+  GetMat(id);
+});
 
 document.getElementById("sound_enabled").innerHTML  = translate('enabled');
 document.getElementById("sound_disabled").innerHTML = translate('disabled');

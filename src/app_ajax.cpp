@@ -314,6 +314,20 @@ void Application::SetupHttpServer()
 		return Ajax_SetFullscreen(false, Request);
 	});
 
+	m_Server.RegisterResource("/ajax/config/list_sound_files", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+		return Ajax_ListSoundFiles();
+	});
+
+	m_Server.RegisterResource("/ajax/config/play_sound_file", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+		return Ajax_PlaySoundFile(Request);
+	});
+
 
 	m_Server.RegisterResource("/ajax/colors/get", [this](auto& Request) -> std::string {
 		if (!IsLoggedIn(Request))
@@ -4090,14 +4104,52 @@ std::string Application::Ajax_ListSoundFiles()
 	ret << YAML::BeginSeq;
 
 	ZED::Core::Indexer([&](const std::string& Filename) {
+		auto pos = Filename.find_last_of('/');
+		if (pos == std::string::npos) return true;
+
+		auto onlyFilename = Filename.substr(pos + 1);
+		auto pos_dot = onlyFilename.find_last_of('.');
+		if (pos_dot == std::string::npos) return true;
+
+		if (onlyFilename.length() < 5) return true;
+
+		auto name = onlyFilename.substr(0, pos_dot);
+		auto extension = onlyFilename.substr(pos_dot + 1);
+
+		if (extension != "wav") return true;
+
 		ret << YAML::BeginMap;
-		ret << YAML::Key << "filename" << YAML::Value << Filename;
+		ret << YAML::Key << "filename" << YAML::Value << name;
 		ret << YAML::EndMap;
 		return true;
-	}, "assets/sounds/*.wav");
+	}, "assets/sounds");
 
 	ret << YAML::EndSeq;
 	return ret.c_str();
+}
+
+
+
+Error Application::Ajax_PlaySoundFile(const HttpServer::Request& Request)
+{
+	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+	auto filename = HttpServer::DecodeURLEncoded(Request.m_Query, "filename");
+
+	auto mat = FindMat(id);
+	if (!mat)
+		return Error::Type::MatNotFound;
+
+	auto temp = mat->GetSoundFilename();
+
+	mat->SetSoundFilename(filename);
+
+	mat->PlaySoundFile();
+
+	Sleep(20 * 1000);
+
+	mat->SetSoundFilename(temp);
+
+	return Error::Type::NoError;
 }
 
 
