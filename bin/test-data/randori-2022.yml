@@ -1,0 +1,658 @@
+name: randori-2022
+version: 1
+year: 2022
+associations:
+  - uuid: be673f6aebc581634ce387bc5aa826a486c7667f6e7cee4c66a648067c6c6170
+    name: International
+    short_name: Inter
+  - uuid: c54a982275d86bb6dab19bb83a03f60fa45bf090bad5a2e5fd75402c7add58fe
+    name: Deutschland
+    short_name: Deuts
+    parent: be673f6aebc581634ce387bc5aa826a486c7667f6e7cee4c66a648067c6c6170
+  - uuid: 17b19765f814b7ea9ca17bd0b269298475658061460c31a6681038afeb5ea838
+    name: Deutschland-Nord
+    short_name: Deuts
+    parent: c54a982275d86bb6dab19bb83a03f60fa45bf090bad5a2e5fd75402c7add58fe
+  - uuid: 8627a6617c8dedf4cee0d7b1ff28f9dfb772c8a79d0b60bbc4e956fc5bb9ccc7
+    name: West
+    short_name: West
+    parent: 17b19765f814b7ea9ca17bd0b269298475658061460c31a6681038afeb5ea838
+  - uuid: 716061bffc8574f8c09c55dff1d84930ca0452d63b32ea8020b145af0cfecc08
+    name: Nordrhein-Westfalen
+    short_name: Nordr
+    parent: 8627a6617c8dedf4cee0d7b1ff28f9dfb772c8a79d0b60bbc4e956fc5bb9ccc7
+  - uuid: d50295b2701337ebec4672b626400f74a7e0cbc892705d674612fd49a0d9a025
+    name: Detmold
+    short_name: Detmo
+    parent: 716061bffc8574f8c09c55dff1d84930ca0452d63b32ea8020b145af0cfecc08
+  - uuid: 0b5f7d822a0808501dc241da45a3e34c59803144a91d8dc8b86cc586c9ace64e
+    name: Bielefeld/Gütersloh
+    short_name: Biele
+    parent: d50295b2701337ebec4672b626400f74a7e0cbc892705d674612fd49a0d9a025
+clubs:
+  - uuid: 4a26b45a0293581ac6ff50b3ec38e158d4789778bf2805aca23b7f5c571f6e09
+    name: TSV Altenhagen 03
+    short_name: Alten
+    parent: 0b5f7d822a0808501dc241da45a3e34c59803144a91d8dc8b86cc586c9ace64e
+  - uuid: d4c9071d814860a211d7c41536656e928fb3aa5c8575b4088549170d58d5600d
+    name: Altenhagen
+    short_name: Alten
+judoka:
+  - uuid: 211e489aa4b4f47302aa4effa8acda0273cf132c98288a47ee76e1aeb7ebcf0f
+    firstname: Tom
+    lastname: G
+    weight: 33800
+    gender: 0
+    birthyear: 1995
+    club: d4c9071d814860a211d7c41536656e928fb3aa5c8575b4088549170d58d5600d
+  - uuid: d68cc779d5f859652e9634dc2965d7ef01016f1a61126cfd10c8b6eea62f1b8f
+    firstname: Richard
+    lastname: M
+    weight: 24100
+    gender: 0
+    birthyear: 0
+    club: 4a26b45a0293581ac6ff50b3ec38e158d4789778bf2805aca23b7f5c571f6e09
+  - uuid: 45b3e2db41a6c6a39c451d9b60a10c257a161c0fa2c9fb6215f4a9eaabd63a39
+    firstname: Joris
+    lastname: M
+    weight: 24800
+    gender: 0
+    birthyear: 0
+    club: 4a26b45a0293581ac6ff50b3ec38e158d4789778bf2805aca23b7f5c571f6e09
+  - uuid: cdeb5c7e7370ab3bee07bfcf9d66dde3f4d5a75f7bb5515481d0800eb1e9828c
+    firstname: Maja
+    lastname: S
+    weight: 45600
+    gender: 1
+    birthyear: 0
+    club: 4a26b45a0293581ac6ff50b3ec38e158d4789778bf2805aca23b7f5c571f6e09
+  - uuid: 2a02804d82736b533b9ac5671a06600e36d16af1ab20c76fa4e965bbda1335af
+    firstname: Julius
+    lastname: B
+    weight: 28900
+    gender: 0
+    birthyear: 0
+    club: 4a26b45a0293581ac6ff50b3ec38e158d4789778bf2805aca23b7f5c571f6e09
+  - uuid: d70081364fbca24ee6b565908b7d142238b8c968f32c1489cb46a117879ebd29
+    firstname: Theo
+    lastname: H
+    weight: 27800
+    gender: 0
+    birthyear: 0
+    club: 4a26b45a0293581ac6ff50b3ec38e158d4789778bf2805aca23b7f5c571f6e09
+  - uuid: a3ef72a460c6fce0be5c4043b849fc6bf5f127ac94ff0959679750f1ef0373f7
+    firstname: Clara
+    lastname: K
+    weight: 34100
+    gender: 1
+    birthyear: 0
+    club: 4a26b45a0293581ac6ff50b3ec38e158d4789778bf2805aca23b7f5c571f6e09
+  - uuid: 8df4b17cf8a43daf87d86aea675523ad2da219beda4ee21d1883f51b90a518c3
+    firstname: Leni
+    lastname: L
+    weight: 44400
+    gender: 1
+    birthyear: 0
+    club: 4a26b45a0293581ac6ff50b3ec38e158d4789778bf2805aca23b7f5c571f6e09
+rule_sets:
+  - uuid: 5b5c6c2e27518b731e070a594068a37442f3b48f337a237ee5ae7bcb01960406
+    name: Youth
+    match_time: 180
+    golden_score_time: 0
+    osaekomi_time: 20
+    osaekomi_with_wazaari_time: 10
+    break_time: 0
+    yuko: false
+    koka: false
+    draw: false
+age_groups:
+  []
+judoka_to_age_group:
+  {}
+disqualified_judoka:
+  []
+default_rule_set: 5b5c6c2e27518b731e070a594068a37442f3b48f337a237ee5ae7bcb01960406
+match_tables:
+  - uuid: 42b84e02d56693c38ab72beac989a67965ae9a191818846bfdce83bab8ae920f
+    schedule_index: 0
+    mat_id: 1
+    color: 1
+    type: 1
+    filter:
+      type: 0
+      min_weight: 0
+      max_weight: 28899
+      gender: 0
+      participants:
+        0: d68cc779d5f859652e9634dc2965d7ef01016f1a61126cfd10c8b6eea62f1b8f
+        1: 45b3e2db41a6c6a39c451d9b60a10c257a161c0fa2c9fb6215f4a9eaabd63a39
+        2: d70081364fbca24ee6b565908b7d142238b8c968f32c1489cb46a117879ebd29
+    matches:
+      - uuid: 57e447d4c2dae2ead944ceadf9e7d21dd40ee904bb304799026c4840e69034af
+        mat_id: 1
+        white: d70081364fbca24ee6b565908b7d142238b8c968f32c1489cb46a117879ebd29
+        blue: d68cc779d5f859652e9634dc2965d7ef01016f1a61126cfd10c8b6eea62f1b8f
+        state: 2
+        winner: 0
+        score: 7
+        time: 180011
+        match_table: 42b84e02d56693c38ab72beac989a67965ae9a191818846bfdce83bab8ae920f
+        is_auto_generated: true
+        log:
+          - group: 2
+            event: 6
+            timestamp: 0
+          - group: 2
+            event: 0
+            timestamp: 0
+          - group: 2
+            event: 1
+            timestamp: 36637
+          - group: 2
+            event: 0
+            timestamp: 36637
+          - group: 2
+            event: 1
+            timestamp: 70979
+          - group: 2
+            event: 0
+            timestamp: 70979
+          - group: 2
+            event: 1
+            timestamp: 117932
+          - group: 2
+            event: 0
+            timestamp: 117932
+          - group: 2
+            event: 1
+            timestamp: 137141
+          - group: 0
+            event: 1
+            timestamp: 137141
+          - group: 2
+            event: 0
+            timestamp: 137141
+          - group: 2
+            event: 1
+            timestamp: 180011
+          - group: 2
+            event: 7
+            timestamp: 180011
+      - uuid: e2a1647c1e360faeb3ee4b388571fa4c509757babe6a5a1e436e847d851c507f
+        mat_id: 1
+        white: 45b3e2db41a6c6a39c451d9b60a10c257a161c0fa2c9fb6215f4a9eaabd63a39
+        blue: d68cc779d5f859652e9634dc2965d7ef01016f1a61126cfd10c8b6eea62f1b8f
+        state: 2
+        winner: 1
+        score: 10
+        time: 139515
+        match_table: 42b84e02d56693c38ab72beac989a67965ae9a191818846bfdce83bab8ae920f
+        is_auto_generated: true
+        log:
+          - group: 2
+            event: 6
+            timestamp: 0
+          - group: 2
+            event: 0
+            timestamp: 0
+          - group: 2
+            event: 1
+            timestamp: 6696
+          - group: 2
+            event: 0
+            timestamp: 6696
+          - group: 2
+            event: 1
+            timestamp: 23345
+          - group: 2
+            event: 0
+            timestamp: 23345
+          - group: 2
+            event: 1
+            timestamp: 64525
+          - group: 2
+            event: 0
+            timestamp: 64525
+          - group: 1
+            event: 1
+            timestamp: 72159
+          - group: 0
+            event: 9
+            timestamp: 89398
+          - group: 2
+            event: 2
+            timestamp: 92286
+          - group: 2
+            event: 1
+            timestamp: 96294
+          - group: 2
+            event: 0
+            timestamp: 96294
+          - group: 2
+            event: 1
+            timestamp: 115499
+          - group: 2
+            event: 0
+            timestamp: 115499
+          - group: 1
+            event: 0
+            timestamp: 139515
+          - group: 2
+            event: 1
+            timestamp: 139515
+          - group: 2
+            event: 7
+            timestamp: 139515
+      - uuid: 65fcae39b4cb6007e9aeaf93eae2353315fa2aa12df6a28413ade55de77491b9
+        mat_id: 1
+        white: d70081364fbca24ee6b565908b7d142238b8c968f32c1489cb46a117879ebd29
+        blue: 45b3e2db41a6c6a39c451d9b60a10c257a161c0fa2c9fb6215f4a9eaabd63a39
+        state: 2
+        winner: 0
+        score: 7
+        time: 180002
+        match_table: 42b84e02d56693c38ab72beac989a67965ae9a191818846bfdce83bab8ae920f
+        is_auto_generated: true
+        log:
+          - group: 2
+            event: 6
+            timestamp: 0
+          - group: 2
+            event: 0
+            timestamp: 0
+          - group: 2
+            event: 1
+            timestamp: 31611
+          - group: 2
+            event: 0
+            timestamp: 31611
+          - group: 2
+            event: 0
+            timestamp: 31624
+          - group: 2
+            event: 1
+            timestamp: 72102
+          - group: 2
+            event: 0
+            timestamp: 72102
+          - group: 2
+            event: 0
+            timestamp: 72272
+          - group: 0
+            event: 1
+            timestamp: 95559
+          - group: 2
+            event: 1
+            timestamp: 104429
+          - group: 2
+            event: 0
+            timestamp: 104429
+          - group: 2
+            event: 0
+            timestamp: 104609
+          - group: 2
+            event: 1
+            timestamp: 167742
+          - group: 2
+            event: 0
+            timestamp: 167742
+          - group: 2
+            event: 0
+            timestamp: 167756
+          - group: 2
+            event: 1
+            timestamp: 180002
+          - group: 2
+            event: 7
+            timestamp: 180002
+  - uuid: 3728ca0cd88d0dc4c76e71b662cd8fe7bbd4c4284fb760fdecb7e82f29f93c50
+    schedule_index: 0
+    mat_id: 1
+    color: 2
+    type: 1
+    best_of_three: true
+    filter:
+      type: 0
+      min_weight: 28740
+      max_weight: 0
+      gender: 0
+      participants:
+        0: 211e489aa4b4f47302aa4effa8acda0273cf132c98288a47ee76e1aeb7ebcf0f
+        1: 2a02804d82736b533b9ac5671a06600e36d16af1ab20c76fa4e965bbda1335af
+    matches:
+      - uuid: 2de4317545a92d096446465787f0af613a2f6b11d09ce4b20f238784b65f1920
+        mat_id: 1
+        white: 2a02804d82736b533b9ac5671a06600e36d16af1ab20c76fa4e965bbda1335af
+        blue: 211e489aa4b4f47302aa4effa8acda0273cf132c98288a47ee76e1aeb7ebcf0f
+        state: 2
+        winner: 0
+        score: 10
+        time: 32970
+        match_table: 3728ca0cd88d0dc4c76e71b662cd8fe7bbd4c4284fb760fdecb7e82f29f93c50
+        is_auto_generated: true
+        log:
+          - group: 2
+            event: 6
+            timestamp: 0
+          - group: 2
+            event: 0
+            timestamp: 0
+          - group: 0
+            event: 1
+            timestamp: 11986
+          - group: 2
+            event: 1
+            timestamp: 24844
+          - group: 2
+            event: 0
+            timestamp: 24844
+          - group: 2
+            event: 1
+            timestamp: 32970
+          - group: 0
+            event: 1
+            timestamp: 32970
+          - group: 0
+            event: 8
+            timestamp: 32970
+          - group: 2
+            event: 7
+            timestamp: 32970
+      - uuid: 9fdb69212c267bb5d4bb8d5267bd8e196dc48792ddc58c644e043339faa128c8
+        mat_id: 1
+        white: 211e489aa4b4f47302aa4effa8acda0273cf132c98288a47ee76e1aeb7ebcf0f
+        blue: 2a02804d82736b533b9ac5671a06600e36d16af1ab20c76fa4e965bbda1335af
+        state: 2
+        winner: 1
+        score: 10
+        time: 74471
+        match_table: 3728ca0cd88d0dc4c76e71b662cd8fe7bbd4c4284fb760fdecb7e82f29f93c50
+        is_auto_generated: true
+        log:
+          - group: 2
+            event: 6
+            timestamp: 0
+          - group: 2
+            event: 0
+            timestamp: 0
+          - group: 1
+            event: 1
+            timestamp: 9659
+          - group: 2
+            event: 1
+            timestamp: 32907
+          - group: 2
+            event: 0
+            timestamp: 32907
+          - group: 1
+            event: 9
+            timestamp: 64449
+          - group: 1
+            event: 1
+            timestamp: 74471
+          - group: 1
+            event: 8
+            timestamp: 74471
+          - group: 2
+            event: 1
+            timestamp: 74471
+          - group: 2
+            event: 7
+            timestamp: 74471
+      - uuid: 0426a38bf3573f4920a48dd23ca4ca126addf0678d1529456083fada3a43a55d
+        mat_id: 1
+        white: 2a02804d82736b533b9ac5671a06600e36d16af1ab20c76fa4e965bbda1335af
+        blue: 211e489aa4b4f47302aa4effa8acda0273cf132c98288a47ee76e1aeb7ebcf0f
+        state: 0
+        winner: 2
+        score: 0
+        time: 0
+        match_table: 3728ca0cd88d0dc4c76e71b662cd8fe7bbd4c4284fb760fdecb7e82f29f93c50
+        dependency_white: 1
+        dependency_blue: 1
+        dependent_match_white: 2de4317545a92d096446465787f0af613a2f6b11d09ce4b20f238784b65f1920
+        dependent_match_blue: 9fdb69212c267bb5d4bb8d5267bd8e196dc48792ddc58c644e043339faa128c8
+        is_auto_generated: true
+        log:
+          []
+  - uuid: ad6e8d56ccfe3c514c175847f32be5c027a97439d3a0684c7b3fd5e37fef3db4
+    schedule_index: 0
+    mat_id: 1
+    color: 3
+    type: 1
+    filter:
+      type: 0
+      min_weight: 0
+      max_weight: 0
+      gender: 1
+      participants:
+        0: cdeb5c7e7370ab3bee07bfcf9d66dde3f4d5a75f7bb5515481d0800eb1e9828c
+        1: a3ef72a460c6fce0be5c4043b849fc6bf5f127ac94ff0959679750f1ef0373f7
+        2: 8df4b17cf8a43daf87d86aea675523ad2da219beda4ee21d1883f51b90a518c3
+    matches:
+      - uuid: cd0080481e269da9abfdf85f587ee0592f56fdcb8c782a25dd328d64372348a4
+        mat_id: 1
+        white: 8df4b17cf8a43daf87d86aea675523ad2da219beda4ee21d1883f51b90a518c3
+        blue: cdeb5c7e7370ab3bee07bfcf9d66dde3f4d5a75f7bb5515481d0800eb1e9828c
+        state: 2
+        winner: 1
+        score: 7
+        time: 180004
+        match_table: ad6e8d56ccfe3c514c175847f32be5c027a97439d3a0684c7b3fd5e37fef3db4
+        is_auto_generated: true
+        log:
+          - group: 2
+            event: 6
+            timestamp: 0
+          - group: 2
+            event: 0
+            timestamp: 0
+          - group: 2
+            event: 1
+            timestamp: 42711
+          - group: 2
+            event: 0
+            timestamp: 42711
+          - group: 2
+            event: 0
+            timestamp: 42771
+          - group: 2
+            event: 1
+            timestamp: 74432
+          - group: 2
+            event: 0
+            timestamp: 74432
+          - group: 2
+            event: 1
+            timestamp: 106728
+          - group: 2
+            event: 0
+            timestamp: 106728
+          - group: 2
+            event: 1
+            timestamp: 145710
+          - group: 2
+            event: 0
+            timestamp: 145710
+          - group: 2
+            event: 1
+            timestamp: 180004
+          - group: 1
+            event: 1
+            timestamp: 180004
+          - group: 2
+            event: 7
+            timestamp: 180004
+      - uuid: cdacf2bc642145739516806d9f73f87cf40d450aa8c13a3dff8e8d2f3e281519
+        mat_id: 1
+        white: a3ef72a460c6fce0be5c4043b849fc6bf5f127ac94ff0959679750f1ef0373f7
+        blue: cdeb5c7e7370ab3bee07bfcf9d66dde3f4d5a75f7bb5515481d0800eb1e9828c
+        state: 2
+        winner: 1
+        score: 10
+        time: 161541
+        match_table: ad6e8d56ccfe3c514c175847f32be5c027a97439d3a0684c7b3fd5e37fef3db4
+        is_auto_generated: true
+        log:
+          - group: 2
+            event: 6
+            timestamp: 0
+          - group: 2
+            event: 0
+            timestamp: 0
+          - group: 1
+            event: 9
+            timestamp: 14507
+          - group: 2
+            event: 2
+            timestamp: 30546
+          - group: 2
+            event: 1
+            timestamp: 34479
+          - group: 1
+            event: 1
+            timestamp: 34479
+          - group: 2
+            event: 0
+            timestamp: 34479
+          - group: 0
+            event: 9
+            timestamp: 71559
+          - group: 2
+            event: 2
+            timestamp: 89500
+          - group: 2
+            event: 1
+            timestamp: 96868
+          - group: 0
+            event: 1
+            timestamp: 96868
+          - group: 2
+            event: 0
+            timestamp: 96868
+          - group: 2
+            event: 1
+            timestamp: 112473
+          - group: 2
+            event: 0
+            timestamp: 112473
+          - group: 2
+            event: 1
+            timestamp: 142837
+          - group: 2
+            event: 0
+            timestamp: 142837
+          - group: 0
+            event: 1
+            timestamp: 161541
+          - group: 0
+            event: 8
+            timestamp: 161541
+          - group: 2
+            event: 1
+            timestamp: 161541
+          - group: 1
+            event: 1
+            timestamp: 161541
+          - group: 1
+            event: 8
+            timestamp: 161541
+          - group: 0
+            event: 4
+            timestamp: 161541
+          - group: 0
+            event: 1
+            timestamp: 161541
+          - group: 2
+            event: 7
+            timestamp: 161541
+      - uuid: f4dbaef44242175593f16962b87dd50a58e33c7cc2a9147592c4057f40f284ee
+        mat_id: 1
+        white: 8df4b17cf8a43daf87d86aea675523ad2da219beda4ee21d1883f51b90a518c3
+        blue: a3ef72a460c6fce0be5c4043b849fc6bf5f127ac94ff0959679750f1ef0373f7
+        state: 2
+        winner: 1
+        score: 1
+        time: 180015
+        match_table: ad6e8d56ccfe3c514c175847f32be5c027a97439d3a0684c7b3fd5e37fef3db4
+        is_auto_generated: true
+        log:
+          - group: 2
+            event: 6
+            timestamp: 0
+          - group: 2
+            event: 0
+            timestamp: 0
+          - group: 2
+            event: 1
+            timestamp: 1461
+          - group: 2
+            event: 0
+            timestamp: 1461
+          - group: 2
+            event: 0
+            timestamp: 1498
+          - group: 2
+            event: 1
+            timestamp: 33611
+          - group: 2
+            event: 0
+            timestamp: 33611
+          - group: 2
+            event: 1
+            timestamp: 41950
+          - group: 2
+            event: 0
+            timestamp: 41950
+          - group: 2
+            event: 1
+            timestamp: 76647
+          - group: 2
+            event: 0
+            timestamp: 76647
+          - group: 2
+            event: 0
+            timestamp: 76712
+          - group: 2
+            event: 1
+            timestamp: 112463
+          - group: 2
+            event: 0
+            timestamp: 112463
+          - group: 2
+            event: 0
+            timestamp: 112521
+          - group: 2
+            event: 0
+            timestamp: 112552
+          - group: 2
+            event: 1
+            timestamp: 160279
+          - group: 2
+            event: 1
+            timestamp: 160279
+          - group: 2
+            event: 0
+            timestamp: 160279
+          - group: 2
+            event: 0
+            timestamp: 160409
+          - group: 2
+            event: 1
+            timestamp: 180015
+          - group: 1
+            event: 17
+            timestamp: 180015
+          - group: 2
+            event: 7
+            timestamp: 180015
+schedule:
+  - 57e447d4c2dae2ead944ceadf9e7d21dd40ee904bb304799026c4840e69034af
+  - 2de4317545a92d096446465787f0af613a2f6b11d09ce4b20f238784b65f1920
+  - cd0080481e269da9abfdf85f587ee0592f56fdcb8c782a25dd328d64372348a4
+  - e2a1647c1e360faeb3ee4b388571fa4c509757babe6a5a1e436e847d851c507f
+  - 9fdb69212c267bb5d4bb8d5267bd8e196dc48792ddc58c644e043339faa128c8
+  - cdacf2bc642145739516806d9f73f87cf40d450aa8c13a3dff8e8d2f3e281519
+  - 65fcae39b4cb6007e9aeaf93eae2353315fa2aa12df6a28413ade55de77491b9
+  - 0426a38bf3573f4920a48dd23ca4ca126addf0678d1529456083fada3a43a55d
+  - f4dbaef44242175593f16962b87dd50a58e33c7cc2a9147592c4057f40f284ee
