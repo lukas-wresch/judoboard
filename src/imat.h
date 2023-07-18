@@ -200,6 +200,7 @@ namespace Judoboard
 
 	protected:
 		virtual void PlaySoundFile() const {}
+		virtual void StopSoundFile() const {}
 
 		std::vector<Match> m_NextMatches;
 

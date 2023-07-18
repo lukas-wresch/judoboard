@@ -175,6 +175,7 @@ namespace Judoboard
 
 	private:
 		virtual void PlaySoundFile() const override { m_Sound.Play(); }
+		virtual void StopSoundFile() const override { m_Sound.Stop(); }
 
 
 		Scoreboard& SetScoreboard(Fighter Whom)

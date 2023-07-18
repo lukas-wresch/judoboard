@@ -1052,6 +1052,9 @@ void Mat::Osaekomi(Fighter Whom)
 		{
 			Hajime();
 			Osaekomi(Whom);
+
+			if (IsSoundEnabled())
+				StopSoundFile();
 		}
 	}
 }
@@ -1127,6 +1130,9 @@ void Mat::Tokeda()
 			m_Graphics["osaekomi_text"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0));
 			m_Graphics["osaekomi_bar_border"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0));
 			m_Graphics["osaekomi_bar"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0));
+
+			if (IsSoundEnabled())
+				StopSoundFile();
 		}
 	}
 }
