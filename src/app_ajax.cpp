@@ -2408,7 +2408,7 @@ Error Application::Ajax_UpdatePassword(Account* Account, const HttpServer::Reque
 
 	auto password = HttpServer::DecodeURLEncoded(Request.m_Body, "password");
 
-	if (password.length() <= 0)//Password not change
+	if (password.length() <= 0)//Password not changed
 		return Error::Type::InvalidInput;
 
 	Account->SetPassword(password);
