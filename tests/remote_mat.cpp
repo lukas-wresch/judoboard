@@ -191,19 +191,21 @@ TEST(RemoteMat, StartMatch)
 
 	auto j1 = new Judoka(GetRandomName(), GetRandomName());
 	auto j2 = new Judoka(GetRandomName(), GetRandomName());
-	master.GetDatabase().AddJudoka(j1);
-	master.GetDatabase().AddJudoka(j2);
+	master.GetTournament()->GetDatabase().AddJudoka(j1);
+	master.GetTournament()->GetDatabase().AddJudoka(j2);
 
-	Match match(j1, j2, nullptr);
-	match.SetMatID(1);
-	EXPECT_TRUE(m->StartMatch(&match));
+	master.GetTournament()->AddMatch(Match(j1, j2, nullptr));
+	auto match = master.GetTournament()->GetSchedule()[0];
+
+	match->SetMatID(1);
+	EXPECT_TRUE(m->StartMatch(match));
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		EXPECT_EQ(m->GetScoreboard(f).m_Ippon, 0);
 		EXPECT_EQ(m->GetScoreboard(f).m_WazaAri, 0);
-		EXPECT_EQ(m->GetScoreboard(f).m_Yuko, -1);
-		EXPECT_EQ(m->GetScoreboard(f).m_Koka, -1);
+		EXPECT_EQ(m->GetScoreboard(f).m_Yuko, 0);
+		EXPECT_EQ(m->GetScoreboard(f).m_Koka, 0);
 
 		EXPECT_EQ(m->GetScoreboard(f).m_Shido, 0);
 		EXPECT_FALSE(m->GetScoreboard(f).m_HansokuMake);

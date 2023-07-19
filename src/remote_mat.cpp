@@ -406,9 +406,10 @@ RemoteMat::InternalState RemoteMat::GetState(bool* pSuccess) const
 	std::string response = SendRequest("/ajax/mat/get_score?id=" + std::to_string(GetMatID()));
 	InternalState internalState = {};
 
-	if (std::count(response.begin(), response.end(), ',') < 10)
+	auto yaml = YAML::Load(response);
+
+	if (!yaml)
 	{
-		ZED::Log::Warn("Invalid response: " + response);
 		if (pSuccess)
 			*pSuccess = false;
 		return internalState;
@@ -417,26 +418,39 @@ RemoteMat::InternalState RemoteMat::GetState(bool* pSuccess) const
 	if (pSuccess)
 		*pSuccess = true;
 
-	ZED::CSV state(response);
+	auto white = yaml["white"];
+	SetScoreboard(Fighter::White).m_Ippon   = white["ippon"].as<uint32_t>();
+	SetScoreboard(Fighter::White).m_WazaAri = white["wazaari"].as<uint32_t>();
+	if (white["yuko"])
+		SetScoreboard(Fighter::White).m_Yuko = white["yuko"].as<int32_t>();
+	if (white["koka"])
+		SetScoreboard(Fighter::White).m_Koka = white["koka"].as<int32_t>();
+	SetScoreboard(Fighter::White).m_Shido   = white["shido"].as<uint32_t>();
+	SetScoreboard(Fighter::White).m_MedicalExamination = white["medical"].as<uint32_t>();
 
-	state >> SetScoreboard(Fighter::White).m_Ippon >> SetScoreboard(Fighter::White).m_WazaAri;
-	state >> SetScoreboard(Fighter::Blue).m_Ippon  >> SetScoreboard(Fighter::Blue).m_WazaAri;
-
-	state >> SetScoreboard(Fighter::White).m_Yuko >> SetScoreboard(Fighter::Blue).m_Yuko;
-	state >> SetScoreboard(Fighter::White).m_Koka >> SetScoreboard(Fighter::Blue).m_Koka;
-
-	state >> SetScoreboard(Fighter::White).m_Shido >> SetScoreboard(Fighter::Blue).m_Shido;
-	state >> SetScoreboard(Fighter::White).m_MedicalExamination >> SetScoreboard(Fighter::Blue).m_MedicalExamination;
+	auto blue = yaml["blue"];
+	SetScoreboard(Fighter::Blue).m_Ippon   = blue["ippon"].as<uint32_t>();
+	SetScoreboard(Fighter::Blue).m_WazaAri = blue["wazaari"].as<uint32_t>();
+	if (blue["yuko"])
+		SetScoreboard(Fighter::Blue).m_Yuko = blue["yuko"].as<int32_t>();
+	if (blue["koka"])
+		SetScoreboard(Fighter::Blue).m_Koka = blue["koka"].as<int32_t>();
+	SetScoreboard(Fighter::Blue).m_Shido   = blue["shido"].as<uint32_t>();
+	SetScoreboard(Fighter::Blue).m_MedicalExamination = blue["medical"].as<uint32_t>();
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; ++f)
 		SetScoreboard(f).m_HansokuMake = m_Scoreboards[(int)f].m_Shido >= 3;
 
-	state >> internalState.display_time >> internalState.hajime;
+	internalState.display_time = yaml["hajime_time"].as<uint32_t>();
+	internalState.white_osaekomi_time = white["osaekomi_time"].as<uint32_t>();
+	internalState.blue_osaekomi_time  =  blue["osaekomi_time"].as<uint32_t>();
 
-	state >> internalState.white_osaekomi_time >> internalState.white_osaekomi;
-	state >> internalState.blue_osaekomi_time  >> internalState.blue_osaekomi;
-
-	state >> internalState.cannextmatchstart >> internalState.hasconcluded >> internalState.isoutoftime >> internalState.NoWinnerYet  >> internalState.isgoldenscore >> internalState.arefightersonmat;
+	internalState.cannextmatchstart = yaml["can_next_match_start"].as<bool>();
+	internalState.hasconcluded      = yaml["has_concluded"].as<bool>();
+	internalState.isoutoftime       = yaml["is_out_of_time"].as<bool>();
+	internalState.NoWinnerYet       = yaml["no_winner_yet"].as<bool>();
+	internalState.isgoldenscore     = yaml["is_goldenscore"].as<bool>();
+	internalState.arefightersonmat  = yaml["are_fighters_on_mat"].as<bool>();
 
 	return internalState;
 }
