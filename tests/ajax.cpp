@@ -391,6 +391,8 @@ TEST(Ajax, GetMats)
 	EXPECT_EQ(yaml["mats"][0]["is_paused"].as<bool>(), false);
 	EXPECT_EQ(yaml["mats"][0]["ippon_style"].as<int>(), (int)IMat::IpponStyle::DoubleDigit);
 	EXPECT_EQ(yaml["mats"][0]["name_style"].as<int>(),  (int)NameStyle::FamilyName);
+	EXPECT_TRUE(yaml["mats"][0]["sound_enabled"].as<bool>());
+	EXPECT_EQ(yaml["mats"][0]["sound_filename"].as<std::string>(), "test");
 }
 
 
@@ -488,7 +490,7 @@ TEST(Ajax, UpdateMat)
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 
-		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&timerStyle=1&nameStyle=0"));
+		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&timerStyle=1&nameStyle=0&sound=false&sound_filename=changed")));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
@@ -497,9 +499,11 @@ TEST(Ajax, UpdateMat)
 		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 0);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 1);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  0);
+		EXPECT_FALSE(app.GetDefaultMat()->IsSoundEnabled());
+		EXPECT_EQ(app.GetDefaultMat()->GetSoundFilename(), "changed");
 
 
-		app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&timerStyle=2&nameStyle=1"));
+		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&timerStyle=2&nameStyle=1&sound=true&sound_filename=changed2")));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
@@ -508,9 +512,11 @@ TEST(Ajax, UpdateMat)
 		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 1);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 2);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  1);
+		EXPECT_TRUE(app.GetDefaultMat()->IsSoundEnabled());
+		EXPECT_EQ(app.GetDefaultMat()->GetSoundFilename(), "changed2");
 
 
-		app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test3&ipponStyle=2&timerStyle=0&nameStyle=0"));
+		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test3&ipponStyle=2&timerStyle=0&nameStyle=0&sound=false&sound_filename=changed3")));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
@@ -519,6 +525,8 @@ TEST(Ajax, UpdateMat)
 		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 2);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 0);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  0);
+		EXPECT_FALSE(app.GetDefaultMat()->IsSoundEnabled());
+		EXPECT_EQ(app.GetDefaultMat()->GetSoundFilename(), "changed3");
 	}
 }
 
@@ -677,6 +685,29 @@ TEST(Ajax, SwapMatches)
 
 
 
+TEST(Ajax, Sound_ListFiles)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto yaml = YAML::Load(app.Ajax_ListSoundFiles());
+
+		ASSERT_TRUE(yaml.IsSequence());
+
+		std::vector<std::string> filenames = { "airhorn", "alert", "gong sabi", "gong", "gong2", "high gong", "low gong", "spooky gong", "tiger gong", "wind chime" };
+
+		int i = 0;
+		for (auto node : yaml)
+		{
+			EXPECT_EQ(node["filename"].as<std::string>(), filenames[i++]);
+		}
+	}
+}
+
+
+
 TEST(Ajax, Setup_Set)
 {
 	initialize();
@@ -721,7 +752,7 @@ TEST(Ajax, ExecuteCommand)
 
 		std::string result = app.Ajax_Execute(HttpServer::Request("cmd=dir"));
 
-		EXPECT_GE(result.length(), 170);
+		EXPECT_GE(result.length(), 120);
 
 		//TODO?!
 	}

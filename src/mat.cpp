@@ -89,6 +89,14 @@ bool Mat::Open()
 
 		ZED::Log::Info("Background created");
 
+		if (!m_Logo)
+			m_Logo = m_Window.GetRenderer().CreateTexture("assets/logo.png");
+
+		ZED::Log::Info("Logo loaded");
+			
+		if (!m_Sound)
+			SetSoundFilename(GetSoundFilename());//Load sound file
+
 		while (m_Window.IsRunning())
 			Mainloop();
 	});
@@ -1044,6 +1052,9 @@ void Mat::Osaekomi(Fighter Whom)
 		{
 			Hajime();
 			Osaekomi(Whom);
+
+			if (IsSoundEnabled())
+				StopSoundFile();
 		}
 	}
 }
@@ -1119,6 +1130,9 @@ void Mat::Tokeda()
 			m_Graphics["osaekomi_text"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0));
 			m_Graphics["osaekomi_bar_border"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0));
 			m_Graphics["osaekomi_bar"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0));
+
+			if (IsSoundEnabled())
+				StopSoundFile();
 		}
 	}
 }
@@ -1170,14 +1184,21 @@ void Mat::Process()
 			AddWazaAri(GetOsaekomiHolder());
 		else
 			AddIppon(GetOsaekomiHolder());
-
+      
 		m_mutex.UnlockWrite();
+    
+		if (IsSoundEnabled())
+			PlaySoundFile();
 	}
 
 	m_mutex.UnlockRead();
 
 	if (IsOutOfTime() && IsHajime())
+	{
 		Mate();
+		if (IsSoundEnabled())
+			PlaySoundFile();
+	}
 }
 
 

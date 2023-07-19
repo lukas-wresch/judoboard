@@ -174,6 +174,10 @@ namespace Judoboard
 		Error Ajax_SetLotteryTier(const HttpServer::Request& Request);
 		std::string Ajax_ListLots();
 
+		//Sound
+		std::string Ajax_ListSoundFiles();
+		Error Ajax_PlaySoundFile(const HttpServer::Request& Request);
+
 		//Config
 		std::string Ajax_GetSetup();
 		Error Ajax_SetSetup(const HttpServer::Request& Request);

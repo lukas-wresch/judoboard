@@ -135,7 +135,7 @@ int Core::ToInt(const std::string& Number)
 	{
 		ret = std::stoi(Number);
 	}
-	catch (...)
+	catch (const std::exception& e)
 	{
 		return -1;
 	}
@@ -243,7 +243,7 @@ Core::Date Core::GetDate()
 bool Core::Indexer(std::function<bool(const std::string&)> onFile, const std::string& FolderName, bool Recru)
 {
 #ifdef _WIN32
-	std::string SearchString = FolderName + "\\*.*";
+	std::string SearchString = FolderName + "/*.*";
 
 	WIN32_FIND_DATAA Find;
 	HANDLE Handle = FindFirstFileA(SearchString.c_str(), &Find);
@@ -257,7 +257,7 @@ bool Core::Indexer(std::function<bool(const std::string&)> onFile, const std::st
 				std::string Filename;
 
 				if (FolderName[0] != '.')
-					Filename = FolderName + "\\" + Find.cFileName;
+					Filename = FolderName + "/" + Find.cFileName;
 				else
 					Filename = Find.cFileName;
 
@@ -269,7 +269,7 @@ bool Core::Indexer(std::function<bool(const std::string&)> onFile, const std::st
 			}
 
 			else if (Find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY && Recru)
-				Indexer(onFile, FolderName + "\\" + Find.cFileName);
+				Indexer(onFile, FolderName + "/" + Find.cFileName);
 		}
 	}
 
