@@ -418,6 +418,7 @@ RemoteMat::InternalState RemoteMat::GetState(bool* pSuccess) const
 	if (pSuccess)
 		*pSuccess = true;
 
+	//White
 	auto white = yaml["white"];
 	SetScoreboard(Fighter::White).m_Ippon   = white["ippon"].as<uint32_t>();
 	SetScoreboard(Fighter::White).m_WazaAri = white["wazaari"].as<uint32_t>();
@@ -425,9 +426,10 @@ RemoteMat::InternalState RemoteMat::GetState(bool* pSuccess) const
 		SetScoreboard(Fighter::White).m_Yuko = white["yuko"].as<int32_t>();
 	if (white["koka"])
 		SetScoreboard(Fighter::White).m_Koka = white["koka"].as<int32_t>();
-	SetScoreboard(Fighter::White).m_Shido   = white["shido"].as<uint32_t>();
+	SetScoreboard(Fighter::White).m_Shido = white["shido"].as<uint32_t>();
 	SetScoreboard(Fighter::White).m_MedicalExamination = white["medical"].as<uint32_t>();
 
+	//Blue
 	auto blue = yaml["blue"];
 	SetScoreboard(Fighter::Blue).m_Ippon   = blue["ippon"].as<uint32_t>();
 	SetScoreboard(Fighter::Blue).m_WazaAri = blue["wazaari"].as<uint32_t>();
@@ -435,16 +437,25 @@ RemoteMat::InternalState RemoteMat::GetState(bool* pSuccess) const
 		SetScoreboard(Fighter::Blue).m_Yuko = blue["yuko"].as<int32_t>();
 	if (blue["koka"])
 		SetScoreboard(Fighter::Blue).m_Koka = blue["koka"].as<int32_t>();
-	SetScoreboard(Fighter::Blue).m_Shido   = blue["shido"].as<uint32_t>();
+	SetScoreboard(Fighter::Blue).m_Shido = blue["shido"].as<uint32_t>();
 	SetScoreboard(Fighter::Blue).m_MedicalExamination = blue["medical"].as<uint32_t>();
 
+	//Conversion
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; ++f)
+	{
+		if (SetScoreboard(f).m_Ippon == 1)
+			SetScoreboard(f).m_WazaAri = 2;
 		SetScoreboard(f).m_HansokuMake = m_Scoreboards[(int)f].m_Shido >= 3;
+	}
 
-	internalState.display_time = yaml["hajime_time"].as<uint32_t>();
+	//Timers
+	internalState.display_time        =  yaml["hajime_time"].as<uint32_t>();
 	internalState.white_osaekomi_time = white["osaekomi_time"].as<uint32_t>();
 	internalState.blue_osaekomi_time  =  blue["osaekomi_time"].as<uint32_t>();
 
+	//Extra states
+	internalState.hajime            = yaml["is_hajime"].as<bool>();
+	internalState.IsOsaekomi        = yaml["is_osaekomi"].as<bool>();
 	internalState.cannextmatchstart = yaml["can_next_match_start"].as<bool>();
 	internalState.hasconcluded      = yaml["has_concluded"].as<bool>();
 	internalState.isoutoftime       = yaml["is_out_of_time"].as<bool>();

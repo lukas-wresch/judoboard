@@ -105,21 +105,13 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 
 	ZED::Core::Pause(2000);
 
-	Judoka j1(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
-	Judoka j2(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
-	Judoka j3(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
+	Judoka* j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
+	Judoka* j2 = new Judoka(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
+	Judoka* j3 = new Judoka(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
 
-	Judoka j4(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
-	Judoka j5(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
-	Judoka j6(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
-
-	master.GetDatabase().AddJudoka(std::move(j1));
-	master.GetDatabase().AddJudoka(std::move(j2));
-	master.GetDatabase().AddJudoka(std::move(j3));
-
-	master.GetDatabase().AddJudoka(std::move(j4));
-	master.GetDatabase().AddJudoka(std::move(j5));
-	master.GetDatabase().AddJudoka(std::move(j6));
+	Judoka* j4 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
+	Judoka* j5 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
+	Judoka* j6 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
 
 	auto tournament_name = GetRandomName();
 	auto tourney = new Tournament(tournament_name, new RuleSet("Test", 60, 0, 20, 10));
@@ -129,12 +121,12 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 	ASSERT_TRUE(master.FindTournamentByName(tournament_name));
 	EXPECT_TRUE(master.OpenTournament(master.FindTournamentByName(tournament_name)->GetUUID()));
 
-	tourney->AddParticipant(&j1);
-	tourney->AddParticipant(&j2);
-	tourney->AddParticipant(&j3);
-	tourney->AddParticipant(&j4);
-	tourney->AddParticipant(&j5);
-	tourney->AddParticipant(&j6);
+	tourney->AddParticipant(j1);
+	tourney->AddParticipant(j2);
+	tourney->AddParticipant(j3);
+	tourney->AddParticipant(j4);
+	tourney->AddParticipant(j5);
+	tourney->AddParticipant(j6);
 
 	MatchTable* m1 = new RoundRobin(0, 49);
 	MatchTable* m2 = new RoundRobin(50, 100);
@@ -147,7 +139,7 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 	mat[0] = master.FindMat(1);
 	mat[1] = master.FindMat(2);
 
-	ZED::Core::Pause(2000);
+	ZED::Core::Pause(1000);
 
 	for (int i = 0;i < 2;i++)
 	{
@@ -157,7 +149,7 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 		EXPECT_TRUE(match);
 		EXPECT_TRUE(mat[i]->StartMatch(match));
 
-		ZED::Core::Pause(5000);
+		ZED::Core::Pause(3000);
 
 		mat[i]->Hajime();
 
@@ -228,7 +220,7 @@ TEST(RemoteMat, SendRuleSet)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -239,16 +231,17 @@ TEST(RemoteMat, SendRuleSet)
 	auto j2 = new Judoka(GetRandomName(), GetRandomName());
 	auto rules = new RuleSet("Test", 5, 0, 30, 20, true, true, true, 0);
 
-	master.GetDatabase().AddJudoka(j1);
-	master.GetDatabase().AddJudoka(j2);
-	master.GetDatabase().AddRuleSet(rules);
+	master.GetTournament()->GetDatabase().AddJudoka(j1);
+	master.GetTournament()->GetDatabase().AddJudoka(j2);
+	master.GetTournament()->GetDatabase().AddRuleSet(rules);
 
 	Match match(j1, j2, nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(rules);
+	master.GetTournament()->AddMatch(std::move(match));
 
 	ASSERT_TRUE(m);
-	ASSERT_TRUE(m->StartMatch(&match));		
+	ASSERT_TRUE(m->StartMatch(master.GetTournament()->GetSchedule()[0]));
 
 	auto remote_rules = slave.GetMats()[0]->GetMatch()->GetRuleSet();
 	EXPECT_EQ(remote_rules.GetName(), "Test");
@@ -261,7 +254,7 @@ TEST(RemoteMat, SendHajime)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -272,16 +265,17 @@ TEST(RemoteMat, SendHajime)
 	auto j2 = new Judoka(GetRandomName(), GetRandomName());
 	auto rules = new RuleSet("Test", 5, 0, 30, 20, true, true, true, 0);
 
-	master.GetDatabase().AddJudoka(j1);
-	master.GetDatabase().AddJudoka(j2);
-	master.GetDatabase().AddRuleSet(rules);
+	master.GetTournament()->GetDatabase().AddJudoka(j1);
+	master.GetTournament()->GetDatabase().AddJudoka(j2);
+	master.GetTournament()->GetDatabase().AddRuleSet(rules);
 
 	Match match(j1, j2, nullptr);
 	match.SetMatID(1);
 	match.SetRuleSet(rules);
+	master.GetTournament()->AddMatch(std::move(match));
 
 	ASSERT_TRUE(m);
-	ASSERT_TRUE(m->StartMatch(&match));
+	ASSERT_TRUE(m->StartMatch(master.GetTournament()->GetSchedule()[0]));
 	m->Hajime();
 
 	auto remote_mat = slave.GetMats()[0];	
@@ -369,8 +363,8 @@ TEST(RemoteMat, ForceClose)
 
 	Judoka j1("White", "LastnameW");
 	Judoka j2("Blue",  "LastnameB");
-	master.GetDatabase().AddJudoka(&j1);
-	master.GetDatabase().AddJudoka(&j2);
+	master.GetTournament()->GetDatabase().AddJudoka(&j1);
+	master.GetTournament()->GetDatabase().AddJudoka(&j2);
 
 	ZED::Core::Pause(500);
 
@@ -385,7 +379,7 @@ TEST(RemoteMat, RemoveIpponShouldRecoverPreviousWazaari)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -414,8 +408,8 @@ TEST(RemoteMat, RemoveIpponShouldRecoverPreviousWazaari)
 
 		EXPECT_FALSE(m->IsHajime());
 
-		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon   == 0);
-		EXPECT_TRUE(m->GetScoreboard(f).m_WazaAri == 1);
+		EXPECT_EQ(m->GetScoreboard(f).m_Ippon,   0);
+		EXPECT_EQ(m->GetScoreboard(f).m_WazaAri, 1);
 
 		m->AddIppon(f);
 
@@ -430,7 +424,7 @@ TEST(RemoteMat, RemoveWazariShouldRemoveIppon)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -495,18 +489,18 @@ TEST(RemoteMat, Scores)
 
 		EXPECT_TRUE(m->StartMatch(match));
 
-		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon == 0);
+		EXPECT_EQ(m->GetScoreboard(f).m_Ippon, 0);
 		m->AddIppon(f);
-		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon == 1);
+		EXPECT_EQ(m->GetScoreboard(f).m_Ippon, 1);
 		m->RemoveIppon(f);
-		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon == 0);
+		EXPECT_EQ(m->GetScoreboard(f).m_Ippon, 0);
 
 				
-		EXPECT_TRUE(m->GetScoreboard(f).m_WazaAri == 0);
+		EXPECT_EQ(m->GetScoreboard(f).m_WazaAri, 0);
 		m->AddWazaAri(f);
-		EXPECT_TRUE(m->GetScoreboard(f).m_WazaAri == 1);
+		EXPECT_EQ(m->GetScoreboard(f).m_WazaAri, 1);
 		m->RemoveWazaAri(f);
-		EXPECT_TRUE(m->GetScoreboard(f).m_WazaAri == 0);
+		EXPECT_EQ(m->GetScoreboard(f).m_WazaAri, 0);
 
 
 		m->AddIppon(f);
@@ -605,7 +599,7 @@ TEST(RemoteMat, ShidoDoesntEndGoldenScore)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		auto rules = new RuleSet("Test", 5, 60, 30, 20, false, true, true, 0);
+		auto rules = new RuleSet("Test", 2, 60, 30, 20, false, true, true, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
 		Match* match = new Match(j1, j2, nullptr);
@@ -617,7 +611,7 @@ TEST(RemoteMat, ShidoDoesntEndGoldenScore)
 
 		m->Hajime();
 
-		ZED::Core::Pause(6 * 1000);
+		ZED::Core::Pause(3 * 1000);
 		EXPECT_TRUE(m->IsOutOfTime());
 
 		EXPECT_FALSE(m->HasConcluded());
@@ -642,7 +636,7 @@ TEST(RemoteMat, ScoreEndsGoldenScore)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1967,7 +1961,7 @@ TEST(RemoteMat, Tokeda)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2054,7 +2048,7 @@ TEST(RemoteMat, Tokeda)
 
 		ZED::Core::Pause(6 * 1000);
 
-		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon == 1);
+		EXPECT_EQ(m->GetScoreboard(f).m_Ippon, 1);
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());
 	}
@@ -2564,7 +2558,7 @@ TEST(RemoteMat, WazariAwaseteIppon)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2585,15 +2579,15 @@ TEST(RemoteMat, WazariAwaseteIppon)
 		EXPECT_TRUE(m->StartMatch(match));
 
 			
-		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon == 0);
-		EXPECT_TRUE(m->GetScoreboard(f).m_WazaAri == 0);
+		EXPECT_EQ(m->GetScoreboard(f).m_Ippon, 0);
+		EXPECT_EQ(m->GetScoreboard(f).m_WazaAri, 0);
 		EXPECT_FALSE(m->EndMatch());
 
 		m->AddWazaAri(f);
 		ZED::Core::Pause(100);
 
-		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon == 0);
-		EXPECT_TRUE(m->GetScoreboard(f).m_WazaAri == 1);
+		EXPECT_EQ(m->GetScoreboard(f).m_Ippon, 0);
+		EXPECT_EQ(m->GetScoreboard(f).m_WazaAri, 1);
 		EXPECT_FALSE(m->EndMatch());
 
 		m->AddWazaAri(f);
@@ -2624,7 +2618,7 @@ TEST(RemoteMat, GoldenScore)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2676,7 +2670,7 @@ TEST(RemoteMat, GoldenScore2)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));

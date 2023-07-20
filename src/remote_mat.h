@@ -44,7 +44,7 @@ namespace Judoboard
 		}
 		virtual bool IsOsaekomi() const override {//Returns true during an osaekomi situation (even during yoshi!)
 			auto state = GetState();
-			return state.white_osaekomi || state.blue_osaekomi || state.white_osaekomi_time > 0 || state.blue_osaekomi_time > 0;
+			return state.IsOsaekomi;
 		};//Returns true during an osaekomi situation
 		virtual Fighter GetOsaekomiHolder() const override {
 			if (GetState().white_osaekomi_time > 0)
@@ -121,7 +121,7 @@ namespace Judoboard
 			uint32_t white_osaekomi_time, blue_osaekomi_time;
 
 			bool white_osaekomi, blue_osaekomi;
-			bool hajime, cannextmatchstart, hasconcluded, isoutoftime, NoWinnerYet, isgoldenscore, arefightersonmat;
+			bool hajime, IsOsaekomi, cannextmatchstart, hasconcluded, isoutoftime, NoWinnerYet, isgoldenscore, arefightersonmat;
 		};
 
 		virtual const Scoreboard& GetScoreboard(Fighter Whom) const override
