@@ -1113,7 +1113,7 @@ void Application::SetupHttpServer()
 			mat->SetAsDraw();
 
 		return Error();//OK
-		});
+	});
 
 	m_Server.RegisterResource("/ajax/mat/-draw", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
@@ -2206,7 +2206,7 @@ void Application::SetupHttpServer()
 			{
 				Match* match = new Match(match_data, nullptr, GetTournament());
 				GetTournament()->AddMatch(match);
-
+				
 				if (mat->StartMatch(match))
 					return Error();//OK
 				return Error(Error::Type::OperationFailed);

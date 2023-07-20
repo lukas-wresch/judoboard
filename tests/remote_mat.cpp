@@ -294,7 +294,7 @@ TEST(RemoteMat, CorrectWinner)
 	ASSERT_TRUE(slave.StartLocalMat(1));
 
 	IMat* m = master.FindMat(1);
-	auto rules = new RuleSet("Test", 5, 0, 30, 20, true, true, true, 0);
+	auto rules = new RuleSet("Test", 2, 0, 30, 20, true, true, true, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
@@ -331,14 +331,14 @@ TEST(RemoteMat, CorrectWinner)
 				m->AddNoDisqualification(!f);
 			}
 
-			ZED::Core::Pause(5500);
+			ZED::Core::Pause(2500);
 
 			if (i == 4)
 				m->SetAsDraw();
-			else
-				EXPECT_TRUE(m->EndMatch());
 
-			ZED::Core::Pause(500);
+			EXPECT_TRUE(m->EndMatch());
+
+			ZED::Core::Pause(200);
 
 			if (i == 4)
 				EXPECT_EQ(match->GetResult().m_Winner, Winner::Draw);
@@ -709,7 +709,6 @@ TEST(RemoteMat, ShidosResultInIndirectHansokumake)
 		master.GetTournament()->AddMatch(match);
 
 		EXPECT_TRUE(m->StartMatch(match));
-
 		
 		m->AddShido(f);
 		m->AddShido(f);
@@ -719,12 +718,12 @@ TEST(RemoteMat, ShidosResultInIndirectHansokumake)
 
 		auto& events = match->GetLog().GetEvents();
 
-		ASSERT_TRUE(events.size() >= 3);
-		EXPECT_TRUE(events[events.size() - 3].m_BiasedEvent == MatchLog::BiasedEvent::AddHansokuMake_Indirect);
-		EXPECT_TRUE(events[events.size() - 3].m_Group == f);
+		ASSERT_GE(events.size(), 3);
+		EXPECT_EQ(events[events.size() - 3].m_BiasedEvent, MatchLog::BiasedEvent::AddHansokuMake_Indirect);
+		EXPECT_EQ(events[events.size() - 3].m_Group, f);
 
-		EXPECT_TRUE(events[events.size() - 2].m_BiasedEvent == MatchLog::BiasedEvent::AddIppon);
-		EXPECT_TRUE(events[events.size() - 2].m_Group == !f);
+		EXPECT_EQ(events[events.size() - 2].m_BiasedEvent, MatchLog::BiasedEvent::AddIppon);
+		EXPECT_EQ(events[events.size() - 2].m_Group, !f);
 	}
 }
 
@@ -753,7 +752,6 @@ TEST(RemoteMat, HansokumakeResultsInDirectHansokumake)
 		master.GetTournament()->AddMatch(match);
 
 		EXPECT_TRUE(m->StartMatch(match));
-
 
 		m->AddHansokuMake(f);
 		m->AddDisqualification(f);
@@ -2925,7 +2923,7 @@ TEST(RemoteMat, Hantei)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		auto rules = new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0);
+		auto rules = new RuleSet("Test", 2, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
 		Match* match = new Match(j1, j2, nullptr);
@@ -2937,7 +2935,7 @@ TEST(RemoteMat, Hantei)
 
 		m->Hajime();
 
-		ZED::Core::Pause(11 * 1000);
+		ZED::Core::Pause(3000);
 		EXPECT_TRUE(m->IsOutOfTime());
 
 		EXPECT_FALSE(m->HasConcluded());
@@ -2945,12 +2943,12 @@ TEST(RemoteMat, Hantei)
 		m->Hantei(f);
 		ZED::Core::Pause(100);
 
-		//EXPECT_TRUE(m->HasConcluded());
-		//EXPECT_TRUE(m->EndMatch());
+		EXPECT_TRUE(m->HasConcluded());
+		EXPECT_TRUE(m->EndMatch());
 
-		EXPECT_TRUE(match->GetResult().m_Winner == Fighter2Winner(f));
-		EXPECT_TRUE(match->GetResult().m_Score  == Match::Score::Hantei);
-		EXPECT_TRUE(match->GetResult().m_Score  == (Match::Score)1);
+		EXPECT_EQ(match->GetResult().m_Winner, Fighter2Winner(f));
+		EXPECT_EQ(match->GetResult().m_Score,  Match::Score::Hantei);
+		EXPECT_EQ(match->GetResult().m_Score,  (Match::Score)1);
 	}
 }
 

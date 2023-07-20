@@ -534,7 +534,12 @@ function GetScore()
 
   AjaxCallback("ajax/mat/get_score?id="+id, function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    let res = YAML.parse(response);
+
+    if (res.white.ippon == 1)
+      res.white.wazaari = 0;
+    if (res.blue.ippon == 1)
+      res.blue.wazaari = 0;
 
     CurrentScore = res;
 

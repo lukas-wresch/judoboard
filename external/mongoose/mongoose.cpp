@@ -4216,8 +4216,8 @@ static void accept_new_connection(const struct socket *listener, struct mg_conte
     int allowed = check_acl(ctx, &accepted.rsa);
     if (allowed)
     {
-      // Put accepted socket structure into the queue
-      ZED::Log::Debug("accepted socket " + std::to_string(accepted.sock));
+      //Put accepted socket structure into the queue
+      //ZED::Log::Debug("accepted socket " + std::to_string(accepted.sock));
       accepted.is_ssl = listener->is_ssl;
       produce_socket(ctx, &accepted);
     }

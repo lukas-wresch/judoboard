@@ -121,6 +121,7 @@ bool RemoteMat::StartMatch(Match* NewMatch, bool UseForce)
 	*NewMatch >> yaml;
 
 	const bool ret = PostData("/ajax/slave/start_match?id=" + std::to_string(GetMatID()), yaml);
+	assert(ret);
 
 	if (ret)
 		m_pMatch = NewMatch;
@@ -396,6 +397,7 @@ bool RemoteMat::PostData(const std::string& URL, const YAML::Emitter& Data) cons
 
 	ZED::HttpClient client(m_Hostname, m_Port);
 	std::string response = client.POST(URL, Data.c_str(), "Cookie: token=test");
+	assert(response == "ok");
 	return response == "ok";
 }
 
@@ -443,8 +445,8 @@ RemoteMat::InternalState RemoteMat::GetState(bool* pSuccess) const
 	//Conversion
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; ++f)
 	{
-		if (SetScoreboard(f).m_Ippon == 1)
-			SetScoreboard(f).m_WazaAri = 2;
+		//if (SetScoreboard(f).m_Ippon == 1)
+			//SetScoreboard(f).m_WazaAri = 2;
 		SetScoreboard(f).m_HansokuMake = m_Scoreboards[(int)f].m_Shido >= 3;
 	}
 
@@ -456,6 +458,8 @@ RemoteMat::InternalState RemoteMat::GetState(bool* pSuccess) const
 	//Extra states
 	internalState.hajime            = yaml["is_hajime"].as<bool>();
 	internalState.IsOsaekomi        = yaml["is_osaekomi"].as<bool>();
+	internalState.white_osaekomi    = white["is_osaekomi_running"].as<bool>();
+	internalState.blue_osaekomi     = blue["is_osaekomi_running"].as<bool>();
 	internalState.cannextmatchstart = yaml["can_next_match_start"].as<bool>();
 	internalState.hasconcluded      = yaml["has_concluded"].as<bool>();
 	internalState.isoutoftime       = yaml["is_out_of_time"].as<bool>();
