@@ -1,6 +1,7 @@
 #include "../ZED/include/http_client.h"
 #include "../ZED/include/log.h"
 #include "remote_mat.h"
+#include "matchlog.h"
 #include "app.h"
 
 
@@ -153,9 +154,17 @@ bool RemoteMat::EndMatch()
 		m_pMatch->GetFighter(Fighter::Blue)->StartBreak();*/
 
 	const bool ret = SendCommand("/ajax/mat/end_match?id=" + std::to_string(GetMatID()));
+	assert(ret);
 
-	if (ret)
-		m_pMatch = nullptr;
+	if (ret && m_pMatch)
+	{
+		auto yaml = YAML::Load(SendRequest("/ajax/match/get_log?id=" + (std::string)m_pMatch->GetUUID()));
+		assert(yaml);
+		if (yaml)
+			m_pMatch->GetLog() << yaml;
+	}
+
+	m_pMatch = nullptr;
 
 	return ret;
 }

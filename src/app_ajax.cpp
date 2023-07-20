@@ -526,14 +526,16 @@ void Application::SetupHttpServer()
 		auto guard = LockReadForScope();
 
 		if (!GetTournament())
-			return std::string("No tournament open");
+			return Error(Error::Type::TournamentNotOpen);
 
 		auto match = GetTournament()->FindMatch(id);
 
 		if (!match)
-			return std::string();
+			return Error(Error::Type::ItemNotFound);
 
-		return match->GetLog().ToString();
+		YAML::Emitter yaml;
+		match->GetLog() >> yaml;
+		return yaml.c_str();
 	});
 
 
