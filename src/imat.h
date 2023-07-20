@@ -188,14 +188,21 @@ namespace Judoboard
 		NameStyle  GetNameStyle()  const { return m_NameStyle; }
 		bool IsFullscreen() const { return m_IsFullscreen; }
 		virtual void SetFullscreen(bool Enabled = true) = 0;
+		bool IsSoundEnabled() const { return m_SoundEnabled; }
+		std::string GetSoundFilename() const { return m_SoundFilename; }
 
 		virtual void SetName(const std::string& NewName) { m_Name = NewName; }
 		virtual void SetIpponStyle(IpponStyle NewStyle) { m_IpponStyle = NewStyle; }
 		virtual void SetTimerStyle(TimerStyle NewStyle) { m_TimerStyle = NewStyle; }
 		virtual void SetNameStyle(NameStyle NewStyle) { m_NameStyle = NewStyle; }
 		virtual void SetIsFullscreen(bool Enabled) { m_IsFullscreen = Enabled; }
+		virtual void EnableSound(bool Enabled = true) { m_SoundEnabled = Enabled; }
+		virtual void SetSoundFilename(const std::string& NewFilename) { m_SoundFilename = NewFilename; }
 
 	protected:
+		virtual void PlaySoundFile() const {}
+		virtual void StopSoundFile() const {}
+
 		std::vector<Match> m_NextMatches;
 
 	private:
@@ -208,5 +215,7 @@ namespace Judoboard
 		IpponStyle m_IpponStyle = IpponStyle::DoubleDigit;
 		NameStyle m_NameStyle   = NameStyle::FamilyName;
 		bool m_IsFullscreen = true;
+		bool m_SoundEnabled = true;//Sound effect for and of match/osaekomi will be played if this flag is set
+		std::string m_SoundFilename = "test";//Sound file that is currently in use
 	};
 }

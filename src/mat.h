@@ -9,6 +9,7 @@
 #include "imat.h"
 #include "rule_set.h"
 #include "window.h"
+#include "../ZED/include/sound.h"
 
 
 
@@ -160,8 +161,23 @@ namespace Judoboard
 			m_mutex.UnlockWrite();
 		}
 
+		virtual void SetSoundFilename(const std::string& NewFilename) override
+		{
+			IMat::SetSoundFilename(NewFilename);
+
+			m_Sound = std::move(ZED::Sound("assets/sounds/" + GetSoundFilename() + ".wav"));
+			if (m_Sound)
+				ZED::Log::Info("Sound file loaded");
+			else
+				ZED::Log::Warn("Could not load sound file");
+		}
+
 
 	private:
+		virtual void PlaySoundFile() const override { m_Sound.Play(); }
+		virtual void StopSoundFile() const override { m_Sound.Stop(); }
+
+
 		Scoreboard& SetScoreboard(Fighter Whom)
 		{
 			if (Whom == Fighter::White)
@@ -488,6 +504,8 @@ namespace Judoboard
 		mutable ZED::Ref<ZED::Texture> m_Background;
 		mutable ZED::Ref<ZED::Texture> m_Logo;
 		mutable ZED::Ref<ZED::Texture> m_Winner;
+    
+		mutable ZED::Sound m_Sound;//Sound signal
 
 		double m_ScalingFactor = 1.0;//Should be 1.0 for 1080p screen, smaller for smaller screen and > 1.0 for larger screens
 

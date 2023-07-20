@@ -3,6 +3,8 @@
 #include "../ZED/include/renderer_opengl.h"
 //#include "../ZED/include/renderer_opengles1_1.h"
 #include "../ZED/include/renderer_sdl2.h"
+#include "../ZED/include/sound.h"
+#include "../ZED/include/log.h"
 #ifndef _WIN32
 #include <gtk/gtk.h>
 #endif
@@ -27,13 +29,23 @@ namespace Judoboard
 		friend gboolean on_configure(GtkWidget* widget, GdkEventConfigure* event, gpointer data);
 #endif
 
-		Window(const std::string& Title) : m_Renderer(IsDisplayConnected() ? new ZED::RendererOpenGL : new ZED::RendererSDL2), m_Title(Title) {}
+		Window(const std::string& Title) : m_Renderer(IsDisplayConnected() ? new ZED::RendererOpenGL : new ZED::RendererSDL2), m_Title(Title)
+		{
+			if (!ZED::SoundEngine::Init())
+				ZED::Log::Warn("Could not start sound engine");
+		}
 		//Window(const std::string& Title) : m_Renderer(new ZED::RendererOpenGLES1_1), m_Title(Title) {}
 		//Window(const std::string& Title) : m_Renderer(new ZED::RendererSDL2), m_Title(Title) {}
 
 		Window(Window&) = delete;
 		Window(const Window&) = delete;
-		~Window() { if (m_Renderer) m_Renderer->Release(); delete m_Renderer; }
+		~Window()
+		{
+			if (m_Renderer)
+				m_Renderer->Release();
+			delete m_Renderer;
+			ZED::SoundEngine::Release();
+		}
 
 		static bool IsDisplayConnected();
 

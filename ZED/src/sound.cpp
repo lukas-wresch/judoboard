@@ -8,9 +8,9 @@ using namespace ZED;
 
 
 #ifdef _DEBUG
-#pragma comment(lib, "../external/SDL2_mixer-2.0.4/VisualC/Win32/Debug/SDL2_mixer.lib")
+#pragma comment(lib, "SDL2_mixer.lib")
 #else
-#pragma comment(lib, "../external/SDL2_mixer-2.0.4/VisualC/Win32/Release/SDL2_mixer.lib")
+#pragma comment(lib, "SDL2_mixer.lib")
 #endif
 
 
