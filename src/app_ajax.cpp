@@ -2242,6 +2242,31 @@ void Application::SetupHttpServer()
 		return Error(Error::Type::OperationFailed);
 	});
 
+	/*m_Server.RegisterResource("/ajax/slave/get_log", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
+		if (!IsSlave())
+			return "You are not allowed to connect";
+
+		//TODO check security token
+
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+		auto guard = LockReadForScope();
+
+		if (!GetTournament())
+			return Error(Error::Type::TournamentNotOpen);
+
+		auto match = GetTournament()->FindMatch(id);
+
+		if (!match)
+			return Error(Error::Type::ItemNotFound);
+
+		YAML::Emitter yaml;
+		match->GetLog() >> yaml;
+		return yaml.c_str();
+	});*/
+
 	m_Server.RegisterResource("/ajax/config/get_setup", [this](auto& Request) -> std::string {
 		//auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		//if (!error)
@@ -2452,6 +2477,7 @@ void Application::SetupHttpServer()
 		}
 
 		match->SetResult(posted_match.GetResult());
+		match->SetLog(posted_match.GetLog());
 		return "ok";
 	});
 

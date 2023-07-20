@@ -83,6 +83,7 @@ namespace Judoboard
 	class MatchLog
 	{
 		friend class Tournament;
+		friend class Match;
 
 	public:
 		enum class EventGroup
