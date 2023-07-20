@@ -152,6 +152,8 @@ bool RemoteMat::EndMatch()
 		m_pMatch->GetFighter(Fighter::White)->StartBreak();
 	if (m_pMatch && m_pMatch->GetFighter(Fighter::Blue))
 		m_pMatch->GetFighter(Fighter::Blue)->StartBreak();*/
+	if (m_pMatch)
+		m_pMatch->EndMatch();
 
 	const bool ret = SendCommand("/ajax/mat/end_match?id=" + std::to_string(GetMatID()));
 	assert(ret);
@@ -399,7 +401,7 @@ bool RemoteMat::PostData(const std::string& URL, const YAML::Emitter& Data) cons
 
 	ZED::HttpClient client(m_Hostname, m_Port);
 	std::string response = client.POST(URL, Data.c_str(), "Cookie: token=test");
-	assert(response == "ok");
+	//assert(response == "ok");
 	return response == "ok";
 }
 

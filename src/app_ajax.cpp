@@ -2478,6 +2478,7 @@ void Application::SetupHttpServer()
 
 		match->SetResult(posted_match.GetResult());
 		match->SetLog(posted_match.GetLog());
+		match->EndMatch();
 		return "ok";
 	});
 

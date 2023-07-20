@@ -4118,7 +4118,7 @@ static int consume_socket(struct mg_context *ctx, struct socket *sp)
     // Copy socket from the queue and increment tail
     *sp = ctx->queue[ctx->sq_tail % ARRAY_SIZE(ctx->queue)];
     ctx->sq_tail++;
-    ZED::Log::Debug("grabbed socket, going busy " +  std::to_string(sp->sock));
+    //ZED::Log::Debug("grabbed socket, going busy " +  std::to_string(sp->sock));
 
     // Wrap pointers if needed
     while (ctx->sq_tail > (int) ARRAY_SIZE(ctx->queue))
@@ -4196,7 +4196,7 @@ static void produce_socket(struct mg_context *ctx, const struct socket *sp)
     // Copy socket to the queue and increment head
     ctx->queue[ctx->sq_head % ARRAY_SIZE(ctx->queue)] = *sp;
     ctx->sq_head++;
-    ZED::Log::Debug("queued socket " + std::to_string(sp->sock));
+    //ZED::Log::Debug("queued socket " + std::to_string(sp->sock));
   }
 
   pthread_cond_signal(&ctx->sq_full);
