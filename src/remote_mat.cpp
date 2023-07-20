@@ -428,8 +428,12 @@ RemoteMat::InternalState RemoteMat::GetState(bool* pSuccess) const
 	SetScoreboard(Fighter::White).m_WazaAri = white["wazaari"].as<uint32_t>();
 	if (white["yuko"])
 		SetScoreboard(Fighter::White).m_Yuko = white["yuko"].as<int32_t>();
+	else
+		SetScoreboard(Fighter::White).m_Yuko = -1;
 	if (white["koka"])
 		SetScoreboard(Fighter::White).m_Koka = white["koka"].as<int32_t>();
+	else
+		SetScoreboard(Fighter::White).m_Koka = -1;
 	SetScoreboard(Fighter::White).m_Shido = white["shido"].as<uint32_t>();
 	SetScoreboard(Fighter::White).m_MedicalExamination = white["medical"].as<uint32_t>();
 
@@ -439,8 +443,12 @@ RemoteMat::InternalState RemoteMat::GetState(bool* pSuccess) const
 	SetScoreboard(Fighter::Blue).m_WazaAri = blue["wazaari"].as<uint32_t>();
 	if (blue["yuko"])
 		SetScoreboard(Fighter::Blue).m_Yuko = blue["yuko"].as<int32_t>();
+	else
+		SetScoreboard(Fighter::Blue).m_Yuko = -1;
 	if (blue["koka"])
 		SetScoreboard(Fighter::Blue).m_Koka = blue["koka"].as<int32_t>();
+	else
+		SetScoreboard(Fighter::Blue).m_Koka = -1;
 	SetScoreboard(Fighter::Blue).m_Shido = blue["shido"].as<uint32_t>();
 	SetScoreboard(Fighter::Blue).m_MedicalExamination = blue["medical"].as<uint32_t>();
 

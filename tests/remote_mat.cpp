@@ -2258,16 +2258,16 @@ TEST(RemoteMat, Yuko2)
 		EXPECT_TRUE(m->StartMatch(match));
 
 
-		EXPECT_TRUE(m->GetScoreboard(f).m_Yuko == -1);
+		EXPECT_EQ(m->GetScoreboard(f).m_Yuko, -1);
 		for (int k = 1; k < 25; k++)
 		{
 			m->AddYuko(f);
-			EXPECT_TRUE(m->GetScoreboard(f).m_Yuko == -1);
+			EXPECT_EQ(m->GetScoreboard(f).m_Yuko, -1);
 		}
 		for (int k = 1; k < 25; k++)
 		{
 			m->RemoveYuko(f);
-			EXPECT_TRUE(m->GetScoreboard(f).m_Yuko == -1);
+			EXPECT_EQ(m->GetScoreboard(f).m_Yuko, -1);
 		}
 
 		m->AddIppon(f);
