@@ -2446,7 +2446,7 @@ void Application::SetupHttpServer()
 
 		ZED::Log::Info("Slave requested rule set info");
 
-		auto rule_set = GetDatabase().FindRuleSet(UUID(std::move(uuid)));
+		auto rule_set = GetTournament()->GetDatabase().FindRuleSet(UUID(std::move(uuid)));
 
 		if (!rule_set)
 			return "Not found";
