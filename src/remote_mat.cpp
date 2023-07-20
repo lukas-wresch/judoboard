@@ -122,7 +122,6 @@ bool RemoteMat::StartMatch(Match* NewMatch, bool UseForce)
 	*NewMatch >> yaml;
 
 	const bool ret = PostData("/ajax/slave/start_match?id=" + std::to_string(GetMatID()), yaml);
-	assert(ret);
 
 	if (ret)
 		m_pMatch = NewMatch;
@@ -152,8 +151,6 @@ bool RemoteMat::EndMatch()
 		m_pMatch->GetFighter(Fighter::White)->StartBreak();
 	if (m_pMatch && m_pMatch->GetFighter(Fighter::Blue))
 		m_pMatch->GetFighter(Fighter::Blue)->StartBreak();*/
-	if (m_pMatch)
-		m_pMatch->EndMatch();
 
 	const bool ret = SendCommand("/ajax/mat/end_match?id=" + std::to_string(GetMatID()));
 	assert(ret);

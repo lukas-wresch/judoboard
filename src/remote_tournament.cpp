@@ -101,8 +101,14 @@ const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 	if (!yaml)
 		return nullptr;
 
-	Judoka* judoka = new Judoka(yaml, &m_StandingData);//TODO replace by pointer to real standing data
-	m_StandingData.AddJudoka(judoka);
+	Judoka* judoka = nullptr;
+	judoka = m_StandingData.FindJudoka(UUID);//Already in cache?
+
+	if (!judoka)
+	{
+		judoka = new Judoka(yaml, &m_StandingData);//TODO replace by pointer to real standing data
+		m_StandingData.AddJudoka(judoka);
+	}
 
 	return judoka;
 }

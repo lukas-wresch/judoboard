@@ -2966,7 +2966,7 @@ TEST(RemoteMat, BreakTime)
 	IMat* m = master.FindMat(1);
 
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 55; time <= 3 * 60; time += 70 + rand() % 70)
+	for (int time = 55; time <= 3 * 60; time += 70 + rand() % 40)
 	{
 		RuleSet* rule_set = new RuleSet("Test" + std::to_string(time), 10, 10, 30, 20, false, false, false, time);
 		master.GetDatabase().AddRuleSet(rule_set);
@@ -2999,14 +2999,14 @@ TEST(RemoteMat, BreakTime)
 		match2->SetRuleSet(rule_set);
 		master.GetTournament()->AddMatch(match2);
 
-		for (int k = 0; k < time-15; k++)
+		for (int k = 0; k < time-10; k++)
 		{
 			EXPECT_FALSE(m->StartMatch(match2));
 			ZED::Core::Pause(1000);
 		}
 
-		ZED::Core::Pause(15 * 1000);
-		ZED::Core::Pause(8000);
+		ZED::Core::Pause(10 * 1000);
+		ZED::Core::Pause(5000);
 
 		EXPECT_TRUE(m->StartMatch(match2));
 		ZED::Core::Pause(200);
