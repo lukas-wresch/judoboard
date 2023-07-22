@@ -39,7 +39,7 @@ DoubleElimination::DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender 
 
 
 
-DoubleElimination::DoubleElimination(const YAML::Node& Yaml, ITournament* Tournament, const MatchTable* Parent)
+DoubleElimination::DoubleElimination(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
 	: MatchTable(Yaml, Tournament, Parent), m_WinnerBracket(nullptr, Tournament, this), m_LoserBracket(nullptr, Tournament, this)
 {
 	if (Yaml["winner_bracket"])

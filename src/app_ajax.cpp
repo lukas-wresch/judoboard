@@ -2495,17 +2495,35 @@ void Application::SetupHttpServer()
 		if (!IsMaster())
 			return "You are not allowed to connect";
 
-		auto uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "uuid");
+		UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "uuid");
 
 		ZED::Log::Info("Slave requested rule set info");
 
-		auto rule_set = GetTournament()->GetDatabase().FindRuleSet(UUID(std::move(uuid)));
+		auto rule_set = GetTournament()->GetDatabase().FindRuleSet(uuid);
 
 		if (!rule_set)
 			return "Not found";
 
 		YAML::Emitter yaml;
 		*rule_set >> yaml;
+		return yaml.c_str();
+	});
+
+	m_Server.RegisterResource("/ajax/master/find_match_table", [this](auto& Request) -> std::string {
+		if (!IsMaster())
+			return "You are not allowed to connect";
+
+		UUID uuid = HttpServer::DecodeURLEncoded(Request.m_Query, "uuid");
+
+		ZED::Log::Info("Slave requested match table info");
+
+		auto match_table = GetTournament()->FindMatchTable(uuid);
+
+		if (!match_table)
+			return "Not found";
+
+		YAML::Emitter yaml;
+		*match_table >> yaml;
 		return yaml.c_str();
 	});
 

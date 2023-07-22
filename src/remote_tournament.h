@@ -24,9 +24,14 @@ namespace Judoboard
 
 		virtual bool AddMatch(Match* NewMatch) override;
 
+		//Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const override;
 		virtual Judoka* FindParticipant(const UUID& UUID) override;
 		virtual const Judoka* FindParticipant(const UUID& UUID) const override;
+
+		//Match tables
+		virtual MatchTable* FindMatchTable(const UUID& ID) override;
+		virtual const MatchTable* FindMatchTable(const UUID& ID) const override;
 
 		//Rule Sets
 		virtual const RuleSet* FindRuleSet(const UUID& UUID) const override;

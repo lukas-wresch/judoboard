@@ -146,6 +146,48 @@ const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 
 
 
+MatchTable* RemoteTournament::FindMatchTable(const UUID& ID)
+{
+	auto response = Request2Master("/ajax/master/find_match_table?uuid=" + (std::string)ID);
+
+	if (response.length() == 0)
+	{
+		ZED::Log::Error("Could not obtain match table data from master server");
+		return nullptr;
+	}
+
+	YAML::Node yaml = YAML::Load(response);
+
+	if (!yaml)
+		return nullptr;
+
+	MatchTable* table = MatchTable::CreateMatchTable(yaml, this);
+	return table;
+}
+
+
+
+const MatchTable* RemoteTournament::FindMatchTable(const UUID& ID) const
+{
+	auto response = Request2Master("/ajax/master/find_match_table?uuid=" + (std::string)ID);
+
+	if (response.length() == 0)
+	{
+		ZED::Log::Error("Could not obtain match table data from master server");
+		return nullptr;
+	}
+
+	YAML::Node yaml = YAML::Load(response);
+
+	if (!yaml)
+		return nullptr;
+
+	MatchTable* table = MatchTable::CreateMatchTable(yaml, this);
+	return table;
+}
+
+
+
 const RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID) const
 {
 	auto response = Request2Master("/ajax/master/find_ruleset?uuid=" + (std::string)UUID);

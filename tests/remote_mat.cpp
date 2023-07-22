@@ -275,6 +275,35 @@ TEST(RemoteMat, SendRuleSet)
 
 
 
+TEST(RemoteMat, SendMatchTable)
+{
+	initialize();
+	Application master(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
+
+	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
+	ASSERT_TRUE(slave.StartLocalMat(1));
+
+	IMat* m = master.FindMat(1);
+
+	auto j1 = new Judoka(GetRandomName(), GetRandomName());
+	auto j2 = new Judoka(GetRandomName(), GetRandomName());
+	master.GetTournament()->AddParticipant(j1);
+	master.GetTournament()->AddParticipant(j2);
+
+	MatchTable* m1 = new RoundRobin(0, 1000);
+	m1->SetMatID(1);
+	master.GetTournament()->AddMatchTable(m1);
+
+	ASSERT_TRUE(m);
+	ASSERT_TRUE(m->StartMatch(master.GetTournament()->GetSchedule()[0]));
+
+	auto remote_table = slave.GetMats()[0]->GetMatch()->GetMatchTable();
+	ASSERT_TRUE(remote_table);
+}
+
+
+
 TEST(RemoteMat, SendHajime)
 {
 	initialize();

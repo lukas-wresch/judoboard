@@ -53,7 +53,8 @@ namespace Judoboard
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;
 		virtual std::vector<Judoka*> GetParticipants() const {
 			std::vector<Judoka*> ret;
-      return ret; }
+			return ret;
+		}
 		virtual const Judoka* FindParticipant(const UUID& UUID) const { return nullptr; }
 		virtual Judoka* FindParticipant(const UUID& UUID) { return nullptr; }
 			
@@ -78,8 +79,8 @@ namespace Judoboard
 			return ret;
 		}
 
-		virtual MatchTable* FindMatchTable(const UUID& ID) { return nullptr; }
-		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
+		virtual MatchTable* FindMatchTable(const UUID& ID) = 0;
+		virtual const MatchTable* FindMatchTable(const UUID& ID) const = 0;
 
 		//Clubs
 		virtual Club* FindClub(const UUID& UUID) { return nullptr; }
