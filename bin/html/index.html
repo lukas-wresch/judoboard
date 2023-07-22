@@ -150,7 +150,7 @@ function Update_MatCount()
         if (mat.type == 1)
           matlist.innerHTML += "<li><a href=\"#mat.html?id=" + mat.id + "\">" + translate('mat') + " " + mat.id + "</a></li>"
         else if (mat.type == 3)
-          matlist.innerHTML += "<li><a href=\"#mat.html?id=" + mat.id + "&host=" + mat.hostname + ":" + mat.port + "\">" + translate('mat') + " " + mat.id + "</a></li>"
+          matlist.innerHTML += "<li><a href=\"#mat.html?id=" + mat.id + "&host=" + mat.hostname + ":" + mat.port + "&token=" + mat.token + "\">" + translate('mat') + " " + mat.id + "</a></li>"
       }
     }
   });

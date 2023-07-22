@@ -27,9 +27,11 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	m_TempTournament.SetDefaultRuleSet(new RuleSet);//Take default rule set as rule set for temporary tournaments
 	m_CurrentTournament = &m_TempTournament;
 
+	std::string token = (std::string)ID::GenerateUUID();
+	m_SecurityToken   = token.substr(0, 32);
+
 	if (!m_Server.IsRunning())
 		ZED::Log::Error("Could not start http server!");
-
 
 	SetupHttpServer();
 }

@@ -14,7 +14,13 @@ namespace Judoboard
 
 		virtual bool IsLocal() const { return false; }
 
-		virtual std::vector<Match> GetNextMatches(uint32_t MatID) const override;
+		virtual std::vector<Match> GetNextMatches(int32_t MatID) const override;
+		virtual Match* GetNextMatch(int32_t MatID = -1) const override {
+			auto ret = GetNextMatches(MatID);
+			if (ret.empty())
+				return nullptr;
+			return FindInCache(ret[0].GetUUID());
+		}
 
 		virtual bool AddMatch(Match* NewMatch) override;
 
@@ -33,8 +39,14 @@ namespace Judoboard
 		std::string Request2Master(const std::string& URL) const;
 		bool Post2Master(const std::string& URL, const YAML::Emitter& Data) const;
 
+		bool IsMatchInCache(const UUID& UUID) const;
+		Match* FindInCache(const UUID& UUID) const;
+
+
 		std::string m_Hostname;
 		uint16_t m_Port;
+
+		mutable std::vector<Match*> m_MatchCache;
 
 		mutable StandingData m_StandingData;//Local cache
 	};

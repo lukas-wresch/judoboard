@@ -165,7 +165,7 @@ function GetLog()
 {
   AjaxCallback('ajax/match/get_log?id='+id, function(response) {
     console.log(response);
-    let res = response.split(",");
+    const res = YAML.parse(response);
 
     var table = document.getElementById("log");
 
@@ -176,91 +176,91 @@ function GetLog()
       let cell2 = row.insertCell(-1);
       let cell3 = row.insertCell(-1);
 
-      cell1.innerHTML = NiceTimeMS(res[i+0]);
+      cell1.innerHTML = NiceTimeMS(event.timestamp);
 
-      if (res.group == 2)
+      if (event.group == 2)
         cell2.innerHTML = "- - -";
-      else if (res.group == 0)
+      else if (event.group == 0)
         cell2.innerHTML = translate('white');
-      else if (res.group == 1)
+      else if (event.group == 1)
       {
         cell2.style.color = "blue";
         cell2.innerHTML = translate('blue');
       }
 
 
-      if (res.group == 2 && res.event == 0)
+      if (event.group == 2 && event.event == 0)
         cell3.innerHTML = "Hajime";
-      else if (res.group == 2 && res.event == 1)
+      else if (event.group == 2 && event.event == 1)
         cell3.innerHTML = "Mate";
-      else if (res.group == 2 && res.event == 2)
+      else if (event.group == 2 && event.event == 2)
         cell3.innerHTML = "Tokeda";
-      else if (res.group == 2 && res.event == 3)
+      else if (event.group == 2 && event.event == 3)
         cell3.innerHTML = "Sonomama";
-      else if (res.group == 2 && res.event == 4)
+      else if (event.group == 2 && event.event == 4)
         cell3.innerHTML = "Yoshi";
-      else if (res.group == 2 && res.event == 5)
+      else if (event.group == 2 && event.event == 5)
         cell3.innerHTML = translate('osaekomi_switched');
-      else if (res.group == 2 && res.event == 6)
+      else if (event.group == 2 && event.event == 6)
         cell3.innerHTML = translate('match_started');
-      else if (res.group == 2 && res.event == 7)
+      else if (event.group == 2 && event.event == 7)
         cell3.innerHTML = translate('end_of_match');
-      else if (res.group == 2 && res.event == 8)
+      else if (event.group == 2 && event.event == 8)
         cell3.innerHTML = translate('goldenscore_activate');
-      else if (res.group == 2 && res.event == 9)
+      else if (event.group == 2 && event.event == 9)
         cell3.innerHTML = translate('goldenscore_revoked');
-      else if (res.group == 2 && res.event == 10)
+      else if (event.group == 2 && event.event == 10)
         cell3.innerHTML = translate('draw');
-      else if (res.group == 2 && res.event == 11)
+      else if (event.group == 2 && event.event == 11)
         cell3.innerHTML = translate('draw_revoked');
 
-      else if (res.event == 0)
+      else if (event.event == 0)
         cell3.innerHTML = "Ippon";
-      else if (res.event == 1)
+      else if (event.event == 1)
         cell3.innerHTML = "Wazaari";
-      else if (res.event == 2)
+      else if (event.event == 2)
         cell3.innerHTML = "Yuko";
-      else if (res.event == 3)
+      else if (event.event == 3)
         cell3.innerHTML = "Koka";
-      else if (res.event == 4)
+      else if (event.event == 4)
         cell3.innerHTML = translate('ippon_revoked');
-      else if (res.event == 5)
+      else if (event.event == 5)
         cell3.innerHTML = translate('wazaari_revoked');
-      else if (res.event == 6)
+      else if (event.event == 6)
         cell3.innerHTML = translate('yuko_revoked');
-      else if (res.event == 7)
+      else if (event.event == 7)
         cell3.innerHTML = translate('koka_revoked');
-      else if (res.event == 8)
+      else if (event.event == 8)
         cell3.innerHTML = "Wazari awasete Ippon";
-      else if (res.event == 9)
+      else if (event.event == 9)
         cell3.innerHTML = "Osaekomi";
-      else if (res.event == 10)
+      else if (event.event == 10)
         cell3.innerHTML = "Shido";
-      else if (res.event == 11)
+      else if (event.event == 11)
         cell3.innerHTML = translate('hansokumake_direct');
-      else if (res.event == 12)
+      else if (event.event == 12)
         cell3.innerHTML = translate('hansokumake_indirect');
-      else if (res.event == 13)
+      else if (event.event == 13)
         cell3.innerHTML = translate('shido_revoked');
-      else if (res.event == 14)
+      else if (event.event == 14)
         cell3.innerHTML = translate('hansokumake_revoked');
-      else if (res.event == 15)
+      else if (event.event == 15)
         cell3.innerHTML = translate('medical_examiniation');
-      else if (res.event == 16)
+      else if (event.event == 16)
         cell3.innerHTML = translate('medical_examiniation_revoked');
-      else if (res.event == 17)
+      else if (event.event == 17)
         cell3.innerHTML = "Hantei";
-      else if (res.event == 18)
+      else if (event.event == 18)
         cell3.innerHTML = translate('disqualification');
-      else if (res.event == 19)
+      else if (event.event == 19)
         cell3.innerHTML = translate('no_disqualification');
-      else if (res.event == 20)
+      else if (event.event == 20)
         cell3.innerHTML = translate('disqualification_revoked');
-      else if (res.event == 21)
+      else if (event.event == 21)
         cell3.innerHTML = translate('no_disqualification_revoked');
-      else if (res.event == 22)
+      else if (event.event == 22)
         cell3.innerHTML = "Gachi";
-      else if (res.event == 23)
+      else if (event.event == 23)
         cell3.innerHTML = translate('gachi_revoked');
     }
   });

@@ -14,7 +14,7 @@ RemoteTournament::RemoteTournament(const std::string& Host, uint16_t Port) : m_H
 
 
 
-std::vector<Match> RemoteTournament::GetNextMatches(uint32_t MatID) const
+std::vector<Match> RemoteTournament::GetNextMatches(int32_t MatID) const
 {
 	auto response = Request2Master("/ajax/master/get_next_matches?id=" + std::to_string(MatID));
 	std::vector<Match> ret;
@@ -32,10 +32,39 @@ std::vector<Match> RemoteTournament::GetNextMatches(uint32_t MatID) const
 
 	for (const auto& node : yaml)
 	{
-		ret.emplace_back(node, nullptr, (RemoteTournament*)this);
+		if (!node.IsMap() || !node["uuid"])
+			continue;
+
+		UUID id(node["uuid"].as<std::string>());
+
+		if (!IsMatchInCache(id))
+			m_MatchCache.push_back(new Match(node, nullptr, (RemoteTournament*)this));
+
+		Match match(node, nullptr, (RemoteTournament*)this);
+		ret.emplace_back(match);
 	}
 	
 	return ret;
+}
+
+
+
+bool RemoteTournament::IsMatchInCache(const UUID& UUID) const
+{
+	for (auto match : m_MatchCache)
+		if (match && match->GetUUID() == UUID)
+			return true;
+	return false;
+}
+
+
+
+Match* RemoteTournament::FindInCache(const UUID& UUID) const
+{
+	for (auto match : m_MatchCache)
+		if (match && match->GetUUID() == UUID)
+			return match;
+	return nullptr;
 }
 
 
@@ -48,7 +77,9 @@ bool RemoteTournament::AddMatch(Match* NewMatch)
 		return false;
 	}
 
-	//TODO: Add match data to cache
+	//Add match data to cache	
+	if (!IsMatchInCache(*NewMatch))
+		m_MatchCache.push_back(NewMatch);
 
 	return true;
 }

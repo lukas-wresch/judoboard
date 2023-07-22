@@ -1125,7 +1125,7 @@ bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 
 
 
-std::vector<Match> Tournament::GetNextMatches(uint32_t MatID) const
+std::vector<Match> Tournament::GetNextMatches(int32_t MatID) const
 {
 	std::vector<Match> ret;
 
