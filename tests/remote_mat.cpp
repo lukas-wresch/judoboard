@@ -221,8 +221,8 @@ TEST(RemoteMat, StartMatch)
 	{
 		EXPECT_EQ(m->GetScoreboard(f).m_Ippon, 0);
 		EXPECT_EQ(m->GetScoreboard(f).m_WazaAri, 0);
-		EXPECT_EQ(m->GetScoreboard(f).m_Yuko, 0);
-		EXPECT_EQ(m->GetScoreboard(f).m_Koka, 0);
+		EXPECT_EQ(m->GetScoreboard(f).m_Yuko, -1);
+		EXPECT_EQ(m->GetScoreboard(f).m_Koka, -1);
 
 		EXPECT_EQ(m->GetScoreboard(f).m_Shido, 0);
 		EXPECT_FALSE(m->GetScoreboard(f).m_HansokuMake);
