@@ -361,6 +361,25 @@ namespace Judoboard
 				return *this;
 			}
 
+			GraphicElement& SetWidth(int Width)
+			{
+				m_width = Width;
+				return *this;
+			}
+
+			GraphicElement& SetHeight(int Height)
+			{
+				m_height = Height;
+				return *this;
+			}
+
+			GraphicElement& SetSize(int Width, int Height)
+			{
+				m_width  = Width;
+				m_height = Height;
+				return *this;
+			}
+
 			GraphicElement& SetTexture(ZED::Texture* NewTexture)
 			{
 				m_Texture = NewTexture;

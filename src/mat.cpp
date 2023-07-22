@@ -1879,7 +1879,8 @@ void Mat::UpdateOsaekomiGraphics() const
 	auto& osaekomi_text = m_Graphics["osaekomi_text"];
 	auto& osaekomi_bar  = m_Graphics["osaekomi_bar"];
 
-	osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
+	//osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
+	osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic);
 
 	const int new_width = m_OsaekomiTimer[(int)fighter].GetElapsedTime() * osaekomi_max_width / (EndTimeOfOsaekomi() * 1000);
 
@@ -1891,18 +1892,29 @@ void Mat::UpdateOsaekomiGraphics() const
 			osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
 		}
 
-		m_Graphics["osaekomi_bar_border"].SetPosition(0, osaekomi_y, 255);
-		m_Graphics["osaekomi_bar_border"].m_width  = new_width + 5;
-		m_Graphics["osaekomi_bar_border"].m_height = (int)(100.0 * m_ScalingFactor) + 10;
-		m_Graphics["osaekomi_bar_border"].m_color  = ZED::Color(0, 0, 0);
+		auto& osaekomi_bar_border = m_Graphics["osaekomi_bar_border"];
+		osaekomi_bar_border.SetPosition(0, osaekomi_y, 255);
+		osaekomi_bar_border.m_width  = new_width + 5;
+		osaekomi_bar_border.m_height = (int)(100.0 * m_ScalingFactor) + 10;
+		osaekomi_bar_border.m_color  = ZED::Color(0, 0, 0);
 
 
 		osaekomi_bar.SetPosition(0, osaekomi_y + 5, 255);
-
 		//osaekomi_bar.m_color = ZED::Color(30, 150, 30);
 		osaekomi_bar.m_color = ZED::Color(255, 0, 0);
 		osaekomi_bar.m_width = new_width;
 		osaekomi_bar.m_height = (int)(100.0 * m_ScalingFactor);
+
+		//New osaekomi bar
+		double rect_width  = 190.0;
+		double rect_height = 150.0;
+		double outer_rect_width  = rect_width  + 10.0;
+		double outer_rect_height = rect_height + 10.0;
+		osaekomi_text.Center().SetPosition(width/2, osaekomi_y);
+		osaekomi_bar. Center().SetPosition(width/2 - (int)(rect_width/2.0 * m_ScalingFactor), osaekomi_y - (int)(rect_height/2.0 * m_ScalingFactor))
+					.SetSize((int)(rect_width * m_ScalingFactor), (int)(rect_height * m_ScalingFactor));
+		osaekomi_bar_border.Center().SetPosition(width/2 - (int)(outer_rect_width/2.0 * m_ScalingFactor), osaekomi_y - (int)(outer_rect_height/2.0 * m_ScalingFactor))
+					.SetSize((int)(outer_rect_width * m_ScalingFactor), (int)(outer_rect_height * m_ScalingFactor));
 	}
 }
 
