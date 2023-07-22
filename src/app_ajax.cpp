@@ -2454,7 +2454,7 @@ void Application::SetupHttpServer()
 
 		ZED::Log::Info("Starting remote mat with id " + std::to_string(id) + " at address " + ip);
 
-		RemoteMat* new_mat = new RemoteMat(id, ip, port);
+		RemoteMat* new_mat = new RemoteMat(id, ip, port, GetAccessToken());
 		new_mat->Open();
 
 		auto guard = LockWriteForScope();

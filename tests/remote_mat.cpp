@@ -174,11 +174,11 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 		EXPECT_TRUE(match);
 		EXPECT_TRUE(mat[i]->StartMatch(match));
 
-		ZED::Core::Pause(3000);
+		ZED::Core::Pause(2000);
 
 		mat[i]->Hajime();
 
-		ZED::Core::Pause(1000);
+		ZED::Core::Pause(500);
 
 		Fighter f = Fighter::White;
 		if (rand() % 2 == 0)
@@ -186,10 +186,10 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 
 		mat[i]->AddIppon(f);
 
-		ZED::Core::Pause(3000);
+		ZED::Core::Pause(2000);
 
 		EXPECT_TRUE(mat[i]->EndMatch());
-		ZED::Core::Pause(3000);
+		ZED::Core::Pause(2000);
 	}
 }
 
@@ -385,7 +385,7 @@ TEST(RemoteMat, CorrectWinner)
 				m->AddNoDisqualification(!f);
 			}
 
-			ZED::Core::Pause(2500);
+			ZED::Core::Pause(500);
 
 			if (i == 4)
 				m->SetAsDraw();
@@ -2880,7 +2880,7 @@ TEST(RemoteMat, Draw)
 	master.GetDatabase().AddJudoka(j1);
 	master.GetDatabase().AddJudoka(j2);
 
-	auto rules = new RuleSet("Test", 10, 60, 30, 20, false, false, true, 0);
+	auto rules = new RuleSet("Test", 5, 60, 30, 20, false, false, true, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
 	Match* match = new Match(j1, j2, nullptr);
@@ -2892,13 +2892,13 @@ TEST(RemoteMat, Draw)
 
 	m->Hajime();
 
-	for (int k = 0; k < 9; k++)
+	for (int k = 0; k < 4; k++)
 	{
 		EXPECT_FALSE(m->IsOutOfTime());
 		ZED::Core::Pause(1000);
 	}
 
-	ZED::Core::Pause(2 * 1000);
+	ZED::Core::Pause(2000);
 	EXPECT_TRUE(m->IsOutOfTime());
 
 	EXPECT_FALSE(m->HasConcluded());
@@ -2924,7 +2924,7 @@ TEST(RemoteMat, Draw2)
 	master.GetDatabase().AddJudoka(j1);
 	master.GetDatabase().AddJudoka(j2);
 
-	auto rules = new RuleSet("Test", 10, 60, 30, 20, false, false, false, 0);
+	auto rules = new RuleSet("Test", 5, 60, 30, 20, false, false, false, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
 	Match* match = new Match(j1, j2, nullptr);
@@ -2937,13 +2937,13 @@ TEST(RemoteMat, Draw2)
 
 	m->Hajime();
 
-	for (int k = 0; k < 9; k++)
+	for (int k = 0; k < 4; k++)
 	{
 		EXPECT_FALSE(m->IsOutOfTime());
 		ZED::Core::Pause(1000);
 	}
 
-	ZED::Core::Pause(2 * 1000);
+	ZED::Core::Pause(2000);
 	EXPECT_TRUE(m->IsOutOfTime());
 
 	EXPECT_FALSE(m->HasConcluded());

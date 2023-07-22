@@ -9,7 +9,7 @@ namespace Judoboard
 	class RemoteMat : public IMat
 	{
 	public:
-		RemoteMat(uint32_t ID, const std::string& Host, uint16_t Port);
+		RemoteMat(uint32_t ID, const std::string& Host, uint16_t Port, const std::string& Token);
 
 		//Virtuals
 		virtual Type GetType() const override { return IMat::Type::RemoteMat; };
@@ -155,5 +155,6 @@ namespace Judoboard
 
 		std::string m_Hostname;
 		uint16_t m_Port;
+		std::string m_SecurityToken;
 	};
 }

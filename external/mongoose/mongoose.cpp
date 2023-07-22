@@ -4179,7 +4179,7 @@ static void worker_thread(struct mg_context *ctx)
     assert(ctx->num_threads >= 0);
     pthread_mutex_unlock(&ctx->mutex);
 
-    ZED::Log::Debug("worker exiting");
+    //ZED::Log::Debug("worker exiting");
 }
 
 // Master thread adds accepted socket to a queue

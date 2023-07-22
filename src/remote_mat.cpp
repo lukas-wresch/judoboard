@@ -10,11 +10,10 @@ using namespace Judoboard;
 
 
 
-RemoteMat::RemoteMat(uint32_t ID, const std::string& Host, uint16_t Port) : IMat(ID), m_Hostname(Host), m_Port(Port)
+RemoteMat::RemoteMat(uint32_t ID, const std::string& Host, uint16_t Port, const std::string& Token)
+	: IMat(ID), m_Hostname(Host), m_Port(Port), m_SecurityToken(Token)
 {
-	ZED::HttpClient client(m_Hostname, m_Port);
-	std::string response = client.GET("/ajax/slave/set_mat_id?id=" + std::to_string(GetMatID()));
-	if (response != "ok")
+	if (!SendCommand("/ajax/slave/set_mat_id?id=" + std::to_string(GetMatID())))
 		ZED::Log::Error("Could not connect to remote mat");
 }
 
@@ -22,10 +21,7 @@ RemoteMat::RemoteMat(uint32_t ID, const std::string& Host, uint16_t Port) : IMat
 
 bool RemoteMat::IsOpen() const
 {
-	ZED::HttpClient client(m_Hostname, m_Port);
-	std::string response = client.GET("/ajax/slave/is_mat_open?id=" + std::to_string(GetMatID()));
-
-	if (response != "ok")
+	if (!SendCommand("/ajax/slave/is_mat_open?id=" + std::to_string(GetMatID())))
 	{
 		ZED::Log::Error("Could not open remote mat");
 		return false;
@@ -146,14 +142,7 @@ bool RemoteMat::HasConcluded() const
 
 bool RemoteMat::EndMatch()
 {
-	//Used to keep the judoka data in sync
-	/*if (m_pMatch && m_pMatch->GetFighter(Fighter::White))
-		m_pMatch->GetFighter(Fighter::White)->StartBreak();
-	if (m_pMatch && m_pMatch->GetFighter(Fighter::Blue))
-		m_pMatch->GetFighter(Fighter::Blue)->StartBreak();*/
-
 	const bool ret = SendCommand("/ajax/mat/end_match?id=" + std::to_string(GetMatID()));
-	assert(ret);
 
 	if (ret)
 		m_pMatch = nullptr;
@@ -387,7 +376,8 @@ ZED::HttpClient::Packet RemoteMat::SendRequest(const std::string& URL) const
 	//ZED::Log::Debug("Sending request: " + URL);
 
 	ZED::HttpClient client(m_Hostname, m_Port);
-	return client.GET(URL, "Cookie: token=test");
+	return client.GET(URL + "&token=" + m_SecurityToken);
+	//return client.GET(URL, "Cookie: token=test");
 }
 
 
