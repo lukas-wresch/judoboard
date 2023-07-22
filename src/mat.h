@@ -278,14 +278,15 @@ namespace Judoboard
 					m_Texture->Unload();
 			}
 
-			void UpdateTexture(const ZED::Renderer& Renderer, const std::string& Text, ZED::Color Color, ZED::FontSize Size = ZED::FontSize::Huge)
+			GraphicElement& UpdateTexture(const ZED::Renderer& Renderer, const std::string& Text, ZED::Color Color, ZED::FontSize Size = ZED::FontSize::Huge)
 			{
-				if (m_Name == Text) return;
+				if (m_Name == Text) return *this;
 
 				m_Texture = Renderer.RenderFont(Size, Text, Color);
 				m_Size = Size;
 				m_Name = Text;
 				m_Color = Color;
+				return *this;
 			}
 
 			void Shorten(const ZED::Renderer& Renderer)//Shortens the text by one character
@@ -370,6 +371,12 @@ namespace Judoboard
 			GraphicElement& SetAlpha(double a)
 			{
 				m_a = a;
+				return *this;
+			}
+
+			GraphicElement& SetColor(ZED::Color Color)
+			{
+				m_color = Color;
 				return *this;
 			}
 

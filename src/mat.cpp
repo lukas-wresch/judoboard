@@ -1435,13 +1435,29 @@ void Mat::NextState(State NextState) const
 			m_Graphics["timer"].SetPosition(width/2, height/2, -120).Center()
 				.AddAnimation(Animation::CreateLinear(0.0, 0.0, 33.0, [](auto& g) { return g.m_a < 255.0; }));
 
-			m_Graphics["mat_name"  ].AddAnimation(Animation::CreateLinear(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
+			m_Graphics["mat_name"].AddAnimation(Animation::CreateLinear(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
 
 			m_Graphics["next_match"].StopAllAnimations()
 				.AddAnimation(Animation::CreateLinear(0.0, 0.0, -38.0, [](auto& g) { return g.m_a > 0.0; }));
 
 			m_Graphics["following_match"].StopAllAnimations()
 				.AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0, [](auto& g) { return g.m_a > 0.0; }));
+
+			//Setup rectangle for age group
+			if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetAgeGroup())
+			{
+				auto name = m_pMatch->GetMatchTable()->GetAgeGroup()->GetName();
+				m_Graphics["age_group_rect"].UpdateTexture(renderer, "Hajime", ZED::Color(0, 0, 0), ZED::FontSize::Gigantic)
+					.StopAllAnimations().Center().SetPosition(width/2, height/2 + (int)(130.0 * m_ScalingFactor), 0)
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0,  50.0, [](auto& g) { return g.m_a < 300.0; }))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0, [](auto& g) { return g.m_a >   0.0; }));
+
+				m_Graphics["age_group_rect_bar"].SetColor(ZED::Color(255, 255, 0))
+					.StopAllAnimations().Center().SetPosition(width/2, height/2 + (int)(130.0 * m_ScalingFactor), 0)
+					.SetSize((int)(300.0 * m_ScalingFactor), (int)(100.0 * m_ScalingFactor))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0,  50.0, [](auto& g) { return g.m_a < 300.0; }))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0, [](auto& g) { return g.m_a >   0.0; }));
+			}
 
 			m_Graphics["hajime"].UpdateTexture(renderer, "Hajime", ZED::Color(255, 255, 255));
 			m_Graphics["mate"  ].UpdateTexture(renderer, "Mate",   ZED::Color(0, 0, 0));
@@ -2189,6 +2205,9 @@ bool Mat::Render(double dt) const
 
 		m_Graphics["next_match"].Render(renderer, dt);
 		m_Graphics["following_match"].Render(renderer, dt);
+
+		m_Graphics["age_group_rect_bar"].Render(renderer, dt);
+		m_Graphics["age_group_rect"].Render(renderer, dt);
 
 		if (Timer::GetTimestamp() - m_CurrentStateStarted >= 10 * 1000)
 			NextState(State::Running);
