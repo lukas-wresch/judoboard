@@ -454,13 +454,18 @@ bool Application::StartLocalMat(uint32_t ID)
 
 bool Application::RegisterMatWithMaster(IMat* Mat)
 {
-	auto yaml = YAML::Load(SendCommandToMaster("/ajax/master/mat_available?port=" + std::to_string(m_Server.GetPort())));
+	if (!Mat)
+		return false;
 
-	if (!yaml)
+	auto yaml = YAML::Load(SendCommandToMaster("/ajax/master/mat_available?id=" + std::to_string(Mat->GetMatID()) + "&port=" + std::to_string(m_Server.GetPort())));
+
+	if (!yaml || !yaml.IsMap())
 	{
 		ZED::Log::Error("Could not register mat with master");
 		return false;
 	}
+
+	auto guard = LockWriteForScope();
 
 	if (yaml["id"])
 		Mat->SetMatID(yaml["id"].as<uint32_t>());
@@ -472,6 +477,7 @@ bool Application::RegisterMatWithMaster(IMat* Mat)
 		Mat->SetTimerStyle((IMat::TimerStyle)yaml["timer_style"].as<int32_t>());
 	if (yaml["name_style"])
 		Mat->SetNameStyle((NameStyle)yaml["name_style"].as<int32_t>());
+
 	return true;
 }
 

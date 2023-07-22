@@ -55,7 +55,7 @@ namespace Judoboard
 		//Commands by judge
 		virtual void Hajime() override;
 		virtual void Mate() override;
-    virtual bool WasMateRecent() const override { return AreFightersOnMat() && Timer::GetTimestamp() - /*m_MateTimestamp*/0 < 3000; }
+		virtual bool WasMateRecent() const override { return AreFightersOnMat() && Timer::GetTimestamp() - /*m_MateTimestamp*/0 < 3000; }
 		virtual void Sonomama() override;
 
 		virtual void AddIppon(Fighter Whom) override;
@@ -104,7 +104,10 @@ namespace Judoboard
 		//Config
 		virtual void SetFullscreen(bool Enabled = true) override
 		{
-			//TODO
+			if (Enabled)
+				SendCommand("/ajax/config/fullscreen?id=" + std::to_string(GetMatID()));
+			else
+				SendCommand("/ajax/config/windowed?id=" + std::to_string(GetMatID()));
 			IMat::SetIsFullscreen(Enabled);
 		}
 

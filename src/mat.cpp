@@ -2147,7 +2147,7 @@ bool Mat::Render(double dt) const
 			renderer.RenderTransformed(text_time, width - 250, height - 70);
 
 		//Is there a next match?
-		if (m_Application && m_Application->GetTournament() && m_Application->GetTournament()->GetNextMatch(GetMatID()))
+		if (m_NextMatches.size() > 0)
 			NextState(State::TransitionToWaiting);//Transition to waiting screen
 
 		break;
