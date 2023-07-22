@@ -46,6 +46,7 @@ namespace Judoboard
 
 		bool IsMatchInCache(const UUID& UUID) const;
 		Match* FindInCache(const UUID& UUID) const;
+		MatchTable* FindMatchTableInCache(const UUID& UUID) const;
 
 
 		std::string m_Hostname;
@@ -53,6 +54,13 @@ namespace Judoboard
 
 		mutable std::vector<Match*> m_MatchCache;
 
+		mutable std::vector<Match> m_NextMatches;
+		mutable uint32_t m_NextMatches_Timestamp = 0;//Timestamp when m_NextMatches was received
+
+		mutable std::vector<MatchTable*> m_MatchTables;
+
 		mutable StandingData m_StandingData;//Local cache
+
+		mutable ZED::RecursiveReadWriteMutex m_Mutex;
 	};
 }

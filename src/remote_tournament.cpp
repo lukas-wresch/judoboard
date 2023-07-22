@@ -16,6 +16,9 @@ RemoteTournament::RemoteTournament(const std::string& Host, uint16_t Port) : m_H
 
 std::vector<Match> RemoteTournament::GetNextMatches(int32_t MatID) const
 {
+	if (Timer::GetTimestamp() - m_NextMatches_Timestamp < 5000)
+		return m_NextMatches;//Return cached value
+
 	auto response = Request2Master("/ajax/master/get_next_matches?id=" + std::to_string(MatID));
 	std::vector<Match> ret;
 
@@ -43,14 +46,20 @@ std::vector<Match> RemoteTournament::GetNextMatches(int32_t MatID) const
 		Match match(node, nullptr, (RemoteTournament*)this);
 		ret.emplace_back(match);
 	}
-	
-	return ret;
+
+	auto guard = m_Mutex.LockWriteForScope();
+	m_NextMatches = std::move(ret);
+	m_NextMatches_Timestamp = Timer::GetTimestamp();
+
+	return m_NextMatches;
 }
 
 
 
 bool RemoteTournament::IsMatchInCache(const UUID& UUID) const
 {
+	auto guard = m_Mutex.LockReadForScope();
+
 	for (auto match : m_MatchCache)
 		if (match && match->GetUUID() == UUID)
 			return true;
@@ -61,9 +70,23 @@ bool RemoteTournament::IsMatchInCache(const UUID& UUID) const
 
 Match* RemoteTournament::FindInCache(const UUID& UUID) const
 {
+	auto guard = m_Mutex.LockReadForScope();
+
 	for (auto match : m_MatchCache)
 		if (match && match->GetUUID() == UUID)
 			return match;
+	return nullptr;
+}
+
+
+
+MatchTable* RemoteTournament::FindMatchTableInCache(const UUID& UUID) const
+{
+	auto guard = m_Mutex.LockReadForScope();
+
+	for (auto table : m_MatchTables)
+		if (table && table->GetUUID() == UUID)
+			return table;
 	return nullptr;
 }
 
@@ -76,6 +99,8 @@ bool RemoteTournament::AddMatch(Match* NewMatch)
 		ZED::Log::Error("Invalid match");
 		return false;
 	}
+
+	auto guard = m_Mutex.LockWriteForScope();
 
 	//Add match data to cache	
 	if (!IsMatchInCache(*NewMatch))
@@ -96,6 +121,10 @@ bool RemoteTournament::IsParticipant(const Judoka& Judoka) const
 
 Judoka* RemoteTournament::FindParticipant(const UUID& UUID)
 {
+	auto judoka = m_StandingData.FindJudoka(UUID);
+	if (judoka)
+		return judoka;
+
 	auto response = Request2Master("/ajax/master/find_judoka?uuid=" + (std::string)UUID);
 
 	if (response.length() == 0)
@@ -109,7 +138,9 @@ Judoka* RemoteTournament::FindParticipant(const UUID& UUID)
 	if (!yaml)
 		return nullptr;
 
-	Judoka* judoka = new Judoka(yaml, &m_StandingData);//TODO replace by pointer to real standing data
+	auto guard = m_Mutex.LockWriteForScope();
+
+	judoka = new Judoka(yaml, &m_StandingData);//TODO replace by pointer to real standing data
 	m_StandingData.AddJudoka(judoka);
 
 	return judoka;
@@ -119,6 +150,10 @@ Judoka* RemoteTournament::FindParticipant(const UUID& UUID)
 
 const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 {
+	auto judoka = m_StandingData.FindJudoka(UUID);
+	if (judoka)
+		return judoka;
+
 	auto response = Request2Master("/ajax/master/find_judoka?uuid=" + (std::string)UUID);
 
 	if (response.length() == 0)
@@ -132,14 +167,10 @@ const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 	if (!yaml)
 		return nullptr;
 
-	Judoka* judoka = nullptr;
-	judoka = m_StandingData.FindJudoka(UUID);//Already in cache?
+	auto guard = m_Mutex.LockWriteForScope();
 
-	if (!judoka)
-	{
-		judoka = new Judoka(yaml, &m_StandingData);//TODO replace by pointer to real standing data
-		m_StandingData.AddJudoka(judoka);
-	}
+	judoka = new Judoka(yaml, &m_StandingData);//TODO replace by pointer to real standing data
+	m_StandingData.AddJudoka(judoka);
 
 	return judoka;
 }
@@ -161,7 +192,11 @@ MatchTable* RemoteTournament::FindMatchTable(const UUID& ID)
 	if (!yaml)
 		return nullptr;
 
+	auto guard = m_Mutex.LockWriteForScope();
+
 	MatchTable* table = MatchTable::CreateMatchTable(yaml, this);
+	m_MatchTables.push_back(table);
+
 	return table;
 }
 
@@ -182,7 +217,11 @@ const MatchTable* RemoteTournament::FindMatchTable(const UUID& ID) const
 	if (!yaml)
 		return nullptr;
 
+	auto guard = m_Mutex.LockWriteForScope();
+
 	MatchTable* table = MatchTable::CreateMatchTable(yaml, this);
+	m_MatchTables.push_back(table);
+
 	return table;
 }
 
@@ -239,7 +278,8 @@ void RemoteTournament::OnMatchConcluded(const Match& Match) const
 	YAML::Emitter result;
 	Match >> result;
 
-	Post2Master("/ajax/master/post_match_result", result);
+	if (!Post2Master("/ajax/master/post_match_result", result))
+		ZED::Log::Error("Could not post match result to master");
 }
 
 
@@ -256,7 +296,7 @@ std::string RemoteTournament::Request2Master(const std::string& URL) const
 		ZED::Log::Info("Could not connect to master server: " + m_Hostname + ":" + std::to_string(m_Port));
 		return "";
 	}
-	else if (std::count(response.begin(), response.end(), ':') < 2)
+	else if (response.length() < 2)
 	{
 		ZED::Log::Warn("Invalid response: " + response);
 		return "";

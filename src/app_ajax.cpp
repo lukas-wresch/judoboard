@@ -543,9 +543,7 @@ void Application::SetupHttpServer()
 	//Mat commands
 	m_Server.RegisterResource("/ajax/mat/hajime", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-		auto account = IsLoggedIn(Request);
-		if (!account)
+		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -565,9 +563,7 @@ void Application::SetupHttpServer()
 	//Generic pause. Will call Mate() or Sonomama() if it's more appropriate
 	m_Server.RegisterResource("/ajax/mat/pause", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-		auto account = IsLoggedIn(Request);
-		if (!account)
+		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -590,9 +586,7 @@ void Application::SetupHttpServer()
 
 	m_Server.RegisterResource("/ajax/mat/mate", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-		auto account = IsLoggedIn(Request);
-		if (!account)
+		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -611,9 +605,7 @@ void Application::SetupHttpServer()
 
 	m_Server.RegisterResource("/ajax/mat/sonomama", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-		auto account = IsLoggedIn(Request);
-		if (!account)
+		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
 		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -632,13 +624,11 @@ void Application::SetupHttpServer()
 
 	m_Server.RegisterResource("/ajax/mat/start_match", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-		auto account = IsLoggedIn(Request);
-		if (!account)
+		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
 		if (!GetTournament())
-			return "No Tournament is currently open";
+			return Error(Error::Type::TournamentNotOpen);
 
 		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
@@ -661,9 +651,7 @@ void Application::SetupHttpServer()
 
 	m_Server.RegisterResource("/ajax/mat/end_match", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-		auto account = IsLoggedIn(Request);
-		if (!account)
+		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
 
 		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -744,7 +732,6 @@ void Application::SetupHttpServer()
 
 	m_Server.RegisterResource("/ajax/mat/screenshot", [this](auto& Request) -> ZED::Blob {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
 		if (!IsLoggedIn(Request))
 			return (std::string)Error(Error::Type::NotLoggedIn);
 
@@ -771,9 +758,7 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+ippon", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-			auto account = IsLoggedIn(Request);
-			if (!account)
+			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -790,9 +775,7 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-ippon", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-			auto account = IsLoggedIn(Request);
-			if (!account)
+			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -809,9 +792,7 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+wazaari", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-			auto account = IsLoggedIn(Request);
-			if (!account)
+			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -828,9 +809,7 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-wazaari", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-			auto account = IsLoggedIn(Request);
-			if (!account)
+			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -847,7 +826,6 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+yuko", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
@@ -865,7 +843,6 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-yuko", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
@@ -883,7 +860,6 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+koka", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
@@ -901,7 +877,6 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-koka", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
@@ -919,9 +894,7 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/osaekomi", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-			auto account = IsLoggedIn(Request);
-			if (!account)
+			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -938,9 +911,7 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+shido", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-			auto account = IsLoggedIn(Request);
-			if (!account)
+			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -957,9 +928,7 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-shido", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-			auto account = IsLoggedIn(Request);
-			if (!account)
+			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -976,9 +945,7 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+hansokumake", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-			auto account = IsLoggedIn(Request);
-			if (!account)
+			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -995,9 +962,7 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-hansokumake", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-			auto account = IsLoggedIn(Request);
-			if (!account)
+			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -1043,9 +1008,7 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+medic", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-			auto account = IsLoggedIn(Request);
-			if (!account)
+			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -1062,9 +1025,7 @@ void Application::SetupHttpServer()
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-medic", [this, fighter](auto& Request) -> std::string {
 			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-			auto account = IsLoggedIn(Request);
-			if (!account)
+			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
 			int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
