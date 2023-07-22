@@ -322,7 +322,10 @@ namespace Judoboard
 					if (m_width > 0 && m_height > 0 && m_a > 0.0)
 					{
 						ZED::Rect rect((int)m_x, (int)m_y, m_width, m_height);
-						Renderer.FillRect(rect, m_color.r, m_color.g, m_color.b, (int)m_a);
+						if (m_a > 255.0)
+							Renderer.FillRect(rect, m_color.r, m_color.g, m_color.b, 255);
+						else
+							Renderer.FillRect(rect, m_color.r, m_color.g, m_color.b, (int)m_a);
 					}
 				}
 

@@ -1447,16 +1447,26 @@ void Mat::NextState(State NextState) const
 			if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetAgeGroup())
 			{
 				auto name = m_pMatch->GetMatchTable()->GetAgeGroup()->GetName();
-				m_Graphics["age_group_rect"].UpdateTexture(renderer, "Hajime", ZED::Color(0, 0, 0), ZED::FontSize::Gigantic)
-					.StopAllAnimations().Center().SetPosition(width/2, height/2 + (int)(130.0 * m_ScalingFactor), 0)
-					.AddAnimation(Animation::CreateLinear(0.0, 0.0,  50.0, [](auto& g) { return g.m_a < 300.0; }))
-					.AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0, [](auto& g) { return g.m_a >   0.0; }));
+				double pos_y = (int)(300.0 * m_ScalingFactor);
 
-				m_Graphics["age_group_rect_bar"].SetColor(ZED::Color(255, 255, 0))
-					.StopAllAnimations().Center().SetPosition(width/2, height/2 + (int)(130.0 * m_ScalingFactor), 0)
-					.SetSize((int)(300.0 * m_ScalingFactor), (int)(100.0 * m_ScalingFactor))
-					.AddAnimation(Animation::CreateLinear(0.0, 0.0,  50.0, [](auto& g) { return g.m_a < 300.0; }))
-					.AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0, [](auto& g) { return g.m_a >   0.0; }));
+				m_Graphics["age_group_rect_text"].UpdateTexture(renderer, name, ZED::Color(0, 0, 0), ZED::FontSize::Gigantic)
+					.StopAllAnimations().Center().SetPosition(width/2, height/2 + pos_y, -100)
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0,  45.0, [](auto& g) { return g.m_a < 400.0; }))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0, -30.0, [](auto& g) { return g.m_a >   0.0; }));
+
+				auto text_width = m_Graphics["age_group_rect_text"]->GetWidth();
+
+				m_Graphics["age_group_rect"].SetColor(ZED::Color(255, 255, 0))
+					.StopAllAnimations().Center().SetPosition(width/2 - (text_width + 10)/2, height/2 + pos_y - (int)(80.0 * m_ScalingFactor), -100)
+					.SetSize(text_width + 20, (int)(160.0 * m_ScalingFactor))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0,  40.0, [](auto& g) { return g.m_a < 400.0; }))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0, -30.0, [](auto& g) { return g.m_a >   0.0; }));
+
+				m_Graphics["age_group_rect_bar"].SetColor(ZED::Color(0, 0, 0))
+					.StopAllAnimations().Center().SetPosition(width/2 - (text_width + 10)/2 - 10, height/2 + pos_y - (int)(90.0 * m_ScalingFactor), -100)
+					.SetSize(text_width + 40, (int)(180.0 * m_ScalingFactor))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0,  40.0, [](auto& g) { return g.m_a < 400.0; }))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0, -35.0, [](auto& g) { return g.m_a >   0.0; }));
 			}
 
 			m_Graphics["hajime"].UpdateTexture(renderer, "Hajime", ZED::Color(255, 255, 255));
@@ -2220,6 +2230,7 @@ bool Mat::Render(double dt) const
 
 		m_Graphics["age_group_rect_bar"].Render(renderer, dt);
 		m_Graphics["age_group_rect"].Render(renderer, dt);
+		m_Graphics["age_group_rect_text"].Render(renderer, dt);
 
 		if (Timer::GetTimestamp() - m_CurrentStateStarted >= 10 * 1000)
 			NextState(State::Running);
@@ -2263,6 +2274,10 @@ bool Mat::Render(double dt) const
 
 		m_Graphics["matchtable"].Render(renderer, dt);
 		m_Graphics["mat_name"  ].Render(renderer, dt);
+
+		m_Graphics["age_group_rect_bar"].Render(renderer, dt);
+		m_Graphics["age_group_rect"].Render(renderer, dt);
+		m_Graphics["age_group_rect_text"].Render(renderer, dt);
 
 		//Render text effects
 		m_Graphics["hajime"].Render(renderer, dt);
