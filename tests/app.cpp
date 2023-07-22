@@ -256,21 +256,21 @@ TEST(App, Mats)
 
 		EXPECT_EQ(app.GetMats().size(), 0);
 		EXPECT_EQ(app.FindDefaultMatID(), 0);
-		EXPECT_FALSE(app.GetDefaultMat());
+		EXPECT_FALSE(app.GetLocalMat());
 		EXPECT_FALSE(app.FindMat(1));
 
 		EXPECT_TRUE(app.StartLocalMat(1));
 
 		EXPECT_EQ(app.GetMats().size(), 1);
 		EXPECT_EQ(app.FindDefaultMatID(), 1);
-		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetLocalMat());
 		EXPECT_TRUE(app.FindMat(1));
 
 		EXPECT_TRUE(app.CloseMat(1));
 
 		EXPECT_EQ(app.GetMats().size(), 1);
 		EXPECT_EQ(app.FindDefaultMatID(), 1);
-		EXPECT_TRUE(app.GetDefaultMat() != nullptr);
+		EXPECT_TRUE(app.GetLocalMat() != nullptr);
 		EXPECT_TRUE(app.FindMat(1) != nullptr);
 	}
 
@@ -434,7 +434,7 @@ TEST(App, FullTournament)
 		tourney->AddMatchTable(m1);
 		tourney->AddMatchTable(m2);
 
-		auto mat = app.GetDefaultMat();
+		auto mat = app.GetLocalMat();
 		ASSERT_TRUE(mat);
 
 		for (int i = 0; i < 6; i++)
@@ -519,7 +519,7 @@ TEST(App, FullTournament_SingleElimination14)
 		tourney->GetMatchTables()[0]->SetMatID(1);
 		tourney->GenerateSchedule();
 
-		auto mat = app.GetDefaultMat();
+		auto mat = app.GetLocalMat();
 		ASSERT_TRUE(mat);
 
 		ZED::Core::Pause(2000);
@@ -605,7 +605,7 @@ TEST(App, FullTournament_SingleElimination7_BO3)
 		tourney->AddMatchTable(group);
 		tourney->GenerateSchedule();
 
-		auto mat = app.GetDefaultMat();
+		auto mat = app.GetLocalMat();
 		ASSERT_TRUE(mat);
 
 		ZED::Core::Pause(3000);
@@ -716,13 +716,13 @@ TEST(App, MasterClosesMatOfSlave)
 	slave.StartLocalMat(2);
 
 	ZED::Core::Pause(2000);
-	EXPECT_TRUE(slave.GetDefaultMat()->IsOpen());
+	EXPECT_TRUE(slave.GetLocalMat()->IsOpen());
 
 	master.CloseMat(2);
 
 	ZED::Core::Pause(2000);
 
-	EXPECT_FALSE(slave.GetDefaultMat()->IsOpen());
+	EXPECT_FALSE(slave.GetLocalMat()->IsOpen());
 }
 
 

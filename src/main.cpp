@@ -167,7 +167,7 @@ int main(int argc, char** argv)
 		ZED::Log::Info("Showing test screen");
 		app.StartLocalMat(1);
 
-		Judoboard::Mat* mat = (Judoboard::Mat*)app.GetDefaultMat();
+		Judoboard::Mat* mat = (Judoboard::Mat*)app.GetLocalMat();
 
 		mat->SetFullscreen();
 		ZED::Core::Pause(5000);
@@ -236,7 +236,7 @@ int main(int argc, char** argv)
 		ZED::Log::Info("Starting demo mode");
 		app.StartLocalMat(1);
 
-		Judoboard::Mat* mat = (Judoboard::Mat*)app.GetDefaultMat();
+		Judoboard::Mat* mat = (Judoboard::Mat*)app.GetLocalMat();
 
 		mat->GetWindow().Fullscreen();
 		ZED::Core::Pause(5000);

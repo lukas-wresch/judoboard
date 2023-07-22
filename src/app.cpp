@@ -302,7 +302,7 @@ Error Application::CheckPermission(const HttpServer::Request& Request, Account::
 
 
 
-IMat* Application::GetDefaultMat() const
+IMat* Application::GetLocalMat() const
 {
 	auto guard = LockReadForScope();
 
@@ -439,8 +439,39 @@ bool Application::StartLocalMat(uint32_t ID)
 	ZED::Log::Info("New local mat has been created with ID=" + std::to_string(ID));
 
 	if (IsSlave())
-		SendCommandToMaster("/ajax/master/mat_available?port=" + std::to_string(m_Server.GetPort()));
+	{
+		if (!RegisterMatWithMaster(new_mat))
+		{
+			ZED::Log::Error("Could not register mat with master");
+			return false;
+		}
+	}
 
+	return true;
+}
+
+
+
+bool Application::RegisterMatWithMaster(IMat* Mat)
+{
+	auto yaml = YAML::Load(SendCommandToMaster("/ajax/master/mat_available?port=" + std::to_string(m_Server.GetPort())));
+
+	if (!yaml)
+	{
+		ZED::Log::Error("Could not register mat with master");
+		return false;
+	}
+
+	if (yaml["id"])
+		Mat->SetMatID(yaml["id"].as<uint32_t>());
+	if (yaml["language"])
+		Localizer::SetLanguage((Language)yaml["language"].as<int32_t>());
+	if (yaml["ippon_style"])
+		Mat->SetIpponStyle((IMat::IpponStyle)yaml["ippon_style"].as<int32_t>());
+	if (yaml["timer_style"])
+		Mat->SetTimerStyle((IMat::TimerStyle)yaml["timer_style"].as<int32_t>());
+	if (yaml["name_style"])
+		Mat->SetNameStyle((NameStyle)yaml["name_style"].as<int32_t>());
 	return true;
 }
 
@@ -596,19 +627,19 @@ bool Application::ConnectToMaster(const std::string& Hostname, uint16_t Port)
 
 
 
-bool Application::SendCommandToMaster(const std::string& URL) const
+std::string Application::SendCommandToMaster(const std::string& URL) const
 {
 	if (m_Mode != Mode::Slave)
 	{
 		ZED::Log::Warn("Command " + URL + " sent, but not in slave mode");
-		return false;
+		return (Error)Error::Type::InternalError;
 	}
 
 	ZED::Log::Debug("Command " + URL + " sent to master");
 
 	ZED::HttpClient client(m_MasterHostname, m_MasterPort);
 	auto packet = client.GET(URL);
-	return packet.body == "ok";
+	return packet.body;
 }
 
 

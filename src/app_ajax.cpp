@@ -2103,10 +2103,10 @@ void Application::SetupHttpServer()
 
 		int new_id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
-		if (!GetDefaultMat())
+		if (!GetLocalMat())
 			return "Could not find mat";
 
-		GetDefaultMat()->SetMatID(new_id);
+		GetLocalMat()->SetMatID(new_id);
 		return Error();//OK
 	});
 
@@ -2389,8 +2389,10 @@ void Application::SetupHttpServer()
 		if (!ConnectToMaster(host))
 			return std::string("Could not connect");
 
-		if (!SendCommandToMaster("/ajax/master/mat_available"))
-			ZED::Log::Warn("Could not make mat available to master");
+		auto mat = GetLocalMat();
+		if (mat)
+			if (!RegisterMatWithMaster(mat))
+				ZED::Log::Error("Could not register mat with master");
 
 		return Error();//OK
 	});
@@ -2417,7 +2419,15 @@ void Application::SetupHttpServer()
 
 		SetMats().emplace_back(new_mat);
 
-		return Error();//OK
+		YAML::Emitter yaml;
+		yaml << YAML::BeginMap;
+		yaml << YAML::Key << "id" << YAML::Value << id;		
+		yaml << YAML::Key << "language"    << YAML::Value << (int)Localizer::GetLanguage();
+		yaml << YAML::Key << "ippon_style" << YAML::Value << (int)GetDatabase().GetIpponStyle();
+		yaml << YAML::Key << "timer_style" << YAML::Value << (int)GetDatabase().GetTimerStyle();
+		yaml << YAML::Key << "name_style"  << YAML::Value << (int)GetDatabase().GetNameStyle();
+		yaml << YAML::EndMap;
+		return yaml.c_str();
 	});
 
 	m_Server.RegisterResource("/ajax/master/find_judoka", [this](auto& Request) -> std::string {

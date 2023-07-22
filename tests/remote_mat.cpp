@@ -2,6 +2,31 @@
 
 
 
+TEST(RemoteMat, SalveMatGetCorrectID)
+{
+	initialize();
+	Application master(8080 + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
+
+	master.StartLocalMat(1);
+
+	ZED::Core::Pause(100);
+
+	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
+
+	ASSERT_TRUE(slave.StartLocalMat(1));
+
+	ZED::Core::Pause(100);
+
+	auto mat1 = master.GetLocalMat();
+	auto mat2 = slave.GetLocalMat();
+
+	EXPECT_EQ(mat1->GetMatID(), 1);
+	EXPECT_EQ(mat2->GetMatID(), 2);
+}
+
+
+
 TEST(RemoteMat, OpenAndClose)
 {
 	initialize();

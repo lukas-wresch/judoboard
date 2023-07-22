@@ -218,7 +218,7 @@ TEST(Tournament, AddAgeGroup)
 
 	app.StartLocalMat(1);
 
-	Judoboard::Mat* mat = (Judoboard::Mat*)app.GetDefaultMat();
+	Judoboard::Mat* mat = (Judoboard::Mat*)app.GetLocalMat();
 
 	srand(ZED::Core::CurrentTimestamp());
 

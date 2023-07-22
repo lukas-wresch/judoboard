@@ -76,15 +76,17 @@ namespace Judoboard
 		//Mats
 		const std::vector<IMat*>& GetMats() const { return m_Mats; }
 		std::vector<IMat*>& SetMats() { return m_Mats; }
-		uint32_t FindDefaultMatID() const { if (GetDefaultMat()) return GetDefaultMat()->GetMatID(); return 0; }//If only one mat is available the ID of that mat will be returned. 0 otherwise
+		uint32_t FindDefaultMatID() const { if (GetLocalMat()) return GetLocalMat()->GetMatID(); return 0; }//If only one mat is available the ID of that mat will be returned. 0 otherwise
 
-		IMat* GetDefaultMat() const;
+		IMat* GetLocalMat() const;
 		IMat* FindMat(uint32_t ID);
 		const IMat* FindMat(uint32_t ID) const;
 		uint32_t GetHighestMatID() const;
 
 		bool StartLocalMat(uint32_t ID = 1);
 		bool CloseMat(uint32_t ID);
+
+		bool RegisterMatWithMaster(IMat* Mat);
 
 		std::vector<Match> GetNextMatches(uint32_t MatID, bool& Success) const;
 
@@ -198,7 +200,7 @@ namespace Judoboard
 
 		Error CheckPermission(const HttpServer::Request& Request, Account::AccessLevel AccessLevel = Account::AccessLevel::User) const;
 
-		bool SendCommandToMaster(const std::string& URL) const;
+		std::string SendCommandToMaster(const std::string& URL) const;
 
 		class ScopedLock
 		{

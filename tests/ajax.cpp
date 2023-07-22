@@ -405,14 +405,14 @@ TEST(Ajax, OpenMat)
 		Application app;
 
 		app.StartLocalMat(1);
-		app.GetDefaultMat()->Close();
-		EXPECT_FALSE(app.GetDefaultMat()->IsOpen());
+		app.GetLocalMat()->Close();
+		EXPECT_FALSE(app.GetLocalMat()->IsOpen());
 
 		app.Ajax_OpenMat(HttpServer::Request("id=1"));
 
-		ASSERT_TRUE(app.GetDefaultMat());
-		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		ASSERT_TRUE(app.GetLocalMat());
+		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 1);
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
 	}
 
 
@@ -420,17 +420,17 @@ TEST(Ajax, OpenMat)
 		Application app;
 
 		app.StartLocalMat(5);
-		app.GetDefaultMat()->Close();
+		app.GetLocalMat()->Close();
 
 		app.Ajax_OpenMat(HttpServer::Request("id=1"));
 
-		EXPECT_FALSE(app.GetDefaultMat()->IsOpen());
+		EXPECT_FALSE(app.GetLocalMat()->IsOpen());
 
 		app.Ajax_OpenMat(HttpServer::Request("id=5"));
 
-		ASSERT_TRUE(app.GetDefaultMat());
-		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 5);
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		ASSERT_TRUE(app.GetLocalMat());
+		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 5);
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
 	}
 }
 
@@ -448,13 +448,13 @@ TEST(Ajax, CloseMat)
 		app.Ajax_OpenMat( HttpServer::Request("id=1"));
 		app.Ajax_CloseMat(HttpServer::Request("id=5"));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
 
 		app.Ajax_CloseMat(HttpServer::Request("id=1"));
 
-		ASSERT_TRUE(app.GetDefaultMat());
-		EXPECT_FALSE(app.GetDefaultMat()->IsOpen());
+		ASSERT_TRUE(app.GetLocalMat());
+		EXPECT_FALSE(app.GetLocalMat()->IsOpen());
 	}
 
 
@@ -466,13 +466,13 @@ TEST(Ajax, CloseMat)
 		app.Ajax_OpenMat( HttpServer::Request("id=5"));
 		app.Ajax_CloseMat(HttpServer::Request("id=1"));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
 
 		app.Ajax_CloseMat(HttpServer::Request("id=5"));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_FALSE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_FALSE(app.GetLocalMat()->IsOpen());
 	}
 }
 
@@ -487,46 +487,46 @@ TEST(Ajax, UpdateMat)
 
 		app.StartLocalMat(1);
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
 
 		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&timerStyle=1&nameStyle=0&sound=false&sound_filename=changed")));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 5);
-		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test");
-		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 0);
-		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 1);
-		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  0);
-		EXPECT_FALSE(app.GetDefaultMat()->IsSoundEnabled());
-		EXPECT_EQ(app.GetDefaultMat()->GetSoundFilename(), "changed");
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
+		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 5);
+		EXPECT_EQ(app.GetLocalMat()->GetName(), "Test");
+		EXPECT_EQ((int)app.GetLocalMat()->GetIpponStyle(), 0);
+		EXPECT_EQ((int)app.GetLocalMat()->GetTimerStyle(), 1);
+		EXPECT_EQ((int)app.GetLocalMat()->GetNameStyle(),  0);
+		EXPECT_FALSE(app.GetLocalMat()->IsSoundEnabled());
+		EXPECT_EQ(app.GetLocalMat()->GetSoundFilename(), "changed");
 
 
 		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&timerStyle=2&nameStyle=1&sound=true&sound_filename=changed2")));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
-		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test2");
-		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 1);
-		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 2);
-		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  1);
-		EXPECT_TRUE(app.GetDefaultMat()->IsSoundEnabled());
-		EXPECT_EQ(app.GetDefaultMat()->GetSoundFilename(), "changed2");
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
+		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 1);
+		EXPECT_EQ(app.GetLocalMat()->GetName(), "Test2");
+		EXPECT_EQ((int)app.GetLocalMat()->GetIpponStyle(), 1);
+		EXPECT_EQ((int)app.GetLocalMat()->GetTimerStyle(), 2);
+		EXPECT_EQ((int)app.GetLocalMat()->GetNameStyle(),  1);
+		EXPECT_TRUE(app.GetLocalMat()->IsSoundEnabled());
+		EXPECT_EQ(app.GetLocalMat()->GetSoundFilename(), "changed2");
 
 
 		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test3&ipponStyle=2&timerStyle=0&nameStyle=0&sound=false&sound_filename=changed3")));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
-		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test3");
-		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 2);
-		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 0);
-		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  0);
-		EXPECT_FALSE(app.GetDefaultMat()->IsSoundEnabled());
-		EXPECT_EQ(app.GetDefaultMat()->GetSoundFilename(), "changed3");
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
+		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 1);
+		EXPECT_EQ(app.GetLocalMat()->GetName(), "Test3");
+		EXPECT_EQ((int)app.GetLocalMat()->GetIpponStyle(), 2);
+		EXPECT_EQ((int)app.GetLocalMat()->GetTimerStyle(), 0);
+		EXPECT_EQ((int)app.GetLocalMat()->GetNameStyle(),  0);
+		EXPECT_FALSE(app.GetLocalMat()->IsSoundEnabled());
+		EXPECT_EQ(app.GetLocalMat()->GetSoundFilename(), "changed3");
 	}
 }
 
@@ -541,29 +541,29 @@ TEST(Ajax, PauseMat)
 
 		app.StartLocalMat(1);
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
 
 		EXPECT_TRUE(app.Ajax_PauseMat(HttpServer::Request("id=1&enable=true")));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_TRUE(app.GetDefaultMat()->IsPaused());
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
+		EXPECT_TRUE(app.GetLocalMat()->IsPaused());
 
 		EXPECT_FALSE(app.Ajax_PauseMat(HttpServer::Request("id=5&enable=false")));
 		EXPECT_TRUE( app.Ajax_PauseMat(HttpServer::Request("id=1&enable=false")));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
-		EXPECT_FALSE(app.GetDefaultMat()->IsPaused());
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
+		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 1);
+		EXPECT_FALSE(app.GetLocalMat()->IsPaused());
 
 		EXPECT_FALSE(app.Ajax_PauseMat(HttpServer::Request("id=5&enable=true")));
 		EXPECT_TRUE( app.Ajax_PauseMat(HttpServer::Request("id=1&enable=true")));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_TRUE(app.GetDefaultMat()->IsPaused());
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
+		EXPECT_TRUE(app.GetLocalMat()->IsPaused());
 	}
 }
 
@@ -769,31 +769,31 @@ TEST(Ajax, SetFullscreen)
 
 		app.StartLocalMat(1);
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		Mat* mat = (Mat*)app.GetDefaultMat();
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
+		Mat* mat = (Mat*)app.GetLocalMat();
 
 		app.Ajax_SetFullscreen(true, HttpServer::Request("id=1"));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsFullscreen());
-		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsFullscreen());
+		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 1);
 
 
 		app.Ajax_SetFullscreen(false, HttpServer::Request("id=1"));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_FALSE(app.GetDefaultMat()->IsFullscreen());
-		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
+		EXPECT_FALSE(app.GetLocalMat()->IsFullscreen());
+		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 1);
 
 
 		app.Ajax_SetFullscreen(true, HttpServer::Request("id=1"));
 
-		EXPECT_TRUE(app.GetDefaultMat());
-		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
-		EXPECT_TRUE(app.GetDefaultMat()->IsFullscreen());
-		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
+		EXPECT_TRUE(app.GetLocalMat());
+		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
+		EXPECT_TRUE(app.GetLocalMat()->IsFullscreen());
+		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 1);
 	}
 }
 
@@ -1273,7 +1273,7 @@ TEST(Ajax, GetNamesOnMat)
 		Application app;
 
 		app.StartLocalMat(5);
-		auto mat = app.GetDefaultMat();
+		auto mat = app.GetLocalMat();
 		mat->SetName("mat name");
 
 		Tournament* tourney = new Tournament;

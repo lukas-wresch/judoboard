@@ -58,7 +58,7 @@ TEST(Mat, LoadConfig)
 
 		app.StartLocalMat(1);
 
-		auto mat = app.GetDefaultMat();
+		auto mat = app.GetLocalMat();
 
 		EXPECT_EQ(mat->GetIpponStyle(), Mat::IpponStyle::SpelledOut);
 		EXPECT_EQ(mat->GetTimerStyle(), Mat::TimerStyle::Full);
@@ -76,7 +76,7 @@ TEST(Mat, LoadConfig)
 		app.CloseMat(1);
 		app.StartLocalMat(1);
 
-		auto mat = app.GetDefaultMat();
+		auto mat = app.GetLocalMat();
 
 		EXPECT_EQ(mat->GetIpponStyle(), Mat::IpponStyle::SingleDigit);
 		EXPECT_EQ(mat->GetTimerStyle(), Mat::TimerStyle::HundredsMS);
@@ -134,7 +134,7 @@ TEST(Mat, ForcedCloseDuringMatch)
 	tourney->AddMatchTable(m1);
 	tourney->AddMatchTable(m2);
 
-	auto mat = app.GetDefaultMat();
+	auto mat = app.GetLocalMat();
 
 	ZED::Core::Pause(6000);
 	auto match = tourney->GetNextMatch(mat->GetMatID());
