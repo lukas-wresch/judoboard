@@ -68,10 +68,31 @@ int main(int argc, char** argv)
 	bool demo = false;
 	bool nowindow = false;
 	bool version  = false;
+	bool slave    = false;
+	std::string master_ip;
+	int master_port = 8080;
+
+	std::vector<std::string> commands;
 
 #ifdef _WIN32
 	std::string cmd(lpcmdline);
-	if (cmd.find("--testscreen") != std::string::npos)
+
+	//Decompose statement
+	size_t pos = 0;
+	for (size_t initialPos = 0; pos != std::string::npos; initialPos = pos + 1)
+	{
+		pos = cmd.find(' ', initialPos);
+		if (pos != std::string::npos)
+			commands.push_back(cmd.substr(initialPos, pos - initialPos));
+		else//Add the last one
+			commands.push_back(cmd.substr(initialPos, std::min(pos, cmd.size()) - initialPos + 1));
+	}
+#else
+	for (int i = 1; i < argc; i++)
+		commands.push_back(std::string(argv[i]));
+#endif
+
+	/*if (cmd.find("--testscreen") != std::string::npos)
 		show_test_screen = true;
 	else if (cmd.find("--demo") != std::string::npos)
 		demo = true;
@@ -79,7 +100,7 @@ int main(int argc, char** argv)
 		nowindow = true;
 	else if (cmd.find("--version") != std::string::npos)
 		version = true;
-#else
+
 	for (int i = 1; i < argc; i++)
 	{
 		if (std::string(argv[i]) == "--port" && i+1 < argc)
@@ -92,11 +113,30 @@ int main(int argc, char** argv)
 			nowindow = true;
 		else if (std::string(argv[i]) == "--version")
 			version = true;
-	}
-#endif
+	}*/
 
-	//TODO load config file
-	Judoboard::Localizer::SetLanguage(Judoboard::Language::German);
+	for (auto it = commands.begin(); it != commands.end(); ++it)
+	{
+		if (*it == "--port" && ++it != commands.end())
+			port = ZED::Core::ToInt(*it);
+		else if (*it == "--slave" && ++it != commands.end())
+		{
+			slave = true;
+			master_ip = *it;
+			if (it+1 != commands.end())
+				master_port = ZED::Core::ToInt(*++it);
+		}
+		else if (*it == "--testscreen")
+			show_test_screen = true;
+		else if (*it == "--demo")
+			demo = true;
+		else if (*it == "--nowindow")
+			nowindow = true;
+		else if (*it == "--version")
+			version = true;
+	}
+
+	
 
 	if (version)
 	{
@@ -140,7 +180,6 @@ int main(int argc, char** argv)
 		auto j1 = CreateRandomJudoka(&app.GetDatabase());
 		auto j2 = CreateRandomJudoka(&app.GetDatabase());
 		Judoboard::Match match(&j1, &j2, nullptr, mat->GetMatID());
-		//Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, true, true);
 		Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, false, false);
 		Judoboard::AgeGroup age_group("U18", 15, 18, &rules);
 		match.SetRuleSet(&rules);
@@ -313,18 +352,28 @@ int main(int argc, char** argv)
 	ZED::Log::Info("Initializing application");
 	Judoboard::Application app(port);
 
-	app.StartLocalMat(1);
+	if (slave)
+	{
+		if (!app.ConnectToMaster(master_ip, master_port))
+		{
+			ZED::Log::Error("Could not connect to master " + master_ip + " " + std::to_string(master_port));
+			return -1;
+		}
 
+		ZED::Log::Info("Connected to master");
 
-	if (!app.LoadDataFromDisk())
-		ZED::Log::Error("Could not load application data from disk");
+		app.StartLocalMat(1);
+	}
+	else
+	{
+		app.StartLocalMat(1);
 
-	if (app.GetDatabase().GetNumAccounts() == 0)
-		app.GetDatabase().AddAccount(Judoboard::Account("admin", "1234", Judoboard::Account::AccessLevel::Admin));
+		if (!app.LoadDataFromDisk())
+			ZED::Log::Error("Could not load application data from disk");
 
-	//if (app.GetTournamentList().size() == 0)
-		//app.AddTournament(new Judoboard::Tournament("Test Tournament", app.GetDatabase().FindRuleSet("Default")));
-
+		if (app.GetDatabase().GetNumAccounts() == 0)
+			app.GetDatabase().AddAccount(Judoboard::Account("admin", "1234", Judoboard::Account::AccessLevel::Admin));
+	}
 
 #ifdef _DEBUG
 	if (app.GetDatabase().GetNumJudoka() < 5)
@@ -374,7 +423,8 @@ int main(int argc, char** argv)
 
 #ifdef WIN32
 #ifndef _DEBUG
-	ShellExecute(NULL, L"open", L"http://localhost:8080", NULL, NULL, 0);
+	if (!slave)
+		ShellExecute(NULL, L"open", L"http://localhost:8080", NULL, NULL, 0);
 #endif
 #endif
 
