@@ -246,8 +246,9 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/get_status", [this](auto& Request) -> std::string {
-		auto account = IsLoggedIn(Request);
-		if (!account)
+		const Account* account;
+		auto error = CheckPermission(Request, Account::AccessLevel::User, &account);
+		if (!error)
 			return "0";
 
 		return std::to_string((int)account->GetAccessLevel());
@@ -539,7 +540,10 @@ void Application::SetupHttpServer()
 	});
 
 
+	//Mat commands
 	m_Server.RegisterResource("/ajax/mat/hajime", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -560,6 +564,8 @@ void Application::SetupHttpServer()
 
 	//Generic pause. Will call Mate() or Sonomama() if it's more appropriate
 	m_Server.RegisterResource("/ajax/mat/pause", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -583,6 +589,8 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/mat/mate", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -602,6 +610,8 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/mat/sonomama", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -621,6 +631,8 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/mat/start_match", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -648,6 +660,8 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/mat/end_match", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -670,6 +684,8 @@ void Application::SetupHttpServer()
 
 	//Serialization
 	m_Server.RegisterResource("/ajax/mat/current_time", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
@@ -684,6 +700,8 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/mat/get_score", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		if (id <= 0)
@@ -702,9 +720,7 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/mat/get_osaekomilist", [this](auto& Request) -> std::string {
-		auto account = IsLoggedIn(Request);
-		if (!account)
-			return Error(Error::Type::NotLoggedIn);
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 
 		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
@@ -727,6 +743,8 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/mat/screenshot", [this](auto& Request) -> ZED::Blob {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		if (!IsLoggedIn(Request))
 			return (std::string)Error(Error::Type::NotLoggedIn);
 
@@ -752,6 +770,8 @@ void Application::SetupHttpServer()
 		Fighter fighter = (Fighter)i;
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+ippon", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -769,6 +789,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-ippon", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -786,6 +808,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+wazaari", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -803,6 +827,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-wazaari", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -820,6 +846,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+yuko", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
@@ -836,6 +864,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-yuko", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
@@ -852,6 +882,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+koka", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
@@ -868,6 +900,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-koka", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 
@@ -884,6 +918,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/osaekomi", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -901,6 +937,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+shido", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -918,6 +956,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-shido", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -935,6 +975,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+hansokumake", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -952,6 +994,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-hansokumake", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -969,24 +1013,28 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+disqualification", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 			return Ajax_AddDisqualification(fighter, Request);
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-disqualification", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 			return Ajax_RemoveDisqualification(fighter, Request);
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+nodisqualification", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 			return Ajax_NoDisqualification(fighter, Request);
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-nodisqualification", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 			if (!IsLoggedIn(Request))
 				return Error(Error::Type::NotLoggedIn);
 			return Ajax_RemoveNoDisqualification(fighter, Request);
@@ -994,6 +1042,8 @@ void Application::SetupHttpServer()
 
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+medic", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -1011,6 +1061,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-medic", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -1028,6 +1080,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/+gachi", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -1045,6 +1099,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/-gachi", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -1062,6 +1118,8 @@ void Application::SetupHttpServer()
 		});
 
 		m_Server.RegisterResource("/ajax/mat/" + Fighter2String(fighter) + "/hantei", [this, fighter](auto& Request) -> std::string {
+			Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 			auto account = IsLoggedIn(Request);
 			if (!account)
 				return Error(Error::Type::NotLoggedIn);
@@ -1082,6 +1140,8 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/mat/-hantei", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1100,6 +1160,8 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/mat/+draw", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1118,6 +1180,8 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/mat/-draw", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1136,6 +1200,8 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/mat/+golden_score", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1157,6 +1223,8 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/mat/-golden_score", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1178,6 +1246,8 @@ void Application::SetupHttpServer()
 	});
 
 	m_Server.RegisterResource("/ajax/mat/tokeda", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1196,6 +1266,8 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/mat/names_on_mat", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+
 		auto account = IsLoggedIn(Request);
 		if (!account)
 			return Error(Error::Type::NotLoggedIn);
@@ -1204,6 +1276,7 @@ void Application::SetupHttpServer()
 	});
 
 
+	//Judoka
 
 	m_Server.RegisterResource("/ajax/judoka/add", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -1397,12 +1470,10 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/account/add", [this](auto& Request) -> std::string {
-		auto account = IsLoggedIn(Request);
-		if (!account)
-			return Error(Error::Type::NotLoggedIn);
-
-		if (account->GetAccessLevel() < Account::AccessLevel::Moderator)
-			return Error(Error::Type::NotEnoughPermissions);
+		const Account* account;
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator, &account);
+		if (!error)
+			return error;
 
 		auto username = HttpServer::DecodeURLEncoded(Request.m_Body, "username");
 		auto password = HttpServer::DecodeURLEncoded(Request.m_Body, "password");
@@ -1424,9 +1495,10 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/account/update", [this](auto& Request) -> std::string {
-		auto account = IsLoggedIn(Request);
-		if (!account)
-			return Error(Error::Type::NotLoggedIn);
+		const Account* account;
+		auto error = CheckPermission(Request, Account::AccessLevel::User, &account);
+		if (!error)
+			return error;
 
 		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
@@ -1462,18 +1534,19 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/account/update_password", [this](auto& Request) -> std::string {
-		auto account = IsLoggedIn(Request);
-		if (!account)
-			return std::string(Error(Error::Type::NotLoggedIn));
+		const Account* account;
+		auto error = CheckPermission(Request, Account::AccessLevel::User, &account);
+		if (!error)
+			return error;
 
 		return Ajax_UpdatePassword((Account*)account, Request);
 	});
 
 
 	m_Server.RegisterResource("/ajax/account/delete", [this](auto& Request) -> std::string {
-		auto account = IsLoggedIn(Request);
-		if (!account)
-			return Error(Error::Type::NotLoggedIn);
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
 
 		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
@@ -1482,10 +1555,6 @@ void Application::SetupHttpServer()
 		auto account_to_change = m_Database.SetAccount(index);
 		if (!account_to_change)
 			return std::string("Account not found");
-
-		//If we are not an admin
-		if (account->GetAccessLevel() != Account::AccessLevel::Admin)
-			return Error(Error::Type::NotEnoughPermissions);
 
 		if (!m_Database.DeleteAccount(account_to_change->GetUsername()))
 			return std::string("Failed");
@@ -1496,12 +1565,10 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/account/list", [this](auto& Request) -> std::string {
-		auto account = IsLoggedIn(Request);
-		if (!account)
-			return Error(Error::Type::NotLoggedIn);
-
-		if (account->GetAccessLevel() < Account::AccessLevel::Moderator)
-			return Error(Error::Type::NotEnoughPermissions);
+		const Account* account;
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator, &account);
+		if (!error)
+			return error;
 
 		ZED::CSV ret;
 		for (auto acc : m_Database.GetAccounts())
@@ -1514,12 +1581,10 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/account/get", [this](auto& Request) -> std::string {
-		auto account = IsLoggedIn(Request);
-		if (!account)
-			return Error(Error::Type::NotLoggedIn);
-
-		if (account->GetAccessLevel() < Account::AccessLevel::Moderator)
-			return Error(Error::Type::NotEnoughPermissions);
+		const Account* account;
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator, &account);
+		if (!error)
+			return error;
 
 		int index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
@@ -1535,12 +1600,9 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/nonces/list", [this](auto& Request) -> std::string {
-		auto account = IsLoggedIn(Request);
-		if (!account)
-			return Error(Error::Type::NotLoggedIn);
-
-		if (account->GetAccessLevel() < Account::AccessLevel::Moderator)
-			return Error(Error::Type::NotEnoughPermissions);
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
 
 		ZED::CSV ret;
 		for (const auto& [nonce, account] : m_Database.GetNonces())
@@ -2421,11 +2483,12 @@ void Application::SetupHttpServer()
 
 		YAML::Emitter yaml;
 		yaml << YAML::BeginMap;
-		yaml << YAML::Key << "id" << YAML::Value << id;		
+		yaml << YAML::Key << "id"          << YAML::Value << id;		
 		yaml << YAML::Key << "language"    << YAML::Value << (int)Localizer::GetLanguage();
 		yaml << YAML::Key << "ippon_style" << YAML::Value << (int)GetDatabase().GetIpponStyle();
 		yaml << YAML::Key << "timer_style" << YAML::Value << (int)GetDatabase().GetTimerStyle();
 		yaml << YAML::Key << "name_style"  << YAML::Value << (int)GetDatabase().GetNameStyle();
+		yaml << YAML::Key << "token"       << YAML::Value << GetAccessToken();
 		yaml << YAML::EndMap;
 		return yaml.c_str();
 	});
@@ -2804,6 +2867,14 @@ std::string Application::Ajax_GetMats() const
 				ret << YAML::Key << "is_fullscreen" << YAML::Value << mat->IsFullscreen();
 				ret << YAML::Key << "sound_enabled" << YAML::Value << mat->IsSoundEnabled();
 				ret << YAML::Key << "sound_filename" << YAML::Value << mat->GetSoundFilename();
+
+				if (mat->GetType() == IMat::Type::RemoteMat)
+				{
+					RemoteMat* rm = (RemoteMat*)mat;
+					ret << YAML::Key << "hostname" << YAML::Value << rm->GetHostname();
+					ret << YAML::Key << "port"     << YAML::Value << rm->GetPort();
+				}
+
 				ret << YAML::EndMap;
 			}
 		}

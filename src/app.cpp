@@ -258,28 +258,28 @@ bool Application::CloseTournament()
 
 
 
-const Account* Application::IsLoggedIn(const HttpServer::Request& Request) const
+bool Application::IsLoggedIn(const HttpServer::Request& Request) const
 {
 	if (!IsRunning())
-		return nullptr;	
+		return false;
+
+	if (IsSlave())
+		if (CheckAccessToken(HttpServer::DecodeURLEncoded(Request.m_Query, "token")))
+			return true;
 
 	auto header = Request.m_RequestInfo.FindHeader("Cookie");
 	if (header)
 	{
-		auto token = HttpServer::DecodeURLEncoded(header->Value, "token");
-		if (token == "test")//TODO remove this, i.e. replace this with a secure token (from a specific account maybe)
-			return GetDefaultAdminAccount();
-
 		auto value = HttpServer::DecodeURLEncoded(header->Value, "session");
 		return m_Database.IsLoggedIn(Request.m_RequestInfo.RemoteIP, value);
 	}
 
-	return nullptr;
+	return false;
 }
 
 
 
-Error Application::CheckPermission(const HttpServer::Request& Request, Account::AccessLevel AccessLevel) const
+Error Application::CheckPermission(const HttpServer::Request& Request, Account::AccessLevel AccessLevel, const Account** pAccount) const
 {
 	if (!IsRunning())
 		return Error::Type::ApplicationShuttingDown;
@@ -296,6 +296,9 @@ Error Application::CheckPermission(const HttpServer::Request& Request, Account::
 
 	if (!account || account->GetAccessLevel() < AccessLevel)
 		return Error::Type::NotEnoughPermissions;
+
+	if (pAccount)
+		*pAccount = account;
 
 	return Error();
 }
@@ -477,6 +480,11 @@ bool Application::RegisterMatWithMaster(IMat* Mat)
 		Mat->SetTimerStyle((IMat::TimerStyle)yaml["timer_style"].as<int32_t>());
 	if (yaml["name_style"])
 		Mat->SetNameStyle((NameStyle)yaml["name_style"].as<int32_t>());
+
+	if (yaml["token"])//Receive access token from master
+		SetAccessToken(yaml["token"].as<std::string>());
+	else
+		return false;
 
 	return true;
 }

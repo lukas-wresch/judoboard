@@ -250,7 +250,7 @@ var showHansokumakeDecisionBlue  = false;
 function Hajime()
 {
   HajimeTimer_Running = true;
-  AjaxCallback('ajax/mat/hajime?id='+id, function(response) {
+  AjaxCallback(host + '/ajax/mat/hajime?id='+id, function(response) {
     GetScore();
   });
   ShowRevokeGoldenScore(false);
@@ -260,7 +260,7 @@ function Hajime()
 function Mate()
 {
   HajimeTimer_Running = false;
-  AjaxCallback('ajax/mat/pause?id='+id, function(response) {
+  AjaxCallback(host + '/ajax/mat/pause?id='+id, function(response) {
     GetScore();
   });
 
@@ -275,9 +275,9 @@ function SetScore(who, command, event)
 
   var url;
   if (who.length >= 1)
-    url = 'ajax/mat/' + who + '/' + command + '?id='+id;
+    url = host + '/ajax/mat/' + who + '/' + command + '?id='+id;
   else
-    url = 'ajax/mat/' + command + '?id='+id;
+    url = host + '/ajax/mat/' + command + '?id='+id;
   AjaxCallback(url, function(response) {
     GetScore();
   });
@@ -286,7 +286,7 @@ function SetScore(who, command, event)
 
 function Osaekomi(who)
 {
-  AjaxCallback('ajax/mat/' + who + '/osaekomi?id='+id, function(response) {
+  AjaxCallback(host + '/ajax/mat/' + who + '/osaekomi?id='+id, function(response) {
     GetScore();
   });
 
@@ -297,7 +297,7 @@ function Osaekomi(who)
 
 function Tokeda()
 {
-  AjaxCallback('ajax/mat/tokeda?id='+id, function(response) {
+  AjaxCallback(host + '/ajax/mat/tokeda?id='+id, function(response) {
     GetOsaekomiList();
     GetScore();
   });
@@ -314,7 +314,7 @@ function StartNextMatch(event)
 {
   event.preventDefault();
 
-  AjaxCallback('ajax/mat/start_match?id='+id, function(response) {
+  AjaxCallback(host + '/ajax/mat/start_match?id='+id, function(response) {
     if (response != "ok")
         alert("Error: " + response);
     GetScore();
@@ -326,7 +326,7 @@ function EndMatch(event)
 {
   event.preventDefault();
 
-  AjaxCallback('ajax/mat/end_match?id='+id, function(respone) {
+  AjaxCallback(host + '/ajax/mat/end_match?id='+id, function(respone) {
     GetJudokaName();
     GetScore();
   });
@@ -339,9 +339,9 @@ function RevokeHantei()
     return;
 
   if (CurrentScore.has_concluded && CurrentScore.winner == 2)
-    Ajax('/ajax/mat/-draw?id=' + id);
+    Ajax(host + '/ajax/mat/-draw?id=' + id);
   else
-    Ajax('/ajax/mat/-hantei?id=' + id);
+    Ajax(host + '/ajax/mat/-hantei?id=' + id);
 }
 
 
@@ -350,7 +350,7 @@ function RevokeGoldenScore()
   if (!CurrentScore.is_goldenscore)
     return;
 
-  Ajax('/ajax/mat/-golden_score?id=' + id);
+  Ajax(host + '/ajax/mat/-golden_score?id=' + id);
 
   ShowRevokeGoldenScore(false);
   ShowHantei(true);
@@ -532,7 +532,7 @@ function GetScore()
 
   updateScore = true;
 
-  AjaxCallback("ajax/mat/get_score?id="+id, function(response) {
+  AjaxCallback(host + "/ajax/mat/get_score?id="+id, function(response) {
     console.log(response);
     let res = YAML.parse(response);
 
@@ -785,7 +785,7 @@ function GetJudokaName()
 
   updateJudokaName = true;
 
-  AjaxCallback("ajax/mat/names_on_mat?id="+id, function(response) {
+  AjaxCallback(host + "/ajax/mat/names_on_mat?id="+id, function(response) {
     console.log(response);
     let res = YAML.parse(response);
 
@@ -1031,7 +1031,10 @@ function UpdateTimer()
 }
 
 
-var id = URLDecode(URL, "id");
+var id   = URLDecode(URL, "id");
+var host = 'http://' + URLDecode(URL, "host");
+if (host == 'undefined')
+  host = '';
 
 GetScore();
 GetJudokaName();

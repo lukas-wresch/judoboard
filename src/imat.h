@@ -87,14 +87,19 @@ namespace Judoboard
 		};
 
 
-		IMat(uint32_t ID) { m_ID = ID; IMat::SetName(Localizer::Translate("Mat") + " " + std::to_string(ID)); }
+		IMat(uint32_t ID) {
+			SetMatID(ID);
+		}
 		virtual ~IMat() {}
 
 		IMat(IMat&) = delete;
 		IMat(const IMat&) = delete;
 
 		uint32_t GetMatID() const { return m_ID; }
-		void SetMatID(uint32_t NewID) { m_ID = NewID; IMat::SetName(Localizer::Translate("Mat") + " " + std::to_string(m_ID)); }
+		void SetMatID(uint32_t NewID) {
+			m_ID = NewID;
+			IMat::SetName(Localizer::Translate("Mat") + " " + std::to_string(m_ID));
+		}
 
 		virtual const std::string& GetName() const { return m_Name; }
 

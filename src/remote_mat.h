@@ -111,6 +111,9 @@ namespace Judoboard
 			IMat::SetIsFullscreen(Enabled);
 		}
 
+		std::string GetHostname() const { return m_Hostname; }
+		uint16_t GetPort() const { return m_Port; }
+
 	private:
 		bool SendCommand(const std::string& URL) const;
 		ZED::HttpClient::Packet SendRequest(const std::string& URL) const;
