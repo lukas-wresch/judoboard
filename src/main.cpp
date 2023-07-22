@@ -178,7 +178,7 @@ int main(int argc, char** argv)
 		mat->Hajime();
 
 		mat->Osaekomi(Judoboard::Fighter::White);
-		ZED::Core::Pause(8000);
+		ZED::Core::Pause(13000);
 		mat->Sonomama();
 
 		mat->AddShido(Judoboard::Fighter::White);
