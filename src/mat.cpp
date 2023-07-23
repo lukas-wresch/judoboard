@@ -317,28 +317,26 @@ bool Mat::StartMatch(Match* NewMatch, bool UseForce)
 					SetScoreboard(whom).m_MedicalExamination--;
 					break;
 				case MatchLog::BiasedEvent::Hantei:
-					Hantei(whom);
+					SetScoreboard(whom).m_Hantei = true;
 					break;
 				case MatchLog::BiasedEvent::AddDisqualification:
-					AddDisqualification(whom);
+					SetScoreboard(whom).m_Disqualification = Scoreboard::DisqualificationState::Disqualified;
 					break;
 				case MatchLog::BiasedEvent::AddNoDisqualification:
-					AddNoDisqualification(whom);
+					SetScoreboard(whom).m_Disqualification = Scoreboard::DisqualificationState::NotDisqualified;
 					break;
 				case MatchLog::BiasedEvent::RemoveDisqualification:
-					RemoveDisqualification(whom);
-					break;
 				case MatchLog::BiasedEvent::RemoveNoDisqualification:
-					RemoveNoDisqualification(whom);
+					SetScoreboard(whom).m_Disqualification = Scoreboard::DisqualificationState::Unknown;
 					break;
 				case MatchLog::BiasedEvent::AddGachi:
-					AddGachi(whom);
+					SetScoreboard(whom).m_Gachi = true;
 					break;
 				case MatchLog::BiasedEvent::RemoveGachi:
-					RemoveGachi(whom);
+					SetScoreboard(whom).m_Gachi = false;
 					break;
 				case MatchLog::BiasedEvent::HanteiRevoked:
-					RevokeHantei();
+					SetScoreboard( whom).m_Hantei = false;
 					break;
 				}
 			}
