@@ -53,6 +53,7 @@
 </div>
 
 <button id="save" class="add" style="margin-top: 1cm;" onclick="return SaveMatch();">Save</button>
+<button id="revise" class="neutral" style="display: none; margin-top: 1cm;" onclick="return ReviseMatch();">Revise</button>
 <div id="div_delete" style="display: none; margin-top: 5mm;">
   <button id="delete" class="remove" onclick="return DeleteMatch();">Delete Match</button>
 </div>
@@ -114,7 +115,10 @@ function GetMatch()
     else if (res.state == 1)
       document.getElementById("status").innerHTML = translate('running');
     else if (res.state == 2)
+    {
       document.getElementById("status").innerHTML = translate('concluded');
+      document.getElementById("revise").show();
+    }
     else if (res.state == 3)
       document.getElementById("status").innerHTML = translate('optional');
     else if (res.state == 4)
@@ -147,13 +151,24 @@ function GetMatch()
 
 function SaveMatch()
 {
-  var params = URLEncode({
+  let params = URLEncode({
     mat:  document.getElementById("mat").value,
     rule: document.getElementById("rule").value
   });
 
   AjaxPost('ajax/match/edit?id='+id, params, function() {
-    navigate('schedule.html');
+    goBack();
+  });
+
+  return false;
+}
+
+
+
+function ReviseMatch()
+{
+  AjaxCallback('ajax/match/revise?id='+id, function() {
+    goBack();
   });
 
   return false;

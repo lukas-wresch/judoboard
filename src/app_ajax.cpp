@@ -1742,6 +1742,14 @@ void Application::SetupHttpServer()
 		return Ajax_EditMatch(Request);
 	});
 
+	m_Server.RegisterResource("/ajax/match/revise", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_ReviseMatch(Request);
+	});
+
 
 	//Rule Sets
 
@@ -2445,6 +2453,34 @@ Error Application::Ajax_EditMatch(const HttpServer::Request& Request)
 
 	match->SetMatID(matID);
 	match->SetRuleSet(ruleSet);	
+
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_ReviseMatch(const HttpServer::Request& Request)
+{
+	UUID matchID = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockWriteForScope();
+
+	auto tournament = GetTournament();
+	if (!tournament)
+		return Error::Type::TournamentNotOpen;
+	if (!tournament->IsLocal())
+		return Error::Type::InternalError;
+
+	auto match = tournament->FindMatch(matchID);
+	if (!match)
+		return Error::Type::ItemNotFound;
+
+	auto mat = FindMat(match->GetMatID());
+	if (!mat)
+		return Error::Type::MatNotFound;
+
+	if (! ((Tournament*)tournament)->ReviseMatch(matchID, *mat) )
+		return Error::Type::OperationFailed;
 
 	return Error();//OK
 }
