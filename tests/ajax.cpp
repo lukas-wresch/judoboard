@@ -390,6 +390,7 @@ TEST(Ajax, GetMats)
 	EXPECT_EQ(yaml["mats"][0]["name"].as<std::string>(), "Mat 1");
 	EXPECT_EQ(yaml["mats"][0]["is_paused"].as<bool>(), false);
 	EXPECT_EQ(yaml["mats"][0]["ippon_style"].as<int>(), (int)IMat::IpponStyle::DoubleDigit);
+	EXPECT_EQ(yaml["mats"][0]["osaekomi_style"].as<int>(), (int)IMat::OsaekomiStyle::ProgressBar);
 	EXPECT_EQ(yaml["mats"][0]["name_style"].as<int>(),  (int)NameStyle::FamilyName);
 	EXPECT_TRUE(yaml["mats"][0]["sound_enabled"].as<bool>());
 	EXPECT_EQ(yaml["mats"][0]["sound_filename"].as<std::string>(), "test");
@@ -490,39 +491,42 @@ TEST(Ajax, UpdateMat)
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 
-		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&timerStyle=1&nameStyle=0&sound=false&sound_filename=changed")));
+		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=0&sound=false&sound_filename=changed")));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 5);
 		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test");
 		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 0);
+		EXPECT_EQ((int)app.GetDefaultMat()->GetOsaekomiStyle(), 0);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 1);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  0);
 		EXPECT_FALSE(app.GetDefaultMat()->IsSoundEnabled());
 		EXPECT_EQ(app.GetDefaultMat()->GetSoundFilename(), "changed");
 
 
-		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&timerStyle=2&nameStyle=1&sound=true&sound_filename=changed2")));
+		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=1&sound=true&sound_filename=changed2")));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
 		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test2");
 		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 1);
+		EXPECT_EQ((int)app.GetDefaultMat()->GetOsaekomiStyle(), 1);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 2);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  1);
 		EXPECT_TRUE(app.GetDefaultMat()->IsSoundEnabled());
 		EXPECT_EQ(app.GetDefaultMat()->GetSoundFilename(), "changed2");
 
 
-		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test3&ipponStyle=2&timerStyle=0&nameStyle=0&sound=false&sound_filename=changed3")));
+		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test3&ipponStyle=2&osaekomiStyle=0&timerStyle=0&nameStyle=0&sound=false&sound_filename=changed3")));
 
 		EXPECT_TRUE(app.GetDefaultMat());
 		EXPECT_TRUE(app.GetDefaultMat()->IsOpen());
 		EXPECT_EQ(app.GetDefaultMat()->GetMatID(), 1);
 		EXPECT_EQ(app.GetDefaultMat()->GetName(), "Test3");
 		EXPECT_EQ((int)app.GetDefaultMat()->GetIpponStyle(), 2);
+		EXPECT_EQ((int)app.GetDefaultMat()->GetOsaekomiStyle(), 0);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetTimerStyle(), 0);
 		EXPECT_EQ((int)app.GetDefaultMat()->GetNameStyle(),  0);
 		EXPECT_FALSE(app.GetDefaultMat()->IsSoundEnabled());
@@ -715,25 +719,27 @@ TEST(Ajax, Setup_Set)
 	{
 		Application app;
 		
-		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=1234&language=0&ipponStyle=1&timerStyle=2&nameStyle=0")), "ok");
+		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=1234&language=0&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=0")), "ok");
 
 		auto yaml = YAML::Load(app.Ajax_GetSetup());
 
 		EXPECT_EQ(yaml["language"].as<int>(), 0);
 		EXPECT_EQ(yaml["port"].as<int>(), 1234);
 		EXPECT_EQ(yaml["ippon_style"].as<int>(), 1);
+		EXPECT_EQ(yaml["osaekomi_style"].as<int>(), 1);
 		EXPECT_EQ(yaml["timer_style"].as<int>(), 2);
 		EXPECT_EQ(yaml["name_style"].as<int>(),  0);
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
 
-		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&ipponStyle=0&timerStyle=1&nameStyle=1")), "ok");
+		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=1")), "ok");
 
 		yaml = YAML::Load(app.Ajax_GetSetup());
 
 		EXPECT_EQ(yaml["language"].as<int>(), 1);
 		EXPECT_EQ(yaml["port"].as<int>(), 567);
 		EXPECT_EQ(yaml["ippon_style"].as<int>(), 0);
+		EXPECT_EQ(yaml["osaekomi_style"].as<int>(), 0);
 		EXPECT_EQ(yaml["timer_style"].as<int>(), 1);
 		EXPECT_EQ(yaml["name_style"].as<int>(),  1);
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);

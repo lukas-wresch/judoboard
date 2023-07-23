@@ -2775,6 +2775,7 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 	int new_id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body,  "id"));
 	auto name  = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
+	int osaekomiStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomiStyle"));
 	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
 	bool sound     = HttpServer::DecodeURLEncoded(Request.m_Body, "sound") == "true";
 	std::string soundFilename = HttpServer::DecodeURLEncoded(Request.m_Body, "sound_filename");
@@ -2807,6 +2808,7 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 
 			mat->SetName(name);
 			mat->SetIpponStyle((Mat::IpponStyle)ipponStyle);
+			mat->SetOsaekomiStyle((Mat::OsaekomiStyle)osaekomiStyle);
 			mat->SetTimerStyle((Mat::TimerStyle)timerStyle);
 			mat->EnableSound(sound);
 			mat->SetSoundFilename(soundFilename);
