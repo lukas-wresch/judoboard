@@ -170,7 +170,7 @@ bool Mat::StartMatch(Match* NewMatch, bool UseForce)
 {
 	if (!NewMatch)
 	{
-		ZED::Log::Warn("Invalid match");
+		ZED::Log::Error("Invalid match");
 		return false;
 	}
 
@@ -218,13 +218,126 @@ bool Mat::StartMatch(Match* NewMatch, bool UseForce)
 	m_Blue  = *NewMatch->GetFighter(Fighter::Blue);
 
 	m_pMatch = NewMatch;
+	bool revise_match = false;
 
-	NewMatch->StartMatch();
-	AddEvent(MatchLog::NeutralEvent::StartMatch);
+	if (NewMatch->HasConcluded())
+		revise_match = true;
+	else if (NewMatch->IsScheduled())
+		AddEvent(MatchLog::NeutralEvent::StartMatch);
+
+	NewMatch->StartMatch();//Mark match is 'is running'
 
 	NextState(State::TransitionToMatch);
 	assert(m_State == State::TransitionToMatch);
 	assert(AreFightersOnMat());
+
+	if (revise_match)//Revise match
+	{
+		m_HajimeTimer.Set(NewMatch->GetResult().m_Time);//Get match timer
+
+		//Read all events
+		const auto& events = NewMatch->GetLog().GetEvents();
+		for (auto& ev : events)
+		{
+			if (ev.m_Group == MatchLog::EventGroup::Neutral)
+			{
+				auto type = ev.m_Event;
+				switch (type)
+				{
+				case MatchLog::NeutralEvent::EnableGoldenScore:
+					EnableGoldenScore();
+					break;
+				case MatchLog::NeutralEvent::DisableGoldenScore:
+					EnableGoldenScore(false);
+					break;
+				case MatchLog::NeutralEvent::EnableDraw:
+					SetAsDraw();
+					break;
+				case MatchLog::NeutralEvent::DisableDraw:
+					SetAsDraw(false);
+					break;
+				}
+			}
+
+			else
+			{
+				Fighter whom = (Fighter)ev.m_Group;
+				auto type = ev.m_BiasedEvent;
+
+				switch (type)
+				{
+				case MatchLog::BiasedEvent::AddIppon:
+					AddIppon(whom);
+					break;
+				case MatchLog::BiasedEvent::AddWazaari:
+					AddWazaAri(whom);
+					break;
+				case MatchLog::BiasedEvent::AddYuko:
+					AddYuko(whom);
+					break;
+				case MatchLog::BiasedEvent::AddKoka:
+					AddKoka(whom);
+					break;
+				case MatchLog::BiasedEvent::RemoveIppon:
+					RemoveIppon(whom);
+					break;
+				case MatchLog::BiasedEvent::RemoveWazaari:
+					RemoveWazaAri(whom);
+					break;
+				case MatchLog::BiasedEvent::RemoveYuko:
+					RemoveYuko(whom);
+					break;
+				case MatchLog::BiasedEvent::RemoveKoka:
+					RemoveKoka(whom);
+					break;
+				case MatchLog::BiasedEvent::AddShido:
+					AddShido(whom);
+					break;
+				case MatchLog::BiasedEvent::AddHansokuMake_Direct:
+					AddHansokuMake(whom);
+					break;
+				case MatchLog::BiasedEvent::RemoveShido:
+					RemoveShido(whom);
+					break;
+				case MatchLog::BiasedEvent::RemoveHansokuMake:
+					RemoveHansokuMake(whom);
+					break;
+				case MatchLog::BiasedEvent::AddMedicalExamination:
+					AddMedicalExamination(whom);
+					break;
+				case MatchLog::BiasedEvent::RemoveMedicalExamination:
+					RemoveMedicalExamination(whom);
+					break;
+				case MatchLog::BiasedEvent::Hantei:
+					Hantei(whom);
+					break;
+				case MatchLog::BiasedEvent::AddDisqualification:
+					AddDisqualification(whom);
+					break;
+				case MatchLog::BiasedEvent::AddNoDisqualification:
+					AddNoDisqualification(whom);
+					break;
+				case MatchLog::BiasedEvent::RemoveDisqualification:
+					RemoveDisqualification(whom);
+					break;
+				case MatchLog::BiasedEvent::RemoveNoDisqualification:
+					RemoveNoDisqualification(whom);
+					break;
+				case MatchLog::BiasedEvent::AddGachi:
+					AddGachi(whom);
+					break;
+				case MatchLog::BiasedEvent::RemoveGachi:
+					RemoveGachi(whom);
+					break;
+				case MatchLog::BiasedEvent::HanteiRevoked:
+					RevokeHantei();
+					break;
+				}
+			}
+		}
+
+		AddEvent(MatchLog::NeutralEvent::ReviseMatch);
+	}
 
 	ZED::Log::Info("New match started");
 	return true;

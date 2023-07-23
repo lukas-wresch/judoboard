@@ -98,7 +98,8 @@ namespace Judoboard
 			OsaekomiSwitched,//Switch osaekomi time from one fighter to the other
 			StartMatch, EndMatch,
 			EnableGoldenScore, DisableGoldenScore,
-			EnableDraw, DisableDraw
+			EnableDraw, DisableDraw,
+			ReviseMatch
 		};
 
 		enum class BiasedEvent

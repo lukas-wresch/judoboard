@@ -954,6 +954,25 @@ Match* Tournament::GetNextOngoingMatch(int32_t MatID)
 
 
 
+bool Tournament::ReviseMatch(const UUID& MatchID, IMat& Mat)
+{
+	auto match = FindMatch(MatchID);
+	if (!match)
+		return false;
+
+	if (Mat.GetMatID() != match->GetMatID())
+		return false;
+	if (!match->HasConcluded())
+		return false;
+
+	if (Mat.AreFightersOnMat())
+		return false;
+
+	return Mat.StartMatch(match, true);
+}
+
+
+
 bool Tournament::RemoveMatch(const UUID& MatchID)
 {
 	if (IsReadonly())
