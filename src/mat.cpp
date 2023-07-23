@@ -245,16 +245,17 @@ bool Mat::StartMatch(Match* NewMatch, bool UseForce)
 				switch (type)
 				{
 				case MatchLog::NeutralEvent::EnableGoldenScore:
-					EnableGoldenScore();
+					SetScoreboard(Fighter::White).m_Ippon = SetScoreboard(Fighter::Blue).m_Ippon = 0;
+					m_GoldenScore = true;
 					break;
 				case MatchLog::NeutralEvent::DisableGoldenScore:
-					EnableGoldenScore(false);
+					m_GoldenScore = false;
 					break;
 				case MatchLog::NeutralEvent::EnableDraw:
-					SetAsDraw();
+					m_IsDraw = true;
 					break;
 				case MatchLog::NeutralEvent::DisableDraw:
-					SetAsDraw(false);
+					m_IsDraw = false;
 					break;
 				}
 			}
@@ -267,46 +268,53 @@ bool Mat::StartMatch(Match* NewMatch, bool UseForce)
 				switch (type)
 				{
 				case MatchLog::BiasedEvent::AddIppon:
-					AddIppon(whom);
+					SetScoreboard(whom).m_Ippon++;
 					break;
 				case MatchLog::BiasedEvent::AddWazaari:
-					AddWazaAri(whom);
+					SetScoreboard(whom).m_WazaAri++;
+					if (SetScoreboard(whom).m_WazaAri == 2)
+						SetScoreboard(whom).m_Ippon++;
 					break;
 				case MatchLog::BiasedEvent::AddYuko:
-					AddYuko(whom);
+					SetScoreboard(whom).m_Yuko++;
 					break;
 				case MatchLog::BiasedEvent::AddKoka:
-					AddKoka(whom);
+					SetScoreboard(whom).m_Koka++;
 					break;
 				case MatchLog::BiasedEvent::RemoveIppon:
-					RemoveIppon(whom);
+					SetScoreboard(whom).m_Ippon--;
 					break;
 				case MatchLog::BiasedEvent::RemoveWazaari:
-					RemoveWazaAri(whom);
+					SetScoreboard(whom).m_WazaAri--;
 					break;
 				case MatchLog::BiasedEvent::RemoveYuko:
-					RemoveYuko(whom);
+					SetScoreboard(whom).m_Yuko--;
 					break;
 				case MatchLog::BiasedEvent::RemoveKoka:
-					RemoveKoka(whom);
+					SetScoreboard(whom).m_Koka--;
 					break;
 				case MatchLog::BiasedEvent::AddShido:
-					AddShido(whom);
+					SetScoreboard(whom).m_Shido++;
 					break;
 				case MatchLog::BiasedEvent::AddHansokuMake_Direct:
-					AddHansokuMake(whom);
+					SetScoreboard(whom).m_HansokuMake = true;
+					SetScoreboard(whom).m_HansokuMake_Direct = true;
+					break;
+				case MatchLog::BiasedEvent::AddHansokuMake_Indirect:
+					SetScoreboard(whom).m_HansokuMake = true;
+					SetScoreboard(whom).m_HansokuMake_Direct = false;
 					break;
 				case MatchLog::BiasedEvent::RemoveShido:
-					RemoveShido(whom);
+					SetScoreboard(whom).m_Shido--;
 					break;
 				case MatchLog::BiasedEvent::RemoveHansokuMake:
-					RemoveHansokuMake(whom);
+					SetScoreboard(whom).m_HansokuMake = false;
 					break;
 				case MatchLog::BiasedEvent::AddMedicalExamination:
-					AddMedicalExamination(whom);
+					SetScoreboard(whom).m_MedicalExamination++;
 					break;
 				case MatchLog::BiasedEvent::RemoveMedicalExamination:
-					RemoveMedicalExamination(whom);
+					SetScoreboard(whom).m_MedicalExamination--;
 					break;
 				case MatchLog::BiasedEvent::Hantei:
 					Hantei(whom);

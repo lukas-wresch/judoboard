@@ -355,6 +355,9 @@ TEST(Tournament, ReviseMatch)
 		EXPECT_TRUE(tourney.ReviseMatch(*match, mat));
 
 		EXPECT_TRUE(mat.AreFightersOnMat());
+		EXPECT_EQ(mat.GetScoreboard(f).m_Ippon,  1);
+		EXPECT_EQ(mat.GetScoreboard(!f).m_Ippon, 0);
+
 		mat.RemoveIppon(f);
 		mat.Hajime();
 		ZED::Core::Pause(1000);

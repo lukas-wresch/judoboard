@@ -117,7 +117,7 @@ function GetMatch()
     else if (res.state == 2)
     {
       document.getElementById("status").innerHTML = translate('concluded');
-      document.getElementById("revise").show();
+      $('#revise').show();
     }
     else if (res.state == 3)
       document.getElementById("status").innerHTML = translate('optional');
@@ -167,9 +167,12 @@ function SaveMatch()
 
 function ReviseMatch()
 {
-  AjaxCallback('ajax/match/revise?id='+id, function() {
-    goBack();
-  });
+  if (confirm(translate('revise_match_confirm')))
+  {
+    AjaxCallback('ajax/match/revise?id='+id, function() {
+      goBack();
+    });
+  }
 
   return false;
 }
