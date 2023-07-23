@@ -33,6 +33,12 @@ namespace Judoboard
 			SpelledOut,//  Show score like: *none*, 1 Wazaari, 2 Wazaari, Ippon
 		};
 
+		enum class OsaekomiStyle
+		{
+			ProgressBar,//Progress bar that moves to the right
+			FixedAtBottom//Fixed digits at the bottom
+		};
+
 
 		struct Scoreboard
 		{
@@ -183,6 +189,7 @@ namespace Judoboard
 
 		//Config
 		IpponStyle GetIpponStyle() const { return m_IpponStyle; }
+		OsaekomiStyle GetOsaekomiStyle() const { return m_OsaekomiStyle; }
 		TimerStyle GetTimerStyle() const { return m_TimerStyle; }
 		NameStyle  GetNameStyle()  const { return m_NameStyle; }
 		bool IsFullscreen() const { return m_IsFullscreen; }
@@ -192,6 +199,7 @@ namespace Judoboard
 
 		virtual void SetName(const std::string& NewName) { m_Name = NewName; }
 		virtual void SetIpponStyle(IpponStyle NewStyle) { m_IpponStyle = NewStyle; }
+		virtual void SetOsaekomiStyle(OsaekomiStyle NewStyle) { m_OsaekomiStyle = NewStyle; }
 		virtual void SetTimerStyle(TimerStyle NewStyle) { m_TimerStyle = NewStyle; }
 		virtual void SetNameStyle(NameStyle NewStyle) { m_NameStyle = NewStyle; }
 		virtual void SetIsFullscreen(bool Enabled) { m_IsFullscreen = Enabled; }
@@ -212,7 +220,8 @@ namespace Judoboard
 		//Configuration
 		TimerStyle m_TimerStyle = TimerStyle::OnlySeconds;
 		IpponStyle m_IpponStyle = IpponStyle::DoubleDigit;
-		NameStyle m_NameStyle   = NameStyle::FamilyName;
+		OsaekomiStyle m_OsaekomiStyle = OsaekomiStyle::ProgressBar;
+		NameStyle m_NameStyle = NameStyle::FamilyName;
 		bool m_IsFullscreen = true;
 		bool m_SoundEnabled = true;//Sound effect for and of match/osaekomi will be played if this flag is set
 		std::string m_SoundFilename = "test";//Sound file that is currently in use

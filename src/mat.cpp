@@ -1447,7 +1447,7 @@ void Mat::NextState(State NextState) const
 			if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetAgeGroup())
 			{
 				auto name = m_pMatch->GetMatchTable()->GetAgeGroup()->GetName();
-				double pos_y = (int)(300.0 * m_ScalingFactor);
+				int pos_y = (int)(300.0 * m_ScalingFactor);
 
 				m_Graphics["age_group_rect_text"].UpdateTexture(renderer, name, ZED::Color(0, 0, 0), ZED::FontSize::Gigantic)
 					.StopAllAnimations().Center().SetPosition(width/2, height/2 + pos_y, -100)
@@ -1905,31 +1905,42 @@ void Mat::UpdateOsaekomiGraphics() const
 	auto& osaekomi_text = m_Graphics["osaekomi_text"];
 	auto& osaekomi_bar  = m_Graphics["osaekomi_bar"];
 
-	//osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
-	osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic);
-
-	const int new_width = m_OsaekomiTimer[(int)fighter].GetElapsedTime() * osaekomi_max_width / (EndTimeOfOsaekomi() * 1000);
-
-	if (osaekomi_text && new_width > osaekomi_bar.m_width || osaekomi_bar.m_a <= 0.0)
+	if (GetOsaekomiStyle() == OsaekomiStyle::ProgressBar)
 	{
-		if (osaekomi_text)
+		osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
+
+		const int new_width = m_OsaekomiTimer[(int)fighter].GetElapsedTime() * osaekomi_max_width / (EndTimeOfOsaekomi() * 1000);
+
+		if (osaekomi_text && new_width > osaekomi_bar.m_width || osaekomi_bar.m_a <= 0.0)
 		{
-			const int new_text_x = new_width - osaekomi_text->GetWidth() - 2;
-			osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
+			if (osaekomi_text)
+			{
+				const int new_text_x = new_width - osaekomi_text->GetWidth() - 2;
+				osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
+			}
+
+			auto& osaekomi_bar_border = m_Graphics["osaekomi_bar_border"];
+			osaekomi_bar_border.SetPosition(0, osaekomi_y, 255);
+			osaekomi_bar_border.m_width  = new_width + 5;
+			osaekomi_bar_border.m_height = (int)(100.0 * m_ScalingFactor) + 10;
+			osaekomi_bar_border.m_color  = ZED::Color(0, 0, 0);
+
+
+			osaekomi_bar.SetPosition(0, osaekomi_y + 5, 255);
+			//osaekomi_bar.m_color = ZED::Color(30, 150, 30);
+			osaekomi_bar.m_color = ZED::Color(255, 0, 0);
+			osaekomi_bar.m_width = new_width;
+			osaekomi_bar.m_height = (int)(100.0 * m_ScalingFactor);
 		}
+	}
+	else
+	{
+		osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic);
 
 		auto& osaekomi_bar_border = m_Graphics["osaekomi_bar_border"];
-		osaekomi_bar_border.SetPosition(0, osaekomi_y, 255);
-		osaekomi_bar_border.m_width  = new_width + 5;
-		osaekomi_bar_border.m_height = (int)(100.0 * m_ScalingFactor) + 10;
-		osaekomi_bar_border.m_color  = ZED::Color(0, 0, 0);
 
-
-		osaekomi_bar.SetPosition(0, osaekomi_y + 5, 255);
-		//osaekomi_bar.m_color = ZED::Color(30, 150, 30);
-		osaekomi_bar.m_color = ZED::Color(255, 0, 0);
-		osaekomi_bar.m_width = new_width;
-		osaekomi_bar.m_height = (int)(100.0 * m_ScalingFactor);
+		osaekomi_bar_border.SetColor(ZED::Color(0, 0, 0));
+		osaekomi_bar.SetColor(ZED::Color(255, 0, 0));
 
 		//New osaekomi bar
 		double rect_width  = 190.0;
