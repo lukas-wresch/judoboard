@@ -345,6 +345,8 @@ bool StandingData::AddAssociation(Association* NewAssociation)
 
 	if (FindAssociation(NewAssociation->GetUUID()))
 		return false;
+	if (FindAssociationByName(NewAssociation->GetName()))
+		return false;
 
 	//Add recursively
 	AddAssociation(const_cast<Association*>(NewAssociation->GetParent()));

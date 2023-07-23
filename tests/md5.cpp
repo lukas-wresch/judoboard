@@ -460,6 +460,17 @@ TEST(MD5, ImportIntoTournament)
 		Database db;
 		Tournament tour(file, &db);
 
+		//Search for duplicates
+		const auto& assoc = tour.GetDatabase().GetAllAssociations();
+		for (size_t i = 0; i < assoc.size(); i++)
+		{
+			for (size_t j = i + 1; j < assoc.size(); j++)
+			{
+				EXPECT_NE(assoc[i]->GetName(), assoc[j]->GetName());
+				EXPECT_NE(assoc[i]->GetUUID(), assoc[j]->GetUUID());
+			}
+		}
+
 		ASSERT_TRUE(tour.GetOrganizer());
 		EXPECT_EQ(tour.GetOrganizer()->GetName(), u8"Bielefeld/G\u00fctersloh");
 
