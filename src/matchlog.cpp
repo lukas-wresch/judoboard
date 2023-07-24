@@ -1,6 +1,5 @@
 #define YAML_CPP_STATIC_DEFINE
 #include "yaml-cpp/yaml.h"
-#include <sstream>
 #include "matchlog.h"
 
 
@@ -9,28 +8,14 @@ using namespace Judoboard;
 
 
 
-const std::string MatchLog::ToString() const
-{
-	std::stringstream ret;
-
-	bool comma_needed = false;
-	for (auto& event : m_Events)
-	{
-		if (comma_needed)
-			ret << ",";
-		ret << event.m_Timestamp << "," << std::to_string((int)event.m_Group) << "," << std::to_string((int)event.m_Event);
-		comma_needed = true;
-	}
-
-	return ret.str();
-}
-
-
-
 void MatchLog::operator << (const YAML::Node& Yaml)
 {
 	if (!Yaml.IsSequence())
 		return;
+
+	std::lock_guard<std::mutex> lock(m_Mutex);
+
+	m_Events.clear();
 
 	for (const auto& node : Yaml)
 	{
@@ -55,6 +40,8 @@ void MatchLog::operator << (const YAML::Node& Yaml)
 void MatchLog::operator >> (YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginSeq;
+
+	std::lock_guard<std::mutex> lock(m_Mutex);
 
 	for (auto& event : m_Events)
 	{

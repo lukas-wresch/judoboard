@@ -25,9 +25,16 @@ namespace Judoboard
 		Application() : m_StartupTimestamp(Timer::GetTimestamp()) {
 			m_TempTournament.EnableAutoSave(false);
 			m_CurrentTournament = &m_TempTournament;
+
+			std::string token = (std::string)ID::GenerateUUID();
+			m_SecurityToken   = token.substr(0, 32);
 		}
 		Application(uint16_t Port);
 		~Application();
+
+		bool CheckAccessToken(const std::string& Token) const {
+			return m_SecurityToken == Token;
+		}
 
 		[[nodiscard]]
 		bool IsRunning() const { return m_Running; }
@@ -37,6 +44,8 @@ namespace Judoboard
 		bool IsSlave()   const { return m_Mode == Mode::Slave; }
 		[[nodiscard]]
 		auto GetPort()   const { return m_Server.GetPort(); }
+
+		const HttpServer& GetHttpServer() const { return m_Server; }
 
 		[[nodiscard]]
 		const Database& GetDatabase() const { return m_Database; }
@@ -74,15 +83,17 @@ namespace Judoboard
 		//Mats
 		const std::vector<IMat*>& GetMats() const { return m_Mats; }
 		std::vector<IMat*>& SetMats() { return m_Mats; }
-		uint32_t FindDefaultMatID() const { if (GetDefaultMat()) return GetDefaultMat()->GetMatID(); return 0; }//If only one mat is available the ID of that mat will be returned. 0 otherwise
+		uint32_t FindDefaultMatID() const { if (GetLocalMat()) return GetLocalMat()->GetMatID(); return 0; }//If only one mat is available the ID of that mat will be returned. 0 otherwise
 
-		IMat* GetDefaultMat() const;
+		IMat* GetLocalMat() const;
 		IMat* FindMat(uint32_t ID);
 		const IMat* FindMat(uint32_t ID) const;
 		uint32_t GetHighestMatID() const;
 
 		bool StartLocalMat(uint32_t ID = 1);
 		bool CloseMat(uint32_t ID);
+
+		bool RegisterMatWithMaster(IMat* Mat);
 
 		std::vector<Match> GetNextMatches(uint32_t MatID, bool& Success) const;
 
@@ -192,11 +203,14 @@ namespace Judoboard
 		void SetupHttpServer();
 
 		bool IsTournamentOpen() const { return m_CurrentTournament; }
-		const Account* IsLoggedIn(const HttpServer::Request& Request) const;
 
-		Error CheckPermission(const HttpServer::Request& Request, Account::AccessLevel AccessLevel = Account::AccessLevel::User) const;
+		bool IsLoggedIn(const HttpServer::Request& Request) const;
+		Error CheckPermission(const HttpServer::Request& Request, Account::AccessLevel AccessLevel = Account::AccessLevel::User, const Account** pAccount = nullptr) const;
 
-		bool SendCommandToMaster(const std::string& URL) const;
+		std::string GetAccessToken() const { return m_SecurityToken; }
+		void SetAccessToken(const std::string& NewToken) { m_SecurityToken = NewToken; }
+
+		std::string SendCommandToMaster(const std::string& URL) const;
 
 		class ScopedLock
 		{
@@ -223,6 +237,8 @@ namespace Judoboard
 
 		std::string m_MasterHostname;//Hostname of the master server
 		uint16_t m_MasterPort = 0;//Port of the master server
+
+		std::string m_SecurityToken;//For remote access
 
 		HttpServer m_Server;
 

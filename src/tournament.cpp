@@ -498,26 +498,7 @@ bool Tournament::Load(const YAML::Node& yaml)
 				continue;
 			}
 
-			MatchTable* new_table  = nullptr;
-
-			switch ((MatchTable::Type)node["type"].as<int>())
-			{
-			case MatchTable::Type::RoundRobin:
-				new_table = new RoundRobin(node, this);
-				break;
-			case MatchTable::Type::Custom:
-				new_table = new CustomTable(node, this);
-				break;
-			case MatchTable::Type::SingleElimination:
-				new_table = new SingleElimination(node, this);
-				break;
-			case MatchTable::Type::Pool:
-				new_table = new Pool(node, this);
-				break;
-			case MatchTable::Type::DoubleElimination:
-				new_table = new DoubleElimination(node, this);
-				break;
-			}
+			MatchTable* new_table = MatchTable::CreateMatchTable(node, this);
 
 			if (new_table)
 				m_MatchTables.push_back(new_table);
@@ -1125,7 +1106,7 @@ bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 
 
 
-std::vector<Match> Tournament::GetNextMatches(uint32_t MatID) const
+std::vector<Match> Tournament::GetNextMatches(int32_t MatID) const
 {
 	std::vector<Match> ret;
 

@@ -88,7 +88,7 @@ namespace Judoboard
 		virtual bool MoveMatchUp(const UUID&  MatchID, uint32_t MatID = 0) override;
 		virtual bool MoveMatchDown(const UUID&  MatchID, uint32_t MatID = 0) override;
 
-		std::vector<Match> GetNextMatches(uint32_t MatID) const;
+		virtual std::vector<Match> GetNextMatches(int32_t MatID) const override;
 
 		//Participant / Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const override { return m_StandingData.FindJudoka(Judoka.GetUUID()); }

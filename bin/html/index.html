@@ -137,16 +137,21 @@ function Update_MatCount()
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    let res = YAML.parse(response);
     
-    var matlist = document.getElementById("navi_mats");
+    let matlist = document.getElementById("navi_mats");
 
     matlist.innerHTML = "";
 
     for (const mat of res.mats)
     {
       if (typeof mat.is_open !== 'undefined' && mat.is_open)
-        matlist.innerHTML += "<li><a href=\"#mat.html?id=" + mat.id + "\">" + translate('mat') + " " + mat.id + "</a></li>"
+      {
+        if (mat.type == 1)
+          matlist.innerHTML += "<li><a href=\"#mat.html?id=" + mat.id + "\">" + translate('mat') + " " + mat.id + "</a></li>"
+        else if (mat.type == 3)
+          matlist.innerHTML += "<li><a href=\"#mat.html?id=" + mat.id + "&host=" + mat.hostname + ":" + mat.port + "&token=" + mat.token + "\">" + translate('mat') + " " + mat.id + "</a></li>"
+      }
     }
   });
 }

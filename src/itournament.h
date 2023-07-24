@@ -38,11 +38,12 @@ namespace Judoboard
 
 		virtual bool AddMatch(Match* NewMatch) { return false; }
 		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(std::move(NewMatch))); }
-		virtual Match* GetNextMatch(int32_t MatID = -1) const { return nullptr; }//Returns the next match for a given mat if available, otherwise null pointer is returned
+
 		//const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 		virtual Match* GetNextOngoingMatch(int32_t MatID) { return nullptr; }//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
 
-		virtual std::vector<Match> GetNextMatches(uint32_t MatID) const = 0;
+		virtual std::vector<Match> GetNextMatches(int32_t MatID) const = 0;
+		virtual Match* GetNextMatch(int32_t MatID = -1) const = 0;//Returns the next match for a given mat if available, otherwise null pointer is returned
 
 		virtual bool RemoveMatch(const UUID& MatchID) { return false; }
 		virtual bool MoveMatchUp(const UUID& MatchID, uint32_t MatID = 0) { return false; }
@@ -52,7 +53,8 @@ namespace Judoboard
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;
 		virtual std::vector<Judoka*> GetParticipants() const {
 			std::vector<Judoka*> ret;
-      return ret; }
+			return ret;
+		}
 		virtual const Judoka* FindParticipant(const UUID& UUID) const { return nullptr; }
 		virtual Judoka* FindParticipant(const UUID& UUID) { return nullptr; }
 			
@@ -77,8 +79,8 @@ namespace Judoboard
 			return ret;
 		}
 
-		virtual MatchTable* FindMatchTable(const UUID& ID) { return nullptr; }
-		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
+		virtual MatchTable* FindMatchTable(const UUID& ID) = 0;
+		virtual const MatchTable* FindMatchTable(const UUID& ID) const = 0;
 
 		//Clubs
 		virtual Club* FindClub(const UUID& UUID) { return nullptr; }
@@ -95,8 +97,8 @@ namespace Judoboard
 		virtual bool AddRuleSet(RuleSet* NewRuleSet) { return false; }
 		virtual const RuleSet* FindRuleSetByName(const std::string& Name) const { return nullptr; }
 		virtual RuleSet* FindRuleSetByName(const std::string& Name) { return nullptr; }
-		virtual const RuleSet* FindRuleSet(const UUID& UUID) const { return nullptr; }
-		virtual RuleSet* FindRuleSet(const UUID& UUID) { return nullptr; }
+		virtual const RuleSet* FindRuleSet(const UUID& UUID) const = 0;
+		virtual RuleSet* FindRuleSet(const UUID& UUID) = 0;
 
 		//Age groups
 		virtual bool AddAgeGroup(AgeGroup* NewAgeGroup) { return false; }

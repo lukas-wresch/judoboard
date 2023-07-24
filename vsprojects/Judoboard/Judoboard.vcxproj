@@ -271,6 +271,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\.gitattributes" />
+    <None Include="..\..\.github\workflows\build.yml" />
+    <None Include="..\..\.github\workflows\dm4.yml" />
+    <None Include="..\..\.github\workflows\md5.yml" />
+    <None Include="..\..\.github\workflows\remote-mat.yml" />
+    <None Include="..\..\.github\workflows\tests.yml" />
     <None Include="..\..\.gitignore" />
     <None Include="..\..\bin\html\account_add.html" />
     <None Include="..\..\bin\html\account_change_password.html" />

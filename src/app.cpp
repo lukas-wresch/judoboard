@@ -24,11 +24,14 @@ bool Application::NoWindow = false;
 Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Timer::GetTimestamp())
 {
 	m_TempTournament.EnableAutoSave(false);
+	m_TempTournament.SetDefaultRuleSet(new RuleSet);//Take default rule set as rule set for temporary tournaments
 	m_CurrentTournament = &m_TempTournament;
+
+	std::string token = (std::string)ID::GenerateUUID();
+	m_SecurityToken   = token.substr(0, 32);
 
 	if (!m_Server.IsRunning())
 		ZED::Log::Error("Could not start http server!");
-
 
 	SetupHttpServer();
 }
@@ -257,28 +260,28 @@ bool Application::CloseTournament()
 
 
 
-const Account* Application::IsLoggedIn(const HttpServer::Request& Request) const
+bool Application::IsLoggedIn(const HttpServer::Request& Request) const
 {
 	if (!IsRunning())
-		return nullptr;	
+		return false;
+
+	if (IsSlave())
+		if (CheckAccessToken(HttpServer::DecodeURLEncoded(Request.m_Query, "token")))
+			return true;
 
 	auto header = Request.m_RequestInfo.FindHeader("Cookie");
 	if (header)
 	{
-		auto token = HttpServer::DecodeURLEncoded(header->Value, "token");
-		if (token == "test")//TODO remove this, i.e. replace this with a secure token (from a specific account maybe)
-			return GetDefaultAdminAccount();
-
 		auto value = HttpServer::DecodeURLEncoded(header->Value, "session");
 		return m_Database.IsLoggedIn(Request.m_RequestInfo.RemoteIP, value);
 	}
 
-	return nullptr;
+	return false;
 }
 
 
 
-Error Application::CheckPermission(const HttpServer::Request& Request, Account::AccessLevel AccessLevel) const
+Error Application::CheckPermission(const HttpServer::Request& Request, Account::AccessLevel AccessLevel, const Account** pAccount) const
 {
 	if (!IsRunning())
 		return Error::Type::ApplicationShuttingDown;
@@ -296,12 +299,15 @@ Error Application::CheckPermission(const HttpServer::Request& Request, Account::
 	if (!account || account->GetAccessLevel() < AccessLevel)
 		return Error::Type::NotEnoughPermissions;
 
+	if (pAccount)
+		*pAccount = account;
+
 	return Error();
 }
 
 
 
-IMat* Application::GetDefaultMat() const
+IMat* Application::GetLocalMat() const
 {
 	auto guard = LockReadForScope();
 
@@ -438,7 +444,49 @@ bool Application::StartLocalMat(uint32_t ID)
 	ZED::Log::Info("New local mat has been created with ID=" + std::to_string(ID));
 
 	if (IsSlave())
-		SendCommandToMaster("/ajax/master/mat_available?port=" + std::to_string(m_Server.GetPort()));
+	{
+		if (!RegisterMatWithMaster(new_mat))
+		{
+			ZED::Log::Error("Could not register mat with master");
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+
+bool Application::RegisterMatWithMaster(IMat* Mat)
+{
+	if (!Mat)
+		return false;
+
+	auto yaml = YAML::Load(SendCommandToMaster("/ajax/master/mat_available?id=" + std::to_string(Mat->GetMatID()) + "&port=" + std::to_string(m_Server.GetPort())));
+
+	if (!yaml || !yaml.IsMap())
+	{
+		ZED::Log::Error("Could not register mat with master");
+		return false;
+	}
+
+	auto guard = LockWriteForScope();
+
+	if (yaml["id"])
+		Mat->SetMatID(yaml["id"].as<uint32_t>());
+	if (yaml["language"])
+		Localizer::SetLanguage((Language)yaml["language"].as<int32_t>());
+	if (yaml["ippon_style"])
+		Mat->SetIpponStyle((IMat::IpponStyle)yaml["ippon_style"].as<int32_t>());
+	if (yaml["timer_style"])
+		Mat->SetTimerStyle((IMat::TimerStyle)yaml["timer_style"].as<int32_t>());
+	if (yaml["name_style"])
+		Mat->SetNameStyle((NameStyle)yaml["name_style"].as<int32_t>());
+
+	if (yaml["token"])//Receive access token from master
+		SetAccessToken(yaml["token"].as<std::string>());
+	else
+		return false;
 
 	return true;
 }
@@ -595,19 +643,19 @@ bool Application::ConnectToMaster(const std::string& Hostname, uint16_t Port)
 
 
 
-bool Application::SendCommandToMaster(const std::string& URL) const
+std::string Application::SendCommandToMaster(const std::string& URL) const
 {
 	if (m_Mode != Mode::Slave)
 	{
 		ZED::Log::Warn("Command " + URL + " sent, but not in slave mode");
-		return false;
+		return (Error)Error::Type::InternalError;
 	}
 
 	ZED::Log::Debug("Command " + URL + " sent to master");
 
 	ZED::HttpClient client(m_MasterHostname, m_MasterPort);
 	auto packet = client.GET(URL);
-	return packet.body == "ok";
+	return packet.body;
 }
 
 

@@ -281,6 +281,9 @@ namespace Judoboard
 		MatchTable(MatchTable&) = delete;
 		MatchTable(const MatchTable&) = delete;
 
+		//Factory method
+		static MatchTable* CreateMatchTable(const YAML::Node& Yaml, const ITournament* Tournament);
+
 		virtual ~MatchTable() {
 			DeleteSchedule();
 		}

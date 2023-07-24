@@ -256,21 +256,21 @@ TEST(App, Mats)
 
 		EXPECT_EQ(app.GetMats().size(), 0);
 		EXPECT_EQ(app.FindDefaultMatID(), 0);
-		EXPECT_FALSE(app.GetDefaultMat());
+		EXPECT_FALSE(app.GetLocalMat());
 		EXPECT_FALSE(app.FindMat(1));
 
 		EXPECT_TRUE(app.StartLocalMat(1));
 
 		EXPECT_EQ(app.GetMats().size(), 1);
 		EXPECT_EQ(app.FindDefaultMatID(), 1);
-		EXPECT_TRUE(app.GetDefaultMat());
+		EXPECT_TRUE(app.GetLocalMat());
 		EXPECT_TRUE(app.FindMat(1));
 
 		EXPECT_TRUE(app.CloseMat(1));
 
 		EXPECT_EQ(app.GetMats().size(), 1);
 		EXPECT_EQ(app.FindDefaultMatID(), 1);
-		EXPECT_TRUE(app.GetDefaultMat() != nullptr);
+		EXPECT_TRUE(app.GetLocalMat() != nullptr);
 		EXPECT_TRUE(app.FindMat(1) != nullptr);
 	}
 
@@ -434,7 +434,7 @@ TEST(App, FullTournament)
 		tourney->AddMatchTable(m1);
 		tourney->AddMatchTable(m2);
 
-		auto mat = app.GetDefaultMat();
+		auto mat = app.GetLocalMat();
 		ASSERT_TRUE(mat);
 
 		for (int i = 0; i < 6; i++)
@@ -519,7 +519,7 @@ TEST(App, FullTournament_SingleElimination14)
 		tourney->GetMatchTables()[0]->SetMatID(1);
 		tourney->GenerateSchedule();
 
-		auto mat = app.GetDefaultMat();
+		auto mat = app.GetLocalMat();
 		ASSERT_TRUE(mat);
 
 		ZED::Core::Pause(2000);
@@ -605,7 +605,7 @@ TEST(App, FullTournament_SingleElimination7_BO3)
 		tourney->AddMatchTable(group);
 		tourney->GenerateSchedule();
 
-		auto mat = app.GetDefaultMat();
+		auto mat = app.GetLocalMat();
 		ASSERT_TRUE(mat);
 
 		ZED::Core::Pause(3000);
@@ -716,13 +716,13 @@ TEST(App, MasterClosesMatOfSlave)
 	slave.StartLocalMat(2);
 
 	ZED::Core::Pause(2000);
-	EXPECT_TRUE(slave.GetDefaultMat()->IsOpen());
+	EXPECT_TRUE(slave.GetLocalMat()->IsOpen());
 
 	master.CloseMat(2);
 
 	ZED::Core::Pause(2000);
 
-	EXPECT_FALSE(slave.GetDefaultMat()->IsOpen());
+	EXPECT_FALSE(slave.GetLocalMat()->IsOpen());
 }
 
 
@@ -774,11 +774,11 @@ TEST(App, MatchOnSlave)
 
 
 
-/*TEST(App, MasterSlaveForceClose)
+TEST(App, MasterSlaveForceClose)
 {
 	initialize();
 	Application master(8080 + rand() % 10000);
-	Application slave(8080  + rand() % 10000);
+	Application slave( 8080 + rand() % 10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
@@ -818,7 +818,7 @@ TEST(App, MatchOnSlave)
 	tourney->EnableAutoSave(false);
 	EXPECT_TRUE(master.AddTournament(tourney));
 
-	master.OpenTournament(master.FindTournamentIndex(tournament_name));
+	master.OpenTournament(*tourney);
 
 	tourney->AddParticipant(&j1);
 	tourney->AddParticipant(&j2);
@@ -827,8 +827,8 @@ TEST(App, MatchOnSlave)
 	tourney->AddParticipant(&j5);
 	tourney->AddParticipant(&j6);
 
-	MatchTable* m1 = new Weightclass(tourney, 0, 49);
-	MatchTable* m2 = new Weightclass(tourney, 50, 100);
+	MatchTable* m1 = new RoundRobin( 0,  49, Gender::Unknown, tourney);
+	MatchTable* m2 = new RoundRobin(50, 100, Gender::Unknown, tourney);
 	m1->SetMatID(1);
 	m2->SetMatID(2);
 	tourney->AddMatchTable(m1);
@@ -842,7 +842,7 @@ TEST(App, MasterSlaveFullTournament)
 	initialize();
 
 	Application master(8080 + rand()%10000);
-	Application slave(8080  + rand()%10000);
+	Application slave( 8080 + rand()%10000);
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
@@ -882,8 +882,8 @@ TEST(App, MasterSlaveFullTournament)
 	tourney->AddParticipant(&j5);
 	tourney->AddParticipant(&j6);
 
-	MatchTable* m1 = new Weightclass(tourney, 0, 49);
-	MatchTable* m2 = new Weightclass(tourney, 50, 100);
+	MatchTable* m1 = new RoundRobin( 0,  49, Gender::Unknown, tourney);
+	MatchTable* m2 = new RoundRobin(50, 100, Gender::Unknown, tourney);
 	m1->SetMatID(2);
 	m2->SetMatID(2);
 	tourney->AddMatchTable(m1);
@@ -936,4 +936,4 @@ TEST(App, MasterSlaveFullTournament)
 		EXPECT_TRUE(mat->EndMatch());
 		ZED::Core::Pause(8000);
 	}
-}*/
+}

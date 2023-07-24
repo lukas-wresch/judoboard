@@ -72,8 +72,15 @@ function Update()
       if (typeof mat.type === 'undefined' || mat.type == 0)
         cell3.innerHTML = "Not available";
       else if (mat.type == 1)
-      {
         cell3.innerHTML = "Local mat";
+      else if (mat.type == 2)
+        cell3.innerHTML = "Virtual mat";
+      else if (mat.type == 3)
+        cell3.innerHTML = "Remote mat";
+
+
+      if (mat.type == 1 || mat.type == 3)
+      {
         if (mat.is_open == 1)
           cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseMat(" + mat.id + ");\">"+ translate('close') +"</button>";
         else
@@ -93,14 +100,8 @@ function Update()
       }
       else if (mat.type == 2)
       {
-        cell3.innerHTML = "Virtual mat";
-        //if (res[i+2] == 1)
-          cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseMat(" + mat.id + ");\">Destroy</button>";
-        //else
-          //cell4.innerHTML = "<button class=\"neutral\" onclick=\"return OpenMat(" + matID + ");\">Start</button>";
+        cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseMat(" + mat.id + ");\">Destroy</button>";
       }
-      else if (mat.type == 3)
-        cell3.innerHTML = "Remote mat";
     }
   });
 }

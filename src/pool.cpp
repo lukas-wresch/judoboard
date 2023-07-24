@@ -35,7 +35,7 @@ Pool::Pool(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament*
 
 
 
-Pool::Pool(const YAML::Node& Yaml, ITournament* Tournament, const MatchTable* Parent)
+Pool::Pool(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
 	: MatchTable(Yaml, Tournament, Parent), m_Finals(nullptr, Tournament, Parent)
 {
 	if (Yaml["pool_count"])

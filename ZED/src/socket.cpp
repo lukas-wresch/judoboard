@@ -50,5 +50,5 @@ void Socket::Disconnect()
 #endif
 
 	m_Socket = -1;
-	Log::Info("Socket disconnected");
+	//Log::Debug("Socket disconnected");
 }
