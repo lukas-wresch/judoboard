@@ -2677,11 +2677,12 @@ std::string Application::Ajax_GetMats() const
 				ret << YAML::Key << "type"    << YAML::Value << (int)mat->GetType();
 				ret << YAML::Key << "is_open" << YAML::Value << mat->IsOpen();
 				ret << YAML::Key << "is_paused" << YAML::Value << mat->IsPaused();
-				ret << YAML::Key << "ippon_style"   << YAML::Value << (int)mat->GetIpponStyle();
-				ret << YAML::Key << "timer_style"   << YAML::Value << (int)mat->GetTimerStyle();
-				ret << YAML::Key << "name_style"    << YAML::Value << (int)mat->GetNameStyle();
-				ret << YAML::Key << "is_fullscreen" << YAML::Value << mat->IsFullscreen();
-				ret << YAML::Key << "sound_enabled" << YAML::Value << mat->IsSoundEnabled();
+				ret << YAML::Key << "ippon_style"    << YAML::Value << (int)mat->GetIpponStyle();
+				ret << YAML::Key << "osaekomi_style" << YAML::Value << (int)mat->GetOsaekomiStyle();
+				ret << YAML::Key << "timer_style"    << YAML::Value << (int)mat->GetTimerStyle();
+				ret << YAML::Key << "name_style"     << YAML::Value << (int)mat->GetNameStyle();
+				ret << YAML::Key << "is_fullscreen"  << YAML::Value << mat->IsFullscreen();
+				ret << YAML::Key << "sound_enabled"  << YAML::Value << mat->IsSoundEnabled();
 				ret << YAML::Key << "sound_filename" << YAML::Value << mat->GetSoundFilename();
 				ret << YAML::EndMap;
 			}
@@ -4162,13 +4163,14 @@ std::string Application::Ajax_GetSetup()
 
 	ret << YAML::BeginMap;
 
-	ret << YAML::Key << "version"     << YAML::Value << Version;
-	ret << YAML::Key << "uptime"      << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
-	ret << YAML::Key << "language"    << YAML::Value << (int)Localizer::GetLanguage();
-	ret << YAML::Key << "port"        << YAML::Value << GetDatabase().GetServerPort();
-	ret << YAML::Key << "ippon_style" << YAML::Value << (int)GetDatabase().GetIpponStyle();
-	ret << YAML::Key << "timer_style" << YAML::Value << (int)GetDatabase().GetTimerStyle();
-	ret << YAML::Key << "name_style"  << YAML::Value << (int)GetDatabase().GetNameStyle();
+	ret << YAML::Key << "version"        << YAML::Value << Version;
+	ret << YAML::Key << "uptime"         << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
+	ret << YAML::Key << "language"       << YAML::Value << (int)Localizer::GetLanguage();
+	ret << YAML::Key << "port"           << YAML::Value << GetDatabase().GetServerPort();
+	ret << YAML::Key << "ippon_style"    << YAML::Value << (int)GetDatabase().GetIpponStyle();
+	ret << YAML::Key << "osaekomi_style" << YAML::Value << (int)GetDatabase().GetOsaekomiStyle();
+	ret << YAML::Key << "timer_style"    << YAML::Value << (int)GetDatabase().GetTimerStyle();
+	ret << YAML::Key << "name_style"     << YAML::Value << (int)GetDatabase().GetNameStyle();
 
 	ret << YAML::EndMap;
 	return ret.c_str();
@@ -4181,12 +4183,14 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 	int language   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "language"));
 	int port       = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "port"));
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
+	int osaekomiStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomiStyle"));
 	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
 	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
 
 	Localizer::SetLanguage((Language)language);
 	GetDatabase().SetServerPort(port);
 	GetDatabase().SetIpponStyle((Mat::IpponStyle)ipponStyle);
+	GetDatabase().SetOsaekomiStyle((Mat::OsaekomiStyle)osaekomiStyle);
 	GetDatabase().SetTimerStyle((Mat::TimerStyle)timerStyle);
 	GetDatabase().SetNameStyle((NameStyle)nameStyle);
 

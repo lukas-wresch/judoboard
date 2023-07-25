@@ -57,10 +57,12 @@ namespace Judoboard
 
 		//Config
 		Mat::IpponStyle GetIpponStyle() const { return m_DefaultIpponStyle; }
+		Mat::OsaekomiStyle GetOsaekomiStyle() const { return m_DefaultOsaekomiStyle; }
 		Mat::TimerStyle GetTimerStyle() const { return m_DefaultTimerStyle; }
 		NameStyle       GetNameStyle()  const { return m_DefaultNameStyle; }
 
 		void SetIpponStyle(Mat::IpponStyle NewStyle) { m_DefaultIpponStyle = NewStyle; }
+		void SetOsaekomiStyle(Mat::OsaekomiStyle NewStyle) { m_DefaultOsaekomiStyle = NewStyle; }
 		void SetTimerStyle(Mat::TimerStyle NewStyle) { m_DefaultTimerStyle = NewStyle; }
 		void SetNameStyle(NameStyle NewStyle) { m_DefaultNameStyle = NewStyle; }
 
@@ -73,6 +75,7 @@ namespace Judoboard
 
 		//Mat default settings
 		Mat::IpponStyle m_DefaultIpponStyle = Mat::IpponStyle::DoubleDigit;
+		Mat::OsaekomiStyle m_DefaultOsaekomiStyle = Mat::OsaekomiStyle::ProgressBar;
 		Mat::TimerStyle m_DefaultTimerStyle = Mat::TimerStyle::OnlySeconds;
 		NameStyle       m_DefaultNameStyle  = NameStyle::FamilyName;
 

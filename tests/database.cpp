@@ -88,6 +88,7 @@ TEST(Database, SaveAndLoad)
 
 		d.SetServerPort(rand());
 		d.SetIpponStyle(Mat::IpponStyle::SpelledOut);
+		d.SetOsaekomiStyle(Mat::OsaekomiStyle::FixedAtBottom);
 		d.SetTimerStyle(Mat::TimerStyle::Full);
 		d.SetNameStyle(NameStyle::GivenName);
 
@@ -99,6 +100,7 @@ TEST(Database, SaveAndLoad)
 
 		EXPECT_EQ(d2.GetServerPort(), d.GetServerPort());
 		EXPECT_EQ(d2.GetIpponStyle(), d.GetIpponStyle());
+		EXPECT_EQ(d2.GetOsaekomiStyle(), d.GetOsaekomiStyle());
 		EXPECT_EQ(d2.GetTimerStyle(), d.GetTimerStyle());
 		EXPECT_EQ(d2.GetNameStyle(),  d.GetNameStyle());
 
