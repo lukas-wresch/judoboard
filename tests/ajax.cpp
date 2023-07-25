@@ -2569,6 +2569,7 @@ TEST(Ajax, ReviseMatch)
 		tourney->AddMatch(match);
 
 		EXPECT_TRUE(mat->StartMatch(match));
+		ZED::Core::Pause(200);
 
 		mat->Hajime();
 		ZED::Core::Pause(1000);
