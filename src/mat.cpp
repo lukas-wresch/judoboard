@@ -384,7 +384,7 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 	auto print_scoreboard = [this, &Yaml](Fighter Who) {
 		Yaml << YAML::BeginMap;
 		Yaml << YAML::Key << "ippon"   << YAML::Value << GetScoreboard(Who).m_Ippon;
-		Yaml << YAML::Key << "wazaari" << YAML::Value << (GetScoreboard(Who).m_Ippon ? 0 : GetScoreboard(Who).m_WazaAri);
+		Yaml << YAML::Key << "wazaari" << YAML::Value << GetScoreboard(Who).m_WazaAri;
 		if (m_pMatch && m_pMatch->GetRuleSet().IsYukoEnabled())
 			Yaml << YAML::Key << "yuko" << YAML::Value << GetScoreboard(Who).m_Yuko;
 		if (m_pMatch && m_pMatch->GetRuleSet().IsKokaEnabled())
@@ -2196,7 +2196,7 @@ bool Mat::Render(double dt) const
 			renderer.RenderTransformed(text_time, width - 250, height - 70);
 
 		//Is there a next match?
-		if (m_Application && m_Application->GetTournament() && m_Application->GetTournament()->GetNextMatch(GetMatID()))
+		if (m_NextMatches.size() > 0)
 			NextState(State::TransitionToWaiting);//Transition to waiting screen
 
 		break;

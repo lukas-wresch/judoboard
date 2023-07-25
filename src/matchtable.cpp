@@ -1,15 +1,49 @@
-#define YAML_CPP_STATIC_DEFINE
-#include "yaml-cpp/yaml.h"
 #include "../ZED/include/log.h"
 #include "matchtable.h"
 #include "match.h"
 #include "weightclass.h"
 #include "fixed.h"
 #include "tournament.h"
+#include "round_robin.h"
+#include "customtable.h"
+#include "single_elimination.h"
+#include "double_elimination.h"
+#include "pool.h"
 
 
 
 using namespace Judoboard;
+
+
+
+MatchTable* MatchTable::CreateMatchTable(const YAML::Node& Yaml, const ITournament* Tournament)
+{
+	MatchTable* new_table = nullptr;
+
+	if (!Yaml.IsMap() || !Yaml["type"])
+		return new_table;
+
+	switch ((MatchTable::Type)Yaml["type"].as<int>())
+	{
+	case MatchTable::Type::RoundRobin:
+		new_table = new RoundRobin(Yaml, Tournament);
+		break;
+	case MatchTable::Type::Custom:
+		new_table = new CustomTable(Yaml, Tournament);
+		break;
+	case MatchTable::Type::SingleElimination:
+		new_table = new SingleElimination(Yaml, Tournament);
+		break;
+	case MatchTable::Type::Pool:
+		new_table = new Pool(Yaml, Tournament);
+		break;
+	case MatchTable::Type::DoubleElimination:
+		new_table = new DoubleElimination(Yaml, Tournament);
+		break;
+	}
+
+	return new_table;
+}
 
 
 

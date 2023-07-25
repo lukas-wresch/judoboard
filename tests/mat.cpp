@@ -58,7 +58,7 @@ TEST(Mat, LoadConfig)
 
 		app.StartLocalMat(1);
 
-		auto mat = app.GetDefaultMat();
+		auto mat = app.GetLocalMat();
 
 		EXPECT_EQ(mat->GetIpponStyle(), Mat::IpponStyle::SpelledOut);
 		EXPECT_EQ(mat->GetTimerStyle(), Mat::TimerStyle::Full);
@@ -76,7 +76,7 @@ TEST(Mat, LoadConfig)
 		app.CloseMat(1);
 		app.StartLocalMat(1);
 
-		auto mat = app.GetDefaultMat();
+		auto mat = app.GetLocalMat();
 
 		EXPECT_EQ(mat->GetIpponStyle(), Mat::IpponStyle::SingleDigit);
 		EXPECT_EQ(mat->GetTimerStyle(), Mat::TimerStyle::HundredsMS);
@@ -134,7 +134,7 @@ TEST(Mat, ForcedCloseDuringMatch)
 	tourney->AddMatchTable(m1);
 	tourney->AddMatchTable(m2);
 
-	auto mat = app.GetDefaultMat();
+	auto mat = app.GetLocalMat();
 
 	ZED::Core::Pause(6000);
 	auto match = tourney->GetNextMatch(mat->GetMatID());
@@ -559,6 +559,7 @@ TEST(Mat, ShidosResultInIndirectHansokumake)
 
 		auto& events = match.GetLog().GetEvents();
 
+		ASSERT_TRUE(events.size() >= 3);
 		EXPECT_TRUE(events[events.size() - 3].m_BiasedEvent == MatchLog::BiasedEvent::AddHansokuMake_Indirect);
 		EXPECT_EQ(events[events.size() - 3].m_Group, f);
 
@@ -874,8 +875,8 @@ TEST(Mat, DoubleIpponDuringGoldenScoreFightersKeepWazaari)
 		EXPECT_FALSE(m.IsHajime());
 		EXPECT_FALSE(m.HasConcluded());
 
-		EXPECT_TRUE(m.GetScoreboard(Fighter::White).m_WazaAri == 1);
-		EXPECT_TRUE(m.GetScoreboard(Fighter::Blue ).m_WazaAri == 1);
+		EXPECT_EQ(m.GetScoreboard(Fighter::White).m_WazaAri, 1);
+		EXPECT_EQ(m.GetScoreboard(Fighter::Blue ).m_WazaAri, 1);
 
 		m.Hajime();
 		m.AddIppon(f);

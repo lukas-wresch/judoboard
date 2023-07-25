@@ -4118,7 +4118,7 @@ static int consume_socket(struct mg_context *ctx, struct socket *sp)
     // Copy socket from the queue and increment tail
     *sp = ctx->queue[ctx->sq_tail % ARRAY_SIZE(ctx->queue)];
     ctx->sq_tail++;
-    ZED::Log::Debug("grabbed socket, going busy " +  std::to_string(sp->sock));
+    //ZED::Log::Debug("grabbed socket, going busy " +  std::to_string(sp->sock));
 
     // Wrap pointers if needed
     while (ctx->sq_tail > (int) ARRAY_SIZE(ctx->queue))
@@ -4179,7 +4179,7 @@ static void worker_thread(struct mg_context *ctx)
     assert(ctx->num_threads >= 0);
     pthread_mutex_unlock(&ctx->mutex);
 
-    ZED::Log::Debug("worker exiting");
+    //ZED::Log::Debug("worker exiting");
 }
 
 // Master thread adds accepted socket to a queue
@@ -4196,7 +4196,7 @@ static void produce_socket(struct mg_context *ctx, const struct socket *sp)
     // Copy socket to the queue and increment head
     ctx->queue[ctx->sq_head % ARRAY_SIZE(ctx->queue)] = *sp;
     ctx->sq_head++;
-    ZED::Log::Debug("queued socket " + std::to_string(sp->sock));
+    //ZED::Log::Debug("queued socket " + std::to_string(sp->sock));
   }
 
   pthread_cond_signal(&ctx->sq_full);
@@ -4216,8 +4216,8 @@ static void accept_new_connection(const struct socket *listener, struct mg_conte
     int allowed = check_acl(ctx, &accepted.rsa);
     if (allowed)
     {
-      // Put accepted socket structure into the queue
-      ZED::Log::Debug("accepted socket " + std::to_string(accepted.sock));
+      //Put accepted socket structure into the queue
+      //ZED::Log::Debug("accepted socket " + std::to_string(accepted.sock));
       accepted.is_ssl = listener->is_ssl;
       produce_socket(ctx, &accepted);
     }

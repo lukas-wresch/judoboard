@@ -79,7 +79,7 @@ function GetMatch()
 {
   AjaxCallback('ajax/match/get?id='+id, function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    let res = YAML.parse(response);
 
     if (typeof res.white_name !== 'undefined')
       document.getElementById("white").innerHTML = res.white_name;
@@ -165,105 +165,102 @@ function GetLog()
 {
   AjaxCallback('ajax/match/get_log?id='+id, function(response) {
     console.log(response);
-    var res = response.split(",");
-
-    if (res.length < 3)
-      return;
+    const res = YAML.parse(response);
 
     var table = document.getElementById("log");
 
-    for (var i=0; i < res.length; i+=3)
+    for (const event of res)
     {
-      var row = table.insertRow(-1);
-      var cell1 = row.insertCell(0);
-      var cell2 = row.insertCell(1);
-      var cell3 = row.insertCell(2);
+      let row = table.insertRow(-1);
+      let cell1 = row.insertCell(-1);
+      let cell2 = row.insertCell(-1);
+      let cell3 = row.insertCell(-1);
 
-      cell1.innerHTML = NiceTimeMS(res[i+0]);
+      cell1.innerHTML = NiceTimeMS(event.timestamp);
 
-      if (res[i+1] == 2)
+      if (event.group == 2)
         cell2.innerHTML = "- - -";
-      else if (res[i+1] == 0)
+      else if (event.group == 0)
         cell2.innerHTML = translate('white');
-      else if (res[i+1] == 1)
+      else if (event.group == 1)
       {
         cell2.style.color = "blue";
         cell2.innerHTML = translate('blue');
       }
 
 
-      if (res[i+1] == 2 && res[i+2] == 0)
+      if (event.group == 2 && event.event == 0)
         cell3.innerHTML = "Hajime";
-      else if (res[i+1] == 2 && res[i+2] == 1)
+      else if (event.group == 2 && event.event == 1)
         cell3.innerHTML = "Mate";
-      else if (res[i+1] == 2 && res[i+2] == 2)
+      else if (event.group == 2 && event.event == 2)
         cell3.innerHTML = "Tokeda";
-      else if (res[i+1] == 2 && res[i+2] == 3)
+      else if (event.group == 2 && event.event == 3)
         cell3.innerHTML = "Sonomama";
-      else if (res[i+1] == 2 && res[i+2] == 4)
+      else if (event.group == 2 && event.event == 4)
         cell3.innerHTML = "Yoshi";
-      else if (res[i+1] == 2 && res[i+2] == 5)
+      else if (event.group == 2 && event.event == 5)
         cell3.innerHTML = translate('osaekomi_switched');
-      else if (res[i+1] == 2 && res[i+2] == 6)
+      else if (event.group == 2 && event.event == 6)
         cell3.innerHTML = translate('match_started');
-      else if (res[i+1] == 2 && res[i+2] == 7)
+      else if (event.group == 2 && event.event == 7)
         cell3.innerHTML = translate('end_of_match');
-      else if (res[i+1] == 2 && res[i+2] == 8)
+      else if (event.group == 2 && event.event == 8)
         cell3.innerHTML = translate('goldenscore_activate');
-      else if (res[i+1] == 2 && res[i+2] == 9)
+      else if (event.group == 2 && event.event == 9)
         cell3.innerHTML = translate('goldenscore_revoked');
-      else if (res[i+1] == 2 && res[i+2] == 10)
+      else if (event.group == 2 && event.event == 10)
         cell3.innerHTML = translate('draw');
-      else if (res[i+1] == 2 && res[i+2] == 11)
+      else if (event.group == 2 && event.event == 11)
         cell3.innerHTML = translate('draw_revoked');
 
-      else if (res[i+2] == 0)
+      else if (event.event == 0)
         cell3.innerHTML = "Ippon";
-      else if (res[i+2] == 1)
+      else if (event.event == 1)
         cell3.innerHTML = "Wazaari";
-      else if (res[i+2] == 2)
+      else if (event.event == 2)
         cell3.innerHTML = "Yuko";
-      else if (res[i+2] == 3)
+      else if (event.event == 3)
         cell3.innerHTML = "Koka";
-      else if (res[i+2] == 4)
+      else if (event.event == 4)
         cell3.innerHTML = translate('ippon_revoked');
-      else if (res[i+2] == 5)
+      else if (event.event == 5)
         cell3.innerHTML = translate('wazaari_revoked');
-      else if (res[i+2] == 6)
+      else if (event.event == 6)
         cell3.innerHTML = translate('yuko_revoked');
-      else if (res[i+2] == 7)
+      else if (event.event == 7)
         cell3.innerHTML = translate('koka_revoked');
-      else if (res[i+2] == 8)
+      else if (event.event == 8)
         cell3.innerHTML = "Wazari awasete Ippon";
-      else if (res[i+2] == 9)
+      else if (event.event == 9)
         cell3.innerHTML = "Osaekomi";
-      else if (res[i+2] == 10)
+      else if (event.event == 10)
         cell3.innerHTML = "Shido";
-      else if (res[i+2] == 11)
+      else if (event.event == 11)
         cell3.innerHTML = translate('hansokumake_direct');
-      else if (res[i+2] == 12)
+      else if (event.event == 12)
         cell3.innerHTML = translate('hansokumake_indirect');
-      else if (res[i+2] == 13)
+      else if (event.event == 13)
         cell3.innerHTML = translate('shido_revoked');
-      else if (res[i+2] == 14)
+      else if (event.event == 14)
         cell3.innerHTML = translate('hansokumake_revoked');
-      else if (res[i+2] == 15)
+      else if (event.event == 15)
         cell3.innerHTML = translate('medical_examiniation');
-      else if (res[i+2] == 16)
+      else if (event.event == 16)
         cell3.innerHTML = translate('medical_examiniation_revoked');
-      else if (res[i+2] == 17)
+      else if (event.event == 17)
         cell3.innerHTML = "Hantei";
-      else if (res[i+2] == 18)
+      else if (event.event == 18)
         cell3.innerHTML = translate('disqualification');
-      else if (res[i+2] == 19)
+      else if (event.event == 19)
         cell3.innerHTML = translate('no_disqualification');
-      else if (res[i+2] == 20)
+      else if (event.event == 20)
         cell3.innerHTML = translate('disqualification_revoked');
-      else if (res[i+2] == 21)
+      else if (event.event == 21)
         cell3.innerHTML = translate('no_disqualification_revoked');
-      else if (res[i+2] == 22)
+      else if (event.event == 22)
         cell3.innerHTML = "Gachi";
-      else if (res[i+2] == 23)
+      else if (event.event == 23)
         cell3.innerHTML = translate('gachi_revoked');
     }
   });

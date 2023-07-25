@@ -83,6 +83,7 @@ namespace Judoboard
 	class MatchLog
 	{
 		friend class Tournament;
+		friend class Match;
 
 	public:
 		enum class EventGroup
@@ -126,6 +127,9 @@ namespace Judoboard
 			std::lock_guard<std::mutex> lock(Copy.m_Mutex);
 			m_Events = Copy.m_Events;
 		}
+		MatchLog(const YAML::Node& Yaml) {
+			*this << Yaml;
+		}
 
 		void AddEvent(NeutralEvent NewEvent, uint32_t Timestamp) {
 			std::lock_guard<std::mutex> lock(m_Mutex);
@@ -147,8 +151,6 @@ namespace Judoboard
 		}
 		
 		void SwapEvents();
-
-		const std::string ToString() const;
 
 		void operator << (const YAML::Node& Yaml);
 		void operator >> (YAML::Emitter& Yaml) const;

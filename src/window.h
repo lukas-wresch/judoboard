@@ -5,7 +5,7 @@
 #include "../ZED/include/renderer_sdl2.h"
 #include "../ZED/include/sound.h"
 #include "../ZED/include/log.h"
-#ifdef LINUX
+#ifndef _WIN32
 #include <gtk/gtk.h>
 #endif
 

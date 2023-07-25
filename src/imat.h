@@ -67,8 +67,8 @@ namespace Judoboard
 
 			uint16_t m_Ippon = 0;
 			uint16_t m_WazaAri = 0;
-			uint16_t m_Yuko = 0;
-			uint16_t m_Koka = 0;
+			int16_t m_Yuko = 0;//-1 if yuko is not possible (disabled by rule set)
+			int16_t m_Koka = 0;//-1 if koka is not possible (disabled by rule set)
 
 			uint16_t m_Shido = 0;
 			uint16_t m_MedicalExamination = 0;
@@ -93,14 +93,19 @@ namespace Judoboard
 		};
 
 
-		IMat(uint32_t ID) { m_ID = ID; IMat::SetName(Localizer::Translate("Mat") + " " + std::to_string(ID)); }
+		IMat(uint32_t ID) {
+			SetMatID(ID);
+		}
 		virtual ~IMat() {}
 
 		IMat(IMat&) = delete;
 		IMat(const IMat&) = delete;
 
 		uint32_t GetMatID() const { return m_ID; }
-		void SetMatID(uint32_t NewID) { m_ID = NewID; }
+		void SetMatID(uint32_t NewID) {
+			m_ID = NewID;
+			IMat::SetName(Localizer::Translate("Mat") + " " + std::to_string(m_ID));
+		}
 
 		virtual const std::string& GetName() const { return m_Name; }
 
@@ -136,6 +141,7 @@ namespace Judoboard
 
 		virtual bool IsOsaekomiRunning() const = 0;//Returns true if one of the osaekomi clocks are running
 		virtual bool IsOsaekomi() const = 0;//Returns true during an osaekomi situation
+		virtual Fighter GetOsaekomiHolder() const = 0;
 
 		//Commands by judge
 		virtual void Hajime() = 0;//Starts/continues the match. If an osaekomi is running this commands acts as an yoshi
