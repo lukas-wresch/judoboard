@@ -23,6 +23,14 @@
 </div>
 
 <div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_osaekomiStyle">Osaekomi Style</label>
+  <select style="margin-bottom:20px;" id="osaekomiStyle">
+    <option selected value="0" id="progressbar">Progress bar</option>
+    <option value="1" id="fixed_at_bottom">Fixed at bottom</option>
+  </select>
+</div>
+
+<div>
   <label style="width:250px;float:left;margin-top:4px;" id="label_timerStyle">Timer Style</label>
   <select style="margin-bottom:20px;" id="timerStyle">
     <option selected value="0" id="with_hundred">With Hundreds (1:23:4)</option>
@@ -95,6 +103,7 @@ function UpdateMat()
     id:              document.getElementById("id").value,
     name:            document.getElementById("name").value,
     ipponStyle:      document.getElementById("ipponStyle").value,
+    osaekomiStyle:   document.getElementById("osaekomiStyle").value,
     timerStyle:      document.getElementById("timerStyle").value,
     sound:           document.getElementById("sound").checked,
     sound_filename:  document.getElementById("sound_filename").value,
@@ -121,7 +130,8 @@ function GetMat(id)
       if (id == mat.id)
       {
         document.getElementById("name").value = mat.name;
-        document.getElementById("ipponStyle").value = mat.ippon_style;
+        document.getElementById("ipponStyle").value    = mat.ippon_style;
+        document.getElementById("osaekomiStyle").value = mat.osaekomi_style;
         document.getElementById("timerStyle").value = mat.timer_style;
         document.getElementById("nameStyle").value  = mat.name_style;
         document.getElementById("sound").checked    = mat.sound_enabled;
@@ -147,7 +157,7 @@ var id = URLDecode(URL, "id");
 
 AjaxCallback("ajax/config/list_sound_files", function(response) {
   console.log(response);
-  let res = YAML.parse(response);
+  const res = YAML.parse(response);
 
   for (const sound of res)
   {
