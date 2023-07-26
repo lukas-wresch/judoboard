@@ -83,6 +83,7 @@ namespace Judoboard
 		virtual Match* GetNextMatch(int32_t MatID = -1) const override;//Returns the next match for a given mat if available, otherwise null pointer is returned
 		const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 		virtual Match* GetNextOngoingMatch(int32_t MatID) override;//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
+		bool ReviseMatch(const UUID& MatchID, IMat& Mat);
 
 		virtual bool RemoveMatch(const UUID& MatchID) override;
 		virtual bool MoveMatchUp(const UUID&  MatchID, uint32_t MatID = 0) override;
