@@ -14,6 +14,14 @@
 </div>
 
 <div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_nameStyle">Name Style</label>
+  <select style="margin-bottom:20px;" id="nameStyle">
+    <option selected value="0" id="given_name_first">Give name first</option>
+    <option value="1" id="family_name_first">Family name first</option>
+  </select>
+</div>
+
+<div>
   <label style="width:250px;float:left;margin-top:4px;" id="label_ipponStyle">Ippon/Waza-Ari Style</label>
   <select style="margin-bottom:20px;" id="ipponStyle">
     <option selected value="0" id="two_digits">Two Digits</option>
@@ -25,8 +33,8 @@
 <div>
   <label style="width:250px;float:left;margin-top:4px;" id="label_osaekomiStyle">Osaekomi Style</label>
   <select style="margin-bottom:20px;" id="osaekomiStyle">
-    <option selected value="0" id="progressbar">Progress bar</option>
-    <option value="1" id="fixed_at_bottom">Fixed at bottom</option>
+    <option selected value="0" id="progressbar"></option>
+    <option value="1" id="fixed_at_bottom"></option>
   </select>
 </div>
 
@@ -53,14 +61,6 @@
   </select>
 
   <button class="neutral" style="margin-left: 0.8cm;" onclick="return PlaySound()" id="play_sound">Play Sound</button>
-</div>
-
-<div>
-  <label style="width:250px;float:left;margin-top:4px;" id="label_nameStyle">Name Style</label>
-  <select style="margin-bottom:20px;" id="nameStyle">
-    <option selected value="0" id="given_name_first">Give name first</option>
-    <option value="1" id="family_name_first">Family name first</option>
-  </select>
 </div>
 
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateMat()" id="update">Update Mat</button>
@@ -172,5 +172,8 @@ AjaxCallback("ajax/config/list_sound_files", function(response) {
 
 document.getElementById("sound_enabled").innerHTML  = translate('enabled');
 document.getElementById("sound_disabled").innerHTML = translate('disabled');
+
+document.getElementById("progressbar").innerHTML     = translate('progressbar');
+document.getElementById("fixed_at_bottom").innerHTML = translate('fixed_at_bottom');
 
 </script>
