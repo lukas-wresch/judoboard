@@ -117,14 +117,16 @@ function ShowMats()
 {
   $("#streaming").fadeToggle(1000);
   Streaming = !Streaming;
-
+  
   if (Streaming)
   {
+    document.querySelector("body").requestFullscreen();
     StreamTimer = window.setInterval(Stream, 800);
     $("#navi_show_mats").text(translate('hide_mats'));
   }
   else
   {
+    document.exitFullscreen();
     window.clearInterval(StreamTimer);
     $("#navi_show_mats").text(translate('show_mats'));
   }
