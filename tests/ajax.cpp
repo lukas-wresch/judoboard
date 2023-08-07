@@ -2556,6 +2556,53 @@ TEST(Ajax, RemoveNoDisqualification)
 
 
 
+TEST(Ajax, ReviseMatch)
+{
+	initialize();
+	
+	Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+	Judoka* j2 = new Judoka("Firstname2", "Lastname2", 50, Gender::Male);
+
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; ++f)
+	{
+		Application app;
+
+		auto tourney = app.GetTournament();
+
+		app.StartLocalMat(1);
+		IMat* mat = app.FindMat(1);
+
+		Match* match = new Match(j1, j2, tourney, 1);
+		tourney->AddMatch(match);
+
+		EXPECT_TRUE(mat->StartMatch(match));
+		ZED::Core::Pause(200);
+
+		mat->Hajime();
+		ZED::Core::Pause(1000);
+		mat->AddIppon(f);
+
+		EXPECT_TRUE(mat->EndMatch());
+		EXPECT_TRUE(match->HasConcluded());
+		EXPECT_EQ(match->GetResult().m_Winner, f);
+
+		EXPECT_TRUE(app.Ajax_ReviseMatch(HttpServer::Request("id=" + (std::string)match->GetUUID())));
+
+		EXPECT_TRUE(mat->AreFightersOnMat());
+		mat->RemoveIppon(f);
+		mat->Hajime();
+		ZED::Core::Pause(1000);
+		mat->AddIppon(!f);
+
+		EXPECT_TRUE(mat->EndMatch());
+		EXPECT_TRUE(match->HasConcluded());
+		EXPECT_EQ(match->GetResult().m_Winner, !f);
+		EXPECT_LE(std::abs((int)match->GetResult().m_Time - 2000), 50);
+	}
+}
+
+
+
 TEST(Ajax, GetParticipantsFromMatchTable)
 {
 	initialize();
