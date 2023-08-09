@@ -35,6 +35,7 @@ jobs:
     - name: run tests
       run: ./run_tests.sh
     - name: debug tests
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: cd bin && gdb ./judoboard_test_debug --eval-command=r bt && cd ..
       
   test3:
