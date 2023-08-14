@@ -400,16 +400,7 @@
     <None Include="..\..\.github\workflows\build.yml">
       <Filter>Resource Files\workflows</Filter>
     </None>
-    <None Include="..\..\.github\workflows\dm4.yml">
-      <Filter>Resource Files\workflows</Filter>
-    </None>
-    <None Include="..\..\.github\workflows\md5.yml">
-      <Filter>Resource Files\workflows</Filter>
-    </None>
     <None Include="..\..\.github\workflows\tests.yml">
-      <Filter>Resource Files\workflows</Filter>
-    </None>
-    <None Include="..\..\.github\workflows\remote-mat.yml">
       <Filter>Resource Files\workflows</Filter>
     </None>
     <None Include="..\..\bin\html\account_change_password.html">

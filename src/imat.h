@@ -230,6 +230,6 @@ namespace Judoboard
 		NameStyle m_NameStyle = NameStyle::FamilyName;
 		bool m_IsFullscreen = true;
 		bool m_SoundEnabled = true;//Sound effect for and of match/osaekomi will be played if this flag is set
-		std::string m_SoundFilename = "test";//Sound file that is currently in use
+		std::string m_SoundFilename = "gong";//Sound file that is currently in use
 	};
 }
