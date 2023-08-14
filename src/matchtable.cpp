@@ -252,7 +252,12 @@ std::string MatchTable::GetDescription() const
 		return GetAgeGroup()->GetName() + " " + name;
 
 	else if (m_Filter)
-		return m_Filter->GetDescription() + " " + name;
+	{
+		if (name.length() > 0)
+			return m_Filter->GetDescription() + " " + name;
+		else
+			return m_Filter->GetDescription();
+	}
 
 	return name;
 }
