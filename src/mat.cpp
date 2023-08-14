@@ -1147,8 +1147,8 @@ void Mat::Osaekomi(Fighter Whom)
 			AddEvent(Whom, MatchLog::BiasedEvent::Osaekomi);
 
 			m_Graphics["osaekomi_text"].StopAllAnimations().SetPosition(0, 0, 255);
-			m_Graphics["osaekomi_bar_border"].StopAllAnimations().SetPosition(0, 0, 0);
-			m_Graphics["osaekomi_bar"].StopAllAnimations().SetPosition(0, 0, 0);
+			m_Graphics["osaekomi_bar_border"].StopAllAnimations().SetPosition(0, 0, 0).SetAlpha(255);
+			m_Graphics["osaekomi_bar"].StopAllAnimations().SetPosition(0, 0, 0).SetAlpha(255);
 
 			m_Graphics["effect_osaekomi_" + Fighter2String(Whom)].StopAllAnimations().SetAlpha(255);
 		}
