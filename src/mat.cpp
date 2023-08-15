@@ -1147,8 +1147,8 @@ void Mat::Osaekomi(Fighter Whom)
 			AddEvent(Whom, MatchLog::BiasedEvent::Osaekomi);
 
 			m_Graphics["osaekomi_text"].StopAllAnimations().SetPosition(0, 0, 255);
-			m_Graphics["osaekomi_bar_border"].StopAllAnimations().SetPosition(0, 0, 0);
-			m_Graphics["osaekomi_bar"].StopAllAnimations().SetPosition(0, 0, 0);
+			m_Graphics["osaekomi_bar_border"].StopAllAnimations().SetPosition(0, 0, 0).SetAlpha(255);
+			m_Graphics["osaekomi_bar"].StopAllAnimations().SetPosition(0, 0, 0).SetAlpha(255);
 
 			m_Graphics["effect_osaekomi_" + Fighter2String(Whom)].StopAllAnimations().SetAlpha(255);
 		}
@@ -1554,13 +1554,39 @@ void Mat::NextState(State NextState) const
 			m_Graphics["timer"].SetPosition(width/2, height/2, -120).Center()
 				.AddAnimation(Animation::CreateLinear(0.0, 0.0, 33.0, [](auto& g) { return g.m_a < 255.0; }));
 
-			m_Graphics["mat_name"  ].AddAnimation(Animation::CreateLinear(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
+			m_Graphics["mat_name"].AddAnimation(Animation::CreateLinear(0.0, 0.0, 30.0, [](auto& g) { return g.m_a < 255.0; }));
 
 			m_Graphics["next_match"].StopAllAnimations()
 				.AddAnimation(Animation::CreateLinear(0.0, 0.0, -38.0, [](auto& g) { return g.m_a > 0.0; }));
 
 			m_Graphics["following_match"].StopAllAnimations()
 				.AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0, [](auto& g) { return g.m_a > 0.0; }));
+
+			//Setup rectangle for age group
+			if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetAgeGroup())
+			{
+				auto name = m_pMatch->GetMatchTable()->GetAgeGroup()->GetName();
+				int pos_y = (int)(300.0 * m_ScalingFactor);
+
+				m_Graphics["age_group_rect_text"].UpdateTexture(renderer, name, ZED::Color(0, 0, 0), ZED::FontSize::Gigantic)
+					.StopAllAnimations().Center().SetPosition(width/2, height/2 + pos_y, -100)
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0,  45.0, [](auto& g) { return g.m_a < 400.0; }))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0, -30.0, [](auto& g) { return g.m_a >   0.0; }));
+
+				auto text_width = m_Graphics["age_group_rect_text"]->GetWidth();
+
+				m_Graphics["age_group_rect"].SetColor(ZED::Color(255, 255, 0))
+					.StopAllAnimations().Center().SetPosition(width/2 - (text_width + 10)/2, height/2 + pos_y - (int)(80.0 * m_ScalingFactor), -100)
+					.SetSize(text_width + 20, (int)(160.0 * m_ScalingFactor))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0,  40.0, [](auto& g) { return g.m_a < 400.0; }))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0, -30.0, [](auto& g) { return g.m_a >   0.0; }));
+
+				m_Graphics["age_group_rect_bar"].SetColor(ZED::Color(0, 0, 0))
+					.StopAllAnimations().Center().SetPosition(width/2 - (text_width + 10)/2 - 10, height/2 + pos_y - (int)(90.0 * m_ScalingFactor), -100)
+					.SetSize(text_width + 40, (int)(180.0 * m_ScalingFactor))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0,  40.0, [](auto& g) { return g.m_a < 400.0; }))
+					.AddAnimation(Animation::CreateLinear(0.0, 0.0, -35.0, [](auto& g) { return g.m_a >   0.0; }));
+			}
 
 			m_Graphics["hajime"].UpdateTexture(renderer, "Hajime", ZED::Color(255, 255, 255));
 			m_Graphics["mate"  ].UpdateTexture(renderer, "Mate",   ZED::Color(0, 0, 0));
@@ -1998,30 +2024,53 @@ void Mat::UpdateOsaekomiGraphics() const
 	auto& osaekomi_text = m_Graphics["osaekomi_text"];
 	auto& osaekomi_bar  = m_Graphics["osaekomi_bar"];
 
-	osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
-
-	const int new_width = m_OsaekomiTimer[(int)fighter].GetElapsedTime() * osaekomi_max_width / (EndTimeOfOsaekomi() * 1000);
-
-	if (osaekomi_text && new_width > osaekomi_bar.m_width || osaekomi_bar.m_a <= 0.0)
+	if (GetOsaekomiStyle() == OsaekomiStyle::ProgressBar)
 	{
-		if (osaekomi_text)
+		osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
+
+		const int new_width = m_OsaekomiTimer[(int)fighter].GetElapsedTime() * osaekomi_max_width / (EndTimeOfOsaekomi() * 1000);
+
+		if (osaekomi_text && new_width > osaekomi_bar.m_width || osaekomi_bar.m_a <= 0.0)
 		{
-			const int new_text_x = new_width - osaekomi_text->GetWidth() - 2;
-			osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
+			if (osaekomi_text)
+			{
+				const int new_text_x = new_width - osaekomi_text->GetWidth() - 2;
+				osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
+			}
+
+			auto& osaekomi_bar_border = m_Graphics["osaekomi_bar_border"];
+			osaekomi_bar_border.SetPosition(0, osaekomi_y, 255);
+			osaekomi_bar_border.m_width  = new_width + 5;
+			osaekomi_bar_border.m_height = (int)(100.0 * m_ScalingFactor) + 10;
+			osaekomi_bar_border.m_color  = ZED::Color(0, 0, 0);
+
+
+			osaekomi_bar.SetPosition(0, osaekomi_y + 5, 255);
+			//osaekomi_bar.m_color = ZED::Color(30, 150, 30);
+			osaekomi_bar.m_color = ZED::Color(255, 0, 0);
+			osaekomi_bar.m_width = new_width;
+			osaekomi_bar.m_height = (int)(100.0 * m_ScalingFactor);
 		}
+	}
+	else
+	{
+		osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Gigantic);
 
-		m_Graphics["osaekomi_bar_border"].SetPosition(0, osaekomi_y, 255);
-		m_Graphics["osaekomi_bar_border"].m_width  = new_width + 5;
-		m_Graphics["osaekomi_bar_border"].m_height = (int)(100.0 * m_ScalingFactor) + 10;
-		m_Graphics["osaekomi_bar_border"].m_color  = ZED::Color(0, 0, 0);
+		auto& osaekomi_bar_border = m_Graphics["osaekomi_bar_border"];
 
+		osaekomi_bar_border.SetColor(ZED::Color(0, 0, 0));
+		osaekomi_bar.SetColor(ZED::Color(255, 0, 0));
 
-		osaekomi_bar.SetPosition(0, osaekomi_y + 5, 255);
-
-		//osaekomi_bar.m_color = ZED::Color(30, 150, 30);
-		osaekomi_bar.m_color = ZED::Color(255, 0, 0);
-		osaekomi_bar.m_width = new_width;
-		osaekomi_bar.m_height = (int)(100.0 * m_ScalingFactor);
+		//New osaekomi bar
+		double rect_width  = 190.0;
+		double rect_height = 150.0;
+		double outer_rect_width  = rect_width  + 10.0;
+		double outer_rect_height = rect_height + 10.0;
+		osaekomi_text.Center().SetPosition(width/2, osaekomi_y);
+		osaekomi_bar. Center().SetPosition(width/2 - (int)(rect_width/2.0 * m_ScalingFactor), osaekomi_y - (int)(rect_height/2.0 * m_ScalingFactor))
+					.SetSize((int)(rect_width * m_ScalingFactor), (int)(rect_height * m_ScalingFactor));
+		osaekomi_bar_border.Center().SetPosition(width/2 - (int)(outer_rect_width/2.0 * m_ScalingFactor), osaekomi_y - (int)(outer_rect_height/2.0 * m_ScalingFactor))
+					.SetSize((int)(outer_rect_width * m_ScalingFactor), (int)(outer_rect_height * m_ScalingFactor));
 	}
 }
 
@@ -2309,6 +2358,10 @@ bool Mat::Render(double dt) const
 		m_Graphics["next_match"].Render(renderer, dt);
 		m_Graphics["following_match"].Render(renderer, dt);
 
+		m_Graphics["age_group_rect_bar"].Render(renderer, dt);
+		m_Graphics["age_group_rect"].Render(renderer, dt);
+		m_Graphics["age_group_rect_text"].Render(renderer, dt);
+
 		if (Timer::GetTimestamp() - m_CurrentStateStarted >= 10 * 1000)
 			NextState(State::Running);
 
@@ -2351,6 +2404,10 @@ bool Mat::Render(double dt) const
 
 		m_Graphics["matchtable"].Render(renderer, dt);
 		m_Graphics["mat_name"  ].Render(renderer, dt);
+
+		m_Graphics["age_group_rect_bar"].Render(renderer, dt);
+		m_Graphics["age_group_rect"].Render(renderer, dt);
+		m_Graphics["age_group_rect_text"].Render(renderer, dt);
 
 		//Render text effects
 		m_Graphics["hajime"].Render(renderer, dt);

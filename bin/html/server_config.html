@@ -35,6 +35,15 @@
   <input style="margin-bottom:0px;" type="number" id="port" value="" min="1" max="65535" />
 </div>
 
+
+<div style="margin-top: 5mm;">
+  <label style="width:200px;float:left;" id="label_nameStyle">Name Style</label>
+  <select id="nameStyle">
+    <option selected value="0" id="given_name_first">Give name first</option>
+    <option value="1" id="family_name_first">Family name first</option>
+  </select>
+</div>
+
 <div style="margin-top: 5mm;">
   <label style="width:200px;float:left;" id="label_ipponStyle">Ippon/Waza-Ari Style</label>
   <select id="ipponStyle">
@@ -45,19 +54,19 @@
 </div>
 
 <div style="margin-top: 5mm;">
+  <label style="width:200px;float:left" id="label_osaekomiStyle">Osaekomi Style</label>
+  <select id="osaekomiStyle">
+    <option selected value="0" id="progressbar"></option>
+    <option value="1" id="fixed_at_bottom"></option>
+  </select>
+</div>
+
+<div style="margin-top: 5mm;">
   <label style="width:200px;float:left;" id="label_timerStyle">Timer Style</label>
   <select id="timerStyle">
     <option selected value="0" id="with_hundred">With Hundreds (1:23:4)</option>
     <option value="1" id="only_seconds">Only seconds (1:23)</option>
     <option value="2" id="full">Completely (1:23.456)</option>
-  </select>
-</div>
-
-<div style="margin-top: 5mm;">
-  <label style="width:200px;float:left;" id="label_nameStyle">Name Style</label>
-  <select id="nameStyle">
-    <option selected value="0" id="given_name_first">Give name first</option>
-    <option value="1" id="family_name_first">Family name first</option>
   </select>
 </div>
 
@@ -164,10 +173,11 @@ function Update()
 
 function UpdateConfig()
 {
-  var params = URLEncode({
+  let params = URLEncode({
     language:    document.getElementById("language").value,
     port:        document.getElementById("port").value,
     ipponStyle:  document.getElementById("ipponStyle").value,
+    osaekomiStyle:  document.getElementById("osaekomiStyle").value,
     timerStyle:  document.getElementById("timerStyle").value,
     nameStyle:   document.getElementById("nameStyle").value,
   });
@@ -191,7 +201,7 @@ function ExecuteCommand()
 function GetStatus()
 {
   AjaxCallback("ajax/config/get_setup", function(response) {
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
     console.log(response);
 
     if (document.getElementById("version").innerHTML == "")
@@ -202,6 +212,7 @@ function GetStatus()
       language = res.language;
       document.getElementById("port").value = res.port;
       document.getElementById("ipponStyle").value = res.ippon_style;
+      document.getElementById("osaekomiStyle").value = res.osaekomi_style;
       document.getElementById("timerStyle").value = res.timer_style;
       document.getElementById("nameStyle").value  = res.name_style;
     }
@@ -214,3 +225,7 @@ function GetStatus()
 
 GetStatus();
 TimerID = window.setInterval(GetStatus, 1000);
+
+
+document.getElementById("progressbar").innerHTML     = translate('progressbar');
+document.getElementById("fixed_at_bottom").innerHTML = translate('fixed_at_bottom');

@@ -14,11 +14,27 @@
 </div>
 
 <div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_nameStyle">Name Style</label>
+  <select style="margin-bottom:20px;" id="nameStyle">
+    <option selected value="0" id="given_name_first">Give name first</option>
+    <option value="1" id="family_name_first">Family name first</option>
+  </select>
+</div>
+
+<div>
   <label style="width:250px;float:left;margin-top:4px;" id="label_ipponStyle">Ippon/Waza-Ari Style</label>
   <select style="margin-bottom:20px;" id="ipponStyle">
     <option selected value="0" id="two_digits">Two Digits</option>
     <option value="1" id="single_digit">One Digit</option>
     <option value="2" id="spelled_out">Spelled Out</option>
+  </select>
+</div>
+
+<div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_osaekomiStyle">Osaekomi Style</label>
+  <select style="margin-bottom:20px;" id="osaekomiStyle">
+    <option selected value="0" id="progressbar"></option>
+    <option value="1" id="fixed_at_bottom"></option>
   </select>
 </div>
 
@@ -45,14 +61,6 @@
   </select>
 
   <button class="neutral" style="margin-left: 0.8cm;" onclick="return PlaySound()" id="play_sound">Play Sound</button>
-</div>
-
-<div>
-  <label style="width:250px;float:left;margin-top:4px;" id="label_nameStyle">Name Style</label>
-  <select style="margin-bottom:20px;" id="nameStyle">
-    <option selected value="0" id="given_name_first">Give name first</option>
-    <option value="1" id="family_name_first">Family name first</option>
-  </select>
 </div>
 
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateMat()" id="update">Update Mat</button>
@@ -95,6 +103,7 @@ function UpdateMat()
     id:              document.getElementById("id").value,
     name:            document.getElementById("name").value,
     ipponStyle:      document.getElementById("ipponStyle").value,
+    osaekomiStyle:   document.getElementById("osaekomiStyle").value,
     timerStyle:      document.getElementById("timerStyle").value,
     sound:           document.getElementById("sound").checked,
     sound_filename:  document.getElementById("sound_filename").value,
@@ -121,7 +130,8 @@ function GetMat(id)
       if (id == mat.id)
       {
         document.getElementById("name").value = mat.name;
-        document.getElementById("ipponStyle").value = mat.ippon_style;
+        document.getElementById("ipponStyle").value    = mat.ippon_style;
+        document.getElementById("osaekomiStyle").value = mat.osaekomi_style;
         document.getElementById("timerStyle").value = mat.timer_style;
         document.getElementById("nameStyle").value  = mat.name_style;
         document.getElementById("sound").checked    = mat.sound_enabled;
@@ -147,7 +157,7 @@ var id = URLDecode(URL, "id");
 
 AjaxCallback("ajax/config/list_sound_files", function(response) {
   console.log(response);
-  let res = YAML.parse(response);
+  const res = YAML.parse(response);
 
   for (const sound of res)
   {
@@ -162,5 +172,8 @@ AjaxCallback("ajax/config/list_sound_files", function(response) {
 
 document.getElementById("sound_enabled").innerHTML  = translate('enabled');
 document.getElementById("sound_disabled").innerHTML = translate('disabled');
+
+document.getElementById("progressbar").innerHTML     = translate('progressbar');
+document.getElementById("fixed_at_bottom").innerHTML = translate('fixed_at_bottom');
 
 </script>

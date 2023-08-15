@@ -88,6 +88,8 @@ bool Database::Load(const std::string& Filename)
 		SetServerPort(yaml["port"].as<int>());
 	if (yaml["ippon_style"])
 		SetIpponStyle((Mat::IpponStyle)yaml["ippon_style"].as<int>());
+	if (yaml["osaekomi_style"])
+		SetOsaekomiStyle((Mat::OsaekomiStyle)yaml["osaekomi_style"].as<int>());
 	if (yaml["timer_style"])
 		SetTimerStyle((Mat::TimerStyle)yaml["timer_style"].as<int>());
 	if (yaml["name_style"])
@@ -131,6 +133,7 @@ bool Database::Save(const std::string& Filename) const
 	yaml << YAML::Key << "language" << YAML::Value << (int)Localizer::GetLanguage();
 	yaml << YAML::Key << "port" << YAML::Value << GetServerPort();
 	yaml << YAML::Key << "ippon_style" << YAML::Value << (int)GetIpponStyle();
+	yaml << YAML::Key << "osaekomi_style" << YAML::Value << (int)GetOsaekomiStyle();
 	yaml << YAML::Key << "timer_style" << YAML::Value << (int)GetTimerStyle();
 	yaml << YAML::Key << "name_style"  << YAML::Value << (int)GetNameStyle();
 	

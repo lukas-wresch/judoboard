@@ -278,14 +278,15 @@ namespace Judoboard
 					m_Texture->Unload();
 			}
 
-			void UpdateTexture(const ZED::Renderer& Renderer, const std::string& Text, ZED::Color Color, ZED::FontSize Size = ZED::FontSize::Huge)
+			GraphicElement& UpdateTexture(const ZED::Renderer& Renderer, const std::string& Text, ZED::Color Color, ZED::FontSize Size = ZED::FontSize::Huge)
 			{
-				if (m_Name == Text) return;
+				if (m_Name == Text) return *this;
 
 				m_Texture = Renderer.RenderFont(Size, Text, Color);
 				m_Size = Size;
 				m_Name = Text;
 				m_Color = Color;
+				return *this;
 			}
 
 			void Shorten(const ZED::Renderer& Renderer)//Shortens the text by one character
@@ -321,7 +322,10 @@ namespace Judoboard
 					if (m_width > 0 && m_height > 0 && m_a > 0.0)
 					{
 						ZED::Rect rect((int)m_x, (int)m_y, m_width, m_height);
-						Renderer.FillRect(rect, m_color.r, m_color.g, m_color.b, (int)m_a);
+						if (m_a > 255.0)
+							Renderer.FillRect(rect, m_color.r, m_color.g, m_color.b, 255);
+						else
+							Renderer.FillRect(rect, m_color.r, m_color.g, m_color.b, (int)m_a);
 					}
 				}
 
@@ -361,6 +365,25 @@ namespace Judoboard
 				return *this;
 			}
 
+			GraphicElement& SetWidth(int Width)
+			{
+				m_width = Width;
+				return *this;
+			}
+
+			GraphicElement& SetHeight(int Height)
+			{
+				m_height = Height;
+				return *this;
+			}
+
+			GraphicElement& SetSize(int Width, int Height)
+			{
+				m_width  = Width;
+				m_height = Height;
+				return *this;
+			}
+
 			GraphicElement& SetTexture(ZED::Texture* NewTexture)
 			{
 				m_Texture = NewTexture;
@@ -370,6 +393,12 @@ namespace Judoboard
 			GraphicElement& SetAlpha(double a)
 			{
 				m_a = a;
+				return *this;
+			}
+
+			GraphicElement& SetColor(ZED::Color Color)
+			{
+				m_color = Color;
 				return *this;
 			}
 
