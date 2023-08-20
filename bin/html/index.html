@@ -17,6 +17,7 @@
   <h3 class="menu-section-title" id="navi_language"></h3>
     <img src="en.png" width="20%" onclick="localStorage.setItem('language', 0); location.reload();">
     <img src="de.png" width="20%" onclick="localStorage.setItem('language', 1); location.reload();">
+    <button class="neutral" style="width: 30mm; margin-top: 1mm; margin-left: 7mm; margin-right: 0mm;" id="fullscreen" onclick="ToggleFullscreen(event)" ontouchstart="ToggleFullscreen(event)">Fullscreen</button>
   </section>
 
   <section class="menu-section">
@@ -113,6 +114,18 @@ document.querySelector('.js-slideout-toggle').addEventListener('click', function
 
 
 
+function ToggleFullscreen(event)
+{
+  event.preventDefault();
+
+  if (!document.fullscreenElement)
+    document.querySelector("body").requestFullscreen();
+  else
+    document.exitFullscreen();
+}
+
+
+
 function ShowMats()
 {
   $("#streaming").fadeToggle(1000);
@@ -120,13 +133,11 @@ function ShowMats()
   
   if (Streaming)
   {
-    document.querySelector("body").requestFullscreen();
     StreamTimer = window.setInterval(Stream, 800);
     $("#navi_show_mats").text(translate('hide_mats'));
   }
   else
   {
-    document.exitFullscreen();
     window.clearInterval(StreamTimer);
     $("#navi_show_mats").text(translate('show_mats'));
   }
