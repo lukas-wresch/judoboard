@@ -226,8 +226,8 @@ function NiceLargeTime(timestamp)
 
 function URLEncode(obj)
 {
-  var str = [];
-  for (var p in obj)
+  let str = [];
+  for (const p in obj)
   {
     if (obj.hasOwnProperty(p))
       str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
@@ -242,20 +242,44 @@ function URLDecode(input, variable)
   if (typeof input === 'undefined')
     return false;
 
-  var query = input.split("?");
+  let query = input.split("?");
 
   if (typeof query[1] === 'undefined')
     return false;
 
-  var vars = query[1].split("&");
+  let vars = query[1].split("&");
 
-  for (var i=0;i < vars.length;i++)
+  for (let i=0;i < vars.length;i++)
   {
-    var pair = vars[i].split("=");
+    let pair = vars[i].split("=");
     if (pair[0] == variable)
       return pair[1];
   }
   return false;
+}
+
+
+
+function bytesToUrlEncoded(utf8Bytes)
+{
+  return Array.from(utf8Bytes)
+    .map(byte => '%' + ('0' + byte.toString(16)).slice(-2))
+    .join('');
+}
+
+
+
+function utf8Encode(string)
+{
+  const utf8 = unescape(encodeURIComponent(string));
+  const utf8Bytes = new Uint8Array(utf8.length);
+
+  for (let i = 0; i < utf8.length; i++)
+  {
+    utf8Bytes[i] = utf8.charCodeAt(i);
+  }
+
+  return bytesToUrlEncoded(utf8Bytes);
 }
 
 
@@ -277,7 +301,7 @@ function GetQueryVariable(variable)
 
 function Ajax(url)
 {
-  var xhttp = new XMLHttpRequest();
+  let xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function()
   {
     if (this.readyState == 4 && this.status == 200)
@@ -296,7 +320,7 @@ function Ajax(url)
 
 function AjaxCallback(url, callback)
 {
-  var xhttp = new XMLHttpRequest();
+  let xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function()
   {
     if (this.readyState == 4 && this.status == 200 && typeof callback !== 'undefined')
@@ -311,7 +335,7 @@ function AjaxCallback(url, callback)
 
 function AjaxPost(url, params, callback)
 {
-  var xhttp = new XMLHttpRequest();
+  let xhttp = new XMLHttpRequest();
   xhttp.open("POST", url);
   xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
@@ -333,7 +357,7 @@ function AjaxPost(url, params, callback)
 
 function AjaxPostToYaml(url, params, callback)
 {
-  var xhttp = new XMLHttpRequest();
+  let xhttp = new XMLHttpRequest();
   xhttp.open("POST", url);
   xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 

@@ -525,7 +525,7 @@ function Update_Participants()
 {
   const search = document.getElementById("participants_search").value;
 
-  AjaxCallback("ajax/judoka/search?participants=true&name=" + search, function(response) {
+  AjaxCallback("ajax/judoka/search?participants=true&name=" + utf8Encode(search), function(response) {
     //console.log(response);
     const res = YAML.parse(response);
 

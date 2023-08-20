@@ -102,7 +102,7 @@ function ToggleFilter()
 
 function Update(color)
 {
-  AjaxCallback('ajax/judoka/search?participants=' + showParticipantsOnly.checked + '&name=' + document.getElementById(color).value, function(response) {
+  AjaxCallback('ajax/judoka/search?participants=' + showParticipantsOnly.checked + '&name=' + utf8Encode(document.getElementById(color).value), function(response) {
     console.log(response);
     const res = YAML.parse(response);
 
