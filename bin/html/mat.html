@@ -19,7 +19,7 @@
   </tr>
 </table>
 
-<table border="1" rules="all" style="margin-top: 0mm; margin-bottom: 3mm; width: 23.0cm;">
+<table border="1" rules="all" style="margin-top: 0mm; margin-bottom: 3mm; width: 100%;">
   <tr id="current_match_row">
     <td style="text-align: center; font-size: 18pt;" colspan="2">
       <div id="current_match_div" style="height: 35px;">
@@ -42,31 +42,31 @@
     </td>
 
     <td style="text-align: center; font-size: 18pt; width: 6.9cm; border-right-style: hidden; border-bottom-style: hidden;">
-      <button disabled class="neutral" style="width: 45mm; margin-top: 3mm; margin-right: 8mm; display: none;" id="end_match" onclick="EndMatch(event)" ontouchstart="EndMatch(event)">End match</button>
+      <button disabled class="neutral" style="height: 7vh; width: 45mm; margin-top: 3mm; margin-right: 20mm; display: none;" id="end_match" onclick="EndMatch(event)" ontouchstart="EndMatch(event)">End match</button>
     </td>
   </tr>
 
   <tr>
     <td style="text-align: center;">
-      <button class="add" id="add_ippon_white" onclick="SetScore('white', '+ippon', event);" ontouchstart="SetScore('white', '+ippon', event);">+Ippon</button>
-      <button class="add" id="add_wazaari_white" style="margin-left: 5mm;" onclick="SetScore('white', '+wazaari', event);" ontouchstart="SetScore('white', '+wazaari', event);">+Waza-Ari</button>
+      <button class="add" id="add_ippon_white"   style="height: 7vh;" onclick="SetScore('white', '+ippon', event);" ontouchstart="SetScore('white', '+ippon', event);">+Ippon</button>
+      <button class="add" id="add_wazaari_white" style="height: 7vh; margin-left: 5mm;" onclick="SetScore('white', '+wazaari', event);" ontouchstart="SetScore('white', '+wazaari', event);">+Waza-Ari</button>
       <br/>
-      <button class="remove" id="rem_ippon_white" onclick="SetScore('white', '-ippon', event);" ontouchstart="SetScore('white', '-ippon', event);">-Ippon</button>
-      <button class="remove" id="rem_wazaari_white" style="margin-left: 5mm;" onclick="SetScore('white', '-wazaari', event);" ontouchstart="SetScore('white', '-wazaari', event);">-Waza-Ari</button>
+      <button class="remove" id="rem_ippon_white"   style="height: 7vh;" onclick="SetScore('white', '-ippon', event);" ontouchstart="SetScore('white', '-ippon', event);">-Ippon</button>
+      <button class="remove" id="rem_wazaari_white" style="height: 7vh; margin-left: 5mm;" onclick="SetScore('white', '-wazaari', event);" ontouchstart="SetScore('white', '-wazaari', event);">-Waza-Ari</button>
       <br/>
-      <button disabled class="neutral" id="white_osaekomi" onclick="Osaekomi('white', event);" ontouchstart="Osaekomi('white', event);">Osaekomi</button>
-      <button disabled class="neutral" style="margin-left: 5mm;" id="tokeda1" onclick="Tokeda(event);" ontouchstart="Tokeda(event);">Tokeda</button>
+      <button disabled class="neutral" id="white_osaekomi" style="height: 7vh;" onclick="Osaekomi('white', event);" ontouchstart="Osaekomi('white', event);">Osaekomi</button>
+      <button disabled class="neutral" style="height: 7vh; margin-left: 5mm;" id="tokeda1" onclick="Tokeda(event);" ontouchstart="Tokeda(event);">Tokeda</button>
     </td>
 
     <td style="text-align: center;">
-      <button class="add" id="add_ippon_blue" onclick="SetScore('blue', '+ippon', event);" ontouchstart="SetScore('blue', '+ippon', event);">+Ippon</button>
-      <button class="add" id="add_wazaari_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '+wazaari', event);" ontouchstart="SetScore('blue', '+wazaari', event);">+Waza-Ari</button>
+      <button class="add" id="add_ippon_blue"   style="height: 7vh;" onclick="SetScore('blue', '+ippon', event);" ontouchstart="SetScore('blue', '+ippon', event);">+Ippon</button>
+      <button class="add" id="add_wazaari_blue" style="height: 7vh; margin-left: 5mm;" onclick="SetScore('blue', '+wazaari', event);" ontouchstart="SetScore('blue', '+wazaari', event);">+Waza-Ari</button>
       <br/>
-      <button class="remove" id="rem_ippon_blue" onclick="SetScore('blue', '-ippon', event);" ontouchstart="SetScore('blue', '-ippon', event);">-Ippon</button>
-      <button class="remove" id="rem_wazaari_blue" style="margin-left: 5mm;" onclick="SetScore('blue', '-wazaari', event);" ontouchstart="SetScore('blue', '-wazaari', event);">-Waza-Ari</button>
+      <button class="remove" id="rem_ippon_blue"   style="height: 7vh;" onclick="SetScore('blue', '-ippon', event);" ontouchstart="SetScore('blue', '-ippon', event);">-Ippon</button>
+      <button class="remove" id="rem_wazaari_blue" style="height: 7vh; margin-left: 5mm;" onclick="SetScore('blue', '-wazaari', event);" ontouchstart="SetScore('blue', '-wazaari', event);">-Waza-Ari</button>
       <br/>
-      <button disabled class="neutral" id="blue_osaekomi" onclick="Osaekomi('blue', event);" ontouchstart="Osaekomi('blue', event);">Osaekomi</button>
-      <button disabled class="neutral" style="margin-left: 5mm;" id="tokeda2" onclick="Tokeda(event);" ontouchstart="Tokeda(event);">Tokeda</button>
+      <button disabled class="neutral" id="blue_osaekomi" style="height: 7vh;" onclick="Osaekomi('blue', event);" ontouchstart="Osaekomi('blue', event);">Osaekomi</button>
+      <button disabled class="neutral" style="height: 7vh; margin-left: 5mm;" id="tokeda2" onclick="Tokeda(event);" ontouchstart="Tokeda(event);">Tokeda</button>
     </td>
 
     <td style="text-align: center; font-size: 18pt; vertical-align: top; border-right-style: hidden; border-bottom-style: hidden;" rowspan="8">
@@ -110,9 +110,9 @@
 
   <tr>
     <td style="text-align: center;" colspan="2">
-      <button class="neutral" id="hajime" onclick="Hajime(event)" ontouchstart="Hajime(event)">Hajime</button>
-      <button disabled class="neutral" id="mate" style="margin-left: 5mm;" onclick="Mate(event)" ontouchstart="Mate(event)">Mate</button>
-      <button class="additional" id="more" style="margin-left: 44mm" onclick="ToggleMore();">More</button>
+      <button class="neutral" id="hajime" style="height: 7vh;" onclick="Hajime(event)" ontouchstart="Hajime(event)">Hajime</button>
+      <button disabled class="neutral" id="mate" style="height: 7vh; margin-left: 5mm;" onclick="Mate(event)" ontouchstart="Mate(event)">Mate</button>
+      <button class="additional" id="more" style="height: 7vh; margin-left: 44mm" onclick="ToggleMore();">More</button>
     </td>
   </tr>
 
@@ -197,10 +197,10 @@
   <tr id="row_decision" style="display: none;">
     <td colspan="2">
       <div id="div_decision" style="display: none; height: 0px; text-align: center; margin-top: 2mm;">
-        <button class="white"   style="width: 3.5cm;" id="white_wins" onclick="SetScore('white', 'hantei', event); ShowHantei(false);">White wins</button>
-        <button class="add"     style="width: 3.5cm;" id="draw" onclick="SetScore('', '+draw', event); ShowHantei(false);">Draw</button>
-        <button class="additional" style="width: 3.5cm;" id="blue_wins" onclick="SetScore('blue', 'hantei', event); ShowHantei(false);">Blue wins</button>
-        <button class="neutral" style="width: 3.5cm;" id="golden_score" onclick="SetScore('', '+golden_score', event); ShowHantei(false); ShowRevokeGoldenScore(true); ">Golden Score</button>
+        <button class="white"   style="height: 7vh; width: 3.5cm; margin-right: 3mm;" id="white_wins" onclick="SetScore('white', 'hantei', event); ShowHantei(false);">White wins</button>
+        <button class="add"     style="height: 7vh; width: 3.5cm; margin-right: 3mm;" id="draw" onclick="SetScore('', '+draw', event); ShowHantei(false);">Draw</button>
+        <button class="additional" style="height: 7vh; width: 3.5cm; margin-right: 3mm;" id="blue_wins" onclick="SetScore('blue', 'hantei', event); ShowHantei(false);">Blue wins</button>
+        <button class="neutral" style="height: 7vh; width: 3.5cm;" id="golden_score" onclick="SetScore('', '+golden_score', event); ShowHantei(false); ShowRevokeGoldenScore(true); ">Golden Score</button>
       </div>
     </td>
   </tr>
@@ -209,7 +209,7 @@
     <td colspan="2">
       <div id="div_revoke_decision" style="display: none; height: 0px; text-align: center;">
         <h2>Hantei: <label id="label_hantei"></label></h2>
-        <button class="remove" style="width: 6.5cm;" id="revoke_hantei" onclick="RevokeHantei();"></button>
+        <button class="remove" style="height: 7vh; width: 6.5cm;" id="revoke_hantei" onclick="RevokeHantei();"></button>
       </div>
     </td>
   </tr>
@@ -442,7 +442,7 @@ function ShowHantei(show)
   if (show)
   {
     $("#row_decision").show();
-    $("#div_decision").show().animate({height: '60px', opacity: 100}, 1000);
+    $("#div_decision").show().animate({height: '9vh', opacity: 100}, 1000);
   }
   else
   {
@@ -462,7 +462,7 @@ function ShowRevokeHantei(show)
   if (show)
   {
     $("#row_revoke_decision").show();
-    $("#div_revoke_decision").show().animate({height: '120px', opacity: 100}, 1000);
+    $("#div_revoke_decision").show().animate({height: '14vh', opacity: 100}, 1000);
   }
   else
   {
