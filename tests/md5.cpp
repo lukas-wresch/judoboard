@@ -2780,6 +2780,13 @@ TEST(MD5, ExportPool)
 	group3->IsFifthPlaceMatch(true);
 	t->AddMatchTable(group3);
 
+	for (int i = 1; i <= 6; ++i)
+		group1->SetStartPosition(j[i], i-1);
+	for (int i = 1; i <= 7; ++i)
+		group2->SetStartPosition(j[6+i], i-1);
+	for (int i = 1; i <= 8; ++i)
+		group3->SetStartPosition(j[6+7+i], i-1);
+
 	t->GenerateSchedule();
 
 	ASSERT_EQ(group1->GetParticipants().size(), 6);
@@ -2806,6 +2813,10 @@ TEST(MD5, ExportPool)
 	ASSERT_EQ(results.GetSize(), 6);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[6]->GetUUID());
 	EXPECT_EQ(results[1].Judoka->GetUUID(), j[5]->GetUUID());
+	EXPECT_EQ(results[2].Judoka->GetUUID(), j[4]->GetUUID());
+	EXPECT_EQ(results[3].Judoka->GetUUID(), j[3]->GetUUID());
+	EXPECT_EQ(results[4].Judoka->GetUUID(), j[2]->GetUUID());
+	EXPECT_EQ(results[5].Judoka->GetUUID(), j[1]->GetUUID());
 
 
 	results = group2->CalculateResults();
@@ -2832,6 +2843,14 @@ TEST(MD5, ExportPool)
 		EXPECT_EQ(results2[0]->Participant->Firstname, j[6]->GetFirstname());
 		EXPECT_EQ(results2[1]->RankNo, 2);
 		EXPECT_EQ(results2[1]->Participant->Firstname, j[5]->GetFirstname());
+		EXPECT_EQ(results2[2]->RankNo, 3);
+		EXPECT_EQ(results2[2]->Participant->Firstname, j[4]->GetFirstname());
+		EXPECT_EQ(results2[3]->RankNo, 4);
+		EXPECT_EQ(results2[3]->Participant->Firstname, j[3]->GetFirstname());
+		EXPECT_EQ(results2[4]->RankNo, 5);
+		EXPECT_EQ(results2[4]->Participant->Firstname, j[2]->GetFirstname());
+		EXPECT_EQ(results2[5]->RankNo, 6);
+		EXPECT_EQ(results2[5]->Participant->Firstname, j[1]->GetFirstname());
 	}
 
 	{
