@@ -2805,28 +2805,54 @@ TEST(MD5, ExportPool)
 	auto results = group1->CalculateResults();
 	ASSERT_EQ(results.GetSize(), 6);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[6]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[5]->GetUUID());
 
 
 	results = group2->CalculateResults();
 	ASSERT_EQ(results.GetSize(), 6);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[6+7]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[6+6]->GetUUID());
 
 
 	results = group3->CalculateResults();
 	ASSERT_EQ(results.GetSize(), 6);
 	EXPECT_EQ(results[0].Judoka->GetUUID(), j[6+7+8]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[6+7+7]->GetUUID());
 
 
 	MD5 file(*t);
 
 	ASSERT_EQ(file.GetWeightclasses().size(), 3);
-	auto& table = file.GetWeightclasses()[0];
 
-	const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
-	ASSERT_EQ(results2.size(), 6);
-	EXPECT_EQ(results2[0]->RankNo, 1);
-	EXPECT_EQ(results2[0]->Participant->Firstname, j[6]->GetFirstname());
+	{
+		auto& table = file.GetWeightclasses()[0];
+		const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+		ASSERT_EQ(results2.size(), 6);
+		EXPECT_EQ(results2[0]->RankNo, 1);
+		EXPECT_EQ(results2[0]->Participant->Firstname, j[6]->GetFirstname());
+		EXPECT_EQ(results2[1]->RankNo, 2);
+		EXPECT_EQ(results2[1]->Participant->Firstname, j[5]->GetFirstname());
+	}
 
+	{
+		auto& table = file.GetWeightclasses()[1];
+		const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+		ASSERT_EQ(results2.size(), 6);
+		EXPECT_EQ(results2[0]->RankNo, 1);
+		EXPECT_EQ(results2[0]->Participant->Firstname, j[6+7]->GetFirstname());
+		EXPECT_EQ(results2[1]->RankNo, 2);
+		EXPECT_EQ(results2[1]->Participant->Firstname, j[6+6]->GetFirstname());
+	}
+
+	{
+		auto& table = file.GetWeightclasses()[2];
+		const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+		ASSERT_EQ(results2.size(), 6);
+		EXPECT_EQ(results2[0]->RankNo, 1);
+		EXPECT_EQ(results2[0]->Participant->Firstname, j[6+7+8]->GetFirstname());
+		EXPECT_EQ(results2[1]->RankNo, 2);
+		EXPECT_EQ(results2[1]->Participant->Firstname, j[6+7+7]->GetFirstname());
+	}
 	
 	file.Save("output.md5");
 
