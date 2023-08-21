@@ -61,7 +61,7 @@ function RemoveParticipant(id)
 
 function Update()
 {
-  AjaxCallback('ajax/judoka/search?all=true&name=' + document.getElementById("name").value, function(response) {
+  AjaxCallback('ajax/judoka/search?all=true&name=' + utf8Encode(document.getElementById("name").value), function(response) {
     console.log(response);
     let res = YAML.parse(response);
 

@@ -23,7 +23,7 @@
 
 function GetJudokaList()
 {
-  AjaxCallback("ajax/judoka/search?name=" + document.getElementById("search").value, function(response) {
+  AjaxCallback("ajax/judoka/search?name=" + utf8Encode(document.getElementById("search").value), function(response) {
     console.log(response);
     const res = YAML.parse(response);
 
