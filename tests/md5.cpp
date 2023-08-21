@@ -2737,6 +2737,104 @@ TEST(MD5, ReadPool3)
 
 
 
+TEST(MD5, ExportPool)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
+	t->EnableAutoSave(false);
+
+
+	Judoka* j[6+7+8+1];
+
+	for (int i = 1; i <= 6+7+8; ++i)
+	{
+		if (i <= 6)
+			j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		else if (i <= 6+7)
+			j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 100 + i);
+		else
+			j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 150 + i);
+
+		j[i]->SetBirthyear(2000);
+		t->AddParticipant(j[i]);
+	}
+
+	Pool* group1 = new Pool(50, 90);
+	Pool* group2 = new Pool(100, 140);
+	Pool* group3 = new Pool(150, 190);
+
+	group1->SetMatID(1);
+	group1->IsThirdPlaceMatch(true);
+	group1->IsFifthPlaceMatch(true);
+	t->AddMatchTable(group1);
+
+	group2->SetMatID(1);
+	group2->IsThirdPlaceMatch(true);
+	group2->IsFifthPlaceMatch(true);
+	t->AddMatchTable(group2);
+
+	group3->SetMatID(1);
+	group3->IsThirdPlaceMatch(true);
+	group3->IsFifthPlaceMatch(true);
+	t->AddMatchTable(group3);
+
+	t->GenerateSchedule();
+
+	ASSERT_EQ(group1->GetParticipants().size(), 6);
+	ASSERT_EQ(group2->GetParticipants().size(), 7);
+	ASSERT_EQ(group3->GetParticipants().size(), 8);
+
+	Mat m(1);
+
+	for (auto match : t->GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+
+	auto results = group1->CalculateResults();
+	ASSERT_EQ(results.GetSize(), 6);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[6]->GetUUID());
+
+
+	results = group2->CalculateResults();
+	ASSERT_EQ(results.GetSize(), 6);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[6+7]->GetUUID());
+
+
+	results = group3->CalculateResults();
+	ASSERT_EQ(results.GetSize(), 6);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[6+7+8]->GetUUID());
+
+
+	MD5 file(*t);
+
+	ASSERT_EQ(file.GetWeightclasses().size(), 3);
+	auto& table = file.GetWeightclasses()[0];
+
+	const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+	ASSERT_EQ(results2.size(), 6);
+	EXPECT_EQ(results2[0]->RankNo, 1);
+	EXPECT_EQ(results2[0]->Participant->Firstname, j[6]->GetFirstname());
+
+	
+	file.Save("output.md5");
+
+	delete t;
+}
+
+
+
 TEST(MD5, ReadDoubleElimination)
 {
 	initialize();

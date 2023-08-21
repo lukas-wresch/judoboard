@@ -239,7 +239,10 @@ MD5::MD5(const Tournament& Tournament)
 			new_weightclass->MatchForFifthPlace = double_elimination->IsFifthPlaceMatch();
 		}
 		else
+		{
+			ZED::Log::Error("Can not export match table!");
 			continue;
+		}
 
 		new_weightclass->ID   = id++;
 		new_weightclass->Date = m_DateStart;
