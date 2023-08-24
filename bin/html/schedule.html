@@ -5,6 +5,12 @@
 <button class="add" style="width: 3.3cm;" id="select_age_groups" onclick="navigate('age_groups_select.html')"></button>
 
 <h2 id="headline-master-schedule">Overview</h2>
+
+<input type="checkbox" id="master-schedule-toggle" class="switch-input" checked onclick="Update_Masterschedule();">
+<label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="master-schedule-toggle">
+  <span class="toggle-on" id="master-schedule-show">Show</span><span class="toggle-off" for="sound" id="master-schedule-hide">Hide</span>
+</label>
+
 <table id="master-schedule" border="1" rules="all" style="margin-bottom: 1cm;">
 </table>
 
@@ -24,9 +30,18 @@
     </table>
 </div>
 
+
 <h2 id="headline">Schedule</h2>
-<label style="width:150px;float:left;margin-top:0px;" id="label_mat_display">Show matches on</label>
-  <select style="margin-bottom:20px; width: 200px;" id="display_mat" onchange='Update_Schedule();'>
+
+<label style="float:left;margin-top:0px;margin-right:10px;" id="label_show_matches">Show matches</label>
+  <select style="margin-bottom:20px; width: 100px;" id="filter_mat" onchange='Update_Schedule();'>
+  <option value="1">All</option>
+  <option value="2">Important</option>
+  <option value="0">None</option>
+  </select>
+
+<label style="width:250px;margin-top:0px;margin-left:10px;margin-right:10px;" id="label_on_mat">on mat</label>
+  <select style="margin-bottom:20px; width: 150px;" id="display_mat" onchange='Update_Schedule();'>
   </select>
 
 <table id="schedule" border="1" rules="all" style="margin-bottom: 1cm;">
@@ -213,6 +228,16 @@ let updateMasterscheduleRunning = false;
 
 function Update_Masterschedule()
 {
+  if (!document.getElementById("master-schedule-toggle").checked)
+  {
+    let table = document.getElementById("master-schedule");
+
+    while (table.rows.length > 0)
+      table.deleteRow(0);
+
+    return;
+  }
+
   if (updateMasterscheduleRunning)
     return;
 
@@ -220,40 +245,40 @@ function Update_Masterschedule()
 
   AjaxCallback("ajax/get_masterschedule", function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
     //console.log(res);
 
     updateMasterscheduleRunning = false;
 
-    var mat_to_display = document.getElementById("display_mat");
-    var mat_to_display_selected = mat_to_display.value;
+    let mat_to_display = document.getElementById("display_mat");
+    let mat_to_display_selected = mat_to_display.value;
     while (mat_to_display.length > 0)
       mat_to_display.remove(0);
 
-    var option = document.createElement("option");
+    let option = document.createElement("option");
     option.value = 0;
     option.text = translate("all_mats");
     mat_to_display.add(option);
 
-    var table = document.getElementById("master-schedule");
+    let table = document.getElementById("master-schedule");
 
     while (table.rows.length > 0)
       table.deleteRow(0);
 
-    var i = 0;
-    var mat_count = res.highest_mat_id;
+    let i = 0;
+    let mat_count = res.highest_mat_id;
 
-    var row = table.insertRow(-1);
+    let row = table.insertRow(-1);
     for (var j=0; j < mat_count; j++)
     {
-      var option = document.createElement("option");
+      let option = document.createElement("option");
       option.value = j+1;
       option.text = translate('mat') + " " + (j+1);
       mat_to_display.add(option);
       mat_to_display.selectedIndex = mat_to_display_selected;
 
-      var cell = row.insertCell(j);
-      var colspan = res.max_widths[j];
+      let cell = row.insertCell(j);
+      let colspan = res.max_widths[j];
 
       cell.innerHTML = translate('mat') + " " + (j+1);
       cell.style.backgroundColor = Color(j+1);
@@ -269,22 +294,22 @@ function Update_Masterschedule()
     //For each index
     for (const per_index of res.master_schedule)
     {
-      var row = table.insertRow(-1);
+      let row = table.insertRow(-1);
 
       //For each mat
       for (const per_mat of per_index)
       {
-        var max = per_mat.max;
-        var entries_rendered = 0;
+        let max = per_mat.max;
+        let entries_rendered = 0;
 
         if (per_mat.entries.length > 0)
         {
           for (const entry of per_mat.entries)
           {
-            var cell = row.insertCell(-1);
+            let cell = row.insertCell(-1);
 
-            var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px; margin-left: 4mm; margin-right: 3mm;";
-            var contents;
+            let style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px; margin-left: 4mm; margin-right: 3mm;";
+            let contents;
 
             if (entry.editable)
               contents = "<a href=\"#matchtable_add.html?id=" + entry.uuid + "\">" + entry.description + "</a><br/>";
@@ -309,7 +334,7 @@ function Update_Masterschedule()
 
         if (per_mat.entries.length < max || max == 0)
         {
-          var cell = row.insertCell(-1);
+          let cell = row.insertCell(-1);
           cell.innerHTML = "";
 
           cell.style.textAlign = "center";
@@ -327,39 +352,49 @@ let updateScheduleRunning = false;
 
 function Update_Schedule()
 {
+  if (document.getElementById("filter_mat").value == 0)
+  {
+    let table = document.getElementById("schedule");
+
+    while (table.rows.length > 1)
+      table.deleteRow(-1);
+
+    return;
+  }
+
   if (updateScheduleRunning)
     return;
 
   updateScheduleRunning = true;
 
-  AjaxCallback("ajax/get_schedule", function(response) {
+  AjaxCallback("ajax/get_schedule?filter=" + document.getElementById("filter_mat").value, function(response) {
     //console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
     updateScheduleRunning = false;
 
-    var table = document.getElementById("schedule");
+    let table = document.getElementById("schedule");
 
     while (table.rows.length > 1)
-      table.deleteRow(table.rows.length-1);
+      table.deleteRow(-1);
 
-    var mat_to_display = document.getElementById("display_mat").value;
+    let mat_to_display = document.getElementById("display_mat").value;
 
-    var no = 0;
+    let no = 0;
     for (const match of res)
     {
       if (mat_to_display != 0 && match.mat_id != mat_to_display)
         continue;
 
-      var row = table.insertRow(-1);
-      var cell0 = row.insertCell(0);
-      var cell1 = row.insertCell(1);
-      var cell2 = row.insertCell(2);
-      var cell3 = row.insertCell(3);
-      var cell4 = row.insertCell(4);
-      var cell5 = row.insertCell(5);
-      var cell6 = row.insertCell(6);
-      var cell7 = row.insertCell(7);
+      let row = table.insertRow(-1);
+      let cell0 = row.insertCell(0);
+      let cell1 = row.insertCell(1);
+      let cell2 = row.insertCell(2);
+      let cell3 = row.insertCell(3);
+      let cell4 = row.insertCell(4);
+      let cell5 = row.insertCell(5);
+      let cell6 = row.insertCell(6);
+      let cell7 = row.insertCell(7);
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
@@ -738,6 +773,13 @@ Update();
 //TimerID = window.setInterval(Update, 6000);
 
 
+function ToggleMasterSchedule()
+{
+
+}
+
+
+
 document.getElementById("headline").innerHTML = translate('schedule');
 
 document.getElementById("headline-master-schedule").innerHTML = translate('overview');
@@ -776,7 +818,8 @@ document.getElementById("headline_age_groups").innerHTML = translate('age_groups
 document.getElementById("break").innerHTML = translate('break_time');
 document.getElementById("age_groups_match_tables").innerHTML = '#' + translate('match_tables');
 
-document.getElementById("label_mat_display").innerHTML = translate('show_matches_on');
+document.getElementById("label_show_matches").innerHTML = translate('show_matches');
+document.getElementById("label_on_mat").innerHTML       = translate('on_mat');
 
 document.getElementById("select_age_groups").innerHTML = translate('select_age_groups');
 
