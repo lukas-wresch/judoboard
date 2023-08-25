@@ -16,12 +16,14 @@ function GetMatchTableList()
     console.log(response);
 
 
-    var body = document.getElementById('matchtables');
+    let body = document.getElementById('matchtables');
     /*var table = document.createElement('table_0');
     table.style.width = '50%';
     table.setAttribute('border', '1');*/
 
     document.getElementById('matchtables').innerHTML = response;
+
+    TimerID = setTimeout(GetMatchTableList, 25000);
   });
 }
 
