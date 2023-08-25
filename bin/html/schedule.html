@@ -502,29 +502,29 @@ function Update_AgeGroups()
 {
   AjaxCallback("ajax/age_groups/list", function(response) {
     //console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
-    var table = document.getElementById("age_groups");
+    let table = document.getElementById("age_groups");
 
     while (table.rows.length > 1)
-      table.deleteRow(table.rows.length-1);
+      table.deleteRow(-1);
       
     if (res === null)
       return;
 
-    var no = 0;
+    let no = 0;
     for (const age of res)
     {
       if (!age.is_used)
         continue;
 
-      var row = table.insertRow(-1);
-      var cell0 = row.insertCell(0);
-      var cell1 = row.insertCell(1);
-      var cell2 = row.insertCell(2);
-      var cell3 = row.insertCell(3);
-      var cell4 = row.insertCell(4);
-      var cell5 = row.insertCell(5);
+      let row = table.insertRow(-1);
+      let cell0 = row.insertCell(0);
+      let cell1 = row.insertCell(1);
+      let cell2 = row.insertCell(2);
+      let cell3 = row.insertCell(3);
+      let cell4 = row.insertCell(4);
+      let cell5 = row.insertCell(5);
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
@@ -653,7 +653,7 @@ function Update_Hansokumake()
 {
   AjaxCallback("ajax/hansokumake/get", function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
     if (res.length < 1)
     {
@@ -663,22 +663,22 @@ function Update_Hansokumake()
        return;
     }
 
-    var table = document.getElementById("hansokumake");
+    let table = document.getElementById("hansokumake");
 
     while (table.rows.length > 1)
-      table.deleteRow(table.rows.length-1);
+      table.deleteRow(-1);
 
-    var no = 0;
+    let no = 0;
     for (const hansoku of res)
     {
-      var row = table.insertRow(-1);
-      var cell0 = row.insertCell(0);
-      var cell1 = row.insertCell(1);
-      var cell2 = row.insertCell(2);
-      var cell3 = row.insertCell(3);
-      var cell4 = row.insertCell(4);
-      var cell5 = row.insertCell(5);
-      var cell6 = row.insertCell(6);
+      let row = table.insertRow(-1);
+      let cell0 = row.insertCell(0);
+      let cell1 = row.insertCell(1);
+      let cell2 = row.insertCell(2);
+      let cell3 = row.insertCell(3);
+      let cell4 = row.insertCell(4);
+      let cell5 = row.insertCell(5);
+      let cell6 = row.insertCell(6);
 
       no++;
       if (no%2 == 0)

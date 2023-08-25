@@ -2175,17 +2175,39 @@ size_t Tournament::GetLotOfAssociation(const UUID& UUID) const
 
 
 
-const std::string Tournament::Schedule2String() const
+const std::string Tournament::Schedule2String(bool ImportantOnly) const
 {
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
 
 	LockRead();
 	auto schedule = GetSchedule();
+	Match* prev = nullptr;
+	int serialized_matches = 0;
+
 	for (auto match : schedule)
 	{
 		if (match)
-			match->ToString(ret);
+		{
+			if (!ImportantOnly)//Default, serialize all matches
+				match->ToString(ret);
+			else//Serialize only the "important" matches
+			{
+				if ((serialized_matches == 0) && (match->IsRunning() || match->IsScheduled()))
+				{
+					prev->ToString(ret);
+					serialized_matches = 1;
+				}
+
+				if (serialized_matches >= 1 && serialized_matches <= 7)
+				{
+					match->ToString(ret);
+					serialized_matches++;
+				}
+			}
+
+			prev = match;
+		}
 	}
 	UnlockRead();
 
