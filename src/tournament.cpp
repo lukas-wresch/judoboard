@@ -2195,7 +2195,8 @@ const std::string Tournament::Schedule2String(bool ImportantOnly) const
 			{
 				if ((serialized_matches == 0) && (match->IsRunning() || match->IsScheduled()))
 				{
-					prev->ToString(ret);
+					if (prev)
+						prev->ToString(ret);
 					serialized_matches = 1;
 				}
 
