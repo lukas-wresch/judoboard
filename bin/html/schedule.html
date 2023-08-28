@@ -35,9 +35,9 @@
 
 <label style="float:left;margin-top:0px;margin-right:10px;" id="label_show_matches">Show matches</label>
   <select style="margin-bottom:20px; width: 100px;" id="filter_mat" onchange='Update_Schedule();'>
-  <option value="1">All</option>
-  <option value="2">Important</option>
-  <option value="0">None</option>
+  <option value="1" id="label-all">All</option>
+  <option value="2" id="label-important">Important</option>
+  <option value="0" id="label-none">None</option>
   </select>
 
 <label style="width:250px;margin-top:0px;margin-left:10px;margin-right:10px;" id="label_on_mat">on mat</label>
@@ -821,3 +821,7 @@ document.getElementById("participants_search_label").innerHTML = translate('sear
 
 document.getElementById("master-schedule-show").innerHTML = translate('show');
 document.getElementById("master-schedule-hide").innerHTML = translate('hide');
+
+document.getElementById("label-all").innerHTML = translate('all');
+document.getElementById("label-important").innerHTML = translate('important');
+document.getElementById("label-none").innerHTML = translate('none');
