@@ -257,7 +257,7 @@ bool Core::Indexer(std::function<bool(const std::string&)> onFile, const std::st
 				std::string Filename;
 
 				if (FolderName[0] != '.')
-					Filename = FolderName + "/" + Find.cFileName;
+					Filename = FolderName + ZED::Core::Separator + Find.cFileName;
 				else
 					Filename = Find.cFileName;
 
@@ -269,7 +269,7 @@ bool Core::Indexer(std::function<bool(const std::string&)> onFile, const std::st
 			}
 
 			else if (Find.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY && Recru)
-				Indexer(onFile, FolderName + "/" + Find.cFileName);
+				Indexer(onFile, FolderName + ZED::Core::Separator + Find.cFileName);
 		}
 	}
 
@@ -292,7 +292,7 @@ bool Core::Indexer(std::function<bool(const std::string&)> onFile, const std::st
 			std::string Filename;
 
 			if (FolderName[0] != '.')
-				Filename = FolderName + "/" + dirp->d_name;
+				Filename = FolderName + ZED::Core::Separator + dirp->d_name;
 			else
 				Filename = dirp->d_name;
 
@@ -304,7 +304,7 @@ bool Core::Indexer(std::function<bool(const std::string&)> onFile, const std::st
 		}
 
 		else if (dirp->d_type == DT_DIR && Recru)
-			Indexer(onFile, FolderName + "/" + dirp->d_name);
+			Indexer(onFile, FolderName + ZED::Core::Separator + dirp->d_name);
 	}
 
 	closedir(dp);

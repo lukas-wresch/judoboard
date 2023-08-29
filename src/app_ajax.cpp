@@ -361,12 +361,14 @@ void Application::SetupHttpServer()
 
 
 	m_Server.RegisterResource("/ajax/get_schedule", [this](auto& Request) -> std::string {
-		auto guard = LockReadForScope();
+		bool important_only = HttpServer::DecodeURLEncoded(Request.m_Query, "filter") == "2";
 
+		auto guard = LockReadForScope();
+		
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		return GetTournament()->Schedule2String();
+		return GetTournament()->Schedule2String(important_only);
 	});
 
 
