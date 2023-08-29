@@ -157,5 +157,8 @@ HttpClient::Packet HttpClient::RecvResponse()
 		}
 	}
 
+	if (header_length == -1)
+		return Packet("", "");
+
 	return Packet(std::string(response.c_str(), header_length), std::string(response.c_str() + header_length, content_length));
 }

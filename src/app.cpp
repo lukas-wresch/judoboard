@@ -677,9 +677,15 @@ void Application::Run()
 			if (*it && !(*it)->IsConnected())
 			{
 				LockWrite();
-				delete *it;
+				auto mat_to_be_deleted = *it;
 				it = m_Mats.erase(it);
 				UnlockWrite();
+
+				ZED::Core::Pause(10 * 1000);
+				runtime += 10;
+
+				delete mat_to_be_deleted;
+				break;
 			}
 			else
 				++it;
