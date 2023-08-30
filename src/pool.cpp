@@ -369,10 +369,8 @@ const std::string Pool::ToHTML() const
 
 	ret += m_Finals.ToHTML();
 
-	//ret += ResultsToHTML();
-
 	if (!IsSubMatchTable())
-		ret += "</div>";
+		ret += ResultsToHTML() + "</div>";
 
 	return ret;
 }

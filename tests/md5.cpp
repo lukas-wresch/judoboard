@@ -2741,7 +2741,7 @@ TEST(MD5, ReadPool4)
 {
 	initialize();
 
-	MD5 file("test-data/BEM_U13_2023.md7");
+	MD5 file("test-data/BEM_U13_2023_with_matches.md7");
 
 	ASSERT_TRUE(file);
 
