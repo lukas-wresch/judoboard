@@ -2737,6 +2737,36 @@ TEST(MD5, ReadPool3)
 
 
 
+TEST(MD5, ReadPool4)
+{
+	initialize();
+
+	MD5 file("test-data/BEM_U13_2023.md7");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	ASSERT_TRUE(file.GetOrganizer());
+
+	Tournament tourney(file);
+
+	//EXPECT_EQ(tourney.GetSchedule().size(), file.GetMatches().size());
+
+	//Compare results of pools
+
+	auto table = tourney.FindMatchTableByDescription(u8"weibliche Jugend U13 -44 kg");
+	EXPECT_EQ(table->GetType(), MatchTable::Type::Pool);
+
+	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -34 kg");
+	EXPECT_EQ(table->GetType(), MatchTable::Type::Pool);
+
+	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -37 kg");
+	EXPECT_EQ(table->GetType(), MatchTable::Type::Pool);
+}
+
+
+
 TEST(MD5, ExportPool)
 {
 	initialize();
