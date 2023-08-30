@@ -497,7 +497,8 @@ const std::string SingleElimination::ToHTML() const
 
 		matchIndex += matchOfRound;
 
-		if (IsThirdPlaceMatch() && matchIndex >= GetSchedule().size() - 2)
+		auto schedule = MatchTable::GetSchedule();//Schedule without 3rd and 5th place matches
+		/*if (IsThirdPlaceMatch() && matchIndex >= GetSchedule().size() - 2)
 			matchIndex++;
 		if (IsFifthPlaceMatch() && matchIndex >= GetSchedule().size() - 5)
 		{
@@ -505,7 +506,7 @@ const std::string SingleElimination::ToHTML() const
 				matchIndex += 3;
 			else
 				matchIndex++;//There is only a single match for 5th place
-		}
+		}*/
 
 		if (IsBestOfThree())
 			matchIndex = matchIndex * 3;
@@ -517,8 +518,8 @@ const std::string SingleElimination::ToHTML() const
 		if (matchOfRound % 2 == 0)
 			style += "border-right-style: hidden;";
 
-		if (matchIndex < GetSchedule().size())
-			return RenderMatch(*GetSchedule()[matchIndex], style);
+		if (matchIndex < schedule.size())
+			return RenderMatch(*schedule[matchIndex], style);
 		return "";
 	};
 
@@ -559,6 +560,7 @@ const std::string SingleElimination::ToHTML() const
 	ret += "</table>";
 
 
+	//Render 3rd place match
 	if (IsThirdPlaceMatch() && m_ThirdPlaceMatches.size() >= 1)
 	{
 		ret += "<table width=\"" + std::to_string(width) + "%\" border='1' rules='all' style=\"margin-bottom: 5mm;\">";
@@ -575,6 +577,7 @@ const std::string SingleElimination::ToHTML() const
 	}
 
 
+	//Render 5th place matches
 	else if (IsFifthPlaceMatch() && m_FifthPlaceMatches.size() >= 3)
 	{
 		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";
@@ -602,6 +605,7 @@ const std::string SingleElimination::ToHTML() const
 	}
 
 
+	//Render 5th place match
 	if (IsFifthPlaceMatch() && m_FifthPlaceMatches.size() >= 1)
 	{
 		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";

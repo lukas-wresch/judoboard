@@ -5,6 +5,7 @@
 #include "weightclass.h"
 #include "single_elimination.h"
 #include "double_elimination.h"
+#include "pool.h"
 #include "age_group.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/file.h"
@@ -238,8 +239,19 @@ MD5::MD5(const Tournament& Tournament)
 			new_weightclass->MatchForThirdPlace = double_elimination->IsThirdPlaceMatch();
 			new_weightclass->MatchForFifthPlace = double_elimination->IsFifthPlaceMatch();
 		}
+		else if (match_table->GetType() == MatchTable::Type::Pool)
+		{
+			const auto pool = (Judoboard::Pool*)match_table;
+
+			new_weightclass->FightSystemID = 24;
+			new_weightclass->MatchForThirdPlace = pool->IsThirdPlaceMatch();
+			new_weightclass->MatchForFifthPlace = pool->IsFifthPlaceMatch();
+		}
 		else
+		{
+			ZED::Log::Error("Can not export match table!");
 			continue;
+		}
 
 		new_weightclass->ID   = id++;
 		new_weightclass->Date = m_DateStart;

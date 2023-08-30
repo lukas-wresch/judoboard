@@ -2737,6 +2737,203 @@ TEST(MD5, ReadPool3)
 
 
 
+TEST(MD5, ReadPool4)
+{
+	initialize();
+
+	MD5 file("test-data/BEM_U13_2023_with_matches.md7");
+
+	ASSERT_TRUE(file);
+
+	file.Dump();
+
+	ASSERT_TRUE(file.GetOrganizer());
+
+	Tournament tourney(file);
+
+	//EXPECT_EQ(tourney.GetSchedule().size(), file.GetMatches().size());
+
+	//Compare results of pools
+
+	auto table = tourney.FindMatchTableByDescription(u8"weibliche Jugend U13 -44 kg");
+	EXPECT_EQ(table->GetType(), MatchTable::Type::Pool);
+
+	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -34 kg");
+	EXPECT_EQ(table->GetType(), MatchTable::Type::Pool);
+
+	table = tourney.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -37 kg");
+	EXPECT_EQ(table->GetType(), MatchTable::Type::Pool);
+}
+
+
+
+TEST(MD5, ExportPool)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
+	t->EnableAutoSave(false);
+
+
+	Judoka* j[6+7+8+1];
+
+	for (int i = 1; i <= 6+7+8; ++i)
+	{
+		if (i <= 6)
+			j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		else if (i <= 6+7)
+			j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 100 + i);
+		else
+			j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 150 + i);
+
+		j[i]->SetBirthyear(2000);
+		t->AddParticipant(j[i]);
+	}
+
+	Pool* group1 = new Pool(50, 90);
+	Pool* group2 = new Pool(100, 140);
+	Pool* group3 = new Pool(150, 190);
+
+	group1->SetMatID(1);
+	group1->IsThirdPlaceMatch(true);
+	group1->IsFifthPlaceMatch(true);
+	t->AddMatchTable(group1);
+
+	group2->SetMatID(1);
+	group2->IsThirdPlaceMatch(true);
+	group2->IsFifthPlaceMatch(true);
+	t->AddMatchTable(group2);
+
+	group3->SetMatID(1);
+	group3->IsThirdPlaceMatch(true);
+	group3->IsFifthPlaceMatch(true);
+	t->AddMatchTable(group3);
+
+	for (int i = 1; i <= 6; ++i)
+		group1->SetStartPosition(j[i], i-1);
+	for (int i = 1; i <= 7; ++i)
+		group2->SetStartPosition(j[6+i], i-1);
+	for (int i = 1; i <= 8; ++i)
+		group3->SetStartPosition(j[6+7+i], i-1);
+
+	t->GenerateSchedule();
+
+	ASSERT_EQ(group1->GetParticipants().size(), 6);
+	ASSERT_EQ(group2->GetParticipants().size(), 7);
+	ASSERT_EQ(group3->GetParticipants().size(), 8);
+
+	Mat m(1);
+
+	for (auto match : t->GetSchedule())
+	{
+		if (!match->HasValidFighters())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+
+	auto results = group1->CalculateResults();
+	ASSERT_EQ(results.GetSize(), 6);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[6]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[5]->GetUUID());
+	EXPECT_EQ(results[2].Judoka->GetUUID(), j[4]->GetUUID());
+	EXPECT_EQ(results[3].Judoka->GetUUID(), j[3]->GetUUID());
+	EXPECT_EQ(results[4].Judoka->GetUUID(), j[2]->GetUUID());
+	EXPECT_EQ(results[5].Judoka->GetUUID(), j[1]->GetUUID());
+
+
+	results = group2->CalculateResults();
+	ASSERT_EQ(results.GetSize(), 6);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[6+7]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[6+6]->GetUUID());
+	EXPECT_EQ(results[2].Judoka->GetUUID(), j[6+5]->GetUUID());
+	EXPECT_EQ(results[3].Judoka->GetUUID(), j[6+4]->GetUUID());
+	EXPECT_EQ(results[4].Judoka->GetUUID(), j[6+3]->GetUUID());
+	EXPECT_EQ(results[5].Judoka->GetUUID(), j[6+2]->GetUUID());
+
+
+	results = group3->CalculateResults();
+	ASSERT_EQ(results.GetSize(), 6);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[6+7+8]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[6+7+7]->GetUUID());
+	EXPECT_EQ(results[2].Judoka->GetUUID(), j[6+7+6]->GetUUID());
+	EXPECT_EQ(results[3].Judoka->GetUUID(), j[6+7+5]->GetUUID());
+	EXPECT_EQ(results[4].Judoka->GetUUID(), j[6+7+4]->GetUUID());
+	EXPECT_EQ(results[5].Judoka->GetUUID(), j[6+7+3]->GetUUID());
+
+
+	MD5 file(*t);
+
+	ASSERT_EQ(file.GetWeightclasses().size(), 3);
+
+	{
+		auto& table = file.GetWeightclasses()[0];
+		const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+		ASSERT_EQ(results2.size(), 6);
+		EXPECT_EQ(results2[0]->RankNo, 1);
+		EXPECT_EQ(results2[0]->Participant->Firstname, j[6]->GetFirstname());
+		EXPECT_EQ(results2[1]->RankNo, 2);
+		EXPECT_EQ(results2[1]->Participant->Firstname, j[5]->GetFirstname());
+		EXPECT_EQ(results2[2]->RankNo, 3);
+		EXPECT_EQ(results2[2]->Participant->Firstname, j[4]->GetFirstname());
+		EXPECT_EQ(results2[3]->RankNo, 4);
+		EXPECT_EQ(results2[3]->Participant->Firstname, j[3]->GetFirstname());
+		EXPECT_EQ(results2[4]->RankNo, 5);
+		EXPECT_EQ(results2[4]->Participant->Firstname, j[2]->GetFirstname());
+		EXPECT_EQ(results2[5]->RankNo, 6);
+		EXPECT_EQ(results2[5]->Participant->Firstname, j[1]->GetFirstname());
+	}
+
+	{
+		auto& table = file.GetWeightclasses()[1];
+		const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+		ASSERT_EQ(results2.size(), 6);
+		EXPECT_EQ(results2[0]->RankNo, 1);
+		EXPECT_EQ(results2[0]->Participant->Firstname, j[6+7]->GetFirstname());
+		EXPECT_EQ(results2[1]->RankNo, 2);
+		EXPECT_EQ(results2[1]->Participant->Firstname, j[6+6]->GetFirstname());
+		EXPECT_EQ(results2[2]->RankNo, 3);
+		EXPECT_EQ(results2[2]->Participant->Firstname, j[6+5]->GetFirstname());
+		EXPECT_EQ(results2[3]->RankNo, 4);
+		EXPECT_EQ(results2[3]->Participant->Firstname, j[6+4]->GetFirstname());
+		EXPECT_EQ(results2[4]->RankNo, 5);
+		EXPECT_EQ(results2[4]->Participant->Firstname, j[6+3]->GetFirstname());
+		EXPECT_EQ(results2[5]->RankNo, 6);
+		EXPECT_EQ(results2[5]->Participant->Firstname, j[6+2]->GetFirstname());
+	}
+
+	{
+		auto& table = file.GetWeightclasses()[2];
+		const auto& results2 = file.FindResults(table->AgeGroupID, table->ID);
+		ASSERT_EQ(results2.size(), 6);
+		EXPECT_EQ(results2[0]->RankNo, 1);
+		EXPECT_EQ(results2[0]->Participant->Firstname, j[6+7+8]->GetFirstname());
+		EXPECT_EQ(results2[1]->RankNo, 2);
+		EXPECT_EQ(results2[1]->Participant->Firstname, j[6+7+7]->GetFirstname());
+		EXPECT_EQ(results2[2]->RankNo, 3);
+		EXPECT_EQ(results2[2]->Participant->Firstname, j[6+7+6]->GetFirstname());
+		EXPECT_EQ(results2[3]->RankNo, 4);
+		EXPECT_EQ(results2[3]->Participant->Firstname, j[6+7+5]->GetFirstname());
+		EXPECT_EQ(results2[4]->RankNo, 5);
+		EXPECT_EQ(results2[4]->Participant->Firstname, j[6+7+4]->GetFirstname());
+		EXPECT_EQ(results2[5]->RankNo, 6);
+		EXPECT_EQ(results2[5]->Participant->Firstname, j[6+7+3]->GetFirstname());
+	}
+	
+	file.Save("output.md5");
+
+	delete t;
+}
+
+
+
 TEST(MD5, ReadDoubleElimination)
 {
 	initialize();
