@@ -2893,6 +2893,8 @@ Error Application::Ajax_OpenMat(const HttpServer::Request& Request)
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	auto guard = LockWriteForScope();
+
 	/*if (id == 0)//Create virtual mat
 	{
 		id = 1;
