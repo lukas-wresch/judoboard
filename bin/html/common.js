@@ -446,7 +446,16 @@ var StreamUpdate = 0;
 
 function Stream()
 {
-  document.getElementById("img").src = "ajax/mat/screenshot?id=1&up=" + StreamUpdate;
+  let index = StreamUpdate % (g_MatList.highest_mat_id-1);
+  let id = g_MatList.mats[index].id
+
+  if (g_MatList.mats[index].type == 3)
+  {
+    host  = g_MatList.mats[index].host;
+    token = g_MatList.mats[index].token;
+  }
+
+  document.getElementById("img").src = "ajax/mat/screenshot?id=" + id + "&update=" + StreamUpdate;
   StreamUpdate++;
 }
 
