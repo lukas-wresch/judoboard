@@ -31,9 +31,12 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	m_SecurityToken   = token.substr(0, 32);
 
 	if (!m_Server.IsRunning())
+	{
 		ZED::Log::Error("Could not start http server!");
-
-	SetupHttpServer();
+		Shutdown();
+	}
+	else
+		SetupHttpServer();
 }
 
 

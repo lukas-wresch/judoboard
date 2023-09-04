@@ -447,15 +447,17 @@ var StreamUpdate = 0;
 function Stream()
 {
   let index = StreamUpdate % (g_MatList.highest_mat_id-1);
-  let id = g_MatList.mats[index].id
+  let id = g_MatList.mats[index].id;
+  let host  = '';
+  let token = '';
 
   if (g_MatList.mats[index].type == 3)
   {
-    host  = g_MatList.mats[index].host;
+    host  = 'http://' + g_MatList.mats[index].hostname + ':' + g_MatList.mats[index].port;
     token = g_MatList.mats[index].token;
   }
 
-  document.getElementById("img").src = "ajax/mat/screenshot?id=" + id + "&update=" + StreamUpdate;
+  document.getElementById("img" + id).src = host + "/ajax/mat/screenshot?id=" + id + '&token=' + token + "&update=" + StreamUpdate;
   StreamUpdate++;
 }
 
