@@ -95,7 +95,7 @@ std::string Localizer::Gender2ShortForm(Gender Gender)
 	case Language::German:
 	{
 		if (Gender == Gender::Male)
-			return  "m";
+			return "m";
 		else if (Gender == Gender::Female)
 			return "w";
 		return "";
@@ -104,7 +104,7 @@ std::string Localizer::Gender2ShortForm(Gender Gender)
 	case Language::English:
 	default:
 		if (Gender == Gender::Male)
-			return  "m";
+			return "m";
 		else if (Gender == Gender::Female)
 			return "f";
 		return "";
