@@ -1031,52 +1031,65 @@ function UpdateTimer()
 }
 
 
-var id   = URLDecode(URL, "id");
-let index = (id-1) % (g_MatList.highest_mat_id-1);
+var id = URLDecode(URL, "id");
 var host  = '';
 var token = '';
 
-if (g_MatList.mats[index].type == 3)
+
+function Mat_Init()
 {
-  host  = 'http://' + g_MatList.mats[index].hostname + ':' + g_MatList.mats[index].port;
-  token = g_MatList.mats[index].token;
-}
+  if (typeof g_MatList == 'undefined')
+  {
+    setTimeout(Mat_Init, 100);
+    return;
+  }
 
-GetScore();
-GetJudokaName();
-TimerID = window.setInterval(UpdateTimer, 100);
+  let index = (id-1) % (g_MatList.highest_mat_id-1);
+
+  if (g_MatList.mats[index].type == 3)
+  {
+    host  = 'http://' + g_MatList.mats[index].hostname + ':' + g_MatList.mats[index].port;
+    token = g_MatList.mats[index].token;
+  }
+
+  GetScore();
+  GetJudokaName();
+  TimerID = window.setInterval(UpdateTimer, 100);
 
 
-document.getElementById("time").innerHTML = translate('time');
-document.getElementById("mat").innerHTML  = translate('mat') + ' ' + id;
+  document.getElementById("time").innerHTML = translate('time');
+  document.getElementById("mat").innerHTML  = translate('mat') + ' ' + id;
 
-document.getElementById("end_match").innerHTML  = translate('end_match');
+  document.getElementById("end_match").innerHTML  = translate('end_match');
 
-//document.getElementById("label_break").innerHTML = translate('break_time');
+  //document.getElementById("label_break").innerHTML = translate('break_time');
 
-document.getElementById("more").innerHTML = translate('more');
+  document.getElementById("more").innerHTML = translate('more');
 
-document.getElementById("next_matches").innerHTML  = translate('next_matches');
+  document.getElementById("next_matches").innerHTML  = translate('next_matches');
 
-document.getElementById("osaekomi_time").innerHTML = translate('time');
-document.getElementById("osaekomi_for").innerHTML  = translate('for');
+  document.getElementById("osaekomi_time").innerHTML = translate('time');
+  document.getElementById("osaekomi_for").innerHTML  = translate('for');
 
-document.getElementById("label_hansokumake_desc_white").innerHTML = translate('white');
-document.getElementById("label_hansokumake_desc_blue" ).innerHTML = translate('blue');
+  document.getElementById("label_hansokumake_desc_white").innerHTML = translate('white');
+  document.getElementById("label_hansokumake_desc_blue" ).innerHTML = translate('blue');
 
-for (const el of document.getElementsByClassName("matchtable_label"))
+  for (const el of document.getElementsByClassName("matchtable_label"))
     el.innerHTML = translate('match_table');
-for (const el of document.getElementsByClassName("medical_examiniations"))
+  for (const el of document.getElementsByClassName("medical_examiniations"))
     el.innerHTML = translate('medical_examiniations');
-for (const el of document.getElementsByClassName("add_medical_examiniations"))
+  for (const el of document.getElementsByClassName("add_medical_examiniations"))
     el.innerHTML = "+" + translate('medical_examiniations');
-for (const el of document.getElementsByClassName("remove_medical_examiniations"))
+  for (const el of document.getElementsByClassName("remove_medical_examiniations"))
     el.innerHTML = "-" + translate('medical_examiniations');
 
-document.getElementById("white_wins").innerHTML = translate('white_wins');
-document.getElementById("blue_wins").innerHTML  = translate('blue_wins');
-document.getElementById("draw").innerHTML  = translate('draw');
-document.getElementById("revoke_hantei").innerHTML  = translate('revoke_hantei');
-document.getElementById("revoke_goldenscore").innerHTML = translate('revoke_goldenscore');
+  document.getElementById("white_wins").innerHTML = translate('white_wins');
+  document.getElementById("blue_wins").innerHTML  = translate('blue_wins');
+  document.getElementById("draw").innerHTML  = translate('draw');
+  document.getElementById("revoke_hantei").innerHTML  = translate('revoke_hantei');
+  document.getElementById("revoke_goldenscore").innerHTML = translate('revoke_goldenscore');
+}
+
+Mat_Init();
 
 </script>

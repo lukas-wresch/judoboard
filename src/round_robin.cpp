@@ -248,7 +248,7 @@ const std::string RoundRobin::ToHTML() const
 				for (auto match : matches)
 				{
 					if (match->IsRunning())
-						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">In Progress</a><br/>";
+						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">" + Localizer::Translate("Running") + "</a><br/>";
 					else if (!match->HasConcluded())
 						ret += "<a href=\"#edit_match.html?id=" + (std::string)match->GetUUID() + "\">- - -</a><br/>";
 					else if (match->GetWinner()->GetUUID() == fighter->GetUUID())
