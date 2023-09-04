@@ -2827,6 +2827,8 @@ std::string Application::Ajax_GetMats() const
 {
 	YAML::Emitter ret;
 
+	auto guard = LockReadForScope();
+
 	if (GetTournament())
 	{//Show all mats that are available/used and an additional one
 		auto max = std::max(GetHighestMatID(), GetTournament()->GetHighestMatIDUsed()) + 1;
