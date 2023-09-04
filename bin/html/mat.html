@@ -1032,13 +1032,15 @@ function UpdateTimer()
 
 
 var id   = URLDecode(URL, "id");
-let temp = URLDecode(URL, "host");
-var host = '';
-if (temp != false)
-  host = 'http://' + temp;
-var token = URLDecode(URL, "token");
-if (token == false)
-  token = '';
+let index = (id-1) % (g_MatList.highest_mat_id-1);
+var host  = '';
+var token = '';
+
+if (g_MatList.mats[index].type == 3)
+{
+  host  = 'http://' + g_MatList.mats[index].hostname + ':' + g_MatList.mats[index].port;
+  token = g_MatList.mats[index].token;
+}
 
 GetScore();
 GetJudokaName();
