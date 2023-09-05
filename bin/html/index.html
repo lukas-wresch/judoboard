@@ -17,7 +17,6 @@
   <h3 class="menu-section-title" id="navi_language"></h3>
     <img src="en.png" width="20%" onclick="localStorage.setItem('language', 0); location.reload();">
     <img src="de.png" width="20%" onclick="localStorage.setItem('language', 1); location.reload();">
-    <!--<button class="neutral" style="width: 30mm; margin-top: 1mm; margin-left: 7mm; margin-right: 0mm;" id="fullscreen" onclick="ToggleFullscreen(event)" ontouchstart="ToggleFullscreen(event)">Fullscreen</button>-->
     <h3 class="menu-section-title">Fullscreen</h3>
     <input type="checkbox" id="fullscreen" class="switch-input" onclick="ToggleFullscreen(event)" ontouchstart="ToggleFullscreen(event)">
     <label style="padding-top:0px;padding-bottom:0px;margin-top:10px;margin-bottom:0px;margin-left:2mm;" class="switch-label" for="fullscreen">
@@ -256,20 +255,6 @@ AjaxCallback("/ajax/get_status", function(response) {
 
 Update_MatCount();
 window.setInterval(Update_MatCount, 20*1000);
-
-
-
-if (document.fullscreenElement) {
-    console.log("The document is in fullscreen mode");
-    // You can update your checkbox or perform any other actions here
-    // For example, check the checkbox
-    //document.getElementById('fullscreenCheckbox').checked = true;
-  } else {
-    console.log("The document is not in fullscreen mode");
-    // You can update your checkbox or perform any other actions here
-    // For example, uncheck the checkbox
-    //document.getElementById('fullscreenCheckbox').checked = false;
-  }
 
 </script>
 
