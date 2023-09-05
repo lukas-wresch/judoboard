@@ -253,6 +253,19 @@ Update_MatCount();
 window.setInterval(Update_MatCount, 20*1000);
 
 
+
+if (document.fullscreenElement) {
+    console.log("The document is in fullscreen mode");
+    // You can update your checkbox or perform any other actions here
+    // For example, check the checkbox
+    //document.getElementById('fullscreenCheckbox').checked = true;
+  } else {
+    console.log("The document is not in fullscreen mode");
+    // You can update your checkbox or perform any other actions here
+    // For example, uncheck the checkbox
+    //document.getElementById('fullscreenCheckbox').checked = false;
+  }
+
 </script>
 
 </body>
