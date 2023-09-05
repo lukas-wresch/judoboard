@@ -57,7 +57,7 @@
 
 function AddJudoka()
 {
-  var params = URLEncode({
+  let params = URLEncode({
     firstname: document.getElementById("firstname").value,
     lastname:  document.getElementById("lastname").value,
     weight:    document.getElementById("weight").value,
@@ -84,7 +84,7 @@ function GetJudoka(id)
 {
   AjaxCallback("ajax/judoka/get?id="+id, function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
     document.getElementById("firstname").value = res.firstname;
     document.getElementById("lastname").value  = res.lastname;
@@ -93,7 +93,7 @@ function GetJudoka(id)
     document.getElementById("birthyear").value = res.birthyear;
     document.getElementById("number").value    = res.number;
 
-    var query = "";
+    let query = "";
     if (res.is_participant)
     {
       document.getElementById("delete").style.display = "none";
@@ -113,7 +113,7 @@ function GetJudoka(id)
 
 function UpdateJudoka()
 {
-  var params = URLEncode({
+  let params = URLEncode({
     firstname: document.getElementById("firstname").value,
     lastname:  document.getElementById("lastname").value,
     weight:    document.getElementById("weight").value,
