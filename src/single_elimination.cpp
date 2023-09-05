@@ -659,7 +659,7 @@ std::string SingleElimination::RenderMatch(const Match& match, std::string style
 
 	//Output result
 	if (match.IsRunning())
-		ret += "<br/>" + Localizer::Translate("In Progress");
+		ret += "<br/>" + Localizer::Translate("Running");
 	else if (match.HasConcluded() && !match.IsCompletelyEmptyMatch())
 	{
 		const auto& result = match.GetResult();
