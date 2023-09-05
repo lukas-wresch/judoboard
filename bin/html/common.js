@@ -54,6 +54,7 @@ var lang_en = {
     female:  [ "Female", "Weiblich" ],
     firstname:  [ "Given name", "Vorname" ],
     for:  [ "For", "F&uuml;r" ],
+    fullscreen:  [ "Fullscreen", "Vollbild" ],
     gachi_revoked:  [ "Gachi revoked!", "Gachi zur&uuml;ckgenommen!" ],
     gender:  [ "Gender", "Geschlecht" ],
     goldenscore_time:  [ "Golden Score Time", "Golden Score Zeit" ],
