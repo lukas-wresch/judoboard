@@ -55,6 +55,7 @@ var lang_en = {
     firstname:  [ "Given name", "Vorname" ],
     fixed_at_bottom:  [ "Fixed at bottom", "Unten fixiert" ],
     for:  [ "For", "F&uuml;r" ],
+    fullscreen:  [ "Fullscreen", "Vollbild" ],
     gachi_revoked:  [ "Gachi revoked!", "Gachi zur&uuml;ckgenommen!" ],
     gender:  [ "Gender", "Geschlecht" ],
     goldenscore_time:  [ "Golden Score Time", "Golden Score Zeit" ],

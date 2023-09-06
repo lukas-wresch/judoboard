@@ -17,6 +17,11 @@
   <h3 class="menu-section-title" id="navi_language"></h3>
     <img src="en.png" width="20%" onclick="localStorage.setItem('language', 0); location.reload();">
     <img src="de.png" width="20%" onclick="localStorage.setItem('language', 1); location.reload();">
+    <h3 class="menu-section-title" id="navi_fullscreen">Fullscreen</h3>
+    <input type="checkbox" id="fullscreen" class="switch-input" onclick="ToggleFullscreen(event)" ontouchstart="ToggleFullscreen(event)">
+    <label style="padding-top:0px;padding-bottom:0px;margin-top:10px;margin-bottom:0px;margin-left:2mm;" class="switch-label" for="fullscreen">
+    <span class="toggle-on" id="fullscreen_enabled"></span><span class="toggle-off" id="fullscreen_disabled"></span>
+    </label>
   </section>
 
   <section class="menu-section">
@@ -114,11 +119,23 @@ document.querySelector('.js-slideout-toggle').addEventListener('click', function
 
 
 
+function ToggleFullscreen(event)
+{
+  //event.preventDefault();
+
+  if (!document.fullscreenElement)
+    document.querySelector("body").requestFullscreen();
+  else
+    document.exitFullscreen();
+}
+
+
+
 function ShowMats()
 {
   $("#streaming").fadeToggle(1000);
   Streaming = !Streaming;
-
+  
   if (Streaming)
   {
     StreamTimer = window.setInterval(Stream, 800);
@@ -183,17 +200,17 @@ if (typeof storage_language != 'object')
     language = storage_language;
 
 AjaxCallback("ajax/config/get_setup", function(response) {
-  var res = YAML.parse(response);
+  const res = YAML.parse(response);
   console.log(response);
 
   const storage_language = localStorage.getItem("language");
-  console.log(typeof storage_language);
   if (typeof storage_language != 'object')
     language = storage_language;
   else
     language = res.language;
 
   document.getElementById("navi_language").innerHTML = translate('language');
+  document.getElementById("navi_fullscreen").innerHTML = translate('fullscreen');
   document.getElementById("navi_tournament").innerHTML = translate('tournament');
 
   document.getElementById("navi_schedule").innerHTML = translate('schedule');
@@ -247,7 +264,6 @@ AjaxCallback("/ajax/get_status", function(response) {
 
 Update_MatCount();
 window.setInterval(Update_MatCount, 20*1000);
-
 
 </script>
 
