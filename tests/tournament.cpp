@@ -1119,6 +1119,9 @@ TEST(Tournament, SaveAndLoad)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
+		tourney->MarkedAsWeighted(*j1);
+		tourney->MarkedAsWeighted(*j2);
+
 		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
 		tourney->AddMatchTable(new RoundRobin(Weight(60), Weight(65)));
 		tourney->AddMatchTable(new Pool(Weight(50), Weight(65)));
@@ -1145,7 +1148,12 @@ TEST(Tournament, SaveAndLoad)
 		EXPECT_EQ(t.GetName(), "deleteMe");
 		EXPECT_EQ(t.GetParticipants().size(), 4);
 		EXPECT_EQ(t.GetMatchTables().size(), tourney->GetMatchTables().size());
-		EXPECT_EQ(t.GetSchedule().size(), tourney->GetSchedule().size());
+		EXPECT_EQ(t.GetSchedule().size(),    tourney->GetSchedule().size());
+
+		EXPECT_TRUE( t.IsMarkedAsWeighted(*j1));
+		EXPECT_TRUE( t.IsMarkedAsWeighted(*j2));
+		EXPECT_FALSE(t.IsMarkedAsWeighted(*j3));
+		EXPECT_FALSE(t.IsMarkedAsWeighted(*j4));
 
 		EXPECT_TRUE( t.IsDisqualified(*j1));
 		EXPECT_FALSE(t.IsDisqualified(*j2));

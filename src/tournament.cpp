@@ -415,10 +415,16 @@ void Tournament::Reset()
 
 	m_Schedule.clear();
 
+	m_Organizer = nullptr;
+
 	//Don't delete since this could be shared memory
 	//m_pDefaultRules = nullptr;
 
-	m_Organizer = nullptr;
+	m_DisqualifiedJudoka.clear();
+
+	m_JudokaToAgeGroup.clear();
+	m_JudokaWeighted.clear();
+	m_AssociationToLotNumber.clear();
 
 	assert(m_StandingData.GetNumJudoka() == 0);
 }
@@ -481,6 +487,12 @@ bool Tournament::Load(const YAML::Node& yaml)
 	{
 		for (const auto& node : yaml["disqualified_judoka"])
 			m_DisqualifiedJudoka.insert(node.as<std::string>());
+	}
+
+	if (yaml["weighted_judoka"] && yaml["weighted_judoka"].IsSequence())
+	{
+		for (const auto& node : yaml["weighted_judoka"])
+			m_JudokaWeighted.insert(node.as<std::string>());
 	}
 
 	if (yaml["default_rule_set"])
@@ -645,6 +657,15 @@ bool Tournament::SaveYAML(const std::string& Filename)
 	yaml << YAML::BeginSeq;
 
 	for (const auto& judoka_uuid : m_DisqualifiedJudoka)
+		yaml << (std::string)judoka_uuid;
+
+	yaml << YAML::EndSeq;
+
+	yaml << YAML::Key << "weighted_judoka";
+	yaml << YAML::Value;
+	yaml << YAML::BeginSeq;
+
+	for (const auto& judoka_uuid : m_JudokaWeighted)
 		yaml << (std::string)judoka_uuid;
 
 	yaml << YAML::EndSeq;
@@ -1233,10 +1254,33 @@ bool Tournament::RemoveParticipant(const UUID& UUID)
 	}
 
 	m_JudokaToAgeGroup.erase(deleted_judoka->GetUUID());
+	m_JudokaWeighted.erase(deleted_judoka->GetUUID());
 
 	GenerateSchedule();//Recalculate schedule
 
 	return true;
+}
+
+
+
+bool Tournament::MarkedAsWeighted(const Judoka& Judoka)
+{
+	if (!FindParticipant(Judoka))
+		return false;
+
+	m_JudokaWeighted.insert(Judoka);
+	return true;
+}
+
+
+
+bool Tournament::IsMarkedAsWeighted(const Judoka& Judoka) const
+{
+#ifdef _DEBUG
+	if (!FindParticipant(Judoka))
+		assert(m_JudokaWeighted.find(Judoka) == m_JudokaWeighted.cend());
+#endif
+	return m_JudokaWeighted.find(Judoka) != m_JudokaWeighted.cend();
 }
 
 

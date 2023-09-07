@@ -1168,7 +1168,13 @@ TEST(Ajax, Judoka_Edit_Participant)
 		j2->SetClub(c1);
 		t->AddParticipant(j2);
 
+		EXPECT_FALSE(t->IsMarkedAsWeighted(*j1));
+		EXPECT_FALSE(t->IsMarkedAsWeighted(*j2));
+
 		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID(), "firstname=first2&lastname=last2&weight=12,5&gender=1&birthyear=2001&number=A1234&club=" + (std::string)c1->GetUUID())));
+
+		EXPECT_TRUE(t->IsMarkedAsWeighted(*j1));
+		EXPECT_FALSE(t->IsMarkedAsWeighted(*j2));
 
 		EXPECT_EQ(j1->GetFirstname(), "first2");
 		EXPECT_EQ(j1->GetLastname(),  "last2");
