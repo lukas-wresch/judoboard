@@ -43,7 +43,7 @@ void Application::SetupHttpServer()
 	m_Server.RegisterResource("/de.png", [](auto& Request) { return HttpServer::LoadFile("html/de.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
 
 
-	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit", "lots",
+	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "participant_weight", "judoka_add", "judoka_list", "judoka_edit", "lots",
 		"club_list", "club_add", "association_list", "association_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
 		"matchtable_list", "matchtable_add", "matchtable_creator", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add",
 		"server_config"
