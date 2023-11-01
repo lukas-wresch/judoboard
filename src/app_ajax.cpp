@@ -1412,6 +1412,15 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/participant/weight/update", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::User);
+		if (!error)
+			return error;
+
+		return Ajax_UpdateParticipantWeight(Request);
+	});
+
+
 	m_Server.RegisterResource("/ajax/account/add", [this](auto& Request) -> std::string {
 		const Account* account;
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator, &account);
@@ -3273,6 +3282,8 @@ std::string Application::Ajax_SearchJudoka(const HttpServer::Request& Request)
 
 		LockRead();
 		ret << YAML::Key << "is_participant" << YAML::Value << GetTournament()->IsParticipant(*judoka);
+		ret << YAML::Key << "is_weighted"    << YAML::Value << GetTournament()->IsMarkedAsWeighted(*judoka);
+
 		auto age_groups = GetTournament()->GetEligableAgeGroupsOfJudoka(judoka);
 		UnlockRead();
 
@@ -3343,6 +3354,29 @@ Error Application::Ajax_DeleteJudoka(const HttpServer::Request& Request)
 		return Error::Type::OperationFailed;
 
 	return Error();//OK
+}
+
+
+
+Error Application::Ajax_UpdateParticipantWeight(const HttpServer::Request& Request)
+{
+	UUID id       = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	Weight weight = Weight(HttpServer::DecodeURLEncoded(Request.m_Query, "weight"));
+
+	auto guard = LockWriteForScope();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	auto judoka = GetTournament()->FindParticipant(id);
+	if (!judoka)
+		return Error::Type::ItemNotFound;
+
+	judoka->SetWeight(weight);
+	GetTournament()->MarkedAsWeighted(*judoka);
+	GetTournament()->OnUpdateParticipant(*judoka);
+
+	return Error::Type::NoError;
 }
 
 

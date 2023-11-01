@@ -23,11 +23,13 @@ function WeighParticipant(id)
 {
   let weight = document.getElementById(id).value;  
     
-  AjaxCallback('ajax/participants/weight/add?id=' + id + "&weight=" + weight, function(resp) {
+  AjaxCallback('ajax/participant/weight/update?id=' + id + "&weight=" + weight, function(resp) {
     if (resp == "ok")
     {
       document.getElementById(id).value = "";
-      document.getElementById("button_" + id).disabled = true;
+      document.getElementById("button_" + id).disabled  = true;
+      document.getElementById("weight_" + id).innerHTML = weight + " kg";
+      document.getElementById("weight_" + id).parentElement.style.backgroundColor = "#0b0";
     }
   });
 
@@ -37,7 +39,7 @@ function WeighParticipant(id)
 
 function RemoveWeighParticipant(id)
 {
-  AjaxCallback('ajax/participants/weight/remove?id=' + id, Update);
+  //AjaxCallback('ajax/participant/weight/remove?id=' + id, Update);
   return false;
 }
 
@@ -65,8 +67,22 @@ function Update()
       let cell4 = row.insertCell(4);
       let cell5 = row.insertCell(5);
 
-      if (no%2 == 0)
-        row.style.backgroundColor = "#eee";
+      if (judoka.is_weighted)
+      {
+        if (no%2 == 0)
+          row.style.backgroundColor = "#0c0";
+        else
+          row.style.backgroundColor = "#0b0";        
+      }
+      else
+      {
+        if (no%2 == 0)
+          row.style.backgroundColor = "#c00";
+        else
+          row.style.backgroundColor = "#b00";
+      }
+      //if (no%2 == 0)
+        //row.style.backgroundColor = "#eee";
       no++;
 
       cell0.innerHTML = no;
@@ -83,6 +99,7 @@ function Update()
       cell2.style.fontSize  = "16pt";
 
       cell3.innerHTML = judoka.weight + " kg";
+      cell3.id = "weight_" + judoka.uuid;
       cell3.style.textAlign = "center";
       cell3.style.fontSize  = "16pt";
 
@@ -93,6 +110,8 @@ function Update()
         
       let numberInput = document.createElement("input");
       numberInput.setAttribute("type", "number");
+      //numberInput.setAttribute("inputmode", "decimal");
+      //numberInput.setAttribute("inputmode", "search");
       numberInput.style.width = "1.4cm";
       numberInput.style.fontSize = "14pt";
       numberInput.id  = judoka.uuid;
@@ -113,6 +132,10 @@ function Update()
 
     table.addEventListener('keydown', function (e) {
       if (e.target && e.target.type === "number" && e.key === "Enter")
+        WeighParticipant(e.target.id);
+    });
+    table.addEventListener('change', function (e) {
+      if (e.target && e.target.type === "number")
         WeighParticipant(e.target.id);
     });
   });
