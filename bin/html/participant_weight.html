@@ -21,20 +21,15 @@
 
 function WeighParticipant(id)
 {
-  let select = document.getElementById("select_" + id);
-  if (select !== null)
-  {
-    if (select.value == 0)
-    {
-        alert("Select age group");
-        return false;
-    }
+  let weight = document.getElementById(id).value;  
     
-    AjaxCallback('ajax/participants/weight/add?id=' + id, function() {
-    });
-  }
-  else
-    AjaxCallback('ajax/participant/add?id=' + id, Update);
+  AjaxCallback('ajax/participants/weight/add?id=' + id + "&weight=" + weight, function(resp) {
+    if (resp == "ok")
+    {
+      document.getElementById(id).value = "";
+      document.getElementById("button_" + id).disabled = true;
+    }
+  });
 
   return false;
 }
@@ -96,19 +91,30 @@ function Update()
       cell4.style.fontSize  = "16pt";
 
         
-      let select = document.createElement("input");
-      select.setAttribute("type", "number");
-      select.style.width = "1.2cm";
-      select.style.fontSize = "14pt";
-      select.id  = "select_" + judoka.uuid;
-      select.min = 1;
-      select.max = 999;
+      let numberInput = document.createElement("input");
+      numberInput.setAttribute("type", "number");
+      numberInput.style.width = "1.4cm";
+      numberInput.style.fontSize = "14pt";
+      numberInput.id  = judoka.uuid;
+      numberInput.min = 1;
+      numberInput.max = 999;
 
-      cell5.appendChild(select);
+      cell5.appendChild(numberInput);
 
-      cell5.innerHTML += "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm; margin-left: 5mm;\" onclick=\"return AddWeightParticipant('"+judoka.uuid+"')\">" + translate('update') + "</button>";
+      cell5.innerHTML += "<button disabled id=\"button_" + judoka.uuid + "\" class=\"neutral\" style=\"width: 2.8cm; height: 0.9cm; margin-left: 5mm;\" onclick=\"return WeighParticipant('"+judoka.uuid+"')\">" + translate('update') + "</button>";
       cell5.style.textAlign = "right";
     }
+
+
+    table.addEventListener('input', function (e) {
+      if (e.target && e.target.type === "number")
+        document.getElementById("button_" + e.target.id).disabled = false;
+    });
+
+    table.addEventListener('keydown', function (e) {
+      if (e.target && e.target.type === "number" && e.key === "Enter")
+        WeighParticipant(e.target.id);
+    });
   });
 }
 
