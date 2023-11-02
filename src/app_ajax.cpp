@@ -3232,6 +3232,9 @@ std::string Application::Ajax_SearchJudoka(const HttpServer::Request& Request)
 		if (judoka_age_group)
 			to_search += judoka_age_group->GetName();
 
+		to_search += std::to_string(judoka->GetBirthyear());
+
+		//Convert to lower case
 		std::transform(to_search.begin(), to_search.end(), to_search.begin(),
 			[](unsigned char c) { return std::tolower(c); });
 

@@ -243,6 +243,30 @@ function URLEncode(obj)
 
 
 
+function JudokaContainsSearchString(judoka, searchString)
+{
+  if (typeof judoka === 'undefined')
+    return false;
+
+  let haystack = judoka.firstname + judoka.lastname;
+  if (typeof judoka.club_name !== 'undefined')
+    haystack += judoka.club_name;
+  haystack += judoka.birthyear;
+  console.log(haystack);
+  haystack = haystack.toLowerCase();
+
+  const query = searchString.split(" ");
+
+  for (let i=0;i < query.length;i++)
+  {    
+    if (!haystack.includes(query[i].toLowerCase()))
+      return false;
+  }
+  return true;
+}
+
+
+
 function URLDecode(input, variable)
 {
   if (typeof input === 'undefined')
