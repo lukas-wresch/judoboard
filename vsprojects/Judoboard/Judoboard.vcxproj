@@ -300,6 +300,7 @@
     <None Include="..\..\bin\html\mat_configure.html" />
     <None Include="..\..\bin\html\mat_edit.html" />
     <None Include="..\..\bin\html\participant_add.html" />
+    <None Include="..\..\bin\html\participant_weight.html" />
     <None Include="..\..\bin\html\rule_add.html" />
     <None Include="..\..\bin\html\rule_list.html" />
     <None Include="..\..\bin\html\schedule.html" />

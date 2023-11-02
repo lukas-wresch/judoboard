@@ -147,6 +147,8 @@ namespace Judoboard
 		Error Ajax_ImportJudoka(const HttpServer::Request& Request);
 		Error Ajax_DeleteJudoka(const HttpServer::Request& Request);
 
+		Error Ajax_UpdateParticipantWeight(const HttpServer::Request& Request);
+
 		//Clubs
 		Error Ajax_AddClub(const HttpServer::Request& Request);
 		std::string Ajax_GetClub(const HttpServer::Request& Request);
