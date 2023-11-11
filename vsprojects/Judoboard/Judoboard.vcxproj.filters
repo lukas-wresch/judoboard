@@ -293,6 +293,9 @@
     <ClInclude Include="..\..\src\loser_bracket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\external\mongoose\mongoose.h">
+      <Filter>HttpServer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\compile.sh">
