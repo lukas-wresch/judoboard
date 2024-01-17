@@ -367,11 +367,11 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		for (uint32_t i = 1; i <= app.GetDatabase().GetMatCount(); i++)
-			app.StartLocalMat(i);
-
 		if (!app.LoadDataFromDisk())
 			ZED::Log::Error("Could not load application data from disk");
+
+		for (uint32_t i = 1; i <= app.GetDatabase().GetMatCount(); i++)
+			app.StartLocalMat(i);
 
 		if (app.GetDatabase().GetNumAccounts() == 0)
 			app.GetDatabase().AddAccount(Judoboard::Account("admin", "1234", Judoboard::Account::AccessLevel::Admin));

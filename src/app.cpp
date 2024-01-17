@@ -408,11 +408,11 @@ bool Application::StartLocalMat(uint32_t ID)
 
 		for (auto mat : m_Mats)
 		{
-			if (mat && mat->GetType() == IMat::Type::LocalMat && mat->IsOpen())
+			/*if (mat && mat->GetType() == IMat::Type::LocalMat && mat->IsOpen())
 			{
 				ZED::Log::Warn("A local mat is already open, can not open another mat");
 				return false;
-			}
+			}*/
 
 			if (mat && mat->GetMatID() == ID)
 			{
