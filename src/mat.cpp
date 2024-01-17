@@ -1578,13 +1578,13 @@ void Mat::NextState(State NextState) const
 
 				m_Graphics["age_group_rect"].SetColor(ZED::Color(255, 255, 0))
 					.StopAllAnimations().Center().SetPosition(width/2 - (text_width + 10)/2, height/2 + pos_y - (int)(80.0 * m_ScalingFactor), -100)
-					.SetSize(text_width + 20, (int)(160.0 * m_ScalingFactor))
+					.SetSize(text_width + 20, (int)(180.0 * m_ScalingFactor))
 					.AddAnimation(Animation::CreateLinear(0.0, 0.0,  40.0, [](auto& g) { return g.m_a < 400.0; }))
 					.AddAnimation(Animation::CreateLinear(0.0, 0.0, -30.0, [](auto& g) { return g.m_a >   0.0; }));
 
 				m_Graphics["age_group_rect_bar"].SetColor(ZED::Color(0, 0, 0))
 					.StopAllAnimations().Center().SetPosition(width/2 - (text_width + 10)/2 - 10, height/2 + pos_y - (int)(90.0 * m_ScalingFactor), -100)
-					.SetSize(text_width + 40, (int)(180.0 * m_ScalingFactor))
+					.SetSize(text_width + 40, (int)(200.0 * m_ScalingFactor))
 					.AddAnimation(Animation::CreateLinear(0.0, 0.0,  40.0, [](auto& g) { return g.m_a < 400.0; }))
 					.AddAnimation(Animation::CreateLinear(0.0, 0.0, -35.0, [](auto& g) { return g.m_a >   0.0; }));
 			}
