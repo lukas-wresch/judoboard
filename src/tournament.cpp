@@ -1525,7 +1525,7 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 	matchTable->GenerateSchedule();
 
 	//Any match table has schedule index 0?
-	if (GetMaxEntriesAtScheduleIndex(0, 0))
+	if (GetMaxEntriesAtScheduleIndex(0, 0) == 0)
 	{
 		for (auto table : m_MatchTables)//Reduce schedule index for all
 			table->SetScheduleIndex(table->GetScheduleIndex() - 1);
@@ -1803,7 +1803,7 @@ bool Tournament::MoveScheduleEntryUp(const UUID& UUID)
 	m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() - 1);
 
 	//Any match table has schedule index 0?
-	if (GetMaxEntriesAtScheduleIndex(0, 0))
+	if (GetMaxEntriesAtScheduleIndex(0, 0) == 0)
 	{
 		for (auto table : m_MatchTables)//Reduce schedule index for all
 			table->SetScheduleIndex(table->GetScheduleIndex() - 1);
@@ -1844,7 +1844,7 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 	m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() + 1);
 
 	//Any match table has schedule index 0?
-	if (GetMaxEntriesAtScheduleIndex(0, 0))
+	if (GetMaxEntriesAtScheduleIndex(0, 0) == 0)
 	{
 		for (auto table : m_MatchTables)//Reduce schedule index for all
 			table->SetScheduleIndex(table->GetScheduleIndex() - 1);
