@@ -362,11 +362,13 @@ int main(int argc, char** argv)
 
 		ZED::Log::Info("Connected to master");
 
-		app.StartLocalMat(1);
+		for (uint32_t i = 1; i <= app.GetDatabase().GetMatCount(); i++)
+			app.StartLocalMat(i);
 	}
 	else
 	{
-		app.StartLocalMat(1);
+		for (uint32_t i = 1; i <= app.GetDatabase().GetMatCount(); i++)
+			app.StartLocalMat(i);
 
 		if (!app.LoadDataFromDisk())
 			ZED::Log::Error("Could not load application data from disk");

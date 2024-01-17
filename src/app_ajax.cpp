@@ -412,7 +412,8 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		GetTournament()->MoveScheduleEntryUp(id);
+		if (!GetTournament()->MoveScheduleEntryUp(id))
+			return Error(Error::Type::OperationFailed);
 		return Error();//OK
 	});
 
@@ -429,7 +430,8 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		GetTournament()->MoveScheduleEntryDown(id);
+		if (!GetTournament()->MoveScheduleEntryDown(id))
+			return Error(Error::Type::OperationFailed);
 		return Error();//OK
 	});
 
@@ -1726,9 +1728,7 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		bool ret = GetTournament()->RemoveMatchTable(id);
-
-		if (!ret)
+		if (!GetTournament()->RemoveMatchTable(id))
 			return std::string("Failed to delete match table");
 
 		return Error();//OK
