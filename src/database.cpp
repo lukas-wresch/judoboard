@@ -271,6 +271,8 @@ bool Database::DoLogin(const std::string& Username, uint32_t IP, const std::stri
 	{
 		if (nonce_it->HasExpired())
 			nonce_it = m_OpenNonces.erase(nonce_it);
+		else
+			++nonce_it;
 	}
 
 	for (auto nonce_it = m_OpenNonces.cbegin(); nonce_it != m_OpenNonces.cend(); ++nonce_it)
@@ -280,7 +282,7 @@ bool Database::DoLogin(const std::string& Username, uint32_t IP, const std::stri
 			m_ClosedNonces.insert({ Response, {*nonce_it, account} });
 			m_OpenNonces.erase(nonce_it);
 			return true;
-		}			
+		}
 	}
 
 	return false;
