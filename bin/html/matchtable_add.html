@@ -310,21 +310,21 @@ function GetMatchTable(id)
 
     if (typeof res.participants !== 'undefined')
     {
-      var table = document.getElementById("participants");
+      let table = document.getElementById("participants");
 
       while (table.rows.length > 1)
         table.deleteRow(table.rows.length-1);
 
-      var no = 0;
+      let no = 0;
       for (const judoka of res.participants)
       {
-         var row = table.insertRow(-1);
-         var cell0 = row.insertCell(0);
-         var cell1 = row.insertCell(1);
-         var cell2 = row.insertCell(2);
-         var cell3 = row.insertCell(3);
-         var cell4 = row.insertCell(4);
-         var cell5 = row.insertCell(5);
+         let row = table.insertRow(-1);
+         let cell0 = row.insertCell(0);
+         let cell1 = row.insertCell(1);
+         let cell2 = row.insertCell(2);
+         let cell3 = row.insertCell(3);
+         let cell4 = row.insertCell(4);
+         let cell5 = row.insertCell(5);
 
          no++;
          if (no%2 == 0)
@@ -336,9 +336,10 @@ function GetMatchTable(id)
            cell0.innerHTML = judoka.start_pos + 1;
          cell0.style.textAlign = "center";
          cell0.style.fontSize  = "14pt";
-
+         
          cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.firstname + " " + judoka.lastname + "</a>";
-         cell2.innerHTML = "<a href=\"#club_add.html?id=" + judoka.club_uuid + "\">" + judoka.club_name + "</a>";
+         if (typeof judoka.club_uuid != 'undefined')
+           cell2.innerHTML = "<a href=\"#club_add.html?id=" + judoka.club_uuid + "\">" + judoka.club_name + "</a>";
 
          cell3.innerHTML = judoka.weight + " kg";
          cell3.style.textAlign = "center";
