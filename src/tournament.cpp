@@ -1524,12 +1524,8 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 
 	matchTable->GenerateSchedule();
 
-	//Any match table has schedule index 0?
-	if (GetMaxEntriesAtScheduleIndex(0, 0) == 0)
-	{
-		for (auto table : m_MatchTables)//Reduce schedule index for all
-			table->SetScheduleIndex(table->GetScheduleIndex() - 1);
-	}
+	//Optimize master schedule entries
+	OrganizeMasterSchedule();
 
 	//Sort
 	std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
@@ -1802,12 +1798,8 @@ bool Tournament::MoveScheduleEntryUp(const UUID& UUID)
 
 	m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() - 1);
 
-	//Any match table has schedule index 0?
-	if (GetMaxEntriesAtScheduleIndex(0, 0) == 0)
-	{
-		for (auto table : m_MatchTables)//Reduce schedule index for all
-			table->SetScheduleIndex(table->GetScheduleIndex() - 1);
-	}
+	//Optimize master schedule entries
+	OrganizeMasterSchedule();
 
 	GenerateSchedule();
 	return true;
@@ -1843,12 +1835,8 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 
 	m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() + 1);
 
-	//Any match table has schedule index 0?
-	if (GetMaxEntriesAtScheduleIndex(0, 0) == 0)
-	{
-		for (auto table : m_MatchTables)//Reduce schedule index for all
-			table->SetScheduleIndex(table->GetScheduleIndex() - 1);
-	}
+	//Optimize master schedule entries
+	OrganizeMasterSchedule();
 
 	GenerateSchedule();
 	return true;
@@ -2477,17 +2465,14 @@ void Tournament::GenerateSchedule()
 			table->GenerateSchedule();
 	}
 
+	OrganizeMasterSchedule();
 	BuildSchedule();
 }
 
 
 
-void Tournament::BuildSchedule()
+void Tournament::OrganizeMasterSchedule()
 {
-	auto guard = LockWriteForScope();
-
-	m_Schedule.clear();
-
 	//Check if there is a schedule index that is not used
 	//so that we can move match tables up
 
@@ -2501,6 +2486,15 @@ void Tournament::BuildSchedule()
 					table->SetScheduleIndex(index-1);
 		}
 	}
+}
+
+
+
+void Tournament::BuildSchedule()
+{
+	auto guard = LockWriteForScope();
+
+	m_Schedule.clear();
 
 	//For all master schedule entries
 	for (int32_t index = 0; index <= GetMaxScheduleIndex(); index++)
