@@ -1524,6 +1524,9 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 
 	matchTable->GenerateSchedule();
 
+	//Optimize master schedule entries
+	OrganizeMasterSchedule();
+
 	//Sort
 	std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
 		//Sort by filter
@@ -1795,6 +1798,9 @@ bool Tournament::MoveScheduleEntryUp(const UUID& UUID)
 
 	m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() - 1);
 
+	//Optimize master schedule entries
+	OrganizeMasterSchedule();
+
 	GenerateSchedule();
 	return true;
 }
@@ -1827,9 +1833,10 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 	if (entry->GetStatus() != Status::Scheduled)//Don't move if already started
 		return false;
 
-	LockWrite();
 	m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() + 1);
-	UnlockWrite();
+
+	//Optimize master schedule entries
+	OrganizeMasterSchedule();
 
 	GenerateSchedule();
 	return true;
@@ -2458,17 +2465,14 @@ void Tournament::GenerateSchedule()
 			table->GenerateSchedule();
 	}
 
+	OrganizeMasterSchedule();
 	BuildSchedule();
 }
 
 
 
-void Tournament::BuildSchedule()
+void Tournament::OrganizeMasterSchedule()
 {
-	auto guard = LockWriteForScope();
-
-	m_Schedule.clear();
-
 	//Check if there is a schedule index that is not used
 	//so that we can move match tables up
 
@@ -2482,6 +2486,15 @@ void Tournament::BuildSchedule()
 					table->SetScheduleIndex(index-1);
 		}
 	}
+}
+
+
+
+void Tournament::BuildSchedule()
+{
+	auto guard = LockWriteForScope();
+
+	m_Schedule.clear();
 
 	//For all master schedule entries
 	for (int32_t index = 0; index <= GetMaxScheduleIndex(); index++)
