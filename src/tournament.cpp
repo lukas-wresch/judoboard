@@ -1790,13 +1790,20 @@ bool Tournament::MoveScheduleEntryUp(const UUID& UUID)
 	if (index >= m_MatchTables.size() || !m_MatchTables[index])
 		return false;
 
-	if (m_MatchTables[index]->GetScheduleIndex() <= 0)
+	if (m_MatchTables[index]->GetScheduleIndex() < 0)
 		return false;
 
 	if (m_MatchTables[index]->GetStatus() != Status::Scheduled)//Don't move if already started
 		return false;
 
-	m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() - 1);
+	if (m_MatchTables[index]->GetScheduleIndex() == 0)
+	{//Special case, move everything else down
+		for (uint32_t i = 0; i < m_MatchTables.size(); ++i)
+			if (i != index)
+				m_MatchTables[i]->SetScheduleIndex(m_MatchTables[i]->GetScheduleIndex() + 1);
+	}
+	else
+		m_MatchTables[index]->SetScheduleIndex(m_MatchTables[index]->GetScheduleIndex() - 1);
 
 	//Optimize master schedule entries
 	OrganizeMasterSchedule();

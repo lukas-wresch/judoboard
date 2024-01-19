@@ -1458,6 +1458,66 @@ TEST(Tournament, ChangeScheduleIndexAfterDeletion)
 
 
 
+TEST(Tournament, ChangeTopmostScheduleIndexUp)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
+		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
+
+		EXPECT_NE(j1->GetUUID(), j2->GetUUID());
+
+		Tournament* tourney = new Tournament("deleteMe");
+		tourney->Reset();
+		tourney->Save();
+
+		EXPECT_TRUE(tourney->AddParticipant(j1));
+		EXPECT_TRUE(tourney->AddParticipant(j2));
+		EXPECT_TRUE(tourney->AddParticipant(j3));
+		EXPECT_TRUE(tourney->AddParticipant(j4));
+
+		auto w1 = new RoundRobin(Weight(50), Weight(55));
+		auto w2 = new RoundRobin(Weight(60), Weight(65));
+		auto w3 = new RoundRobin(Weight(70), Weight(80));
+		tourney->AddMatchTable(w1);
+		tourney->AddMatchTable(w2);
+		tourney->AddMatchTable(w3);
+
+		tourney->GenerateSchedule();
+
+		EXPECT_EQ(w1->GetScheduleIndex(), 0);
+		EXPECT_EQ(w2->GetScheduleIndex(), 1);
+		EXPECT_EQ(w3->GetScheduleIndex(), 2);
+
+		EXPECT_TRUE(tourney->MoveScheduleEntryUp(*w1));
+
+		EXPECT_EQ(w1->GetScheduleIndex(), 0);
+		EXPECT_EQ(w2->GetScheduleIndex(), 1);
+		EXPECT_EQ(w3->GetScheduleIndex(), 2);
+
+		EXPECT_TRUE(tourney->MoveScheduleEntryUp(*w2));
+
+		EXPECT_EQ(w1->GetScheduleIndex(), 0);
+		EXPECT_EQ(w2->GetScheduleIndex(), 0);
+		EXPECT_EQ(w3->GetScheduleIndex(), 1);
+
+		EXPECT_TRUE(tourney->MoveScheduleEntryUp(*w1));
+
+		EXPECT_EQ(w1->GetScheduleIndex(), 0);
+		EXPECT_EQ(w2->GetScheduleIndex(), 1);
+		EXPECT_EQ(w3->GetScheduleIndex(), 2);
+	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+}
+
+
+
 TEST(Tournament, ChangeScheduleIndexAfterChangingMat)
 {
 	initialize();
