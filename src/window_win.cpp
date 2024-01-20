@@ -10,6 +10,10 @@ using namespace Judoboard;
 
 
 
+std::vector<Window::MonitorInfo> Window::m_MonitorInfos;
+
+
+
 LRESULT CALLBACK Judoboard::WindowProc(HWND Hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch (Message)
@@ -276,19 +280,38 @@ void Window::CloseWindow()
 
 
 
-void Window::Fullscreen(bool Enabled) const
+void Window::Fullscreen(bool Enabled, int Monitor) const
 {
+	if (Monitor >= 0 && m_MonitorInfos.empty())
+		EnumerateMonitors();
+
+	RECT rect;//Position and width, height of the window
+	if (Monitor >= 0 && Monitor < m_MonitorInfos.size())
+	{
+		rect.left   = m_MonitorInfos[Monitor].rect.left;
+		rect.top    = m_MonitorInfos[Monitor].rect.top;
+		rect.right  = m_MonitorInfos[Monitor].rect.right  - m_MonitorInfos[Monitor].rect.left;
+		rect.bottom = m_MonitorInfos[Monitor].rect.bottom - m_MonitorInfos[Monitor].rect.top;
+	}
+	else
+	{
+		rect.left = 0;
+		rect.top  = 0;
+		rect.right  = GetSystemMetrics(SM_CXSCREEN);
+		rect.bottom = GetSystemMetrics(SM_CYSCREEN);
+	}
+
 	DWORD dwStyle = GetWindowLong(m_Hwnd, GWL_STYLE);
 
 	if (Enabled)
 	{
 		SetWindowLong(m_Hwnd, GWL_STYLE, dwStyle & ~WS_OVERLAPPEDWINDOW);
-		SetWindowPos(m_Hwnd, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), NULL);
+		SetWindowPos(m_Hwnd, NULL, rect.left, rect.top, rect.right, rect.bottom, NULL);
 	}
 	else
 	{
 		SetWindowLong(m_Hwnd, GWL_STYLE, dwStyle | WS_OVERLAPPEDWINDOW);
-		SetWindowPos(m_Hwnd, NULL, 50, 50, 1024, 768, NULL);
+		SetWindowPos(m_Hwnd, NULL,  rect.left + 50,  rect.top + 50, 1024, 768, NULL);
 	}
 }
 
@@ -311,4 +334,22 @@ unsigned int Window::GetDisplayHeight() const
 bool Window::IsDisplayConnected()
 {
 	return !Application::NoWindow;
+}
+
+
+
+BOOL CALLBACK Window::MonitorEnumCallback(HMONITOR hMon, HDC hdc, RECT* RectMonitor, LPARAM pData)
+{
+	MonitorInfo new_monitor_info;
+	new_monitor_info.rect = *RectMonitor;
+	m_MonitorInfos.push_back(new_monitor_info);
+	return TRUE;
+}
+
+
+
+void Window::EnumerateMonitors()
+{
+	m_MonitorInfos.clear();
+	EnumDisplayMonitors(0, 0, MonitorEnumCallback, NULL);
 }

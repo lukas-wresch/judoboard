@@ -169,7 +169,7 @@ void Judoboard::Window::CloseWindow()
 
 
 
-void Judoboard::Window::Fullscreen(bool Enabled) const
+void Judoboard::Window::Fullscreen(bool Enabled, int Monitor) const
 {
 	if (!m_Hwnd) return;
 

@@ -48,6 +48,7 @@ namespace Judoboard
 		}
 
 		static bool IsDisplayConnected();
+		static void EnumerateMonitors();
 
 		bool OpenWindow(std::function<bool()> MainloopCallback, std::function<void()> OnInit = nullptr);
 		bool OpenWindow();
@@ -58,12 +59,21 @@ namespace Judoboard
 		bool IsRunning() const;
 		const ZED::Renderer& GetRenderer() const { return *m_Renderer; }
 
-		void Fullscreen(bool Enabled = true) const;
+		void Fullscreen(bool Enabled = true, int Monitor = -1) const;
 
 		unsigned int GetDisplayWidth()  const;
 		unsigned int GetDisplayHeight() const;
 
 	private:
+		static BOOL CALLBACK MonitorEnumCallback(HMONITOR hMon, HDC hdc, RECT* RectMonitor, LPARAM pData);
+
+		struct MonitorInfo
+		{
+			//uint32_t index = 0;
+			RECT rect = {};
+		};
+		static std::vector<MonitorInfo> m_MonitorInfos;
+
 		std::string m_Title;
 
 		ZED::Renderer* m_Renderer = nullptr;
