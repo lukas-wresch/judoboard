@@ -231,6 +231,14 @@ function NiceLargeTime(timestamp)
 
 
 
+function ContainsNonPrintableCharacters(str)
+{
+  let regex = /[\x00-\x20\x7F-\x9F\u00A0]+$/;
+  return regex.test(str);
+}
+
+
+
 function URLEncode(obj)
 {
   let str = [];

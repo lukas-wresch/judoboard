@@ -405,19 +405,31 @@ function Update_Schedule()
       cell0.style.height    = "1.5cm";
 
       if (typeof match.white_name !== 'undefined')
+      {
+        if (ContainsNonPrintableCharacters(match.white_name))
+          match.white_name = "&nbsp;&nbsp;&nbsp;";
         cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + match.white_uuid + "\">" + match.white_name + "</a>";
+      }
       else
         cell1.innerHTML = "???";
       cell1.style.fontSize  = "16pt";
 
       if (typeof match.blue_name !== 'undefined')
+      {
+        if (ContainsNonPrintableCharacters(match.blue_name))
+          match.blue_name = "&nbsp;&nbsp;&nbsp;";
         cell2.innerHTML = "<a href=\"#judoka_add.html?id=" + match.blue_uuid + "\">" + match.blue_name + "</a>";
+      }
       else
         cell2.innerHTML = "???";
       cell2.style.fontSize  = "16pt";
 
       if (typeof match.match_table !== 'undefined')
+      {
+        if (ContainsNonPrintableCharacters(match.match_table_name))
+          match.match_table_name = "&nbsp;&nbsp;&nbsp;";
         cell3.innerHTML = "<a href=\"#matchtable_add.html?id="+match.match_table+"\">" + match.match_table_name + "</a>";
+      }
       else
         cell3.innerHTML = "- - -";
       
@@ -588,8 +600,8 @@ function Update_Participants()
       cell0.innerHTML = no;
       cell0.style.textAlign = "center";
       cell0.style.fontSize  = "14pt";
-
-      cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.firstname + ' ' + judoka.lastname + '</a>';
+      
+      cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.firstname + '&nbsp;' + judoka.lastname + '</a>';
       cell1.style.fontSize  = "16pt";
       cell2.innerHTML = judoka.weight + ' kg';
       cell2.style.textAlign = "center";
