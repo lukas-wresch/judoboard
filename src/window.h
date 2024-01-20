@@ -67,7 +67,6 @@ namespace Judoboard
 	private:
 #ifdef _WIN32
 		static BOOL CALLBACK MonitorEnumCallback(HMONITOR hMon, HDC hdc, RECT* RectMonitor, LPARAM pData);
-#endif
 
 		struct MonitorInfo
 		{
@@ -75,6 +74,7 @@ namespace Judoboard
 			RECT rect = {};
 		};
 		static std::vector<MonitorInfo> m_MonitorInfos;
+#endif
 
 		std::string m_Title;
 
