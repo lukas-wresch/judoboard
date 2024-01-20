@@ -4301,7 +4301,7 @@ std::string Application::Ajax_ListSoundFiles()
 	ret << YAML::BeginSeq;
 
 	ZED::Core::Indexer([&](const std::string& Filename) {
-		auto pos = Filename.find_last_of('/');
+		auto pos = Filename.find_last_of(ZED::Core::Separator);
 		if (pos == std::string::npos) return true;
 
 		auto onlyFilename = Filename.substr(pos + 1);
