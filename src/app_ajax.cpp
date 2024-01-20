@@ -1752,6 +1752,7 @@ void Application::SetupHttpServer()
 
 		UUID whiteID = HttpServer::DecodeURLEncoded(Request.m_Body, "white");
 		UUID blueID  = HttpServer::DecodeURLEncoded(Request.m_Body, "blue");
+		int  matID   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
 
 		auto guard = LockReadForScope();
 
@@ -1769,7 +1770,11 @@ void Application::SetupHttpServer()
 		if (!white || !blue)//Judokas exist?
 			return std::string("Judoka not found in database");
 
-		GetTournament()->AddMatch(Match(white, blue, GetTournament(), FindDefaultMatID()));
+		if (matID <= 0)//Illegal mat?
+			matID = FindDefaultMatID();//Use the default
+
+		if (!GetTournament()->AddMatch(Match(white, blue, GetTournament(), matID)))
+			return Error(Error::Type::OperationFailed);
 
 		return Error();//OK
 	});

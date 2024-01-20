@@ -147,6 +147,7 @@ var lang_en = {
     running:   [ "Running", "am K&auml;mpfen" ],
     search:  [ "Search", "Suchen" ],
     show:  [ "Show", "Anzeigen" ],
+    show_only_participants:  [ "Show only participants", "Nur Turnierteilnehmer" ],
     shutdown_confirm:  [ "Are you sure you want to shutdown Judoboard?", "Soll Judoboard wirklich heruntergefahren werden?" ],
     start:  [ "Start", "Starten" ],
     start_next_match:  [ "Start Next Match", "Kampf starten" ],
