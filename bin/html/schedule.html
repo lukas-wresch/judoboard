@@ -4,6 +4,7 @@
 <button class="add" style="width: 3.3cm;" id="new_matchtable" onclick="navigate('matchtable_add.html')">New Match table</button>
 <button class="add" style="width: 3.3cm;" id="select_age_groups" onclick="navigate('age_groups_select.html')"></button>
 
+
 <h2 id="headline-master-schedule">Overview</h2>
 
 <input type="checkbox" id="master-schedule-toggle" class="switch-input" checked onclick="Update_Masterschedule();">
@@ -93,7 +94,6 @@
 
 
 <script>
-
 
 function MoveEntryUp(id)
 {
@@ -292,11 +292,13 @@ function Update_Masterschedule()
       return;
 
     //For each index
+    let schedule_index = 0;
     for (const per_index of res.master_schedule)
     {
       let row = table.insertRow(-1);
 
       //For each mat
+      let mat_index = 1;
       for (const per_mat of per_index)
       {
         let max = per_mat.max;
@@ -328,6 +330,17 @@ function Update_Masterschedule()
             cell.innerHTML = contents;
             cell.style.backgroundColor = entry.color;
             cell.style.textAlign = "center";
+
+            cell.dataset['uuid'] = entry.uuid;
+            cell.dataset['mat']  = entry.mat_id;
+            cell.dataset['schedule_index'] = schedule_index;
+
+            cell.draggable = true;
+            cell.addEventListener('dragstart', dragstart);
+            cell.addEventListener('dragover',  dragover);
+            cell.addEventListener('dragend',   dragend);
+            cell.addEventListener('drop',      drop);
+
             entries_rendered++;
           }
         }
@@ -340,10 +353,76 @@ function Update_Masterschedule()
           cell.style.textAlign = "center";
           cell.colSpan = max - entries_rendered;
           cell.style.height = "1.3cm";
+
+          cell.dataset['mat']            = mat_index;
+          cell.dataset['schedule_index'] = schedule_index;
+
+          cell.draggable = true;
+          cell.addEventListener('dragstart', dragstart);
+          cell.addEventListener('dragover',  dragover);
+          cell.addEventListener('dragend',   dragend);
+          cell.addEventListener('drop', drop);
         }
-      }
-    }
+
+        mat_index++;
+      }//For each mat
+
+      schedule_index++;
+    }//For each schedule index
   });
+}
+
+
+var dragged_data;
+
+function dragstart(event) {
+    console.log('drag started');
+    console.log(this);
+    console.log(event.target.dataset);
+    dragged_data = event.target.dataset;
+}
+function dragover(event) {
+  event.preventDefault();
+  //console.log('drag over');
+  //console.log(this);
+}
+function drop(event) {
+  event.preventDefault();
+  console.log('drop onto');
+  console.log(this);
+  console.log(event.target.dataset);
+
+  if (dragged_data['uuid'] === 'undefined')
+    return;
+  if (typeof event.target.dataset['mat'] === 'undefined')
+    return;
+
+  SetEntryMat(dragged_data['uuid'], event.target.dataset['mat']);
+
+  let diff = dragged_data['schedule_index'] - event.target.dataset['schedule_index'];
+  let max = 100;
+  let i = 0;
+  while (diff != 0)
+  {
+    if (diff > 0)
+    {
+      MoveEntryUp(dragged_data['uuid']);
+      diff--;
+    }
+    else
+    {
+      MoveEntryDown(dragged_data['uuid']);
+      diff++;
+    }
+
+    i++;
+    if (i > max)
+      break;
+  }
+}
+function dragend() {
+    //console.log('drag stopped');
+    //console.log(this);
 }
 
 

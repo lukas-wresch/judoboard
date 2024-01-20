@@ -135,6 +135,10 @@ int Core::ToInt(const std::string& Number)
 	{
 		ret = std::stoi(Number);
 	}
+	catch (const std::invalid_argument& e)
+	{
+		return -1;
+	}
 	catch (const std::exception& e)
 	{
 		return -1;
