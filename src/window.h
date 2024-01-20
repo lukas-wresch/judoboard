@@ -65,7 +65,9 @@ namespace Judoboard
 		unsigned int GetDisplayHeight() const;
 
 	private:
+#ifdef _WIN32
 		static BOOL CALLBACK MonitorEnumCallback(HMONITOR hMon, HDC hdc, RECT* RectMonitor, LPARAM pData);
+#endif
 
 		struct MonitorInfo
 		{
