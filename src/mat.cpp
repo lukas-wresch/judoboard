@@ -1272,7 +1272,7 @@ const std::vector<Match> Mat::GetNextMatches() const
 uint32_t Mat::EndTimeOfOsaekomi() const
 {
 	auto guard = m_mutex.LockReadForScope();
-	const bool hasWazaari = GetScoreboard(GetOsaekomiHolder()).m_WazaAri == 1;
+	const bool hasWazaari = GetScoreboard(GetOsaekomiHolder()).m_WazaAri >= 1;
 	return m_pMatch->GetRuleSet().GetOsaeKomiTime(hasWazaari);
 }
 
