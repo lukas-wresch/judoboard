@@ -338,6 +338,7 @@ function Update_Masterschedule()
             cell.draggable = true;
             cell.addEventListener('dragstart', dragstart);
             cell.addEventListener('dragover',  dragover);
+            cell.addEventListener('dragleave', dragleave);
             cell.addEventListener('dragend',   dragend);
             cell.addEventListener('drop',      drop);
 
@@ -360,6 +361,7 @@ function Update_Masterschedule()
           cell.draggable = true;
           cell.addEventListener('dragstart', dragstart);
           cell.addEventListener('dragover',  dragover);
+          cell.addEventListener('dragleave', dragleave);
           cell.addEventListener('dragend',   dragend);
           cell.addEventListener('drop', drop);
         }
@@ -375,17 +377,51 @@ function Update_Masterschedule()
 
 var dragged_data;
 
-function dragstart(event) {
+function dragstart(event)
+{
     console.log('drag started');
     console.log(this);
     console.log(event.target.dataset);
+
+    event.target.style.opacity = 0.1;
     dragged_data = event.target.dataset;
 }
-function dragover(event) {
+
+var old_color;
+
+function dragover(event)
+{
   event.preventDefault();
   //console.log('drag over');
   //console.log(this);
+
+  if (event.target.style.opacity > 0.5)
+    event.target.style.opacity = 0.5;
+  //if (old_color != 'rgb(255, 0, 0)')
+    //old_color = event.target.style.backgroundColor;
+  //event.target.style.backgroundColor = 'rgb(255, 0, 0)';
 }
+
+function dragleave(event)
+{
+  event.preventDefault();
+  //console.log('drag over');
+  //console.log(this);
+
+  if (event.target.style.opacity > 0.1)
+    event.target.style.opacity = 1.0;
+  //event.target.style.backgroundColor = old_color;
+}
+
+function dragend(event)
+{
+  event.preventDefault();
+    //console.log('drag stopped');
+    //console.log(this);
+
+    event.target.style.opacity = 1.0;
+}
+
 function drop(event) {
   event.preventDefault();
   console.log('drop onto');
@@ -419,10 +455,6 @@ function drop(event) {
     if (i > max)
       break;
   }
-}
-function dragend() {
-    //console.log('drag stopped');
-    //console.log(this);
 }
 
 
