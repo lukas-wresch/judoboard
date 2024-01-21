@@ -54,7 +54,7 @@ namespace Judoboard
 
 		bool LoadDataFromDisk();
 		const Account* GetDefaultAdminAccount() const;
-
+		
 		//DM4
 		std::string AddDM4File(const DM4& File, bool ParseOnly = false, bool* pSuccess = nullptr);
 
@@ -174,6 +174,7 @@ namespace Judoboard
 		//Match tables
 		Error Ajax_AddMatchTable(HttpServer::Request Request);
 		Error Ajax_EditMatchTable(const HttpServer::Request& Request);
+		Error Ajax_MoveMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_GetMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_ListAllMatchTables(const HttpServer::Request& Request);
 		std::string Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request);

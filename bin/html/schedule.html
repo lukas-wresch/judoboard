@@ -97,7 +97,6 @@
 
 function MoveEntryUp(id)
 {
-  let mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_up?id=' + id, function() {
     Update_Masterschedule();
   });
@@ -107,7 +106,6 @@ function MoveEntryUp(id)
 
 function MoveEntryDown(id)
 {
-  let mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_down?id=' + id, function() {
     Update_Masterschedule();
   });
@@ -118,7 +116,7 @@ function MoveEntryDown(id)
 
 function SetEntryMat(id, mat)
 {
-  AjaxCallback('ajax/masterschedule/set_mat?id='+id+'&mat='+mat, function() {
+  AjaxCallback('ajax/masterschedule/move?id='+id+'&mat='+mat, function() {
     Update_Masterschedule();
   });
 
@@ -129,7 +127,7 @@ function SetEntryMat(id, mat)
 
 function MoveUp(id)
 {
-  var mat_to_display = document.getElementById("display_mat").value;
+  let mat_to_display = document.getElementById("display_mat").value;
   AjaxCallback('/ajax/match/move_up?id=' + id + '&mat=' + mat_to_display, function() {
     Update_Schedule();
   });
@@ -139,7 +137,7 @@ function MoveUp(id)
 
 function MoveDown(id)
 {
-  var mat_to_display = document.getElementById("display_mat").value;
+  let mat_to_display = document.getElementById("display_mat").value;
   AjaxCallback('/ajax/match/move_down?id=' + id + '&mat=' + mat_to_display, function() {
     Update_Schedule();
   });
@@ -375,28 +373,30 @@ function Update_Masterschedule()
 }
 
 
-var dragged_data;
+let dragged_cell;
 
 function dragstart(event)
 {
-    console.log('drag started');
-    console.log(this);
-    console.log(event.target.dataset);
-
     event.target.style.opacity = 0.1;
-    dragged_data = event.target.dataset;
+    dragged_cell = event.target;
 }
-
-var old_color;
 
 function dragover(event)
 {
   event.preventDefault();
-  //console.log('drag over');
-  //console.log(this);
+  console.log(event.target.style.backgroundColor);
+  //if (event.target.style.backgroundColor == 'rgb(255, 255, 255)')
+  //event.target.style.backgroundColor = 'rgb(255, 200, 200)';
 
-  if (event.target.style.opacity > 0.5)
-    event.target.style.opacity = 0.5;
+  if (typeof event.target.dataset['uuid'] === 'undefined')
+  {
+    event.target.style.backgroundColor = dragged_cell.style.backgroundColor;
+    event.target.style.opacity = 0.8;
+  }
+  //event.target.dataset['marked'] = true;
+
+  //if (event.target.style.opacity > 0.5)
+    //event.target.style.opacity = 0.5;
   //if (old_color != 'rgb(255, 0, 0)')
     //old_color = event.target.style.backgroundColor;
   //event.target.style.backgroundColor = 'rgb(255, 0, 0)';
@@ -405,56 +405,36 @@ function dragover(event)
 function dragleave(event)
 {
   event.preventDefault();
-  //console.log('drag over');
-  //console.log(this);
 
-  if (event.target.style.opacity > 0.1)
-    event.target.style.opacity = 1.0;
+  if (typeof event.target.dataset['uuid'] === 'undefined')
+  {
+    event.target.style.backgroundColor = 'rgb(255, 255, 255)';
+  }
+
+  //if (event.target.style.opacity > 0.1)
+    //event.target.style.opacity = 1.0;
   //event.target.style.backgroundColor = old_color;
 }
 
 function dragend(event)
 {
   event.preventDefault();
-    //console.log('drag stopped');
-    //console.log(this);
 
-    event.target.style.opacity = 1.0;
+  event.target.style.opacity = 1.0;
 }
 
-function drop(event) {
+function drop(event)
+{
   event.preventDefault();
-  console.log('drop onto');
-  console.log(this);
-  console.log(event.target.dataset);
 
-  if (dragged_data['uuid'] === 'undefined')
+  if (dragged_cell.dataset['uuid'] === 'undefined')
     return;
   if (typeof event.target.dataset['mat'] === 'undefined')
     return;
 
-  SetEntryMat(dragged_data['uuid'], event.target.dataset['mat']);
-
-  let diff = dragged_data['schedule_index'] - event.target.dataset['schedule_index'];
-  let max = 100;
-  let i = 0;
-  while (diff != 0)
-  {
-    if (diff > 0)
-    {
-      MoveEntryUp(dragged_data['uuid']);
-      diff--;
-    }
-    else
-    {
-      MoveEntryDown(dragged_data['uuid']);
-      diff++;
-    }
-
-    i++;
-    if (i > max)
-      break;
-  }
+  AjaxCallback('ajax/masterschedule/move?id='+dragged_cell.dataset['uuid']+'&schedule_index='+event.target.dataset['schedule_index']+'&mat='+event.target.dataset['mat'], function() {
+    Update_Masterschedule();
+  });
 }
 
 
