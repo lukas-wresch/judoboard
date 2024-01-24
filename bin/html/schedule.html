@@ -319,10 +319,13 @@ function Update_Masterschedule()
             contents += entry.schedule_size + ' ' + translate('matches') + ' / ' + entry.participant_count + ' ' + translate('participants');
             contents += "<br/>"
 
-            contents += "<table><tr><td rowspan=\"2\"><a style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id-1) + ");\"></a></td>";
-            contents += "           <td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp('"   + entry.uuid + "');\"></a></td>";
-            contents += "           <td rowspan=\"2\"><a style=\"" + style + "transform: rotate(-45deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id+1) + ");\"></a></td></tr>";
-            contents += "       <tr><td><a style=\"" + style + "transform: rotate(45deg);\"    href=\"#\" onclick=\"return MoveEntryDown('" + entry.uuid + "');\"></a></td></tr></table>";
+            let dragable = "draggable=\"true\" data-uuid=\""+entry.uuid+"\" ";
+            let data_string = "data-mat=\"" + entry.mat_id + "\" data-schedule_index=\"" + schedule_index + "\"";
+
+            contents += "<table " + dragable + data_string + "><tr><td "+dragable+data_string+" rowspan=\"2\"><a "+dragable+data_string+" style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id-1) + ");\"></a></td>";
+            contents += "           <td "+dragable+data_string+"><a "+dragable+data_string+" style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp('"   + entry.uuid + "');\"></a></td>";
+            contents += "           <td "+dragable+data_string+" rowspan=\"2\"><a "+dragable+data_string+" style=\"" + style + "transform: rotate(-45deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id+1) + ");\"></a></td></tr>";
+            contents += "       <tr><td "+dragable+data_string+"><a "+dragable+data_string+" style=\"" + style + "transform: rotate(45deg);\"    href=\"#\" onclick=\"return MoveEntryDown('" + entry.uuid + "');\"></a></td></tr></table>";
 
 
             cell.innerHTML = contents;
@@ -377,29 +380,19 @@ let dragged_cell;
 
 function dragstart(event)
 {
-    event.target.style.opacity = 0.1;
-    dragged_cell = event.target;
+  event.target.style.opacity = 0.1;
+  dragged_cell = event.target;
 }
 
 function dragover(event)
 {
   event.preventDefault();
-  console.log(event.target.style.backgroundColor);
-  //if (event.target.style.backgroundColor == 'rgb(255, 255, 255)')
-  //event.target.style.backgroundColor = 'rgb(255, 200, 200)';
 
   if (typeof event.target.dataset['uuid'] === 'undefined')
   {
     event.target.style.backgroundColor = dragged_cell.style.backgroundColor;
     event.target.style.opacity = 0.8;
   }
-  //event.target.dataset['marked'] = true;
-
-  //if (event.target.style.opacity > 0.5)
-    //event.target.style.opacity = 0.5;
-  //if (old_color != 'rgb(255, 0, 0)')
-    //old_color = event.target.style.backgroundColor;
-  //event.target.style.backgroundColor = 'rgb(255, 0, 0)';
 }
 
 function dragleave(event)
@@ -410,16 +403,11 @@ function dragleave(event)
   {
     event.target.style.backgroundColor = 'rgb(255, 255, 255)';
   }
-
-  //if (event.target.style.opacity > 0.1)
-    //event.target.style.opacity = 1.0;
-  //event.target.style.backgroundColor = old_color;
 }
 
 function dragend(event)
 {
   event.preventDefault();
-
   event.target.style.opacity = 1.0;
 }
 
@@ -427,12 +415,16 @@ function drop(event)
 {
   event.preventDefault();
 
+  let target = event.target;
+
+  //console.log(target);
+
   if (dragged_cell.dataset['uuid'] === 'undefined')
     return;
-  if (typeof event.target.dataset['mat'] === 'undefined')
+  if (typeof target.dataset['mat'] === 'undefined')
     return;
 
-  AjaxCallback('ajax/masterschedule/move?id='+dragged_cell.dataset['uuid']+'&schedule_index='+event.target.dataset['schedule_index']+'&mat='+event.target.dataset['mat'], function() {
+  AjaxCallback('ajax/masterschedule/move?id='+dragged_cell.dataset['uuid']+'&schedule_index='+target.dataset['schedule_index']+'&mat='+target.dataset['mat'], function() {
     Update_Masterschedule();
   });
 }
