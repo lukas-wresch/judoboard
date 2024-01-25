@@ -128,18 +128,11 @@ int Core::ToInt(const std::string& Number)
 {
 	int ret = -1;
 
-	if (Number.empty())
-		return ret;
-
 	try
 	{
 		ret = std::stoi(Number);
 	}
-	catch (const std::invalid_argument& e)
-	{
-		return -1;
-	}
-	catch (const std::exception& e)
+	catch (...)
 	{
 		return -1;
 	}
