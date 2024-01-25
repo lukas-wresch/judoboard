@@ -436,6 +436,15 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/masterschedule/move", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_MoveMatchTable(Request);
+	});
+
+
 	m_Server.RegisterResource("/ajax/match/get", [this](auto& Request) -> std::string {
 		auto account = IsLoggedIn(Request);
 		if (!account)
@@ -456,35 +465,6 @@ void Application::SetupHttpServer()
 		YAML::Emitter ret;
 		match->ToString(ret);
 		return ret.c_str();
-	});
-
-
-	m_Server.RegisterResource("/ajax/masterschedule/set_mat", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-
-		UUID id  = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-		int  mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
-
-		if (mat <= 0)
-			return std::string("Invalid mat id");
-
-		auto guard = LockWriteForScope();
-
-		if (!GetTournament())
-			return std::string("No tournament open");
-
-		if (GetTournament()->GetStatus() == Status::Concluded)
-			return std::string("Tournament is already finalized");
-
-		auto entry = GetTournament()->FindMatchTable(id);
-
-		if (!entry)
-			return Error(Error::Type::ItemNotFound);
-
-		entry->SetMatID(mat);
-		return Error();//OK
 	});
 
 
@@ -4079,6 +4059,38 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	if (!GetTournament()->OnUpdateMatchTable(id))
 		return Error(Error::Type::OperationFailed);
 	return Error();//OK
+}
+
+
+
+Error Application::Ajax_MoveMatchTable(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	int  schedule_index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "schedule_index"));
+	int  mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
+
+	if (mat <= 0 && schedule_index < 0)
+		return Error::Type::InvalidInput;
+
+	auto guard = LockWriteForScope();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	if (GetTournament()->GetStatus() == Status::Concluded)
+		return Error::Type::OperationFailed;
+
+	auto entry = GetTournament()->FindMatchTable(id);
+
+	if (!entry)
+		return Error::Type::ItemNotFound;
+
+	if (mat >= 1)
+		entry->SetMatID(mat);
+	if (schedule_index >= 0)
+		entry->SetScheduleIndex(schedule_index);
+
+	return Error::Type::NoError;//OK
 }
 
 

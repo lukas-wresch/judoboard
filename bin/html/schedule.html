@@ -4,6 +4,7 @@
 <button class="add" style="width: 3.3cm;" id="new_matchtable" onclick="navigate('matchtable_add.html')">New Match table</button>
 <button class="add" style="width: 3.3cm;" id="select_age_groups" onclick="navigate('age_groups_select.html')"></button>
 
+
 <h2 id="headline-master-schedule">Overview</h2>
 
 <input type="checkbox" id="master-schedule-toggle" class="switch-input" checked onclick="Update_Masterschedule();">
@@ -94,10 +95,8 @@
 
 <script>
 
-
 function MoveEntryUp(id)
 {
-  let mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_up?id=' + id, function() {
     Update_Masterschedule();
   });
@@ -107,7 +106,6 @@ function MoveEntryUp(id)
 
 function MoveEntryDown(id)
 {
-  let mat_to_display = document.getElementById("display_mat");
   AjaxCallback('/ajax/masterschedule/move_down?id=' + id, function() {
     Update_Masterschedule();
   });
@@ -118,7 +116,7 @@ function MoveEntryDown(id)
 
 function SetEntryMat(id, mat)
 {
-  AjaxCallback('ajax/masterschedule/set_mat?id='+id+'&mat='+mat, function() {
+  AjaxCallback('ajax/masterschedule/move?id='+id+'&mat='+mat, function() {
     Update_Masterschedule();
   });
 
@@ -129,7 +127,7 @@ function SetEntryMat(id, mat)
 
 function MoveUp(id)
 {
-  var mat_to_display = document.getElementById("display_mat").value;
+  let mat_to_display = document.getElementById("display_mat").value;
   AjaxCallback('/ajax/match/move_up?id=' + id + '&mat=' + mat_to_display, function() {
     Update_Schedule();
   });
@@ -139,7 +137,7 @@ function MoveUp(id)
 
 function MoveDown(id)
 {
-  var mat_to_display = document.getElementById("display_mat").value;
+  let mat_to_display = document.getElementById("display_mat").value;
   AjaxCallback('/ajax/match/move_down?id=' + id + '&mat=' + mat_to_display, function() {
     Update_Schedule();
   });
@@ -292,11 +290,13 @@ function Update_Masterschedule()
       return;
 
     //For each index
+    let schedule_index = 0;
     for (const per_index of res.master_schedule)
     {
       let row = table.insertRow(-1);
 
       //For each mat
+      let mat_index = 1;
       for (const per_mat of per_index)
       {
         let max = per_mat.max;
@@ -319,15 +319,30 @@ function Update_Masterschedule()
             contents += entry.schedule_size + ' ' + translate('matches') + ' / ' + entry.participant_count + ' ' + translate('participants');
             contents += "<br/>"
 
-            contents += "<table><tr><td rowspan=\"2\"><a style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id-1) + ");\"></a></td>";
-            contents += "           <td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp('"   + entry.uuid + "');\"></a></td>";
-            contents += "           <td rowspan=\"2\"><a style=\"" + style + "transform: rotate(-45deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id+1) + ");\"></a></td></tr>";
-            contents += "       <tr><td><a style=\"" + style + "transform: rotate(45deg);\"    href=\"#\" onclick=\"return MoveEntryDown('" + entry.uuid + "');\"></a></td></tr></table>";
+            let dragable = "draggable=\"true\" data-uuid=\""+entry.uuid+"\" ";
+            let data_string = "data-mat=\"" + entry.mat_id + "\" data-schedule_index=\"" + schedule_index + "\"";
+
+            contents += "<table " + dragable + data_string + "><tr><td "+dragable+data_string+" rowspan=\"2\"><a "+dragable+data_string+" style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id-1) + ");\"></a></td>";
+            contents += "           <td "+dragable+data_string+"><a "+dragable+data_string+" style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveEntryUp('"   + entry.uuid + "');\"></a></td>";
+            contents += "           <td "+dragable+data_string+" rowspan=\"2\"><a "+dragable+data_string+" style=\"" + style + "transform: rotate(-45deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id+1) + ");\"></a></td></tr>";
+            contents += "       <tr><td "+dragable+data_string+"><a "+dragable+data_string+" style=\"" + style + "transform: rotate(45deg);\"    href=\"#\" onclick=\"return MoveEntryDown('" + entry.uuid + "');\"></a></td></tr></table>";
 
 
             cell.innerHTML = contents;
             cell.style.backgroundColor = entry.color;
             cell.style.textAlign = "center";
+
+            cell.dataset['uuid'] = entry.uuid;
+            cell.dataset['mat']  = entry.mat_id;
+            cell.dataset['schedule_index'] = schedule_index;
+
+            cell.draggable = true;
+            cell.addEventListener('dragstart', dragstart);
+            cell.addEventListener('dragover',  dragover);
+            cell.addEventListener('dragleave', dragleave);
+            cell.addEventListener('dragend',   dragend);
+            cell.addEventListener('drop',      drop);
+
             entries_rendered++;
           }
         }
@@ -340,9 +355,77 @@ function Update_Masterschedule()
           cell.style.textAlign = "center";
           cell.colSpan = max - entries_rendered;
           cell.style.height = "1.3cm";
+
+          cell.dataset['mat']            = mat_index;
+          cell.dataset['schedule_index'] = schedule_index;
+
+          cell.draggable = true;
+          cell.addEventListener('dragstart', dragstart);
+          cell.addEventListener('dragover',  dragover);
+          cell.addEventListener('dragleave', dragleave);
+          cell.addEventListener('dragend',   dragend);
+          cell.addEventListener('drop', drop);
         }
-      }
-    }
+
+        mat_index++;
+      }//For each mat
+
+      schedule_index++;
+    }//For each schedule index
+  });
+}
+
+
+let dragged_cell;
+
+function dragstart(event)
+{
+  event.target.style.opacity = 0.1;
+  dragged_cell = event.target;
+}
+
+function dragover(event)
+{
+  event.preventDefault();
+
+  if (typeof event.target.dataset['uuid'] === 'undefined')
+  {
+    event.target.style.backgroundColor = dragged_cell.style.backgroundColor;
+    event.target.style.opacity = 0.8;
+  }
+}
+
+function dragleave(event)
+{
+  event.preventDefault();
+
+  if (typeof event.target.dataset['uuid'] === 'undefined')
+  {
+    event.target.style.backgroundColor = 'rgb(255, 255, 255)';
+  }
+}
+
+function dragend(event)
+{
+  event.preventDefault();
+  event.target.style.opacity = 1.0;
+}
+
+function drop(event)
+{
+  event.preventDefault();
+
+  let target = event.target;
+
+  //console.log(target);
+
+  if (dragged_cell.dataset['uuid'] === 'undefined')
+    return;
+  if (typeof target.dataset['mat'] === 'undefined')
+    return;
+
+  AjaxCallback('ajax/masterschedule/move?id='+dragged_cell.dataset['uuid']+'&schedule_index='+target.dataset['schedule_index']+'&mat='+target.dataset['mat'], function() {
+    Update_Masterschedule();
   });
 }
 

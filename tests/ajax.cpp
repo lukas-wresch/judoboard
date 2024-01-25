@@ -2331,6 +2331,38 @@ TEST(Ajax, MatchTable_Edit)
 
 
 
+TEST(Ajax, MatchTable_Move)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7")) );
+
+		ASSERT_EQ(tables.size(), 1);
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
+		EXPECT_EQ(tables[0]->GetName(), "Test");
+		EXPECT_EQ(tables[0]->GetMatID(), 7);
+
+
+		for (int i = 0; i < 100; i++)
+		{
+			int mat   = rand()%10 + 1;
+			int index = rand()%100;
+
+			EXPECT_TRUE(app.Ajax_MoveMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID() + "&schedule_index=" + std::to_string(index) + "&mat=" + std::to_string(mat))) );
+
+			EXPECT_EQ(tables[0]->GetMatID(), mat);
+			EXPECT_EQ(tables[0]->GetScheduleIndex(), index);
+		}
+	}
+}
+
+
+
 TEST(Ajax, MatchTable_Get)
 {
 	initialize();
