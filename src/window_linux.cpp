@@ -9,14 +9,14 @@ using namespace Judoboard;
 
 
 
-gboolean Judoboard::on_destroy(GtkWidget* widget, GdkEventAny* event)
+gboolean on_destroy(GtkWidget* widget, GdkEventAny* event)
 {
 	return true;
 }
 
 
 
-gboolean Judoboard::on_delete(GtkWidget* widget, GdkEventKey* event, gpointer data)
+gboolean on_delete(GtkWidget* widget, GdkEventKey* event, gpointer data)
 {
 	Judoboard::Window* win = (Judoboard::Window*)data;
 	gtk_widget_hide(GTK_WIDGET(win->m_Hwnd));
@@ -34,7 +34,7 @@ gboolean Judoboard::on_delete(GtkWidget* widget, GdkEventKey* event, gpointer da
 
 
 
-gboolean Judoboard::on_configure(GtkWidget* widget, GdkEventConfigure* event, gpointer data)
+gboolean on_configure(GtkWidget* widget, GdkEventConfigure* event, gpointer data)
 {
 	Judoboard::Window* win = (Judoboard::Window*)data;
 	win->GetRenderer().ResetViewPort(event->width, event->height);
@@ -43,7 +43,7 @@ gboolean Judoboard::on_configure(GtkWidget* widget, GdkEventConfigure* event, gp
 
 
 
-bool Judoboard::Window::OpenWindow()
+bool Window::OpenWindow()
 {
 	if (!IsDisplayConnected())
 	{
@@ -124,7 +124,7 @@ bool Judoboard::Window::OpenWindow()
 
 
 
-bool Judoboard::Window::HandleEvents() const
+bool Window::HandleEvents() const
 {
 	if (!m_IsRunning)
 		return false;
@@ -137,14 +137,14 @@ bool Judoboard::Window::HandleEvents() const
 
 
 
-bool Judoboard::Window::IsRunning() const
+bool Window::IsRunning() const
 {
 	return m_IsRunning;
 }
 
 
 
-void Judoboard::Window::CloseWindow()
+void Window::CloseWindow()
 {
 	if (!m_Renderer) return;
 
@@ -169,7 +169,7 @@ void Judoboard::Window::CloseWindow()
 
 
 
-void Judoboard::Window::Fullscreen(bool Enabled, int Monitor) const
+void Window::Fullscreen(bool Enabled, int Monitor) const
 {
 	if (!m_Hwnd) return;
 
@@ -181,7 +181,7 @@ void Judoboard::Window::Fullscreen(bool Enabled, int Monitor) const
 
 
 
-unsigned int Judoboard::Window::GetDisplayWidth() const
+unsigned int Window::GetDisplayWidth() const
 {
 	if (!IsDisplayConnected) return 0;
 
@@ -193,7 +193,7 @@ unsigned int Judoboard::Window::GetDisplayWidth() const
 
 
 
-unsigned int Judoboard::Window::GetDisplayHeight() const
+unsigned int Window::GetDisplayHeight() const
 {
 	if (!IsDisplayConnected) return 0;
 
@@ -205,7 +205,16 @@ unsigned int Judoboard::Window::GetDisplayHeight() const
 
 
 
-bool Judoboard::Window::IsDisplayConnected()
+bool Window::IsDisplayConnected()
 {
 	return !Application::NoWindow;
+}
+
+
+
+std::vector<Window::MonitorInfo> Window::EnumerateMonitors()
+{
+	m_MonitorInfos.clear();
+	//NOT IMPLEMENTED YET
+	return m_MonitorInfos;
 }
