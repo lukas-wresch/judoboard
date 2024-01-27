@@ -9,14 +9,14 @@ using namespace Judoboard;
 
 
 
-gboolean on_destroy(GtkWidget* widget, GdkEventAny* event)
+gboolean Judoboard::on_destroy(GtkWidget* widget, GdkEventAny* event)
 {
 	return true;
 }
 
 
 
-gboolean on_delete(GtkWidget* widget, GdkEventKey* event, gpointer data)
+gboolean Judoboard::on_delete(GtkWidget* widget, GdkEventKey* event, gpointer data)
 {
 	Judoboard::Window* win = (Judoboard::Window*)data;
 	gtk_widget_hide(GTK_WIDGET(win->m_Hwnd));
@@ -34,7 +34,7 @@ gboolean on_delete(GtkWidget* widget, GdkEventKey* event, gpointer data)
 
 
 
-gboolean on_configure(GtkWidget* widget, GdkEventConfigure* event, gpointer data)
+gboolean Judoboard::on_configure(GtkWidget* widget, GdkEventConfigure* event, gpointer data)
 {
 	Judoboard::Window* win = (Judoboard::Window*)data;
 	win->GetRenderer().ResetViewPort(event->width, event->height);
