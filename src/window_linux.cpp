@@ -212,7 +212,7 @@ bool Judoboard::Window::IsDisplayConnected()
 
 
 
-std::vector<Window::MonitorInfo> Judoboard::Window::EnumerateMonitors()
+std::vector<Judoboard::Window::MonitorInfo> Judoboard::Window::EnumerateMonitors()
 {
 	m_MonitorInfos.clear();
 	//NOT IMPLEMENTED YET
