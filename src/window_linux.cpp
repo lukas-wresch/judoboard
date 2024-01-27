@@ -9,7 +9,7 @@ using namespace Judoboard;
 
 
 
-std::vector<Judoboard::Window::MonitorInfo> Window::m_MonitorInfos;
+std::vector<Judoboard::Window::MonitorInfo> Judoboard::Window::m_MonitorInfos;
 
 
 
