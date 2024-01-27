@@ -43,7 +43,7 @@ gboolean Judoboard::on_configure(GtkWidget* widget, GdkEventConfigure* event, gp
 
 
 
-bool Window::OpenWindow()
+bool Judoboard::Window::OpenWindow()
 {
 	if (!IsDisplayConnected())
 	{
@@ -124,7 +124,7 @@ bool Window::OpenWindow()
 
 
 
-bool Window::HandleEvents() const
+bool Judoboard::Window::HandleEvents() const
 {
 	if (!m_IsRunning)
 		return false;
