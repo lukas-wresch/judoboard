@@ -102,13 +102,18 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override {}
 
 		//Config
-		virtual void SetFullscreen(bool Enabled = true) override
+		virtual void SetFullscreen(bool Enabled = true, int Monitor = -1) override
 		{
 			if (Enabled)
-				SendCommand("/ajax/config/fullscreen?id=" + std::to_string(GetMatID()));
+				SendCommand("/ajax/config/fullscreen?id=" + std::to_string(GetMatID()) + "&monitor=" + std::to_string(Monitor));
 			else
-				SendCommand("/ajax/config/windowed?id=" + std::to_string(GetMatID()));
+				SendCommand("/ajax/config/windowed?id=" + std::to_string(GetMatID()) + "&monitor=" + std::to_string(Monitor));
 			IMat::SetIsFullscreen(Enabled);
+		}
+
+		virtual int GetMonitor() const override
+		{
+			return -1;//NOT IMPLEMENTED
 		}
 
 		std::string GetHostname() const { return m_Hostname; }

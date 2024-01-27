@@ -106,6 +106,7 @@ var lang_en = {
     min_participants:  [ "Min participants", "Mindestteilnehmer" ],
     max_participants:  [ "Max participants", "Maximalteilnehmer" ],
     max_weight_diff:  [ "Weight difference", "Gewichtsunterschied" ],
+    monitor:  [ "Monitor", "Monitor" ],
     more:  [ "More", "Mehr" ],
     match_revised:  [ "Match revised", "Kampf revidiert" ],
     match_started:  [ "Match started", "Kampf gestartet" ],

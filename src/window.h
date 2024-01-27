@@ -21,6 +21,16 @@ namespace Judoboard
 	class Window
 	{
 	public:
+		struct MonitorInfo
+		{
+			uint32_t index = 0;
+			int left = 0;
+			int top  = 0;
+			int right  = 0;
+			int bottom = 0;
+		};
+		static std::vector<MonitorInfo> m_MonitorInfos;
+
 #ifdef _WIN32
 		friend LRESULT CALLBACK WindowProc(HWND Hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 #else
@@ -48,7 +58,7 @@ namespace Judoboard
 		}
 
 		static bool IsDisplayConnected();
-		static void EnumerateMonitors();
+		static std::vector<MonitorInfo> EnumerateMonitors();
 
 		bool OpenWindow(std::function<bool()> MainloopCallback, std::function<void()> OnInit = nullptr);
 		bool OpenWindow();
@@ -67,13 +77,6 @@ namespace Judoboard
 	private:
 #ifdef _WIN32
 		static BOOL CALLBACK MonitorEnumCallback(HMONITOR hMon, HDC hdc, RECT* RectMonitor, LPARAM pData);
-
-		struct MonitorInfo
-		{
-			//uint32_t index = 0;
-			RECT rect = {};
-		};
-		static std::vector<MonitorInfo> m_MonitorInfos;
 #endif
 
 		std::string m_Title;

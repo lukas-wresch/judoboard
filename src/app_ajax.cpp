@@ -268,7 +268,6 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
-
 		return Ajax_OpenMat(Request);
 	});
 
@@ -277,7 +276,6 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
-
 		return Ajax_CloseMat(Request);
 	});
 
@@ -286,7 +284,6 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
-
 		return Ajax_PauseMat(Request);
 	});
 
@@ -295,24 +292,7 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
-
 		return Ajax_UpdateMat(Request);
-	});
-
-
-	m_Server.RegisterResource("/ajax/config/fullscreen", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-		return Ajax_SetFullscreen(true, Request);
-	});
-
-
-	m_Server.RegisterResource("/ajax/config/windowed", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-		return Ajax_SetFullscreen(false, Request);
 	});
 
 	m_Server.RegisterResource("/ajax/config/list_sound_files", [this](auto& Request) -> std::string {
@@ -2841,6 +2821,21 @@ std::string Application::Ajax_GetMats() const
 		ret << YAML::BeginMap;
 		ret << YAML::Key << "highest_mat_id" << YAML::Value << max;
 
+		ret << YAML::Key << "monitors" << YAML::Value;
+		ret << YAML::BeginSeq;
+
+		auto monitors = Window::EnumerateMonitors();
+		for (auto& monitor : monitors)
+		{
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "index"  << YAML::Value << monitor.index;
+			ret << YAML::Key << "width"  << YAML::Value << monitor.right;
+			ret << YAML::Key << "height" << YAML::Value << monitor.bottom;
+			ret << YAML::EndMap;
+		}
+
+		ret << YAML::EndSeq;
+
 		ret << YAML::Key << "mats" << YAML::Value;
 		ret << YAML::BeginSeq;
 
@@ -2870,6 +2865,7 @@ std::string Application::Ajax_GetMats() const
 				ret << YAML::Key << "timer_style"    << YAML::Value << (int)mat->GetTimerStyle();
 				ret << YAML::Key << "name_style"     << YAML::Value << (int)mat->GetNameStyle();
 				ret << YAML::Key << "is_fullscreen"  << YAML::Value << mat->IsFullscreen();
+				ret << YAML::Key << "monitor"        << YAML::Value << mat->GetMonitor();
 				ret << YAML::Key << "sound_enabled"  << YAML::Value << mat->IsSoundEnabled();
 				ret << YAML::Key << "sound_filename" << YAML::Value << mat->GetSoundFilename();
 
@@ -2973,6 +2969,10 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 {
 	int id     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 	int new_id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body,  "id"));
+
+	bool fullscreen = HttpServer::DecodeURLEncoded(Request.m_Body, "fullscreen") == "true";
+	int monitor = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "monitor"));
+
 	auto name  = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int osaekomiStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomiStyle"));
@@ -3005,6 +3005,9 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 		{
 			if (id != new_id)
 				mat->SetMatID(new_id);
+
+			if (mat->IsFullscreen() != fullscreen || mat->GetMonitor() != monitor)
+				mat->SetFullscreen(fullscreen, monitor);
 
 			mat->SetName(name);
 			mat->SetIpponStyle((Mat::IpponStyle)ipponStyle);
@@ -4578,26 +4581,6 @@ std::string Application::Ajax_GetHansokumake() const
 
 	ret << YAML::EndSeq;
 	return ret.c_str();
-}
-
-
-
-Error Application::Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request)
-{
-	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-	if (id <= 0)
-		return Error::Type::InvalidID;
-
-	auto guard = LockWriteForScope();
-
-	auto mat = FindMat(id);
-
-	if (!mat)
-		return Error::Type::MatNotFound;
-
-	mat->SetFullscreen(Fullscreen);
-	return Error();//OK
 }
 
 

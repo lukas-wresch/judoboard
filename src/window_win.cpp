@@ -288,10 +288,10 @@ void Window::Fullscreen(bool Enabled, int Monitor) const
 	RECT rect;//Position and width, height of the window
 	if (Monitor >= 0 && Monitor < m_MonitorInfos.size())
 	{
-		rect.left   = m_MonitorInfos[Monitor].rect.left;
-		rect.top    = m_MonitorInfos[Monitor].rect.top;
-		rect.right  = m_MonitorInfos[Monitor].rect.right  - m_MonitorInfos[Monitor].rect.left;
-		rect.bottom = m_MonitorInfos[Monitor].rect.bottom - m_MonitorInfos[Monitor].rect.top;
+		rect.left   = m_MonitorInfos[Monitor].left;
+		rect.top    = m_MonitorInfos[Monitor].top;
+		rect.right  = m_MonitorInfos[Monitor].right  - m_MonitorInfos[Monitor].left;
+		rect.bottom = m_MonitorInfos[Monitor].bottom - m_MonitorInfos[Monitor].top;
 	}
 	else
 	{
@@ -341,15 +341,20 @@ bool Window::IsDisplayConnected()
 BOOL CALLBACK Window::MonitorEnumCallback(HMONITOR hMon, HDC hdc, RECT* RectMonitor, LPARAM pData)
 {
 	MonitorInfo new_monitor_info;
-	new_monitor_info.rect = *RectMonitor;
+	new_monitor_info.index  = (uint32_t)m_MonitorInfos.size();
+	new_monitor_info.left   = RectMonitor->left;
+	new_monitor_info.top    = RectMonitor->top;
+	new_monitor_info.right  = RectMonitor->right;
+	new_monitor_info.bottom = RectMonitor->bottom;
 	m_MonitorInfos.push_back(new_monitor_info);
 	return TRUE;
 }
 
 
 
-void Window::EnumerateMonitors()
+std::vector<Window::MonitorInfo> Window::EnumerateMonitors()
 {
 	m_MonitorInfos.clear();
 	EnumDisplayMonitors(0, 0, MonitorEnumCallback, NULL);
+	return m_MonitorInfos;
 }

@@ -199,7 +199,8 @@ namespace Judoboard
 		TimerStyle GetTimerStyle() const { return m_TimerStyle; }
 		NameStyle  GetNameStyle()  const { return m_NameStyle; }
 		bool IsFullscreen() const { return m_IsFullscreen; }
-		virtual void SetFullscreen(bool Enabled = true) = 0;
+		virtual void SetFullscreen(bool Enabled = true, int Monitor = -1) = 0;
+		virtual int GetMonitor() const = 0;
 		bool IsSoundEnabled() const { return m_SoundEnabled; }
 		std::string GetSoundFilename() const { return m_SoundFilename; }
 
@@ -216,6 +217,9 @@ namespace Judoboard
 		virtual void PlaySoundFile() const {}
 		virtual void StopSoundFile() const {}
 
+		int  GetMonitorIndex() const { return m_Monitor; }
+		void SetMonitorIndex(int Monitor) { m_Monitor = Monitor; }
+
 		std::vector<Match> m_NextMatches;
 
 	private:
@@ -229,6 +233,7 @@ namespace Judoboard
 		OsaekomiStyle m_OsaekomiStyle = OsaekomiStyle::ProgressBar;
 		NameStyle m_NameStyle = NameStyle::FamilyName;
 		bool m_IsFullscreen = true;
+		int  m_Monitor = 0;
 		bool m_SoundEnabled = true;//Sound effect for and of match/osaekomi will be played if this flag is set
 		std::string m_SoundFilename = "gong";//Sound file that is currently in use
 	};

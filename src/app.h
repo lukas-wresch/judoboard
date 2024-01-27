@@ -124,7 +124,6 @@ namespace Judoboard
 		Error Ajax_CloseMat( const HttpServer::Request& Request);
 		Error Ajax_PauseMat( const HttpServer::Request& Request);
 		Error Ajax_UpdateMat(const HttpServer::Request& Request);
-		Error Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request);
 
 		std::string Ajax_GetNamesOnMat(const HttpServer::Request& Request);
 

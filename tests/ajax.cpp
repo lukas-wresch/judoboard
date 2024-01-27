@@ -767,7 +767,7 @@ TEST(Ajax, ExecuteCommand)
 
 
 
-TEST(Ajax, SetFullscreen)
+/*TEST(Ajax, SetFullscreen)
 {
 	initialize();
 
@@ -802,7 +802,7 @@ TEST(Ajax, SetFullscreen)
 		EXPECT_TRUE(app.GetLocalMat()->IsFullscreen());
 		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 1);
 	}
-}
+}*/
 
 
 
