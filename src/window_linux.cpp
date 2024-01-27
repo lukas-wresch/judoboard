@@ -137,14 +137,14 @@ bool Judoboard::Window::HandleEvents() const
 
 
 
-bool Window::IsRunning() const
+bool Judoboard::Window::IsRunning() const
 {
 	return m_IsRunning;
 }
 
 
 
-void Window::CloseWindow()
+void Judoboard::Window::CloseWindow()
 {
 	if (!m_Renderer) return;
 
@@ -169,7 +169,7 @@ void Window::CloseWindow()
 
 
 
-void Window::Fullscreen(bool Enabled, int Monitor) const
+void Judoboard::Window::Fullscreen(bool Enabled, int Monitor) const
 {
 	if (!m_Hwnd) return;
 
@@ -181,7 +181,7 @@ void Window::Fullscreen(bool Enabled, int Monitor) const
 
 
 
-unsigned int Window::GetDisplayWidth() const
+unsigned int Judoboard::Window::GetDisplayWidth() const
 {
 	if (!IsDisplayConnected) return 0;
 
@@ -193,7 +193,7 @@ unsigned int Window::GetDisplayWidth() const
 
 
 
-unsigned int Window::GetDisplayHeight() const
+unsigned int Judoboard::Window::GetDisplayHeight() const
 {
 	if (!IsDisplayConnected) return 0;
 
@@ -205,14 +205,14 @@ unsigned int Window::GetDisplayHeight() const
 
 
 
-bool Window::IsDisplayConnected()
+bool Judoboard::Window::IsDisplayConnected()
 {
 	return !Application::NoWindow;
 }
 
 
 
-std::vector<Window::MonitorInfo> Window::EnumerateMonitors()
+std::vector<Window::MonitorInfo> Judoboard::Window::EnumerateMonitors()
 {
 	m_MonitorInfos.clear();
 	//NOT IMPLEMENTED YET
