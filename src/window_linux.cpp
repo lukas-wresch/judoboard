@@ -9,6 +9,10 @@ using namespace Judoboard;
 
 
 
+std::vector<Judoboard::Window::MonitorInfo> Window::m_MonitorInfos;
+
+
+
 gboolean Judoboard::on_destroy(GtkWidget* widget, GdkEventAny* event)
 {
 	return true;
