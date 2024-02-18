@@ -15,6 +15,22 @@ File::File(const char* Filename, bool WriteAccess)
 
 
 
+bool File::Exists(const char* Filename)
+{
+	File f(Filename);
+	return f;
+}
+
+
+
+size_t File::GetSize(const char* Filename)
+{
+	File f(Filename);
+	return f.GetSize();
+}
+
+
+
 void File::Close()
 {
 	if (IsOpen())

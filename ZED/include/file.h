@@ -15,6 +15,11 @@ namespace ZED
 		File(const std::string& Filename, bool WriteAccess = false) : File(Filename.c_str(), WriteAccess) {}
 
 		~File() { Close(); }
+
+		static bool Exists(const char* Filename);
+		static bool Exists(const std::string& Filename) { return Exists(Filename.c_str()); }
+		static size_t GetSize(const char* Filename);
+		static size_t GetSize(const std::string& Filename) { return GetSize(Filename.c_str()); }
 		
 		bool IsOpen() const { return m_File; }
 
