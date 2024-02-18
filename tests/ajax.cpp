@@ -187,9 +187,10 @@ TEST(Ajax, AgeGroup_List)
 
 	{
 		Application app;
+		RuleSet r("rule set", 10, 20, 30, 40);
 
 		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
-		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
+		auto a2 = new AgeGroup("age 2", 30, 40, &r);
 
 		app.GetDatabase().AddAgeGroup(a1);
 		app.GetTournament()->AddAgeGroup(a2);
@@ -224,6 +225,8 @@ TEST(Ajax, AgeGroup_List)
 		EXPECT_EQ(yaml[7]["num_match_tables"].as<int>(), 0);
 		EXPECT_EQ(yaml[7]["num_matches"].as<int>(), 0);
 		EXPECT_EQ(yaml[7]["num_participants"].as<int>(), 0);
+		EXPECT_EQ(yaml[7]["rules_name"].as<std::string>(), "rule set");
+		EXPECT_EQ(yaml[7]["rules_uuid"].as<std::string>(), r.GetUUID());
 	}
 }
 
