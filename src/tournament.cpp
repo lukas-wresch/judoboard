@@ -1747,6 +1747,13 @@ void Tournament::GetAgeGroupInfo(YAML::Emitter& Yaml, const AgeGroup* AgeGroup) 
 
 	auto guard = LockReadForScope();
 
+	auto rules = AgeGroup->GetRuleSet();
+	if (rules)
+	{
+		Yaml << YAML::Key << "rules_name" << YAML::Value << rules->GetName();
+		Yaml << YAML::Key << "rules_uuid" << YAML::Value << (std::string)rules->GetUUID();
+	}
+
 	size_t num_match_tables = 0;
 	size_t num_matches = 0;
 	for (auto match_table : m_MatchTables)

@@ -66,6 +66,7 @@
     <th style="width: 2.0cm; text-align: center;" id="age_groups_participants">#Participants</th>
     <th style="width: 3.0cm; text-align: center;" id="age_groups_match_tables">#Match tables</th>
     <th style="width: 2.0cm; text-align: center;" id="age_groups_matches" class="num_matches">#Matches</th>
+    <th style="width: 3.0cm; text-align: center;" id="rules">Rule Set</th>
     <th style="width: 3.0cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
@@ -525,6 +526,7 @@ function Update_AgeGroups()
       let cell3 = row.insertCell(3);
       let cell4 = row.insertCell(4);
       let cell5 = row.insertCell(5);
+      let cell6 = row.insertCell(6);
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
@@ -548,8 +550,18 @@ function Update_AgeGroups()
       cell4.style.textAlign = "center";
       cell4.style.fontSize  = "16pt";
 
-      cell5.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveAgeGroup('"+age.uuid+"')\">" + translate('remove') + "</button>";
+      if (typeof age.rules_uuid !== 'undefined')
+        cell5.innerHTML = "<a href=\"#rule_add.html?id=" + age.rules_uuid + "\">" + age.rules_name + "</a>";
+      else
+      {
+        cell5.innerHTML = "- - -";
+        cell5.style.backgroundColor = "red";
+      }
       cell5.style.textAlign = "center";
+      cell5.style.fontSize  = "16pt";
+
+      cell6.innerHTML = "<button class=\"remove\" style=\"width: 2.5cm; height: 0.9cm;\" onclick=\"return RemoveAgeGroup('"+age.uuid+"')\">" + translate('remove') + "</button>";
+      cell6.style.textAlign = "center";
     }
   });
 }
