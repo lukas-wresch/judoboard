@@ -45,7 +45,7 @@ void Application::SetupHttpServer()
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit", "lots",
 		"club_list", "club_add", "association_list", "association_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
-		"matchtable_list", "matchtable_add", "matchtable_creator", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add",
+		"matchtable_list", "matchtable_add", "matchtable_creator", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add", "tournament_settings",
 		"server_config"
 	};
 
@@ -1721,6 +1721,15 @@ void Application::SetupHttpServer()
 			return error;
 
 		return Ajax_GetMatchTable(Request);
+	});
+
+
+	m_Server.RegisterResource("/ajax/matchtable/move_all", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_MoveAllMatchTables(Request);
 	});
 
 
@@ -4089,6 +4098,30 @@ Error Application::Ajax_MoveMatchTable(const HttpServer::Request& Request)
 		entry->SetMatID(mat);
 	if (schedule_index >= 0)
 		entry->SetScheduleIndex(schedule_index);
+
+	return Error::Type::NoError;//OK
+}
+
+
+
+Error Application::Ajax_MoveAllMatchTables(const HttpServer::Request& Request)
+{
+	int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
+
+	if (mat <= 0)
+		return Error::Type::InvalidInput;
+
+	auto guard = LockWriteForScope();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	if (GetTournament()->GetStatus() == Status::Concluded)
+		return Error::Type::OperationFailed;
+
+	auto& match_tables = GetTournament()->GetMatchTables();
+	for (auto table : match_tables)
+		table->SetMatID(mat);
 
 	return Error::Type::NoError;//OK
 }

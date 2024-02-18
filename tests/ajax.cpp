@@ -2363,6 +2363,37 @@ TEST(Ajax, MatchTable_Move)
 
 
 
+TEST(Ajax, MatchTable_MoveAll)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7")) );
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=3")) );
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=2")) );
+
+		ASSERT_EQ(tables.size(), 3);
+
+
+		for (int i = 0; i < 100; i++)
+		{
+			int mat = rand()%10 + 1;
+
+			EXPECT_TRUE(app.Ajax_MoveAllMatchTables(HttpServer::Request("mat=" + std::to_string(mat))));
+
+			EXPECT_EQ(tables[0]->GetMatID(), mat);
+			EXPECT_EQ(tables[1]->GetMatID(), mat);
+			EXPECT_EQ(tables[2]->GetMatID(), mat);
+		}
+	}
+}
+
+
+
 TEST(Ajax, MatchTable_Get)
 {
 	initialize();

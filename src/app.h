@@ -175,6 +175,7 @@ namespace Judoboard
 		Error Ajax_AddMatchTable(HttpServer::Request Request);
 		Error Ajax_EditMatchTable(const HttpServer::Request& Request);
 		Error Ajax_MoveMatchTable(const HttpServer::Request& Request);
+		Error Ajax_MoveAllMatchTables(const HttpServer::Request& Request);
 		std::string Ajax_GetMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_ListAllMatchTables(const HttpServer::Request& Request);
 		std::string Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request);

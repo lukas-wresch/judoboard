@@ -1,0 +1,41 @@
+<h2 id="headline"></h2>
+
+<button class="add" style="width: 3.0cm;" id="pause_all" onclick="PauseAll(true);"></button>
+<button class="add" style="width: 3.3cm;" id="unpause_all" onclick="PauseAll(false);"></button>
+
+
+<div style="margin-top:1cm;">
+	<select style="margin-bottom:20px; width: 100px;" id="mats">
+	</select>
+	<button class="add" style="width: 3.3cm;" id="move_matchtables_to_mat" onclick="MoveMatchTableToMat();"></button>
+</div>
+
+<script>
+
+
+function PauseAll(enable)
+{
+	AjaxCallback("ajax/pause_all_mats?enable=" + enable, function(response) {
+	});	
+}
+
+
+function MoveMatchTableToMat()
+{
+	AjaxCallback("ajax/matchtable/move_all?mat=" + document.getElementById("mats").value, function(response) {
+		goBack();
+	});	
+}
+
+
+document.getElementById("headline").innerHTML = translate('tournament_settings');
+
+for (let i = 1;i <= 8; i++)
+{
+	let option = document.createElement("option");
+    option.value = i;
+    option.text  = translate("mat") + ' ' + i;
+    document.getElementById("mats").add(option);
+}
+
+</script>
