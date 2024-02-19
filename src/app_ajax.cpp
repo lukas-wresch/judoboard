@@ -291,6 +291,15 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/config/pause_all_mats", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_PauseAllMats(Request);
+	});
+
+
 	m_Server.RegisterResource("/ajax/config/set_mat", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -2940,12 +2949,35 @@ Error Application::Ajax_PauseMat(const HttpServer::Request& Request)
 	if (id <= 0)
 		return Error(Error::Type::InvalidID);
 
+	auto guard = LockWriteForScope();
+
 	auto mat = FindMat(id);
 
 	if (!mat)
 		return Error(Error::Type::MatNotFound);
 
 	if (!mat->Pause(enable))
+		return Error(Error::Type::OperationFailed);
+
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_PauseAllMats(const HttpServer::Request& Request)
+{
+	bool enable = HttpServer::DecodeURLEncoded(Request.m_Query, "enable") == "true";
+
+	auto guard = LockWriteForScope();
+
+	bool success = true;
+	for (auto mat : GetMats())
+	{
+		if (!mat || !mat->Pause(enable))
+			success = false;	
+	}
+
+	if (!success)
 		return Error(Error::Type::OperationFailed);
 
 	return Error();//OK

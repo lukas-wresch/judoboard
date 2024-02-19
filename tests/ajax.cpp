@@ -574,6 +574,45 @@ TEST(Ajax, PauseMat)
 
 
 
+TEST(Ajax, PauseAllMats)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+		app.StartLocalMat(2);
+		app.StartLocalMat(3);
+
+		auto mat1 = app.FindMat(1);
+		auto mat2 = app.FindMat(2);
+		auto mat3 = app.FindMat(3);
+
+		EXPECT_FALSE(app.Ajax_PauseAllMats(HttpServer::Request("enable=false")));
+
+		EXPECT_TRUE(app.Ajax_PauseAllMats(HttpServer::Request("enable=true")));
+
+		EXPECT_TRUE(mat1->IsPaused());
+		EXPECT_TRUE(mat2->IsPaused());
+		EXPECT_TRUE(mat3->IsPaused());
+
+		EXPECT_FALSE(app.Ajax_PauseAllMats(HttpServer::Request("enable=true")));
+
+		EXPECT_TRUE(mat1->IsPaused());
+		EXPECT_TRUE(mat2->IsPaused());
+		EXPECT_TRUE(mat3->IsPaused());
+
+		EXPECT_TRUE(app.Ajax_PauseAllMats(HttpServer::Request("enable=false")));
+
+		EXPECT_FALSE(mat1->IsPaused());
+		EXPECT_FALSE(mat2->IsPaused());
+		EXPECT_FALSE(mat3->IsPaused());		
+	}
+}
+
+
+
 TEST(Ajax, UpdatePassword)
 {
 	initialize();
