@@ -3006,9 +3006,7 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 			if (id != new_id)
 				mat->SetMatID(new_id);
 
-			if (mat->IsFullscreen() != fullscreen || mat->GetMonitor() != monitor)
-				mat->SetFullscreen(fullscreen, monitor);
-
+			mat->SetFullscreen(fullscreen, monitor);
 			mat->SetName(name);
 			mat->SetIpponStyle((Mat::IpponStyle)ipponStyle);
 			mat->SetOsaekomiStyle((Mat::OsaekomiStyle)osaekomiStyle);
