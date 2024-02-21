@@ -362,16 +362,26 @@ int main(int argc, char** argv)
 
 		ZED::Log::Info("Connected to master");
 
+		auto monitors = Judoboard::Window::EnumerateMonitors();
+
 		for (uint32_t i = 1; i <= app.GetDatabase().GetMatCount(); i++)
-			app.StartLocalMat(i);
+		{
+			auto mat = app.StartLocalMat(i);
+			mat->SetFullscreen(mat->IsFullscreen(), i%monitors.size());
+		}
 	}
 	else
 	{
 		if (!app.LoadDataFromDisk())
 			ZED::Log::Error("Could not load application data from disk");
 
+		auto monitors = Judoboard::Window::EnumerateMonitors();
+
 		for (uint32_t i = 1; i <= app.GetDatabase().GetMatCount(); i++)
-			app.StartLocalMat(i);
+		{
+			auto mat = app.StartLocalMat(i);
+			mat->SetFullscreen(mat->IsFullscreen(), i%monitors.size());
+		}
 
 		if (app.GetDatabase().GetNumAccounts() == 0)
 			app.GetDatabase().AddAccount(Judoboard::Account("admin", "1234", Judoboard::Account::AccessLevel::Admin));

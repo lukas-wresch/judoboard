@@ -396,7 +396,7 @@ bool Application::CloseMat(uint32_t ID)
 
 
 
-bool Application::StartLocalMat(uint32_t ID)
+IMat* Application::StartLocalMat(uint32_t ID)
 {
 	ZED::Log::Info("Starting local mat");
 
@@ -451,11 +451,11 @@ bool Application::StartLocalMat(uint32_t ID)
 		if (!RegisterMatWithMaster(new_mat))
 		{
 			ZED::Log::Error("Could not register mat with master");
-			return false;
+			return nullptr;
 		}
 	}
 
-	return true;
+	return new_mat;
 }
 
 
