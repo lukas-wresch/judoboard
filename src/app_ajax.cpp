@@ -4364,6 +4364,7 @@ std::string Application::Ajax_GetSetup()
 	ret << YAML::Key << "version"        << YAML::Value << Version;
 	ret << YAML::Key << "uptime"         << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
 	ret << YAML::Key << "language"       << YAML::Value << (int)Localizer::GetLanguage();
+	ret << YAML::Key << "mat_count"      << YAML::Value << GetDatabase().GetMatCount();
 	ret << YAML::Key << "port"           << YAML::Value << GetDatabase().GetServerPort();
 	ret << YAML::Key << "ippon_style"    << YAML::Value << (int)GetDatabase().GetIpponStyle();
 	ret << YAML::Key << "osaekomi_style" << YAML::Value << (int)GetDatabase().GetOsaekomiStyle();
@@ -4379,6 +4380,7 @@ std::string Application::Ajax_GetSetup()
 Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 {
 	int language   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "language"));
+	int mat_count  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat_count"));
 	int port       = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "port"));
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int osaekomiStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomiStyle"));
@@ -4386,7 +4388,10 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
 
 	Localizer::SetLanguage((Language)language);
-	GetDatabase().SetServerPort(port);
+	if (mat_count >= 0)
+		GetDatabase().SetMatCount(mat_count);
+	if (port > 0)
+		GetDatabase().SetServerPort(port);
 	GetDatabase().SetIpponStyle((Mat::IpponStyle)ipponStyle);
 	GetDatabase().SetOsaekomiStyle((Mat::OsaekomiStyle)osaekomiStyle);
 	GetDatabase().SetTimerStyle((Mat::TimerStyle)timerStyle);

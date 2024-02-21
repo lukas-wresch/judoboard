@@ -96,6 +96,7 @@ var lang_en = {
     matches: [ "Matches", "K&auml;mpfe" ],
     mat:  [ "Mat", "Matte" ],
     mats:  [ "Mats", "Matten" ],
+    mats_on_startup:  [ "Mats on startup", "Matten bei Programmstart" ],
     match_log:  [ "Match Log", "Kampfprotokoll" ],
     male:  [ "Male", "M&auml;nnlich" ],
     medical_examiniation:   [ "Medical Examination",  "Medizinische Untersuchung" ],

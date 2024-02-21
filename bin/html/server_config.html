@@ -31,6 +31,11 @@
 </div>
 
 <div style="margin-top: 5mm;">
+    <label style="width:200px;float:left;" id="label_startup_mats"></label>
+    <input style="margin-bottom:20px;" type="number" id="mat_count" value="" min="1" max="10" />
+</div>
+
+<div style="margin-top: 5mm;">
   <label style="width:200px;float:left;" id="label_port">Server port</label>
   <input style="margin-bottom:0px;" type="number" id="port" value="" min="1" max="65535" />
 </div>
@@ -122,7 +127,7 @@ function TestConnection()
 
 function ConnectToMaster()
 {
-  var xhttp = new XMLHttpRequest();
+  let xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function()
   {
     if (this.readyState == 4 && this.status == 200)
@@ -175,6 +180,7 @@ function UpdateConfig()
 {
   let params = URLEncode({
     language:    document.getElementById("language").value,
+    mat_count:    document.getElementById("mat_count").value,
     port:        document.getElementById("port").value,
     ipponStyle:  document.getElementById("ipponStyle").value,
     osaekomiStyle:  document.getElementById("osaekomiStyle").value,
@@ -209,6 +215,7 @@ function GetStatus()
       document.getElementById("version").innerHTML = res.version;
       document.getElementById("uptime").innerHTML  = NiceLargeTime(res.uptime);
       document.getElementById("language").value = res.language;
+      document.getElementById("mat_count").value = res.mat_count;
       language = res.language;
       document.getElementById("port").value = res.port;
       document.getElementById("ipponStyle").value = res.ippon_style;
@@ -229,3 +236,4 @@ TimerID = window.setInterval(GetStatus, 1000);
 
 document.getElementById("progressbar").innerHTML     = translate('progressbar');
 document.getElementById("fixed_at_bottom").innerHTML = translate('fixed_at_bottom');
+document.getElementById("label_startup_mats").innerHTML = translate('mats_on_startup');
