@@ -117,6 +117,7 @@ var lang_en = {
     neutral:  [ "Neutral", "Neutral" ],
     new_account:  [ "New Account", "Neues Benutzerkonto" ],
     new_club:  [ "New Club", "Neuer Verein" ],
+    new_mat: [ "New Mat", "Neue Matte" ],
     new_match: [ "New Match", "Neuer Kampf" ],
     new_matchtable: [ "New Matchtable", "Neuer Kampflist" ],
     none: [ "None", "Keine" ],

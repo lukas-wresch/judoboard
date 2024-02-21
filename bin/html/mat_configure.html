@@ -1,4 +1,4 @@
-<button class="neutral" id="new_match" onclick="return OpenMat(0);">Create new mat</button>
+<button class="add" id="new_mat" onclick="return OpenMat(0);"></button>
 
 
 <h2 id="headline"></h2>
@@ -109,5 +109,6 @@ TimerID = window.setInterval(Update, 2000);
 document.getElementById("headline").innerHTML = translate('mats');
 document.getElementById("type").innerHTML     = translate('type');
 document.getElementById("options").innerHTML  = translate('options');
+document.getElementById("new_mat").innerHTML  = translate('new_mat');
 
 </script>

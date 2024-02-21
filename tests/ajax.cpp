@@ -437,6 +437,27 @@ TEST(Ajax, OpenMat)
 
 
 
+TEST(Ajax, OpenNewMat)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+
+		EXPECT_TRUE(app.FindMat(1));
+		EXPECT_FALSE(app.FindMat(2));
+
+		EXPECT_TRUE(app.Ajax_OpenMat(HttpServer::Request("id=0")));
+
+		EXPECT_TRUE(app.FindMat(1));
+		EXPECT_TRUE(app.FindMat(2));
+	}
+}
+
+
+
 TEST(Ajax, CloseMat)
 {
 	initialize();

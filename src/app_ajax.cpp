@@ -2893,35 +2893,33 @@ std::string Application::Ajax_GetMats() const
 Error Application::Ajax_OpenMat(const HttpServer::Request& Request)
 {
 	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-	if (id <= 0)
+	if (id < 0)
 		return Error::Type::InvalidID;
 
 	auto guard = LockWriteForScope();
 
-	/*if (id == 0)//Create virtual mat
+	if (id == 0)//Create new mat
 	{
 		id = 1;
 		while (FindMat(id))//Find first empty id
 			id++;
 
-		VirtualMat* new_mat = new VirtualMat(id);
-		new_mat->Open();
-
-		SetMats().emplace_back(new_mat);
+		if (!StartLocalMat(id))
+			return Error::Type::OperationFailed;
 		return Error();//OK
 	}
 
 	else
-	{*/
-	for (auto mat : SetMats())
 	{
-		if (mat && mat->GetMatID() == id)
+		for (auto mat : SetMats())
 		{
-			mat->Open();
-			return Error::Type::NoError;//OK
+			if (mat && mat->GetMatID() == id)
+			{
+				mat->Open();
+				return Error::Type::NoError;//OK
+			}
 		}
 	}
-	//}
 
 	return Error::Type::OperationFailed;
 }
