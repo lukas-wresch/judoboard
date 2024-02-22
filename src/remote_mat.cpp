@@ -371,6 +371,14 @@ bool RemoteMat::SendCommand(const std::string& URL) const
 
 
 
+bool RemoteMat::SendCommand(const std::string& URL, const std::string& Body) const
+{
+	std::string response = SendRequest(URL, Body);
+	return response == "ok";
+}
+
+
+
 ZED::HttpClient::Packet RemoteMat::SendRequest(const std::string& URL) const
 {
 	//ZED::Log::Debug("Sending request: " + URL);
@@ -382,12 +390,20 @@ ZED::HttpClient::Packet RemoteMat::SendRequest(const std::string& URL) const
 
 
 
+ZED::HttpClient::Packet RemoteMat::SendRequest(const std::string& URL, const std::string& Body) const
+{
+	ZED::HttpClient client(m_Hostname, m_Port);
+	return client.POST(URL + "&token=" + m_SecurityToken, Body);
+}
+
+
+
 bool RemoteMat::PostData(const std::string& URL, const YAML::Emitter& Data) const
 {
 	ZED::Log::Debug("Posting data: " + URL);
 
 	ZED::HttpClient client(m_Hostname, m_Port);
-	std::string response = client.POST(URL, Data.c_str(), "Cookie: token=test");
+	std::string response = client.POST(URL, Data.c_str(), "Cookie: token=test");//DEBUG
 	//assert(response == "ok");
 	return response == "ok";
 }
