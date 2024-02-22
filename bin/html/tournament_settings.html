@@ -11,6 +11,9 @@
 </div>
 
 <button class="remove" style="width: 6.3cm;" id="remove_empty_matchtables" onclick="RemoveEmptyMatchTables();"></button>
+<div style="margin-top:1cm;margin-bottom:1cm;">
+	<button class="remove" style="width: 6.3cm;" id="remove_completed_matchtables" onclick="RemoveCompletedMatchTables();"></button>
+</div>
 
 <script>
 
@@ -18,6 +21,13 @@
 function PauseAll(enable)
 {
 	AjaxCallback("ajax/config/pause_all_mats?enable=" + enable, function(response) {
+	});	
+}
+
+
+function RemoveEmptyMatchTables()
+{
+	AjaxCallback("ajax/tournament/delete_matchless_tables", function(response) {
 	});	
 }
 
@@ -35,6 +45,7 @@ document.getElementById("pause_all").innerHTML = translate('ause_all_matspause_a
 document.getElementById("unpause_all").innerHTML = translate('unpause_all_mats');
 document.getElementById("move_matchtables_to_mat").innerHTML = translate('move_to_mat');
 document.getElementById("remove_empty_matchtables").innerHTML = translate('remove_matchtables_without_matches');
+document.getElementById("remove_completed_matchtables").innerHTML = translate('remove_completed_matchtables');
 
 for (let i = 1;i <= 8; i++)
 {

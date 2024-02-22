@@ -3045,6 +3045,41 @@ TEST(Ajax, Tournament_Edit)
 
 
 
+TEST(Ajax, Tournament_DeleteMatchlessTables)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 50));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 51));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 52));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 60));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 61));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 62));
+
+		MatchTable* m1 = new RoundRobin(Weight(0), Weight(49));
+		MatchTable* m2 = new RoundRobin(Weight(50), Weight(55));
+		MatchTable* m3 = new RoundRobin(Weight(60), Weight(65));
+		MatchTable* m4 = new RoundRobin(Weight(70), Weight(80));
+		app.GetTournament()->AddMatchTable(m1);
+		app.GetTournament()->AddMatchTable(m2);
+		app.GetTournament()->AddMatchTable(m3);
+		app.GetTournament()->AddMatchTable(m4);
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 4);
+
+		EXPECT_TRUE(app.Ajax_DeleteMatchlessMatchTables());
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 2);
+		EXPECT_EQ(app.GetTournament()->GetMatchTables()[0]->GetNumberOfMatches(), 3);
+		EXPECT_EQ(app.GetTournament()->GetMatchTables()[1]->GetNumberOfMatches(), 3);
+	}
+}
+
+
+
 TEST(Ajax, UpdateWeight)
 {
 	initialize();

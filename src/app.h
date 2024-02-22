@@ -117,6 +117,7 @@ namespace Judoboard
 		Error Ajax_AssignAgeGroup(const HttpServer::Request& Request);
 		std::string Ajax_ListTournaments();
 		Error Ajax_SwapMatchesOfTournament(const HttpServer::Request& Request);
+		Error Ajax_DeleteMatchlessMatchTables();
 
 		//Mat
 		std::string Ajax_GetMats() const;
