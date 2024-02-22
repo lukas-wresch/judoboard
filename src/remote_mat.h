@@ -95,20 +95,28 @@ namespace Judoboard
 		virtual void Tokeda() override;
 
 		//Output
-		virtual Match::Result GetResult() const { Match::Result ret; return ret; };
+		virtual Match::Result GetResult() const { assert(false); Match::Result ret; return ret; };//NOT IMPLEMENTED
 		virtual ZED::Blob RequestScreenshot() const;
 
 		//Serialization
 		virtual void ToString(YAML::Emitter& Yaml) const override {}
 
 		//Config
-		virtual void SetFullscreen(bool Enabled = true) override
+		virtual void SetFullscreen(bool Enabled = true, int Monitor = -1) override
 		{
-			if (Enabled)
-				SendCommand("/ajax/config/fullscreen?id=" + std::to_string(GetMatID()));
-			else
-				SendCommand("/ajax/config/windowed?id=" + std::to_string(GetMatID()));
+			SendCommand("/ajax/config/set_mat?id=" + std::to_string(GetMatID()), std::string("fullscreen=") + (Enabled ? "true" : "false") + "&monitor=" + std::to_string(Monitor));
 			IMat::SetIsFullscreen(Enabled);
+			IMat::SetMonitorIndex(Monitor);
+		}
+
+		virtual int GetMonitor() const override
+		{
+			std::string response = SendRequest("/ajax/config/get_mats");
+			auto yaml = YAML::Load(response);
+
+			if (yaml["mats"] && yaml["mats"][GetMatID()] && yaml["mats"][GetMatID()]["monitor"])
+				return yaml["mats"][GetMatID()]["monitor"].as<int>();
+			return -1;
 		}
 
 		std::string GetHostname() const { return m_Hostname; }
@@ -116,7 +124,9 @@ namespace Judoboard
 
 	private:
 		bool SendCommand(const std::string& URL) const;
+		bool SendCommand(const std::string& URL, const std::string& Body) const;
 		ZED::HttpClient::Packet SendRequest(const std::string& URL) const;
+		ZED::HttpClient::Packet SendRequest(const std::string& URL, const std::string& Body) const;
 		bool PostData(const std::string& URL, const YAML::Emitter& Data) const;
 
 		struct InternalState

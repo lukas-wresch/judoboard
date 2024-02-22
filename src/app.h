@@ -90,7 +90,7 @@ namespace Judoboard
 		const IMat* FindMat(uint32_t ID) const;
 		uint32_t GetHighestMatID() const;
 
-		bool StartLocalMat(uint32_t ID = 1);
+		IMat* StartLocalMat(uint32_t ID = 1);
 		bool CloseMat(uint32_t ID);
 
 		bool RegisterMatWithMaster(IMat* Mat);
@@ -124,7 +124,6 @@ namespace Judoboard
 		Error Ajax_CloseMat( const HttpServer::Request& Request);
 		Error Ajax_PauseMat( const HttpServer::Request& Request);
 		Error Ajax_UpdateMat(const HttpServer::Request& Request);
-		Error Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request);
 
 		std::string Ajax_GetNamesOnMat(const HttpServer::Request& Request);
 

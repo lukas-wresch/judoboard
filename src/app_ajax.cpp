@@ -268,7 +268,6 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
-
 		return Ajax_OpenMat(Request);
 	});
 
@@ -277,7 +276,6 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
-
 		return Ajax_CloseMat(Request);
 	});
 
@@ -286,7 +284,6 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
-
 		return Ajax_PauseMat(Request);
 	});
 
@@ -295,24 +292,7 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
-
 		return Ajax_UpdateMat(Request);
-	});
-
-
-	m_Server.RegisterResource("/ajax/config/fullscreen", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-		return Ajax_SetFullscreen(true, Request);
-	});
-
-
-	m_Server.RegisterResource("/ajax/config/windowed", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-		return Ajax_SetFullscreen(false, Request);
 	});
 
 	m_Server.RegisterResource("/ajax/config/list_sound_files", [this](auto& Request) -> std::string {
@@ -1732,6 +1712,7 @@ void Application::SetupHttpServer()
 
 		UUID whiteID = HttpServer::DecodeURLEncoded(Request.m_Body, "white");
 		UUID blueID  = HttpServer::DecodeURLEncoded(Request.m_Body, "blue");
+		int  matID   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
 
 		auto guard = LockReadForScope();
 
@@ -1749,7 +1730,11 @@ void Application::SetupHttpServer()
 		if (!white || !blue)//Judokas exist?
 			return std::string("Judoka not found in database");
 
-		GetTournament()->AddMatch(Match(white, blue, GetTournament(), FindDefaultMatID()));
+		if (matID <= 0)//Illegal mat?
+			matID = FindDefaultMatID();//Use the default
+
+		if (!GetTournament()->AddMatch(Match(white, blue, GetTournament(), matID)))
+			return Error(Error::Type::OperationFailed);
 
 		return Error();//OK
 	});
@@ -2816,6 +2801,21 @@ std::string Application::Ajax_GetMats() const
 		ret << YAML::BeginMap;
 		ret << YAML::Key << "highest_mat_id" << YAML::Value << max;
 
+		ret << YAML::Key << "monitors" << YAML::Value;
+		ret << YAML::BeginSeq;
+
+		auto monitors = Window::EnumerateMonitors();
+		for (auto& monitor : monitors)
+		{
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "index"  << YAML::Value << monitor.index;
+			ret << YAML::Key << "width"  << YAML::Value << monitor.right;
+			ret << YAML::Key << "height" << YAML::Value << monitor.bottom;
+			ret << YAML::EndMap;
+		}
+
+		ret << YAML::EndSeq;
+
 		ret << YAML::Key << "mats" << YAML::Value;
 		ret << YAML::BeginSeq;
 
@@ -2845,6 +2845,7 @@ std::string Application::Ajax_GetMats() const
 				ret << YAML::Key << "timer_style"    << YAML::Value << (int)mat->GetTimerStyle();
 				ret << YAML::Key << "name_style"     << YAML::Value << (int)mat->GetNameStyle();
 				ret << YAML::Key << "is_fullscreen"  << YAML::Value << mat->IsFullscreen();
+				ret << YAML::Key << "monitor"        << YAML::Value << mat->GetMonitor();
 				ret << YAML::Key << "sound_enabled"  << YAML::Value << mat->IsSoundEnabled();
 				ret << YAML::Key << "sound_filename" << YAML::Value << mat->GetSoundFilename();
 
@@ -2872,35 +2873,33 @@ std::string Application::Ajax_GetMats() const
 Error Application::Ajax_OpenMat(const HttpServer::Request& Request)
 {
 	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-	if (id <= 0)
+	if (id < 0)
 		return Error::Type::InvalidID;
 
 	auto guard = LockWriteForScope();
 
-	/*if (id == 0)//Create virtual mat
+	if (id == 0)//Create new mat
 	{
 		id = 1;
 		while (FindMat(id))//Find first empty id
 			id++;
 
-		VirtualMat* new_mat = new VirtualMat(id);
-		new_mat->Open();
-
-		SetMats().emplace_back(new_mat);
+		if (!StartLocalMat(id))
+			return Error::Type::OperationFailed;
 		return Error();//OK
 	}
 
 	else
-	{*/
-	for (auto mat : SetMats())
 	{
-		if (mat && mat->GetMatID() == id)
+		for (auto mat : SetMats())
 		{
-			mat->Open();
-			return Error::Type::NoError;//OK
+			if (mat && mat->GetMatID() == id)
+			{
+				mat->Open();
+				return Error::Type::NoError;//OK
+			}
 		}
 	}
-	//}
 
 	return Error::Type::OperationFailed;
 }
@@ -2948,6 +2947,10 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 {
 	int id     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 	int new_id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body,  "id"));
+
+	bool fullscreen = HttpServer::DecodeURLEncoded(Request.m_Body, "fullscreen") == "true";
+	int monitor = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "monitor"));
+
 	auto name  = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int osaekomiStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomiStyle"));
@@ -2981,6 +2984,7 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 			if (id != new_id)
 				mat->SetMatID(new_id);
 
+			mat->SetFullscreen(fullscreen, monitor);
 			mat->SetName(name);
 			mat->SetIpponStyle((Mat::IpponStyle)ipponStyle);
 			mat->SetOsaekomiStyle((Mat::OsaekomiStyle)osaekomiStyle);
@@ -4372,6 +4376,7 @@ std::string Application::Ajax_GetSetup()
 	ret << YAML::Key << "version"        << YAML::Value << Version;
 	ret << YAML::Key << "uptime"         << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
 	ret << YAML::Key << "language"       << YAML::Value << (int)Localizer::GetLanguage();
+	ret << YAML::Key << "mat_count"      << YAML::Value << GetDatabase().GetMatCount();
 	ret << YAML::Key << "port"           << YAML::Value << GetDatabase().GetServerPort();
 	ret << YAML::Key << "ippon_style"    << YAML::Value << (int)GetDatabase().GetIpponStyle();
 	ret << YAML::Key << "osaekomi_style" << YAML::Value << (int)GetDatabase().GetOsaekomiStyle();
@@ -4387,6 +4392,7 @@ std::string Application::Ajax_GetSetup()
 Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 {
 	int language   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "language"));
+	int mat_count  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat_count"));
 	int port       = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "port"));
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int osaekomiStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomiStyle"));
@@ -4394,7 +4400,10 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
 
 	Localizer::SetLanguage((Language)language);
-	GetDatabase().SetServerPort(port);
+	if (mat_count >= 0)
+		GetDatabase().SetMatCount(mat_count);
+	if (port > 0)
+		GetDatabase().SetServerPort(port);
 	GetDatabase().SetIpponStyle((Mat::IpponStyle)ipponStyle);
 	GetDatabase().SetOsaekomiStyle((Mat::OsaekomiStyle)osaekomiStyle);
 	GetDatabase().SetTimerStyle((Mat::TimerStyle)timerStyle);
@@ -4585,26 +4594,6 @@ std::string Application::Ajax_GetHansokumake() const
 
 	ret << YAML::EndSeq;
 	return ret.c_str();
-}
-
-
-
-Error Application::Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request)
-{
-	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-	if (id <= 0)
-		return Error::Type::InvalidID;
-
-	auto guard = LockWriteForScope();
-
-	auto mat = FindMat(id);
-
-	if (!mat)
-		return Error::Type::MatNotFound;
-
-	mat->SetFullscreen(Fullscreen);
-	return Error();//OK
 }
 
 

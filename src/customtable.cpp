@@ -86,7 +86,7 @@ const std::string CustomTable::ToHTML() const
 		+ "</th><th style=\"width: 1.0cm;\">" + Localizer::Translate("Wins") + "</th><th style=\"width: 1.0cm;\">"
 		+ Localizer::Translate("Score") + "</th><th style=\"width: 1.3cm;\">" + Localizer::Translate("Time") + "</th></tr>";
 
-	for (size_t i = 0; i < GetParticipants().size(); i++)
+	for (size_t i = 0; i < results.GetSize(); i++)
 	{
 		const auto& score = results[i];
 

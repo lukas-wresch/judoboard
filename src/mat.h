@@ -148,10 +148,16 @@ namespace Judoboard
 		}
 
 		//Config
-		virtual void SetFullscreen(bool Enabled = true) override
+		virtual void SetFullscreen(bool Enabled = true, int Monitor = -1) override
 		{
-			m_Window.Fullscreen(Enabled);
+			m_Window.Fullscreen(Enabled, Monitor);
 			IMat::SetIsFullscreen(Enabled);
+			IMat::SetMonitorIndex(Monitor);
+		}
+
+		virtual int GetMonitor() const override
+		{
+			return GetMonitorIndex();
 		}
 
 		virtual void SetName(const std::string& NewName) override

@@ -44,6 +44,7 @@ void Localizer::Initialize(Language NewLanguage)
 
 			s_de["Not enough permissions"] = u8"Nicht genug Rechte f\u00fcr diesen Vorgang";
 			s_de["Operation failed"]       = u8"Vorgang fehlgeschlagen";
+			s_de["Application is shutting down"] = "Das Programm wird heruntergefahren";
 
 			s_de["Running"] = u8"am K\u00e4mpfen";
 

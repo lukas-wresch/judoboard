@@ -96,6 +96,7 @@ var lang_en = {
     matches: [ "Matches", "K&auml;mpfe" ],
     mat:  [ "Mat", "Matte" ],
     mats:  [ "Mats", "Matten" ],
+    mats_on_startup:  [ "Mats on startup", "Matten bei Programmstart" ],
     match_log:  [ "Match Log", "Kampfprotokoll" ],
     male:  [ "Male", "M&auml;nnlich" ],
     medical_examiniation:   [ "Medical Examination",  "Medizinische Untersuchung" ],
@@ -106,6 +107,7 @@ var lang_en = {
     min_participants:  [ "Min participants", "Mindestteilnehmer" ],
     max_participants:  [ "Max participants", "Maximalteilnehmer" ],
     max_weight_diff:  [ "Weight difference", "Gewichtsunterschied" ],
+    monitor:  [ "Monitor", "Monitor" ],
     more:  [ "More", "Mehr" ],
     match_revised:  [ "Match revised", "Kampf revidiert" ],
     match_started:  [ "Match started", "Kampf gestartet" ],
@@ -116,6 +118,7 @@ var lang_en = {
     neutral:  [ "Neutral", "Neutral" ],
     new_account:  [ "New Account", "Neues Benutzerkonto" ],
     new_club:  [ "New Club", "Neuer Verein" ],
+    new_mat: [ "New Mat", "Neue Matte" ],
     new_match: [ "New Match", "Neuer Kampf" ],
     new_matchtable: [ "New Matchtable", "Neuer Kampflist" ],
     none: [ "None", "Keine" ],
@@ -147,6 +150,7 @@ var lang_en = {
     running:   [ "Running", "am K&auml;mpfen" ],
     search:  [ "Search", "Suchen" ],
     show:  [ "Show", "Anzeigen" ],
+    show_only_participants:  [ "Show only participants", "Nur Turnierteilnehmer" ],
     shutdown_confirm:  [ "Are you sure you want to shutdown Judoboard?", "Soll Judoboard wirklich heruntergefahren werden?" ],
     start:  [ "Start", "Starten" ],
     start_next_match:  [ "Start Next Match", "Kampf starten" ],
@@ -227,6 +231,14 @@ function NiceTimeMS(timestamp)
 function NiceLargeTime(timestamp)
 {
   return Math.floor(timestamp/(1000*60*60)) + ':' + zeroPad(Math.floor(timestamp/(1000*60)%60), 2) + ':' + zeroPad(Math.floor((timestamp/1000))%60, 2);
+}
+
+
+
+function ContainsNonPrintableCharacters(str)
+{
+  let regex = /[\x00-\x20\x7F-\x9F\u00A0]+$/;
+  return regex.test(str);
 }
 
 

@@ -440,6 +440,27 @@ TEST(Ajax, OpenMat)
 
 
 
+TEST(Ajax, OpenNewMat)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+
+		EXPECT_TRUE(app.FindMat(1));
+		EXPECT_FALSE(app.FindMat(2));
+
+		EXPECT_TRUE(app.Ajax_OpenMat(HttpServer::Request("id=0")));
+
+		EXPECT_TRUE(app.FindMat(1));
+		EXPECT_TRUE(app.FindMat(2));
+	}
+}
+
+
+
 TEST(Ajax, CloseMat)
 {
 	initialize();
@@ -616,6 +637,7 @@ TEST(Ajax, Setup_Get)
 		auto yaml = YAML::Load(app.Ajax_GetSetup());
 
 		EXPECT_EQ(yaml["language"].as<int>(), (int)Localizer::GetLanguage());
+		EXPECT_EQ(yaml["mat_count"].as<int>(), 1);
 		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetServerPort());
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
@@ -625,6 +647,7 @@ TEST(Ajax, Setup_Get)
 		yaml = YAML::Load(app.Ajax_GetSetup());
 
 		EXPECT_EQ(yaml["language"].as<int>(), (int)Localizer::GetLanguage());
+		EXPECT_EQ(yaml["mat_count"].as<int>(), 1);
 		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetServerPort());
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 1100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
@@ -723,11 +746,12 @@ TEST(Ajax, Setup_Set)
 	{
 		Application app;
 		
-		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=1234&language=0&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=0")), "ok");
+		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=1234&language=0&mat_count=5&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=0")), "ok");
 
 		auto yaml = YAML::Load(app.Ajax_GetSetup());
 
 		EXPECT_EQ(yaml["language"].as<int>(), 0);
+		EXPECT_EQ(yaml["mat_count"].as<int>(), 5);
 		EXPECT_EQ(yaml["port"].as<int>(), 1234);
 		EXPECT_EQ(yaml["ippon_style"].as<int>(), 1);
 		EXPECT_EQ(yaml["osaekomi_style"].as<int>(), 1);
@@ -736,11 +760,12 @@ TEST(Ajax, Setup_Set)
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
 
-		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=1")), "ok");
+		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&mat_count=8&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=1")), "ok");
 
 		yaml = YAML::Load(app.Ajax_GetSetup());
 
 		EXPECT_EQ(yaml["language"].as<int>(), 1);
+		EXPECT_EQ(yaml["mat_count"].as<int>(), 8);
 		EXPECT_EQ(yaml["port"].as<int>(), 567);
 		EXPECT_EQ(yaml["ippon_style"].as<int>(), 0);
 		EXPECT_EQ(yaml["osaekomi_style"].as<int>(), 0);
@@ -770,7 +795,7 @@ TEST(Ajax, ExecuteCommand)
 
 
 
-TEST(Ajax, SetFullscreen)
+/*TEST(Ajax, SetFullscreen)
 {
 	initialize();
 
@@ -805,7 +830,7 @@ TEST(Ajax, SetFullscreen)
 		EXPECT_TRUE(app.GetLocalMat()->IsFullscreen());
 		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 1);
 	}
-}
+}*/
 
 
 

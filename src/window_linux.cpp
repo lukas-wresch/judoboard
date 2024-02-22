@@ -9,6 +9,10 @@ using namespace Judoboard;
 
 
 
+std::vector<Judoboard::Window::MonitorInfo> Judoboard::Window::m_MonitorInfos;
+
+
+
 gboolean Judoboard::on_destroy(GtkWidget* widget, GdkEventAny* event)
 {
 	return true;
@@ -169,7 +173,7 @@ void Judoboard::Window::CloseWindow()
 
 
 
-void Judoboard::Window::Fullscreen(bool Enabled) const
+void Judoboard::Window::Fullscreen(bool Enabled, int Monitor) const
 {
 	if (!m_Hwnd) return;
 
@@ -208,4 +212,13 @@ unsigned int Judoboard::Window::GetDisplayHeight() const
 bool Judoboard::Window::IsDisplayConnected()
 {
 	return !Application::NoWindow;
+}
+
+
+
+std::vector<Judoboard::Window::MonitorInfo> Judoboard::Window::EnumerateMonitors()
+{
+	m_MonitorInfos.clear();
+	//NOT IMPLEMENTED YET
+	return m_MonitorInfos;
 }

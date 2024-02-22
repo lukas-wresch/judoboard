@@ -155,11 +155,11 @@ function GetFightSystemForm(callback)
 
 function AddMatchtable()
 {
-  var data = [];
+  let data = [];
 
-  var elements = document.getElementById("form_filter").elements;
+  let elements = document.getElementById("form_filter").elements;
 
-  for (var i = 0, element; element = elements[i++];)
+  for (let i = 0, element; element = elements[i++];)
   {
     if (element.type == 'checkbox')
       data[element.id] = element.checked;
@@ -169,7 +169,7 @@ function AddMatchtable()
 
   elements = document.getElementById("form_fight_system").elements;
 
-  for (var i = 0, element; element = elements[i++];)
+  for (let i = 0, element; element = elements[i++];)
   {
     if (element.type == 'checkbox')
       data[element.id] = element.checked;
@@ -186,11 +186,11 @@ function AddMatchtable()
 
   console.log(data);
 
-  var params = URLEncode(data);
+  let params = URLEncode(data);
   console.log(params);
 
   AjaxPost('ajax/matchtable/add', params, function() {
-    navigate("matchtable_list.html");
+    goBack();
   });
 
   return false;
@@ -200,11 +200,11 @@ function AddMatchtable()
 
 function UpdateMatchtable()
 {
-  var data = [];
+  let data = [];
 
-  var elements = document.getElementById("form_filter").elements;
+  let elements = document.getElementById("form_filter").elements;
 
-  for (var i = 0, element; element = elements[i++];)
+  for (let i = 0, element; element = elements[i++];)
   {
     if (element.type == 'checkbox')
       data[element.id] = element.checked;
@@ -214,7 +214,7 @@ function UpdateMatchtable()
 
   elements = document.getElementById("form_fight_system").elements;
 
-  for (var i = 0, element; element = elements[i++];)
+  for (let i = 0, element; element = elements[i++];)
   {
     if (element.type == 'checkbox')
       data[element.id] = element.checked;
@@ -231,10 +231,10 @@ function UpdateMatchtable()
   data["type"] = document.getElementById("type").value;
   data["fight_system"] = document.getElementById("fight_system").value;
 
-  var params = URLEncode(data);
+  let params = URLEncode(data);
 
   AjaxPost('ajax/matchtable/update?id=' + id, params, function() {
-    navigate("matchtable_list.html");
+    goBack();
   });
 
   return false;
@@ -247,7 +247,7 @@ function DeleteMatchtable()
   if (confirm(translate('delete_matchtable_confirm')))
   {
     AjaxCallback('ajax/matchtable/delete?id=' + id, function() {
-      navigate("matchtable_list.html");
+      goBack();
     });
   }
 
@@ -271,10 +271,11 @@ function GetMatchTable(id)
 {
   AjaxCallback("ajax/matchtable/get?id="+id, function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    let res = YAML.parse(response);
     g_yaml = res;
     
-    document.getElementById("name").value = res.name;
+    if (typeof res.name !== 'undefined')
+      document.getElementById("name").value = res.name;
 
     if (!res.is_sub_match_table)
     {
