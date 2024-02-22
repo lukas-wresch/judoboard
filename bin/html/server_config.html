@@ -32,7 +32,7 @@
 
 <div style="margin-top: 5mm;">
     <label style="width:200px;float:left;" id="label_startup_mats"></label>
-    <input style="margin-bottom:20px;" type="number" id="mat_count" value="" min="1" max="10" />
+    <input style="margin-bottom:20px;" type="number" id="mat_count" value="" min="0" max="10" />
 </div>
 
 <div style="margin-top: 5mm;">
@@ -105,7 +105,7 @@
 
 function TestConnection()
 {
-  var xhttp = new XMLHttpRequest();
+  let xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function()
   {
     if (this.readyState == 4 && this.status == 200)
