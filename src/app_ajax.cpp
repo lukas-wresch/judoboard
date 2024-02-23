@@ -2028,6 +2028,13 @@ void Application::SetupHttpServer()
 		return Ajax_DeleteMatchlessMatchTables();
 	});
 
+	m_Server.RegisterResource("/ajax/tournament/delete_completed_tables", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+		return Ajax_DeleteCompletedMatchTables();
+	});
+
 	m_Server.RegisterResource("/ajax/tournament/delete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
@@ -2840,6 +2847,26 @@ Error Application::Ajax_DeleteMatchlessMatchTables()
 	for (auto table : tables)
 	{
 		if (table && table->GetNumberOfMatches() == 0)
+			tournament->RemoveMatchTable(*table);//This modifies the original list
+	}
+
+	return Error::Type::NoError;
+}
+
+
+
+Error Application::Ajax_DeleteCompletedMatchTables()
+{
+	auto guard = LockWriteForScope();
+
+	auto tournament = GetTournament();
+	if (!tournament)
+		return Error::Type::OperationFailed;
+
+	auto tables = tournament->GetMatchTables();//Make copy of list
+	for (auto table : tables)
+	{
+		if (table && table->GetStatus() == Status::Concluded)
 			tournament->RemoveMatchTable(*table);//This modifies the original list
 	}
 

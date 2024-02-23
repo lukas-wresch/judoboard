@@ -118,6 +118,7 @@ namespace Judoboard
 		std::string Ajax_ListTournaments();
 		Error Ajax_SwapMatchesOfTournament(const HttpServer::Request& Request);
 		Error Ajax_DeleteMatchlessMatchTables();
+		Error Ajax_DeleteCompletedMatchTables();
 
 		//Mat
 		std::string Ajax_GetMats() const;

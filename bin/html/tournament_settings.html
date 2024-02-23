@@ -32,6 +32,13 @@ function RemoveEmptyMatchTables()
 }
 
 
+function RemoveCompletedMatchTables()
+{
+	AjaxCallback("ajax/tournament/delete_completed_tables", function(response) {
+	});	
+}
+
+
 function MoveMatchTableToMat()
 {
 	AjaxCallback("ajax/matchtable/move_all?mat=" + document.getElementById("mats").value, function(response) {
