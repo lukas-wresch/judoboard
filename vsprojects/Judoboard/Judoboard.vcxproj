@@ -309,6 +309,7 @@
     <None Include="..\..\bin\html\style.css" />
     <None Include="..\..\bin\html\tournament_add.html" />
     <None Include="..\..\bin\html\tournament_list.html" />
+    <None Include="..\..\bin\html\tournament_settings.html" />
     <None Include="..\..\compile.bat" />
     <None Include="..\..\compile.sh" />
     <None Include="..\..\compile64.bat" />

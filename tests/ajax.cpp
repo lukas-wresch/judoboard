@@ -598,6 +598,45 @@ TEST(Ajax, PauseMat)
 
 
 
+TEST(Ajax, PauseAllMats)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+		app.StartLocalMat(2);
+		app.StartLocalMat(3);
+
+		auto mat1 = app.FindMat(1);
+		auto mat2 = app.FindMat(2);
+		auto mat3 = app.FindMat(3);
+
+		EXPECT_FALSE(app.Ajax_PauseAllMats(HttpServer::Request("enable=false")));
+
+		EXPECT_TRUE(app.Ajax_PauseAllMats(HttpServer::Request("enable=true")));
+
+		EXPECT_TRUE(mat1->IsPaused());
+		EXPECT_TRUE(mat2->IsPaused());
+		EXPECT_TRUE(mat3->IsPaused());
+
+		EXPECT_FALSE(app.Ajax_PauseAllMats(HttpServer::Request("enable=true")));
+
+		EXPECT_TRUE(mat1->IsPaused());
+		EXPECT_TRUE(mat2->IsPaused());
+		EXPECT_TRUE(mat3->IsPaused());
+
+		EXPECT_TRUE(app.Ajax_PauseAllMats(HttpServer::Request("enable=false")));
+
+		EXPECT_FALSE(mat1->IsPaused());
+		EXPECT_FALSE(mat2->IsPaused());
+		EXPECT_FALSE(mat3->IsPaused());		
+	}
+}
+
+
+
 TEST(Ajax, UpdatePassword)
 {
 	initialize();
@@ -2391,6 +2430,37 @@ TEST(Ajax, MatchTable_Move)
 
 
 
+TEST(Ajax, MatchTable_MoveAll)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7")) );
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=3")) );
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=2")) );
+
+		ASSERT_EQ(tables.size(), 3);
+
+
+		for (int i = 0; i < 100; i++)
+		{
+			int mat = rand()%10 + 1;
+
+			EXPECT_TRUE(app.Ajax_MoveAllMatchTables(HttpServer::Request("mat=" + std::to_string(mat))));
+
+			EXPECT_EQ(tables[0]->GetMatID(), mat);
+			EXPECT_EQ(tables[1]->GetMatID(), mat);
+			EXPECT_EQ(tables[2]->GetMatID(), mat);
+		}
+	}
+}
+
+
+
 TEST(Ajax, MatchTable_Get)
 {
 	initialize();
@@ -2999,6 +3069,101 @@ TEST(Ajax, Tournament_Edit)
 
 	ZED::Core::RemoveFile("tournaments/test.yml");
 	ZED::Core::RemoveFile("tournaments/test2.yml");
+}
+
+
+
+TEST(Ajax, Tournament_DeleteMatchlessTables)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 50));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 51));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 52));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 60));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 61));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 62));
+
+		MatchTable* m1 = new RoundRobin(Weight(0), Weight(49));
+		MatchTable* m2 = new RoundRobin(Weight(50), Weight(55));
+		MatchTable* m3 = new RoundRobin(Weight(60), Weight(65));
+		MatchTable* m4 = new RoundRobin(Weight(70), Weight(80));
+		app.GetTournament()->AddMatchTable(m1);
+		app.GetTournament()->AddMatchTable(m2);
+		app.GetTournament()->AddMatchTable(m3);
+		app.GetTournament()->AddMatchTable(m4);
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 4);
+
+		EXPECT_TRUE(app.Ajax_DeleteMatchlessMatchTables());
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 2);
+		EXPECT_EQ(app.GetTournament()->GetMatchTables()[0]->GetNumberOfMatches(), 3);
+		EXPECT_EQ(app.GetTournament()->GetMatchTables()[1]->GetNumberOfMatches(), 3);
+	}
+}
+
+
+
+TEST(Ajax, Tournament_DeleteCompletedTables)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 50));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 51));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 52));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 60));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 61));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 62));
+
+		MatchTable* m1 = new RoundRobin(Weight(0), Weight(49));
+		MatchTable* m2 = new RoundRobin(Weight(50), Weight(55));
+		MatchTable* m3 = new RoundRobin(Weight(60), Weight(65));
+		MatchTable* m4 = new RoundRobin(Weight(70), Weight(80));
+		app.GetTournament()->AddMatchTable(m1);
+		app.GetTournament()->AddMatchTable(m2);
+		app.GetTournament()->AddMatchTable(m3);
+		app.GetTournament()->AddMatchTable(m4);
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 4);
+
+		EXPECT_TRUE(app.Ajax_DeleteCompletedMatchTables());
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 2);
+		EXPECT_EQ(app.GetTournament()->GetMatchTables()[0]->GetNumberOfMatches(), 3);
+		EXPECT_EQ(app.GetTournament()->GetMatchTables()[1]->GetNumberOfMatches(), 3);
+
+		app.StartLocalMat();
+		auto mat = app.FindMat(1);
+
+		auto match1 = app.GetTournament()->GetNextMatch();
+		EXPECT_TRUE(mat->StartMatch(match1));
+		mat->AddIppon(Fighter::White);
+		EXPECT_TRUE(mat->EndMatch());
+
+		auto match2 = app.GetTournament()->GetNextMatch();
+		EXPECT_TRUE(mat->StartMatch(match2));
+		mat->AddIppon(Fighter::White);
+		EXPECT_TRUE(mat->EndMatch());
+
+		auto match3 = app.GetTournament()->GetNextMatch();
+		EXPECT_TRUE(mat->StartMatch(match3));
+		mat->AddIppon(Fighter::White);
+		EXPECT_TRUE(mat->EndMatch());
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 2);
+
+		EXPECT_TRUE(app.Ajax_DeleteCompletedMatchTables());
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 1);
+		EXPECT_EQ(app.GetTournament()->GetMatchTables()[0]->GetNumberOfMatches(), 3);
+	}
 }
 
 

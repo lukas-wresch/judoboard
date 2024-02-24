@@ -35,7 +35,7 @@ namespace Judoboard
 		virtual bool Open()  override;
 		virtual bool Close() override;
 		virtual bool Pause(bool Enable = true) override {
-			if (Enable)
+			if (!IsPaused() && Enable)
 			{
 				if (m_State == State::StartUp || m_State == State::Waiting)
 				{
@@ -43,7 +43,7 @@ namespace Judoboard
 					return true;
 				}
 			}
-			else if (IsPaused())
+			else if (IsPaused() && !Enable)
 			{
 				NextState(State::Waiting);
 				return true;
