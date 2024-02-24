@@ -38,6 +38,7 @@ function PauseAll(enable)
 function RemoveEmptyMatchTables()
 {
 	AjaxCallback("ajax/tournament/delete_matchless_tables", function(response) {
+		goBack();
 	});	
 }
 
@@ -45,6 +46,7 @@ function RemoveEmptyMatchTables()
 function RemoveCompletedMatchTables()
 {
 	AjaxCallback("ajax/tournament/delete_completed_tables", function(response) {
+		goBack();
 	});	
 }
 

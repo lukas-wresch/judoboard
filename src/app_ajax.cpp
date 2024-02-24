@@ -3060,6 +3060,8 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 
 	if (id != new_id)//Check if new_id is an unused id
 	{
+		auto guard = LockReadForScope();
+
 		for (const auto mat : GetMats())
 		{
 			if (mat && mat->GetMatID() == new_id)
