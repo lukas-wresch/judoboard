@@ -1,15 +1,25 @@
 <h2 id="headline"></h2>
 
+<div>
+Pause/Unpause all mats.
+</div>
 <button class="neutral" style="width: 4.3cm;" id="pause_all" onclick="PauseAll(true);"></button>
 <button class="neutral" style="width: 4.3cm;" id="unpause_all" onclick="PauseAll(false);"></button>
 
 
 <div style="margin-top:1cm;margin-bottom:1cm;">
+	<div>
+	Move all match tables of the current tournament to a specific mat.
+	</div>
+
 	<select style="margin-bottom:20px; width: 100px;" id="mats">
 	</select>
 	<button class="neutral" style="width: 4.0cm;" id="move_matchtables_to_mat" onclick="MoveMatchTableToMat();"></button>
 </div>
 
+<div>
+Remove match tables.
+</div>
 <button class="remove" style="width: 6.3cm;" id="remove_empty_matchtables" onclick="RemoveEmptyMatchTables();"></button>
 <div style="margin-top:1cm;margin-bottom:1cm;">
 	<button class="remove" style="width: 6.3cm;" id="remove_completed_matchtables" onclick="RemoveCompletedMatchTables();"></button>
@@ -47,11 +57,11 @@ function MoveMatchTableToMat()
 }
 
 
-document.getElementById("headline").innerHTML = translate('settings');
-document.getElementById("pause_all").innerHTML = translate('ause_all_matspause_all');
+document.getElementById("headline").innerHTML    = translate('settings');
+document.getElementById("pause_all").innerHTML   = translate('pause_all_mats');
 document.getElementById("unpause_all").innerHTML = translate('unpause_all_mats');
-document.getElementById("move_matchtables_to_mat").innerHTML = translate('move_to_mat');
-document.getElementById("remove_empty_matchtables").innerHTML = translate('remove_matchtables_without_matches');
+document.getElementById("move_matchtables_to_mat").innerHTML      = translate('move_to_mat');
+document.getElementById("remove_empty_matchtables").innerHTML     = translate('remove_matchtables_without_matches');
 document.getElementById("remove_completed_matchtables").innerHTML = translate('remove_completed_matchtables');
 
 for (let i = 1;i <= 8; i++)
