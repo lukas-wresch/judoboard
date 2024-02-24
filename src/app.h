@@ -117,12 +117,15 @@ namespace Judoboard
 		Error Ajax_AssignAgeGroup(const HttpServer::Request& Request);
 		std::string Ajax_ListTournaments();
 		Error Ajax_SwapMatchesOfTournament(const HttpServer::Request& Request);
+		Error Ajax_DeleteMatchlessMatchTables();
+		Error Ajax_DeleteCompletedMatchTables();
 
 		//Mat
 		std::string Ajax_GetMats() const;
-		Error Ajax_OpenMat(  const HttpServer::Request& Request);
-		Error Ajax_CloseMat( const HttpServer::Request& Request);
-		Error Ajax_PauseMat( const HttpServer::Request& Request);
+		Error Ajax_OpenMat( const HttpServer::Request& Request);
+		Error Ajax_CloseMat(const HttpServer::Request& Request);
+		Error Ajax_PauseMat(const HttpServer::Request& Request);
+		Error Ajax_PauseAllMats(const HttpServer::Request& Request);
 		Error Ajax_UpdateMat(const HttpServer::Request& Request);
 
 		std::string Ajax_GetNamesOnMat(const HttpServer::Request& Request);
@@ -174,6 +177,7 @@ namespace Judoboard
 		Error Ajax_AddMatchTable(HttpServer::Request Request);
 		Error Ajax_EditMatchTable(const HttpServer::Request& Request);
 		Error Ajax_MoveMatchTable(const HttpServer::Request& Request);
+		Error Ajax_MoveAllMatchTables(const HttpServer::Request& Request);
 		std::string Ajax_GetMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_ListAllMatchTables(const HttpServer::Request& Request);
 		std::string Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request);

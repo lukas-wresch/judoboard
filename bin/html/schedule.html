@@ -3,6 +3,7 @@
 <button class="add" style="width: 3.0cm;" id="new_match" onclick="navigate('add_match.html')">New Match</button>
 <button class="add" style="width: 3.3cm;" id="new_matchtable" onclick="navigate('matchtable_add.html')">New Match table</button>
 <button class="add" style="width: 3.3cm;" id="select_age_groups" onclick="navigate('age_groups_select.html')"></button>
+<button class="add" style="width: 3.3cm;" id="tournament_settings" onclick="navigate('tournament_settings.html')"></button>
 
 
 <h2 id="headline-master-schedule">Overview</h2>
@@ -889,6 +890,7 @@ document.getElementById("headline-participants").innerHTML = translate('particip
 document.getElementById("new_participant").innerHTML = translate('new_participant');
 document.getElementById("new_match").innerHTML = translate('new_match');
 document.getElementById("new_matchtable").innerHTML = translate('add_matchtable');
+document.getElementById("tournament_settings").innerHTML = translate('settings');
 
 for (const el of document.getElementsByClassName("no"))
     el.innerHTML = translate('no');

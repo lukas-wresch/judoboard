@@ -45,7 +45,7 @@ void Application::SetupHttpServer()
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit", "lots",
 		"club_list", "club_add", "association_list", "association_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
-		"matchtable_list", "matchtable_add", "matchtable_creator", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add",
+		"matchtable_list", "matchtable_add", "matchtable_creator", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add", "tournament_settings",
 		"server_config"
 	};
 
@@ -285,6 +285,15 @@ void Application::SetupHttpServer()
 		if (!error)
 			return error;
 		return Ajax_PauseMat(Request);
+	});
+
+
+	m_Server.RegisterResource("/ajax/config/pause_all_mats", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_PauseAllMats(Request);
 	});
 
 
@@ -1704,6 +1713,15 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/matchtable/move_all", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_MoveAllMatchTables(Request);
+	});
+
+
 
 	m_Server.RegisterResource("/ajax/match/add", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -1986,6 +2004,20 @@ void Application::SetupHttpServer()
 
 		tournament->DeleteAllMatchResults();
 		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/tournament/delete_matchless_tables", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+		return Ajax_DeleteMatchlessMatchTables();
+	});
+
+	m_Server.RegisterResource("/ajax/tournament/delete_completed_tables", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+		return Ajax_DeleteCompletedMatchTables();
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/delete", [this](auto& Request) -> std::string {
@@ -2788,6 +2820,46 @@ Error Application::Ajax_SwapMatchesOfTournament(const HttpServer::Request& Reque
 
 
 
+Error Application::Ajax_DeleteMatchlessMatchTables()
+{
+	auto guard = LockWriteForScope();
+
+	auto tournament = GetTournament();
+	if (!tournament)
+		return Error::Type::OperationFailed;
+
+	auto tables = tournament->GetMatchTables();//Make copy of list
+	for (auto table : tables)
+	{
+		if (table && table->GetNumberOfMatches() == 0)
+			tournament->RemoveMatchTable(*table);//This modifies the original list
+	}
+
+	return Error::Type::NoError;
+}
+
+
+
+Error Application::Ajax_DeleteCompletedMatchTables()
+{
+	auto guard = LockWriteForScope();
+
+	auto tournament = GetTournament();
+	if (!tournament)
+		return Error::Type::OperationFailed;
+
+	auto tables = tournament->GetMatchTables();//Make copy of list
+	for (auto table : tables)
+	{
+		if (table && table->GetStatus() == Status::Concluded)
+			tournament->RemoveMatchTable(*table);//This modifies the original list
+	}
+
+	return Error::Type::NoError;
+}
+
+
+
 std::string Application::Ajax_GetMats() const
 {
 	YAML::Emitter ret;
@@ -2930,12 +3002,35 @@ Error Application::Ajax_PauseMat(const HttpServer::Request& Request)
 	if (id <= 0)
 		return Error(Error::Type::InvalidID);
 
+	auto guard = LockWriteForScope();
+
 	auto mat = FindMat(id);
 
 	if (!mat)
 		return Error(Error::Type::MatNotFound);
 
 	if (!mat->Pause(enable))
+		return Error(Error::Type::OperationFailed);
+
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_PauseAllMats(const HttpServer::Request& Request)
+{
+	bool enable = HttpServer::DecodeURLEncoded(Request.m_Query, "enable") == "true";
+
+	auto guard = LockWriteForScope();
+
+	bool success = true;
+	for (auto mat : GetMats())
+	{
+		if (!mat || !mat->Pause(enable))
+			success = false;	
+	}
+
+	if (!success)
 		return Error(Error::Type::OperationFailed);
 
 	return Error();//OK
@@ -2968,6 +3063,8 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 
 	if (id != new_id)//Check if new_id is an unused id
 	{
+		auto guard = LockReadForScope();
+
 		for (const auto mat : GetMats())
 		{
 			if (mat && mat->GetMatID() == new_id)
@@ -4093,6 +4190,30 @@ Error Application::Ajax_MoveMatchTable(const HttpServer::Request& Request)
 		entry->SetMatID(mat);
 	if (schedule_index >= 0)
 		entry->SetScheduleIndex(schedule_index);
+
+	return Error::Type::NoError;//OK
+}
+
+
+
+Error Application::Ajax_MoveAllMatchTables(const HttpServer::Request& Request)
+{
+	int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
+
+	if (mat <= 0)
+		return Error::Type::InvalidInput;
+
+	auto guard = LockWriteForScope();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	if (GetTournament()->GetStatus() == Status::Concluded)
+		return Error::Type::OperationFailed;
+
+	auto& match_tables = GetTournament()->GetMatchTables();
+	for (auto table : match_tables)
+		table->SetMatID(mat);
 
 	return Error::Type::NoError;//OK
 }

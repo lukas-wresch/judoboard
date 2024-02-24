@@ -42,6 +42,8 @@ void Localizer::Initialize(Language NewLanguage)
 			s_de["Score"]  = u8"Unterwertung";
 			s_de["Time"]   = u8"Zeit";
 
+			s_de["Pause"]  = u8"Pause";
+
 			s_de["Not enough permissions"] = u8"Nicht genug Rechte f\u00fcr diesen Vorgang";
 			s_de["Operation failed"]       = u8"Vorgang fehlgeschlagen";
 			s_de["Application is shutting down"] = "Das Programm wird heruntergefahren";
