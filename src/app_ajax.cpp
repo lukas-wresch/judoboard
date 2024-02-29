@@ -4191,6 +4191,8 @@ Error Application::Ajax_MoveMatchTable(const HttpServer::Request& Request)
 	if (schedule_index >= 0)
 		entry->SetScheduleIndex(schedule_index);
 
+	GetTournament()->OnUpdateMatchTable(*entry);
+
 	return Error::Type::NoError;//OK
 }
 
