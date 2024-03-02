@@ -1053,8 +1053,8 @@ bool Tournament::MoveMatchUp(const UUID& MatchID, uint32_t MatID)
 	if (!schedule[prev_match_index] || !schedule[current_index])
 		return false;
 
-	//Is either match running?
-	if (!schedule[prev_match_index]->IsScheduled() || !schedule[current_index]->IsScheduled())
+	//Don't move if both have concluded
+	if (schedule[prev_match_index]->HasConcluded() && schedule[current_index]->HasConcluded())
 		return false;
 
 	//Swap matches
@@ -1107,8 +1107,8 @@ bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 	if (!schedule[curr_match_index] || !schedule[next_match_index])
 		return false;
 
-	//Is either match running?
-	if (!schedule[curr_match_index]->IsScheduled() || !schedule[next_match_index]->IsScheduled())
+	//Don't move if both have concluded
+	if (schedule[curr_match_index]->HasConcluded() && schedule[next_match_index]->HasConcluded())
 		return false;
 
 	//Swap matches
@@ -1498,7 +1498,7 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 {
 	if (IsReadonly())
 		return false;
-	if (GetStatus() != Status::Scheduled)
+	if (GetStatus() == Status::Concluded)
 		return false;
 
 	auto guard = LockWriteForScope();
@@ -1509,20 +1509,20 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 		return false;
 
 	if (matchTable->GetStatus() != Status::Scheduled)//Can safely recalculate the match table
-		return false;
-
-	auto participants = matchTable->GetParticipants();
-	for (auto judoka : participants)
-		if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
-			matchTable->RemoveParticipant(judoka);
-
-	for (auto judoka : m_StandingData.GetAllJudokas())
 	{
-		if (judoka && matchTable->IsElgiable(*judoka))
-			matchTable->AddParticipant(judoka);
-	}
+		auto participants = matchTable->GetParticipants();
+		for (auto judoka : participants)
+			if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
+				matchTable->RemoveParticipant(judoka);
 
-	matchTable->GenerateSchedule();
+		for (auto judoka : m_StandingData.GetAllJudokas())
+		{
+			if (judoka && matchTable->IsElgiable(*judoka))
+				matchTable->AddParticipant(judoka);
+		}
+
+		matchTable->GenerateSchedule();
+	}
 
 	//Optimize master schedule entries
 	OrganizeMasterSchedule();
@@ -1798,9 +1798,6 @@ bool Tournament::MoveScheduleEntryUp(const UUID& UUID)
 		return false;
 
 	if (m_MatchTables[index]->GetScheduleIndex() < 0)
-		return false;
-
-	if (m_MatchTables[index]->GetStatus() != Status::Scheduled)//Don't move if already started
 		return false;
 
 	if (m_MatchTables[index]->GetScheduleIndex() == 0)
@@ -2196,7 +2193,7 @@ size_t Tournament::GetLotOfAssociation(const UUID& UUID) const
 
 
 
-const std::string Tournament::Schedule2String(bool ImportantOnly) const
+const std::string Tournament::Schedule2String(bool ImportantOnly, int Mat) const
 {
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
@@ -2210,6 +2207,9 @@ const std::string Tournament::Schedule2String(bool ImportantOnly) const
 	{
 		if (match)
 		{
+			if (Mat >= 1 && match->GetMatID() != Mat)
+				continue;
+
 			if (!ImportantOnly)//Default, serialize all matches
 				match->ToString(ret);
 			else//Serialize only the "important" matches
@@ -2233,65 +2233,6 @@ const std::string Tournament::Schedule2String(bool ImportantOnly) const
 	}
 	UnlockRead();
 
-	ret << YAML::EndSeq;
-	return ret.c_str();
-}
-
-
-
-const std::string Tournament::Participants2String() const
-{
-	YAML::Emitter ret;
-	ret << YAML::BeginSeq;
-	LockRead();
-
-	auto schedule = GetSchedule();
-	for (auto judoka : m_StandingData.GetAllJudokas())
-	{
-		uint32_t num_matches = 0;
-		for (auto match : schedule)
-		{
-			if (match && match->HasValidFighters() && match->Contains(*judoka))
-				num_matches++;
-		}
-
-		auto judoka_age_group = GetAgeGroupOfJudoka(judoka);
-
-		ret << YAML::BeginMap;
-
-		ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
-		ret << YAML::Key << "name" << YAML::Value << judoka->GetName(NameStyle::GivenName);
-		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
-		ret << YAML::Key << "num_matches" << YAML::Value << num_matches;
-
-		if (judoka->GetClub())
-		{
-			ret << YAML::Key << "club_uuid" << YAML::Value << (std::string)judoka->GetClub()->GetUUID();
-			ret << YAML::Key << "club_name" << YAML::Value << judoka->GetClub()->GetName();
-		}
-
-		if (judoka_age_group)
-			ret << YAML::Key << "age_group_uuid" << YAML::Value << (std::string)judoka_age_group->GetUUID();
-
-		//Calculate eligable age groups
-		ret << YAML::Key << "age_groups" << YAML::Value;
-		ret << YAML::BeginSeq;
-
-		auto age_groups = GetEligableAgeGroupsOfJudoka(judoka);
-		for (auto age_group : age_groups)
-		{
-			ret << YAML::BeginMap;
-			ret << YAML::Key << "uuid" << YAML::Value << (std::string)age_group->GetUUID();
-			ret << YAML::Key << "name" << YAML::Value << age_group->GetName();
-			ret << YAML::EndMap;
-		}
-
-		ret << YAML::EndSeq;
-
-		ret << YAML::EndMap;
-	}
-
-	UnlockRead();
 	ret << YAML::EndSeq;
 	return ret.c_str();
 }
