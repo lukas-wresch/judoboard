@@ -2430,6 +2430,40 @@ TEST(Ajax, MatchTable_Move)
 
 
 
+TEST(Ajax, MatchTable_Move2)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+		app.GetTournament()->AddParticipant(j1);
+
+		auto j2 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+		app.GetTournament()->AddParticipant(j2);
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test1&mat=1&minWeight=40&maxWeight=70")) );
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test2&mat=1&minWeight=40&maxWeight=70")) );
+
+		ASSERT_EQ(tables.size(), 2);
+		EXPECT_EQ(tables[0]->GetName(), "Test1");
+		EXPECT_EQ(tables[1]->GetName(), "Test2");
+
+		auto schedule = app.GetTournament()->GetSchedule();
+		EXPECT_EQ(schedule[0]->GetMatchTable()->GetName(), "Test1");
+
+		EXPECT_TRUE(app.Ajax_MoveMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID() + "&schedule_index=3") ));
+
+		schedule = app.GetTournament()->GetSchedule();
+		EXPECT_EQ(schedule[0]->GetMatchTable()->GetName(), "Test2");
+	}
+}
+
+
+
 TEST(Ajax, MatchTable_MoveAll)
 {
 	initialize();
