@@ -31,7 +31,7 @@
 
 function AddParticipant(id)
 {
-  var select = document.getElementById("select_" + id);
+  let select = document.getElementById("select_" + id);
   if (select !== null)
   {
     if (select.value == 0)
@@ -45,7 +45,12 @@ function AddParticipant(id)
     });
   }
   else
-    AjaxCallback('ajax/participant/add?id=' + id, Update);
+    AjaxCallback('ajax/participant/add?id=' + id, function(resp) {
+      if (resp == "ok")
+        Update();
+      else
+        alert("Could not add participant to tournament. Check if judoka's club is allowed for this tournament.");
+    });
 
   return false;
 }

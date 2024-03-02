@@ -452,7 +452,7 @@ function Update_Schedule()
 
   updateScheduleRunning = true;
 
-  AjaxCallback("ajax/get_schedule?filter=" + document.getElementById("filter_mat").value, function(response) {
+  AjaxCallback("ajax/get_schedule?filter=" + document.getElementById("filter_mat").value + '&mat=' + document.getElementById("display_mat").value, function(response) {
     //console.log(response);
     const res = YAML.parse(response);
 
@@ -463,13 +463,11 @@ function Update_Schedule()
     while (table.rows.length > 1)
       table.deleteRow(-1);
 
-    let mat_to_display = document.getElementById("display_mat").value;
-
     let no = 0;
     for (const match of res)
     {
-      if (mat_to_display != 0 && match.mat_id != mat_to_display)
-        continue;
+      //if (mat_to_display != 0 && match.mat_id != mat_to_display)
+        //continue;
 
       let row = table.insertRow(-1);
       let cell0 = row.insertCell(0);
