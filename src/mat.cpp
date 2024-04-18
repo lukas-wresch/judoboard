@@ -130,6 +130,10 @@ bool Mat::Close()
 	m_Graphics["winner_blue" ].Reset();
 	m_Graphics["winner_white"].Reset();
 
+	m_Background.Delete();
+	m_Logo.Delete();
+	m_Winner.Delete();
+
 	return true;
 }
 
