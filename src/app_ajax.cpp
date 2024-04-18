@@ -351,13 +351,14 @@ void Application::SetupHttpServer()
 
 	m_Server.RegisterResource("/ajax/get_schedule", [this](auto& Request) -> std::string {
 		bool important_only = HttpServer::DecodeURLEncoded(Request.m_Query, "filter") == "2";
+		int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
 
 		auto guard = LockReadForScope();
 		
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		return GetTournament()->Schedule2String(important_only);
+		return GetTournament()->Schedule2String(important_only, mat);
 	});
 
 
@@ -4189,9 +4190,10 @@ Error Application::Ajax_MoveMatchTable(const HttpServer::Request& Request)
 	if (mat >= 1)
 		entry->SetMatID(mat);
 	if (schedule_index >= 0)
+	{
 		entry->SetScheduleIndex(schedule_index);
-
-	GetTournament()->OnUpdateMatchTable(*entry);
+		GetTournament()->OnUpdateMatchTable(*entry);
+	}
 
 	return Error::Type::NoError;//OK
 }

@@ -140,14 +140,12 @@ namespace Judoboard
 
 		//Events
 		virtual void OnMatchConcluded(const Match& Match) const = 0;
-		virtual bool OnUpdateParticipant(const UUID& UUID) { return false; }//Calling this function we recalculate the given judoka
-		virtual bool OnUpdateMatchTable(const UUID& UUID)  { return false; }//Calling this function we recalculate the given match table
+		virtual bool OnUpdateParticipant(const UUID& UUID) { assert(false); return false; }//Calling this function we recalculate the given judoka
+		virtual bool OnUpdateMatchTable(const UUID& UUID)  { assert(false); return false; }//Calling this function we recalculate the given match table
 
 		//Serialization
-		virtual const std::string Schedule2String(bool ImportantOnly) const { return ""; }
-		[[deprecated]]
-		virtual const std::string Participants2String() const { return ""; }
-		virtual const std::string MasterSchedule2String() const { return ""; }
+		virtual const std::string Schedule2String(bool ImportantOnly, int Mat = -1) const { assert(false); return ""; }
+		virtual const std::string MasterSchedule2String() const { assert(false); return ""; }
 
 		virtual void GenerateSchedule() {}
 
