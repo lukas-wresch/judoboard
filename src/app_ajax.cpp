@@ -3325,6 +3325,7 @@ std::string Application::Ajax_SearchJudoka(const HttpServer::Request& Request)
 		ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
 		ret << YAML::Key << "firstname" << YAML::Value << judoka->GetFirstname();
 		ret << YAML::Key << "lastname" << YAML::Value << judoka->GetLastname();
+		ret << YAML::Key << "gender" << YAML::Value << (int)judoka->GetGender();
 		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
 		ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
 
