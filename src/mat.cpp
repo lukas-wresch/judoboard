@@ -604,9 +604,9 @@ void Mat::Hajime()
 				m_Graphics["hajime"].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0, [](auto& g) { return g.m_a > 0.0; }));
 			m_Graphics["mate"].StopAllAnimations().AddAnimation(Animation::CreateLinear(0.0, 0.0, -90.0, [](auto& g) { return g.m_a > 0.0; }));
 
-			//m_Graphics["osaekomi_text"].StopAllAnimations().SetPosition(0, 0, 255);
-			//m_Graphics["osaekomi_bar_border"].StopAllAnimations().SetPosition(0, 0, 0);
-			//m_Graphics["osaekomi_bar"].StopAllAnimations().SetPosition(0, 0, 0);
+			m_Graphics["osaekomi_text"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0));
+			m_Graphics["osaekomi_bar_border"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0));
+			m_Graphics["osaekomi_bar"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0));
 		}
 	}
 
@@ -782,8 +782,41 @@ void Mat::RemoveWazaAri(Fighter Whom)
 
 		m_Graphics["effect_wazaari_" + Fighter2String(Whom)].SetAlpha(0);
 
+		if (WasEndOfOsaekomiRecent() && GetScoreboard(Whom).m_WazaAri > 0)//Remove wazari shortly after an osaekomi ended?
+		{
+			//Remove the first wazaari
+			SetScoreboard(Whom).m_WazaAri--;
+			AddEvent(Whom, MatchLog::BiasedEvent::RemoveWazaari);
+
+			const auto osaekomi_holder = GetOsaekomiHolder();
+
+			assert(m_OsaekomiList.size() >= 1);
+
+			//Shift hajime and osaekomi timer for lost time
+			auto shift = Timer::GetTimestamp() - m_EndOfOsaekomiTimestamp;
+			m_HajimeTimer.Shift(shift);
+			m_OsaekomiTimer[(int)osaekomi_holder].Shift(shift);
+
+			//Continue osaekomi
+			m_OsaekomiTimer[(int)osaekomi_holder].Start();
+			m_IsOsaekomi = true;
+
+			//Since mate was called by mistake
+			Hajime();//Has to be called at the end since it resets the osaekomi timer
+
+			m_Graphics["effect_ippon_"  + Fighter2String(osaekomi_holder)].SetAlpha(0);
+
+			m_Graphics["hajime"].SetAlpha(0);
+			m_Graphics["mate"].SetAlpha(0);
+
+			if (IsSoundEnabled())
+				StopSoundFile();
+		}
+
 		if (IsOsaekomi() && GetOsaekomiHolder() == Whom)
+		{
 			m_Graphics["osaekomi_bar"].m_width = 0;//We have to reset and recalculate the osaekomi bar
+		}
 	}
 }
 
@@ -1303,6 +1336,8 @@ void Mat::Process()
 		m_OsaekomiTimer[(int)GetOsaekomiHolder()].Pause();
 		m_OsaekomiTimer[(int)GetOsaekomiHolder()].Set(osaekomi_time);
 		m_IsOsaekomi = false;
+
+		m_EndOfOsaekomiTimestamp = Timer::GetTimestamp();
 
 		if (GetScoreboard(GetOsaekomiHolder()).m_WazaAri == 1)
 			AddWazaAri(GetOsaekomiHolder());
