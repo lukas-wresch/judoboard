@@ -2465,6 +2465,53 @@ TEST(Ajax, MatchTable_Move2)
 
 
 
+TEST(Ajax, MatchTable_MoveWithOneFinished)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+		app.GetTournament()->AddParticipant(j1);
+		auto j2 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+		app.GetTournament()->AddParticipant(j2);
+		auto j3 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+		app.GetTournament()->AddParticipant(j3);
+
+		auto j4 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+		app.GetTournament()->AddParticipant(j4);
+		auto j5 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+		app.GetTournament()->AddParticipant(j5);
+		auto j6 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+		app.GetTournament()->AddParticipant(j6);
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test1&mat=1&minWeight=40&maxWeight=70")) );
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test2&mat=1&minWeight=40&maxWeight=70")) );
+
+		ASSERT_EQ(tables.size(), 2);
+		EXPECT_EQ(tables[0]->GetName(), "Test1");
+		EXPECT_EQ(tables[1]->GetName(), "Test2");
+
+		auto schedule = app.GetTournament()->GetSchedule();
+		EXPECT_EQ(schedule[0]->GetMatchTable()->GetName(), "Test1");
+
+		auto mat = app.StartLocalMat();
+		EXPECT_TRUE(mat->StartMatch(app.GetTournament()->GetNextMatch()));
+		mat->AddIppon(Fighter::White);
+		EXPECT_TRUE(mat->EndMatch());
+
+		EXPECT_TRUE(app.Ajax_MoveMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID() + "&schedule_index=3") ));
+
+		schedule = app.GetTournament()->GetSchedule();
+		EXPECT_EQ(schedule[0]->GetMatchTable()->GetName(), "Test2");
+	}
+}
+
+
+
 TEST(Ajax, MatchTable_MoveAll)
 {
 	initialize();
