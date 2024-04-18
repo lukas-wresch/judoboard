@@ -431,10 +431,15 @@ function navigate(url)
 {
   window.clearInterval(TimerID);
 
-  g_LastURL = URL;
-
   window.location = '/#' + url;
-  URL = url;
+
+  if (URL != url)
+  {
+    g_LastURL = URL;
+    URL = url;
+  }
+
+  $( "#main" ).load(URL);
 
   if (window.innerWidth <= 900)//Mobile
     slideout.close();
@@ -455,7 +460,6 @@ window.onhashchange = function(e)
 {
   console.log(location.hash.slice(1));
   navigate(location.hash.slice(1));
-  $( "#main" ).load(URL);
 };
 
 

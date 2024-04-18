@@ -1168,6 +1168,7 @@ TEST(Ajax, Judoka_Search)
 		ASSERT_EQ(yaml.size(), 2);
 		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)j1->GetUUID());
 		EXPECT_EQ(yaml[1]["uuid"].as<std::string>(), (std::string)j2->GetUUID());
+		EXPECT_EQ(yaml[1]["gender"].as<int>(), (int)j2->GetGender());
 
 		yaml = YAML::Load( app.Ajax_SearchJudoka(HttpServer::Request("name=kl&participants=true")) );
 		ASSERT_EQ(yaml.size(), 1);

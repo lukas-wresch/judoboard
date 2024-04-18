@@ -45,11 +45,20 @@ function Command(cmd, id)
 
 
 
+let updateMatsRunning = false;
+
 function Update()
 {
+  if (updateMatsRunning)
+    return;
+
+  updateMatsRunning = true;
+
   AjaxCallback("ajax/config/get_mats", function(response) {
     console.log(response);
     const res = YAML.parse(response);
+
+    updateMatsRunning = false;
 
     let table = document.getElementById("mats");
     
