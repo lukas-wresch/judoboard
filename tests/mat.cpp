@@ -1642,6 +1642,52 @@ TEST(Mat, TokedaAfterOsaekomi_Wazaari)
 
 
 
+TEST(Mat, TokedaAfterOsaekomi_WazaariRemoved)
+{
+	initialize();
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		EXPECT_TRUE(m.Open());
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		match.SetRuleSet(new RuleSet("Test", 10, 0, 4, 2, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.Hajime();
+
+		m.AddWazaAri(f);
+
+		m.Osaekomi(f);
+		EXPECT_TRUE(m.IsOsaekomi());
+		EXPECT_TRUE(m.IsOsaekomiRunning());
+
+		ZED::Core::Pause(3000);
+
+		m.RemoveWazaAri(f);
+
+		EXPECT_TRUE(m.IsHajime());
+		EXPECT_TRUE(m.IsOsaekomi());
+		EXPECT_TRUE(m.IsOsaekomiRunning());
+
+		ZED::Core::Pause(2500);
+
+		EXPECT_FALSE(m.IsHajime());
+		EXPECT_FALSE(m.IsOsaekomi());
+		EXPECT_FALSE(m.IsOsaekomiRunning());
+
+		EXPECT_LE(std::abs((int)m.GetTimeElapsed() - 4000), 100);
+
+		EXPECT_TRUE(m.HasConcluded());
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
 TEST(Mat, TokedaAfterMate_OutOfTime)
 {
 	initialize();

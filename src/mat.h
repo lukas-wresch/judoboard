@@ -97,6 +97,7 @@ namespace Judoboard
 		virtual void Hajime() override;
 		virtual void Mate() override;
 		virtual bool WasMateRecent() const override { return AreFightersOnMat() && Timer::GetTimestamp() - m_MateTimestamp < 3000; }
+		virtual bool WasEndOfOsaekomiRecent() const { return AreFightersOnMat() && Timer::GetTimestamp() - m_EndOfOsaekomiTimestamp < 3000; }
 		virtual void Sonomama() override;
 
 		virtual void AddIppon(Fighter Whom) override;
@@ -512,7 +513,8 @@ namespace Judoboard
 
 		Timer m_HajimeTimer;
 		Timer m_OsaekomiTimer[2];
-		uint32_t m_MateTimestamp = 0;//Timestam of last mate command
+		uint32_t m_MateTimestamp = 0;//Timestamp of last mate command
+		uint32_t m_EndOfOsaekomiTimestamp = 0;//Timestamp when the last osaekomi ended naturally (osaekomi timer larger than time required)
 
 		std::vector<OsaekomiEntry> m_OsaekomiList;
 		bool m_IsOsaekomi = false;

@@ -192,7 +192,7 @@ function GetLog()
     console.log(response);
     const res = YAML.parse(response);
 
-    var table = document.getElementById("log");
+    let table = document.getElementById("log");
 
     for (const event of res)
     {
@@ -238,7 +238,7 @@ function GetLog()
         cell3.innerHTML = translate('draw');
       else if (event.group == 2 && event.event == 11)
         cell3.innerHTML = translate('draw_revoked');
-      else if (res[i+1] == 2 && res[i+2] == 12)
+      else if (event.group == 2 && event.event == 12)
         cell3.innerHTML = translate('match_revised');
 
       else if (event.event == 0)

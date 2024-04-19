@@ -2409,15 +2409,16 @@ void Tournament::GenerateSchedule()
 {
 	if (IsReadonly())
 		return;
-	if (GetStatus() != Status::Scheduled)
-		return;
 
 	auto guard = LockWriteForScope();
 
-	for (auto table : m_MatchTables)
+	if (GetStatus() == Status::Scheduled)//Can safely recalculate all match tables?
 	{
-		if (table)
-			table->GenerateSchedule();
+		for (auto table : m_MatchTables)
+		{
+			if (table)
+				table->GenerateSchedule();
+		}
 	}
 
 	OrganizeMasterSchedule();
