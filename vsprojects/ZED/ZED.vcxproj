@@ -21,14 +21,17 @@
   <ItemGroup>
     <ClCompile Include="..\..\ZED\external\SDL_rotozoom\SDL_rotozoom.cpp" />
     <ClCompile Include="..\..\ZED\src\blob.cpp" />
+    <ClCompile Include="..\..\ZED\src\component.cpp" />
     <ClCompile Include="..\..\ZED\src\core.cpp" />
     <ClCompile Include="..\..\ZED\src\csv.cpp" />
+    <ClCompile Include="..\..\ZED\src\entity.cpp" />
     <ClCompile Include="..\..\ZED\src\file.cpp" />
     <ClCompile Include="..\..\ZED\src\http_client.cpp" />
     <ClCompile Include="..\..\ZED\src\image.cpp" />
     <ClCompile Include="..\..\ZED\src\log.cpp" />
     <ClCompile Include="..\..\ZED\src\opengl_extensions.cpp" />
     <ClCompile Include="..\..\ZED\src\png.cpp" />
+    <ClCompile Include="..\..\ZED\src\registry.cpp" />
     <ClCompile Include="..\..\ZED\src\renderer.cpp" />
     <ClCompile Include="..\..\ZED\src\renderer_opengl.cpp" />
     <ClCompile Include="..\..\ZED\src\renderer_sdl2.cpp" />
@@ -41,14 +44,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ZED\include\blob.h" />
+    <ClInclude Include="..\..\ZED\include\component.h" />
     <ClInclude Include="..\..\ZED\include\core.h" />
     <ClInclude Include="..\..\ZED\include\csv.h" />
+    <ClInclude Include="..\..\ZED\include\entity.h" />
     <ClInclude Include="..\..\ZED\include\file.h" />
     <ClInclude Include="..\..\ZED\include\http_client.h" />
     <ClInclude Include="..\..\ZED\include\image.h" />
     <ClInclude Include="..\..\ZED\include\log.h" />
     <ClInclude Include="..\..\ZED\include\png.h" />
     <ClInclude Include="..\..\ZED\include\read_write_mutex.h" />
+    <ClInclude Include="..\..\ZED\include\registry.h" />
     <ClInclude Include="..\..\ZED\include\renderer.h" />
     <ClInclude Include="..\..\ZED\include\renderer_opengl.h" />
     <ClInclude Include="..\..\ZED\include\renderer_sdl2.h" />
