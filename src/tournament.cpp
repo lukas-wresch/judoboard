@@ -813,6 +813,11 @@ bool Tournament::AddMatch(Match* NewMatch)
 
 	auto guard = LockWriteForScope();
 
+	NewMatch->SetTournament(this);//If not yet associated
+
+	if (NewMatch->GetMatID() == 0)//Not assigned any mat?
+		NewMatch->SetMatID(1);//Use mat ID 1 as the default
+
 	//Do we have the rule set already?
 	if (!m_StandingData.FindRuleSet(NewMatch->GetRuleSet().GetUUID()))
 		m_StandingData.AddRuleSet(new RuleSet(NewMatch->GetRuleSet()));//Copy rule set

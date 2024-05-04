@@ -1775,10 +1775,14 @@ TEST(Tournament, AddMatchAfterConclusion)
 		EXPECT_TRUE(tourney.AddParticipant(j3));
 		EXPECT_TRUE(tourney.AddParticipant(j4));
 
-		auto match1 = new Match(j1, j3, &tourney, 1);
+		//auto match1 = new Match(j1, j3, &tourney, 1);
+		auto match1 = new Match(j1, j3, nullptr);
 		auto match2 = new Match(j1, j4, &tourney, 1);
 
+		EXPECT_FALSE(match1->GetTournament());
 		EXPECT_TRUE(tourney.AddMatch(match1));
+		EXPECT_TRUE(match1->GetTournament());
+		EXPECT_EQ(match1->GetMatID(), 1);
 
 		auto mat = new Mat(1);
 		mat->StartMatch(match1);
