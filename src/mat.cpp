@@ -159,6 +159,10 @@ bool Mat::Reset()
 	m_IsOsaekomi = false;
 	m_OsaekomiHolder = Fighter::White;
 
+	m_MateTimestamp = 0;
+	m_EndOfOsaekomiTimestamp = 0;
+	m_MatchTimeBeforeGoldenScore = 0;
+
 	m_GoldenScore = false;
 	m_IsDraw = false;
 
@@ -481,6 +485,10 @@ bool Mat::EnableGoldenScore(bool GoldenScore)
 
 	if (GoldenScore)
 	{
+		m_MatchTimeBeforeGoldenScore = m_HajimeTimer.GetElapsedTime();
+		if (IsOsaekomiTimerPositiv())
+			m_MatchTimeBeforeGoldenScore += m_OsaekomiTimer[(int)GetOsaekomiHolder()].GetElapsedTime();
+
 		m_HajimeTimer.Reset();
 		//In case of double ippon, reset the ippons
 		SetScoreboard(Fighter::White).m_Ippon = SetScoreboard(Fighter::Blue).m_Ippon = 0;
@@ -488,7 +496,8 @@ bool Mat::EnableGoldenScore(bool GoldenScore)
 	}
 	else
 	{
-		m_HajimeTimer = m_pMatch->GetRuleSet().GetMatchTime() * 1000;
+		if (m_pMatch)
+			m_HajimeTimer = m_pMatch->GetRuleSet().GetMatchTime() * 1000;
 		AddEvent(MatchLog::NeutralEvent::DisableGoldenScore);
 	}
 
@@ -2728,7 +2737,11 @@ Match::Result Mat::GetResult() const
 	auto time = m_HajimeTimer.GetElapsedTime();
 
 	if (IsGoldenScore() && m_pMatch)
-		time += m_pMatch->GetRuleSet().GetMatchTime() * 1000;
+		time += m_MatchTimeBeforeGoldenScore;//Total time (with last second osaekomi) before golden score
+
+	//Osaekomi after 'out if time'?
+	if (IsOsaekomiTimerPositiv() && m_pMatch && m_pMatch->GetRuleSet().IsOutOfTime(m_HajimeTimer.GetElapsedTime(), IsGoldenScore()) )
+		time += m_OsaekomiTimer[(int)GetOsaekomiHolder()].GetElapsedTime();
 
 	//Double hansokumake
 	if (GetScoreboard(Fighter::White).m_HansokuMake && GetScoreboard(Fighter::Blue).m_HansokuMake)
