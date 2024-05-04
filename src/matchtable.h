@@ -285,7 +285,8 @@ namespace Judoboard
 		static MatchTable* CreateMatchTable(const YAML::Node& Yaml, const ITournament* Tournament);
 
 		virtual ~MatchTable() {
-			DeleteSchedule();
+			for (auto match : m_Schedule)
+				delete match;
 		}
 
 		virtual Type GetType() const { return Type::Unknown; }
