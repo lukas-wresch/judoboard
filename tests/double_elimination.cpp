@@ -467,6 +467,67 @@ TEST(LoserBracket, Count64)
 
 
 
+TEST(DoubleElimination, Count6)
+{
+	initialize();
+
+	Tournament* t = new Tournament("Tournament Name");
+	t->EnableAutoSave(false);
+
+	Judoka* j[33];
+	bool has_match[33];
+	const size_t count = 6;
+
+	for (int i = 1; i <= count; ++i)
+	{
+		j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i);
+		has_match[i] = false;
+		t->AddParticipant(j[i]);
+	}
+
+	DoubleElimination* group = new DoubleElimination(0, 200);
+	group->SetMatID(1);
+	t->AddMatchTable(group);
+
+	for (int i = 1; i <= count; ++i)
+		group->SetStartPosition(j[i], i);
+
+	EXPECT_EQ(group->GetMaxStartPositions(), 8);
+
+	auto& winner_schedule = group->GetWinnerBracket().GetSchedule();
+	auto& loser_schedule  = group->GetLoserBracket() .GetSchedule();
+
+	//EXPECT_TRUE(loser_schedule[0]->Contains(*j[1]));
+
+	ASSERT_EQ(winner_schedule.size(),  4 + 2 + 1);
+	ASSERT_EQ(loser_schedule.size(),   2 + 2);
+
+	Mat m(1);
+
+	for (auto match : group->GetSchedule())
+	{
+		if (match->IsEmptyMatch())
+			continue;
+
+		EXPECT_TRUE(m.StartMatch(match));
+		if (m.GetFighter(Fighter::White).GetWeight() > m.GetFighter(Fighter::Blue).GetWeight())
+			m.AddIppon(Fighter::White);
+		else
+			m.AddIppon(Fighter::Blue);
+		EXPECT_TRUE(m.EndMatch());
+	}
+
+	auto results = group->CalculateResults();
+
+	ASSERT_EQ(results.GetSize(), 2);
+	EXPECT_EQ(results[0].Judoka->GetUUID(), j[6]->GetUUID());
+	EXPECT_EQ(results[1].Judoka->GetUUID(), j[5]->GetUUID());
+
+	delete t;
+}
+
+
+
 TEST(DoubleElimination, Count7)
 {
 	initialize();
