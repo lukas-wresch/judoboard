@@ -237,7 +237,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			continue;
 
 		//Filter UP and DOWN matches in round robin (MD7)
-		if (!white || !blue && match.Weightclass && match.Weightclass->pUserData)
+		if ((!white || !blue) && match.Weightclass && match.Weightclass->pUserData)
 				if ( ((MatchTable*)match.Weightclass->pUserData)->GetType() == MatchTable::Type::RoundRobin)
 					continue;
 
@@ -363,7 +363,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	for (auto weightclass : File.GetWeightclasses())
 	{
 		auto table = (MatchTable*)weightclass->pUserData;
-		auto md5_schedule = File.FindMatchesOfWeightclass(weightclass->AgeGroupID, weightclass->ID);
+		//auto md5_schedule = File.FindMatchesOfWeightclass(weightclass->AgeGroupID, weightclass->ID);
 
 		if (!table || table->GetType() == MatchTable::Type::RoundRobin)
 			continue;

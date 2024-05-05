@@ -164,12 +164,9 @@ bool Weightclass::IsElgiable(const Judoka& Fighter) const
 			return false;
 
 		//Check if the judoka is indeed starting for that age group
-		if (GetTournament())
-		{
-			auto age_group_starting_for = GetTournament()->GetAgeGroupOfJudoka(&Fighter);
-			if (!age_group_starting_for || GetAgeGroup()->GetUUID() != age_group_starting_for->GetUUID())
-				return false;
-		}
+		auto age_group_starting_for = GetTournament()->GetAgeGroupOfJudoka(&Fighter);
+		if (!age_group_starting_for || GetAgeGroup()->GetUUID() != age_group_starting_for->GetUUID())
+			return false;
 	}
 
 	if (m_Gender != Gender::Unknown)//Gender enforced?
