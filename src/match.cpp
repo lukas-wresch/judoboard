@@ -527,6 +527,16 @@ const Judoka* Match::GetWinner() const
 
 const Judoka* Match::GetLoser() const
 {
+	if (IsCompletelyEmptyMatch())
+		return nullptr;
+
+	if (IsEmptyMatch())
+	{
+		if (GetFighter(Fighter::White))
+			return GetFighter(Fighter::Blue);
+		return GetFighter(Fighter::White);
+	}
+
 	if (!HasConcluded())
 		return nullptr;
 
