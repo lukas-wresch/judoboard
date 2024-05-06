@@ -92,29 +92,6 @@ int main(int argc, char** argv)
 		commands.push_back(std::string(argv[i]));
 #endif
 
-	/*if (cmd.find("--testscreen") != std::string::npos)
-		show_test_screen = true;
-	else if (cmd.find("--demo") != std::string::npos)
-		demo = true;
-	else if (cmd.find("--nowindow") != std::string::npos)
-		nowindow = true;
-	else if (cmd.find("--version") != std::string::npos)
-		version = true;
-
-	for (int i = 1; i < argc; i++)
-	{
-		if (std::string(argv[i]) == "--port" && i+1 < argc)
-			port = ZED::Core::ToInt(argv[i+1]);
-		else if (std::string(argv[i]) == "--testscreen")
-			show_test_screen = true;
-		else if (std::string(argv[i]) == "--demo")
-			demo = true;
-		else if (std::string(argv[i]) == "--nowindow")
-			nowindow = true;
-		else if (std::string(argv[i]) == "--version")
-			version = true;
-	}*/
-
 	for (auto it = commands.begin(); it != commands.end(); ++it)
 	{
 		if (*it == "--port" && ++it != commands.end())
@@ -134,9 +111,39 @@ int main(int argc, char** argv)
 			nowindow = true;
 		else if (*it == "--version")
 			version = true;
+
+#ifdef _DEBUG
+		else if (*it == "--dummy")//CREATE DUMMY TOURNAMENT
+		{
+			Judoboard::Tournament tournament1("dummy-mustermann1");
+			for (int i = 0; i < 150; i++)
+			{
+				Judoboard::Judoka* white = new Judoboard::Judoka("Max" + std::to_string(2 * i + 1), "Mustermann");
+				Judoboard::Judoka* blue  = new Judoboard::Judoka("Max" + std::to_string(2 * i + 2), "Mustermann");
+				Judoboard::Match* match  = new Judoboard::Match(white, blue, &tournament1, (i % 2) + 1);
+				tournament1.AddMatch(match);
+			}
+			for (auto table : tournament1.GetMatchTables())
+				table->SetName(" ");
+
+
+			Judoboard::Tournament tournament2("dummy-mustermann2");
+			for (int i = 0; i < 150; i++)
+			{
+				Judoboard::Judoka* white = new Judoboard::Judoka("Max" + std::to_string(2 * i + 1), "Mustermann");
+				Judoboard::Judoka* blue  = new Judoboard::Judoka("Max" + std::to_string(2 * i + 2), "Mustermann");
+				Judoboard::Match* match  = new Judoboard::Match(white, blue, &tournament2, (i % 2) + 1);
+				tournament2.AddMatch(match);
+			}
+			for (auto table : tournament2.GetMatchTables())
+				table->SetName(" ");
+			
+			return 0;
+		}//END OF CREATE DUMMY TOURNAMENT
+#endif
 	}
 
-	
+
 
 	if (version)
 	{
