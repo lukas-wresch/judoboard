@@ -70,6 +70,7 @@ namespace ZED
 	class SoundDevice
 	{
 	public:
+		SoundDevice() {}
 		DLLEXPORT SoundDevice(int Index) : SoundDevice(GetDeviceName(Index)) {}
 		DLLEXPORT SoundDevice(const char* DeviceName);
 		SoundDevice(const std::string& DeviceName) : SoundDevice(DeviceName.c_str()) {}
@@ -85,7 +86,7 @@ namespace ZED
 		DLLEXPORT void Stop();
 
 	private:
-		SDL_AudioDeviceID m_Device;
+		SDL_AudioDeviceID m_Device = 0;
 	};
 
 

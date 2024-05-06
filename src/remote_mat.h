@@ -119,6 +119,11 @@ namespace Judoboard
 			return -1;
 		}
 
+		virtual void SetAudio(bool Enabled, const std::string& NewFilename, int DeviceID) override
+		{
+			assert(false);//NOT IMPLEMENTED
+		}
+
 		std::string GetHostname() const { return m_Hostname; }
 		uint16_t GetPort() const { return m_Port; }
 

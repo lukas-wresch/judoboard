@@ -162,6 +162,22 @@ namespace Judoboard
 			return GetMonitorIndex();
 		}
 
+		virtual void SetAudio(bool Enabled, const std::string& NewFilename, int DeviceID) override
+		{
+			EnableSound(Enabled);
+			SetSoundFilename(NewFilename);
+			SetAudioDeviceID(DeviceID);
+
+			m_Sound = std::move(ZED::Sound("assets/sounds/" + GetSoundFilename() + ".wav"));
+			if (m_Sound)
+				ZED::Log::Info("Sound file loaded");
+			else
+				ZED::Log::Warn("Could not load sound file");
+
+			if (DeviceID >= 0)
+				m_AudioDevice = ZED::SoundDevice(DeviceID);
+		}
+
 		virtual void SetName(const std::string& NewName) override
 		{
 			m_mutex.LockWrite();
@@ -169,21 +185,24 @@ namespace Judoboard
 			m_mutex.UnlockWrite();
 		}
 
-		virtual void SetSoundFilename(const std::string& NewFilename) override
-		{
-			IMat::SetSoundFilename(NewFilename);
-
-			m_Sound = std::move(ZED::Sound("assets/sounds/" + GetSoundFilename() + ".wav"));
-			if (m_Sound)
-				ZED::Log::Info("Sound file loaded");
-			else
-				ZED::Log::Warn("Could not load sound file");
-		}
-
 
 	private:
-		virtual void PlaySoundFile() const override { m_Sound.Play(); }
-		virtual void StopSoundFile() const override { m_Sound.Stop(); }
+		virtual void PlaySoundFile() const override {
+			if (!IsSoundEnabled()) return;
+
+			if (GetAudioDeviceID() <= -1)//Default
+				m_Sound.Play();
+			else
+				m_AudioDevice.Play(m_Sound);
+		}
+		virtual void StopSoundFile() const override {
+			if (!IsSoundEnabled()) return;
+
+			if (GetAudioDeviceID() <= -1)//Default
+				m_Sound.Stop();
+			else
+				m_AudioDevice.Stop();
+		}
 
 
 		Scoreboard& SetScoreboard(Fighter Whom)
@@ -545,6 +564,7 @@ namespace Judoboard
 		mutable ZED::Ref<ZED::Texture> m_Winner;
     
 		mutable ZED::Sound m_Sound;//Sound signal
+		mutable ZED::SoundDevice m_AudioDevice;
 
 		double m_ScalingFactor = 1.0;//Should be 1.0 for 1080p screen, smaller for smaller screen and > 1.0 for larger screens
 
