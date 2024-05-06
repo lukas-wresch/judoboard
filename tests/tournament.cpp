@@ -1030,6 +1030,89 @@ TEST(Tournament, TestData_Randori2022)
 
 
 
+TEST(Tournament, StressTest_DeletionMovingAdding)
+{
+	initialize();
+
+	{
+		auto tournament_name = GetRandomName();
+		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
+
+		Judoka* j[100];
+
+		for (int i = 0; i < 100; i++)
+		{
+			j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
+			tourney->AddParticipant(j[i]);
+		}
+
+		MatchTable* m1 = new RoundRobin(Weight(0), Weight(60));
+		MatchTable* m2 = new RoundRobin(Weight(60), Weight(70));
+		MatchTable* m3 = new RoundRobin(Weight(70), Weight(80));
+		MatchTable* m4 = new RoundRobin(Weight(80), Weight(90));
+		MatchTable* m5 = new RoundRobin(Weight(90), Weight(100));
+
+		tourney->AddMatchTable(m1);
+		tourney->AddMatchTable(m2);
+		tourney->AddMatchTable(m3);
+		tourney->AddMatchTable(m4);
+		tourney->AddMatchTable(m5);
+
+
+		auto adder = [&]() {
+			for (int i = 0; i < 1000; i++)
+			{
+				Match* new_match = new Match(j[rand() % 100], j[rand() % 100], nullptr);
+				tourney->AddMatch(new_match);
+			}
+		};
+
+		auto swapper = [&]() {
+			for (int i = 0; i < 1000; i++)
+			{
+				auto schedule = tourney->GetSchedule();
+
+				if (rand() % 2 == 0)
+					tourney->MoveMatchUp(schedule[rand() % schedule.size()]->GetUUID());
+				else
+					tourney->MoveMatchDown(schedule[rand() % schedule.size()]->GetUUID());
+			}
+		};
+
+		auto remover = [&]() {
+			for (int i = 0; i < 1000; i++)
+			{
+				auto schedule = tourney->GetSchedule();
+				tourney->RemoveMatch(schedule[rand() % schedule.size()]->GetUUID());
+			}
+		};
+
+		for (int k = 0; k < 5; k++)
+		{
+			std::thread add[10];
+			std::thread rem[10];
+			std::thread swp[10];
+
+			for (int i = 0; i < 10; i++)
+				add[i] = std::thread(adder);
+			for (int i = 0; i < 10; i++)
+				rem[i] = std::thread(remover);
+			for (int i = 0; i < 10; i++)
+				swp[i] = std::thread(swapper);
+
+
+			for (int i = 0; i < 10; i++)
+				add[i].join();
+			for (int i = 0; i < 10; i++)
+				rem[i].join();
+			for (int i = 0; i < 10; i++)
+				swp[i].join();
+		}
+	}
+}
+
+
+
 TEST(Tournament, SwapMatches_Randori2022)
 {
 	initialize();
