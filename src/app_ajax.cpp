@@ -486,8 +486,8 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		bool success = GetTournament()->RemoveMatch(id);
-
+		if (!GetTournament()->RemoveMatch(id))
+			return Error(Error::Type::OperationFailed);
 		return Error(Error::Type::NoError);
 	});
 
