@@ -27,6 +27,15 @@ Sound::Sound(const char* Filename)
 
 
 
+uint32_t Sound::GetSize() const
+{
+	if (!m_SndChunk)
+		return 0;
+	return m_SndChunk->alen;
+}
+
+
+
 void Sound::Play(int Loops) const
 {
 	if (m_SndChunk)
@@ -51,6 +60,71 @@ void Sound::Unload()
 	if (m_SndChunk)
 		Mix_FreeChunk(m_SndChunk);
 	m_SndChunk = nullptr;
+}
+
+
+
+SoundDevice::SoundDevice(const char* DeviceName)
+{
+	SDL_AudioSpec desired, obtained;
+	SDL_memset(&desired, 0, sizeof(desired));
+	desired.freq   = 44100;
+	desired.format = AUDIO_S16;//16-bit
+	desired.channels = 2;//Stereo
+	desired.samples = 4096;
+
+	m_Device = SDL_OpenAudioDevice(DeviceName, 0, &desired, &obtained, 0);
+	Pause(false);//The device is paused by default
+}
+
+
+
+SoundDevice::~SoundDevice()
+{
+	if (IsValid())
+		SDL_CloseAudioDevice(m_Device);
+}
+
+
+
+const char* SoundDevice::GetDeviceName(int Index)
+{
+	return SDL_GetAudioDeviceName(Index, 0);
+}
+
+
+
+int SoundDevice::GetNumberOfDevices()
+{
+	return SDL_GetNumAudioDevices(0);
+}
+
+
+
+void SoundDevice::Play(const Sound& Sound)
+{
+	if (IsValid() && Sound)
+	{
+		SDL_ClearQueuedAudio(m_Device);//Can not mix multiple audio streams, so clear all queued audio data
+		SDL_QueueAudio(m_Device, Sound.m_SndChunk->abuf, Sound.m_SndChunk->alen);
+		Pause(false);
+	}
+}
+
+
+
+void SoundDevice::Pause(bool Enable)
+{
+	if (IsValid())
+		SDL_PauseAudioDevice(m_Device, Enable ? 1 : 0);
+}
+
+
+
+void SoundDevice::Stop()
+{
+	if (IsValid())
+		SDL_ClearQueuedAudio(m_Device);
 }
 
 

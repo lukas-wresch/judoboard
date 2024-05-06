@@ -6,6 +6,7 @@
 
 typedef struct _Mix_Music Mix_Music;
 struct Mix_Chunk;
+typedef uint32_t SDL_AudioDeviceID;
 
 
 
@@ -13,6 +14,8 @@ namespace ZED
 {
 	class Sound
 	{
+		friend class SoundDevice;
+
 	public:
 		Sound() = default;
 		Sound(Sound&) = delete;
@@ -46,6 +49,8 @@ namespace ZED
 
 		bool IsValid() const { return m_SndChunk; }
 
+		DLLEXPORT uint32_t GetSize() const;//Returns the size of the sound in bytes
+
 		DLLEXPORT void Play(int Loops = 0) const;
 		void Loop() const { Play(-1); }
 		DLLEXPORT void Stop() const;
@@ -58,6 +63,29 @@ namespace ZED
 		Mix_Chunk* m_SndChunk = nullptr;
 		mutable int m_Channel = -1;
 		bool m_Shared = false;
+	};
+
+
+
+	class SoundDevice
+	{
+	public:
+		DLLEXPORT SoundDevice(int Index) : SoundDevice(GetDeviceName(Index)) {}
+		DLLEXPORT SoundDevice(const char* DeviceName);
+		SoundDevice(const std::string& DeviceName) : SoundDevice(DeviceName.c_str()) {}
+		DLLEXPORT ~SoundDevice();
+
+		DLLEXPORT static const char* GetDeviceName(int Index);
+		DLLEXPORT static int GetNumberOfDevices();
+
+		bool IsValid() const { return m_Device > 0; }
+
+		DLLEXPORT void Play(const Sound& Sound);
+		DLLEXPORT void Pause(bool Enable = true);
+		DLLEXPORT void Stop();
+
+	private:
+		SDL_AudioDeviceID m_Device;
 	};
 
 
