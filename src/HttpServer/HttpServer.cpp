@@ -171,6 +171,32 @@ HttpServer::~HttpServer()
 
 
 
+uint32_t HttpServer::GetWorkerCount() const
+{
+    if (m_Context)
+        return m_Context->num_threads;
+    return 0;
+}
+
+
+
+uint32_t HttpServer::GetFreeWorkerCount() const
+{
+    if (m_Context)
+        return m_Context->free_threads;
+    return 0;
+}
+
+
+
+void HttpServer::IncreaseWorkerCount(uint32_t Amount)
+{
+    if (m_Context)
+        mg_increase_worker_count(m_Context, Amount);
+}
+
+
+
 void HttpServer::RegisterResource(const std::string& URI, std::function<ZED::Blob(Request&)> Callback, ResourceType Type, uint32_t Cache)
 {
     m_Resources.insert({ URI, Resource(Type, Callback, Cache) });
