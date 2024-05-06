@@ -246,6 +246,8 @@ var showRevokeGoldenScore = false;
 var showHansokumakeDecisionWhite = false;
 var showHansokumakeDecisionBlue  = false;
 
+let isGoldenscore = false;
+
 
 function Hajime()
 {
@@ -763,7 +765,8 @@ function GetScore()
     else
       ShowRevokeHantei(false);
 
-    document.getElementById("golden_score").disabled = res.is_goldenscore;
+    isGoldenscore = res.is_goldenscore;
+    document.getElementById("golden_score").disabled = isGoldenscore;
 
     if (typeof res.white.unknown_disqualification !== 'undefined')
         ShowHansokumakeDecision(true, 'white');
@@ -787,7 +790,7 @@ function GetJudokaName()
 
   AjaxCallback(host + '/ajax/mat/names_on_mat?id='+id + '&token=' + token, function(response) {
     console.log(response);
-    let res = YAML.parse(response);
+    const res = YAML.parse(response);
 
     updateJudokaName = false;
 
@@ -924,11 +927,11 @@ function GetOsaekomiList()
 
   AjaxCallback("ajax/mat/get_osaekomilist?id="+id, function(response) {
     console.log(response);
-    var res = response.split(",");
+    const res = response.split(",");
 
     updateOsaekomiList = false;
 
-    var table = document.getElementById("osaekomi_list");
+    const table = document.getElementById("osaekomi_list");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
@@ -941,12 +944,12 @@ function GetOsaekomiList()
     else
       $("#osaekomi_list_div").show(1000);
 
-    for (var i=0; i < res.length; i+=2)
+    for (let i=0; i < res.length; i+=2)
     {
-      var row = table.insertRow(-1);
+      let row = table.insertRow(-1);
 
-      var cell1 = row.insertCell(0);
-      var cell2 = row.insertCell(1);
+      let cell1 = row.insertCell(0);
+      let cell2 = row.insertCell(1);
 
       if (res[i] == 0)
         cell1.innerHTML = translate('white'); 
@@ -969,28 +972,15 @@ function DisplayTimer()
 }
 
 
-function GetTimer()
-{
-  AjaxCallback("ajax/mat/current_time?id="+id, function(response) {
-    var res = response.split(",");
-
-    HajimeTimer = parseInt(res[0]);
-
-    if (parseInt(res[1]) == 1)
-      HajimeTimer_Running = true;
-    else
-      HajimeTimer_Running = false;
-
-    DisplayTimer();
-  });
-}
-
-
 function UpdateTimer()
 {
   if (HajimeTimer_Running)
   {
-    HajimeTimer -= 100;
+    if (isGoldenscore)
+      HajimeTimer += 100;
+    else
+      HajimeTimer -= 100;
+
     if (HajimeTimer < 0)
       HajimeTimer = 0;
     DisplayTimer();

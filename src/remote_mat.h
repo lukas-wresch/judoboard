@@ -30,7 +30,6 @@ namespace Judoboard
 		virtual bool HasConcluded() const override;
 		virtual bool EndMatch() override;
 
-		virtual uint32_t GetTimeElapsed()  const override { return 0; }
 		virtual uint32_t GetTime2Display() const override { return 0; }
 
 		virtual bool IsHajime()      const override { return GetState().hajime; }
