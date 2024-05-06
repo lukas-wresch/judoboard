@@ -18,10 +18,6 @@ namespace Judoboard
 		DoubleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
 			: DoubleElimination(new Weightclass(Weightclass_, this), Tournament) {}
 
-		~DoubleElimination() {
-			DeleteSchedule();
-		}
-
 		static std::string GetHTMLForm();
 
 		virtual Type GetType() const override { return Type::DoubleElimination; }

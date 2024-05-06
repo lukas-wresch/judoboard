@@ -235,6 +235,12 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		if (white && blue && *white == *blue)//Filter dummy matches
 			continue;
+
+		//Filter UP and DOWN matches in round robin (MD7)
+		if ((!white || !blue) && match.Weightclass && match.Weightclass->pUserData)
+				if ( ((MatchTable*)match.Weightclass->pUserData)->GetType() == MatchTable::Type::RoundRobin)
+					continue;
+
 		//if (!white && !blue)//Filter dummy matches
 			//continue;
 		
@@ -335,11 +341,13 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			auto se = (SingleElimination*)table;
 			//se->ReorderLastMatches();
 		}
-		/*else if (table->GetType() == MatchTable::Type::DoubleElimination)
+		else if (table->GetType() == MatchTable::Type::DoubleElimination)
 		{
 			auto de = (DoubleElimination*)table;
-			de->GetWinnerBracket().ReorderLastMatches();
-		}*/
+			de->AutoGenerateSchedule(true);
+			de->GenerateSchedule();//Re-generated matches
+			//de->GetWinnerBracket().ReorderLastMatches();
+		}
 		else if (table->GetType() == MatchTable::Type::RoundRobin && table->IsBestOfThree())
 		{
 			if (table->GetSchedule().size() == 3)
@@ -355,7 +363,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	for (auto weightclass : File.GetWeightclasses())
 	{
 		auto table = (MatchTable*)weightclass->pUserData;
-		auto md5_schedule = File.FindMatchesOfWeightclass(weightclass->AgeGroupID, weightclass->ID);
+		//auto md5_schedule = File.FindMatchesOfWeightclass(weightclass->AgeGroupID, weightclass->ID);
 
 		if (!table || table->GetType() == MatchTable::Type::RoundRobin)
 			continue;
@@ -803,6 +811,8 @@ bool Tournament::AddMatch(Match* NewMatch)
 		return false;
 	}
 
+	//auto guard = LockWriteForScope();//TODO, check if respoinsible for crash
+
 	//Do we have the match already?
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
@@ -811,7 +821,12 @@ bool Tournament::AddMatch(Match* NewMatch)
 			return false;
 	}
 
-	auto guard = LockWriteForScope();
+	auto guard = LockWriteForScope();//TODO, this should move above
+
+	NewMatch->SetTournament(this);//If not yet associated
+
+	if (NewMatch->GetMatID() == 0)//Not assigned to any mat?
+		NewMatch->SetMatID(1);//Use mat ID 1 as the default
 
 	//Do we have the rule set already?
 	if (!m_StandingData.FindRuleSet(NewMatch->GetRuleSet().GetUUID()))
@@ -1042,7 +1057,7 @@ bool Tournament::MoveMatchUp(const UUID& MatchID, uint32_t MatID)
 	{
 		if (MatID != 0 && schedule[current_index]->GetMatID() != MatID)
 			continue;
-		if (schedule[current_index]->GetUUID() == MatchID)
+		if (schedule[current_index]->GetUUID() == MatchID)//CRASH HERE, MatchID points to invalid memory
 			break;
 		prev_match_index = current_index;
 	}

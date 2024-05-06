@@ -484,11 +484,11 @@ void Application::SetupHttpServer()
 		auto guard = LockWriteForScope();
 
 		if (!GetTournament())
-			return std::string("No tournament open");
+			return Error(Error::Type::TournamentNotOpen);
 
 		bool success = GetTournament()->RemoveMatch(id);
 
-		return std::string();
+		return Error(Error::Type::NoError);
 	});
 
 	m_Server.RegisterResource("/ajax/match/get_log", [this](auto& Request) -> std::string {

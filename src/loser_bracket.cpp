@@ -224,8 +224,8 @@ void LoserBracket::GenerateSchedule()
 
 		if (IsFinalMatch() && GetSchedule().size() >= 3)
 		{
-			auto match1 = GetSchedule()[GetSchedule().size() - 3];
-			auto match2 = GetSchedule()[GetSchedule().size() - 2];
+			match1 = GetSchedule()[GetSchedule().size() - 3];
+			match2 = GetSchedule()[GetSchedule().size() - 2];
 		}
 
 		auto third_place = CreateAutoMatch(nullptr, nullptr);

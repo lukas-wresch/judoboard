@@ -527,6 +527,16 @@ const Judoka* Match::GetWinner() const
 
 const Judoka* Match::GetLoser() const
 {
+	if (IsCompletelyEmptyMatch())
+		return nullptr;
+
+	if (IsEmptyMatch())
+	{
+		if (GetFighter(Fighter::White))
+			return GetFighter(Fighter::Blue);
+		return GetFighter(Fighter::White);
+	}
+
 	if (!HasConcluded())
 		return nullptr;
 
@@ -624,10 +634,10 @@ bool Match::IsEmptyMatch() const
 	if (m_Blue.m_DependentMatchTable  && !m_Blue.m_DependentMatchTable->HasConcluded())
 		return !GetFighter(Fighter::White);*/
 
-	if (m_White.m_DependentMatch)
-		return m_White.m_DependentMatch->IsCompletelyEmptyMatch();
-	if (m_Blue.m_DependentMatch)
-		return m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
+	if (m_White.m_DependentMatch && m_White.m_DependentMatch->IsCompletelyEmptyMatch())
+		return true;
+	if (m_Blue.m_DependentMatch && m_Blue.m_DependentMatch->IsCompletelyEmptyMatch())
+		return true;
 
 	return !GetFighter(Fighter::White) || !GetFighter(Fighter::Blue);
 }
@@ -642,7 +652,10 @@ bool Match::IsCompletelyEmptyMatch() const
 		return false;
 
 	if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
-		return m_White.m_DependentMatch->IsCompletelyEmptyMatch() && m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
+	{
+		if (m_White.m_DependentMatch->IsCompletelyEmptyMatch() && m_Blue.m_DependentMatch->IsCompletelyEmptyMatch())
+			return true;
+	}
 
 	return !GetFighter(Fighter::White) && !GetFighter(Fighter::Blue);
 }
