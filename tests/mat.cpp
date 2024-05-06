@@ -1565,7 +1565,7 @@ TEST(Mat, TokedaAfterOsaekomi)
 
 		m.Mate();
 
-		EXPECT_LE(std::abs((int)m.GetTimeElapsed() - 3500), 50);
+		EXPECT_LE(std::abs((int) (10*1000 - m.GetTime2Display()) - 3500), 50);
 
 		EXPECT_FALSE(m.IsHajime());
 		EXPECT_FALSE(m.IsOsaekomi());
@@ -1621,7 +1621,7 @@ TEST(Mat, TokedaAfterOsaekomi_Wazaari)
 
 		m.Mate();
 
-		EXPECT_LE(std::abs((int)m.GetTimeElapsed() - 3500), 50);
+		EXPECT_LE(std::abs((int) (10*1000 - m.GetTime2Display()) - 3500), 50);
 
 		EXPECT_FALSE(m.IsHajime());
 		EXPECT_FALSE(m.IsOsaekomi());
@@ -1679,7 +1679,7 @@ TEST(Mat, TokedaAfterOsaekomi_WazaariRemoved)
 		EXPECT_FALSE(m.IsOsaekomi());
 		EXPECT_FALSE(m.IsOsaekomiRunning());
 
-		EXPECT_LE(std::abs((int)m.GetTimeElapsed() - 4000), 100);
+		EXPECT_LE(std::abs((int) (10*1000 - m.GetTime2Display()) - 4000), 100);
 
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
@@ -2303,7 +2303,7 @@ TEST(Mat, GoldenScore_Revoke)
 	m.EnableGoldenScore(false);
 
 	EXPECT_TRUE(m.IsOutOfTime());
-	EXPECT_EQ(m.GetTimeElapsed(), 2000);
+	EXPECT_EQ(m.GetTime2Display(), 0);
 
 	EXPECT_FALSE(m.HasConcluded());
 	EXPECT_FALSE(m.EndMatch());
@@ -2411,7 +2411,7 @@ TEST(Mat, GoldenScoreResetTime)
 
 	EXPECT_TRUE(m.EnableGoldenScore());
 
-	EXPECT_TRUE(m.GetTimeElapsed() == 0);
+	EXPECT_EQ(m.GetTime2Display(), 0);
 
 	m.AddIppon(Fighter::White);
 
