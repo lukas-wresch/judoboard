@@ -1,6 +1,7 @@
 <div style="margin-left: 0.5cm; font-size: 20pt;">
   <label id="mat"></label> - <label id="time"></label>: <span id="hajimetime"></span><br/>
-  <label class="matchtable_label"></label>: <label id="matchtable"></label>
+  <label class="matchtable_label"></label>: <label id="matchtable"></label><br/>
+  <label id="total_time_label"></label>: <label id="total_time"></label>
 </div>
 
 <table border="1" rules="all" style="margin-top: 3mm; margin-bottom: 0mm; width: 21.0cm;">
@@ -229,6 +230,8 @@ var CurrentScore;
 var HajimeTimer = 0;
 var HajimeTimer_Running = false;
 
+let totalTime = 0;
+
 var OsaekomiWhiteTimer = 0;
 var OsaekomiWhiteTimer_Running = false;
 
@@ -273,7 +276,7 @@ function SetScore(who, command, event)
 {
   event.preventDefault();
 
-  var url;
+  let url;
   if (who.length >= 1)
     url = host + '/ajax/mat/' + who + '/' + command + '?id='+id + '&token=' + token;
   else
@@ -640,6 +643,7 @@ function GetScore()
     document.getElementById("rem_koka_blue").disabled    = !res.are_fighters_on_mat || !res.koka_enabled;
 
     HajimeTimer = parseInt(res.hajime_time);
+    totalTime   = parseInt(res.total_time);
 
     OsaekomiWhiteTimer = parseInt(res.white.osaekomi_time);
     OsaekomiWhiteTimer_Running = res.white.is_osaekomi_running;
@@ -962,10 +966,10 @@ function GetOsaekomiList()
 function DisplayTimer()
 {
   document.getElementById("hajimetime").innerHTML = Math.floor(HajimeTimer/(1000*60)) + ':' + zeroPad(Math.floor((HajimeTimer/1000))%60, 2) + '.' + Math.floor((HajimeTimer%1000)/100);
+  document.getElementById("total_time").innerHTML = Math.floor(totalTime  /(1000*60)) + ':' + zeroPad(Math.floor((totalTime  /1000))%60, 2) + '.' + Math.floor((totalTime  %1000)/100);
 
   document.getElementById("white_osaekomitime").innerHTML = Math.floor((OsaekomiWhiteTimer/1000)) + '.' + Math.floor((OsaekomiWhiteTimer%1000)/100);
-
-  document.getElementById("blue_osaekomitime").innerHTML = Math.floor((OsaekomiBlueTimer/1000)) + '.' + Math.floor((OsaekomiBlueTimer%1000)/100);
+  document.getElementById("blue_osaekomitime").innerHTML  = Math.floor((OsaekomiBlueTimer /1000)) + '.' + Math.floor((OsaekomiBlueTimer %1000)/100);
 }
 
 
@@ -993,6 +997,7 @@ function UpdateTimer()
     HajimeTimer -= 100;
     if (HajimeTimer < 0)
       HajimeTimer = 0;
+    totalTime += 100;
     DisplayTimer();
   }
 
@@ -1059,6 +1064,7 @@ function Mat_Init()
 
   document.getElementById("time").innerHTML = translate('time');
   document.getElementById("mat").innerHTML  = translate('mat') + ' ' + id;
+  document.getElementById("total_time_label").innerHTML = translate('total_time');
 
   document.getElementById("end_match").innerHTML  = translate('end_match');
 
