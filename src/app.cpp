@@ -712,14 +712,19 @@ void Application::Run()
 
 #ifdef _DEBUG
 		if (m_Server.GetFreeWorkerCount() == 0)
+		{
 			m_Server.IncreaseWorkerCount();
+			ZED::Log::Debug("Increased http worker count");
+		}
 #else
-		if (m_Server.GetFreeWorkerCount() <= 2)
+		if (m_Server.GetFreeWorkerCount() == 0)
+			m_Server.IncreaseWorkerCount(3);
+		else if (m_Server.GetFreeWorkerCount() <= 2)
 			m_Server.IncreaseWorkerCount();
 #endif
 
-		ZED::Core::Pause(10 * 1000);
-		runtime += 10;
+		ZED::Core::Pause(5 * 1000);
+		runtime += 5;
 
 		//Auto-save database
 		if (runtime % (5 * 60) == 0)//Every 5 minutes

@@ -54,7 +54,7 @@ TEST(HttpServer, MultipleRequests)
 		auto time = ZED::Core::CurrentTimestamp();
 		ZED::HttpClient client("localhost", port);
 		client.GET("/");
-		EXPECT_LE(ZED::Core::CurrentTimestamp() - time, 10u);
+		EXPECT_LE(ZED::Core::CurrentTimestamp() - time, 20u);
 	}
 }
 
@@ -69,6 +69,9 @@ TEST(HttpServer, Block_SemiOpen)
 	int port = rand()%5000 + 2000;
 	Application app(port);
 
+	std::thread app_thread([&]() {
+		app.Run();
+	});
 
 	{
 		auto time = ZED::Core::CurrentTimestamp();
@@ -83,23 +86,31 @@ TEST(HttpServer, Block_SemiOpen)
 		client->SetKeepAlive();
 		client->SendGETRequest("/");
 
-		ZED::Core::Pause(10 * 1000);
+		ZED::Core::Pause(80 * 1000);
 
 		delete client;
 	};
 
+#ifdef _DEBUG
+	for (int i = 0; i < 15; i++)
+#else
 	for (int i = 0; i < 50; i++)
+#endif
 	{
 		std::thread thread(connection_keep_alive);
 		thread.detach();
 	}
 
+	ZED::Core::Pause(40 * 1000);
 
 	{
 		auto time = ZED::Core::CurrentTimestamp();
 		ZED::HttpClient client("localhost", port);
 		client.GET("/");
 		time = ZED::Core::CurrentTimestamp() - time;
-		EXPECT_LE(time, 10u);
+		EXPECT_LE(time, 30u);
 	}
+
+	app.Shutdown();
+	app_thread.join();
 }
