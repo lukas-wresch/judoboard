@@ -164,6 +164,19 @@ const MatchTable* Pool::FindMatchTable(const UUID& UUID) const
 
 
 
+bool Pool::DeleteMatch(const UUID& UUID)
+{
+	bool success = MatchTable::DeleteMatch(UUID);
+
+	for (auto pool : m_Pools)
+		success |= pool->DeleteMatch(UUID);
+
+	success |= m_Finals.DeleteMatch(UUID);
+	return success;
+}
+
+
+
 void Pool::GenerateSchedule()
 {
 	if (!IsAutoGenerateSchedule())

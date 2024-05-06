@@ -991,6 +991,9 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
 		}
 	}
 
+	for (auto table : m_MatchTables)
+		table->DeleteMatch(MatchID);
+
 	auto schedule = GetSchedule();
 	for (size_t i = 0; i < schedule.size(); ++i)
 	{
@@ -1523,7 +1526,7 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 	if (!matchTable)
 		return false;
 
-	if (matchTable->GetStatus() != Status::Scheduled)//Can safely recalculate the match table
+	if (matchTable->GetStatus() == Status::Scheduled)//Can safely recalculate the match table
 	{
 		auto participants = matchTable->GetParticipants();
 		for (auto judoka : participants)
@@ -1580,7 +1583,7 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 		return a->GetUUID() < b->GetUUID();
 	});
 
-	GenerateSchedule();
+	BuildSchedule();
 
 	return true;
 }
