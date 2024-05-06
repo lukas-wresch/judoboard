@@ -1047,6 +1047,8 @@ void Mat::RemoveHansokuMake(Fighter Whom)
 
 		AddEvent(Whom, MatchLog::BiasedEvent::RemoveHansokuMake);
 		m_Graphics["effect_hansokumake_" + Fighter2String(Whom)].StopAllAnimations().SetAlpha(0);
+
+		RemoveIppon(!Whom);//Remove the ippon of the other fighter (that he got due to the HansokuMake)
 	}
 }
 
