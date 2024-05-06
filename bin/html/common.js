@@ -489,26 +489,26 @@ function GetRuleSets(callback)
 {
   AjaxCallback("ajax/rule/list", function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
-    var rules = document.getElementById("rule");
+    let rules = document.getElementById("rule");
 
     while (rules.length >= 1)
       rules.remove(rules.length-1);
 
-    var option = document.createElement("option");
+    let option = document.createElement("option");
     option.value = 0;
     option.text = "(None)";
     rules.add(option);
 
     for (const rule of res.rules)
     {
-      var option = document.createElement("option");
+      let option = document.createElement("option");
 
       option.value = rule.uuid;
 
       if (typeof res.default !== 'undefined' && rule.uuid == res.default)
-        option.text = rule.name + " (" + lang.tournament_default + ")";
+        option.text = rule.name + " (" + translate('tournament_default') + ")";
       else
         option.text = rule.name;
 
