@@ -703,6 +703,21 @@ void Application::Run()
 				if (!tournament->Save())
 					ZED::Log::Error("Failed to save!");
 			}
+
+			if (m_Database.IsResultsServer() && runtime % 60 == 0)
+			{
+				auto endpoint = m_Database.GetResultsServer();
+				auto data     = GetTournament()->Schedule2ResultsServer();
+
+				auto index = endpoint.find_first_of('/', 0);
+				auto host  = endpoint.substr(0, index);
+				auto path  = endpoint.substr(index);
+
+				std::thread([data, host, path]() {
+					ZED::HttpClient client(host);
+					client.POST(path, data);
+				}).detach();
+			}
 		}
 		UnlockRead();
 
