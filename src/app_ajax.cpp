@@ -4500,7 +4500,7 @@ Error Application::Ajax_PlaySoundFile(const HttpServer::Request& Request)
 
 	mat->SetAudio(true, filename, audio_device);
 
-	mat->PlaySoundFile();
+	mat->QueueSoundFile();
 
 	ZED::Core::Pause(20 * 1000);
 

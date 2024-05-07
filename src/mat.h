@@ -164,18 +164,22 @@ namespace Judoboard
 
 		virtual void SetAudio(bool Enabled, const std::string& NewFilename, int DeviceID) override
 		{
+			if (!m_Sound || GetSoundFilename() != NewFilename)
+			{
+				m_Sound = std::move(ZED::Sound("assets/sounds/" + GetSoundFilename() + ".wav"));
+				if (m_Sound)
+					ZED::Log::Info("Sound file loaded");
+				else
+					ZED::Log::Warn("Could not load sound file");
+			}
+
 			EnableSound(Enabled);
 			SetSoundFilename(NewFilename);
 			SetAudioDeviceID(DeviceID);
+		}
 
-			m_Sound = std::move(ZED::Sound("assets/sounds/" + GetSoundFilename() + ".wav"));
-			if (m_Sound)
-				ZED::Log::Info("Sound file loaded");
-			else
-				ZED::Log::Warn("Could not load sound file");
-
-			if (DeviceID >= 0)
-				m_AudioDevice = ZED::SoundDevice(DeviceID);
+		virtual void QueueSoundFile() const override {
+			m_PlaySound = true;
 		}
 
 		virtual void SetName(const std::string& NewName) override
@@ -187,13 +191,19 @@ namespace Judoboard
 
 
 	private:
-		virtual void PlaySoundFile() const override {
+		void PlaySoundFile() const {
 			if (!IsSoundEnabled()) return;
 
 			if (GetAudioDeviceID() <= -1)//Default
 				m_Sound.Play();
 			else
+			{
+				if (m_AudioDevice.GetDeviceIndex() != GetAudioDeviceID())
+					m_AudioDevice = ZED::SoundDevice(GetAudioDeviceID());
+
+				assert(m_AudioDevice.IsValid());
 				m_AudioDevice.Play(m_Sound);
+			}
 		}
 		virtual void StopSoundFile() const override {
 			if (!IsSoundEnabled()) return;
@@ -546,14 +556,13 @@ namespace Judoboard
 
 		Match* m_pMatch = nullptr;//Current match (if the current fight is associated with a match)
 
-		const Application* m_Application;
+		const Application* m_Application = nullptr;
 
 		mutable volatile bool m_RequestScreenshot = false;//True if a screenshot has been requested. Will be false after the screenshot has been saved
 		mutable ZED::Blob m_Screenshot;
 		uint32_t m_LastFrameTime = 40;
 
 		std::thread m_Thread;//Thread for running the main loop
-		//mutable std::recursive_mutex m_mutex;
 		mutable ZED::RecursiveReadWriteMutex m_mutex;
 
 		//Graphics
@@ -563,8 +572,9 @@ namespace Judoboard
 		mutable ZED::Ref<ZED::Texture> m_Logo;
 		mutable ZED::Ref<ZED::Texture> m_Winner;
     
-		mutable ZED::Sound m_Sound;//Sound signal
+		mutable ZED::Sound m_Sound;//Sound file
 		mutable ZED::SoundDevice m_AudioDevice;
+		mutable volatile bool m_PlaySound = false;//Flag to notify the main thread to play the sound file
 
 		double m_ScalingFactor = 1.0;//Should be 1.0 for 1080p screen, smaller for smaller screen and > 1.0 for larger screens
 

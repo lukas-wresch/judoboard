@@ -149,6 +149,11 @@ function GetMat(id)
     console.log(response);
     const res = YAML.parse(response);
 
+    while (document.getElementById("monitor").length > 0)
+      document.getElementById("monitor").remove(document.getElementById("monitor").length-1);
+    while (document.getElementById("audio_device").length > 1)
+      document.getElementById("audio_device").remove(document.getElementById("audio_device").length-1);
+
     for (const monitor of res.monitors)
     {
       let option = document.createElement("option");
@@ -197,7 +202,7 @@ function GetMat(id)
 
 
 
-var id = URLDecode(URL, "id");
+let id = URLDecode(URL, "id");
 
 AjaxCallback("ajax/config/list_sound_files", function(response) {
   console.log(response);

@@ -202,7 +202,7 @@ namespace Judoboard
 
 		//Audio
 		virtual void SetAudio(bool Enabled, const std::string& NewFilename, int DeviceID) = 0;
-		virtual void PlaySoundFile() const {}
+		virtual void QueueSoundFile() const {}
 		bool IsSoundEnabled() const { return m_SoundEnabled; }
 		std::string GetSoundFilename() const { return m_SoundFilename; }
 		int GetAudioDeviceID() const { return m_AudioDeviceID; }

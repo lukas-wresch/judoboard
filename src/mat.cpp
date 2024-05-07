@@ -9,9 +9,6 @@
 #include "../ZED/include/log.h"
 
 
-
-#define PI    3.14159265358979323846f
-
 using namespace Judoboard;
 
 
@@ -1373,6 +1370,8 @@ void Mat::Process()
 
 void Mat::RenderBackgroundEffect(float alpha) const
 {
+	const float PI = 3.14159265358979323846f;
+
 	if (alpha >= 359.5f)
 		alpha = 359.5f;
 	if (alpha <= 270.5f)
@@ -1389,7 +1388,7 @@ void Mat::RenderBackgroundEffect(float alpha) const
 	float m = std::tan(beta / (180.0f / PI));
 
 	auto& renderer = m_Window.GetRenderer();
-	const int width = renderer.GetWidth();
+	const int width  = renderer.GetWidth();
 	const int height = renderer.GetHeight();
 
 	renderer.FillRect(ZED::Rect(0, 0, width, height), 0, 0, 255);
@@ -2674,18 +2673,19 @@ bool Mat::Mainloop()
 		}
 	}
 
-	if (m_FrameCount % 400 == 50)
+	Process();
+
+	Render((double)m_LastFrameTime * 0.001f);
+
+	if (m_PlaySound)
 	{
-		SetAudio(true, "gong", 1);
+		//SetAudio(true, "gong", 1);
 		PlaySoundFile();
+		m_PlaySound = false;
 		//auto device = ZED::SoundDevice(1);
 		//device.Play(m_Sound);
 		//ZED::Core::Pause(5000);
 	}
-
-	Process();
-
-	Render((double)m_LastFrameTime * 0.001f);
 
 	//Calculate frame time
 	uint32_t target_frameTime = 40;//25 FPS when idle

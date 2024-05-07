@@ -64,16 +64,16 @@ void Sound::Unload()
 
 
 
-SoundDevice::SoundDevice(const char* DeviceName)
+SoundDevice::SoundDevice(int Index) : m_DeviceIndex(Index)
 {
 	SDL_AudioSpec desired, obtained;
 	SDL_memset(&desired, 0, sizeof(desired));
 	desired.freq   = 44100;
 	desired.format = AUDIO_S16;//16-bit
 	desired.channels = 2;//Stereo
-	desired.samples = 4096;
+	desired.samples  = 4096;
 
-	m_Device = SDL_OpenAudioDevice(DeviceName, 0, &desired, &obtained, 0);
+	m_Device = SDL_OpenAudioDevice(GetDeviceName(Index), 0, &desired, &obtained, 0);
 	Pause(false);//The device is paused by default
 }
 
@@ -133,7 +133,7 @@ bool SoundEngine::Init()
 {
 	int audio_rate = 44100;
 	Uint16 audio_format = AUDIO_S16;//16-bit
-	int audio_channels = 2;//Stereo
+	int audio_channels  = 2;//Stereo
 	const int audio_buffers = 4096;
 
 	if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) == -1)

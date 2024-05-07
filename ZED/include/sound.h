@@ -71,15 +71,26 @@ namespace ZED
 	{
 	public:
 		SoundDevice() {}
-		DLLEXPORT SoundDevice(int Index) : SoundDevice(GetDeviceName(Index)) {}
-		DLLEXPORT SoundDevice(const char* DeviceName);
-		SoundDevice(const std::string& DeviceName) : SoundDevice(DeviceName.c_str()) {}
+		SoundDevice(SoundDevice&) = delete;
+		SoundDevice(const SoundDevice&) = delete;
+		SoundDevice(SoundDevice&& rhs) noexcept {
+			this->m_Device = rhs.m_Device;
+			rhs.m_Device   = 0;
+		}
+		void operator =(SoundDevice&& rhs) noexcept {
+			this->m_Device = rhs.m_Device;
+			rhs.m_Device   = 0;
+		}
+		DLLEXPORT SoundDevice(int Index);
+		//DLLEXPORT SoundDevice(const char* DeviceName);
+		//SoundDevice(const std::string& DeviceName) : SoundDevice(DeviceName.c_str()) {}
 		DLLEXPORT ~SoundDevice();
 
 		DLLEXPORT static const char* GetDeviceName(int Index);
 		DLLEXPORT static int GetNumberOfDevices();
 
 		bool IsValid() const { return m_Device > 0; }
+		int  GetDeviceIndex() const { return m_DeviceIndex; }
 
 		DLLEXPORT void Play(const Sound& Sound);
 		DLLEXPORT void Pause(bool Enable = true);
@@ -87,6 +98,7 @@ namespace ZED
 
 	private:
 		SDL_AudioDeviceID m_Device = 0;
+		int m_DeviceIndex = -1;
 	};
 
 
