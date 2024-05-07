@@ -95,7 +95,7 @@ bool Mat::Open()
 		ZED::Log::Info("Logo loaded");
 			
 		if (!m_Sound)
-			SetSoundFilename(GetSoundFilename());//Load sound file
+			SetAudio(IsSoundEnabled(), GetSoundFilename(), GetAudioDeviceID());
 
 		while (m_Window.IsRunning())
 			Mainloop();
@@ -2672,6 +2672,15 @@ bool Mat::Mainloop()
 
 			m_NextMatches = std::move(nextMatches);
 		}
+	}
+
+	if (m_FrameCount % 400 == 50)
+	{
+		SetAudio(true, "gong", 1);
+		PlaySoundFile();
+		//auto device = ZED::SoundDevice(1);
+		//device.Play(m_Sound);
+		//ZED::Core::Pause(5000);
 	}
 
 	Process();
