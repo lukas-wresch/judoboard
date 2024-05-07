@@ -318,6 +318,7 @@ function StartNextMatch(event)
     if (response != "ok")
         alert("Error: " + response);
     GetScore();
+    GetJudokaName();
   });
 }
 
@@ -357,19 +358,22 @@ function RevokeGoldenScore()
 }
 
 
-function MoveUp(match_id)
+function MoveUp(index, match_id)
 {
-  AjaxCallback('/ajax/match/move_up?id=' + match_id + '&mat=' + id, function() {
-    GetJudokaName();
-  });
-  return false;
-}
+  let table = document.getElementById("next_matches_table");
 
+  table.rows[  index*2-1].cells[1].innerHTML = "- - -";
+  table.rows[  index*2-1].cells[2].innerHTML = "- - -";
+  table.rows[  index*2  ].cells[0].innerHTML = "- - -";
+  table.rows[  index*2  ].cells[1].innerHTML = "- - -";
 
-function MoveDown(match_id)
-{
-  AjaxCallback('/ajax/match/move_down?id=' + match_id + '&mat=' + id, function() {
-    GetJudokaName();
+  table.rows[2+index*2-1].cells[1].innerHTML = "- - -";
+  table.rows[2+index*2-1].cells[2].innerHTML = "- - -";
+  table.rows[2+index*2  ].cells[0].innerHTML = "- - -";
+  table.rows[2+index*2  ].cells[1].innerHTML = "- - -";
+
+  AjaxCallback('/ajax/match/move_up?id=' + match_id + '&mat=' + id, function(resp) {
+      GetJudokaName();
   });
   return false;
 }
@@ -534,7 +538,7 @@ function GetScore()
 
   AjaxCallback(host + "/ajax/mat/get_score?id="+id, function(response) {
     console.log(response);
-    let res = YAML.parse(response);
+    const res = YAML.parse(response);
 
     if (res.white.ippon == 1)
       res.white.wazaari = 0;
@@ -787,7 +791,7 @@ function GetJudokaName()
 
   AjaxCallback(host + '/ajax/mat/names_on_mat?id='+id + '&token=' + token, function(response) {
     console.log(response);
-    let res = YAML.parse(response);
+    const res = YAML.parse(response);
 
     updateJudokaName = false;
 
@@ -818,7 +822,6 @@ function GetJudokaName()
     //Update needed?    
     if (white_name != document.getElementById("white_name").innerHTML || blue_name != document.getElementById("blue_name").innerHTML)
     {
-      console.log("update");
       document.getElementById("white_name").innerHTML = white_name;
       document.getElementById("blue_name").innerHTML  = blue_name;
     }
@@ -839,7 +842,7 @@ function GetJudokaName()
       if (typeof match.match_table_desc !== 'undefined')
         cell1.innerHTML = match.match_table_desc;
 
-      let row2 = table.insertRow(-1);
+      let row2  = table.insertRow(-1);
       let cell3 = row2.insertCell(-1);
       let cell4 = row2.insertCell(-1);
 
@@ -879,14 +882,14 @@ function GetJudokaName()
 
       if (i == 0)
       {
-        var dis = 'disabled';
+        let dis = 'disabled';
         if (CurrentScore.can_next_match_start && match.current_breaktime >= match.breaktime)
           dis = '';
 
         cell5.innerHTML = '<button ' + dis + ' class="neutral" style="width: 50mm; margin-top: 1mm;" onclick="StartNextMatch(event)" ontouchstart="StartNextMatch(event)">' + translate('start_next_match') + '</button>';
       }
       else
-        cell5.innerHTML = '<button class="neutral" style="width: 50mm; margin-top: 1mm;" onclick="MoveUp(\'' + match.uuid + '\', event)" ontouchstart="MoveUp(\'' + match.uuid + '\', event)">' + translate('push_up') + '</button>';
+        cell5.innerHTML = '<button class="neutral" style="width: 50mm; margin-top: 1mm;" onclick="MoveUp(' + i + ', \'' + match.uuid + '\')" ontouchstart="MoveUp(' + i + ', \'' + match.uuid + '\')">' + translate('push_up') + '</button>';
 
       i++;
     }
@@ -894,11 +897,11 @@ function GetJudokaName()
 
     for (; i < 3; i++)
     {
-      var row = table.insertRow(-1);
+      let row = table.insertRow(-1);
 
-      var cell1 = row.insertCell(-1);
-      var cell2 = row.insertCell(-1);
-      var cell3 = row.insertCell(-1);
+      let cell1 = row.insertCell(-1);
+      let cell2 = row.insertCell(-1);
+      let cell3 = row.insertCell(-1);
 
       cell1.style = "width: 7.4cm;";
       cell2.style = "width: 7.4cm; background-color: rgba(30, 30, 255, 1.0); color: white;";
@@ -928,7 +931,7 @@ function GetOsaekomiList()
 
     updateOsaekomiList = false;
 
-    var table = document.getElementById("osaekomi_list");
+    let table = document.getElementById("osaekomi_list");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
@@ -941,12 +944,12 @@ function GetOsaekomiList()
     else
       $("#osaekomi_list_div").show(1000);
 
-    for (var i=0; i < res.length; i+=2)
+    for (let i=0; i < res.length; i+=2)
     {
-      var row = table.insertRow(-1);
+      let row = table.insertRow(-1);
 
-      var cell1 = row.insertCell(0);
-      var cell2 = row.insertCell(1);
+      let cell1 = row.insertCell(0);
+      let cell2 = row.insertCell(1);
 
       if (res[i] == 0)
         cell1.innerHTML = translate('white'); 

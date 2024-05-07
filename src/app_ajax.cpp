@@ -4733,6 +4733,11 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 
 	auto guard = LockReadForScope();
 
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	auto next_matches = GetTournament()->GetNextMatches(id);
+
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -4759,14 +4764,13 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 
 	ret << YAML::Key << "match_table_name" << YAML::Value;
 	if (current_match && current_match->GetMatchTable())
-		ret << current_match->GetMatchTable()->GetDescription();//TODO secure via mutex
+		ret << current_match->GetMatchTable()->GetDescription();
 	else
 		ret << "- - -";
 
 	ret << YAML::Key << "next_matches" << YAML::Value << YAML::BeginSeq;
 
-	auto nextMatches = mat->GetNextMatches();
-	for (const auto& match : nextMatches)
+	for (const auto& match : next_matches)
 	{
 		ret << YAML::BeginMap;
 
