@@ -2343,6 +2343,29 @@ const std::string Tournament::MasterSchedule2String() const
 
 
 
+const std::string Tournament::Schedule2ResultsServer() const
+{
+	nlohmann::json ret;
+
+	LockRead();
+
+	ret["name"] = GetName();
+
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
+	{
+		nlohmann::json match_json;
+		*match >> match_json;
+		ret["schedule"].push_back(match_json);
+	}
+
+	UnlockRead();
+
+	return ret.dump();
+}
+
+
+
 void Tournament::FindAgeGroupForJudoka(const Judoka& Judoka)
 {
 	//Find age groups this judoka can belong to

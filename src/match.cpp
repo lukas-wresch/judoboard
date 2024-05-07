@@ -188,6 +188,40 @@ void Match::operator >>(YAML::Emitter& Yaml) const
 
 
 
+void Match::operator >>(nlohmann::json& Json) const
+{
+	//Json["uuid"] = (std::string)GetUUID();
+
+	Json["mat_id"] = GetMatID();
+
+	if (GetFighter(Fighter::White))
+		Json["white"] = (std::string)GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+	if (GetFighter(Fighter::Blue))
+		Json["blue"]  = (std::string)GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+
+	Json["state"] = (int)m_State;
+
+	if (HasConcluded())
+	{
+		Json["winner"] = (int)m_Result.m_Winner;
+		Json["score"]  = (int)m_Result.m_Score;
+		Json["time"]   = (int)m_Result.m_Time;
+	}
+
+	if (m_Table)
+		Json["match_table"] = m_Table->GetDescription();
+
+	if (!m_Tag.IsNormal())
+		Json["tag"] = (uint32_t)m_Tag.value;
+
+	if (IsRunning())
+	{
+		//Export current state
+	}
+}
+
+
+
 void Match::ToString(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginMap;

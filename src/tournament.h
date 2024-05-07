@@ -188,8 +188,9 @@ namespace Judoboard
 		virtual bool OnUpdateMatchTable(const UUID& UUID) override;//Calling this function we recalculate the given match table
 
 		//Serialization
-		const std::string Schedule2String(bool ImportantOnly, int Mat = -1) const override;
-		const std::string MasterSchedule2String() const override;
+		virtual const std::string Schedule2String(bool ImportantOnly, int Mat = -1) const override;
+		virtual const std::string MasterSchedule2String() const override;
+		virtual const std::string Schedule2ResultsServer() const override;
 
 		virtual void GenerateSchedule() override;
 		void OrganizeMasterSchedule();

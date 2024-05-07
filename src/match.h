@@ -205,6 +205,7 @@ namespace Judoboard
 		void ToString(YAML::Emitter& Yaml) const;
 
 		void operator >>(YAML::Emitter& Yaml) const;
+		void operator >>(nlohmann::json& Json) const;
 
 		bool operator ==(const Match& rhs) const {
 			return GetUUID() == rhs.GetUUID();
