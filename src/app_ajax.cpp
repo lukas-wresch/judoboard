@@ -4508,6 +4508,8 @@ std::string Application::Ajax_GetSetup()
 	ret << YAML::Key << "osaekomi_style" << YAML::Value << (int)GetDatabase().GetOsaekomiStyle();
 	ret << YAML::Key << "timer_style"    << YAML::Value << (int)GetDatabase().GetTimerStyle();
 	ret << YAML::Key << "name_style"     << YAML::Value << (int)GetDatabase().GetNameStyle();
+	ret << YAML::Key << "results_server"     << YAML::Value << GetDatabase().IsResultsServer();
+	ret << YAML::Key << "results_server_url" << YAML::Value << GetDatabase().GetResultsServer();
 
 	ret << YAML::EndMap;
 	return ret.c_str();
@@ -4522,10 +4524,15 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 	int port       = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "port"));
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int osaekomiStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomiStyle"));
-	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
-	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
+	int timerStyle    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
+	int nameStyle     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
+	bool results_server      = HttpServer::DecodeURLEncoded(Request.m_Body, "results_server") == "true";
+	auto results_server_url  = HttpServer::DecodeURLEncoded(Request.m_Body, "results_server_url");
 
 	Localizer::SetLanguage((Language)language);
+	
+	auto guard = LockWriteForScope();
+
 	if (mat_count >= 0)
 		GetDatabase().SetMatCount(mat_count);
 	if (port > 0)
@@ -4534,6 +4541,9 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 	GetDatabase().SetOsaekomiStyle((Mat::OsaekomiStyle)osaekomiStyle);
 	GetDatabase().SetTimerStyle((Mat::TimerStyle)timerStyle);
 	GetDatabase().SetNameStyle((NameStyle)nameStyle);
+	GetDatabase().SetNameStyle((NameStyle)nameStyle);
+	GetDatabase().IsResultsServer(results_server);
+	GetDatabase().SetResultsServer(results_server_url);
 
 	return Error::Type::NoError;
 }

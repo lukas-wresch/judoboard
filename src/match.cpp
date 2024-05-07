@@ -205,7 +205,7 @@ void Match::operator >>(nlohmann::json& Json) const
 	{
 		Json["winner"] = (int)m_Result.m_Winner;
 		Json["score"]  = (int)m_Result.m_Score;
-		Json["time"]   = (int)m_Result.m_Time;
+		Json["time"]   = m_Result.m_Time;
 	}
 
 	if (m_Table)
@@ -226,7 +226,7 @@ void Match::ToString(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginMap;
 
-	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "uuid"              << YAML::Value << (std::string)GetUUID();
 	Yaml << YAML::Key << "current_breaktime" << YAML::Value << GetCurrentBreaktime();
 	Yaml << YAML::Key << "breaktime"         << YAML::Value << GetRuleSet().GetBreakTime();
 

@@ -716,6 +716,8 @@ void Application::Run()
 				std::thread([data, host, path]() {
 					ZED::HttpClient client(host);
 					client.POST(path, data);
+					auto response = client.RecvResponse();
+					assert(response.header == "ok");
 				}).detach();
 			}
 		}
