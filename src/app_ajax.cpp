@@ -4508,6 +4508,7 @@ std::string Application::Ajax_GetSetup()
 	ret << YAML::Key << "osaekomi_style" << YAML::Value << (int)GetDatabase().GetOsaekomiStyle();
 	ret << YAML::Key << "timer_style"    << YAML::Value << (int)GetDatabase().GetTimerStyle();
 	ret << YAML::Key << "name_style"     << YAML::Value << (int)GetDatabase().GetNameStyle();
+	ret << YAML::Key << "http_workers_free" << YAML::Value << std::to_string(m_Server.GetFreeWorkerCount()) + "/" + std::to_string(m_Server.GetWorkerCount());
 
 	ret << YAML::EndMap;
 	return ret.c_str();
