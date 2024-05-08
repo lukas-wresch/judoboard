@@ -40,6 +40,7 @@ void CustomTable::operator >> (YAML::Emitter& Yaml) const
 }
 
 
+
 const std::string CustomTable::ToHTML() const
 {
 	std::string ret;
