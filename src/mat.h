@@ -179,7 +179,7 @@ namespace Judoboard
 		}
 
 		virtual void QueueSoundFile() const override {
-			m_PlaySound = true;
+			m_QueueSound = true;
 		}
 
 		virtual void SetName(const std::string& NewName) override
@@ -574,7 +574,7 @@ namespace Judoboard
     
 		mutable ZED::Sound m_Sound;//Sound file
 		mutable ZED::SoundDevice m_AudioDevice;
-		mutable volatile bool m_PlaySound = false;//Flag to notify the main thread to play the sound file
+		mutable volatile bool m_QueueSound = false;//Flag to notify the main thread to play the sound file
 
 		double m_ScalingFactor = 1.0;//Should be 1.0 for 1080p screen, smaller for smaller screen and > 1.0 for larger screens
 

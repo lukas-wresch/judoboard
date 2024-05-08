@@ -2677,14 +2677,10 @@ bool Mat::Mainloop()
 
 	Render((double)m_LastFrameTime * 0.001f);
 
-	if (m_PlaySound)
+	if (m_QueueSound)
 	{
-		//SetAudio(true, "gong", 1);
 		PlaySoundFile();
-		m_PlaySound = false;
-		//auto device = ZED::SoundDevice(1);
-		//device.Play(m_Sound);
-		//ZED::Core::Pause(5000);
+		m_QueueSound = false;
 	}
 
 	//Calculate frame time
