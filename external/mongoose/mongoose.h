@@ -23,6 +23,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <atomic>
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -174,6 +175,8 @@ struct mg_context {
     mg_callback_t user_callback;  // User-defined callback function
     void* user_data;              // User-defined data
 
+    std::atomic<int> free_threads = 0;
+
     struct socket* listening_sockets;
 
     volatile int num_threads;  // Number of threads
@@ -234,6 +237,10 @@ struct mg_connection {
 //   web server context, or NULL on error.
 struct mg_context *mg_start(void (*user_callback)(enum mg_event event, struct mg_connection* conn), void *user_data,
                             const char **options);
+
+
+int  mg_get_free_worker_count(struct mg_context* ctx);
+void mg_increase_worker_count(struct mg_context* ctx, int amount);
 
 
 // Stop the web server.

@@ -72,6 +72,7 @@ namespace Judoboard
 		bool IsHajime() const override { return m_HajimeTimer.IsRunning(); }
 		bool IsOsaekomiRunning() const override { return m_OsaekomiTimer[0].IsRunning() || m_OsaekomiTimer[1].IsRunning(); }//Returns true during an osaekomi situation
 		bool IsOsaekomi() const override { return m_IsOsaekomi; }//Returns true during an osaekomi situation (even during sonomama!)
+		bool IsOsaekomiTimerPositiv() const { return m_OsaekomiTimer[0].GetElapsedTime() > 0 || m_OsaekomiTimer[1].GetElapsedTime() > 0; }//Returns true during an osaekomi situation (even during sonomama!) and afer match
 		bool IsSonomama() const { return !IsHajime() && IsOsaekomi(); }
 		Fighter GetOsaekomiHolder() const { return m_OsaekomiHolder; }
 		bool CanNextMatchStart() const override { return m_State == State::Waiting; }
@@ -96,7 +97,7 @@ namespace Judoboard
 		virtual void Hajime() override;
 		virtual void Mate() override;
 		virtual bool WasMateRecent() const override { return AreFightersOnMat() && Timer::GetTimestamp() - m_MateTimestamp < 3000; }
-		virtual bool WasEndOfOsaekomiRecent() const { return AreFightersOnMat() && Timer::GetTimestamp() - m_EndOfOsaekomiTimestamp < 3000; }
+		bool WasEndOfOsaekomiRecent() const { return AreFightersOnMat() && Timer::GetTimestamp() - m_EndOfOsaekomiTimestamp < 3000; }
 		virtual void Sonomama() override;
 
 		virtual void AddIppon(Fighter Whom) override;
@@ -514,6 +515,7 @@ namespace Judoboard
 		Timer m_OsaekomiTimer[2];
 		uint32_t m_MateTimestamp = 0;//Timestamp of last mate command
 		uint32_t m_EndOfOsaekomiTimestamp = 0;//Timestamp when the last osaekomi ended naturally (osaekomi timer larger than time required)
+		uint32_t m_MatchTimeBeforeGoldenScore = 0;//Time of the entire match without golden score (including osaekomi after effective match time)
 
 		std::vector<OsaekomiEntry> m_OsaekomiList;
 		bool m_IsOsaekomi = false;

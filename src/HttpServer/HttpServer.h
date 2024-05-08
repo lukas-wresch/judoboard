@@ -102,6 +102,14 @@ public:
 
 	[[nodiscard]]
 	bool IsRunning() const { return m_Context; }
+
+	[[nodiscard]]
+	uint32_t GetWorkerCount() const;
+
+	[[nodiscard]]
+	uint32_t GetFreeWorkerCount() const;
+
+	void IncreaseWorkerCount(uint32_t Amount = 1);
 		
 	//void RegisterResource(const std::string& URI, std::string (*Callback)(const std::string Query), ResourceType Type = ResourceType::HTML);
 	//void RegisterResource(const std::string& URI, std::function<std::string(Request&)> Callback, ResourceType Type = ResourceType::HTML);

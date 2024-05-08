@@ -194,6 +194,8 @@ namespace Judoboard
 
 		uint32_t GetCurrentBreaktime() const;
 
+		const ITournament* GetTournament() const { return m_Tournament; }
+
 		bool IsBestOfThree() const { return m_White.m_Type == DependencyType::BestOfThree; }
 
 		Tag  GetTag() const { return m_Tag; }
@@ -209,10 +211,9 @@ namespace Judoboard
 		}
 
 	private:
-		const ITournament* GetTournament() const { return m_Tournament; }
-
-		void SetState(Status NewState) { m_State = NewState; }
 		void SetResult(const Result& Result) { m_Result = Result; SetState(Status::Concluded); }
+		void SetState(Status NewState) { m_State = NewState; }
+		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
 
 		void SetLog(const MatchLog& NewLog) {
 			m_Log.m_Mutex.lock();

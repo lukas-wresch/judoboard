@@ -675,6 +675,8 @@ void Application::Run()
 	while (IsRunning())
 	{
 		LockRead();
+
+		//Check if there is a mat that should be removed
 		for (auto it = m_Mats.begin(); it != m_Mats.end();)
 		{
 			if (*it && !(*it)->IsConnected())
@@ -694,6 +696,7 @@ void Application::Run()
 				++it;
 		}
 
+		//Auto-save
 		if (GetTournament() && GetTournament()->IsLocal())
 		{
 			Tournament* tournament = (Tournament*)GetTournament();
@@ -704,11 +707,26 @@ void Application::Run()
 					ZED::Log::Error("Failed to save!");
 			}
 		}
+
 		UnlockRead();
 
-		ZED::Core::Pause(10 * 1000);
-		runtime += 10;
+#ifdef _DEBUG
+		if (m_Server.GetFreeWorkerCount() == 0)
+		{
+			m_Server.IncreaseWorkerCount();
+			ZED::Log::Debug("Increased http worker count");
+		}
+#else
+		if (m_Server.GetFreeWorkerCount() == 0)
+			m_Server.IncreaseWorkerCount(3);
+		else if (m_Server.GetFreeWorkerCount() <= 2)
+			m_Server.IncreaseWorkerCount();
+#endif
 
+		ZED::Core::Pause(5 * 1000);
+		runtime += 5;
+
+		//Auto-save database
 		if (runtime % (5 * 60) == 0)//Every 5 minutes
 		{
 			if (!m_Database.Save())

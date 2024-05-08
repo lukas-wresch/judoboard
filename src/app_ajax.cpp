@@ -484,11 +484,11 @@ void Application::SetupHttpServer()
 		auto guard = LockWriteForScope();
 
 		if (!GetTournament())
-			return std::string("No tournament open");
+			return Error(Error::Type::TournamentNotOpen);
 
 		bool success = GetTournament()->RemoveMatch(id);
 
-		return std::string();
+		return Error(Error::Type::NoError);
 	});
 
 	m_Server.RegisterResource("/ajax/match/get_log", [this](auto& Request) -> std::string {
@@ -4493,6 +4493,7 @@ std::string Application::Ajax_GetSetup()
 	ret << YAML::Key << "osaekomi_style" << YAML::Value << (int)GetDatabase().GetOsaekomiStyle();
 	ret << YAML::Key << "timer_style"    << YAML::Value << (int)GetDatabase().GetTimerStyle();
 	ret << YAML::Key << "name_style"     << YAML::Value << (int)GetDatabase().GetNameStyle();
+	ret << YAML::Key << "http_workers_free" << YAML::Value << std::to_string(m_Server.GetFreeWorkerCount()) + "/" + std::to_string(m_Server.GetWorkerCount());
 
 	ret << YAML::EndMap;
 	return ret.c_str();
@@ -4718,6 +4719,11 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 
 	auto guard = LockReadForScope();
 
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	auto next_matches = GetTournament()->GetNextMatches(id);
+
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -4744,14 +4750,13 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 
 	ret << YAML::Key << "match_table_name" << YAML::Value;
 	if (current_match && current_match->GetMatchTable())
-		ret << current_match->GetMatchTable()->GetDescription();//TODO secure via mutex
+		ret << current_match->GetMatchTable()->GetDescription();
 	else
 		ret << "- - -";
 
 	ret << YAML::Key << "next_matches" << YAML::Value << YAML::BeginSeq;
 
-	auto nextMatches = mat->GetNextMatches();
-	for (const auto& match : nextMatches)
+	for (const auto& match : next_matches)
 	{
 		ret << YAML::BeginMap;
 
