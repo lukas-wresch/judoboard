@@ -143,6 +143,54 @@ TEST(Tournament, MoveSchedule)
 
 
 
+TEST(Tournament, DeleteMatch)
+{
+	{
+		initialize();
+
+		Judoka j1("Firstname1", "Lastname1", 50, Gender::Male);
+		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
+		Judoka j3("Firstname3", "Lastname3", 52, Gender::Male);
+		Judoka j4("Firstname4", "Lastname4", 53, Gender::Male);
+
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+		Tournament tourney("deleteMe");
+		tourney.Reset();
+		tourney.EnableAutoSave(false);
+
+		EXPECT_TRUE(tourney.AddParticipant(&j1));
+		EXPECT_TRUE(tourney.AddParticipant(&j2));
+		EXPECT_TRUE(tourney.AddParticipant(&j3));
+		EXPECT_TRUE(tourney.AddParticipant(&j4));
+
+		auto matchtable = new SingleElimination(Weight(50), Weight(60));
+		matchtable->IsThirdPlaceMatch(true);
+		tourney.AddMatchTable(matchtable);
+		tourney.GenerateSchedule();
+
+		EXPECT_EQ(tourney.GetMatchTables().size(),  1);
+		EXPECT_EQ(matchtable->GetSchedule().size(), 4);
+		EXPECT_EQ(tourney.GetSchedule().size(),     4);
+
+		tourney.RemoveMatch(tourney.GetSchedule()[3]->GetUUID());
+
+		EXPECT_EQ(tourney.GetMatchTables().size(),  1);
+		EXPECT_EQ(matchtable->GetSchedule().size(), 3);
+		EXPECT_EQ(tourney.GetSchedule().size(),     3);
+
+		tourney.AddMatch(new Match(&j1, &j2, nullptr));
+
+		EXPECT_EQ(tourney.GetMatchTables().size(),  2);
+		EXPECT_EQ(matchtable->GetSchedule().size(), 3);
+		EXPECT_EQ(tourney.GetSchedule().size(),     4);
+	}
+
+	ZED::Core::RemoveFile("deleteMe.yml");
+}
+
+
+
 TEST(Tournament, Disqualification)
 {
 	initialize();

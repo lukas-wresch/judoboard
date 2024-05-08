@@ -36,6 +36,8 @@ namespace Judoboard
 		virtual Match* FindMatch(const UUID& UUID) const override;
 		virtual const MatchTable* FindMatchTable(const UUID& UUID) const override;
 
+		virtual bool DeleteMatch(const UUID& UUID) override;
+
 		bool IsThirdPlaceMatch() const { return m_Finals.IsThirdPlaceMatch(); }
 		bool IsFifthPlaceMatch() const { return m_Finals.IsFifthPlaceMatch(); }
 

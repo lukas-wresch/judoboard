@@ -310,6 +310,8 @@ namespace Judoboard
 		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
 
+		virtual bool DeleteMatch(const UUID& UUID);
+
 		//Basics
 		const Match* GetMatch(size_t Index) const { if (Index >= m_Schedule.size()) return nullptr; return m_Schedule[Index]; }
 
