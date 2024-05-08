@@ -196,8 +196,12 @@ void Match::operator >>(nlohmann::json& Json) const
 
 	if (GetFighter(Fighter::White))
 		Json["white"] = (std::string)GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+	else
+		Json["white"] = "???";
 	if (GetFighter(Fighter::Blue))
 		Json["blue"]  = (std::string)GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+	else
+		Json["blue"] = "???";
 
 	Json["state"] = (int)m_State;
 
@@ -207,12 +211,22 @@ void Match::operator >>(nlohmann::json& Json) const
 		Json["score"]  = (int)m_Result.m_Score;
 		Json["time"]   = m_Result.m_Time;
 	}
+	else
+	{
+		Json["winner"] = 0;
+		Json["score"]  = 0;
+		Json["time"]   = 0;
+	}
 
 	if (m_Table)
 		Json["match_table"] = m_Table->GetDescription();
+	else
+		Json["match_table"] = "- - -";
 
 	if (!m_Tag.IsNormal())
 		Json["tag"] = (uint32_t)m_Tag.value;
+	else
+		Json["tag"] = 0;
 
 	if (IsRunning())
 	{

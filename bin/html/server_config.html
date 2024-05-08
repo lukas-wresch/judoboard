@@ -200,7 +200,7 @@ function UpdateConfig()
     timerStyle:    document.getElementById("timerStyle").value,
     nameStyle:     document.getElementById("nameStyle").value,
     results_server:      document.getElementById("results_server").checked,
-    results_server_url:  document.getElementById("results_server_url").checked,
+    results_server_url:  document.getElementById("results_server_url").value,
   });
 
   AjaxPost("ajax/config/set_setup", params, function(){
