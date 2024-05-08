@@ -1373,8 +1373,6 @@ TEST(Ajax, GetNamesOnMat)
 
 		app.AddTournament(tourney);
 
-		ZED::Core::Pause(3000);
-
 		YAML::Node yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
@@ -1403,8 +1401,6 @@ TEST(Ajax, GetNamesOnMat)
 
 		mat->StartMatch(match1);
 
-		ZED::Core::Pause(2000);
-
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
@@ -1427,8 +1423,6 @@ TEST(Ajax, GetNamesOnMat)
 		mat->AddIppon(Fighter::White);
 		mat->EndMatch();
 
-		ZED::Core::Pause(2000);
-
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
@@ -1447,8 +1441,6 @@ TEST(Ajax, GetNamesOnMat)
 
 		mat->StartMatch(match2);
 
-		ZED::Core::Pause(2000);
-
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
@@ -1463,8 +1455,6 @@ TEST(Ajax, GetNamesOnMat)
 
 		mat->AddIppon(Fighter::White);
 		mat->EndMatch();
-
-		ZED::Core::Pause(2000);
 
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
