@@ -8,6 +8,12 @@ $json = json_decode(file_get_contents("php://input"));
 var_dump($json);
 
 
+sqlite_query("CREATE TABLE `setup` ("
+			."`name`     TEXT,"
+			."`language` INTEGER"
+			.")");
+
+
 sqlite_query("CREATE TABLE `schedule` ("
 			."`id`     INTEGER PRIMARY KEY AUTOINCREMENT,"
 			."`mat_id` INTEGER,"
@@ -20,6 +26,12 @@ sqlite_query("CREATE TABLE `schedule` ("
 			."`match_table` TEXT,"
 			."`tag`    INTEGER"
 			.")");
+
+
+sqlite_query("DELETE FROM `setup`;");
+
+sqlite_query("INSERT INTO `setup` (`name`, `language`) VALUES ('$json->name', '1');");
+
 
 sqlite_query("DELETE FROM `schedule`;");
 

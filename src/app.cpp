@@ -710,26 +710,29 @@ void Application::Run()
 				auto data     = GetTournament()->Schedule2ResultsServer();
 
 				auto index = endpoint.find_first_of('/', 0);
-				auto host  = endpoint.substr(0, index);
-				auto path  = endpoint.substr(index);
-
-				FILE* file;
-				fopen_s(&file, "results.json", "w");
-				if (file)
+				if (index != std::string::npos)
 				{
-					fprintf(file, data.c_str());
-					fclose(file);
+					auto host = endpoint.substr(0, index);
+					auto path = endpoint.substr(index);
+
+					FILE* file;
+					fopen_s(&file, "results.json", "w");
+					if (file)
+					{
+						fprintf(file, data.c_str());
+						fclose(file);
+					}
+
+					std::string command = "curl.exe " + endpoint + " -k -d " + "@results.json";
+					system(command.c_str());
+
+					/*std::thread([data, host, path]() {
+						ZED::HttpClient client(host);
+						client.POST(path, data);
+						auto response = client.RecvResponse();
+						assert(response.header == "ok");
+					}).detach();*/
 				}
-
-				std::string command = "curl.exe " + endpoint + " -k -d " + "@results.json";
-				system(command.c_str());
-
-				/*std::thread([data, host, path]() {
-					ZED::HttpClient client(host);
-					client.POST(path, data);
-					auto response = client.RecvResponse();
-					assert(response.header == "ok");
-				}).detach();*/
 			}
 		}
 		UnlockRead();
