@@ -1462,11 +1462,12 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	for (size_t i = 0; i < NewMatchTable->GetSchedule().size(); i++)
 	{
 		auto match = NewMatchTable->GetSchedule()[i];
-		if (!match->IsEmptyMatch())
+		if (!match->IsEmptyMatch() && !match->IsCompletelyEmptyMatch())
 			m_Schedule.emplace_back(NewMatchTable, i);
 	}
 
-	OnUpdateMatchTable(*NewMatchTable);
+	if (NewMatchTable->GetType() != MatchTable::Type::Custom)//No need to call OnUpdate for custom
+		OnUpdateMatchTable(*NewMatchTable);
 }
 
 
