@@ -1,5 +1,6 @@
 #include <unordered_map>
 #include "localizer.h"
+#include "../ZED/include/log.h"
 
 
 
@@ -50,7 +51,7 @@ void Localizer::Initialize(Language NewLanguage)
 
 			s_de["Running"] = u8"am K\u00e4mpfen";
 
-			s_de["Weightclass"] = "Gewichtsklasse";
+			s_de["Weightclass"]   = "Gewichtsklasse";
 			s_de["Current Match"] = "Aktueller Kampf";
 			s_de["Next Match"]    = u8"N\u00e4chster Kampf";
 			s_de["Following Matches"] = u8"Nachfolgende K\u00e4mpfe";
@@ -81,7 +82,10 @@ std::string Localizer::Translate(const std::string& English)
 		{
 			auto it = s_de.find(English);
 
+			if (it == s_de.end())
+				ZED::Log::Warn("Could not translate: " + English);
 			assert(it != s_de.end());
+
 			if (it != s_de.end())
 				return it->second;
 			break;
