@@ -129,8 +129,7 @@ namespace Judoboard
 		virtual bool HasConcluded() const = 0;//Returns true if and only if the match has finished and hence EndMatch() can be called
 		virtual bool EndMatch() = 0;//Closes the match that is currently on the mat and resets the scoreboard
 
-		virtual uint32_t GetTimeElapsed()  const = 0;
-		virtual uint32_t GetTime2Display() const = 0;
+		virtual uint32_t GetTime2Display() const = 0;//Returns the match time as it should be displayed in milliseconds
 
 		virtual bool IsHajime() const = 0;//Returns true if and only the match is running and not paused i.e. the hajime timer is running
 		virtual bool IsOutOfTime() const = 0;//Returns true if and only if the match has run out of time

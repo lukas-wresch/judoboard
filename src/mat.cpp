@@ -443,18 +443,18 @@ ZED::Blob Mat::RequestScreenshot() const
 
 uint32_t Mat::GetTime2Display() const
 {
+	if (m_GoldenScore)//If golden score
+		return m_HajimeTimer.GetElapsedTime();//Always count upwards
+
 	if (m_pMatch)
 	{
-		const auto& rules = m_pMatch->GetRuleSet();
-		if (rules.GetMatchTime() > 0)//If match time is not infinite
-		{
-			if (m_GoldenScore)
-				return (rules.GetGoldenScoreTime() * 1000 - m_HajimeTimer).GetElapsedTime();
-			return (rules.GetMatchTime() * 1000 - m_HajimeTimer).GetElapsedTime();
-		}
+		const auto match_time = m_pMatch->GetRuleSet().GetMatchTime();
+
+		if (match_time > 0)//If match time is not infinite
+			return (match_time*1000 - m_HajimeTimer).GetElapsedTime();
 	}
 
-	return m_HajimeTimer.GetElapsedTime();//Infinite match (and default if no m_pMatch is nullptr)
+	return m_HajimeTimer.GetElapsedTime();//Infinite match (and default if m_pMatch is nullptr)
 }
 
 

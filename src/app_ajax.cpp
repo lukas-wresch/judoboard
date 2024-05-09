@@ -645,21 +645,6 @@ void Application::SetupHttpServer()
 	});
 
 	//Serialization
-	m_Server.RegisterResource("/ajax/mat/current_time", [this](auto& Request) -> std::string {
-		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id <= 0)
-			return Error(Error::Type::InvalidID);
-
-		auto mat = FindMat(id);
-
-		if (!mat)
-			return Error(Error::Type::MatNotFound);
-
-		return std::to_string(mat->GetTimeElapsed()) + "," + (mat->IsHajime() ? "1" : "0");
-	});
 
 	m_Server.RegisterResource("/ajax/mat/get_score", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response

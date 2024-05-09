@@ -249,6 +249,8 @@ var showRevokeGoldenScore = false;
 var showHansokumakeDecisionWhite = false;
 var showHansokumakeDecisionBlue  = false;
 
+let isGoldenscore = false;
+
 
 function Hajime()
 {
@@ -773,7 +775,8 @@ function GetScore()
     else
       ShowRevokeHantei(false);
 
-    document.getElementById("golden_score").disabled = res.is_goldenscore;
+    isGoldenscore = res.is_goldenscore;
+    document.getElementById("golden_score").disabled = isGoldenscore;
 
     if (typeof res.white.unknown_disqualification !== 'undefined')
         ShowHansokumakeDecision(true, 'white');
@@ -933,7 +936,7 @@ function GetOsaekomiList()
 
   AjaxCallback("ajax/mat/get_osaekomilist?id="+id, function(response) {
     console.log(response);
-    var res = response.split(",");
+    const res = response.split(",");
 
     updateOsaekomiList = false;
 
@@ -978,28 +981,15 @@ function DisplayTimer()
 }
 
 
-function GetTimer()
-{
-  AjaxCallback("ajax/mat/current_time?id="+id, function(response) {
-    var res = response.split(",");
-
-    HajimeTimer = parseInt(res[0]);
-
-    if (parseInt(res[1]) == 1)
-      HajimeTimer_Running = true;
-    else
-      HajimeTimer_Running = false;
-
-    DisplayTimer();
-  });
-}
-
-
 function UpdateTimer()
 {
   if (HajimeTimer_Running)
   {
-    HajimeTimer -= 100;
+    if (isGoldenscore)
+      HajimeTimer += 100;
+    else
+      HajimeTimer -= 100;
+
     if (HajimeTimer < 0)
       HajimeTimer = 0;
     totalTime += 100;

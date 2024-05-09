@@ -67,7 +67,6 @@ namespace Judoboard
 		//Basics
 		const Judoka& GetFighter(Fighter Who) const { if (Who == Fighter::White) return m_White; return m_Blue; }
 		std::string GetTime2String() const { return m_HajimeTimer.ToString(); }
-		uint32_t GetTimeElapsed() const { return m_HajimeTimer.GetElapsedTime(); }
 		uint32_t GetTime2Display() const;
 		bool IsIppon() const { return GetScoreboard(Fighter::White).m_Ippon >= 1 || GetScoreboard(Fighter::Blue).m_Ippon >= 1; }
 		bool IsHajime() const override { return m_HajimeTimer.IsRunning(); }

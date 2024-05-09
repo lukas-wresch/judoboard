@@ -25,8 +25,6 @@ namespace Judoboard
 		virtual bool HasConcluded() const override { return false; }
 		virtual bool EndMatch() = 0;
 
-		virtual uint32_t GetTimeElapsed() const { return 0; }
-
 		virtual bool IsHajime()      const override { return false; }
 		virtual bool IsOutOfTime()   const override { return false; }
 		virtual bool IsGoldenScore() const override { return false; }
