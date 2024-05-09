@@ -705,10 +705,10 @@ void Mat::AddIppon(Fighter Whom)
 		if (GetScoreboard(Whom).m_WazaAri < 2)//If its not a wazari awasete ippon
 			AddEvent(Whom, MatchLog::BiasedEvent::AddIppon);
 
+		Mate();
+
 		if (!GetScoreboard(!Whom).m_HansokuMake)//Don't show ippon effect if its due to an hansokumake
 			m_Graphics["effect_ippon_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0, [](auto& g) { return g.m_a > 0.0; }));
-
-		Mate();
 	}
 
 	ZED::Log::Info("Ippon");
