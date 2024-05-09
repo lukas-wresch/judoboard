@@ -646,9 +646,6 @@ function GetScore()
     document.getElementById("rem_yuko_blue").disabled    = !res.are_fighters_on_mat || !res.yuko_enabled;
     document.getElementById("rem_koka_blue").disabled    = !res.are_fighters_on_mat || !res.koka_enabled;
 
-    HajimeTimer = parseInt(res.hajime_time);
-    totalTime   = parseInt(res.total_time);
-
     OsaekomiWhiteTimer = parseInt(res.white.osaekomi_time);
     OsaekomiWhiteTimer_Running = res.white.is_osaekomi_running;
     OsaekomiBlueTimer  = parseInt(res.blue.osaekomi_time);
@@ -682,6 +679,9 @@ function GetScore()
     if (res.is_hajime)
     {
       HajimeTimer_Running = true;
+      HajimeTimer = (HajimeTimer + parseInt(res.hajime_time))/2;
+      totalTime   = (totalTime   + parseInt(res.total_time) )/2;
+
       document.getElementById("hajime").innerHTML = "Hajime";
       document.getElementById("hajime").disabled  = true;
       document.getElementById("mate").disabled    = false;
@@ -705,6 +705,8 @@ function GetScore()
     else
     {
       HajimeTimer_Running = false;
+      HajimeTimer = parseInt(res.hajime_time);
+      totalTime   = parseInt(res.total_time);
 
       if (res.is_osaekomi)
         document.getElementById("hajime").innerHTML = "Yoshi";
@@ -969,7 +971,7 @@ function GetOsaekomiList()
 function DisplayTimer()
 {
   document.getElementById("hajimetime").innerHTML = Math.floor(HajimeTimer/(1000*60)) + ':' + zeroPad(Math.floor((HajimeTimer/1000))%60, 2) + '.' + Math.floor((HajimeTimer%1000)/100);
-  document.getElementById("total_time").innerHTML = Math.floor(totalTime  /(1000*60)) + ':' + zeroPad(Math.floor((totalTime  /1000))%60, 2) + '.' + Math.floor((totalTime  %1000)/100);
+  document.getElementById("total_time").innerHTML = Math.floor(totalTime  /(1000*60)) + ':' + zeroPad(Math.floor((totalTime  /1000))%60, 2);
 
   document.getElementById("white_osaekomitime").innerHTML = Math.floor((OsaekomiWhiteTimer/1000)) + '.' + Math.floor((OsaekomiWhiteTimer%1000)/100);
   document.getElementById("blue_osaekomitime").innerHTML  = Math.floor((OsaekomiBlueTimer /1000)) + '.' + Math.floor((OsaekomiBlueTimer %1000)/100);
@@ -1067,7 +1069,7 @@ function Mat_Init()
 
   document.getElementById("time").innerHTML = translate('time');
   document.getElementById("mat").innerHTML  = translate('mat') + ' ' + id;
-  document.getElementById("total_time_label").innerHTML = translate('total_time');
+  document.getElementById("total_time_label").innerHTML = translate('match_time');
 
   document.getElementById("end_match").innerHTML  = translate('end_match');
 
