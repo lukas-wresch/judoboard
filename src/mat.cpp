@@ -2581,6 +2581,7 @@ bool Mat::Render(double dt) const
 			renderer.RenderTransformed(name, width / 2 - name->GetWidth() / 2, height - name->GetHeight() - 10);
 
 		auto font = renderer.RenderFont(ZED::FontSize::Gigantic, Localizer::Translate("Pause"), ZED::Color(0, 0, 0));
+		renderer.FillRect(ZED::Rect(     -10 + width/2 - font->GetWidth()/2, height/2 - font->GetHeight()/2, font->GetWidth(), font->GetHeight()), 255, 255, 255);
 		renderer.RenderTransformed(*font.data, width/2 - font->GetWidth()/2, height/2 - font->GetHeight()/2);
 	}
 
