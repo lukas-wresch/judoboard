@@ -72,10 +72,12 @@ public:
 	};
 
 	HttpServer() : m_Port(0) {}
-	HttpServer(uint16_t Port);
 	HttpServer(HttpServer&) = delete;
 	HttpServer(const HttpServer&) = delete;
+	HttpServer(HttpServer&& rhs) = delete;
 	~HttpServer();
+
+	void Start(uint16_t Port);
 
 	[[nodiscard]]
 	uint16_t GetPort() const { return m_Port; }
@@ -131,6 +133,7 @@ private:
 	};
 
 	void* Callback(mg_event Event, mg_connection* Connection);
+
 
 	mg_context* m_Context = nullptr;
 	uint16_t m_Port;

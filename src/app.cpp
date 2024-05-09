@@ -43,31 +43,31 @@ Application::Application() : m_StartupTimestamp(Timer::GetTimestamp())
 
 bool Application::StartHttpServer(uint16_t Port)
 {
-	m_Server = HttpServer(Port);
+	m_Server.Start(Port);
 
-	if (!m_Server.IsRunning())
+	if (m_Server.IsRunning())
 	{
-		ZED::Log::Error("Could not start http server!");
-		Shutdown();
-		return false;
+		SetupHttpServer();
+		return true;
 	}
 
-	SetupHttpServer();
-	return true;
+	ZED::Log::Error("Could not start http server!");
+	Shutdown();
+	return false;	
 }
 
 
 
 Application::~Application()
 {
+	m_Running = false;
+	m_CurrentTournament = nullptr;
+
 	if (!m_Database.Save("database.yml"))
 		ZED::Log::Error("Could not save database!");
 
 	for (auto mat : m_Mats)
 		delete mat;
-
-	m_Running = false;
-	m_CurrentTournament = nullptr;
 
 	for (auto tournament : m_Tournaments)
 		delete tournament;
