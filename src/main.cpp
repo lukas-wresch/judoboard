@@ -357,7 +357,12 @@ int main(int argc, char** argv)
 
 	
 	ZED::Log::Info("Initializing application");
-	Judoboard::Application app(port);
+	Judoboard::Application app;
+
+	if (!app.LoadDataFromDisk())
+		ZED::Log::Error("Could not load application data from disk");
+
+	app.StartHttpServer(app.GetDatabase().GetServerPort());
 
 	if (slave)
 	{
@@ -380,9 +385,6 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		if (!app.LoadDataFromDisk())
-			ZED::Log::Error("Could not load application data from disk");
-
 		auto monitors = Judoboard::Window::EnumerateMonitors();
 
 		for (uint32_t i = 1; i <= app.GetDatabase().GetMatCount(); i++)

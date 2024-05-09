@@ -21,7 +21,7 @@ bool Application::NoWindow = false;
 
 
 
-Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Timer::GetTimestamp())
+Application::Application() : m_StartupTimestamp(Timer::GetTimestamp())
 {
 	m_TempTournament.EnableAutoSave(false);
 	m_TempTournament.SetDefaultRuleSet(new RuleSet);//Take default rule set as rule set for temporary tournaments
@@ -37,6 +37,23 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 	}
 	else
 		SetupHttpServer();
+}
+
+
+
+bool Application::StartHttpServer(uint16_t Port)
+{
+	m_Server = HttpServer(Port);
+
+	if (!m_Server.IsRunning())
+	{
+		ZED::Log::Error("Could not start http server!");
+		Shutdown();
+		return false;
+	}
+
+	SetupHttpServer();
+	return true;
 }
 
 

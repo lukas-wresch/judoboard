@@ -4553,6 +4553,7 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 	GetDatabase().SetOsaekomiStyle((Mat::OsaekomiStyle)osaekomiStyle);
 	GetDatabase().SetTimerStyle((Mat::TimerStyle)timerStyle);
 	GetDatabase().SetNameStyle((NameStyle)nameStyle);
+	GetDatabase().Save();
 
 	return Error::Type::NoError;
 }
@@ -4720,6 +4721,7 @@ std::string Application::Ajax_GetHansokumake() const
 		const auto match = mat->GetMatch();
 		if (!match)
 			continue;
+
 
 		for (Fighter fighter = Fighter::White; fighter <= Fighter::Blue; ++fighter)
 		{

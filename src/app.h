@@ -22,15 +22,10 @@ namespace Judoboard
 	class Application : public ZED::RecursiveReadWriteMutex//TODO should be private/or private member
 	{
 	public:
-		Application() : m_StartupTimestamp(Timer::GetTimestamp()) {
-			m_TempTournament.EnableAutoSave(false);
-			m_CurrentTournament = &m_TempTournament;
-
-			std::string token = (std::string)ID::GenerateUUID();
-			m_SecurityToken   = token.substr(0, 32);
-		}
-		Application(uint16_t Port);
+		Application();
 		~Application();
+
+		bool StartHttpServer(uint16_t Port);
 
 		bool CheckAccessToken(const std::string& Token) const {
 			return m_SecurityToken == Token;
