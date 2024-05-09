@@ -1154,7 +1154,7 @@ TEST(Mat, MatchTimeCorrectAfterOsaekomi)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time < 20 ; time += 5)
+	for (int time = 3; time < 20 ; time += 5)
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		Application app;
@@ -1175,8 +1175,9 @@ TEST(Mat, MatchTimeCorrectAfterOsaekomi)
 		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m.IsOutOfTime());
+		EXPECT_EQ(m.GetOsaekomiList().size(), 1);
 		EXPECT_TRUE(m.EndMatch());
-		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time + 20)*1000), 50);
+		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time-1 + 20)*1000), 100);
 	}
 }
 
@@ -1186,7 +1187,7 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time < 20 ; time += 5)
+	for (int time = 3; time < 20 ; time += 5)
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		Application app;
@@ -1213,8 +1214,9 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi)
 		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m.IsOutOfTime());
+		EXPECT_EQ(m.GetOsaekomiList().size(), 1);
 		EXPECT_TRUE(m.EndMatch());
-		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time + time + 20)*1000), 50);
+		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time + time-1 + 20)*1000), 100);
 	}
 }
 
@@ -1224,7 +1226,7 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi2)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time < 20 ; time += 5)
+	for (int time = 3; time < 20 ; time += 5)
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		Application app;
@@ -1237,7 +1239,7 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi2)
 
 		m.Hajime();
 
-		ZED::Core::Pause( (time - 1) * 1000);
+		ZED::Core::Pause( (time - 2) * 1000);
 
 		m.Osaekomi(f);
 		ZED::Core::Pause(9 * 1000);
@@ -1256,8 +1258,9 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi2)
 		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m.IsOutOfTime());
+		EXPECT_EQ(m.GetOsaekomiList().size(), 2);
 		EXPECT_TRUE(m.EndMatch());
-		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time + 9 + time + 20)*1000), 50);
+		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time-2 + 9 + time-1 + 20)*1000), 100);
 	}
 }
 

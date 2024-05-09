@@ -486,8 +486,6 @@ bool Mat::EnableGoldenScore(bool GoldenScore)
 	if (GoldenScore)
 	{
 		m_MatchTimeBeforeGoldenScore = m_HajimeTimer.GetElapsedTime();
-		if (IsOsaekomiTimerPositiv())
-			m_MatchTimeBeforeGoldenScore += m_OsaekomiTimer[(int)GetOsaekomiHolder()].GetElapsedTime();
 
 		m_HajimeTimer.Reset();
 		//In case of double ippon, reset the ippons
@@ -497,7 +495,7 @@ bool Mat::EnableGoldenScore(bool GoldenScore)
 	else
 	{
 		if (m_pMatch)
-			m_HajimeTimer = m_pMatch->GetRuleSet().GetMatchTime() * 1000;
+			m_HajimeTimer = m_MatchTimeBeforeGoldenScore;
 		AddEvent(MatchLog::NeutralEvent::DisableGoldenScore);
 	}
 
@@ -635,17 +633,18 @@ void Mat::Mate()
 		m_HajimeTimer.Pause();
 		m_MateTimestamp = Timer::GetTimestamp();
 
-		//Don't overflow timer
-		if (IsOutOfTime())
-			m_HajimeTimer = GetMaxMatchTime();
-
 		if (IsOsaekomi())//Mate during osaekomi?
 		{
 			const auto osaekomi_holder = GetOsaekomiHolder();
+			auto osaekomi_time = m_OsaekomiTimer[(int)GetOsaekomiHolder()].GetElapsedTime();
 
-			m_OsaekomiList.emplace_back(OsaekomiEntry(osaekomi_holder, m_OsaekomiTimer[(int)osaekomi_holder].GetElapsedTime()));
+			if (osaekomi_time > EndTimeOfOsaekomi() * 1000)
+				osaekomi_time = EndTimeOfOsaekomi() * 1000;
+			m_OsaekomiList.emplace_back(OsaekomiEntry(osaekomi_holder, osaekomi_time));
 
 			m_OsaekomiTimer[(int)osaekomi_holder].Pause();
+			m_OsaekomiTimer[(int)osaekomi_holder].Set(osaekomi_time);
+			m_EndOfOsaekomiTimestamp = Timer::GetTimestamp();
 			m_IsOsaekomi = false;
 
 			//In case mate is called during sonomama
@@ -655,7 +654,7 @@ void Mat::Mate()
 			m_Graphics["osaekomi_bar_border"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0));
 			m_Graphics["osaekomi_bar"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0));
 
-			m_Graphics["effect_osaekomi_" + Fighter2String(osaekomi_holder)].AddAnimation(Animation::CreateLinear(0.0, 0.0, -55.0, [](auto& g) { return g.m_a > 0.0; }));
+			m_Graphics["effect_osaekomi_" + Fighter2String(osaekomi_holder)].AddAnimation(Animation::CreateLinear(0.0, 0.0, -30.0, [](auto& g) { return g.m_a > 0.0; }));
 		}
 
 		AddEvent(MatchLog::NeutralEvent::Mate);
@@ -705,15 +704,6 @@ void Mat::AddIppon(Fighter Whom)
 
 		if (GetScoreboard(Whom).m_WazaAri < 2)//If its not a wazari awasete ippon
 			AddEvent(Whom, MatchLog::BiasedEvent::AddIppon);
-
-		if (IsOsaekomiRunning())//Ippon during osaekomi? Fighter must have given up
-		{
-			m_OsaekomiTimer[0].Pause();
-			m_OsaekomiTimer[1].Pause();
-			m_IsOsaekomi = false;
-
-			m_Graphics["effect_osaekomi_" + Fighter2String(GetOsaekomiHolder())].AddAnimation(Animation::CreateLinear(0.0, 0.0, -30.0, [](auto& g) { return g.m_a > 0.0; }));
-		}
 
 		if (!GetScoreboard(!Whom).m_HansokuMake)//Don't show ippon effect if its due to an hansokumake
 			m_Graphics["effect_ippon_" + Fighter2String(Whom)].SetAlpha(255).AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0, [](auto& g) { return g.m_a > 0.0; }));
@@ -1256,6 +1246,12 @@ void Mat::Tokeda()
 		m_OsaekomiTimer[(int)osaekomi_holder].Pause();
 		m_IsOsaekomi = false;
 
+		if (IsOutOfTime() && IsHajime())
+		{
+			Mate();
+			PlaySoundFile();
+		}
+
 		AddEvent(MatchLog::NeutralEvent::Tokeda);
 
 		m_Graphics["osaekomi_text"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0));
@@ -1337,23 +1333,12 @@ void Mat::Process()
 	{
 		m_mutex.LockWrite();
 
-		auto osaekomi_time = m_OsaekomiTimer[(int)GetOsaekomiHolder()].GetElapsedTime();
-		if (osaekomi_time > EndTimeOfOsaekomi() * 1000)
-			osaekomi_time = EndTimeOfOsaekomi() * 1000;
-		m_OsaekomiList.emplace_back(OsaekomiEntry(GetOsaekomiHolder(), osaekomi_time));
-
-		UpdateGraphics();
-
-		m_OsaekomiTimer[(int)GetOsaekomiHolder()].Pause();
-		m_OsaekomiTimer[(int)GetOsaekomiHolder()].Set(osaekomi_time);
-		m_IsOsaekomi = false;
-
-		m_EndOfOsaekomiTimestamp = Timer::GetTimestamp();
-
 		if (GetScoreboard(GetOsaekomiHolder()).m_WazaAri == 1)
 			AddWazaAri(GetOsaekomiHolder());
 		else
 			AddIppon(GetOsaekomiHolder());
+
+		UpdateGraphics();
       
 		m_mutex.UnlockWrite();
     
@@ -1366,6 +1351,8 @@ void Mat::Process()
 	if (IsOutOfTime() && IsHajime())
 	{
 		Mate();
+		m_HajimeTimer = GetMaxMatchTime();//Don't overflow timer
+
 		if (IsSoundEnabled())
 			PlaySoundFile();
 	}
@@ -2741,9 +2728,6 @@ Match::Result Mat::GetResult() const
 	if (IsGoldenScore() && m_pMatch)
 		time += m_MatchTimeBeforeGoldenScore;//Total time (with last second osaekomi) before golden score
 
-	//Osaekomi after 'out if time'?
-	if (IsOsaekomiTimerPositiv() && m_pMatch && m_pMatch->GetRuleSet().IsOutOfTime(m_HajimeTimer.GetElapsedTime(), IsGoldenScore()) )
-		time += m_OsaekomiTimer[(int)GetOsaekomiHolder()].GetElapsedTime();
 
 	//Double hansokumake
 	if (GetScoreboard(Fighter::White).m_HansokuMake && GetScoreboard(Fighter::Blue).m_HansokuMake)
