@@ -2889,6 +2889,19 @@ std::string Application::Ajax_GetMats() const
 
 		ret << YAML::EndSeq;
 
+		ret << YAML::Key << "audio_devices" << YAML::Value;
+		ret << YAML::BeginSeq;
+
+		for (int i = 0; i < ZED::SoundDevice::GetNumberOfDevices(); i++)
+		{
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "index" << YAML::Value << i;
+			ret << YAML::Key << "name"  << YAML::Value << ZED::SoundDevice::GetDeviceName(i);
+			ret << YAML::EndMap;
+		}
+
+		ret << YAML::EndSeq;
+
 		ret << YAML::Key << "mats" << YAML::Value;
 		ret << YAML::BeginSeq;
 
@@ -2921,6 +2934,7 @@ std::string Application::Ajax_GetMats() const
 				ret << YAML::Key << "monitor"        << YAML::Value << mat->GetMonitor();
 				ret << YAML::Key << "sound_enabled"  << YAML::Value << mat->IsSoundEnabled();
 				ret << YAML::Key << "sound_filename" << YAML::Value << mat->GetSoundFilename();
+				ret << YAML::Key << "sound_device"   << YAML::Value << mat->GetAudioDeviceID();
 
 				if (mat->GetType() == IMat::Type::RemoteMat)
 				{
@@ -3053,6 +3067,8 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
 	bool sound     = HttpServer::DecodeURLEncoded(Request.m_Body, "sound") == "true";
 	std::string soundFilename = HttpServer::DecodeURLEncoded(Request.m_Body, "sound_filename");
+	int audio_device = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "sound_device"));
+
 	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
 
 	if (id <= 0 || new_id <= 0)
@@ -3087,8 +3103,7 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 			mat->SetIpponStyle((Mat::IpponStyle)ipponStyle);
 			mat->SetOsaekomiStyle((Mat::OsaekomiStyle)osaekomiStyle);
 			mat->SetTimerStyle((Mat::TimerStyle)timerStyle);
-			mat->EnableSound(sound);
-			mat->SetSoundFilename(soundFilename);
+			mat->SetAudio(sound, soundFilename, audio_device);
 			mat->SetNameStyle((NameStyle)nameStyle);
 
 			return Error();//OK
@@ -4473,20 +4488,23 @@ Error Application::Ajax_PlaySoundFile(const HttpServer::Request& Request)
 {
 	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 	auto filename = HttpServer::DecodeURLEncoded(Request.m_Query, "filename");
+	int audio_device = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "sound_device"));
 
 	auto mat = FindMat(id);
 	if (!mat)
 		return Error::Type::MatNotFound;
 
-	auto temp = mat->GetSoundFilename();
+	auto temp_enabled  = mat->IsSoundEnabled();
+	auto temp_filename = mat->GetSoundFilename();
+	auto temp_device   = mat->GetAudioDeviceID();
 
-	mat->SetSoundFilename(filename);
+	mat->SetAudio(true, filename, audio_device);
 
-	mat->PlaySoundFile();
+	mat->QueueSoundFile();
 
 	ZED::Core::Pause(20 * 1000);
 
-	mat->SetSoundFilename(temp);
+	mat->SetAudio(temp_enabled, temp_filename, temp_device);
 
 	return Error::Type::NoError;
 }

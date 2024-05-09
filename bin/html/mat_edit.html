@@ -77,6 +77,13 @@
   <button class="neutral" style="margin-left: 0.8cm;" onclick="return PlaySound()" id="play_sound">Play Sound</button>
 </div>
 
+<div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_audio_device"></label>
+  <select style="margin-bottom:20px;" id="audio_device">
+  <option value="-1" style="font-weight: bold;" id="default"></option>
+  </select>
+</div>
+
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateMat()" id="update">Update Mat</button>
 
 </form>
@@ -106,7 +113,7 @@ function CloseMat()
 
 function PlaySound()
 {
-  AjaxCallback('/ajax/config/play_sound_file?id=' + id + '&filename=' + document.getElementById("sound_filename").value);
+  AjaxCallback('/ajax/config/play_sound_file?id=' + id + '&filename=' + document.getElementById("sound_filename").value + '&sound_device=' + document.getElementById("audio_device").value);
   return false;
 }
 
@@ -123,6 +130,7 @@ function UpdateMat()
     timerStyle:      document.getElementById("timerStyle").value,
     sound:           document.getElementById("sound").checked,
     sound_filename:  document.getElementById("sound_filename").value,
+    sound_device:    document.getElementById("audio_device").value,    
     nameStyle:   document.getElementById("nameStyle").value,
   });
 
@@ -141,12 +149,25 @@ function GetMat(id)
     console.log(response);
     const res = YAML.parse(response);
 
+    while (document.getElementById("monitor").length > 0)
+      document.getElementById("monitor").remove(document.getElementById("monitor").length-1);
+    while (document.getElementById("audio_device").length > 1)
+      document.getElementById("audio_device").remove(document.getElementById("audio_device").length-1);
+
     for (const monitor of res.monitors)
     {
       let option = document.createElement("option");
       option.text  = translate('monitor') + ' ' + (monitor.index+1) + ' (' + monitor.width + 'x' + monitor.height + ')';
       option.value = monitor.index;
       document.getElementById("monitor").add(option);
+    }
+
+    for (const device of res.audio_devices)
+    {
+      let option = document.createElement("option");
+      option.text  = device.name;
+      option.value = device.index;
+      document.getElementById("audio_device").add(option);
     }
 
     for (const mat of res.mats)
@@ -181,7 +202,7 @@ function GetMat(id)
 
 
 
-var id = URLDecode(URL, "id");
+let id = URLDecode(URL, "id");
 
 AjaxCallback("ajax/config/list_sound_files", function(response) {
   console.log(response);
@@ -211,5 +232,8 @@ document.getElementById("sound_disabled").innerHTML = translate('disabled');
 
 document.getElementById("progressbar").innerHTML     = translate('progressbar');
 document.getElementById("fixed_at_bottom").innerHTML = translate('fixed_at_bottom');
+
+document.getElementById("label_audio_device").innerHTML = translate('audio_device');
+document.getElementById("default").innerHTML = translate('default');
 
 </script>

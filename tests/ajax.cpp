@@ -389,6 +389,8 @@ TEST(Ajax, GetMats)
 	yaml = YAML::Load(app.Ajax_GetMats());
 
 	EXPECT_EQ(yaml["highest_mat_id"].as<int>(), 2);
+	EXPECT_TRUE(yaml["monitors"].IsSequence());
+	EXPECT_TRUE(yaml["audio_devices"].IsSequence());
 	EXPECT_EQ(yaml["mats"][0]["type"].as<int>(), (int)Mat::Type::LocalMat);
 	EXPECT_EQ(yaml["mats"][0]["name"].as<std::string>(), "Mat 1");
 	EXPECT_EQ(yaml["mats"][0]["is_paused"].as<bool>(), false);
@@ -515,7 +517,7 @@ TEST(Ajax, UpdateMat)
 		EXPECT_TRUE(app.GetLocalMat());
 		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
 
-		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=0&sound=false&sound_filename=changed")));
+		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=0&sound=false&sound_filename=changed&sound_device=7")));
 
 		EXPECT_TRUE(app.GetLocalMat());
 		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
@@ -527,9 +529,10 @@ TEST(Ajax, UpdateMat)
 		EXPECT_EQ((int)app.GetLocalMat()->GetNameStyle(),  0);
 		EXPECT_FALSE(app.GetLocalMat()->IsSoundEnabled());
 		EXPECT_EQ(app.GetLocalMat()->GetSoundFilename(), "changed");
+		EXPECT_EQ(app.GetLocalMat()->GetAudioDeviceID(), 7);
 
 
-		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=1&sound=true&sound_filename=changed2")));
+		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=1&sound=true&sound_filename=changed2&sound_device=-1")));
 
 
 		EXPECT_TRUE(app.GetLocalMat());
@@ -542,9 +545,10 @@ TEST(Ajax, UpdateMat)
 		EXPECT_EQ((int)app.GetLocalMat()->GetNameStyle(),  1);
 		EXPECT_TRUE(app.GetLocalMat()->IsSoundEnabled());
 		EXPECT_EQ(app.GetLocalMat()->GetSoundFilename(), "changed2");
+		EXPECT_EQ(app.GetLocalMat()->GetAudioDeviceID(), -1);
 
 
-		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test3&ipponStyle=2&osaekomiStyle=0&timerStyle=0&nameStyle=0&sound=false&sound_filename=changed3")));
+		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test3&ipponStyle=2&osaekomiStyle=0&timerStyle=0&nameStyle=0&sound=false&sound_filename=changed3&sound_device=42")));
 
 		EXPECT_TRUE(app.GetLocalMat());
 		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
@@ -556,6 +560,7 @@ TEST(Ajax, UpdateMat)
 		EXPECT_EQ((int)app.GetLocalMat()->GetNameStyle(),  0);
 		EXPECT_FALSE(app.GetLocalMat()->IsSoundEnabled());
 		EXPECT_EQ(app.GetLocalMat()->GetSoundFilename(), "changed3");
+		EXPECT_EQ(app.GetLocalMat()->GetAudioDeviceID(), 42);
 	}
 }
 

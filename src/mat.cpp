@@ -9,9 +9,6 @@
 #include "../ZED/include/log.h"
 
 
-
-#define PI    3.14159265358979323846f
-
 using namespace Judoboard;
 
 
@@ -95,7 +92,7 @@ bool Mat::Open()
 		ZED::Log::Info("Logo loaded");
 			
 		if (!m_Sound)
-			SetSoundFilename(GetSoundFilename());//Load sound file
+			SetAudio(IsSoundEnabled(), GetSoundFilename(), GetAudioDeviceID());
 
 		while (m_Window.IsRunning())
 			Mainloop();
@@ -1375,6 +1372,8 @@ void Mat::Process()
 
 void Mat::RenderBackgroundEffect(float alpha) const
 {
+	const float PI = 3.14159265358979323846f;
+
 	if (alpha >= 359.5f)
 		alpha = 359.5f;
 	if (alpha <= 270.5f)
@@ -1391,7 +1390,7 @@ void Mat::RenderBackgroundEffect(float alpha) const
 	float m = std::tan(beta / (180.0f / PI));
 
 	auto& renderer = m_Window.GetRenderer();
-	const int width = renderer.GetWidth();
+	const int width  = renderer.GetWidth();
 	const int height = renderer.GetHeight();
 
 	renderer.FillRect(ZED::Rect(0, 0, width, height), 0, 0, 255);
@@ -2679,6 +2678,12 @@ bool Mat::Mainloop()
 	Process();
 
 	Render((double)m_LastFrameTime * 0.001f);
+
+	if (m_QueueSound)
+	{
+		PlaySoundFile();
+		m_QueueSound = false;
+	}
 
 	//Calculate frame time
 	uint32_t target_frameTime = 40;//25 FPS when idle
