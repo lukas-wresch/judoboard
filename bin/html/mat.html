@@ -361,8 +361,10 @@ function RevokeGoldenScore()
 }
 
 
-function MoveUp(index, match_id)
+function MoveUp(index, match_id, event)
 {
+  event.preventDefault();
+
   let table = document.getElementById("next_matches_table");
 
   table.rows[  index*2-1].cells[1].innerHTML = "- - -";
@@ -893,7 +895,7 @@ function GetJudokaName()
         cell5.innerHTML = '<button ' + dis + ' class="neutral" style="width: 50mm; margin-top: 1mm;" onclick="StartNextMatch(event)" ontouchstart="StartNextMatch(event)">' + translate('start_next_match') + '</button>';
       }
       else
-        cell5.innerHTML = '<button class="neutral" style="width: 50mm; margin-top: 1mm;" onclick="MoveUp(' + i + ', \'' + match.uuid + '\')" ontouchstart="MoveUp(' + i + ', \'' + match.uuid + '\')">' + translate('push_up') + '</button>';
+        cell5.innerHTML = '<button class="neutral" style="width: 50mm; margin-top: 1mm;" onclick="MoveUp(' + i + ', \'' + match.uuid + '\', event)" ontouchstart="MoveUp(' + i + ', \'' + match.uuid + '\', event)">' + translate('push_up') + '</button>';
 
       i++;
     }
