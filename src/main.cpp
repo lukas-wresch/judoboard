@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 {
 	ZED::Log::Open("log.txt");
 
-	int port = 8080;
+	int port = 0;
 	bool show_test_screen = false;
 	bool demo = false;
 	bool nowindow = false;
@@ -360,9 +360,15 @@ int main(int argc, char** argv)
 	Judoboard::Application app;
 
 	if (!app.LoadDataFromDisk())
+	{
 		ZED::Log::Error("Could not load application data from disk");
+		if (port <= 0)//Port not set via command line
+			port = 8080;
+	}
+	else if (port <= 0)//Port not set via command line
+		port = app.GetDatabase().GetServerPort();
 
-	app.StartHttpServer(app.GetDatabase().GetServerPort());
+	app.StartHttpServer(port);
 
 	if (slave)
 	{
