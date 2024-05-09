@@ -4054,7 +4054,10 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		auto error = Ajax_AddMatchTable(Request);
 		if (!error)
+		{
+			GetTournament()->AddMatchTable(table);//Add match table again since we just deleted it
 			return error;
+		}
 
 		table = GetTournament()->FindMatchTable(id);
 
@@ -4093,11 +4096,8 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 	//Update filter
 
-	if (!table->IsSubMatchTable())
+	if (!table->IsSubMatchTable() && table->GetFilter() && table->GetFilter()->GetType() == IFilter::Type::Weightclass)
 	{
-		if (!table->GetFilter() || table->GetFilter()->GetType() != IFilter::Type::Weightclass)
-			return Error::Type::OperationFailed;
-
 		auto weightclass = (Weightclass*)table->GetFilter();
 
 		auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
@@ -4123,6 +4123,18 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 			GetTournament()->LockWrite();
 
 			round_robin->IsBestOfThree(bo3);
+
+			GetTournament()->UnlockWrite();
+			break;
+		}
+
+		case MatchTable::Type::Custom:
+		{
+			CustomTable* custom = (CustomTable*)table;
+
+			GetTournament()->LockWrite();
+
+			custom->IsBestOfThree(bo3);
 
 			GetTournament()->UnlockWrite();
 			break;
