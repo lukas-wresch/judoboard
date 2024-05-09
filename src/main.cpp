@@ -374,7 +374,8 @@ int main(int argc, char** argv)
 		for (uint32_t i = 1; i <= app.GetDatabase().GetMatCount(); i++)
 		{
 			auto mat = app.StartLocalMat(i);
-			mat->SetFullscreen(mat->IsFullscreen(), i%monitors.size());
+			if (monitors.size() > 0)
+				mat->SetFullscreen(mat->IsFullscreen(), i%monitors.size());
 		}
 	}
 	else
@@ -387,7 +388,8 @@ int main(int argc, char** argv)
 		for (uint32_t i = 1; i <= app.GetDatabase().GetMatCount(); i++)
 		{
 			auto mat = app.StartLocalMat(i);
-			mat->SetFullscreen(mat->IsFullscreen(), i%monitors.size());
+			if (monitors.size() > 0)
+				mat->SetFullscreen(mat->IsFullscreen(), i%monitors.size());
 		}
 
 		if (app.GetDatabase().GetNumAccounts() == 0)
