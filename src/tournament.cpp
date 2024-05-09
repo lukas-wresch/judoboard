@@ -4,6 +4,7 @@
 #include <cassert>
 #include "../ZED/include/log.h"
 #include "tournament.h"
+#include "app.h"
 #include "database.h"
 #include "weightclass.h"
 #include "customtable.h"
@@ -1464,6 +1465,24 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	}
 
 	OnUpdateMatchTable(*NewMatchTable);
+}
+
+
+
+void Tournament::OnMatchStarted(const Match& Match) const
+{
+	ScheduleSave();
+	if (m_Application)
+		m_Application->RequestPushToResultsServer();
+}
+
+
+
+void Tournament::OnMatchConcluded(const Match& Match) const
+{
+	ScheduleSave();
+	if (m_Application)
+		m_Application->RequestPushToResultsServer();
 }
 
 

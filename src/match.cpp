@@ -744,6 +744,15 @@ uint32_t Match::GetCurrentBreaktime() const
 
 
 
+void Match::StartMatch()
+{
+	m_State = Status::Running;
+	if (GetTournament())
+		GetTournament()->OnMatchStarted(*this);
+}
+
+
+
 void Match::EndMatch()
 {
 	m_State = Status::Concluded;
