@@ -70,7 +70,7 @@ namespace ZED
 	class SoundDevice
 	{
 	public:
-		SoundDevice() {}
+		SoundDevice() = default;
 		SoundDevice(SoundDevice&) = delete;
 		SoundDevice(const SoundDevice&) = delete;
 		SoundDevice(SoundDevice&& rhs) noexcept {

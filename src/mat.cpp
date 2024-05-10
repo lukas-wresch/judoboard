@@ -554,10 +554,11 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 
 	if (m_pMatch)
 	{
-		Yaml << YAML::Key << "yuko_enabled" << m_pMatch->GetRuleSet().IsYukoEnabled();
-		Yaml << YAML::Key << "koka_enabled" << m_pMatch->GetRuleSet().IsKokaEnabled();
-		Yaml << YAML::Key << "golden_score_enabled" << m_pMatch->GetRuleSet().IsGoldenScoreEnabled();
-		Yaml << YAML::Key << "draw_enabled" << m_pMatch->GetRuleSet().IsDrawAllowed();
+		auto rules = m_pMatch->GetRuleSet();
+		Yaml << YAML::Key << "yuko_enabled" << rules.IsYukoEnabled();
+		Yaml << YAML::Key << "koka_enabled" << rules.IsKokaEnabled();
+		Yaml << YAML::Key << "golden_score_enabled" << rules.IsGoldenScoreEnabled();
+		Yaml << YAML::Key << "draw_enabled" << rules.IsDrawAllowed();
 	}
 
 	Yaml << YAML::EndMap;

@@ -66,10 +66,13 @@ namespace Judoboard
 		ID(const ID& rhs) : m_UUID(rhs.m_UUID) {}
 		ID(ID&& rhs) noexcept : m_UUID(std::move(rhs.m_UUID)) {}
 
-		ID& operator =(const ID& rhs)
+		void operator =(const ID& rhs)
 		{
 			m_UUID = rhs.m_UUID;
-			return *this;
+		}
+		void operator =(ID&& rhs) noexcept
+		{
+			m_UUID = std::move(rhs.m_UUID);
 		}
 
 		static const UUID GenerateUUID();
