@@ -1530,7 +1530,7 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 	{
 		auto participants = matchTable->GetParticipants();
 		for (auto judoka : participants)
-			if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
+			if (judoka && judoka->GetWeight() != 0 && !matchTable->IsElgiable(*judoka))//No longer eligable?
 				matchTable->RemoveParticipant(judoka);
 
 		for (auto judoka : m_StandingData.GetAllJudokas())
