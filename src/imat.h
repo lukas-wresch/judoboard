@@ -10,8 +10,6 @@ namespace Judoboard
 {
 	class IMat
 	{
-		friend class Application;
-
 	public:
 		enum class Type
 		{
@@ -131,8 +129,7 @@ namespace Judoboard
 		virtual bool HasConcluded() const = 0;//Returns true if and only if the match has finished and hence EndMatch() can be called
 		virtual bool EndMatch() = 0;//Closes the match that is currently on the mat and resets the scoreboard
 
-		virtual uint32_t GetTimeElapsed()  const = 0;
-		virtual uint32_t GetTime2Display() const = 0;
+		virtual uint32_t GetTime2Display() const = 0;//Returns the match time as it should be displayed in milliseconds
 
 		virtual bool IsHajime() const = 0;//Returns true if and only the match is running and not paused i.e. the hajime timer is running
 		virtual bool IsOutOfTime() const = 0;//Returns true if and only if the match has run out of time
@@ -194,31 +191,39 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const = 0;
 
 		//Config
+		virtual void SetFullscreen(bool Enabled = true, int Monitor = -1) = 0;
+		virtual int GetMonitor() const = 0;
 		IpponStyle GetIpponStyle() const { return m_IpponStyle; }
 		OsaekomiStyle GetOsaekomiStyle() const { return m_OsaekomiStyle; }
 		TimerStyle GetTimerStyle() const { return m_TimerStyle; }
 		NameStyle  GetNameStyle()  const { return m_NameStyle; }
 		bool IsFullscreen() const { return m_IsFullscreen; }
-		virtual void SetFullscreen(bool Enabled = true, int Monitor = -1) = 0;
-		virtual int GetMonitor() const = 0;
+
+		//Audio
+		virtual void SetAudio(bool Enabled, const std::string& NewFilename, int DeviceID) = 0;
+		virtual void QueueSoundFile() const {}
 		bool IsSoundEnabled() const { return m_SoundEnabled; }
 		std::string GetSoundFilename() const { return m_SoundFilename; }
+		int GetAudioDeviceID() const { return m_AudioDeviceID; }
 
+		//Name and styling
 		virtual void SetName(const std::string& NewName) { m_Name = NewName; }
 		virtual void SetIpponStyle(IpponStyle NewStyle) { m_IpponStyle = NewStyle; }
 		virtual void SetOsaekomiStyle(OsaekomiStyle NewStyle) { m_OsaekomiStyle = NewStyle; }
 		virtual void SetTimerStyle(TimerStyle NewStyle) { m_TimerStyle = NewStyle; }
 		virtual void SetNameStyle(NameStyle NewStyle) { m_NameStyle = NewStyle; }
 		virtual void SetIsFullscreen(bool Enabled) { m_IsFullscreen = Enabled; }
-		virtual void EnableSound(bool Enabled = true) { m_SoundEnabled = Enabled; }
-		virtual void SetSoundFilename(const std::string& NewFilename) { m_SoundFilename = NewFilename; }
+
 
 	protected:
-		virtual void PlaySoundFile() const {}
 		virtual void StopSoundFile() const {}
 
 		int  GetMonitorIndex() const { return m_Monitor; }
 		void SetMonitorIndex(int Monitor) { m_Monitor = Monitor; }
+
+		void EnableSound(bool Enabled = true) { m_SoundEnabled = Enabled; }
+		void SetSoundFilename(const std::string& NewFilename) { m_SoundFilename = NewFilename; }
+		void SetAudioDeviceID(int DeviceID) { m_AudioDeviceID = DeviceID; }
 
 		std::vector<Match> m_NextMatches;
 
@@ -236,5 +241,6 @@ namespace Judoboard
 		int  m_Monitor = 0;
 		bool m_SoundEnabled = true;//Sound effect for and of match/osaekomi will be played if this flag is set
 		std::string m_SoundFilename = "gong";//Sound file that is currently in use
+		int m_AudioDeviceID = -1;//-1 for the default audio device. >= 0 for a specific device
 	};
 }

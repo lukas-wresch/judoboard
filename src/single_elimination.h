@@ -65,6 +65,8 @@ namespace Judoboard
 			MatchTable::DeleteSchedule();
 		}
 
+		virtual bool DeleteMatch(const UUID& UUID) override;
+
 		virtual const std::vector<Match*> GetSchedule() const override;
 
 		virtual Results CalculateResults() const override;

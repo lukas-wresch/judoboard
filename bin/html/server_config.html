@@ -23,6 +23,11 @@
 </div>
 
 <div style="margin-top: 5mm;">
+    <label style="width:200px;float:left;" id="label_http_threads">Free http threads</label>
+    <span  id="http_threads">- - -</span>
+</div>
+
+<div style="margin-top: 5mm;">
   <label style="width:200px;float:left;" id="label_language">Language</label>
   <select style="margin-bottom:0px;" id="language">
     <option value="0" id="english">English</option>
@@ -239,9 +244,13 @@ function GetStatus()
       document.getElementById("nameStyle").value  = res.name_style;
       document.getElementById("results_server").checked   = res.results_server;
       document.getElementById("results_server_url").value = res.results_server_url;
+      document.getElementById("http_threads").innerHTML = res.http_workers_free;
     }
     else
+    {
       document.getElementById("uptime").innerHTML = NiceLargeTime(res.uptime);
+      document.getElementById("http_threads").innerHTML = res.http_workers_free;
+    }
   });
 }
 

@@ -81,7 +81,11 @@ function Update()
       if (typeof mat.type === 'undefined' || mat.type == 0)
         cell3.innerHTML = "Not available";
       else if (mat.type == 1)
-        cell3.innerHTML = "Local mat";
+      {
+        cell3.innerHTML = "Local mat<br/>";
+        cell3.innerHTML += "Monitor: " + mat.monitor + "<br/>";
+        cell3.innerHTML += "Audio device: " + mat.sound_device;
+      }
       else if (mat.type == 2)
         cell3.innerHTML = "Virtual mat";
       else if (mat.type == 3)

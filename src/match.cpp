@@ -687,6 +687,11 @@ bool Match::IsEmptyMatch() const
 	if (m_Blue.m_DependentMatch && m_Blue.m_DependentMatch->IsCompletelyEmptyMatch())
 		return true;
 
+	if (m_White.m_DependentMatch && !m_White.m_DependentMatch->HasConcluded())
+		return false;
+	if (m_Blue.m_DependentMatch  && !m_Blue.m_DependentMatch->HasConcluded())
+		return false;
+
 	return !GetFighter(Fighter::White) || !GetFighter(Fighter::Blue);
 }
 

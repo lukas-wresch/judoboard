@@ -41,9 +41,13 @@ namespace ZED
 		Packet POST(const std::string& Path, const Blob& Data, const std::string& AdditionalHeaders = "") { SendPOSTRequest(Path.c_str(), Data, AdditionalHeaders.c_str()); return RecvResponse(); }
 		Packet POST(const std::string& Path, const std::string& Data, const std::string& AdditionalHeaders = "") { SendPOSTRequest(Path.c_str(), Blob(Data), AdditionalHeaders.c_str()); return RecvResponse(); }
 
+		void SetKeepAlive(bool Enable = true) { m_KeepAlive = Enable; }
+
 	private:
 		SocketTCP m_Socket;
 
 		std::string m_Hostname;
+
+		bool m_KeepAlive = false;
 	};
 }

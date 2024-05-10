@@ -19,12 +19,17 @@ bool HttpClient::SendGETRequest(const char* Path, const char* AdditionalHeaders)
 	strcat_s(request, sizeof(request), Path);
 	strcat_s(request, sizeof(request), " HTTP/1.1\r\nHost: ");
 	strcat_s(request, sizeof(request), m_Hostname.c_str());
-	strcat_s(request, sizeof(request), "\r\n");
 
 	if (AdditionalHeaders)
+	{
+		strcat_s(request, sizeof(request), "\r\n");
 		strcat_s(request, sizeof(request), AdditionalHeaders);
+	}
 
-	strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
+	if (m_KeepAlive)
+		strcat_s(request, sizeof(request), "\r\nConnection: keep-alive\r\n\r\n");
+	else
+		strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
 
 	return m_Socket.Send(request, strlen(request));
 }
@@ -38,18 +43,23 @@ bool HttpClient::SendPOSTRequest(const char* Path, const Blob& Data, const char*
 
 
 	char request[1024] = {};
-	strcpy_s(request, sizeof(request), "GET ");
+	strcpy_s(request, sizeof(request), "POST ");
 	strcat_s(request, sizeof(request), Path);
 	strcat_s(request, sizeof(request), " HTTP/1.1\r\nHost: ");
 	strcat_s(request, sizeof(request), m_Hostname.c_str());
 	strcat_s(request, sizeof(request), "\r\nContent-Length: ");
 	strcat_s(request, sizeof(request), std::to_string(Data.GetSize()).c_str());
-	strcat_s(request, sizeof(request), "\r\n");
 
 	if (AdditionalHeaders)
+	{
+		strcat_s(request, sizeof(request), "\r\n");
 		strcat_s(request, sizeof(request), AdditionalHeaders);
+	}
 
-	strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
+	if (m_KeepAlive)
+		strcat_s(request, sizeof(request), "\r\nConnection: keep-alive\r\n\r\n");
+	else
+		strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
 
 	if (!m_Socket.Send(request, strlen(request)))
 		return false;
@@ -90,7 +100,11 @@ bool HttpClient::SendFile(const char* Path, const char* Filename)
 	strcat_s(request, sizeof(request), m_Hostname.c_str());
 	strcat_s(request, sizeof(request), "\r\nContent-Length: ");
 	strcat_s(request, sizeof(request), std::to_string(length).c_str());
-	strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
+
+	if (m_KeepAlive)
+		strcat_s(request, sizeof(request), "\r\nConnection: keep-alive\r\n\r\n");
+	else
+		strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
 
 	if (!m_Socket.Send(request, strlen(request)))
 		return false;

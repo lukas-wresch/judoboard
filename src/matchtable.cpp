@@ -244,6 +244,24 @@ bool MatchTable::RemoveParticipant(const Judoka* Participant)
 
 
 
+bool MatchTable::DeleteMatch(const UUID& UUID)
+{
+	for (auto it = m_Schedule.begin(); it != m_Schedule.end(); ++it)
+	{
+		if ((*it)->GetUUID() == UUID)
+		{
+			if (!IsSubMatchTable())
+				delete *it;
+			m_Schedule.erase(it);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
 std::string MatchTable::GetDescription() const
 {
 	auto name = GetName();

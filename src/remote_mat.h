@@ -30,7 +30,6 @@ namespace Judoboard
 		virtual bool HasConcluded() const override;
 		virtual bool EndMatch() override;
 
-		virtual uint32_t GetTimeElapsed()  const override { return 0; }
 		virtual uint32_t GetTime2Display() const override { return 0; }
 
 		virtual bool IsHajime()      const override { return GetState().hajime; }
@@ -117,6 +116,11 @@ namespace Judoboard
 			if (yaml["mats"] && yaml["mats"][GetMatID()] && yaml["mats"][GetMatID()]["monitor"])
 				return yaml["mats"][GetMatID()]["monitor"].as<int>();
 			return -1;
+		}
+
+		virtual void SetAudio(bool Enabled, const std::string& NewFilename, int DeviceID) override
+		{
+			assert(false);//NOT IMPLEMENTED
 		}
 
 		std::string GetHostname() const { return m_Hostname; }

@@ -97,6 +97,37 @@ size_t SingleElimination::GetNumberOfRounds() const
 
 
 
+bool SingleElimination::DeleteMatch(const UUID& UUID)
+{
+	bool success = MatchTable::DeleteMatch(UUID);
+
+	for (auto it = m_ThirdPlaceMatches.begin(); it != m_ThirdPlaceMatches.end(); ++it)
+	{
+		if ((*it)->GetUUID() == UUID)
+		{
+			if (!IsSubMatchTable())
+				delete *it;
+			m_ThirdPlaceMatches.erase(it);
+			success = true;
+		}
+	}
+
+	for (auto it = m_FifthPlaceMatches.begin(); it != m_FifthPlaceMatches.end(); ++it)
+	{
+		if ((*it)->GetUUID() == UUID)
+		{
+			if (!IsSubMatchTable())
+				delete *it;
+			m_FifthPlaceMatches.erase(it);
+			success = true;
+		}
+	}
+
+	return success;
+}
+
+
+
 const std::vector<Match*> SingleElimination::GetSchedule() const
 {
 	std::vector<Match*> ret = MatchTable::GetSchedule();

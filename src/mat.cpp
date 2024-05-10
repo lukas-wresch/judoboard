@@ -9,9 +9,6 @@
 #include "../ZED/include/log.h"
 
 
-
-#define PI    3.14159265358979323846f
-
 using namespace Judoboard;
 
 
@@ -95,7 +92,7 @@ bool Mat::Open()
 		ZED::Log::Info("Logo loaded");
 			
 		if (!m_Sound)
-			SetSoundFilename(GetSoundFilename());//Load sound file
+			SetAudio(IsSoundEnabled(), GetSoundFilename(), GetAudioDeviceID());
 
 		while (m_Window.IsRunning())
 			Mainloop();
@@ -446,18 +443,18 @@ ZED::Blob Mat::RequestScreenshot() const
 
 uint32_t Mat::GetTime2Display() const
 {
+	if (m_GoldenScore)//If golden score
+		return m_HajimeTimer.GetElapsedTime();//Always count upwards
+
 	if (m_pMatch)
 	{
-		const auto& rules = m_pMatch->GetRuleSet();
-		if (rules.GetMatchTime() > 0)//If match time is not infinite
-		{
-			if (m_GoldenScore)
-				return (rules.GetGoldenScoreTime() * 1000 - m_HajimeTimer).GetElapsedTime();
-			return (rules.GetMatchTime() * 1000 - m_HajimeTimer).GetElapsedTime();
-		}
+		const auto match_time = m_pMatch->GetRuleSet().GetMatchTime();
+
+		if (match_time > 0)//If match time is not infinite
+			return (match_time*1000 - m_HajimeTimer).GetElapsedTime();
 	}
 
-	return m_HajimeTimer.GetElapsedTime();//Infinite match (and default if no m_pMatch is nullptr)
+	return m_HajimeTimer.GetElapsedTime();//Infinite match (and default if m_pMatch is nullptr)
 }
 
 
@@ -543,15 +540,17 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "is_hajime"   << YAML::Value << IsHajime();
 	Yaml << YAML::Key << "is_osaekomi" << YAML::Value << IsOsaekomi();
 
+	const auto result = GetResult();
 	Yaml << YAML::Key << "was_mate_recent"      << YAML::Value << WasMateRecent();
 	Yaml << YAML::Key << "are_fighters_on_mat"  << YAML::Value << AreFightersOnMat();
 	Yaml << YAML::Key << "can_next_match_start" << YAML::Value << CanNextMatchStart();
 	Yaml << YAML::Key << "has_concluded"        << YAML::Value << HasConcluded();
-	Yaml << YAML::Key << "winner"               << YAML::Value << (int)GetResult().m_Winner;
+	Yaml << YAML::Key << "winner"               << YAML::Value << (int)result.m_Winner;
 	Yaml << YAML::Key << "is_out_of_time"       << YAML::Value << IsOutOfTime();
-	Yaml << YAML::Key << "no_winner_yet"        << YAML::Value << (GetResult().m_Winner == Winner::Draw);
+	Yaml << YAML::Key << "no_winner_yet"        << YAML::Value << (result.m_Winner == Winner::Draw);
 	Yaml << YAML::Key << "is_goldenscore"       << YAML::Value << IsGoldenScore();
 	Yaml << YAML::Key << "is_hantei"            << YAML::Value << (GetScoreboard(Fighter::White).m_Hantei || GetScoreboard(Fighter::Blue).m_Hantei);
+	Yaml << YAML::Key << "total_time"           << YAML::Value << result.m_Time;
 
 	if (m_pMatch)
 	{
@@ -1373,6 +1372,8 @@ void Mat::Process()
 
 void Mat::RenderBackgroundEffect(float alpha) const
 {
+	const float PI = 3.14159265358979323846f;
+
 	if (alpha >= 359.5f)
 		alpha = 359.5f;
 	if (alpha <= 270.5f)
@@ -1389,7 +1390,7 @@ void Mat::RenderBackgroundEffect(float alpha) const
 	float m = std::tan(beta / (180.0f / PI));
 
 	auto& renderer = m_Window.GetRenderer();
-	const int width = renderer.GetWidth();
+	const int width  = renderer.GetWidth();
 	const int height = renderer.GetHeight();
 
 	renderer.FillRect(ZED::Rect(0, 0, width, height), 0, 0, 255);
@@ -2677,6 +2678,12 @@ bool Mat::Mainloop()
 	Process();
 
 	Render((double)m_LastFrameTime * 0.001f);
+
+	if (m_QueueSound)
+	{
+		PlaySoundFile();
+		m_QueueSound = false;
+	}
 
 	//Calculate frame time
 	uint32_t target_frameTime = 40;//25 FPS when idle

@@ -109,6 +109,17 @@ size_t DoubleElimination::GetMaxStartPositions() const
 
 
 
+bool DoubleElimination::DeleteMatch(const UUID& UUID)
+{
+	bool success = MatchTable::DeleteMatch(UUID);
+
+	success |= m_WinnerBracket.DeleteMatch(UUID);
+	success |= m_LoserBracket.DeleteMatch(UUID);
+	return success;
+}
+
+
+
 MatchTable::Results DoubleElimination::CalculateResults() const
 {
 	Results ret    = m_WinnerBracket.CalculateResults();

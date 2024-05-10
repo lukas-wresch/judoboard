@@ -39,7 +39,7 @@ namespace Judoboard
 
 		bool IsOutOfTime(int MatchTime_Millseconds, bool GoldenScore) const;
 
-		int GetMatchTime() const { return m_MatchTime; }
+		int GetMatchTime() const { return m_MatchTime; }//Returns the match time in seconds
 		int GetGoldenScoreTime() const { return m_GoldenScoreTime; }
 		uint32_t GetBreakTime() const { return m_BreakTime; }
 		bool IsExtendBreakTime() const { return m_IsExtendBreakTime; }
