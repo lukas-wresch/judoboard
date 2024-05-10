@@ -1462,12 +1462,11 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	for (size_t i = 0; i < NewMatchTable->GetSchedule().size(); i++)
 	{
 		auto match = NewMatchTable->GetSchedule()[i];
-		if (!match->IsEmptyMatch() && !match->IsCompletelyEmptyMatch())
+		if (!match->IsEmptyMatch())
 			m_Schedule.emplace_back(NewMatchTable, i);
 	}
 
-	if (NewMatchTable->GetType() != MatchTable::Type::Custom)//No need to call OnUpdate for custom
-		OnUpdateMatchTable(*NewMatchTable);
+	OnUpdateMatchTable(*NewMatchTable);
 }
 
 
@@ -1584,7 +1583,8 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 		return a->GetUUID() < b->GetUUID();
 	});
 
-	BuildSchedule();
+	if (matchTable->GetScheduleIndex() != GetMaxScheduleIndex())//No need to rebuild schedule
+		BuildSchedule();
 
 	return true;
 }
