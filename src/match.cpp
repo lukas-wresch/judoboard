@@ -190,7 +190,7 @@ void Match::operator >>(YAML::Emitter& Yaml) const
 
 void Match::operator >>(nlohmann::json& Json) const
 {
-	//Json["uuid"] = (std::string)GetUUID();
+	Json["uuid"] = (std::string)GetUUID();
 
 	Json["mat_id"] = GetMatID();
 

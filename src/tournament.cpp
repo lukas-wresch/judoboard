@@ -2362,7 +2362,7 @@ const std::string Tournament::MasterSchedule2String() const
 
 
 
-const std::string Tournament::Schedule2ResultsServer() const
+nlohmann::json Tournament::Schedule2ResultsServer() const
 {
 	nlohmann::json ret;
 
@@ -2378,9 +2378,18 @@ const std::string Tournament::Schedule2ResultsServer() const
 		ret["schedule"].push_back(match_json);
 	}
 
+	auto tables = GetMatchTables();
+	for (auto table : tables)
+	{
+		nlohmann::json table_json;
+		*table >> table_json;
+		ret["match_tables"].push_back(table_json);
+	}
+
 	UnlockRead();
 
-	return ret.dump();
+	//return ret.dump();
+	return ret;
 }
 
 

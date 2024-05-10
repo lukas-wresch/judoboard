@@ -377,6 +377,7 @@ namespace Judoboard
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual void ToString(YAML::Emitter& Yaml) const;
+		virtual void operator >>(nlohmann::json& Json) const;
 
 		//Events
 		virtual void OnLotteryPerformed();//Called when a lottery draw was performed

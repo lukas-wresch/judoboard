@@ -714,6 +714,16 @@ void Application::Run()
 					auto endpoint = m_Database.GetResultsServer();
 					auto data = GetTournament()->Schedule2ResultsServer();
 
+					auto guard = LockReadForScope();
+					for (auto mat : GetMats())
+					{
+						if (mat)
+						{
+							data["mats"].push_back({ "id",   mat->GetMatID(),
+													 "name", mat->GetName()});
+						}
+					}
+
 					auto index = endpoint.find_first_of('/', 0);
 					if (index != std::string::npos)
 					{
@@ -724,7 +734,7 @@ void Application::Run()
 						fopen_s(&file, "results.json", "w");
 						if (file)
 						{
-							fprintf(file, data.c_str());
+							fprintf(file, data.dump().c_str());
 							fclose(file);
 						}
 
