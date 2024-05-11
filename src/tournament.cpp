@@ -4,6 +4,7 @@
 #include <cassert>
 #include "../ZED/include/log.h"
 #include "tournament.h"
+#include "app.h"
 #include "database.h"
 #include "weightclass.h"
 #include "customtable.h"
@@ -1471,6 +1472,24 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 
 
+void Tournament::OnMatchStarted(const Match& Match) const
+{
+	ScheduleSave();
+	if (m_Application)
+		m_Application->RequestPushToResultsServer();
+}
+
+
+
+void Tournament::OnMatchConcluded(const Match& Match) const
+{
+	ScheduleSave();
+	if (m_Application)
+		m_Application->RequestPushToResultsServer();
+}
+
+
+
 bool Tournament::OnUpdateParticipant(const UUID& UUID)
 {
 	if (IsReadonly())
@@ -2348,6 +2367,38 @@ const std::string Tournament::MasterSchedule2String() const
 	ret << YAML::EndMap;
 
 	return ret.c_str();
+}
+
+
+
+nlohmann::json Tournament::Schedule2ResultsServer() const
+{
+	nlohmann::json ret;
+
+	LockRead();
+
+	ret["name"] = GetName();
+
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
+	{
+		nlohmann::json match_json;
+		*match >> match_json;
+		ret["schedule"].push_back(match_json);
+	}
+
+	auto tables = GetMatchTables();
+	for (auto table : tables)
+	{
+		nlohmann::json table_json;
+		*table >> table_json;
+		ret["match_tables"].push_back(table_json);
+	}
+
+	UnlockRead();
+
+	//return ret.dump();
+	return ret;
 }
 
 

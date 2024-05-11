@@ -188,11 +188,59 @@ void Match::operator >>(YAML::Emitter& Yaml) const
 
 
 
+void Match::operator >>(nlohmann::json& Json) const
+{
+	Json["uuid"] = (std::string)GetUUID();
+
+	Json["mat_id"] = GetMatID();
+
+	if (GetFighter(Fighter::White))
+		Json["white"] = (std::string)GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+	else
+		Json["white"] = "???";
+	if (GetFighter(Fighter::Blue))
+		Json["blue"]  = (std::string)GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+	else
+		Json["blue"] = "???";
+
+	Json["state"] = (int)m_State;
+
+	if (HasConcluded())
+	{
+		Json["winner"] = (int)m_Result.m_Winner;
+		Json["score"]  = (int)m_Result.m_Score;
+		Json["time"]   = m_Result.m_Time;
+	}
+	else
+	{
+		Json["winner"] = 0;
+		Json["score"]  = 0;
+		Json["time"]   = 0;
+	}
+
+	if (m_Table)
+		Json["match_table"] = m_Table->GetDescription();
+	else
+		Json["match_table"] = "- - -";
+
+	if (!m_Tag.IsNormal())
+		Json["tag"] = (uint32_t)m_Tag.value;
+	else
+		Json["tag"] = 0;
+
+	if (IsRunning())
+	{
+		//Export current state
+	}
+}
+
+
+
 void Match::ToString(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginMap;
 
-	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "uuid"              << YAML::Value << (std::string)GetUUID();
 	Yaml << YAML::Key << "current_breaktime" << YAML::Value << GetCurrentBreaktime();
 	Yaml << YAML::Key << "breaktime"         << YAML::Value << GetRuleSet().GetBreakTime();
 
@@ -697,6 +745,15 @@ uint32_t Match::GetCurrentBreaktime() const
 		return breakW;
 
 	return std::min(breakW, breakB);
+}
+
+
+
+void Match::StartMatch()
+{
+	m_State = Status::Running;
+	if (GetTournament())
+		GetTournament()->OnMatchStarted(*this);
 }
 
 

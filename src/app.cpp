@@ -232,6 +232,7 @@ bool Application::OpenTournament(const UUID& UUID)
 
 	auto guard = LockWriteForScope();
 
+	tournament->SetApplication(this);
 	m_CurrentTournament = tournament;
 
 	//Restart ongoing matches
@@ -705,6 +706,61 @@ void Application::Run()
 				ZED::Log::Info("Tournament auto-saved");
 				if (!tournament->Save())
 					ZED::Log::Error("Failed to save!");
+			}
+
+			if (m_Database.IsResultsServer())
+			{
+				auto time_since_last_update = (Timer::GetTimestamp() - m_ResultsServer_LastUpdate) / 1000;
+				if (time_since_last_update >= 60 ||
+					(m_RequestResultsServer && time_since_last_update >= 10) )
+				{
+					auto endpoint = m_Database.GetResultsServer();
+					auto data = GetTournament()->Schedule2ResultsServer();
+
+					auto guard = LockReadForScope();
+					for (auto mat : GetMats())
+					{
+						if (mat)
+						{
+							data["mats"].push_back({ "id",   mat->GetMatID(),
+													 "name", mat->GetName()});
+						}
+					}
+
+					auto index = endpoint.find_first_of('/', 0);
+					if (index != std::string::npos)
+					{
+						auto host = endpoint.substr(0, index);
+						auto path = endpoint.substr(index);
+
+						FILE* file = nullptr;
+						fopen_s(&file, "results.json", "w");
+						if (file)
+						{
+							fprintf(file, data.dump().c_str());
+							fclose(file);
+						}
+
+#ifdef _WIN32
+						std::string command = endpoint + " -k -d " + "@results.json";
+						ShellExecuteA(NULL, "open", "curl.exe", command.c_str(), NULL, SW_HIDE);
+#else
+						std::string command = "curl.exe " + endpoint + " -k -d " + "@results.json";
+						system(command.c_str());
+#endif
+
+						/*std::thread([data, host, path]() {
+							ZED::HttpClient client(host);
+							client.POST(path, data);
+							auto response = client.RecvResponse();
+							assert(response.header == "ok");
+						}).detach();*/
+
+						m_ResultsServer_LastUpdate = Timer::GetTimestamp();
+						m_RequestResultsServer = false;
+						ZED::Log::Info("Pushed update to results server");
+					}
+				}
 			}
 		}
 

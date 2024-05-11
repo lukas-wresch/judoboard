@@ -685,6 +685,8 @@ TEST(Ajax, Setup_Get)
 		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetServerPort());
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+		EXPECT_TRUE(yaml["results_server"]);
+		EXPECT_TRUE(yaml["results_server_url"]);
 
 		ZED::Core::Pause(1000);
 
@@ -695,6 +697,8 @@ TEST(Ajax, Setup_Get)
 		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetServerPort());
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 1100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+		EXPECT_TRUE(yaml["results_server"]);
+		EXPECT_TRUE(yaml["results_server_url"]);
 	}
 
 }
@@ -790,7 +794,7 @@ TEST(Ajax, Setup_Set)
 	{
 		Application app;
 		
-		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=1234&language=0&mat_count=5&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=0")), "ok");
+		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=1234&language=0&mat_count=5&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=0&results_server=true&results_server_url=abc")), "ok");
 
 		auto yaml = YAML::Load(app.Ajax_GetSetup());
 
@@ -803,8 +807,10 @@ TEST(Ajax, Setup_Set)
 		EXPECT_EQ(yaml["name_style"].as<int>(),  0);
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+		EXPECT_EQ(yaml["results_server"].as<bool>(), true);
+		EXPECT_EQ(yaml["results_server_url"].as<std::string>(), "abc");
 
-		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&mat_count=8&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=1")), "ok");
+		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&mat_count=8&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=1&results_server=false&results_server_url=def")), "ok");
 
 		yaml = YAML::Load(app.Ajax_GetSetup());
 
@@ -817,6 +823,8 @@ TEST(Ajax, Setup_Set)
 		EXPECT_EQ(yaml["name_style"].as<int>(),  1);
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+		EXPECT_EQ(yaml["results_server"].as<bool>(), false);
+		EXPECT_EQ(yaml["results_server_url"].as<std::string>(), "def");
 	}
 }
 
