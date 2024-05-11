@@ -519,7 +519,7 @@ TEST(DoubleElimination, Count6)
 		match_count++;
 	}
 
-	EXPECT_TRUE(match_count, 7);
+	EXPECT_EQ(match_count, 7);
 
 	auto results = group->CalculateResults();
 
