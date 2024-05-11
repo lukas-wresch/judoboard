@@ -3820,8 +3820,6 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 	age_group->SetRuleSet(rule);
 
 	GetTournament()->AddRuleSet(rule);
-	TODO Might need to recalculate all match tables where the age group has changed
-	But only if age/gender changed! Hoe about OnUpdateAgeGroup()??
 
 	return Error::Type::NoError;
 }

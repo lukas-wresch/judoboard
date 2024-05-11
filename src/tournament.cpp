@@ -1498,6 +1498,7 @@ bool Tournament::OnUpdateParticipant(const UUID& UUID)
 	for (auto table : m_MatchTables)
 	{
 		if (!table) continue;
+		if (judoka->GetWeight() == 0) continue;
 
 		if (!table->IsElgiable(*judoka))//No longer eligable?
 			table->RemoveParticipant(judoka);
