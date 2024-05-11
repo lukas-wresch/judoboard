@@ -1095,4 +1095,44 @@ function Mat_Init()
 
 Mat_Init();
 
+window.addEventListener("keydown", function(event){
+  console.log(event);
+
+  if (event.code == "Numpad0")
+    Hajime(event);
+  else if (event.code == "NumpadDecimal")
+    Mate(event);
+
+  else if (event.code == "Numpad7")
+    SetScore('white', '+ippon', event);
+  else if (event.code == "Numpad8")
+    SetScore('white', '+wazaari', event);
+  else if (event.code == "Numpad9")
+    SetScore('blue', '+ippon', event);
+  else if (event.code == "NumpadSubtract")
+    SetScore('blue', '+wazaari', event);
+
+  else if (event.code == "Numpad4")
+    SetScore('white', '-ippon', event);
+  else if (event.code == "Numpad5")
+    SetScore('white', '-wazaari', event);
+  else if (event.code == "Numpad6")
+    SetScore('blue', '-ippon', event);
+  else if (event.code == "NumpadAdd")
+    SetScore('blue', '-wazaari', event);
+
+  else if (event.code == "Numpad1")
+    Osaekomi('white', event);
+  else if (event.code == "Numpad2")
+    Tokeda(event);
+  else if (event.code == "Numpad3")
+    Osaekomi('blue', event);
+
+  else if (event.code == "NumpadEnter")
+    EndMatch(event);
+  else if (event.code == "Backspace")
+    StartNextMatch(event);
+});
+
+
 </script>

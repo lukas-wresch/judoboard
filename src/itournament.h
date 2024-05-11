@@ -147,6 +147,7 @@ namespace Judoboard
 		virtual const std::string Schedule2String(bool ImportantOnly, int Mat = -1) const { assert(false); return ""; }
 		virtual const std::string MasterSchedule2String() const { assert(false); return ""; }
 
+		virtual void BuildSchedule() {}
 		virtual void GenerateSchedule() {}
 
 		virtual bool Save() { return false; }
