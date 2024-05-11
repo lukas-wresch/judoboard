@@ -1542,9 +1542,6 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 		matchTable->GenerateSchedule();
 	}
 
-	//Optimize master schedule entries
-	OrganizeMasterSchedule();
-
 	//Sort
 	std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
 		//Sort by filter
@@ -2468,6 +2465,8 @@ void Tournament::OrganizeMasterSchedule()
 void Tournament::BuildSchedule()
 {
 	auto guard = LockWriteForScope();
+
+	OrganizeMasterSchedule();
 
 	m_Schedule.clear();
 

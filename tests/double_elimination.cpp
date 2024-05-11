@@ -503,6 +503,7 @@ TEST(DoubleElimination, Count6)
 	ASSERT_EQ(loser_schedule.size(),   2 + 2);
 
 	Mat m(1);
+	int match_count = 0;
 
 	for (auto match : group->GetSchedule())
 	{
@@ -515,7 +516,10 @@ TEST(DoubleElimination, Count6)
 		else
 			m.AddIppon(Fighter::Blue);
 		EXPECT_TRUE(m.EndMatch());
+		match_count++;
 	}
+
+	EXPECT_TRUE(match_count, 7);
 
 	auto results = group->CalculateResults();
 
