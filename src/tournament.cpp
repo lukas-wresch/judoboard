@@ -1583,7 +1583,8 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 		return a->GetUUID() < b->GetUUID();
 	});
 
-	BuildSchedule();
+	if (matchTable->GetScheduleIndex() != GetMaxScheduleIndex())//No need to rebuild schedule
+		BuildSchedule();
 
 	return true;
 }
