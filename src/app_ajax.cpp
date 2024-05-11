@@ -3819,6 +3819,8 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 	age_group->SetGender(gender);
 	age_group->SetRuleSet(rule);
 
+	GetTournament()->AddRuleSet(rule);
+
 	return Error::Type::NoError;
 }
 
@@ -4499,7 +4501,9 @@ Error Application::Ajax_PlaySoundFile(const HttpServer::Request& Request)
 
 	mat->QueueSoundFile();
 
-	ZED::Core::Pause(20 * 1000);
+	ZED::Core::Pause(500);
+	if (audio_device == -1)
+		ZED::Core::Pause(10 * 1000);
 
 	mat->SetAudio(temp_enabled, temp_filename, temp_device);
 

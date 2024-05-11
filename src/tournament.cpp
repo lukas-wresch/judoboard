@@ -1498,6 +1498,7 @@ bool Tournament::OnUpdateParticipant(const UUID& UUID)
 	for (auto table : m_MatchTables)
 	{
 		if (!table) continue;
+		if (judoka->GetWeight() == 0) continue;
 
 		if (!table->IsElgiable(*judoka))//No longer eligable?
 			table->RemoveParticipant(judoka);
@@ -1526,8 +1527,12 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 	if (!matchTable)
 		return false;
 
+	bool need_to_rebuild = false;
+
 	if (matchTable->GetStatus() == Status::Scheduled)//Can safely recalculate the match table
 	{
+		auto old_match_count = matchTable->GetSchedule().size();
+
 		auto participants = matchTable->GetParticipants();
 		for (auto judoka : participants)
 			if (judoka && judoka->GetWeight() != 0 && !matchTable->IsElgiable(*judoka))//No longer eligable?
@@ -1540,6 +1545,9 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 		}
 
 		matchTable->GenerateSchedule();
+
+		if (old_match_count != matchTable->GetSchedule().size())
+			need_to_rebuild = true;//Only rebuild schedule in this case
 	}
 
 	//Optimize master schedule entries
@@ -1583,7 +1591,7 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 		return a->GetUUID() < b->GetUUID();
 	});
 
-	if (matchTable->GetScheduleIndex() != GetMaxScheduleIndex())//No need to rebuild schedule
+	if (need_to_rebuild)//Do we need to rebuild the schedule?
 		BuildSchedule();
 
 	return true;

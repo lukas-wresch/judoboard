@@ -2019,8 +2019,7 @@ void Mat::UpdateGraphics() const
 			
 			
 			//Update osaekomi
-			if (IsOsaekomi())
-				UpdateOsaekomiGraphics();
+			UpdateOsaekomiGraphics();
 
 			//Update text effects
 			if (m_Graphics["timer"])
