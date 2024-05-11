@@ -164,15 +164,15 @@ namespace Judoboard
 		{
 			if (!m_Sound || GetSoundFilename() != NewFilename)
 			{
-				m_Sound = std::move(ZED::Sound("assets/sounds/" + GetSoundFilename() + ".wav"));
+				m_Sound = std::move(ZED::Sound("assets/sounds/" + NewFilename + ".wav"));
 				if (m_Sound)
 					ZED::Log::Info("Sound file loaded");
 				else
 					ZED::Log::Warn("Could not load sound file");
 			}
 
-			EnableSound(Enabled);
 			SetSoundFilename(NewFilename);
+			EnableSound(Enabled);
 			SetAudioDeviceID(DeviceID);
 		}
 
