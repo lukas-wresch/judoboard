@@ -110,15 +110,16 @@ function GetFilterForm(callback)
   AjaxCallback('ajax/filter/get_form?type=' + document.getElementById("type").value, function(response) {
     document.getElementById("form_filter").innerHTML = response;
     
-    document.getElementById("label_min_weight").innerHTML = translate('min_weight');
-    document.getElementById("label_max_weight").innerHTML = translate('max_weight');
-    document.getElementById("label_gender").innerHTML     = translate('gender');
-    document.getElementById("all").innerHTML    = translate('all');
-    document.getElementById("male").innerHTML   = translate('male');
-    document.getElementById("female").innerHTML = translate('female');
-    
     if (g_yaml && typeof g_yaml.min_weight !== 'undefined')
+    {
+      document.getElementById("label_min_weight").innerHTML = translate('min_weight');
+      document.getElementById("label_max_weight").innerHTML = translate('max_weight');
+      document.getElementById("label_gender").innerHTML     = translate('gender');
+      document.getElementById("all").innerHTML    = translate('all');
+      document.getElementById("male").innerHTML   = translate('male');
+      document.getElementById("female").innerHTML = translate('female');
       document.getElementById("minWeight").value = g_yaml.min_weight;
+    }
     if (g_yaml && typeof g_yaml.max_weight !== 'undefined')
       document.getElementById("maxWeight").value = g_yaml.max_weight;
     if (g_yaml && typeof g_yaml.gender !== 'undefined')
@@ -271,7 +272,7 @@ function GetMatchTable(id)
 {
   AjaxCallback("ajax/matchtable/get?id="+id, function(response) {
     console.log(response);
-    let res = YAML.parse(response);
+    const res = YAML.parse(response);
     g_yaml = res;
     
     if (typeof res.name !== 'undefined')

@@ -44,10 +44,19 @@ void Localizer::Initialize(Language NewLanguage)
 			s_de["Time"]   = u8"Zeit";
 
 			s_de["Pause"]  = u8"Pause";
+			s_de["Friendly Match"]  = u8"Freundschaftskampf";
 
+			s_de["Not logged in"]          = u8"Nicht eingeloggt";
 			s_de["Not enough permissions"] = u8"Nicht genug Rechte f\u00fcr diesen Vorgang";
-			s_de["Operation failed"]       = u8"Vorgang fehlgeschlagen";
+			s_de["Invalid id"]             = u8"Ung\u00fcrltige id";
+			s_de["Could not find mat"]     = u8"Matte nicht geufunden";
 			s_de["Application is shutting down"] = "Das Programm wird heruntergefahren";
+			s_de["Internal error"]         = u8"Interner Fehler";
+			s_de["Not found"]              = u8"Nicht gefunden";
+			s_de["No tournament is open"]  = u8"Kein Turnier ist offen";
+			s_de["Operation failed"]       = u8"Vorgang fehlgeschlagen";
+			s_de["Invalid format"]         = u8"Ung\u00fcrltiges Format";
+			s_de["Invalid input"]          = u8"Ung\u00fcrltige Eingabe";
 
 			s_de["Running"] = u8"am K\u00e4mpfen";
 
