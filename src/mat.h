@@ -187,6 +187,9 @@ namespace Judoboard
 			m_mutex.UnlockWrite();
 		}
 
+		//Used for unit tests / debugging
+		auto& GetGraphics() const { return m_Graphics; }
+
 
 	private:
 		void PlaySoundFile() const {
@@ -311,6 +314,11 @@ namespace Judoboard
 
 				if (m_Texture)
 					m_Texture->Unload();
+			}
+
+			auto GetText() const
+			{
+				return m_Name;
 			}
 
 			GraphicElement& UpdateTexture(const ZED::Renderer& Renderer, const std::string& Text, ZED::Color Color, ZED::FontSize Size = ZED::FontSize::Huge)

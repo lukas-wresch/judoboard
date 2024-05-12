@@ -658,6 +658,180 @@ TEST(App, FullTournament_SingleElimination7_BO3)
 
 
 
+TEST(App, FullTournament_StressTest)
+{
+	initialize();
+	Application::NoWindow = false;
+
+	{
+		auto tournament_name = GetRandomName();
+		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
+
+		const int mat_count = 8;
+
+		Judoka* j[100];
+
+		for (int i = 0; i < 80; i++)
+		{
+			j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
+			tourney->AddParticipant(j[i]);
+		}
+
+		MatchTable* m1 = new RoundRobin(Weight(0),  Weight(60));
+		MatchTable* m2 = new RoundRobin(Weight(60), Weight(70));
+		MatchTable* m3 = new RoundRobin(Weight(70), Weight(80));
+		MatchTable* m4 = new RoundRobin(Weight(80), Weight(90));
+		MatchTable* m5 = new RoundRobin(Weight(90), Weight(100));
+
+		tourney->AddMatchTable(m1);
+		tourney->AddMatchTable(m2);
+		tourney->AddMatchTable(m3);
+		tourney->AddMatchTable(m4);
+		tourney->AddMatchTable(m5);
+
+
+		IMat* mats[mat_count];
+		for (int i = 0; i < mat_count; ++i)
+		{
+			mats[i] = new Mat(i + 1);
+			mats[i]->SetAudio(false, "", 0);
+		}
+
+
+		auto adder = [&]() {
+			for (int i = 0; i < 1000; ++i)
+			{
+				Match* new_match = new Match(j[rand() % 100], j[rand() % 100], nullptr, rand()% mat_count + 1);
+				tourney->AddMatch(new_match);
+
+				ZED::Core::Pause(10);
+			}
+		};
+
+		auto swapper = [&]() {
+			for (int i = 0; i < 10000; ++i)
+			{
+				auto schedule = tourney->GetSchedule();
+				int j = rand() % schedule.size();
+				int k = rand() % schedule.size();
+
+				if (rand() % 2 == 0)
+					tourney->MoveMatchUp(schedule[j]->GetUUID());
+				else
+					tourney->MoveMatchDown(schedule[j]->GetUUID());
+
+				schedule[k]->SetMatID(rand()%mat_count + 1);
+
+				ZED::Core::Pause(10);
+			}
+		};
+
+		auto remover = [&]() {
+			for (int i = 0; i < 1000; ++i)
+			{
+				auto schedule = tourney->GetSchedule();
+				int j = rand() % schedule.size();
+				tourney->RemoveMatch(schedule[j]->GetUUID());
+
+				ZED::Core::Pause(100);
+			}
+		};
+
+		auto show_schedule = [&]() {
+			for (int i = 0; i < 10000; ++i)
+			{
+				auto schedule = tourney->Schedule2String(false);
+				tourney->MasterSchedule2String();
+
+				ZED::Core::Pause(5);
+
+				tourney->LockRead();
+				for (auto table : tourney->GetMatchTables())
+				{
+					YAML::Emitter ret;
+					ret << YAML::BeginMap;
+					table->ToString(ret);
+					ret << YAML::EndMap;
+				}
+				tourney->UnlockRead();
+
+				ZED::Core::Pause(5);
+
+				tourney->LockRead();
+				std::string ret;
+				for (auto table : tourney->GetMatchTables())
+				{
+					assert(table);
+					ret += table->ToHTML();
+				}
+				tourney->UnlockRead();
+
+				ZED::Core::Pause(5);
+			}
+		};
+
+		const int thread_count = 10;
+		std::thread add[thread_count];
+		std::thread rem[thread_count];
+		std::thread swp[thread_count];
+		std::thread html[thread_count];
+
+		for (int i = 0; i < thread_count; i++)
+			add[i] = std::thread(adder);
+		for (int i = 0; i < thread_count; i++)
+			rem[i] = std::thread(remover);
+		for (int i = 0; i < thread_count; i++)
+			swp[i] = std::thread(swapper);
+		for (int i = 0; i < thread_count; i++)
+			html[i] = std::thread(show_schedule);
+
+
+		for (int i = 0; i < 100; i++)
+			for (auto mat : mats)
+		{
+			if (mat->HasConcluded())
+			{
+				mat->EndMatch();
+				ZED::Core::Pause(2000);
+			}
+
+			auto next_match = tourney->GetNextMatch(mat->GetMatID());
+			mat->StartMatch(next_match);
+			
+			mat->Hajime();
+
+			Fighter f = Fighter::White;
+			if (rand() % 2 == 0)
+				f = Fighter::Blue;
+
+			int rnd = rand() % 6;
+
+			if (rnd == 0)
+				mat->AddIppon(f);
+			else if (rnd == 1)
+				mat->AddWazaAri(f);
+			else if (rnd == 2)
+				mat->AddWazaAri(f);
+			else
+				mat->Osaekomi(f);
+
+			ZED::Core::Pause(500);
+		}
+
+
+		for (int i = 0; i < thread_count; i++)
+			add[i].join();
+		for (int i = 0; i < thread_count; i++)
+			rem[i].join();
+		for (int i = 0; i < thread_count; i++)
+			swp[i].join();
+		for (int i = 0; i < thread_count; i++)
+			html[i].join();
+	}
+}
+
+
+
 TEST(App, VeryLongNameTest)
 {
 	initialize();

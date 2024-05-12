@@ -1331,6 +1331,7 @@ TEST(Mat, OsaekomiTime)
 			}
 
 			ZED::Core::Pause(2000);
+			EXPECT_EQ(m.GetGraphics()["osaekomi_text"].GetText(), std::to_string(time));
 			EXPECT_TRUE(m.HasConcluded());
 			EXPECT_TRUE(m.EndMatch());
 		}

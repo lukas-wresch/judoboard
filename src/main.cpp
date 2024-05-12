@@ -230,7 +230,10 @@ int main(int argc, char** argv)
 		mat->AddShido(Judoboard::Fighter::White);
 		mat->AddShido(Judoboard::Fighter::Blue);
 
-		ZED::Core::Pause(2*60*1000);
+		for (auto& g : mat->GetGraphics())
+			g.second.StopAllAnimations();
+
+		ZED::Core::Pause(60*1000);
 
 		return 0;
 	}
