@@ -2245,6 +2245,7 @@ const std::string Tournament::Schedule2String(bool ImportantOnly, int Mat) const
 	auto schedule = GetSchedule();
 	Match* prev = nullptr;
 	int serialized_matches = 0;
+	std::vector<Match*> residual_matches;
 
 	for (auto match : schedule)
 	{
@@ -2264,16 +2265,23 @@ const std::string Tournament::Schedule2String(bool ImportantOnly, int Mat) const
 					serialized_matches = 1;
 				}
 
-				if (serialized_matches >= 1 && serialized_matches <= 7)
+				if (serialized_matches >= 1 && serialized_matches <= 9)
 				{
 					match->ToString(ret);
 					serialized_matches++;
 				}
+				else if (serialized_matches > 9)
+					residual_matches.push_back(match);
 			}
 
 			prev = match;
 		}
 	}
+
+	if (residual_matches.size() <= 3)//Only 3 matches remaining?
+		for (auto match : residual_matches)
+			match->ToString(ret);//Put them all in
+
 	UnlockRead();
 
 	ret << YAML::EndSeq;
