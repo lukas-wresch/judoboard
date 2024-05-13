@@ -387,6 +387,8 @@ bool Mat::EndMatch()
 
 bool Mat::HasConcluded() const
 {
+	auto guard = m_mutex.LockReadForScope();
+
 	if ( (m_State == State::Running || m_State == State::TransitionToMatch) && !m_HajimeTimer.IsRunning())
 	{
 		//Any Hansokumake that has not been decided
@@ -2728,6 +2730,8 @@ void Mat::AddEvent(Fighter Whom, MatchLog::BiasedEvent NewEvent)
 
 Match::Result Mat::GetResult() const
 {
+	auto guard = m_mutex.LockReadForScope();
+
 	auto time = m_HajimeTimer.GetElapsedTime();
 
 	if (IsGoldenScore() && m_pMatch)

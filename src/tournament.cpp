@@ -812,8 +812,6 @@ bool Tournament::AddMatch(Match* NewMatch)
 		return false;
 	}
 
-	//auto guard = LockWriteForScope();//TODO, check if respoinsible for crash
-
 	//Do we have the match already?
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
@@ -822,7 +820,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 			return false;
 	}
 
-	auto guard = LockWriteForScope();//TODO, this should move above
+	auto guard = LockWriteForScope();
 
 	NewMatch->SetTournament(this);//If not yet associated
 
@@ -1061,7 +1059,7 @@ bool Tournament::MoveMatchUp(const UUID& MatchID, uint32_t MatID)
 	{
 		if (MatID != 0 && schedule[current_index]->GetMatID() != MatID)
 			continue;
-		if (schedule[current_index]->GetUUID() == MatchID)//CRASH HERE, MatchID points to invalid memory
+		if (schedule[current_index]->GetUUID() == MatchID)
 			break;
 		prev_match_index = current_index;
 	}
