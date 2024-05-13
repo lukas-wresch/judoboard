@@ -171,7 +171,7 @@ namespace Judoboard
 			return nullptr;
 		}
 		bool IsEmptyMatch() const;
-		bool IsCompletelyEmptyMatch() const;
+		//bool IsCompletelyEmptyMatch() const;
 		const std::vector<const Match*> GetDependentMatches() const;//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
 		auto GetDependencyTypeOf(Fighter Fighter) const {
 			if (Fighter == Fighter::White)

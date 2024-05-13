@@ -691,7 +691,7 @@ std::string SingleElimination::RenderMatch(const Match& match, std::string style
 	//Output result
 	if (match.IsRunning())
 		ret += "<br/>" + Localizer::Translate("Running");
-	else if (match.HasConcluded() && !match.IsCompletelyEmptyMatch())
+	else if (match.HasConcluded() && !match.IsEmptyMatch())
 	{
 		const auto& result = match.GetResult();
 		if (result.m_Winner == Winner::White)

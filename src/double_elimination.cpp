@@ -167,7 +167,20 @@ void DoubleElimination::GenerateSchedule()
 
 	m_LoserBracket.GenerateSchedule();
 
-	if (m_WinnerBracket.GetNumberOfRounds() == 4)
+	if (m_WinnerBracket.GetNumberOfRounds() == 3)
+	{
+		for (size_t i = 0; i < 4 + 2; i++)
+			AddMatch(m_WinnerBracket.GetSchedule()[i]);
+		for (size_t i = 0; i < 2 + 2; i++)
+			AddMatch(m_LoserBracket.GetSchedule()[i]);
+
+		for (size_t i = 4 + 2; i < m_WinnerBracket.GetSchedule().size(); i++)
+			AddMatch(m_WinnerBracket.GetSchedule()[i]);
+		for (size_t i = 2 + 2; i < m_LoserBracket.GetSchedule().size(); i++)
+			AddMatch(m_LoserBracket.GetSchedule()[i]);
+	}
+
+	else if (m_WinnerBracket.GetNumberOfRounds() == 4)
 	{
 		for (size_t i = 0; i < 8 + 4; i++)
 			AddMatch(m_WinnerBracket.GetSchedule()[i]);

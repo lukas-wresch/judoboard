@@ -101,12 +101,18 @@ void LoserBracket::GenerateSchedule()
 
 	auto create_pair = [&](size_t i) {
 		auto new_match = CreateAutoMatch(GetFilter()->GetJudokaByStartPosition(i-1),
-										 GetFilter()->GetJudokaByStartPosition(i));
+										 GetFilter()->GetJudokaByStartPosition(i+1-1));
 		nextRound.emplace_back(new_match);
 	};
 
 	//Hardcoded starting positions
-	if (max_initial_start_pos == 16)//For double elimination with 32 participants
+	if (max_initial_start_pos == 4)//For double elimination with 8 participants
+	{
+		create_pair(3);
+		create_pair(1);
+		current_start_pos = max_initial_start_pos;
+	}
+	else if (max_initial_start_pos == 16)//For double elimination with 32 participants
 	{
 		create_pair(13);
 		create_pair(15);
@@ -149,6 +155,9 @@ void LoserBracket::GenerateSchedule()
 	bool infuse = true;
 	bool swap   = true;
 	bool special_swap = max_initial_start_pos == 32;//Special swap only used for 64 system
+
+	if (max_initial_start_pos == 4)//For double elimination with 8 participants
+		swap = false;
 
 	for (int round = 1; round < rounds; ++round)
 	{
