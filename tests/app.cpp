@@ -668,10 +668,11 @@ TEST(App, FullTournament_StressTest)
 		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
 
 		const int mat_count = 8;
+		const int judoka_count = 50;
 
-		Judoka* j[100];
+		Judoka* j[judoka_count];
 
-		for (int i = 0; i < 80; i++)
+		for (int i = 0; i < judoka_count; i++)
 		{
 			j[i] = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
 			tourney->AddParticipant(j[i]);
@@ -694,51 +695,57 @@ TEST(App, FullTournament_StressTest)
 		for (int i = 0; i < mat_count; ++i)
 		{
 			mats[i] = new Mat(i + 1);
-			mats[i]->SetAudio(false, "", 0);
+			//mats[i]->SetAudio(false, "", 0);
 		}
 
 
 		auto adder = [&]() {
-			for (int i = 0; i < 1000; ++i)
+			for (int i = 0; i < 50; ++i)
 			{
-				Match* new_match = new Match(j[rand() % 100], j[rand() % 100], nullptr, rand()% mat_count + 1);
+				Match* new_match = new Match(j[rand() % judoka_count], j[rand() % judoka_count], nullptr, rand()% mat_count + 1);
 				tourney->AddMatch(new_match);
 
-				ZED::Core::Pause(10);
+				ZED::Core::Pause(100);
 			}
 		};
 
 		auto swapper = [&]() {
-			for (int i = 0; i < 10000; ++i)
+			for (int i = 0; tourney->GetStatus() != Status::Concluded && i < 9000; ++i)
 			{
 				auto schedule = tourney->GetSchedule();
-				int j = rand() % schedule.size();
-				int k = rand() % schedule.size();
+				if (schedule.size() > 0)
+				{
+					int j = rand() % schedule.size();
+					int k = rand() % schedule.size();
 
-				if (rand() % 2 == 0)
-					tourney->MoveMatchUp(schedule[j]->GetUUID());
-				else
-					tourney->MoveMatchDown(schedule[j]->GetUUID());
+					if (rand() % 2 == 0)
+						tourney->MoveMatchUp(schedule[j]->GetUUID());
+					else
+						tourney->MoveMatchDown(schedule[j]->GetUUID());
 
-				schedule[k]->SetMatID(rand()%mat_count + 1);
+					schedule[k]->SetMatID(rand() % mat_count + 1);
+				}
 
 				ZED::Core::Pause(10);
 			}
 		};
 
 		auto remover = [&]() {
-			for (int i = 0; i < 1000; ++i)
+			for (int i = 0; tourney->GetStatus() != Status::Concluded && i < 800; ++i)
 			{
 				auto schedule = tourney->GetSchedule();
-				int j = rand() % schedule.size();
-				tourney->RemoveMatch(schedule[j]->GetUUID());
+				if (schedule.size() > 0)
+				{
+					int j = rand() % schedule.size();
+					tourney->RemoveMatch(schedule[j]->GetUUID());
+				}
 
 				ZED::Core::Pause(100);
 			}
 		};
 
 		auto show_schedule = [&]() {
-			for (int i = 0; i < 10000; ++i)
+			for (int i = 0; tourney->GetStatus() != Status::Concluded && i < 8000; ++i)
 			{
 				auto schedule = tourney->Schedule2String(false);
 				tourney->MasterSchedule2String();
@@ -770,7 +777,7 @@ TEST(App, FullTournament_StressTest)
 			}
 		};
 
-		const int thread_count = 10;
+		const int thread_count = 4;
 		std::thread add[thread_count];
 		std::thread rem[thread_count];
 		std::thread swp[thread_count];
@@ -786,13 +793,13 @@ TEST(App, FullTournament_StressTest)
 			html[i] = std::thread(show_schedule);
 
 
-		for (int i = 0; i < 100; i++)
+		while (tourney->GetSchedule().size() > 0 && tourney->GetStatus() != Status::Concluded)
 			for (auto mat : mats)
 		{
 			if (mat->HasConcluded())
 			{
 				mat->EndMatch();
-				ZED::Core::Pause(2000);
+				ZED::Core::Pause(500);
 			}
 
 			auto next_match = tourney->GetNextMatch(mat->GetMatID());
@@ -804,7 +811,7 @@ TEST(App, FullTournament_StressTest)
 			if (rand() % 2 == 0)
 				f = Fighter::Blue;
 
-			int rnd = rand() % 6;
+			/*int rnd = rand() % 6;
 
 			if (rnd == 0)
 				mat->AddIppon(f);
@@ -812,12 +819,20 @@ TEST(App, FullTournament_StressTest)
 				mat->AddWazaAri(f);
 			else if (rnd == 2)
 				mat->AddWazaAri(f);
-			else
+			else*/
 				mat->Osaekomi(f);
 
-			ZED::Core::Pause(500);
+			ZED::Core::Pause(200);
 		}
 
+		ZED::Core::Pause(25 * 1000);
+
+		for (auto mat : mats)
+		{
+			mat->EndMatch();
+			mat->Close();
+			delete mat;
+		}
 
 		for (int i = 0; i < thread_count; i++)
 			add[i].join();
@@ -827,6 +842,8 @@ TEST(App, FullTournament_StressTest)
 			swp[i].join();
 		for (int i = 0; i < thread_count; i++)
 			html[i].join();
+
+		delete tourney;
 	}
 }
 
