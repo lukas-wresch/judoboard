@@ -241,44 +241,6 @@ void LoserBracket::GenerateSchedule()
 		third_place->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
 		third_place->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
 	}
-	
-
-	//Add additional matches for 5th place
-	/*if (IsFifthPlaceMatch() && m_Schedule.size() >= 8)
-	{
-		int offset = 3;//Final and two semi finals
-		if (IsThirdPlaceMatch())
-			offset = 4;
-
-		auto match1 = m_Schedule[m_Schedule.size() - 1 - offset - 3];
-		auto match2 = m_Schedule[m_Schedule.size() - 1 - offset - 2];
-		auto match3 = m_Schedule[m_Schedule.size() - 1 - offset - 1];
-		auto match4 = m_Schedule[m_Schedule.size() - 1 - offset];
-
-		//Order gets fixed at the end
-		auto semi2 = CreateAutoMatch(nullptr, nullptr);
-		auto fifth = CreateAutoMatch(nullptr, nullptr);
-		auto semi1 = CreateAutoMatch(nullptr, nullptr);
-
-		semi1->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
-		semi1->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
-
-		semi2->SetDependency(Fighter::White, DependencyType::TakeLoser, match3);
-		semi2->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match4);
-
-		fifth->SetDependency(Fighter::White, DependencyType::TakeWinner, semi1);
-		fifth->SetDependency(Fighter::Blue,  DependencyType::TakeWinner, semi2);
-
-		//Swap matches so that match for 1st place is still the last one
-		offset = 3;
-
-		std::swap(m_Schedule[m_Schedule.size() - 1 - offset - 2], m_Schedule[m_Schedule.size() - 1 - 2]);
-		std::swap(m_Schedule[m_Schedule.size() - 1 - offset - 1], m_Schedule[m_Schedule.size() - 1 - 1]);
-		std::swap(m_Schedule[m_Schedule.size() - 1 - offset],     m_Schedule[m_Schedule.size() - 1]);
-
-		if (IsThirdPlaceMatch())
-			std::swap(m_Schedule[m_Schedule.size() - 1 - offset - 3], m_Schedule[m_Schedule.size() - 1 - 3]);
-	}*/
 
 
 	//Add additional matches for best of three

@@ -664,29 +664,27 @@ std::string SingleElimination::RenderMatch(const Match& match, std::string style
 {
 	std::string ret = "<td style=\"" + style + "\">";
 
-	if (!match.IsEmptyMatch())
+	bool is_empty = match.IsEmptyMatch();
+
+	if (!is_empty)
 		ret += "<a href='#edit_match.html?id=" + (std::string)match.GetUUID() + "'>";
 
 	//Output name of fighters
 	if (match.GetFighter(Fighter::White))
 		ret += match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
-	//else if (match->HasDependentMatches() || match->GetDependencyTypeOf(Fighter::White))
-	else if ((match.GetDependencyTypeOf(Fighter::White) != DependencyType::None) &&
-		(match.GetDependencyTypeOf(Fighter::White) != DependencyType::BestOfThree))
-		ret += "???";
-	else
+	else if (is_empty)
 		ret += "- - -";
+	else
+		ret += "???";
 
 	ret += " vs. ";
 
 	if (match.GetFighter(Fighter::Blue))
 		ret += match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
-	//else if (match->HasDependentMatches())
-	else if ((match.GetDependencyTypeOf(Fighter::Blue) != DependencyType::None) &&
-		(match.GetDependencyTypeOf(Fighter::Blue) != DependencyType::BestOfThree))
-		ret += "???";
-	else
+	else if (is_empty)
 		ret += "- - -";
+	else
+		ret += "???";
 
 	//Output result
 	if (match.IsRunning())

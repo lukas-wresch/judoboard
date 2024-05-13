@@ -693,31 +693,23 @@ bool Match::IsEmptyMatch() const
 		else if (m_White.m_DependentMatch->IsEmptyMatch() && m_Blue.m_DependentMatch->IsEmptyMatch())
 			return m_White.m_Type == DependencyType::TakeLoser && m_Blue.m_Type == DependencyType::TakeLoser;
 		else if (m_White.m_DependentMatch->IsEmptyMatch())
-			return m_White.m_Type == DependencyType::TakeLoser;
+		{
+			if (m_White.m_Type == DependencyType::TakeWinner)
+				return !m_White.m_DependentMatch->GetWinner();
+			else if (m_White.m_Type == DependencyType::TakeLoser)
+				return !m_White.m_DependentMatch->GetLoser();
+		}
 		else if (m_Blue.m_DependentMatch->IsEmptyMatch())
-			return m_Blue.m_Type == DependencyType::TakeLoser;
+		{
+			if (m_Blue.m_Type == DependencyType::TakeWinner)
+				return !m_Blue.m_DependentMatch->GetWinner();
+			else if (m_Blue.m_Type == DependencyType::TakeLoser)
+				return !m_Blue.m_DependentMatch->GetLoser();
+		}
 	}
 
 	return !GetFighter(Fighter::White) || !GetFighter(Fighter::Blue);
 }
-
-
-
-/*bool Match::IsCompletelyEmptyMatch() const
-{
-	if (m_White.m_DependentMatchTable && !m_White.m_DependentMatchTable->HasConcluded())
-		return false;
-	if (m_Blue.m_DependentMatchTable  && !m_Blue.m_DependentMatchTable->HasConcluded())
-		return false;
-
-	if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
-	{
-		if (m_White.m_DependentMatch->IsCompletelyEmptyMatch() && m_Blue.m_DependentMatch->IsCompletelyEmptyMatch())
-			return true;
-	}
-
-	return !GetFighter(Fighter::White) && !GetFighter(Fighter::Blue);
-}*/
 
 
 
