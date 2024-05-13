@@ -666,11 +666,13 @@ TEST(Mat, DisqualificationCanBeRemoved)
 
 
 		m.AddHansokuMake(f);
+		EXPECT_FALSE(m.HasConcluded());
 		EXPECT_FALSE(m.GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(m.GetScoreboard(f).IsNotDisqualified());
 		EXPECT_TRUE(m.GetScoreboard(f).IsUnknownDisqualification());
 
 		m.AddDisqualification(f);
+		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(m.GetScoreboard(f).IsNotDisqualified());
 		EXPECT_FALSE(m.GetScoreboard(f).IsUnknownDisqualification());
