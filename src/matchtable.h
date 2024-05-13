@@ -299,6 +299,7 @@ namespace Judoboard
 		virtual Status GetStatus() const;
 
 		virtual Results CalculateResults() const = 0;
+		virtual size_t  ResultsCount() const = 0;//Returns the number of results that this match table will output
 
 		virtual bool AddMatch(Match* NewMatch);//Add a match manually to the match table. Use only for manual cases
 

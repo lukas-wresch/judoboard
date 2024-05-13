@@ -670,45 +670,54 @@ const std::vector<const Match*> Match::GetDependentMatches() const
 
 bool Match::IsEmptyMatch() const
 {
-	if (m_White.m_DependentMatchTable && m_Blue.m_DependentMatchTable)
-		return false;
-	if (m_White.m_DependentMatchTable)
-		return !GetFighter(Fighter::Blue);
-	if (m_Blue.m_DependentMatchTable)
-		return !GetFighter(Fighter::White);
+	return IsEmptySlot(Fighter::White) || IsEmptySlot(Fighter::Blue);
+}
 
-	
-	/*if (m_White.m_DependentMatch && m_White.m_DependentMatch->IsCompletelyEmptyMatch())
-		return true;
-	if (m_Blue.m_DependentMatch  && m_Blue.m_DependentMatch->IsCompletelyEmptyMatch())
-		return true;*/
 
-	
-	if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
+
+bool Match::IsEmptySlot(Fighter Fighter) const
+{
+	const DependentJudoka* j = nullptr;
+	if (Fighter == Fighter::White)
+		j = &m_White;
+	else
+		j = &m_Blue;
+
+
+	if (j->m_DependentMatchTable)
 	{
-		//There are 4 case: both empty, both not empty, white empty etc.
-
-		if (!m_White.m_DependentMatch->IsEmptyMatch() && !m_Blue.m_DependentMatch->IsEmptyMatch())
-			return false;
-		else if (m_White.m_DependentMatch->IsEmptyMatch() && m_Blue.m_DependentMatch->IsEmptyMatch())
-			return m_White.m_Type == DependencyType::TakeLoser && m_Blue.m_Type == DependencyType::TakeLoser;
-		else if (m_White.m_DependentMatch->IsEmptyMatch())
-		{
-			if (m_White.m_Type == DependencyType::TakeWinner)
-				return !m_White.m_DependentMatch->GetWinner();
-			else if (m_White.m_Type == DependencyType::TakeLoser)
-				return !m_White.m_DependentMatch->GetLoser();
-		}
-		else if (m_Blue.m_DependentMatch->IsEmptyMatch())
-		{
-			if (m_Blue.m_Type == DependencyType::TakeWinner)
-				return !m_Blue.m_DependentMatch->GetWinner();
-			else if (m_Blue.m_Type == DependencyType::TakeLoser)
-				return !m_Blue.m_DependentMatch->GetLoser();
-		}
+		int index = (int)j->m_Type - (int)DependencyType::TakeRank1;
+		return !(index < j->m_DependentMatchTable->ResultsCount());
 	}
 
-	return !GetFighter(Fighter::White) || !GetFighter(Fighter::Blue);
+
+	else if (j->m_DependentMatch)
+	{
+		if (j->m_Type == DependencyType::BestOfThree)
+		{
+			//Take the first match (stored in m_White) since is has the same colors
+			if (Fighter == Fighter::White)
+				return m_White.m_DependentMatch->IsEmptySlot(Fighter);
+			return m_Blue.m_DependentMatch->IsEmptySlot(Fighter);
+		}
+
+		else if (j->m_Type == DependencyType::TakeWinner)
+			return j->m_DependentMatch->IsCompletelyEmptyMatch();
+
+		else if (j->m_Type == DependencyType::TakeLoser)
+			return j->m_DependentMatch->IsEmptyMatch();
+
+		assert(false);
+	}
+
+	return !j->m_Judoka;
+}
+
+
+
+bool Match::IsCompletelyEmptyMatch() const
+{
+	return IsEmptySlot(Fighter::White) && IsEmptySlot(Fighter::Blue);
 }
 
 

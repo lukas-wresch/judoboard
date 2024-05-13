@@ -33,6 +33,13 @@ namespace Judoboard
 		virtual bool DeleteMatch(const UUID& UUID) override;
 
 		virtual Results CalculateResults() const override;
+		virtual size_t ResultsCount() const override {
+			if (IsThirdPlaceMatch() && IsFifthPlaceMatch())
+				return std::min((size_t)6, GetParticipants().size());
+			else if (!IsThirdPlaceMatch() && !IsFifthPlaceMatch())
+				return std::min((size_t)2, GetParticipants().size());
+			return std::min((size_t)4, GetParticipants().size());
+		}
 		virtual void GenerateSchedule() override;
 
 		bool IsThirdPlaceMatch() const { return m_LoserBracket.IsFinalMatch(); }

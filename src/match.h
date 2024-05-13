@@ -171,7 +171,6 @@ namespace Judoboard
 			return nullptr;
 		}
 		bool IsEmptyMatch() const;
-		//bool IsCompletelyEmptyMatch() const;
 		const std::vector<const Match*> GetDependentMatches() const;//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
 		auto GetDependencyTypeOf(Fighter Fighter) const {
 			if (Fighter == Fighter::White)
@@ -212,6 +211,8 @@ namespace Judoboard
 		}
 
 	private:
+		bool IsEmptySlot(Fighter Fighter) const;
+		bool IsCompletelyEmptyMatch() const;
 		void SetResult(const Result& Result) { m_Result = Result; SetState(Status::Concluded); }
 		void SetState(Status NewState) { m_State = NewState; }
 		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }

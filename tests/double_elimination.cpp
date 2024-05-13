@@ -888,6 +888,30 @@ TEST(DoubleElimination, Count11_Example)
 
 
 	EXPECT_FALSE(schedule[1 - 1]->IsEmptyMatch());
+	EXPECT_TRUE( schedule[2 - 1]->IsEmptyMatch());
+	EXPECT_FALSE(schedule[3 - 1]->IsEmptyMatch());
+	EXPECT_TRUE( schedule[4 - 1]->IsEmptyMatch());
+	EXPECT_FALSE(schedule[5 - 1]->IsEmptyMatch());
+	EXPECT_TRUE( schedule[6 - 1]->IsEmptyMatch());
+	EXPECT_TRUE( schedule[7 - 1]->IsEmptyMatch());
+	EXPECT_TRUE( schedule[8 - 1]->IsEmptyMatch());
+
+	EXPECT_FALSE(schedule[9  - 1]->IsEmptyMatch());
+	EXPECT_FALSE(schedule[10 - 1]->IsEmptyMatch());
+	EXPECT_FALSE(schedule[11 - 1]->IsEmptyMatch());
+	EXPECT_FALSE(schedule[12 - 1]->IsEmptyMatch());
+
+	EXPECT_TRUE( schedule[13 - 1]->IsEmptyMatch());
+	EXPECT_TRUE( schedule[14 - 1]->IsEmptyMatch());
+	EXPECT_TRUE( schedule[15 - 1]->IsEmptyMatch());
+	EXPECT_TRUE( schedule[16 - 1]->IsEmptyMatch());
+
+	EXPECT_FALSE(schedule[17 - 1]->IsEmptyMatch());
+	EXPECT_FALSE(schedule[18 - 1]->IsEmptyMatch());
+	EXPECT_FALSE(schedule[19 - 1]->IsEmptyMatch());
+	EXPECT_TRUE( schedule[20 - 1]->IsEmptyMatch());
+
+
 	EXPECT_EQ(schedule[1 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Alexa");
 	EXPECT_EQ(schedule[1 - 1]->GetFighter(Fighter::Blue )->GetFirstname(), "Sophie");
 	EXPECT_TRUE(m.StartMatch(schedule[1 - 1]));
