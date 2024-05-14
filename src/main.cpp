@@ -83,9 +83,9 @@ int main(int argc, char** argv)
 	{
 		pos = cmd.find(' ', initialPos);
 		if (pos != std::string::npos)
-			commands.push_back(cmd.substr(initialPos, pos - initialPos));
+			commands.emplace_back(cmd.substr(initialPos, pos - initialPos));
 		else//Add the last one
-			commands.push_back(cmd.substr(initialPos, std::min(pos, cmd.size()) - initialPos + 1));
+			commands.emplace_back(cmd.substr(initialPos, std::min(pos, cmd.size()) - initialPos + 1));
 	}
 #else
 	for (int i = 1; i < argc; i++)

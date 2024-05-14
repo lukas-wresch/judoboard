@@ -660,21 +660,21 @@ const std::string SingleElimination::ToHTML() const
 
 
 
-std::string SingleElimination::RenderMatch(const Match& match, std::string style) const
+std::string SingleElimination::RenderMatch(const Match& Match, const std::string& Style) const
 {
-	std::string ret = "<td style=\"" + style + "\">";
+	std::string ret = "<td style=\"" + Style + "\">";
 
-	bool is_empty = match.IsEmptyMatch();
+	bool is_empty = Match.IsEmptyMatch();
 
 	if (!is_empty)
-		ret += "<a href='#edit_match.html?id=" + (std::string)match.GetUUID() + "'>";
+		ret += "<a href='#edit_match.html?id=" + (std::string)Match.GetUUID() + "'>";
 
 	//Output name of fighters
 	for (auto f = Fighter::White; f <= Fighter::Blue; ++f)
 	{
-		if (match.GetFighter(f))
-			ret += match.GetFighter(f)->GetName(NameStyle::GivenName);
-		else if (match.IsEmptySlot(f))
+		if (Match.GetFighter(f))
+			ret += Match.GetFighter(f)->GetName(NameStyle::GivenName);
+		else if (Match.IsEmptySlot(f))
 			ret += "- - -";
 		else
 			ret += "???";
@@ -684,11 +684,11 @@ std::string SingleElimination::RenderMatch(const Match& match, std::string style
 	}
 
 	//Output result
-	if (match.IsRunning())
+	if (Match.IsRunning())
 		ret += "<br/>" + Localizer::Translate("Running");
-	else if (match.HasConcluded() && !is_empty)
-	{
-		const auto& result = match.GetResult();
+	else if (Match.HasConcluded() && !Match.IsEmptyMatch())
+  {
+		const auto& result = Match.GetResult();
 		if (result.m_Winner == Winner::White)
 			ret += "<br/>"   + std::to_string((int)result.m_Score) + ":0";
 		else

@@ -1,4 +1,4 @@
-<h2 id="headline">New Account</h2>
+<h2 id="headline"></h2>
 
 <form>
 
@@ -32,14 +32,14 @@
 
 function AddAccount()
 {
-  var params = URLEncode({
+  let params = URLEncode({
     username:    document.getElementById("username").value,
     password:    document.getElementById("password").value,
     permissions: document.getElementById("permissions").value
   });
 
   AjaxPost('ajax/account/add', params, function() {
-    navigate("account_list.html");
+    goBack();
   });
 
   return false;
@@ -48,13 +48,13 @@ function AddAccount()
 
 function UpdateAccount()
 {
-  var params = URLEncode({
+  let params = URLEncode({
     password:    document.getElementById("password").value,
     permissions: document.getElementById("permissions").value
   });
 
   AjaxPost('ajax/account/update?id='+id, params, function() {
-    navigate("account_list.html");
+    goBack();
   });
 
   return false;
@@ -64,15 +64,15 @@ function UpdateAccount()
 function GetAccount(id)
 {
   AjaxCallback("ajax/account/get?id="+id, function(response) {
-    var res = response.split(",");
+    const res = response.split(",");
 
-    document.getElementById("username").value  = res[0];
-    document.getElementById("permissions").value    = res[2];
+    document.getElementById("username").value    = res[0];
+    document.getElementById("permissions").value = res[2];
   });
 }
 
 
-var id = URLDecode(URL, "id");
+let id = URLDecode(URL, "id");
 
 
 if (id)
@@ -93,6 +93,6 @@ else
 
 document.getElementById("label_username").innerHTML = translate('username');
 document.getElementById("label_password").innerHTML = translate('password');
-document.getElementById("label_permissions").innerHTML    = translate('access_level');
+document.getElementById("label_permissions").innerHTML = translate('access_level');
 
 </script>
