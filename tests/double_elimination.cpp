@@ -1202,6 +1202,7 @@ TEST(DoubleElimination, Count16)
 	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[5]));
 	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[6]));
 	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[7]));
+
 	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[8]));
 	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[9]));
 	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[10]));
@@ -1211,14 +1212,17 @@ TEST(DoubleElimination, Count16)
 	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[13]));
 	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[14]));
 	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[15]));
+
 	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[16]));
 	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[17]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[18]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[19]));
 
-	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[18]));
-	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[19]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[20]));
+	EXPECT_TRUE(group->GetWinnerBracket().FindMatch(*group->GetSchedule()[21]));
 
-	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[20]));
-	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[21]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[22]));
+	EXPECT_TRUE(group->GetLoserBracket().FindMatch(*group->GetSchedule()[23]));
 
 	delete t;
 }
