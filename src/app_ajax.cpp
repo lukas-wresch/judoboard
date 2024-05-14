@@ -373,6 +373,7 @@ void Application::SetupHttpServer()
 	m_Server.RegisterResource("/ajax/hansokumake/get", [this](auto& Request) -> std::string {
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
+
 		return Ajax_GetHansokumake();
 	});
 
@@ -397,7 +398,7 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		auto guard = LockWriteForScope();
+		auto guard = LockReadForScope();
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
@@ -415,7 +416,7 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		auto guard = LockWriteForScope();
+		auto guard = LockReadForScope();
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
@@ -446,6 +447,8 @@ void Application::SetupHttpServer()
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
+
+		auto guard = GetTournament()->LockReadForScope();
 
 		auto match = GetTournament()->FindMatch(id);
 
@@ -481,7 +484,7 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		auto guard = LockWriteForScope();
+		auto guard = LockReadForScope();
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
@@ -502,6 +505,8 @@ void Application::SetupHttpServer()
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
+
+		auto guard = GetTournament()->LockReadForScope();
 
 		auto match = GetTournament()->FindMatch(id);
 
@@ -525,6 +530,8 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		auto guard = LockReadForScope();
+
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -544,6 +551,8 @@ void Application::SetupHttpServer()
 
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
+
+		auto guard = LockReadForScope();
 
 		auto mat = FindMat(id);
 
@@ -568,6 +577,8 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		auto guard = LockReadForScope();
+
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -586,6 +597,8 @@ void Application::SetupHttpServer()
 
 		if (matID <= 0)
 			return Error(Error::Type::InvalidID);
+
+		auto guard = LockReadForScope();
 
 		auto mat = FindMat(matID);
 
@@ -609,12 +622,14 @@ void Application::SetupHttpServer()
 		if (matID <= 0)
 			return Error(Error::Type::InvalidID);
 
+		auto guard = LockReadForScope();
+
 		auto mat = FindMat(matID);
 
 		if (!mat)
 			return Error(Error::Type::MatNotFound);
 
-		auto guard = LockWriteForScope();
+		auto guard = GetTournament()->LockReadForScope();
 
 		auto nextMatch = GetTournament()->GetNextMatch(mat->GetMatID());
 		if (nextMatch)
@@ -632,6 +647,8 @@ void Application::SetupHttpServer()
 
 		if (matID <= 0)
 			return Error(Error::Type::InvalidID);
+
+		auto guard = LockReadForScope();
 
 		auto mat = FindMat(matID);
 
@@ -699,6 +716,8 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return (std::string)Error(Error::Type::InvalidID);
 
+		auto guard = LockReadForScope();
+
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -725,6 +744,8 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			auto guard = LockReadForScope();
+
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -741,6 +762,8 @@ void Application::SetupHttpServer()
 
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
+
+			auto guard = LockReadForScope();
 
 			auto mat = FindMat(id);
 
@@ -759,6 +782,8 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			auto guard = LockReadForScope();
+
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -775,6 +800,8 @@ void Application::SetupHttpServer()
 
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
+
+			auto guard = LockReadForScope();
 
 			auto mat = FindMat(id);
 
@@ -793,6 +820,8 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			auto guard = LockReadForScope();
+
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -809,6 +838,8 @@ void Application::SetupHttpServer()
 
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
+
+			auto guard = LockReadForScope();
 
 			auto mat = FindMat(id);
 
@@ -827,6 +858,8 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			auto guard = LockReadForScope();
+
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -843,6 +876,8 @@ void Application::SetupHttpServer()
 
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
+
+			auto guard = LockReadForScope();
 
 			auto mat = FindMat(id);
 
@@ -861,6 +896,8 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			auto guard = LockReadForScope();
+
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -877,6 +914,8 @@ void Application::SetupHttpServer()
 
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
+
+			auto guard = LockReadForScope();
 
 			auto mat = FindMat(id);
 
@@ -895,6 +934,8 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			auto guard = LockReadForScope();
+
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -912,6 +953,8 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			auto guard = LockReadForScope();
+
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -928,6 +971,8 @@ void Application::SetupHttpServer()
 
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
+
+			auto guard = LockReadForScope();
 
 			auto mat = FindMat(id);
 
@@ -975,6 +1020,8 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			auto guard = LockReadForScope();
+
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -991,6 +1038,8 @@ void Application::SetupHttpServer()
 
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
+
+			auto guard = LockReadForScope();
 
 			auto mat = FindMat(id);
 
@@ -1009,6 +1058,8 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			auto guard = LockReadForScope();
+
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -1026,6 +1077,8 @@ void Application::SetupHttpServer()
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
 
+			auto guard = LockReadForScope();
+
 			auto mat = FindMat(id);
 
 			if (mat)
@@ -1042,6 +1095,8 @@ void Application::SetupHttpServer()
 
 			if (id <= 0)
 				return Error(Error::Type::InvalidID);
+
+			auto guard = LockReadForScope();
 
 			auto mat = FindMat(id);
 
@@ -1063,6 +1118,8 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		auto guard = LockReadForScope();
+
 		auto mat = FindMat(id);
 
 		if (mat)
@@ -1080,6 +1137,8 @@ void Application::SetupHttpServer()
 
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
+
+		auto guard = LockReadForScope();
 
 		auto mat = FindMat(id);
 
@@ -1099,6 +1158,8 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		auto guard = LockReadForScope();
+
 		auto mat = FindMat(id);
 
 		if (mat)
@@ -1116,6 +1177,8 @@ void Application::SetupHttpServer()
 
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
+
+		auto guard = LockReadForScope();
 
 		auto mat = FindMat(id);
 
@@ -1138,6 +1201,8 @@ void Application::SetupHttpServer()
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
 
+		auto guard = LockReadForScope();
+
 		auto mat = FindMat(id);
 
 		if (!mat)
@@ -1158,6 +1223,8 @@ void Application::SetupHttpServer()
 
 		if (id <= 0)
 			return Error(Error::Type::InvalidID);
+
+		auto guard = LockReadForScope();
 
 		auto mat = FindMat(id);
 
@@ -1194,23 +1261,6 @@ void Application::SetupHttpServer()
 
 		return Ajax_GetJudoka(Request);
 	});
-
-
-	/*m_Server.RegisterResource("/ajax/judoka/list", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-
-		YAML::Emitter ret;
-		ret << YAML::BeginSeq;
-		for (auto judoka : m_Database.GetAllJudokas())
-		{
-			if (judoka)
-				judoka->ToString(ret);
-		}
-		ret << YAML::EndSeq;
-		return ret.c_str();
-	});*/
 
 
 	m_Server.RegisterResource("/ajax/judoka/update", [this](auto& Request) -> std::string {
@@ -4405,7 +4455,7 @@ Error Application::Ajax_SetLotteryTier(const HttpServer::Request& Request)
 	if (tier < 0)
 		return Error::Type::InvalidInput;
 
-	auto guard = LockWriteForScope();
+	auto guard = LockReadForScope();
 
 	if (!GetTournament())
 		return Error(Error::Type::TournamentNotOpen);
@@ -4489,6 +4539,8 @@ Error Application::Ajax_PlaySoundFile(const HttpServer::Request& Request)
 	auto filename = HttpServer::DecodeURLEncoded(Request.m_Query, "filename");
 	int audio_device = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "sound_device"));
 
+	auto guard = LockReadForScope();
+
 	auto mat = FindMat(id);
 	if (!mat)
 		return Error::Type::MatNotFound;
@@ -4518,6 +4570,8 @@ std::string Application::Ajax_GetSetup()
 
 	ret << YAML::BeginMap;
 
+	auto guard = LockReadForScope();
+
 	ret << YAML::Key << "version"        << YAML::Value << Version;
 	ret << YAML::Key << "uptime"         << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
 	ret << YAML::Key << "language"       << YAML::Value << (int)Localizer::GetLanguage();
@@ -4539,15 +4593,15 @@ std::string Application::Ajax_GetSetup()
 
 Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 {
-	int language   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "language"));
-	int mat_count  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat_count"));
-	int port       = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "port"));
-	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
+	int language      = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "language"));
+	int mat_count     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat_count"));
+	int port          = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "port"));
+	int ipponStyle    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int osaekomiStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomiStyle"));
 	int timerStyle    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
 	int nameStyle     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
-	bool results_server      = HttpServer::DecodeURLEncoded(Request.m_Body, "results_server") == "true";
-	auto results_server_url  = HttpServer::DecodeURLEncoded(Request.m_Body, "results_server_url");
+	bool results_server     = HttpServer::DecodeURLEncoded(Request.m_Body, "results_server") == "true";
+	auto results_server_url = HttpServer::DecodeURLEncoded(Request.m_Body, "results_server_url");
 
 	Localizer::SetLanguage((Language)language);
 	
@@ -4606,6 +4660,8 @@ Error Application::Ajax_AddDisqualification(Fighter Whom, const HttpServer::Requ
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	auto guard = LockReadForScope();
+
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -4623,6 +4679,8 @@ Error Application::Ajax_RemoveDisqualification(Fighter Whom, const HttpServer::R
 
 	if (id <= 0)
 		return Error::Type::InvalidID;
+
+	auto guard = LockReadForScope();
 
 	auto mat = FindMat(id);
 
@@ -4642,6 +4700,8 @@ Error Application::Ajax_NoDisqualification(Fighter Whom, const HttpServer::Reque
 	if (id <= 0)
 		return Error::Type::InvalidID;
 
+	auto guard = LockReadForScope();
+
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -4659,6 +4719,8 @@ Error Application::Ajax_RemoveNoDisqualification(Fighter Whom, const HttpServer:
 
 	if (id <= 0)
 		return Error::Type::InvalidID;
+
+	auto guard = LockReadForScope();
 
 	auto mat = FindMat(id);
 
@@ -4679,7 +4741,7 @@ Error Application::Ajax_MoveMatchUp(const HttpServer::Request& Request)
 	if (mat <= -1)
 		mat = 0;
 
-	auto guard = LockWriteForScope();
+	auto guard = LockReadForScope();
 
 	if (!GetTournament())
 		return Error::Type::TournamentNotOpen;
@@ -4700,7 +4762,7 @@ Error Application::Ajax_MoveMatchDown(const HttpServer::Request& Request)
 	if (mat <= -1)
 		mat = 0;
 
-	auto guard = LockWriteForScope();
+	auto guard = LockReadForScope();
 
 	if (!GetTournament())
 		return Error::Type::TournamentNotOpen;

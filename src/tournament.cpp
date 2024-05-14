@@ -398,6 +398,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 Tournament::~Tournament()
 {
+	auto guard = LockWriteForScope();
+
 	if (m_Schedule.size() > 0 || GetParticipants().size() > 0 || m_MatchTables.size() > 0)
 		Save();
 
@@ -411,6 +413,8 @@ void Tournament::Reset()
 {
 	if (IsReadonly())
 		return;
+
+	auto guard = LockWriteForScope();
 
 	m_Description.clear();
   
@@ -436,6 +440,8 @@ void Tournament::Reset()
 
 bool Tournament::Load(const YAML::Node& yaml)
 {
+	auto guard = LockWriteForScope();
+
 	if (!yaml["version"] || !yaml["name"])
 	{
 		ZED::Log::Warn("Data is not a valid tournament file");
@@ -582,6 +588,8 @@ bool Tournament::LoadYAML(const std::string& Filename)
 
 bool Tournament::SaveYAML(const std::string& Filename)
 {
+	auto guard = LockReadForScope();
+
 	if (m_Name.empty())
 		return false;
 
@@ -951,6 +959,8 @@ Match* Tournament::GetNextOngoingMatch(int32_t MatID)
 
 bool Tournament::ReviseMatch(const UUID& MatchID, IMat& Mat)
 {
+	auto guard = LockWriteForScope();
+
 	auto match = FindMatch(MatchID);
 	if (!match)
 		return false;
@@ -1035,9 +1045,6 @@ Match* Tournament::FindMatch(const UUID& UUID) const
 		for (auto match : table->GetSchedule())
 			if (match->GetUUID() == UUID)
 				return match;
-	/*for (auto match : m_Schedule)
-		if (match && match->GetUUID() == UUID)
-			return match;*/
 
 	return nullptr;
 }
@@ -2209,10 +2216,10 @@ bool Tournament::PerformLottery()
 	std::sort(m_AssociationToLotNumber.begin(), m_AssociationToLotNumber.end(),
 		[](const auto& a, const auto& b) { return a.second < b.second; });
 
-	UnlockWrite();
-
 	for (auto table : m_MatchTables)
 		table->OnLotteryPerformed();
+
+	UnlockWrite();
 
 	GenerateSchedule();
 
@@ -2239,7 +2246,8 @@ const std::string Tournament::Schedule2String(bool ImportantOnly, int Mat) const
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
 
-	LockRead();
+	auto guard = LockReadForScope();
+
 	auto schedule = GetSchedule();
 	Match* prev = nullptr;
 	int serialized_matches = 0;
@@ -2280,8 +2288,6 @@ const std::string Tournament::Schedule2String(bool ImportantOnly, int Mat) const
 		for (auto match : residual_matches)
 			match->ToString(ret);//Put them all in
 
-	UnlockRead();
-
 	ret << YAML::EndSeq;
 	return ret.c_str();
 }
@@ -2293,7 +2299,7 @@ const std::string Tournament::MasterSchedule2String() const
 	YAML::Emitter ret;
 	ret << YAML::BeginMap;
 
-	LockRead();
+	auto guard = LockReadForScope();
 
 	const auto highest_matID = GetHighestMatIDUsed();
 	ret << YAML::Key << "highest_mat_id" << YAML::Value << highest_matID;
@@ -2367,8 +2373,6 @@ const std::string Tournament::MasterSchedule2String() const
 		ret << YAML::EndSeq;
 	}
 
-	UnlockRead();
-
 	ret << YAML::EndMap;//master schedule
 	ret << YAML::EndMap;
 
@@ -2381,7 +2385,7 @@ nlohmann::json Tournament::Schedule2ResultsServer() const
 {
 	nlohmann::json ret;
 
-	LockRead();
+	auto guard = LockReadForScope();
 
 	ret["name"] = GetName();
 
@@ -2401,9 +2405,6 @@ nlohmann::json Tournament::Schedule2ResultsServer() const
 		ret["match_tables"].push_back(table_json);
 	}
 
-	UnlockRead();
-
-	//return ret.dump();
 	return ret;
 }
 
@@ -2411,6 +2412,8 @@ nlohmann::json Tournament::Schedule2ResultsServer() const
 
 void Tournament::FindAgeGroupForJudoka(const Judoka& Judoka)
 {
+	auto guard = LockReadForScope();
+
 	//Find age groups this judoka can belong to
 	std::vector<AgeGroup*> EligableAgeGroups;
 	for (auto age_group : m_StandingData.GetAgeGroups())
@@ -2428,9 +2431,9 @@ void Tournament::FindAgeGroupForJudoka(const Judoka& Judoka)
 
 int32_t Tournament::GetFreeScheduleIndex(uint32_t Mat) const
 {
-	int32_t ret = 0;
+	auto guard = LockReadForScope();
 
-	for (; true; ++ret)
+	for (int32_t ret = 0; true; ++ret)
 	{
 		bool is_free = true;
 
@@ -2456,6 +2459,8 @@ int32_t Tournament::GetMaxScheduleIndex(uint32_t Mat) const
 {
 	int32_t ret = -1;
 
+	auto guard = LockReadForScope();
+
 	for (auto entry : m_MatchTables)
 	{
 		if (entry && entry->GetScheduleIndex() > ret)
@@ -2473,6 +2478,8 @@ int32_t Tournament::GetMaxScheduleIndex(uint32_t Mat) const
 uint32_t Tournament::GetMaxEntriesAtScheduleIndex(uint32_t MatID, int32_t ScheduleIndex) const
 {
 	uint32_t count = 0;
+
+	auto guard = LockReadForScope();
 
 	for (auto entry : m_MatchTables)
 	{
@@ -2502,7 +2509,6 @@ void Tournament::GenerateSchedule()
 		}
 	}
 
-	OrganizeMasterSchedule();
 	BuildSchedule();
 }
 
@@ -2512,6 +2518,8 @@ void Tournament::OrganizeMasterSchedule()
 {
 	//Check if there is a schedule index that is not used
 	//so that we can move match tables up
+
+	auto guard = LockWriteForScope();
 
 	for (int32_t index = 0; index <= GetMaxScheduleIndex(); index++)
 	{

@@ -496,7 +496,7 @@ function GetRuleSets(callback)
     let rules = document.getElementById("rule");
 
     while (rules.length >= 1)
-      rules.remove(rules.length-1);
+      rules.remove(0);
 
     let option = document.createElement("option");
     option.value = 0;
@@ -531,21 +531,21 @@ function GetAgeGroups(callback)
 {
   AjaxCallback("ajax/age_groups/list", function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
-    var ages = document.getElementById("age_group");
+    let ages = document.getElementById("age_group");
 
     while (ages.length >= 1)
-      ages.remove(ages.length-1);
+      ages.remove(0);
 
-    var option = document.createElement("option");
+    let option = document.createElement("option");
     option.value = 0;
     option.text = "(None)";
     ages.add(option);
 
     for (const age of res)
     {
-      var option = document.createElement("option");
+      let option = document.createElement("option");
       option.value = age.uuid;
       option.text  = age.name;
       ages.add(option);
@@ -562,21 +562,21 @@ function GetClubs(callback, query = "")
 {
   AjaxCallback("ajax/club/list?" + query, function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
-    var clubs = document.getElementById("clubs");
+    let clubs = document.getElementById("clubs");
 
     while (clubs.length >= 1)
-      clubs.remove(clubs.length-1);
+      clubs.remove(0);
 
-    var option = document.createElement("option");
+    let option = document.createElement("option");
     option.value = 0;
     option.text  = "(None)";
     clubs.add(option);
 
     for (const club of res)
     {
-      var option = document.createElement("option");
+      let option = document.createElement("option");
       option.value = club.uuid;
       option.text  = club.name;
       clubs.add(option);
@@ -593,21 +593,21 @@ function GetAssociations(callback, query = "")
 {
   AjaxCallback("ajax/association/list?" + query, function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
-    var clubs = document.getElementById("clubs");
+    let clubs = document.getElementById("clubs");
 
     while (clubs.length >= 1)
-      clubs.remove(clubs.length-1);
+      clubs.remove(0);
 
-    var option = document.createElement("option");
+    let option = document.createElement("option");
     option.value = 0;
     option.text  = "(None)";
     clubs.add(option);
 
     for (const club of res)
     {
-      var option = document.createElement("option");
+      let option = document.createElement("option");
       option.value = club.uuid;
       option.text  = club.name;
       clubs.add(option);
@@ -623,19 +623,19 @@ function GetAssociations(callback, query = "")
 function GetColors(callback)
 {
   AjaxCallback("ajax/colors/get", function(response) {
-    var res = response.split(",");
+    const res = response.split(",");
 
     if (res.length < 1)
       return;
 
-    var color = document.getElementById("color");
+    let color = document.getElementById("color");
 
     while (color.length >= 1)
-      color.remove(color.length-1);
+      color.remove(0);
 
-    for (var i=0; i < res.length;)
+    for (let i=0; i < res.length;)
     {
-      var option = document.createElement("option");
+      let option = document.createElement("option");
       option.value = res[i++];
       option.text  = res[i++];
       option.style.backgroundColor = res[i++].substring(0, 4);
@@ -645,7 +645,7 @@ function GetColors(callback)
 
     color.onchange = function(e)
     {
-      for (var i=0; i < color.length;i++)
+      for (let i=0; i < color.length;i++)
       {
         if (color.children[i].value == color.value)
           color.style.backgroundColor = color.children[i].style.backgroundColor;
@@ -663,16 +663,18 @@ function GetColors(callback)
 function GetMats(callback)
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
     if (res.length < 2)
       return;
 
-    var ui_mats = document.getElementById("mat");
+    let ui_mats = document.getElementById("mat");
+    while (ui_mats.length > 0)
+      ui_mats.remove(0);
 
     for (const mat of res.mats)
     {
-      var option = document.createElement("option");
+      let option = document.createElement("option");
       option.text  = mat.name;
       option.value = mat.id;
 

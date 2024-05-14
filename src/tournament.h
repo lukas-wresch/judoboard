@@ -173,12 +173,13 @@ namespace Judoboard
 		//Lottery
 		virtual bool PerformLottery() override;
 		virtual uint32_t GetLotteryTier() const override { return m_LotteryTier; }
-		virtual void SetLotteryTier(uint32_t NewLotteryTier) override {
+		virtual bool SetLotteryTier(uint32_t NewLotteryTier) override {
 			if (GetStatus() == Status::Scheduled && !IsReadonly())
 			{
 				m_LotteryTier = NewLotteryTier;
-				PerformLottery();
+				return PerformLottery();
 			}
+			return false;
 		}
 		size_t GetLotOfAssociation(const UUID& UUID) const;
 		virtual std::vector<std::pair<UUID, size_t>> GetLots() const override { return m_AssociationToLotNumber; }

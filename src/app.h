@@ -91,7 +91,7 @@ namespace Judoboard
 		uint32_t GetHighestMatID() const;
 
 		IMat* StartLocalMat(uint32_t ID = 1);
-		bool CloseMat(uint32_t ID);
+		bool  CloseMat(uint32_t ID);
 
 		bool RegisterMatWithMaster(IMat* Mat);
 
