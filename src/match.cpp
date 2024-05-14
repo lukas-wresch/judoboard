@@ -533,9 +533,6 @@ const Judoka* Match::GetEnemyOf(const Judoka& Judoka) const
 
 const Judoka* Match::GetWinner() const
 {
-	//if (IsCompletelyEmptyMatch())
-		//return nullptr;
-
 	if (IsEmptyMatch())
 	{
 		if (GetFighter(Fighter::White))
@@ -575,9 +572,6 @@ const Judoka* Match::GetWinner() const
 
 const Judoka* Match::GetLoser() const
 {
-	//if (IsCompletelyEmptyMatch())
-		//return nullptr;
-
 	if (IsEmptyMatch())
 	{
 		if (GetFighter(Fighter::White))
@@ -711,13 +705,6 @@ bool Match::IsEmptySlot(Fighter Fighter) const
 	}
 
 	return !j->m_Judoka;
-}
-
-
-
-bool Match::IsCompletelyEmptyMatch() const
-{
-	return IsEmptySlot(Fighter::White) && IsEmptySlot(Fighter::Blue);
 }
 
 
