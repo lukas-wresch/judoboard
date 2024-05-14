@@ -96,7 +96,7 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	protected:
-		std::string RenderMatch(const Match& match, std::string style = "") const;
+		std::string RenderMatch(const Match& Match, const std::string& Style = "") const;
 
 		std::vector<Match*> m_ThirdPlaceMatches;
 		std::vector<Match*> m_FifthPlaceMatches;

@@ -666,11 +666,13 @@ TEST(Mat, DisqualificationCanBeRemoved)
 
 
 		m.AddHansokuMake(f);
+		EXPECT_FALSE(m.HasConcluded());
 		EXPECT_FALSE(m.GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(m.GetScoreboard(f).IsNotDisqualified());
 		EXPECT_TRUE(m.GetScoreboard(f).IsUnknownDisqualification());
 
 		m.AddDisqualification(f);
+		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(m.GetScoreboard(f).IsNotDisqualified());
 		EXPECT_FALSE(m.GetScoreboard(f).IsUnknownDisqualification());
@@ -1064,6 +1066,82 @@ TEST(Mat, Hansokumake)
 		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
 
 		m.RemoveIppon(!f);
+		EXPECT_FALSE(m.HasConcluded());
+
+		EXPECT_FALSE(m.EndMatch());
+
+		m.AddHansokuMake(f);
+		EXPECT_TRUE(m.GetScoreboard(f).m_HansokuMake);
+
+		m.AddDisqualification(f);
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
+TEST(Mat, HansokumakeRemove)
+{
+	initialize();
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(&match));
+
+
+		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
+		m.AddHansokuMake(f);
+
+		EXPECT_TRUE(m.GetScoreboard(f).m_HansokuMake);
+		EXPECT_EQ(m.GetScoreboard(!f).m_Ippon, 1);
+
+		m.RemoveHansokuMake(f);
+		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
+		EXPECT_EQ(m.GetScoreboard(!f).m_Ippon, 0);
+
+		EXPECT_FALSE(m.HasConcluded());
+
+		EXPECT_FALSE(m.EndMatch());
+
+		m.AddHansokuMake(f);
+		EXPECT_TRUE(m.GetScoreboard(f).m_HansokuMake);
+
+		m.AddDisqualification(f);
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
+TEST(Mat, HansokumakeRemoveWithWazaari)
+{
+	initialize();
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.AddWazaAri(!f);
+
+		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
+		m.AddHansokuMake(f);
+
+		EXPECT_TRUE(m.GetScoreboard(f).m_HansokuMake);
+		EXPECT_EQ(m.GetScoreboard(!f).m_Ippon, 1);
+
+		m.RemoveHansokuMake(f);
+		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
+		EXPECT_EQ(m.GetScoreboard(!f).m_Ippon,   0);
+		EXPECT_EQ(m.GetScoreboard(!f).m_WazaAri, 1);
+
 		EXPECT_FALSE(m.HasConcluded());
 
 		EXPECT_FALSE(m.EndMatch());

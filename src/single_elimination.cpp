@@ -660,18 +660,18 @@ const std::string SingleElimination::ToHTML() const
 
 
 
-std::string SingleElimination::RenderMatch(const Match& match, std::string style) const
+std::string SingleElimination::RenderMatch(const Match& Match, const std::string& Style) const
 {
-	std::string ret = "<td style=\"" + style + "\">";
+	std::string ret = "<td style=\"" + Style + "\">";
 
-	bool is_empty = match.IsEmptyMatch();
+	bool is_empty = Match.IsEmptyMatch();
 
 	if (!is_empty)
-		ret += "<a href='#edit_match.html?id=" + (std::string)match.GetUUID() + "'>";
+		ret += "<a href='#edit_match.html?id=" + (std::string)Match.GetUUID() + "'>";
 
 	//Output name of fighters
-	if (match.GetFighter(Fighter::White))
-		ret += match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+	if (Match.GetFighter(Fighter::White))
+		ret += Match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
 	else if (is_empty)
 		ret += "- - -";
 	else
@@ -679,19 +679,19 @@ std::string SingleElimination::RenderMatch(const Match& match, std::string style
 
 	ret += " vs. ";
 
-	if (match.GetFighter(Fighter::Blue))
-		ret += match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+	if (Match.GetFighter(Fighter::Blue))
+		ret += Match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
 	else if (is_empty)
 		ret += "- - -";
 	else
 		ret += "???";
 
 	//Output result
-	if (match.IsRunning())
+	if (Match.IsRunning())
 		ret += "<br/>" + Localizer::Translate("Running");
-	else if (match.HasConcluded() && !match.IsEmptyMatch())
-	{
-		const auto& result = match.GetResult();
+	else if (Match.HasConcluded() && !Match.IsEmptyMatch())
+  {
+		const auto& result = Match.GetResult();
 		if (result.m_Winner == Winner::White)
 			ret += "<br/>"   + std::to_string((int)result.m_Score) + ":0";
 		else
@@ -700,7 +700,7 @@ std::string SingleElimination::RenderMatch(const Match& match, std::string style
 		ret += " (" + Timer::TimestampToString(result.m_Time) + ")";
 	}
 
-	if (!match.IsEmptyMatch())
+	if (!Match.IsEmptyMatch())
 		ret += "</a>";
 	ret += "</a></td>";
 

@@ -57,6 +57,7 @@ public:
 		Request(const Request& Org)//Deep copy
 			: m_Query(Org.m_Query), m_Body(Org.m_Body, Org.m_Body.GetSize()), m_RequestInfo(Org.m_RequestInfo), m_ResponseHeader(Org.m_ResponseHeader) {
 		}
+		void operator =(const Request& Org) = delete;
 
 		Request(const std::string& Query) : m_Query(Query) {}
 		Request(const std::string& Query, ZED::Blob&& Body) : m_Query(Query), m_Body(std::move(Body)) {}

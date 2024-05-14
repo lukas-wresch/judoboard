@@ -131,6 +131,10 @@ namespace Judoboard
 		MatchLog(const YAML::Node& Yaml) {
 			*this << Yaml;
 		}
+		void operator =(const MatchLog& Copy) {
+			std::lock_guard<std::mutex> lock(Copy.m_Mutex);
+			m_Events = Copy.m_Events;
+		}
 
 		void AddEvent(NeutralEvent NewEvent, uint32_t Timestamp) {
 			std::lock_guard<std::mutex> lock(m_Mutex);
