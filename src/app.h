@@ -94,6 +94,8 @@ namespace Judoboard
 
 		bool ConnectToMaster(const std::string& Hostname, uint16_t Port = 8080);
 
+		void RequestPushToResultsServer() const { m_RequestResultsServer = true; }
+
 		void Run();
 		void Shutdown() const { m_Running = false; }
 
@@ -252,6 +254,9 @@ namespace Judoboard
 
 		//mutable std::recursive_mutex m_mutex;
 		//ZED::ReadWriteMutex m_mutex;
+
+		mutable volatile bool m_RequestResultsServer = false;//If true a push to the results server has been requested
+		uint32_t m_ResultsServer_LastUpdate = 0;//Timestamp of the last update
 
 		mutable volatile bool m_Running = true;
 		const uint32_t m_StartupTimestamp;

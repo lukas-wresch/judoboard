@@ -14,6 +14,9 @@
 
 namespace Judoboard
 {
+	class Application;
+
+
 	class Tournament : public ITournament
 	{
 		friend class Application;
@@ -181,19 +184,19 @@ namespace Judoboard
 		virtual std::vector<std::pair<UUID, size_t>> GetLots() const override { return m_AssociationToLotNumber; }
 
 		//Events
-		virtual void OnMatchConcluded(const Match& Match) const override {
-			ScheduleSave();
-		}
+		virtual void OnMatchStarted(const Match& Match) const override;
+		virtual void OnMatchConcluded(const Match& Match) const override;
 		virtual bool OnUpdateParticipant(const UUID& UUID) override;//Calling this function we recalculate the given judoka
 		virtual bool OnUpdateMatchTable(const UUID& UUID) override;//Calling this function we recalculate the given match table
 
 		//Serialization
-		const std::string Schedule2String(bool ImportantOnly, int Mat = -1) const override;
-		const std::string MasterSchedule2String() const override;
+		virtual const std::string Schedule2String(bool ImportantOnly, int Mat = -1) const override;
+		virtual const std::string MasterSchedule2String() const override;
+		virtual nlohmann::json Schedule2ResultsServer() const override;
 
-		virtual void GenerateSchedule() override;
 		void OrganizeMasterSchedule();
-		void BuildSchedule();
+		virtual void BuildSchedule();
+		virtual void GenerateSchedule() override;
 
 		virtual bool Save() override {
 			if (!m_AutoSave) return true;
@@ -207,6 +210,8 @@ namespace Judoboard
 		{
 			return Timer::GetTimestamp() - m_LastSaveTime;
 		}
+
+		void SetApplication(const Application* App) { m_Application = App; }
 
 	private:
 		bool LoadYAML(const std::string& Filename);
@@ -241,6 +246,8 @@ namespace Judoboard
 
 		const Association* m_Organizer = nullptr;//Tournament is organized by this association, only childen of this association can participate
 		uint32_t m_LotteryTier = 0;//Tier for performing lottery (usually organizer tier + 1)
+
+		const Application* m_Application = nullptr;
 
 		std::vector<MatchTable*> m_MatchTables;
 		//std::vector<Match*> m_Schedule;

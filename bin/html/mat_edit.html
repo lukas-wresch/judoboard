@@ -205,6 +205,9 @@ function GetMat(id)
 let id = URLDecode(URL, "id");
 
 AjaxCallback("ajax/config/list_sound_files", function(response) {
+  while (document.getElementById("sound_filename").length > 0)
+      document.getElementById("sound_filename").remove(document.getElementById("sound_filename").length-1);
+
   console.log(response);
   const res = YAML.parse(response);
 

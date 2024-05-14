@@ -2914,7 +2914,7 @@ TEST(RemoteMat, GoldenScoreResetTime)
 
 	EXPECT_TRUE(m->EnableGoldenScore());
 
-	EXPECT_EQ(m->GetTimeElapsed(), 0);
+	EXPECT_EQ(m->GetTime2Display(), 0);
 
 	m->AddIppon(Fighter::White);
 

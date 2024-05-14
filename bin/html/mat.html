@@ -122,7 +122,7 @@
       <div id="div_hansokumake_decision_white" style="display: none; height: 0px; text-align: center;">
         <h2>Hansokumake: <label id="label_hansokumake_desc_white">White</label></h2>
         <button class="remove" style="width: 4.5cm;"                   onclick="SetScore('white', '+disqualification', event); ShowHansokumakeDecision(false, 'white');">Disqualification</button>
-        <button class="add"    style="margin-left: 2cm; width: 4.5cm;" onclick="SetScore('white', '-disqualification', event); ShowHansokumakeDecision(false, 'white');">No Disqualification</button>
+        <button class="add"    style="margin-left: 2cm; width: 4.5cm;" onclick="SetScore('white', '+nodisqualification', event); ShowHansokumakeDecision(false, 'white');">No Disqualification</button>
       </div>
     </td>
   </tr>
@@ -132,7 +132,7 @@
       <div id="div_hansokumake_decision_blue" style="display: none; height: 0px; text-align: center;">
         <h2>Hansokumake: <label id="label_hansokumake_desc_blue">Blue</label></h2>
         <button class="remove" style="width: 4.5cm;"                   onclick="SetScore('blue', '+disqualification', event); ShowHansokumakeDecision(false, 'blue');">Disqualification</button>
-        <button class="add"    style="margin-left: 2cm; width: 4.5cm;" onclick="SetScore('blue', '-disqualification', event); ShowHansokumakeDecision(false, 'blue');">No Disqualification</button>
+        <button class="add"    style="margin-left: 2cm; width: 4.5cm;" onclick="SetScore('blue', '+nodisqualification', event); ShowHansokumakeDecision(false, 'blue');">No Disqualification</button>
       </div>
     </td>
   </tr>
@@ -249,6 +249,8 @@ var showRevokeGoldenScore = false;
 var showHansokumakeDecisionWhite = false;
 var showHansokumakeDecisionBlue  = false;
 
+let isGoldenscore = false;
+
 
 function Hajime()
 {
@@ -361,8 +363,10 @@ function RevokeGoldenScore()
 }
 
 
-function MoveUp(index, match_id)
+function MoveUp(index, match_id, event)
 {
+  event.preventDefault();
+
   let table = document.getElementById("next_matches_table");
 
   table.rows[  index*2-1].cells[1].innerHTML = "- - -";
@@ -646,9 +650,6 @@ function GetScore()
     document.getElementById("rem_yuko_blue").disabled    = !res.are_fighters_on_mat || !res.yuko_enabled;
     document.getElementById("rem_koka_blue").disabled    = !res.are_fighters_on_mat || !res.koka_enabled;
 
-    HajimeTimer = parseInt(res.hajime_time);
-    totalTime   = parseInt(res.total_time);
-
     OsaekomiWhiteTimer = parseInt(res.white.osaekomi_time);
     OsaekomiWhiteTimer_Running = res.white.is_osaekomi_running;
     OsaekomiBlueTimer  = parseInt(res.blue.osaekomi_time);
@@ -682,6 +683,9 @@ function GetScore()
     if (res.is_hajime)
     {
       HajimeTimer_Running = true;
+      HajimeTimer = (HajimeTimer + parseInt(res.hajime_time))/2;
+      totalTime   = (totalTime   + parseInt(res.total_time) )/2;
+
       document.getElementById("hajime").innerHTML = "Hajime";
       document.getElementById("hajime").disabled  = true;
       document.getElementById("mate").disabled    = false;
@@ -705,6 +709,8 @@ function GetScore()
     else
     {
       HajimeTimer_Running = false;
+      HajimeTimer = parseInt(res.hajime_time);
+      totalTime   = parseInt(res.total_time);
 
       if (res.is_osaekomi)
         document.getElementById("hajime").innerHTML = "Yoshi";
@@ -771,7 +777,8 @@ function GetScore()
     else
       ShowRevokeHantei(false);
 
-    document.getElementById("golden_score").disabled = res.is_goldenscore;
+    isGoldenscore = res.is_goldenscore;
+    document.getElementById("golden_score").disabled = isGoldenscore;
 
     if (typeof res.white.unknown_disqualification !== 'undefined')
         ShowHansokumakeDecision(true, 'white');
@@ -893,7 +900,7 @@ function GetJudokaName()
         cell5.innerHTML = '<button ' + dis + ' class="neutral" style="width: 50mm; margin-top: 1mm;" onclick="StartNextMatch(event)" ontouchstart="StartNextMatch(event)">' + translate('start_next_match') + '</button>';
       }
       else
-        cell5.innerHTML = '<button class="neutral" style="width: 50mm; margin-top: 1mm;" onclick="MoveUp(' + i + ', \'' + match.uuid + '\')" ontouchstart="MoveUp(' + i + ', \'' + match.uuid + '\')">' + translate('push_up') + '</button>';
+        cell5.innerHTML = '<button class="neutral" style="width: 50mm; margin-top: 1mm;" onclick="MoveUp(' + i + ', \'' + match.uuid + '\', event)" ontouchstart="MoveUp(' + i + ', \'' + match.uuid + '\', event)">' + translate('push_up') + '</button>';
 
       i++;
     }
@@ -931,7 +938,7 @@ function GetOsaekomiList()
 
   AjaxCallback("ajax/mat/get_osaekomilist?id="+id, function(response) {
     console.log(response);
-    var res = response.split(",");
+    const res = response.split(",");
 
     updateOsaekomiList = false;
 
@@ -969,27 +976,10 @@ function GetOsaekomiList()
 function DisplayTimer()
 {
   document.getElementById("hajimetime").innerHTML = Math.floor(HajimeTimer/(1000*60)) + ':' + zeroPad(Math.floor((HajimeTimer/1000))%60, 2) + '.' + Math.floor((HajimeTimer%1000)/100);
-  document.getElementById("total_time").innerHTML = Math.floor(totalTime  /(1000*60)) + ':' + zeroPad(Math.floor((totalTime  /1000))%60, 2) + '.' + Math.floor((totalTime  %1000)/100);
+  document.getElementById("total_time").innerHTML = Math.floor(totalTime  /(1000*60)) + ':' + zeroPad(Math.floor((totalTime  /1000))%60, 2);
 
   document.getElementById("white_osaekomitime").innerHTML = Math.floor((OsaekomiWhiteTimer/1000)) + '.' + Math.floor((OsaekomiWhiteTimer%1000)/100);
   document.getElementById("blue_osaekomitime").innerHTML  = Math.floor((OsaekomiBlueTimer /1000)) + '.' + Math.floor((OsaekomiBlueTimer %1000)/100);
-}
-
-
-function GetTimer()
-{
-  AjaxCallback("ajax/mat/current_time?id="+id, function(response) {
-    var res = response.split(",");
-
-    HajimeTimer = parseInt(res[0]);
-
-    if (parseInt(res[1]) == 1)
-      HajimeTimer_Running = true;
-    else
-      HajimeTimer_Running = false;
-
-    DisplayTimer();
-  });
 }
 
 
@@ -997,7 +987,11 @@ function UpdateTimer()
 {
   if (HajimeTimer_Running)
   {
-    HajimeTimer -= 100;
+    if (isGoldenscore)
+      HajimeTimer += 100;
+    else
+      HajimeTimer -= 100;
+
     if (HajimeTimer < 0)
       HajimeTimer = 0;
     totalTime += 100;
@@ -1067,7 +1061,7 @@ function Mat_Init()
 
   document.getElementById("time").innerHTML = translate('time');
   document.getElementById("mat").innerHTML  = translate('mat') + ' ' + id;
-  document.getElementById("total_time_label").innerHTML = translate('total_time');
+  document.getElementById("total_time_label").innerHTML = translate('match_time');
 
   document.getElementById("end_match").innerHTML  = translate('end_match');
 
@@ -1100,5 +1094,45 @@ function Mat_Init()
 }
 
 Mat_Init();
+
+window.addEventListener("keydown", function(event){
+  console.log(event);
+
+  if (event.code == "Numpad0")
+    Hajime(event);
+  else if (event.code == "NumpadDecimal")
+    Mate(event);
+
+  else if (event.code == "Numpad7")
+    SetScore('white', '+ippon', event);
+  else if (event.code == "Numpad8")
+    SetScore('white', '+wazaari', event);
+  else if (event.code == "Numpad9")
+    SetScore('blue', '+ippon', event);
+  else if (event.code == "NumpadSubtract")
+    SetScore('blue', '+wazaari', event);
+
+  else if (event.code == "Numpad4")
+    SetScore('white', '-ippon', event);
+  else if (event.code == "Numpad5")
+    SetScore('white', '-wazaari', event);
+  else if (event.code == "Numpad6")
+    SetScore('blue', '-ippon', event);
+  else if (event.code == "NumpadAdd")
+    SetScore('blue', '-wazaari', event);
+
+  else if (event.code == "Numpad1")
+    Osaekomi('white', event);
+  else if (event.code == "Numpad2")
+    Tokeda(event);
+  else if (event.code == "Numpad3")
+    Osaekomi('blue', event);
+
+  else if (event.code == "NumpadEnter")
+    EndMatch(event);
+  else if (event.code == "Backspace")
+    StartNextMatch(event);
+});
+
 
 </script>

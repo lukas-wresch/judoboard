@@ -98,6 +98,10 @@ bool Database::Load(const std::string& Filename)
 
 	if (yaml["mat_count"])
 		SetMatCount(yaml["mat_count"].as<int>());
+	if (yaml["results_server"])
+		IsResultsServer(yaml["results_server"].as<bool>());
+	if (yaml["results_server_url"])
+		SetResultsServer(yaml["results_server_url"].as<std::string>());
 
 	//Read standing data
 	StandingData::operator <<(yaml);
@@ -143,6 +147,8 @@ bool Database::Save(const std::string& Filename) const
 	yaml << YAML::Key << "name_style"  << YAML::Value << (int)GetNameStyle();
 
 	yaml << YAML::Key << "mat_count" << YAML::Value << (int)GetMatCount();
+	yaml << YAML::Key << "results_server"     << YAML::Value << (bool)IsResultsServer();
+	yaml << YAML::Key << "results_server_url" << YAML::Value << GetResultsServer();
 	
 	StandingData::operator >>(yaml);
 

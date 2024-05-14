@@ -4,6 +4,7 @@
 #include <cassert>
 #include "../ZED/include/log.h"
 #include "tournament.h"
+#include "app.h"
 #include "database.h"
 #include "weightclass.h"
 #include "customtable.h"
@@ -811,8 +812,6 @@ bool Tournament::AddMatch(Match* NewMatch)
 		return false;
 	}
 
-	//auto guard = LockWriteForScope();//TODO, check if respoinsible for crash
-
 	//Do we have the match already?
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
@@ -821,7 +820,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 			return false;
 	}
 
-	auto guard = LockWriteForScope();//TODO, this should move above
+	auto guard = LockWriteForScope();
 
 	NewMatch->SetTournament(this);//If not yet associated
 
@@ -1060,7 +1059,7 @@ bool Tournament::MoveMatchUp(const UUID& MatchID, uint32_t MatID)
 	{
 		if (MatID != 0 && schedule[current_index]->GetMatID() != MatID)
 			continue;
-		if (schedule[current_index]->GetUUID() == MatchID)//CRASH HERE, MatchID points to invalid memory
+		if (schedule[current_index]->GetUUID() == MatchID)
 			break;
 		prev_match_index = current_index;
 	}
@@ -1471,6 +1470,24 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 
 
+void Tournament::OnMatchStarted(const Match& Match) const
+{
+	ScheduleSave();
+	if (m_Application)
+		m_Application->RequestPushToResultsServer();
+}
+
+
+
+void Tournament::OnMatchConcluded(const Match& Match) const
+{
+	ScheduleSave();
+	if (m_Application)
+		m_Application->RequestPushToResultsServer();
+}
+
+
+
 bool Tournament::OnUpdateParticipant(const UUID& UUID)
 {
 	if (IsReadonly())
@@ -1498,6 +1515,7 @@ bool Tournament::OnUpdateParticipant(const UUID& UUID)
 	for (auto table : m_MatchTables)
 	{
 		if (!table) continue;
+		if (judoka->GetWeight() == 0) continue;
 
 		if (!table->IsElgiable(*judoka))//No longer eligable?
 			table->RemoveParticipant(judoka);
@@ -1526,11 +1544,15 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 	if (!matchTable)
 		return false;
 
+	bool need_to_rebuild = false;
+
 	if (matchTable->GetStatus() == Status::Scheduled)//Can safely recalculate the match table
 	{
+		auto old_match_count = matchTable->GetSchedule().size();
+
 		auto participants = matchTable->GetParticipants();
 		for (auto judoka : participants)
-			if (judoka && !matchTable->IsElgiable(*judoka))//No longer eligable?
+			if (judoka && judoka->GetWeight() != 0 && !matchTable->IsElgiable(*judoka))//No longer eligable?
 				matchTable->RemoveParticipant(judoka);
 
 		for (auto judoka : m_StandingData.GetAllJudokas())
@@ -1540,10 +1562,10 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 		}
 
 		matchTable->GenerateSchedule();
-	}
 
-	//Optimize master schedule entries
-	OrganizeMasterSchedule();
+		if (old_match_count != matchTable->GetSchedule().size())
+			need_to_rebuild = true;//Only rebuild schedule in this case
+	}
 
 	//Sort
 	std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
@@ -1583,7 +1605,8 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 		return a->GetUUID() < b->GetUUID();
 	});
 
-	BuildSchedule();
+	if (need_to_rebuild)//Do we need to rebuild the schedule?
+		BuildSchedule();
 
 	return true;
 }
@@ -2220,6 +2243,7 @@ const std::string Tournament::Schedule2String(bool ImportantOnly, int Mat) const
 	auto schedule = GetSchedule();
 	Match* prev = nullptr;
 	int serialized_matches = 0;
+	std::vector<Match*> residual_matches;
 
 	for (auto match : schedule)
 	{
@@ -2239,16 +2263,23 @@ const std::string Tournament::Schedule2String(bool ImportantOnly, int Mat) const
 					serialized_matches = 1;
 				}
 
-				if (serialized_matches >= 1 && serialized_matches <= 7)
+				if (serialized_matches >= 1 && serialized_matches <= 9)
 				{
 					match->ToString(ret);
 					serialized_matches++;
 				}
+				else if (serialized_matches > 9)
+					residual_matches.push_back(match);
 			}
 
 			prev = match;
 		}
 	}
+
+	if (residual_matches.size() <= 3)//Only 3 matches remaining?
+		for (auto match : residual_matches)
+			match->ToString(ret);//Put them all in
+
 	UnlockRead();
 
 	ret << YAML::EndSeq;
@@ -2342,6 +2373,38 @@ const std::string Tournament::MasterSchedule2String() const
 	ret << YAML::EndMap;
 
 	return ret.c_str();
+}
+
+
+
+nlohmann::json Tournament::Schedule2ResultsServer() const
+{
+	nlohmann::json ret;
+
+	LockRead();
+
+	ret["name"] = GetName();
+
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
+	{
+		nlohmann::json match_json;
+		*match >> match_json;
+		ret["schedule"].push_back(match_json);
+	}
+
+	auto tables = GetMatchTables();
+	for (auto table : tables)
+	{
+		nlohmann::json table_json;
+		*table >> table_json;
+		ret["match_tables"].push_back(table_json);
+	}
+
+	UnlockRead();
+
+	//return ret.dump();
+	return ret;
 }
 
 
@@ -2467,6 +2530,8 @@ void Tournament::OrganizeMasterSchedule()
 void Tournament::BuildSchedule()
 {
 	auto guard = LockWriteForScope();
+
+	OrganizeMasterSchedule();
 
 	m_Schedule.clear();
 

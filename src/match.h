@@ -124,7 +124,7 @@ namespace Judoboard
 		MatchLog& GetLog() { return m_Log; }
 		const MatchLog& GetLog() const { return m_Log; }
 
-		void StartMatch() { m_State = Status::Running; }
+		void StartMatch();
 		void EndMatch();
 
 		const MatchTable* GetMatchTable() const { return m_Table; }
@@ -205,6 +205,7 @@ namespace Judoboard
 		void ToString(YAML::Emitter& Yaml) const;
 
 		void operator >>(YAML::Emitter& Yaml) const;
+		void operator >>(nlohmann::json& Json) const;
 
 		bool operator ==(const Match& rhs) const {
 			return GetUUID() == rhs.GetUUID();

@@ -139,6 +139,7 @@ namespace Judoboard
 		virtual std::vector<std::pair<UUID, size_t>> GetLots() const { std::vector<std::pair<UUID, size_t>> ret; return ret; }
 
 		//Events
+		virtual void OnMatchStarted(const Match& Match) const = 0;
 		virtual void OnMatchConcluded(const Match& Match) const = 0;
 		virtual bool OnUpdateParticipant(const UUID& UUID) { assert(false); return false; }//Calling this function we recalculate the given judoka
 		virtual bool OnUpdateMatchTable(const UUID& UUID)  { assert(false); return false; }//Calling this function we recalculate the given match table
@@ -146,7 +147,9 @@ namespace Judoboard
 		//Serialization
 		virtual const std::string Schedule2String(bool ImportantOnly, int Mat = -1) const { assert(false); return ""; }
 		virtual const std::string MasterSchedule2String() const { assert(false); return ""; }
+		virtual nlohmann::json Schedule2ResultsServer() const { assert(false); return ""; }
 
+		virtual void BuildSchedule() {}
 		virtual void GenerateSchedule() {}
 
 		virtual bool Save() { return false; }
@@ -161,7 +164,6 @@ namespace Judoboard
 	protected:
 		StandingData m_StandingData;//Local database for the tournament containing all participants and rule sets
 
-		//mutable std::recursive_mutex m_mutex;
 		ZED::RecursiveReadWriteMutex m_mutex;
 	};
 }

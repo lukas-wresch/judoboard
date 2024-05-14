@@ -67,13 +67,11 @@ namespace Judoboard
 		//Basics
 		const Judoka& GetFighter(Fighter Who) const { if (Who == Fighter::White) return m_White; return m_Blue; }
 		std::string GetTime2String() const { return m_HajimeTimer.ToString(); }
-		uint32_t GetTimeElapsed() const { return m_HajimeTimer.GetElapsedTime(); }
 		uint32_t GetTime2Display() const;
 		bool IsIppon() const { return GetScoreboard(Fighter::White).m_Ippon >= 1 || GetScoreboard(Fighter::Blue).m_Ippon >= 1; }
 		bool IsHajime() const override { return m_HajimeTimer.IsRunning(); }
 		bool IsOsaekomiRunning() const override { return m_OsaekomiTimer[0].IsRunning() || m_OsaekomiTimer[1].IsRunning(); }//Returns true during an osaekomi situation
 		bool IsOsaekomi() const override { return m_IsOsaekomi; }//Returns true during an osaekomi situation (even during sonomama!)
-		bool IsOsaekomiTimerPositiv() const { return m_OsaekomiTimer[0].GetElapsedTime() > 0 || m_OsaekomiTimer[1].GetElapsedTime() > 0; }//Returns true during an osaekomi situation (even during sonomama!) and afer match
 		bool IsSonomama() const { return !IsHajime() && IsOsaekomi(); }
 		Fighter GetOsaekomiHolder() const { return m_OsaekomiHolder; }
 		bool CanNextMatchStart() const override { return m_State == State::Waiting; }
@@ -166,15 +164,15 @@ namespace Judoboard
 		{
 			if (!m_Sound || GetSoundFilename() != NewFilename)
 			{
-				m_Sound = std::move(ZED::Sound("assets/sounds/" + GetSoundFilename() + ".wav"));
+				m_Sound = std::move(ZED::Sound("assets/sounds/" + NewFilename + ".wav"));
 				if (m_Sound)
 					ZED::Log::Info("Sound file loaded");
 				else
 					ZED::Log::Warn("Could not load sound file");
 			}
 
-			EnableSound(Enabled);
 			SetSoundFilename(NewFilename);
+			EnableSound(Enabled);
 			SetAudioDeviceID(DeviceID);
 		}
 

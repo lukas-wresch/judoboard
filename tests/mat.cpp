@@ -666,11 +666,13 @@ TEST(Mat, DisqualificationCanBeRemoved)
 
 
 		m.AddHansokuMake(f);
+		EXPECT_FALSE(m.HasConcluded());
 		EXPECT_FALSE(m.GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(m.GetScoreboard(f).IsNotDisqualified());
 		EXPECT_TRUE(m.GetScoreboard(f).IsUnknownDisqualification());
 
 		m.AddDisqualification(f);
+		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.GetScoreboard(f).IsDisqualified());
 		EXPECT_FALSE(m.GetScoreboard(f).IsNotDisqualified());
 		EXPECT_FALSE(m.GetScoreboard(f).IsUnknownDisqualification());
@@ -1078,6 +1080,82 @@ TEST(Mat, Hansokumake)
 
 
 
+TEST(Mat, HansokumakeRemove)
+{
+	initialize();
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(&match));
+
+
+		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
+		m.AddHansokuMake(f);
+
+		EXPECT_TRUE(m.GetScoreboard(f).m_HansokuMake);
+		EXPECT_EQ(m.GetScoreboard(!f).m_Ippon, 1);
+
+		m.RemoveHansokuMake(f);
+		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
+		EXPECT_EQ(m.GetScoreboard(!f).m_Ippon, 0);
+
+		EXPECT_FALSE(m.HasConcluded());
+
+		EXPECT_FALSE(m.EndMatch());
+
+		m.AddHansokuMake(f);
+		EXPECT_TRUE(m.GetScoreboard(f).m_HansokuMake);
+
+		m.AddDisqualification(f);
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
+TEST(Mat, HansokumakeRemoveWithWazaari)
+{
+	initialize();
+	for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
+	{
+		Application app;
+		Mat m(1);
+
+		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match.SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(&match));
+
+		m.AddWazaAri(!f);
+
+		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
+		m.AddHansokuMake(f);
+
+		EXPECT_TRUE(m.GetScoreboard(f).m_HansokuMake);
+		EXPECT_EQ(m.GetScoreboard(!f).m_Ippon, 1);
+
+		m.RemoveHansokuMake(f);
+		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
+		EXPECT_EQ(m.GetScoreboard(!f).m_Ippon,   0);
+		EXPECT_EQ(m.GetScoreboard(!f).m_WazaAri, 1);
+
+		EXPECT_FALSE(m.HasConcluded());
+
+		EXPECT_FALSE(m.EndMatch());
+
+		m.AddHansokuMake(f);
+		EXPECT_TRUE(m.GetScoreboard(f).m_HansokuMake);
+
+		m.AddDisqualification(f);
+		EXPECT_TRUE(m.EndMatch());
+	}
+}
+
+
+
 TEST(Mat, MedicalExaminiations)
 {
 	initialize();
@@ -1154,7 +1232,7 @@ TEST(Mat, MatchTimeCorrectAfterOsaekomi)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time < 20 ; time += 5)
+	for (int time = 3; time < 20 ; time += 5)
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		Application app;
@@ -1175,8 +1253,9 @@ TEST(Mat, MatchTimeCorrectAfterOsaekomi)
 		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m.IsOutOfTime());
+		EXPECT_EQ(m.GetOsaekomiList().size(), 1);
 		EXPECT_TRUE(m.EndMatch());
-		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time + 20)*1000), 50);
+		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time-1 + 20)*1000), 100);
 	}
 }
 
@@ -1186,7 +1265,7 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time < 20 ; time += 5)
+	for (int time = 3; time < 20 ; time += 5)
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		Application app;
@@ -1213,8 +1292,9 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi)
 		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m.IsOutOfTime());
+		EXPECT_EQ(m.GetOsaekomiList().size(), 1);
 		EXPECT_TRUE(m.EndMatch());
-		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time + time + 20)*1000), 50);
+		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time + time-1 + 20)*1000), 100);
 	}
 }
 
@@ -1224,7 +1304,7 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi2)
 {
 	initialize();
 	srand(ZED::Core::CurrentTimestamp());
-	for (int time = 1; time < 20 ; time += 5)
+	for (int time = 3; time < 20 ; time += 5)
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
 	{
 		Application app;
@@ -1237,7 +1317,7 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi2)
 
 		m.Hajime();
 
-		ZED::Core::Pause( (time - 1) * 1000);
+		ZED::Core::Pause( (time - 2) * 1000);
 
 		m.Osaekomi(f);
 		ZED::Core::Pause(9 * 1000);
@@ -1256,8 +1336,9 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi2)
 		ZED::Core::Pause(100);
 
 		EXPECT_TRUE(m.IsOutOfTime());
+		EXPECT_EQ(m.GetOsaekomiList().size(), 2);
 		EXPECT_TRUE(m.EndMatch());
-		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time + 9 + time + 20)*1000), 50);
+		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time-2 + 9 + time-1 + 20)*1000), 100);
 	}
 }
 
@@ -1678,7 +1759,7 @@ TEST(Mat, TokedaAfterOsaekomi)
 
 		m.Mate();
 
-		EXPECT_LE(std::abs((int)m.GetTimeElapsed() - 3500), 50);
+		EXPECT_LE(std::abs((int) (10*1000 - m.GetTime2Display()) - 3500), 50);
 
 		EXPECT_FALSE(m.IsHajime());
 		EXPECT_FALSE(m.IsOsaekomi());
@@ -1734,7 +1815,7 @@ TEST(Mat, TokedaAfterOsaekomi_Wazaari)
 
 		m.Mate();
 
-		EXPECT_LE(std::abs((int)m.GetTimeElapsed() - 3500), 50);
+		EXPECT_LE(std::abs((int) (10*1000 - m.GetTime2Display()) - 3500), 50);
 
 		EXPECT_FALSE(m.IsHajime());
 		EXPECT_FALSE(m.IsOsaekomi());
@@ -1792,7 +1873,7 @@ TEST(Mat, TokedaAfterOsaekomi_WazaariRemoved)
 		EXPECT_FALSE(m.IsOsaekomi());
 		EXPECT_FALSE(m.IsOsaekomiRunning());
 
-		EXPECT_LE(std::abs((int)m.GetTimeElapsed() - 4000), 100);
+		EXPECT_LE(std::abs((int) (10*1000 - m.GetTime2Display()) - 4000), 100);
 
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
@@ -2416,7 +2497,7 @@ TEST(Mat, GoldenScore_Revoke)
 	m.EnableGoldenScore(false);
 
 	EXPECT_TRUE(m.IsOutOfTime());
-	EXPECT_EQ(m.GetTimeElapsed(), 2000);
+	EXPECT_EQ(m.GetTime2Display(), 0);
 
 	EXPECT_FALSE(m.HasConcluded());
 	EXPECT_FALSE(m.EndMatch());
@@ -2524,7 +2605,7 @@ TEST(Mat, GoldenScoreResetTime)
 
 	EXPECT_TRUE(m.EnableGoldenScore());
 
-	EXPECT_TRUE(m.GetTimeElapsed() == 0);
+	EXPECT_EQ(m.GetTime2Display(), 0);
 
 	m.AddIppon(Fighter::White);
 

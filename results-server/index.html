@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+<!--<link rel="stylesheet" href="jquery-ui.css">-->
+<script type="text/javascript" src="common.js"></script>
+</head>
+
+<body>
+<div style="font-size: 25pt; margin-top: 4mm;">Judoboard</div>
+
+<div id="content">
+</div>
+
+</body>
+<script>
+
+function Update()
+{
+  AjaxCallback("get.php", function(response) {
+    document.getElementById("content").innerHTML = response;
+  });
+}
+
+Update();
+window.setInterval(Update, 30*1000);
+
+</script>
+</html>

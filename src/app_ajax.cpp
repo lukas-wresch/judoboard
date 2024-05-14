@@ -486,8 +486,8 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		bool success = GetTournament()->RemoveMatch(id);
-
+		if (!GetTournament()->RemoveMatch(id))
+			return Error(Error::Type::OperationFailed);
 		return Error(Error::Type::NoError);
 	});
 
@@ -645,21 +645,6 @@ void Application::SetupHttpServer()
 	});
 
 	//Serialization
-	m_Server.RegisterResource("/ajax/mat/current_time", [this](auto& Request) -> std::string {
-		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id <= 0)
-			return Error(Error::Type::InvalidID);
-
-		auto mat = FindMat(id);
-
-		if (!mat)
-			return Error(Error::Type::MatNotFound);
-
-		return std::to_string(mat->GetTimeElapsed()) + "," + (mat->IsHajime() ? "1" : "0");
-	});
 
 	m_Server.RegisterResource("/ajax/mat/get_score", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
@@ -3834,6 +3819,8 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 	age_group->SetGender(gender);
 	age_group->SetRuleSet(rule);
 
+	GetTournament()->AddRuleSet(rule);
+
 	return Error::Type::NoError;
 }
 
@@ -4054,7 +4041,10 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		auto error = Ajax_AddMatchTable(Request);
 		if (!error)
+		{
+			GetTournament()->AddMatchTable(table);//Add match table again since we just deleted it
 			return error;
+		}
 
 		table = GetTournament()->FindMatchTable(id);
 
@@ -4093,11 +4083,8 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 	//Update filter
 
-	if (!table->IsSubMatchTable())
+	if (!table->IsSubMatchTable() && table->GetFilter() && table->GetFilter()->GetType() == IFilter::Type::Weightclass)
 	{
-		if (!table->GetFilter() || table->GetFilter()->GetType() != IFilter::Type::Weightclass)
-			return Error::Type::OperationFailed;
-
 		auto weightclass = (Weightclass*)table->GetFilter();
 
 		auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
@@ -4123,6 +4110,18 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 			GetTournament()->LockWrite();
 
 			round_robin->IsBestOfThree(bo3);
+
+			GetTournament()->UnlockWrite();
+			break;
+		}
+
+		case MatchTable::Type::Custom:
+		{
+			CustomTable* custom = (CustomTable*)table;
+
+			GetTournament()->LockWrite();
+
+			custom->IsBestOfThree(bo3);
 
 			GetTournament()->UnlockWrite();
 			break;
@@ -4208,7 +4207,7 @@ Error Application::Ajax_MoveMatchTable(const HttpServer::Request& Request)
 	if (schedule_index >= 0)
 	{
 		entry->SetScheduleIndex(schedule_index);
-		GetTournament()->OnUpdateMatchTable(*entry);
+		GetTournament()->BuildSchedule();
 	}
 
 	return Error::Type::NoError;//OK
@@ -4502,7 +4501,9 @@ Error Application::Ajax_PlaySoundFile(const HttpServer::Request& Request)
 
 	mat->QueueSoundFile();
 
-	ZED::Core::Pause(20 * 1000);
+	ZED::Core::Pause(500);
+	if (audio_device == -1)
+		ZED::Core::Pause(10 * 1000);
 
 	mat->SetAudio(temp_enabled, temp_filename, temp_device);
 
@@ -4526,7 +4527,9 @@ std::string Application::Ajax_GetSetup()
 	ret << YAML::Key << "osaekomi_style" << YAML::Value << (int)GetDatabase().GetOsaekomiStyle();
 	ret << YAML::Key << "timer_style"    << YAML::Value << (int)GetDatabase().GetTimerStyle();
 	ret << YAML::Key << "name_style"     << YAML::Value << (int)GetDatabase().GetNameStyle();
-	ret << YAML::Key << "http_workers_free" << YAML::Value << std::to_string(m_Server.GetFreeWorkerCount()) + "/" + std::to_string(m_Server.GetWorkerCount());
+	ret << YAML::Key << "results_server"     << YAML::Value << GetDatabase().IsResultsServer();
+	ret << YAML::Key << "results_server_url" << YAML::Value << GetDatabase().GetResultsServer();
+	ret << YAML::Key << "http_workers_free"  << YAML::Value << std::to_string(m_Server.GetFreeWorkerCount()) + "/" + std::to_string(m_Server.GetWorkerCount());
 
 	ret << YAML::EndMap;
 	return ret.c_str();
@@ -4541,10 +4544,15 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 	int port       = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "port"));
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int osaekomiStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomiStyle"));
-	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
-	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
+	int timerStyle    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
+	int nameStyle     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
+	bool results_server      = HttpServer::DecodeURLEncoded(Request.m_Body, "results_server") == "true";
+	auto results_server_url  = HttpServer::DecodeURLEncoded(Request.m_Body, "results_server_url");
 
 	Localizer::SetLanguage((Language)language);
+	
+	auto guard = LockWriteForScope();
+
 	if (mat_count >= 0)
 		GetDatabase().SetMatCount(mat_count);
 	if (port > 0)
@@ -4553,7 +4561,10 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 	GetDatabase().SetOsaekomiStyle((Mat::OsaekomiStyle)osaekomiStyle);
 	GetDatabase().SetTimerStyle((Mat::TimerStyle)timerStyle);
 	GetDatabase().SetNameStyle((NameStyle)nameStyle);
-	GetDatabase().Save();
+	GetDatabase().SetNameStyle((NameStyle)nameStyle);
+	GetDatabase().IsResultsServer(results_server);
+	GetDatabase().SetResultsServer(results_server_url);
+  GetDatabase().Save();
 
 	return Error::Type::NoError;
 }

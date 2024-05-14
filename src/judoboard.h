@@ -1,17 +1,11 @@
 #pragma once
 #define YAML_CPP_STATIC_DEFINE
 #include "yaml-cpp/yaml.h"
+#include <json/json.hpp>
 #include <string>
 #include <cassert>
 #include "id.h"
 
-
-
-namespace YAML
-{
-	class Emitter;
-	class Node;
-}
 
 
 namespace Judoboard

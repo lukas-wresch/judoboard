@@ -168,7 +168,6 @@ var lang_en = {
     schedule:  [ "Schedule", "Zeitplan" ],
     split_genders: [ "Split Genders", "Geschlechter trennen" ],
     time:  [ "Time", "Zeit" ],
-    total_time:  [ "Total Time", "Gesamtzeit" ],
     tournament:  [ "Tournament", "Turnier" ],
     tournaments:  [ "Tournaments", "Turniere" ],
     tournament_default:  [ "Tournament Default", "Turnierstandard" ],

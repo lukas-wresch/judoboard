@@ -3538,6 +3538,10 @@ TEST(MD7, ImportKEM_U13_2024_05_05)
 		ASSERT_TRUE(table);
 		EXPECT_EQ(table->GetParticipants().size(), 4);
 		EXPECT_EQ(table->GetSchedule().size(),     6);
+
+		tour.OnUpdateMatchTable(*table);
+		EXPECT_EQ(table->GetParticipants().size(), 4);
+		EXPECT_EQ(table->GetSchedule().size(),     6);
 	}
 
 	ZED::Core::RemoveFile("tournaments/KEM_U13_05052024_02.yml");
