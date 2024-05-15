@@ -132,8 +132,10 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
 
 
 
-HttpServer::HttpServer(uint16_t Port) : m_Port(Port)
+void HttpServer::Start(uint16_t Port)
 {
+    m_Port = Port;
+
     char port_string[32];
 #ifdef _WIN32
     _itoa_s(Port, port_string, 10);
