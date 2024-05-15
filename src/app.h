@@ -21,6 +21,8 @@ namespace Judoboard
 
 	class Application : public ZED::RecursiveReadWriteMutex//TODO should be private/or private member
 	{
+		friend class License;
+
 	public:
 		Application() : m_StartupTimestamp(Timer::GetTimestamp()) {
 			m_TempTournament.EnableAutoSave(false);
@@ -133,6 +135,8 @@ namespace Judoboard
 		std::string Ajax_GetNamesOnMat(const HttpServer::Request& Request);
 
 		//Commands
+		Error Ajax_StartMatch(const HttpServer::Request& Request);
+		Error Ajax_EndMatch(const HttpServer::Request& Request);
 		Error Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request);
 		Error Ajax_RemoveDisqualification(Fighter Whom, const HttpServer::Request& Request);
 		Error Ajax_NoDisqualification(Fighter Whom, const HttpServer::Request& Request);

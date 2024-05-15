@@ -443,12 +443,12 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		auto guard = LockReadForScope();
+		auto app_guard = LockReadForScope();
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		auto guard = GetTournament()->LockReadForScope();
+		auto tournament_guard = GetTournament()->LockReadForScope();
 
 		auto match = GetTournament()->FindMatch(id);
 
@@ -501,12 +501,12 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		auto guard = LockReadForScope();
+		auto app_guard = LockReadForScope();
 
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		auto guard = GetTournament()->LockReadForScope();
+		auto tournament_guard = GetTournament()->LockReadForScope();
 
 		auto match = GetTournament()->FindMatch(id);
 
@@ -606,58 +606,6 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::MatNotFound);
 
 		mat->Sonomama();
-		return Error();//OK
-	});
-
-	m_Server.RegisterResource("/ajax/mat/start_match", [this](auto& Request) -> std::string {
-		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-		if (!IsLoggedIn(Request))
-			return Error(Error::Type::NotLoggedIn);
-
-		if (!GetTournament())
-			return Error(Error::Type::TournamentNotOpen);
-
-		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (matID <= 0)
-			return Error(Error::Type::InvalidID);
-
-		auto guard = LockReadForScope();
-
-		auto mat = FindMat(matID);
-
-		if (!mat)
-			return Error(Error::Type::MatNotFound);
-
-		auto guard = GetTournament()->LockReadForScope();
-
-		auto nextMatch = GetTournament()->GetNextMatch(mat->GetMatID());
-		if (nextMatch)
-			if (!mat->StartMatch(nextMatch))
-				return "Could not start next match";
-		return Error();//OK
-	});
-
-	m_Server.RegisterResource("/ajax/mat/end_match", [this](auto& Request) -> std::string {
-		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-		if (!IsLoggedIn(Request))
-			return Error(Error::Type::NotLoggedIn);
-
-		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (matID <= 0)
-			return Error(Error::Type::InvalidID);
-
-		auto guard = LockReadForScope();
-
-		auto mat = FindMat(matID);
-
-		if (!mat)
-			return Error(Error::Type::MatNotFound);
-
-		if (!mat->EndMatch())
-			return Error(Error::Type::OperationFailed);
-
 		return Error();//OK
 	});
 
@@ -4560,6 +4508,56 @@ Error Application::Ajax_PlaySoundFile(const HttpServer::Request& Request)
 	mat->SetAudio(temp_enabled, temp_filename, temp_device);
 
 	return Error::Type::NoError;
+}
+
+
+
+Error Application::Ajax_StartMatch(const HttpServer::Request& Request)
+{
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	if (matID <= 0)
+		return Error::Type::InvalidID;
+
+	auto app_guard = LockReadForScope();
+
+	auto mat = FindMat(matID);
+
+	if (!mat)
+		return Error::Type::MatNotFound;
+
+	auto tournament_guard = GetTournament()->LockReadForScope();
+
+	auto nextMatch = GetTournament()->GetNextMatch(mat->GetMatID());
+	if (nextMatch)
+		if (!mat->StartMatch(nextMatch))
+			return Error::Type::OperationFailed;
+	return Error::Type::NoError;//OK
+}
+
+
+
+Error Application::Ajax_EndMatch(const HttpServer::Request& Request)
+{
+	int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	if (matID <= 0)
+		return Error::Type::InvalidID;
+
+	auto guard = LockReadForScope();
+
+	auto mat = FindMat(matID);
+
+	if (!mat)
+		return Error::Type::MatNotFound;
+
+	if (!mat->EndMatch())
+		return Error::Type::OperationFailed;
+
+	return Error::Type::NoError;//OK
 }
 
 
