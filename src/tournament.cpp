@@ -440,8 +440,6 @@ void Tournament::Reset()
 
 bool Tournament::Load(const YAML::Node& yaml)
 {
-	auto guard = LockWriteForScope();
-
 	if (!yaml["version"] || !yaml["name"])
 	{
 		ZED::Log::Warn("Data is not a valid tournament file");
@@ -600,8 +598,6 @@ bool Tournament::SaveYAML(const std::string& Filename)
 		ZED::Log::Error("Could not open file: " + Filename);
 		return false;
 	}
-
-	auto guard = LockReadForScope();
 
 	YAML::Emitter yaml;
 
