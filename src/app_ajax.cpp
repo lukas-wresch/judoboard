@@ -4202,7 +4202,7 @@ Error Application::Ajax_MoveMatchTable(const HttpServer::Request& Request)
 
 	if (mat >= 1)
 		entry->SetMatID(mat);
-	if (schedule_index >= 0)
+	if (schedule_index >= 0 && entry->GetScheduleIndex() != schedule_index)
 	{
 		entry->SetScheduleIndex(schedule_index);
 		GetTournament()->BuildSchedule();
