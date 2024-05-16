@@ -52,9 +52,9 @@ DoubleElimination::DoubleElimination(const YAML::Node& Yaml, const ITournament* 
 
 #ifdef _DEBUG
 	for (auto match : m_WinnerBracket.GetSchedule())
-		assert(*match->GetMatchTable() == m_WinnerBracket);//someshow it's not connected correctly
+		assert(*match->GetMatchTable() == *this);
 	for (auto match : m_LoserBracket.GetSchedule())
-		assert(*match->GetMatchTable() == m_LoserBracket);
+		assert(*match->GetMatchTable() == *this);
 #endif
 }
 
