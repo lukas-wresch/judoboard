@@ -4564,6 +4564,7 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 	GetDatabase().SetNameStyle((NameStyle)nameStyle);
 	GetDatabase().IsResultsServer(results_server);
 	GetDatabase().SetResultsServer(results_server_url);
+  GetDatabase().Save();
 
 	return Error::Type::NoError;
 }
@@ -4731,6 +4732,7 @@ std::string Application::Ajax_GetHansokumake() const
 		const auto match = mat->GetMatch();
 		if (!match)
 			continue;
+
 
 		for (Fighter fighter = Fighter::White; fighter <= Fighter::Blue; ++fighter)
 		{
