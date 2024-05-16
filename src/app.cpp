@@ -29,14 +29,6 @@ Application::Application() : m_StartupTimestamp(Timer::GetTimestamp())
 
 	std::string token = (std::string)ID::GenerateUUID();
 	m_SecurityToken   = token.substr(0, 32);
-
-	if (!m_Server.IsRunning())
-	{
-		ZED::Log::Error("Could not start http server!");
-		Shutdown();
-	}
-	else
-		SetupHttpServer();
 }
 
 

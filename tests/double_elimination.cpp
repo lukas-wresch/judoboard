@@ -670,6 +670,8 @@ TEST(DoubleElimination, Count6_Example)
 	m.AddIppon(Fighter::White);
 	EXPECT_TRUE(m.EndMatch());
 
+	EXPECT_EQ(group->CalculateResults().GetSize(), 0);
+
 	EXPECT_TRUE(schedule[2 - 1]->IsEmptyMatch());
 
 	EXPECT_EQ(schedule[3 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Hans");

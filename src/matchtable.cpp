@@ -269,12 +269,12 @@ std::string MatchTable::GetDescription() const
 	if (name.length() > 0 && GetAgeGroup())
 		return GetAgeGroup()->GetName() + " " + name;
 
-	else if (m_Filter)
+	else if (GetFilter())
 	{
 		if (name.length() > 0)
-			return m_Filter->GetDescription() + " " + name;
+			return GetFilter()->GetDescription() + " " + name;
 		else
-			return m_Filter->GetDescription();
+			return GetFilter()->GetDescription();
 	}
 
 	return name;
@@ -658,9 +658,10 @@ const std::string MatchTable::GetHTMLTop() const
 		ret += "<div style=\"border-style: dashed; border-width: 2px; border-color: #ccc; padding: 0.3cm; margin-bottom: 0.3cm;\">";
 
 	if (!IsSubMatchTable())
-		ret += "<h3>";
+		ret += "<h3><a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
+	else
+		ret += GetDescription();
 
-	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
 	if (GetMatID() != 0)
 		ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName();
 

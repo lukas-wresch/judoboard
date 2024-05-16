@@ -222,8 +222,6 @@ void LoserBracket::GenerateSchedule()
 		infuse = !infuse;//Switch for next round
 	}
 
-
-	//TODO REFACTOR THE FOLLOWING
 	
 	//Add additional match for 3rd place
 	if (IsThirdPlaceMatch() && GetSchedule().size() >= 2)
@@ -254,15 +252,6 @@ MatchTable::Results LoserBracket::CalculateResults() const
 {
 	Results ret;
 
-	if (GetParticipants().size() == 0)
-		return ret;
-
-	if (GetParticipants().size() == 1)
-	{
-		ret.Add(GetParticipants()[0], this);
-		return ret;
-	}
-
 	if (GetSchedule().size() == 0)
 		return ret;
 
@@ -285,8 +274,11 @@ MatchTable::Results LoserBracket::CalculateResults() const
 	if (IsThirdPlaceMatch())
 	{
 		const Match* third_place_match = schedule[schedule.size() - 1];
-		ret.Add(third_place_match->GetWinner(), this);
-		ret.Add(third_place_match->GetLoser(),  this);
+		if (third_place_match->HasConcluded())
+		{
+			ret.Add(third_place_match->GetWinner(), this);
+			ret.Add(third_place_match->GetLoser(), this);
+		}
 	}
 
 	return ret;
@@ -296,12 +288,7 @@ MatchTable::Results LoserBracket::CalculateResults() const
 
 const std::string LoserBracket::ToHTML() const
 {
-	std::string ret;
-
-	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
-
-	if (GetMatID() != 0)
-		ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName() + "<br/>";
+	std::string ret = GetHTMLTop();
 
 	ret += "<table border='1' rules='all'>";
 
@@ -323,11 +310,6 @@ const std::string LoserBracket::ToHTML() const
 		}
 
 		matchIndex += matchOfRound;
-
-		if (IsThirdPlaceMatch() && matchIndex >= GetSchedule().size() - 2)
-			matchIndex++;
-		if (IsFifthPlaceMatch() && matchIndex >= GetSchedule().size() - 5)
-			matchIndex += 3;
 
 		if (IsBestOfThree())
 			matchIndex = matchIndex * 3;
@@ -369,24 +351,26 @@ const std::string LoserBracket::ToHTML() const
 
 			assert(no_matches != 0);
 
-			//const int split = (int)std::pow(2, round+1)
 			const size_t split = N / no_matches;
-			//const int offset = (int)std::pow(2, round) + 1;
 			const size_t offset = split - round;
 
 			if ( (y + offset) % split != 0)
 			{
 				std::string style;
-				if (round == 0 || (y + offset) % split >= 1)
+				if (round == 0)
+					style += "border-left-style: hidden;";
+				else if (infuse)
+					style += "border-left-style: hidden;";
+				else if (!infuse && (y + offset) % split >= round)
 					style += "border-left-style: hidden;";
 				if (round+1 == rounds)
 					style += "border-right-style: hidden;";
 
-#ifdef _DEBUG
-				ret += "<td style=\"" + style + "border-bottom-style: hidden; \">" + std::to_string((y + offset) % split) + "</td>";
-#else
+//#ifdef _DEBUG
+				//ret += "<td style=\"" + style + "border-bottom-style: hidden; \">" + std::to_string((y + offset) % split) + "</td>";
+//#else
 				ret += "<td style=\"" + style + "border-bottom-style: hidden; \"></td>";
-#endif
+//#endif
 				continue;
 			}
 
@@ -400,51 +384,31 @@ const std::string LoserBracket::ToHTML() const
 	ret += "</table>";
 
 
-	/*if (IsThirdPlaceMatch())
+	if (IsThirdPlaceMatch())//3rd or 5th place match
 	{
-		ret += "<table width=\"" + std::to_string(width) + "%\" border='1' rules='all' style=\"margin-bottom: 5mm;\">";
+		ret += "<table width=\"" + std::to_string(width) + "%\" border='1' rules='all' style=\"margin-top: 10mm;\">";
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += "<th>" + Localizer::Translate("3rd Place Match") + "</th>";
+		if (!IsSubMatchTable())
+			ret += "<th>" + Localizer::Translate("3rd Place Match") + "</th>";
+		else
+			ret += "<th>" + Localizer::Translate("5th Place Match") + "</th>";
 		ret += "</tr>";
 
 		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += renderMatchIndex(m_Schedule.size() - 2);
+
+		int matchIndex = (int)GetSchedule().size() - 1;
+
+		if (IsBestOfThree())
+			matchIndex = matchIndex * 3;
+
+		if (matchIndex < GetSchedule().size())
+			ret += RenderMatch(*GetSchedule()[matchIndex]);
+
 		ret += "</tr>";
 
 		ret += "</table>";
 	}
-
-
-	if (IsFifthPlaceMatch())
-	{
-		ret += "<table border='1' rules='all' style=\"margin-bottom: 5mm;\">";
-
-		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += "<th colspan=\"2\" width=\"" + std::to_string(width*2) + "%\">" + Localizer::Translate("5th Place Match") + "</th>";
-		ret += "</tr>";
-
-		int offset = 4;
-		if (IsThirdPlaceMatch())
-			offset = 5;
-
-		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += renderMatchIndex(m_Schedule.size() - offset - 2, "border-left-style: hidden; border-right-style: hidden;");
-		ret += "<td style=\"border-bottom-style: hidden; border-right-style: hidden;\"></td>";
-		ret += "</tr>";
-
-		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += "<td style=\"border-bottom-style: hidden; border-left-style: hidden;\"></td>";
-		ret += renderMatchIndex(m_Schedule.size() - offset, "border-right-style: hidden;");
-		ret += "</tr>";
-
-		ret += "<tr style='height: 5mm; text-align: center'>";
-		ret += renderMatchIndex(m_Schedule.size() - offset - 1, "border-left-style: hidden;");
-		ret += "<td style=\"border-bottom-style: hidden; border-right-style: hidden;\"></td>";
-		ret += "</tr>";
-
-		ret += "</table>";
-	}*/
 
 	if (!IsSubMatchTable())
 		ret += ResultsToHTML();	
