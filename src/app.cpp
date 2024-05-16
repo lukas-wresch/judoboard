@@ -746,7 +746,7 @@ void Application::Run()
 						fopen_s(&file, "results.json", "w");
 						if (file)
 						{
-							fprintf(file, data.dump().c_str());
+							fprintf(file, "%s", data.dump().c_str());
 							fclose(file);
 						}
 

@@ -647,7 +647,7 @@ TEST(DoubleElimination, Count6_Example)
 
 	t->GenerateSchedule();
 	auto& schedule = group->GetSchedule();
-	auto& tournament_schedule = t->GetSchedule();
+	auto tournament_schedule = t->GetSchedule();
 	ASSERT_EQ(tournament_schedule.size(), winner_schedule.size() + loser_schedule.size() - 4);
 
 	EXPECT_FALSE(schedule[1 - 1]->IsEmptyMatch());
