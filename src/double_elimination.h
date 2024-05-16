@@ -30,6 +30,8 @@ namespace Judoboard
 			m_LoserBracket.SetMatID(MatID);
 		}
 
+		virtual Match* FindMatch(const UUID& UUID) const override;
+
 		virtual bool DeleteMatch(const UUID& UUID) override;
 
 		virtual Results CalculateResults() const override;
@@ -64,6 +66,7 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	protected:
+		void BuildSchedule();
 		virtual void DeleteSchedule() override {
 			m_WinnerBracket.DeleteSchedule();
 			m_LoserBracket.DeleteSchedule();

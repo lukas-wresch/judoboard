@@ -47,11 +47,14 @@ DoubleElimination::DoubleElimination(const YAML::Node& Yaml, const ITournament* 
 	if (Yaml["loser_bracket"])
 		m_LoserBracket = LoserBracket(Yaml["loser_bracket"], Tournament, this);
 
+	//Rebuild schedule
+	BuildSchedule();
+
 #ifdef _DEBUG
 	for (auto match : m_WinnerBracket.GetSchedule())
-		assert(match->GetMatchTable() == &m_WinnerBracket);
+		assert(*match->GetMatchTable() == m_WinnerBracket);//someshow it's not connected correctly
 	for (auto match : m_LoserBracket.GetSchedule())
-		assert(match->GetMatchTable() == &m_LoserBracket);
+		assert(*match->GetMatchTable() == m_LoserBracket);
 #endif
 }
 
@@ -62,7 +65,13 @@ void DoubleElimination::operator >> (YAML::Emitter& Yaml) const
 	if (!IsSubMatchTable())
 		Yaml << YAML::BeginMap;
 
+	//Remove schedule so that it doesn't get saved
+	auto temp = GetSchedule();
+	SetSchedule().clear();
+
 	MatchTable::operator >>(Yaml);
+
+	SetSchedule() = std::move(temp);
 
 	Yaml << YAML::Key << "winner_bracket" << YAML::Value;
 	Yaml << YAML::BeginMap;
@@ -105,6 +114,16 @@ size_t DoubleElimination::GetMaxStartPositions() const
 		return 0;
 
 	return m_WinnerBracket.GetMaxStartPositions();
+}
+
+
+
+Match* DoubleElimination::FindMatch(const UUID& UUID) const
+{
+	auto match = m_WinnerBracket.FindMatch(UUID);
+	if (!match)
+		match = m_LoserBracket.FindMatch(UUID);
+	return match;
 }
 
 
@@ -167,6 +186,13 @@ void DoubleElimination::GenerateSchedule()
 
 	m_LoserBracket.GenerateSchedule();
 
+	BuildSchedule();
+}
+
+
+
+void DoubleElimination::BuildSchedule()
+{
 	if (m_WinnerBracket.GetNumberOfRounds() == 3)//8 participants
 	{
 		for (size_t i = 0; i < 4 + 2; i++)
