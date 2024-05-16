@@ -460,7 +460,7 @@ int main(int argc, char** argv)
 	}
 #endif
 
-	ZED::Core::Pause(3000);
+	ZED::Core::Pause(2000);
 
 #ifdef WIN32
 #ifndef _DEBUG
