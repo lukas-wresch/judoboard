@@ -43,6 +43,10 @@ void Localizer::Initialize(Language NewLanguage)
 			s_de["Score"]  = u8"Unterwertung";
 			s_de["Time"]   = u8"Zeit";
 
+			s_de["Version"] = u8"Version";
+			s_de["License"] = u8"Lizenz";
+			s_de["Trial version"] = u8"Testversion";
+
 			s_de["Pause"]  = u8"Pause";
 			s_de["Friendly Match"]  = u8"Freundschaftskampf";
 

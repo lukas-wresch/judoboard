@@ -359,6 +359,26 @@ int main(int argc, char** argv)
 	ZED::Log::Info("Initializing application");
 	Judoboard::Application app(port);
 
+
+	License::Check(&app);
+
+	switch (License::GetLicenseState())
+	{
+	case License::State::FileNotExist:
+		MessageBox(NULL, L"Demo version! The program will close after 30 minutes.", L"Judoboard", MB_OK | MB_ICONINFORMATION);
+		break;
+	case License::State::Expired:
+		MessageBox(NULL, L"License expired!", L"Judoboard", MB_OK | MB_ICONERROR);
+		break;
+	case License::State::Valid:
+		//MessageBox(NULL, L"License valid!", L"Judoboard", MB_OK | MB_ICONINFORMATION);
+		break;
+	}
+
+	//char* user_id = License::GetUserID();
+	//License::Sign(user_id, License::Type::Basic, "2024-12-31", "Lukas");
+
+
 	if (slave)
 	{
 		if (!app.ConnectToMaster(master_ip, master_port))

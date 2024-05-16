@@ -8,6 +8,7 @@
 #include "dmf.h"
 #include "imat.h"
 #include "error.h"
+#include "../external/license/license.h"
 #include "HttpServer/HttpServer.h"
 
 

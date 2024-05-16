@@ -382,6 +382,7 @@ FodyWeavers.xsd
 *.csv
 *.dll
 *.txt
+*.key
 *.zip
 *.testdurations
 
