@@ -5,7 +5,8 @@
 TEST(App, ServerConnection)
 {
 	initialize();
-	Application app(8080 + rand() % 10000);
+	Application app;
+	ASSERT_TRUE(app.StartHttpServer(8080 + rand() % 10000));
 
 	ZED::HttpClient client("127.0.0.1", app.GetPort());
 	ASSERT_TRUE(client.IsConnected());
@@ -876,8 +877,10 @@ TEST(App, VeryLongNameTest)
 TEST(App, MasterSlave)
 {
 	initialize();
-	Application master(8080 + rand() % 10000);
-	Application slave(8080  + rand() % 10000);
+	Application master;
+	Application slave;
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
 
 	EXPECT_TRUE(master.IsMaster());
 	EXPECT_FALSE(master.IsSlave());
@@ -896,8 +899,10 @@ TEST(App, MasterSlave)
 TEST(App, MasterClosesMatOfSlave)
 {
 	initialize();
-	Application master(8080 + rand() % 10000);
-	Application slave(8080  + rand() % 10000);
+	Application master;
+	Application slave;
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
@@ -921,8 +926,10 @@ TEST(App, MasterClosesMatOfSlave)
 TEST(App, MatchOnSlave)
 {
 	initialize();
-	Application master(8080 + rand() % 10000);
-	Application slave( 8080 + rand() % 10000);
+	Application master;
+	Application slave;
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
@@ -968,8 +975,10 @@ TEST(App, MatchOnSlave)
 TEST(App, MasterSlaveForceClose)
 {
 	initialize();
-	Application master(8080 + rand() % 10000);
-	Application slave( 8080 + rand() % 10000);
+	Application master;
+	Application slave;
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
@@ -1031,9 +1040,10 @@ TEST(App, MasterSlaveForceClose)
 TEST(App, MasterSlaveFullTournament)
 {
 	initialize();
-
-	Application master(8080 + rand()%10000);
-	Application slave( 8080 + rand()%10000);
+	Application master;
+	Application slave;
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 

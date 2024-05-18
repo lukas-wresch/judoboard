@@ -9,7 +9,8 @@ TEST(HttpServer, SimpleRequest)
 	//Block server with semi open connections
 
 	int port = rand()%5000 + 2000;
-	Application app(port);
+	Application app;
+	app.StartHttpServer(port);
 
 	ZED::HttpClient client("localhost", port);
 	ASSERT_TRUE(client.IsConnected());
@@ -29,7 +30,8 @@ TEST(HttpServer, MultipleRequests)
 	//Block server with semi open connections
 
 	int port = rand()%5000 + 2000;
-	Application app(port);
+	Application app;
+	app.StartHttpServer(port);
 
 
 	{
@@ -67,7 +69,8 @@ TEST(HttpServer, Block_SemiOpen)
 	//Block server with semi open connections
 
 	int port = rand()%5000 + 2000;
-	Application app(port);
+	Application app;
+	app.StartHttpServer(port);
 
 	std::thread app_thread([&]() {
 		app.Run();

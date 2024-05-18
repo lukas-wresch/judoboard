@@ -387,6 +387,8 @@ bool Mat::EndMatch()
 
 bool Mat::HasConcluded() const
 {
+	auto guard = m_mutex.LockReadForScope();
+
 	if ( (m_State == State::Running || m_State == State::TransitionToMatch) && !m_HajimeTimer.IsRunning())
 	{
 		//Any Hansokumake that has not been decided
@@ -552,10 +554,11 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 
 	if (m_pMatch)
 	{
-		Yaml << YAML::Key << "yuko_enabled" << m_pMatch->GetRuleSet().IsYukoEnabled();
-		Yaml << YAML::Key << "koka_enabled" << m_pMatch->GetRuleSet().IsKokaEnabled();
-		Yaml << YAML::Key << "golden_score_enabled" << m_pMatch->GetRuleSet().IsGoldenScoreEnabled();
-		Yaml << YAML::Key << "draw_enabled" << m_pMatch->GetRuleSet().IsDrawAllowed();
+		auto rules = m_pMatch->GetRuleSet();
+		Yaml << YAML::Key << "yuko_enabled" << rules.IsYukoEnabled();
+		Yaml << YAML::Key << "koka_enabled" << rules.IsKokaEnabled();
+		Yaml << YAML::Key << "golden_score_enabled" << rules.IsGoldenScoreEnabled();
+		Yaml << YAML::Key << "draw_enabled" << rules.IsDrawAllowed();
 	}
 
 	Yaml << YAML::EndMap;
@@ -1036,6 +1039,8 @@ void Mat::RemoveHansokuMake(Fighter Whom)
 
 		AddEvent(Whom, MatchLog::BiasedEvent::RemoveHansokuMake);
 		m_Graphics["effect_hansokumake_" + Fighter2String(Whom)].StopAllAnimations().SetAlpha(0);
+
+		RemoveIppon(!Whom);//Remove the ippon of the other fighter (that he got due to the HansokuMake)
 	}
 }
 
@@ -2719,6 +2724,8 @@ void Mat::AddEvent(Fighter Whom, MatchLog::BiasedEvent NewEvent)
 
 Match::Result Mat::GetResult() const
 {
+	auto guard = m_mutex.LockReadForScope();
+
 	auto time = m_HajimeTimer.GetElapsedTime();
 
 	if (IsGoldenScore() && m_pMatch)

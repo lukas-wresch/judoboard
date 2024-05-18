@@ -21,7 +21,7 @@ bool Application::NoWindow = false;
 
 
 
-Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Timer::GetTimestamp())
+Application::Application() : m_StartupTimestamp(Timer::GetTimestamp())
 {
 	m_TempTournament.EnableAutoSave(false);
 	m_TempTournament.SetDefaultRuleSet(new RuleSet);//Take default rule set as rule set for temporary tournaments
@@ -29,28 +29,37 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 	std::string token = (std::string)ID::GenerateUUID();
 	m_SecurityToken   = token.substr(0, 32);
+}
 
-	if (!m_Server.IsRunning())
+
+
+bool Application::StartHttpServer(uint16_t Port)
+{
+	m_Server.Start(Port);
+
+	if (m_Server.IsRunning())
 	{
-		ZED::Log::Error("Could not start http server!");
-		Shutdown();
-	}
-	else
 		SetupHttpServer();
+		return true;
+	}
+
+	ZED::Log::Error("Could not start http server!");
+	Shutdown();
+	return false;	
 }
 
 
 
 Application::~Application()
 {
+	m_Running = false;
+	m_CurrentTournament = nullptr;
+
 	if (!m_Database.Save("database.yml"))
 		ZED::Log::Error("Could not save database!");
 
 	for (auto mat : m_Mats)
 		delete mat;
-
-	m_Running = false;
-	m_CurrentTournament = nullptr;
 
 	for (auto tournament : m_Tournaments)
 		delete tournament;
@@ -737,7 +746,7 @@ void Application::Run()
 						fopen_s(&file, "results.json", "w");
 						if (file)
 						{
-							fprintf(file, data.dump().c_str());
+							fprintf(file, "%s", data.dump().c_str());
 							fclose(file);
 						}
 

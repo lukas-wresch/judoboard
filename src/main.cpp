@@ -63,7 +63,14 @@ int main(int argc, char** argv)
 {
 	ZED::Log::Open("log.txt");
 
-	int port = 8080;
+	//Log start time
+	auto date = ZED::Core::GetDate();
+	char buffer[128];
+	snprintf(buffer, sizeof(buffer), "Application start at %d.%d.%d at %d:%d:%d",
+		date.day, date.month, date.year, date.hour, date.minute, date.second);
+	ZED::Log::Info(buffer);
+
+	int port = 0;
 	bool show_test_screen = false;
 	bool demo = false;
 	bool nowindow = false;
@@ -83,9 +90,9 @@ int main(int argc, char** argv)
 	{
 		pos = cmd.find(' ', initialPos);
 		if (pos != std::string::npos)
-			commands.push_back(cmd.substr(initialPos, pos - initialPos));
+			commands.emplace_back(cmd.substr(initialPos, pos - initialPos));
 		else//Add the last one
-			commands.push_back(cmd.substr(initialPos, std::min(pos, cmd.size()) - initialPos + 1));
+			commands.emplace_back(cmd.substr(initialPos, std::min(pos, cmd.size()) - initialPos + 1));
 	}
 #else
 	for (int i = 1; i < argc; i++)
@@ -360,7 +367,18 @@ int main(int argc, char** argv)
 
 	
 	ZED::Log::Info("Initializing application");
-	Judoboard::Application app(port);
+	Judoboard::Application app;
+
+	if (!app.LoadDataFromDisk())
+	{
+		ZED::Log::Error("Could not load application data from disk");
+		if (port <= 0)//Port not set via command line
+			port = 8080;
+	}
+	else if (port <= 0)//Port not set via command line
+		port = app.GetDatabase().GetServerPort();
+
+	app.StartHttpServer(port);
 
 	if (slave)
 	{
@@ -383,9 +401,6 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		if (!app.LoadDataFromDisk())
-			ZED::Log::Error("Could not load application data from disk");
-
 		auto monitors = Judoboard::Window::EnumerateMonitors();
 
 		for (uint32_t i = 1; i <= app.GetDatabase().GetMatCount(); i++)

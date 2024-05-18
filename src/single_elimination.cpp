@@ -660,40 +660,35 @@ const std::string SingleElimination::ToHTML() const
 
 
 
-std::string SingleElimination::RenderMatch(const Match& match, std::string style) const
+std::string SingleElimination::RenderMatch(const Match& Match, const std::string& Style) const
 {
-	std::string ret = "<td style=\"" + style + "\">";
+	std::string ret = "<td style=\"" + Style + "\">";
 
-	if (!match.IsEmptyMatch())
-		ret += "<a href='#edit_match.html?id=" + (std::string)match.GetUUID() + "'>";
+	bool is_empty = Match.IsEmptyMatch();
+
+	if (!is_empty)
+		ret += "<a href='#edit_match.html?id=" + (std::string)Match.GetUUID() + "'>";
 
 	//Output name of fighters
-	if (match.GetFighter(Fighter::White))
-		ret += match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
-	//else if (match->HasDependentMatches() || match->GetDependencyTypeOf(Fighter::White))
-	else if ((match.GetDependencyTypeOf(Fighter::White) != DependencyType::None) &&
-		(match.GetDependencyTypeOf(Fighter::White) != DependencyType::BestOfThree))
-		ret += "???";
-	else
-		ret += "- - -";
+	for (auto f = Fighter::White; f <= Fighter::Blue; ++f)
+	{
+		if (Match.GetFighter(f))
+			ret += Match.GetFighter(f)->GetName(NameStyle::GivenName);
+		else if (Match.IsEmptySlot(f))
+			ret += "- - -";
+		else
+			ret += "???";
 
-	ret += " vs. ";
-
-	if (match.GetFighter(Fighter::Blue))
-		ret += match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
-	//else if (match->HasDependentMatches())
-	else if ((match.GetDependencyTypeOf(Fighter::Blue) != DependencyType::None) &&
-		(match.GetDependencyTypeOf(Fighter::Blue) != DependencyType::BestOfThree))
-		ret += "???";
-	else
-		ret += "- - -";
+		if (f == Fighter::White)
+			ret += " vs. ";
+	}
 
 	//Output result
-	if (match.IsRunning())
+	if (Match.IsRunning())
 		ret += "<br/>" + Localizer::Translate("Running");
-	else if (match.HasConcluded() && !match.IsCompletelyEmptyMatch())
-	{
-		const auto& result = match.GetResult();
+	else if (Match.HasConcluded() && !Match.IsEmptyMatch())
+  {
+		const auto& result = Match.GetResult();
 		if (result.m_Winner == Winner::White)
 			ret += "<br/>"   + std::to_string((int)result.m_Score) + ":0";
 		else
@@ -702,9 +697,9 @@ std::string SingleElimination::RenderMatch(const Match& match, std::string style
 		ret += " (" + Timer::TimestampToString(result.m_Time) + ")";
 	}
 
-	if (!match.IsEmptyMatch())
+	if (!is_empty)
 		ret += "</a>";
-	ret += "</a></td>";
+	ret += "</td>";
 
 	return ret;
 };

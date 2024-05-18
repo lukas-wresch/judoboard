@@ -16,7 +16,8 @@ namespace Judoboard
 		LoserBracket(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
 		LoserBracket(const YAML::Node& Yaml, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 		LoserBracket(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
-
+		LoserBracket(const LoserBracket& rhs) = delete;
+		LoserBracket(LoserBracket&& rhs) = delete;
 		void operator =(const LoserBracket& rhs) = delete;
 		void operator =(LoserBracket&& rhs) noexcept {
 			ID::operator=(rhs);
@@ -50,6 +51,8 @@ namespace Judoboard
 				return 2;
 			return (size_t)pow(2, GetNumberOfBaseRounds()) - 2;
 		}
+
+		virtual const std::vector<Match*> GetSchedule() const { return MatchTable::GetSchedule(); }
 
 		virtual Results CalculateResults() const override;
 		virtual void GenerateSchedule() override;

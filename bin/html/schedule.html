@@ -489,7 +489,7 @@ function Update_Schedule()
 
       if (typeof match.white_name !== 'undefined')
       {
-        if (ContainsNonPrintableCharacters(match.white_name))
+        if (!ContainsPrintableCharacters(match.white_name))
           match.white_name = "&nbsp;&nbsp;&nbsp;";
         cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + match.white_uuid + "\">" + match.white_name + "</a>";
       }
@@ -499,7 +499,7 @@ function Update_Schedule()
 
       if (typeof match.blue_name !== 'undefined')
       {
-        if (ContainsNonPrintableCharacters(match.blue_name))
+        if (!ContainsPrintableCharacters(match.blue_name))
           match.blue_name = "&nbsp;&nbsp;&nbsp;";
         cell2.innerHTML = "<a href=\"#judoka_add.html?id=" + match.blue_uuid + "\">" + match.blue_name + "</a>";
       }
@@ -509,7 +509,7 @@ function Update_Schedule()
 
       if (typeof match.match_table !== 'undefined')
       {
-        if (ContainsNonPrintableCharacters(match.match_table_name))
+        if (!ContainsPrintableCharacters(match.match_table_name))
           match.match_table_name = "&nbsp;&nbsp;&nbsp;";
         cell3.innerHTML = "<a href=\"#matchtable_add.html?id="+match.match_table+"\">" + match.match_table_name + "</a>";
       }
