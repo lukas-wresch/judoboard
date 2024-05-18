@@ -8,6 +8,7 @@
 #endif
 
 
+
 namespace Judoboard
 {
 	class License
@@ -27,7 +28,7 @@ namespace Judoboard
 		enum class Type
 		{
 			Unknown = 0,
-			Basic = 1,
+			Basic   = 1,
 			Standard = 2,
 			Professionel = 3
 		};
