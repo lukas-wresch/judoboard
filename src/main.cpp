@@ -362,6 +362,7 @@ int main(int argc, char** argv)
 
 	License::Check(&app);
 
+#ifdef _WIN32
 	switch (License::GetLicenseState())
 	{
 	case License::State::FileNotExist:
@@ -374,9 +375,7 @@ int main(int argc, char** argv)
 		//MessageBox(NULL, L"License valid!", L"Judoboard", MB_OK | MB_ICONINFORMATION);
 		break;
 	}
-
-	//char* user_id = License::GetUserID();
-	//License::Sign(user_id, License::Type::Basic, "2024-12-31", "Lukas");
+#endif
 
 
 	if (slave)
