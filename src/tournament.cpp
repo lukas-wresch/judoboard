@@ -685,7 +685,6 @@ bool Tournament::SaveYAML(const std::string& Filename)
 	for (const auto& match : schedule)
 	{
 		assert(!match->IsEmptyMatch());
-		//assert(!match->IsCompletelyEmptyMatch());
 
 		UUID id = match->GetUUID();
 		bool found = false;
@@ -2575,8 +2574,6 @@ void Tournament::BuildSchedule()
 							i++;
 							done = false;
 						}
-						else
-							int t = 45;
 
 						index++;
 					}
