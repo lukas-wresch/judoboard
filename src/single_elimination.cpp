@@ -436,6 +436,61 @@ void SingleElimination::GenerateSchedule()
 
 
 
+Delivery SingleElimination::GetMatchParcels() const
+{
+	Delivery ret(*this);
+
+	int bo3 = 1;
+	if (IsBestOfThree())
+		bo3 = 3;
+
+	if (GetNumberOfRounds() <= 1)
+	{
+		ret << GetSchedule().size();
+	}
+	else if (GetNumberOfRounds() == 2)
+	{
+		ret << 2*bo3;
+		ret.AddRemainder();
+	}
+	else if (GetNumberOfRounds() == 3)
+	{
+		ret << 4*bo3 << 2*bo3;
+		ret.AddRemainder();
+	}
+	else if (GetNumberOfRounds() == 3)
+	{
+		ret << 8*bo3 + 4*bo3 << 2*bo3;
+		ret.AddRemainder();
+	}
+	else if (GetNumberOfRounds() == 4)
+	{
+		ret << 16*bo3 << 8*bo3 + 4*bo3 << 2*bo3;
+		ret.AddRemainder();
+	}
+	else if (GetNumberOfRounds() == 5)
+	{
+		ret << 32*bo3 << 16*bo3 << 8*bo3 + 4*bo3 << 2*bo3;
+		ret.AddRemainder();
+	}
+	else
+	{
+		int matches = GetMaxStartPositions() / 2;
+		while (matches >= 2)
+		{
+			ret << matches * bo3;
+			matches /= 2;
+		}
+
+		ret.AddRemainder();
+	}
+
+	assert(ret.GetSize() == GetSchedule().size());
+	return ret;
+}
+
+
+
 MatchTable::Results SingleElimination::CalculateResults() const
 {
 	Results ret;

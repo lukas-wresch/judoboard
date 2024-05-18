@@ -5,6 +5,7 @@
 #include "match.h"
 #include "judoka.h"
 #include "filter.h"
+#include "scheduler.h"
 
 
 
@@ -304,7 +305,9 @@ namespace Judoboard
 		virtual bool AddMatch(Match* NewMatch);//Add a match manually to the match table. Use only for manual cases
 
 		virtual const std::vector<Match*> GetSchedule() const { return m_Schedule; }
+		[[deprecated]]
 		virtual uint32_t GetRecommendedNumMatchesBeforeBreak() const { return m_RecommendedNumMatches_Before_Break; }
+		virtual Delivery GetMatchParcels() const = 0;
 
 		virtual const std::string ToHTML() const = 0;
 
