@@ -68,6 +68,8 @@ void Localizer::Initialize(Language NewLanguage)
 			s_de["Default"] = "Standard";
 			s_de["Round"]   = "Runde";
 			s_de["Finals"]  = "Finalrunde";
+			s_de["3rd Place Match"] = "3. Platz";
+			s_de["5th Place Match"] = "5. Platz";
 
 			s_de["Children"] = "Kinder";
 			s_de["Youth"]    = "Jugendliche";

@@ -31,6 +31,7 @@ namespace Judoboard
 		virtual size_t GetMaxStartPositions() const override;
 
 		virtual Results CalculateResults() const override { return m_Finals.CalculateResults(); }
+		virtual size_t ResultsCount() const override  { return m_Finals.ResultsCount(); }
 		virtual void GenerateSchedule() override;
 
 		virtual Match* FindMatch(const UUID& UUID) const override;

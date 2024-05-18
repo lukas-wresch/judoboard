@@ -685,7 +685,6 @@ bool Tournament::SaveYAML(const std::string& Filename)
 	for (const auto& match : schedule)
 	{
 		assert(!match->IsEmptyMatch());
-		assert(!match->IsCompletelyEmptyMatch());
 
 		UUID id = match->GetUUID();
 		bool found = false;
@@ -1563,7 +1562,7 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 
 		matchTable->GenerateSchedule();
 
-		if (old_match_count != matchTable->GetSchedule().size())
+		//if (old_match_count != matchTable->GetSchedule().size())//Problematic with single elimination when creating a table with 3rd place
 			need_to_rebuild = true;//Only rebuild schedule in this case
 	}
 

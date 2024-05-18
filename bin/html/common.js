@@ -249,6 +249,13 @@ function ContainsNonPrintableCharacters(str)
 }
 
 
+function ContainsPrintableCharacters(str)
+{
+  let regex = /^[\x20-\x7E\u00A0]+$/;
+  return regex.test(str);
+}
+
+
 
 function URLEncode(obj)
 {

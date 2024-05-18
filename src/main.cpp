@@ -63,6 +63,13 @@ int main(int argc, char** argv)
 {
 	ZED::Log::Open("log.txt");
 
+	//Log start time
+	auto date = ZED::Core::GetDate();
+	char buffer[128];
+	snprintf(buffer, sizeof(buffer), "Application start at %d.%d.%d at %d:%d:%d",
+		date.day, date.month, date.year, date.hour, date.minute, date.second);
+	ZED::Log::Info(buffer);
+
 	int port = 0;
 	bool show_test_screen = false;
 	bool demo = false;

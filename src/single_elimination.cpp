@@ -664,35 +664,30 @@ std::string SingleElimination::RenderMatch(const Match& Match, const std::string
 {
 	std::string ret = "<td style=\"" + Style + "\">";
 
-	if (!Match.IsEmptyMatch())
+	bool is_empty = Match.IsEmptyMatch();
+
+	if (!is_empty)
 		ret += "<a href='#edit_match.html?id=" + (std::string)Match.GetUUID() + "'>";
 
 	//Output name of fighters
-	if (Match.GetFighter(Fighter::White))
-		ret += Match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
-	//else if (match->HasDependentMatches() || match->GetDependencyTypeOf(Fighter::White))
-	else if ((Match.GetDependencyTypeOf(Fighter::White) != DependencyType::None) &&
-		(Match.GetDependencyTypeOf(Fighter::White) != DependencyType::BestOfThree))
-		ret += "???";
-	else
-		ret += "- - -";
+	for (auto f = Fighter::White; f <= Fighter::Blue; ++f)
+	{
+		if (Match.GetFighter(f))
+			ret += Match.GetFighter(f)->GetName(NameStyle::GivenName);
+		else if (Match.IsEmptySlot(f))
+			ret += "- - -";
+		else
+			ret += "???";
 
-	ret += " vs. ";
-
-	if (Match.GetFighter(Fighter::Blue))
-		ret += Match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
-	//else if (Match->HasDependentMatches())
-	else if ((Match.GetDependencyTypeOf(Fighter::Blue) != DependencyType::None) &&
-		(Match.GetDependencyTypeOf(Fighter::Blue) != DependencyType::BestOfThree))
-		ret += "???";
-	else
-		ret += "- - -";
+		if (f == Fighter::White)
+			ret += " vs. ";
+	}
 
 	//Output result
 	if (Match.IsRunning())
 		ret += "<br/>" + Localizer::Translate("Running");
-	else if (Match.HasConcluded() && !Match.IsCompletelyEmptyMatch())
-	{
+	else if (Match.HasConcluded() && !Match.IsEmptyMatch())
+  {
 		const auto& result = Match.GetResult();
 		if (result.m_Winner == Winner::White)
 			ret += "<br/>"   + std::to_string((int)result.m_Score) + ":0";
@@ -702,9 +697,9 @@ std::string SingleElimination::RenderMatch(const Match& Match, const std::string
 		ret += " (" + Timer::TimestampToString(result.m_Time) + ")";
 	}
 
-	if (!Match.IsEmptyMatch())
+	if (!is_empty)
 		ret += "</a>";
-	ret += "</a></td>";
+	ret += "</td>";
 
 	return ret;
 };
