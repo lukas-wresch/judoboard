@@ -360,18 +360,18 @@ int main(int argc, char** argv)
 	Judoboard::Application app(port);
 
 
-	License::Check(&app);
+	Judoboard::License::Check(&app);
 
 #ifdef _WIN32
-	switch (License::GetLicenseState())
+	switch (Judoboard::License::GetLicenseState())
 	{
-	case License::State::FileNotExist:
+	case Judoboard::License::State::FileNotExist:
 		MessageBox(NULL, L"Demo version! The program will close after 30 minutes.", L"Judoboard", MB_OK | MB_ICONINFORMATION);
 		break;
-	case License::State::Expired:
+	case Judoboard::License::State::Expired:
 		MessageBox(NULL, L"License expired!", L"Judoboard", MB_OK | MB_ICONERROR);
 		break;
-	case License::State::Valid:
+	case Judoboard::License::State::Valid:
 		//MessageBox(NULL, L"License valid!", L"Judoboard", MB_OK | MB_ICONINFORMATION);
 		break;
 	}
