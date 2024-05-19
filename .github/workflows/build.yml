@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: configure
-      run: chmod u+x *.sh && ./dependencies.sh
+      run: chmod u+x *.sh && ./dependencies.sh && rm external/license/license.a && mv external/license/license-x64.a external/license/license.a
     - name: make
       run: ./compile.sh
       
@@ -44,4 +44,4 @@ jobs:
     - name: copy libpng
       run: dir; cd vsprojects; dir; copy packages\libpng.1.6.28.1\build\native\lib\x64\v140\dynamic\Release\libpng16.lib ZED\libpng16.lib
     - name: msbuild
-      run: dir; cd vsprojects; dir; msbuild Judoboard.sln
+      run: dir; cd vsprojects; dir; msbuild Judoboard.sln /p:Configuration=Release

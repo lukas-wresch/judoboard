@@ -7,6 +7,7 @@
 #include "round_robin.h"
 #include "standing_data.h"
 #include "../ZED/include/log.h"
+#include "../ZED/include/http_client.h"
 
 
 
@@ -118,6 +119,16 @@ int main(int argc, char** argv)
 			nowindow = true;
 		else if (*it == "--version")
 			version = true;
+		else if (*it == "--sign")
+		{
+			auto user_id = *(++it);
+			int  type    = ZED::Core::ToInt(*(++it));
+			auto expires = *(++it);
+			auto name    = *(++it);
+
+			Judoboard::License::Sign(user_id.c_str(), (Judoboard::License::Type)type, expires.c_str(), name.c_str());
+			return 0;
+		}
 
 #ifdef _DEBUG
 		else if (*it == "--dummy")//CREATE DUMMY TOURNAMENT
@@ -377,6 +388,57 @@ int main(int argc, char** argv)
 
 	app.StartHttpServer(port);
 
+
+	Judoboard::License::Check(&app);
+
+	bool do_update = false;
+	switch (Judoboard::License::GetLicenseState())
+	{
+	case Judoboard::License::State::FileNotExist:
+#ifdef _WIN32
+		do_update = true;
+		MessageBox(NULL, L"Demo version! The program will close after 30 minutes.", L"Judoboard", MB_OK | MB_ICONINFORMATION);
+#endif
+		break;
+	case Judoboard::License::State::Expired:
+#ifdef _WIN32
+		do_update = true;
+		MessageBox(NULL, L"License expired!", L"Judoboard", MB_OK | MB_ICONERROR);
+#endif
+		break;
+	case Judoboard::License::State::Valid:
+		//do_update = true;
+		//MessageBox(NULL, L"License valid!", L"Judoboard", MB_OK | MB_ICONINFORMATION);
+		break;
+	}
+
+	if (do_update)
+	{
+		std::thread([]() {
+			char url[512];
+			char computer_name[MAX_COMPUTERNAME_LENGTH + 1] = {};
+#ifdef _WIN32
+			GetComputerNameA(computer_name, NULL);
+#endif
+			snprintf(url, sizeof(url), "/judoboard/license.php?id=%s&name=%s", Judoboard::License::GetUserID(), computer_name);
+
+			ZED::HttpClient client("wresch.spdns.eu");
+
+			auto packet = client.GET(url);
+			if (packet.body.length() > 64 && packet.body.length() < 256)
+			{
+				FILE* file = nullptr;
+				fopen_s(&file, "license.key", "wb");
+				if (file)
+				{
+					fwrite(packet.body.c_str(), sizeof(char), packet.body.length(), file);
+					fclose(file);
+				}
+			}
+		}).detach();
+	}
+
+
 	if (slave)
 	{
 		if (!app.ConnectToMaster(master_ip, master_port))
@@ -455,7 +517,7 @@ int main(int argc, char** argv)
 	}
 #endif
 
-	ZED::Core::Pause(3000);
+	ZED::Core::Pause(2000);
 
 #ifdef WIN32
 #ifndef _DEBUG

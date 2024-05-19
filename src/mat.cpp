@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include "../ZED/include/log.h"
+#include "../external/license/license.h"
 
 
 using namespace Judoboard;
@@ -2327,20 +2328,37 @@ bool Mat::Render(double dt) const
 		if (m_Logo)//Render logo
 		{
 			m_Logo->SetSize(renderer.GetWidth() / 1920.0f);
-			renderer.RenderTransformed(*m_Logo, width / 2 - (int)(m_Logo->GetWidth() / 2.0f * m_Logo->GetSizeX()), 50);
+			renderer.RenderTransformed(*m_Logo, width/2 - (int)(m_Logo->GetWidth()/2.0f * m_Logo->GetSizeX()), 50);
 		}
 
 		auto name = renderer.RenderFont(ZED::FontSize::Gigantic, GetName(), ZED::Color(0, 0, 0));
 		if (name)
-			renderer.RenderTransformed(name, width / 2 - name->GetWidth() / 2, height / 2);
+			renderer.RenderTransformed(name, width/2 - name->GetWidth()/2, height/2);
 
 		auto appname = renderer.RenderFont(ZED::FontSize::Middle, Application::Name, ZED::Color(0, 0, 0));
 		if (appname)
 			renderer.RenderTransformed(appname, 30, height - 120);
 
-		auto version = renderer.RenderFont(ZED::FontSize::Middle, "Version: " + Application::Version, ZED::Color(0, 0, 0));
+		auto version = renderer.RenderFont(ZED::FontSize::Middle, Localizer::Translate("Version") + std::string(": ") + Application::Version, ZED::Color(0, 0, 0));
 		if (version)
 			renderer.RenderTransformed(version, 30, height - 70);
+
+		if (License::GetLicenseState() == License::State::Valid)
+		{
+			auto license = renderer.RenderFont(ZED::FontSize::Middle, Localizer::Translate("License") + std::string(":"), ZED::Color(0, 0, 0));
+			if (license)
+				renderer.RenderTransformed(license, width/2 - license->GetWidth()/2, height - 120);
+
+			auto license_key = renderer.RenderFont(ZED::FontSize::Middle, License::GetUserID(), ZED::Color(0, 0, 0));
+			if (license_key)
+				renderer.RenderTransformed(license_key, width/2 - license_key->GetWidth()/2, height - 70);
+		}
+		else
+		{
+			auto trial = renderer.RenderFont(ZED::FontSize::Middle, Localizer::Translate("Trial version"), ZED::Color(0, 0, 0));
+			if (trial)
+				renderer.RenderTransformed(trial, width/2 - trial->GetWidth()/2, height - 120);
+		}
 
 		auto date = ZED::Core::GetDate();
 

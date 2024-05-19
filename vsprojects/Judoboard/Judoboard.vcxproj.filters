@@ -302,6 +302,9 @@
     <ClInclude Include="..\..\src\scheduler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\external\license\license.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\compile.sh">

@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: configure
-      run: chmod u+x *.sh && ./dependencies.sh && XDG_RUNTIME_DIR=. && sudo apt-get install gdb
+      run: chmod u+x *.sh && ./dependencies.sh && XDG_RUNTIME_DIR=. && sudo apt-get install gdb  && rm external/license/license.a && mv external/license/license-x64.a external/license/license.a
     - name: make
       run: ./compile.sh
     - name: run tests
@@ -57,5 +57,5 @@ jobs:
       run: dir; .\compile.bat
     - name: Run Tests
       run: dir; cd bin; dir; .\GoogleTest.exe --gtest_filter=Matnothing
-    - name: Debug Tests
-      run: dir; cd bin; dir; .\GoogleTest_Debug.exe --gtest_filter=Matnothing
+    #- name: Debug Tests
+      #run: dir; cd bin; dir; .\GoogleTest_Debug.exe --gtest_filter=Matnothing
