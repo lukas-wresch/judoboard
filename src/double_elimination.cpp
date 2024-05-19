@@ -191,6 +191,29 @@ void DoubleElimination::GenerateSchedule()
 
 
 
+Delivery DoubleElimination::GetMatchParcels() const
+{
+	Delivery ret(*this);
+
+	auto winner_parcels = m_WinnerBracket.GetMatchParcels();
+	auto loser_parcels  = m_LoserBracket.GetMatchParcels();
+
+	//Intermix them
+	bool added = false;
+	do
+	{
+		if (ret << winner_parcels)
+			added = true;//On success
+		if (ret << loser_parcels)
+			added = true;//On success
+	}  while (added);
+
+	assert(ret.GetSize() == GetSchedule().size());
+	return ret;
+}
+
+
+
 void DoubleElimination::BuildSchedule()
 {
 	if (m_WinnerBracket.GetNumberOfRounds() == 3)//8 participants

@@ -29,6 +29,8 @@ namespace Judoboard
 		virtual size_t ResultsCount() const override { return GetParticipants().size(); }
 		virtual void GenerateSchedule() override;
 
+		virtual Delivery GetMatchParcels() const override;
+
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
 		virtual const std::string ToHTML() const override;

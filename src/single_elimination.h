@@ -79,6 +79,8 @@ namespace Judoboard
 		}
 		virtual void GenerateSchedule() override;
 
+		virtual Delivery GetMatchParcels() const override;
+
 		virtual bool AddMatch(Match* NewMatch) override;
 
 		bool IsThirdPlaceMatch() const { return m_ThirdPlaceMatch; }

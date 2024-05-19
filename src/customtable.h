@@ -20,6 +20,8 @@ namespace Judoboard
 
 		virtual void GenerateSchedule() override {}
 
+		virtual Delivery GetMatchParcels() const override;
+
 		virtual Results CalculateResults() const override {
 			Results ret;
 			return ret;

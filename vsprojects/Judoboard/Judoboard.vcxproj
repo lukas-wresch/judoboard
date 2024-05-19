@@ -140,7 +140,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -207,6 +207,7 @@
     <ClCompile Include="..\..\src\reverser.cpp" />
     <ClCompile Include="..\..\src\round_robin.cpp" />
     <ClCompile Include="..\..\src\rule_set.cpp" />
+    <ClCompile Include="..\..\src\scheduler.cpp" />
     <ClCompile Include="..\..\src\single_elimination.cpp" />
     <ClCompile Include="..\..\src\splitter.cpp" />
     <ClCompile Include="..\..\src\standing_data.cpp" />
@@ -260,6 +261,7 @@
     <ClInclude Include="..\..\src\reverser.h" />
     <ClInclude Include="..\..\src\round_robin.h" />
     <ClInclude Include="..\..\src\rule_set.h" />
+    <ClInclude Include="..\..\src\scheduler.h" />
     <ClInclude Include="..\..\src\schedule_entry.h" />
     <ClInclude Include="..\..\src\single_elimination.h" />
     <ClInclude Include="..\..\src\splitter.h" />

@@ -156,6 +156,9 @@
     <ClCompile Include="..\..\src\loser_bracket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\scheduler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\window.h">
@@ -295,6 +298,9 @@
     </ClInclude>
     <ClInclude Include="..\..\external\mongoose\mongoose.h">
       <Filter>HttpServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scheduler.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\external\license\license.h">
       <Filter>Header Files</Filter>

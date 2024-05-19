@@ -28,6 +28,15 @@ std::string CustomTable::GetHTMLForm()
 
 
 
+Delivery CustomTable::GetMatchParcels() const
+{
+	Delivery ret(*this);
+	ret.AddRemainder();
+	return ret;
+}
+
+
+
 void CustomTable::operator >> (YAML::Emitter& Yaml) const
 {
 	if (!IsSubMatchTable())

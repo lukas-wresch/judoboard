@@ -196,6 +196,60 @@ void RoundRobin::operator >> (YAML::Emitter& Yaml) const
 
 
 
+Delivery RoundRobin::GetMatchParcels() const
+{
+	Delivery ret(*this);
+
+	int bo3 = 1;
+	if (IsBestOfThree())
+		bo3 = 3;
+
+	if (GetParticipants().size() == 2)
+		ret << bo3;
+	else if (GetParticipants().size() == 3)
+	{
+		ret << bo3 << bo3 << bo3;
+	}
+
+	else if (GetParticipants().size() == 4)
+	{
+		ret << 2*bo3 << 2*bo3 << 2*bo3;
+	}
+
+	else if (GetParticipants().size() == 5)
+	{
+		ret << 2*bo3 << 2*bo3 << 2*bo3 << 2*bo3 << 2*bo3;
+	}
+
+	else if (GetParticipants().size() == 6)
+	{
+		ret << 3*bo3 << 2*bo3 << 2*bo3 << 3*bo3 << 3*bo3 << 2*bo3;
+	}
+
+	else
+	{
+		auto count = GetSchedule().size();
+		while (count > 0)
+		{
+			if (count >= 3*bo3)
+			{
+				ret   << 3*bo3;
+				count -= 3*bo3;
+			}
+			else
+			{
+				ret << count;
+				break;
+			}
+		}
+	}
+
+	assert(ret.GetSize() == GetSchedule().size());
+	return ret;
+}
+
+
+
 const std::string RoundRobin::ToHTML() const
 {
 	std::string ret = GetHTMLTop();
