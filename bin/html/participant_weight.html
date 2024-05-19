@@ -21,14 +21,29 @@
 
 function WeighParticipant(id)
 {
-  let weight = document.getElementById(id).value;  
-    
+  let weight = document.getElementById(id).value;
+
+  let weight_upload = localStorage.getItem("weight_upload");
+  if (typeof weight_upload != 'string')
+  {
+    weight_upload = {};
+    weight_upload[id] = weight;
+  }
+  else
+  {
+    weight_upload = JSON.parse(weight_upload);
+    weight_upload[id] = weight;
+  }
+  localStorage.setItem('weight_upload', JSON.stringify(weight_upload));
+  
+  document.getElementById("weight_" + id).parentElement.style.backgroundColor = "#ff0";
+  document.getElementById(id).value = "";
+  document.getElementById("button_" + id).disabled  = true;
+  document.getElementById("weight_" + id).innerHTML = weight + " kg";
+
   AjaxCallback('ajax/participant/weight/update?id=' + id + "&weight=" + weight, function(resp) {
     if (resp == "ok")
     {
-      document.getElementById(id).value = "";
-      document.getElementById("button_" + id).disabled  = true;
-      document.getElementById("weight_" + id).innerHTML = weight + " kg";
       document.getElementById("weight_" + id).parentElement.style.backgroundColor = "#0b0";
     }
   });

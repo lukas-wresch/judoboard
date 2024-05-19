@@ -190,6 +190,7 @@ var lang_en = {
     upload_md5_file: [ "Upload MD5 File", "MD5 Datei hochladen" ],
     user:  [ "User", "Benutzer" ],
     username:  [ "Username", "Benutzername" ],
+    update:  [ "Update", "&Auml;ndern" ],
     update_rule_set:  [ "Update Rule Set", "&Auml;ndere Regelwerk" ],
     update_tournament:  [ "Update Tournament", "&Auml;ndere Turnier" ],
     update_account:  [ "Update Account", "Benutzerkonto &auml;ndern" ],
