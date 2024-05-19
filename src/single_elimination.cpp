@@ -458,24 +458,24 @@ Delivery SingleElimination::GetMatchParcels() const
 		ret << 4*bo3 << 2*bo3;
 		ret.AddRemainder();
 	}
-	else if (GetNumberOfRounds() == 3)
+	else if (GetNumberOfRounds() == 4)
 	{
 		ret << 8*bo3 + 4*bo3 << 2*bo3;
 		ret.AddRemainder();
 	}
-	else if (GetNumberOfRounds() == 4)
+	else if (GetNumberOfRounds() == 5)
 	{
 		ret << 16*bo3 << 8*bo3 + 4*bo3 << 2*bo3;
 		ret.AddRemainder();
 	}
-	else if (GetNumberOfRounds() == 5)
+	else if (GetNumberOfRounds() == 6)
 	{
 		ret << 32*bo3 << 16*bo3 << 8*bo3 + 4*bo3 << 2*bo3;
 		ret.AddRemainder();
 	}
 	else
 	{
-		int matches = GetMaxStartPositions() / 2;
+		size_t matches = GetMaxStartPositions() / 2;
 		while (matches >= 2)
 		{
 			ret << matches * bo3;
