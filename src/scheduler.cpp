@@ -6,6 +6,46 @@ using namespace Judoboard;
 
 
 
+MatchParcel::MatchParcel(const MatchTable& Table, size_t Count)
+	: m_Table(Table)
+{
+	auto schedule = Table.GetSchedule();
+	for (auto match : schedule)
+	{
+		m_Matches.emplace_back(match);
+		m_Count++;
+		if (m_Count >= Count)
+			break;
+	}
+	m_StartIndex = m_Count;
+}
+
+
+
+void MatchParcel::operator << (size_t Count)
+{
+	auto schedule = m_Table.GetSchedule();
+	for (size_t i = 0; i < Count; ++i)
+	{
+		assert(schedule[m_StartIndex + i]);
+		m_Matches.emplace_back(schedule[m_StartIndex + i]);
+	}
+
+	m_StartIndex += Count;
+	m_Count      += Count;
+}
+
+
+
+void MatchParcel::operator += (MatchParcel& rhs)
+{
+	assert(m_Table == rhs.m_Table);
+	assert(m_StartIndex + m_Count == rhs.m_StartIndex);
+	m_StartIndex += rhs.m_Count;
+}
+
+
+
 MatchParcel MatchParcel::Split()
 {
 	MatchParcel ret(m_Table, m_StartIndex, m_Count/2);
@@ -21,16 +61,7 @@ MatchParcel MatchParcel::Split()
 
 
 
-void MatchParcel::operator += (MatchParcel& rhs)
-{
-	assert(m_Table == rhs.m_Table);
-	assert(m_StartIndex + m_Count == rhs.m_StartIndex);
-	m_StartIndex += rhs.m_Count;
-}
-
-
-
-Delivery Delivery::AddRemainder()
+Delivery& Delivery::AddRemainder()
 {
 	return Append(m_Table.GetSchedule().size() - GetSize());
 }
