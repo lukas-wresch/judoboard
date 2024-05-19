@@ -285,7 +285,9 @@ namespace Judoboard
 		static MatchTable* CreateMatchTable(const YAML::Node& Yaml, const ITournament* Tournament);
 
 		virtual ~MatchTable() {
-			DeleteSchedule();
+			if (!IsSubMatchTable())
+				for (auto match : m_Schedule)
+					delete match;
 		}
 
 		virtual Type GetType() const { return Type::Unknown; }
@@ -297,6 +299,7 @@ namespace Judoboard
 		virtual Status GetStatus() const;
 
 		virtual Results CalculateResults() const = 0;
+		virtual size_t  ResultsCount() const = 0;//Returns the number of results that this match table will output
 
 		virtual bool AddMatch(Match* NewMatch);//Add a match manually to the match table. Use only for manual cases
 
@@ -307,6 +310,8 @@ namespace Judoboard
 
 		virtual bool AddParticipant(Judoka* NewParticipant, bool Force = false);
 		virtual bool RemoveParticipant(const Judoka* Participant);
+
+		virtual bool DeleteMatch(const UUID& UUID);
 
 		//Basics
 		const Match* GetMatch(size_t Index) const { if (Index >= m_Schedule.size()) return nullptr; return m_Schedule[Index]; }
@@ -375,6 +380,7 @@ namespace Judoboard
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual void ToString(YAML::Emitter& Yaml) const;
+		virtual void operator >>(nlohmann::json& Json) const;
 
 		//Events
 		virtual void OnLotteryPerformed();//Called when a lottery draw was performed

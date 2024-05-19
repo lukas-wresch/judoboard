@@ -114,7 +114,13 @@ namespace ZED
 			New.data = nullptr;
 		}*/
 
-		void Reset(T* NewReference = nullptr)\
+		void Delete()
+		{
+			delete data;
+			data = nullptr;
+		}
+
+		void Reset(T* NewReference = nullptr)
 		{
 			data = NewReference;
 		}

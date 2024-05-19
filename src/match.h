@@ -36,18 +36,18 @@ namespace Judoboard
 			Result(Winner Winner, Score Score, uint32_t Time = 0)
 			{
 				m_Winner = Winner;
-				m_Score  = Score;
-				m_Time   = Time;
+				m_Score = Score;
+				m_Time = Time;
 			}
 			Result(Fighter Winner, Score Score, uint32_t Time = 0)
 			{
 				m_Winner = Fighter2Winner(Winner);
-				m_Score  = Score;
-				m_Time   = Time;
+				m_Score = Score;
+				m_Time = Time;
 			}
 
 			Winner m_Winner = Winner::Draw;
-			Score  m_Score  = Score::Draw;
+			Score  m_Score = Score::Draw;
 			uint32_t m_Time = 0;//Match time in milliseconds
 		};
 
@@ -96,9 +96,9 @@ namespace Judoboard
 				struct
 				{
 					bool finals : 1;
-					bool semi   : 1;
-					bool third  : 1;
-					bool fifth  : 1;
+					bool semi : 1;
+					bool third : 1;
+					bool fifth : 1;
 					bool reserved1 : 1;
 					bool reserved2 : 1;
 					bool reserved3 : 1;
@@ -124,7 +124,7 @@ namespace Judoboard
 		MatchLog& GetLog() { return m_Log; }
 		const MatchLog& GetLog() const { return m_Log; }
 
-		void StartMatch() { m_State = Status::Running; }
+		void StartMatch();
 		void EndMatch();
 
 		const MatchTable* GetMatchTable() const { return m_Table; }
@@ -139,7 +139,7 @@ namespace Judoboard
 			if (Fighter == Fighter::White)
 				m_White.m_Judoka = NewFighter;
 			else
-				m_Blue.m_Judoka  = NewFighter;
+				m_Blue.m_Judoka = NewFighter;
 		}
 		void SwapFighters();
 		[[nodiscard]] std::vector<const Judoka*> GetPotentialFighters() const;
@@ -170,8 +170,8 @@ namespace Judoboard
 				return GetFighter(Fighter::Blue);
 			return nullptr;
 		}
+		bool IsEmptySlot(Fighter Fighter) const;
 		bool IsEmptyMatch() const;
-		bool IsCompletelyEmptyMatch() const;
 		const std::vector<const Match*> GetDependentMatches() const;//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
 		auto GetDependencyTypeOf(Fighter Fighter) const {
 			if (Fighter == Fighter::White)
@@ -194,6 +194,8 @@ namespace Judoboard
 
 		uint32_t GetCurrentBreaktime() const;
 
+		const ITournament* GetTournament() const { return m_Tournament; }
+
 		bool IsBestOfThree() const { return m_White.m_Type == DependencyType::BestOfThree; }
 
 		Tag  GetTag() const { return m_Tag; }
@@ -203,16 +205,17 @@ namespace Judoboard
 		void ToString(YAML::Emitter& Yaml) const;
 
 		void operator >>(YAML::Emitter& Yaml) const;
+		void operator >>(nlohmann::json& Json) const;
 
 		bool operator ==(const Match& rhs) const {
 			return GetUUID() == rhs.GetUUID();
 		}
 
 	private:
-		const ITournament* GetTournament() const { return m_Tournament; }
-
-		void SetState(Status NewState) { m_State = NewState; }
+		bool IsCompletelyEmptyMatch() const { return IsEmptySlot(Fighter::White) && IsEmptySlot(Fighter::Blue); }
 		void SetResult(const Result& Result) { m_Result = Result; SetState(Status::Concluded); }
+		void SetState(Status NewState) { m_State = NewState; }
+		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
 
 		void SetLog(const MatchLog& NewLog) {
 			m_Log.m_Mutex.lock();

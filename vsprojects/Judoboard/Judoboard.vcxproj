@@ -161,6 +161,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -223,6 +224,7 @@
     <ClCompile Include="..\..\src\window_win.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\external\mongoose\mongoose.h" />
     <ClInclude Include="..\..\src\account.h" />
     <ClInclude Include="..\..\src\age_group.h" />
     <ClInclude Include="..\..\src\app.h" />
@@ -308,6 +310,7 @@
     <None Include="..\..\bin\html\style.css" />
     <None Include="..\..\bin\html\tournament_add.html" />
     <None Include="..\..\bin\html\tournament_list.html" />
+    <None Include="..\..\bin\html\tournament_settings.html" />
     <None Include="..\..\compile.bat" />
     <None Include="..\..\compile.sh" />
     <None Include="..\..\compile64.bat" />

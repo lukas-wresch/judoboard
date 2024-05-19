@@ -25,9 +25,8 @@ Match::Match(const Judoka* White, const Judoka* Blue, const ITournament* Tournam
 
 
 Match::Match(const DependentJudoka& White, const DependentJudoka& Blue, const ITournament* Tournament, uint32_t MatID)
+	: m_White(White), m_Blue(Blue)
 {
-	m_White = White;
-	m_Blue  = Blue;
 	SetMatID(MatID);
 }
 
@@ -188,11 +187,59 @@ void Match::operator >>(YAML::Emitter& Yaml) const
 
 
 
+void Match::operator >>(nlohmann::json& Json) const
+{
+	Json["uuid"] = (std::string)GetUUID();
+
+	Json["mat_id"] = GetMatID();
+
+	if (GetFighter(Fighter::White))
+		Json["white"] = (std::string)GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+	else
+		Json["white"] = "???";
+	if (GetFighter(Fighter::Blue))
+		Json["blue"]  = (std::string)GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+	else
+		Json["blue"] = "???";
+
+	Json["state"] = (int)m_State;
+
+	if (HasConcluded())
+	{
+		Json["winner"] = (int)m_Result.m_Winner;
+		Json["score"]  = (int)m_Result.m_Score;
+		Json["time"]   = m_Result.m_Time;
+	}
+	else
+	{
+		Json["winner"] = 0;
+		Json["score"]  = 0;
+		Json["time"]   = 0;
+	}
+
+	if (m_Table)
+		Json["match_table"] = m_Table->GetDescription();
+	else
+		Json["match_table"] = "- - -";
+
+	if (!m_Tag.IsNormal())
+		Json["tag"] = (uint32_t)m_Tag.value;
+	else
+		Json["tag"] = 0;
+
+	if (IsRunning())
+	{
+		//Export current state
+	}
+}
+
+
+
 void Match::ToString(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::BeginMap;
 
-	Yaml << YAML::Key << "uuid" << YAML::Value << (std::string)GetUUID();
+	Yaml << YAML::Key << "uuid"              << YAML::Value << (std::string)GetUUID();
 	Yaml << YAML::Key << "current_breaktime" << YAML::Value << GetCurrentBreaktime();
 	Yaml << YAML::Key << "breaktime"         << YAML::Value << GetRuleSet().GetBreakTime();
 
@@ -485,9 +532,6 @@ const Judoka* Match::GetEnemyOf(const Judoka& Judoka) const
 
 const Judoka* Match::GetWinner() const
 {
-	if (IsCompletelyEmptyMatch())
-		return nullptr;
-
 	if (IsEmptyMatch())
 	{
 		if (GetFighter(Fighter::White))
@@ -527,6 +571,13 @@ const Judoka* Match::GetWinner() const
 
 const Judoka* Match::GetLoser() const
 {
+	if (IsEmptyMatch())
+	{
+		if (GetFighter(Fighter::White))
+			return GetFighter(Fighter::Blue);
+		return GetFighter(Fighter::White);
+	}
+
 	if (!HasConcluded())
 		return nullptr;
 
@@ -612,39 +663,47 @@ const std::vector<const Match*> Match::GetDependentMatches() const
 
 bool Match::IsEmptyMatch() const
 {
-	if (m_White.m_DependentMatchTable && m_Blue.m_DependentMatchTable)
-		return false;
-	if (m_White.m_DependentMatchTable)
-		return !GetFighter(Fighter::Blue);
-	if (m_Blue.m_DependentMatchTable)
-		return !GetFighter(Fighter::White);
-
-	/*if (m_White.m_DependentMatchTable && !m_White.m_DependentMatchTable->HasConcluded())
-		return !GetFighter(Fighter::Blue);
-	if (m_Blue.m_DependentMatchTable  && !m_Blue.m_DependentMatchTable->HasConcluded())
-		return !GetFighter(Fighter::White);*/
-
-	if (m_White.m_DependentMatch)
-		return m_White.m_DependentMatch->IsCompletelyEmptyMatch();
-	if (m_Blue.m_DependentMatch)
-		return m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
-
-	return !GetFighter(Fighter::White) || !GetFighter(Fighter::Blue);
+	return IsEmptySlot(Fighter::White) || IsEmptySlot(Fighter::Blue);
 }
 
 
 
-bool Match::IsCompletelyEmptyMatch() const
+bool Match::IsEmptySlot(Fighter Fighter) const
 {
-	if (m_White.m_DependentMatchTable && !m_White.m_DependentMatchTable->HasConcluded())
-		return false;
-	if (m_Blue.m_DependentMatchTable  && !m_Blue.m_DependentMatchTable->HasConcluded())
-		return false;
+	const DependentJudoka* j = nullptr;
+	if (Fighter == Fighter::White)
+		j = &m_White;
+	else
+		j = &m_Blue;
 
-	if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
-		return m_White.m_DependentMatch->IsCompletelyEmptyMatch() && m_Blue.m_DependentMatch->IsCompletelyEmptyMatch();
 
-	return !GetFighter(Fighter::White) && !GetFighter(Fighter::Blue);
+	if (j->m_DependentMatchTable)
+	{
+		int index = (int)j->m_Type - (int)DependencyType::TakeRank1;
+		return !(index < j->m_DependentMatchTable->ResultsCount());
+	}
+
+
+	else if (j->m_DependentMatch)
+	{
+		if (j->m_Type == DependencyType::BestOfThree)
+		{
+			//Take the first match (stored in m_White) since is has the same colors
+			if (Fighter == Fighter::White)
+				return m_White.m_DependentMatch->IsEmptySlot(Fighter);
+			return m_Blue.m_DependentMatch->IsEmptySlot(Fighter);
+		}
+
+		else if (j->m_Type == DependencyType::TakeWinner)
+			return j->m_DependentMatch->IsCompletelyEmptyMatch();
+
+		else if (j->m_Type == DependencyType::TakeLoser)
+			return j->m_DependentMatch->IsEmptyMatch();
+
+		assert(false);
+	}
+
+	return !j->m_Judoka;
 }
 
 
@@ -679,6 +738,15 @@ uint32_t Match::GetCurrentBreaktime() const
 		return breakW;
 
 	return std::min(breakW, breakB);
+}
+
+
+
+void Match::StartMatch()
+{
+	m_State = Status::Running;
+	if (GetTournament())
+		GetTournament()->OnMatchStarted(*this);
 }
 
 

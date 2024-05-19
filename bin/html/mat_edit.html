@@ -3,7 +3,7 @@
 <form>
 
 <div>
-  <label id="label_id" style="width:250px;float:left;margin-top:5px;">No.</label>
+  <label id="label_no" style="width:250px;float:left;margin-top:5px;"></label>
   <select style="padding-top:5px;margin-bottom:20px;width: 1.5cm;" id="id">
   </select>
 </div>
@@ -11,6 +11,20 @@
 <div>
   <label style="width:250px;float:left; margin-top:4px;" id="label_name">Name</label>
   <input style="margin-bottom:20px;" type="text" id="name" value="" size="30" maxlength="64"/>
+</div>
+
+<div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_fullscreen"></label>
+  <input type="checkbox" id="mat_fullscreen" class="switch-input">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="mat_fullscreen">
+    <span class="toggle-on" id="fullscreen_enabled"></span><span class="toggle-off" for="mat_fullscreen" id="fullscreen_disabled"></span>
+  </label>
+</div>
+
+<div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_monitor"></label>
+  <select style="margin-bottom:20px;" id="monitor">
+  </select>
 </div>
 
 <div>
@@ -63,6 +77,13 @@
   <button class="neutral" style="margin-left: 0.8cm;" onclick="return PlaySound()" id="play_sound">Play Sound</button>
 </div>
 
+<div>
+  <label style="width:250px;float:left;margin-top:4px;" id="label_audio_device"></label>
+  <select style="margin-bottom:20px;" id="audio_device">
+  <option value="-1" style="font-weight: bold;" id="default"></option>
+  </select>
+</div>
+
 <button class="neutral" style="margin-top: 0.8cm;" onclick="return UpdateMat()" id="update">Update Mat</button>
 
 </form>
@@ -92,7 +113,7 @@ function CloseMat()
 
 function PlaySound()
 {
-  AjaxCallback('/ajax/config/play_sound_file?id=' + id + '&filename=' + document.getElementById("sound_filename").value);
+  AjaxCallback('/ajax/config/play_sound_file?id=' + id + '&filename=' + document.getElementById("sound_filename").value + '&sound_device=' + document.getElementById("audio_device").value);
   return false;
 }
 
@@ -101,12 +122,15 @@ function UpdateMat()
 {
   let params = URLEncode({
     id:              document.getElementById("id").value,
+    fullscreen:      document.getElementById("mat_fullscreen").checked,
+    monitor:         document.getElementById("monitor").value,
     name:            document.getElementById("name").value,
     ipponStyle:      document.getElementById("ipponStyle").value,
     osaekomiStyle:   document.getElementById("osaekomiStyle").value,
     timerStyle:      document.getElementById("timerStyle").value,
     sound:           document.getElementById("sound").checked,
     sound_filename:  document.getElementById("sound_filename").value,
+    sound_device:    document.getElementById("audio_device").value,    
     nameStyle:   document.getElementById("nameStyle").value,
   });
 
@@ -123,18 +147,43 @@ function GetMat(id)
 {
   AjaxCallback("ajax/config/get_mats", function(response) {
     console.log(response);
-    let res = YAML.parse(response);
+    const res = YAML.parse(response);
+
+    while (document.getElementById("monitor").length > 0)
+      document.getElementById("monitor").remove(document.getElementById("monitor").length-1);
+    while (document.getElementById("audio_device").length > 1)
+      document.getElementById("audio_device").remove(document.getElementById("audio_device").length-1);
+
+    for (const monitor of res.monitors)
+    {
+      let option = document.createElement("option");
+      option.text  = translate('monitor') + ' ' + (monitor.index+1) + ' (' + monitor.width + 'x' + monitor.height + ')';
+      option.value = monitor.index;
+      document.getElementById("monitor").add(option);
+    }
+
+    for (const device of res.audio_devices)
+    {
+      let option = document.createElement("option");
+      option.text  = device.name;
+      option.value = device.index;
+      document.getElementById("audio_device").add(option);
+    }
 
     for (const mat of res.mats)
     {
       if (id == mat.id)
       {
         document.getElementById("name").value = mat.name;
+        document.getElementById("mat_fullscreen").checked = mat.is_fullscreen;
+        document.getElementById("monitor").value          = mat.monitor;
+
         document.getElementById("ipponStyle").value    = mat.ippon_style;
         document.getElementById("osaekomiStyle").value = mat.osaekomi_style;
-        document.getElementById("timerStyle").value = mat.timer_style;
-        document.getElementById("nameStyle").value  = mat.name_style;
-        document.getElementById("sound").checked    = mat.sound_enabled;
+        document.getElementById("timerStyle").value    = mat.timer_style;
+        document.getElementById("nameStyle").value     = mat.name_style;
+
+        document.getElementById("sound").checked        = mat.sound_enabled;
         document.getElementById("sound_filename").value = mat.sound_filename;
       }
     }
@@ -153,9 +202,12 @@ function GetMat(id)
 
 
 
-var id = URLDecode(URL, "id");
+let id = URLDecode(URL, "id");
 
 AjaxCallback("ajax/config/list_sound_files", function(response) {
+  while (document.getElementById("sound_filename").length > 0)
+      document.getElementById("sound_filename").remove(document.getElementById("sound_filename").length-1);
+
   console.log(response);
   const res = YAML.parse(response);
 
@@ -170,10 +222,21 @@ AjaxCallback("ajax/config/list_sound_files", function(response) {
   GetMat(id);
 });
 
+document.getElementById("label_no").innerHTML = translate('no');
+
+document.getElementById("label_fullscreen").innerHTML = translate('fullscreen');
+document.getElementById("fullscreen_enabled").innerHTML = translate('enabled');
+document.getElementById("fullscreen_disabled").innerHTML = translate('disabled');
+
+document.getElementById("label_monitor").innerHTML = translate('monitor');
+
 document.getElementById("sound_enabled").innerHTML  = translate('enabled');
 document.getElementById("sound_disabled").innerHTML = translate('disabled');
 
 document.getElementById("progressbar").innerHTML     = translate('progressbar');
 document.getElementById("fixed_at_bottom").innerHTML = translate('fixed_at_bottom');
+
+document.getElementById("label_audio_device").innerHTML = translate('audio_device');
+document.getElementById("default").innerHTML = translate('default');
 
 </script>

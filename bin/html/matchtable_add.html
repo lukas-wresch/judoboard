@@ -110,15 +110,16 @@ function GetFilterForm(callback)
   AjaxCallback('ajax/filter/get_form?type=' + document.getElementById("type").value, function(response) {
     document.getElementById("form_filter").innerHTML = response;
     
-    document.getElementById("label_min_weight").innerHTML = translate('min_weight');
-    document.getElementById("label_max_weight").innerHTML = translate('max_weight');
-    document.getElementById("label_gender").innerHTML     = translate('gender');
-    document.getElementById("all").innerHTML    = translate('all');
-    document.getElementById("male").innerHTML   = translate('male');
-    document.getElementById("female").innerHTML = translate('female');
-    
     if (g_yaml && typeof g_yaml.min_weight !== 'undefined')
+    {
+      document.getElementById("label_min_weight").innerHTML = translate('min_weight');
+      document.getElementById("label_max_weight").innerHTML = translate('max_weight');
+      document.getElementById("label_gender").innerHTML     = translate('gender');
+      document.getElementById("all").innerHTML    = translate('all');
+      document.getElementById("male").innerHTML   = translate('male');
+      document.getElementById("female").innerHTML = translate('female');
       document.getElementById("minWeight").value = g_yaml.min_weight;
+    }
     if (g_yaml && typeof g_yaml.max_weight !== 'undefined')
       document.getElementById("maxWeight").value = g_yaml.max_weight;
     if (g_yaml && typeof g_yaml.gender !== 'undefined')
@@ -155,11 +156,11 @@ function GetFightSystemForm(callback)
 
 function AddMatchtable()
 {
-  var data = [];
+  let data = [];
 
-  var elements = document.getElementById("form_filter").elements;
+  let elements = document.getElementById("form_filter").elements;
 
-  for (var i = 0, element; element = elements[i++];)
+  for (let i = 0, element; element = elements[i++];)
   {
     if (element.type == 'checkbox')
       data[element.id] = element.checked;
@@ -169,7 +170,7 @@ function AddMatchtable()
 
   elements = document.getElementById("form_fight_system").elements;
 
-  for (var i = 0, element; element = elements[i++];)
+  for (let i = 0, element; element = elements[i++];)
   {
     if (element.type == 'checkbox')
       data[element.id] = element.checked;
@@ -186,11 +187,11 @@ function AddMatchtable()
 
   console.log(data);
 
-  var params = URLEncode(data);
+  let params = URLEncode(data);
   console.log(params);
 
   AjaxPost('ajax/matchtable/add', params, function() {
-    navigate("matchtable_list.html");
+    goBack();
   });
 
   return false;
@@ -200,11 +201,11 @@ function AddMatchtable()
 
 function UpdateMatchtable()
 {
-  var data = [];
+  let data = [];
 
-  var elements = document.getElementById("form_filter").elements;
+  let elements = document.getElementById("form_filter").elements;
 
-  for (var i = 0, element; element = elements[i++];)
+  for (let i = 0, element; element = elements[i++];)
   {
     if (element.type == 'checkbox')
       data[element.id] = element.checked;
@@ -214,7 +215,7 @@ function UpdateMatchtable()
 
   elements = document.getElementById("form_fight_system").elements;
 
-  for (var i = 0, element; element = elements[i++];)
+  for (let i = 0, element; element = elements[i++];)
   {
     if (element.type == 'checkbox')
       data[element.id] = element.checked;
@@ -231,10 +232,10 @@ function UpdateMatchtable()
   data["type"] = document.getElementById("type").value;
   data["fight_system"] = document.getElementById("fight_system").value;
 
-  var params = URLEncode(data);
+  let params = URLEncode(data);
 
   AjaxPost('ajax/matchtable/update?id=' + id, params, function() {
-    navigate("matchtable_list.html");
+    goBack();
   });
 
   return false;
@@ -247,7 +248,7 @@ function DeleteMatchtable()
   if (confirm(translate('delete_matchtable_confirm')))
   {
     AjaxCallback('ajax/matchtable/delete?id=' + id, function() {
-      navigate("matchtable_list.html");
+      goBack();
     });
   }
 
@@ -271,10 +272,11 @@ function GetMatchTable(id)
 {
   AjaxCallback("ajax/matchtable/get?id="+id, function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
     g_yaml = res;
     
-    document.getElementById("name").value = res.name;
+    if (typeof res.name !== 'undefined')
+      document.getElementById("name").value = res.name;
 
     if (!res.is_sub_match_table)
     {
@@ -310,21 +312,21 @@ function GetMatchTable(id)
 
     if (typeof res.participants !== 'undefined')
     {
-      var table = document.getElementById("participants");
+      let table = document.getElementById("participants");
 
       while (table.rows.length > 1)
         table.deleteRow(table.rows.length-1);
 
-      var no = 0;
+      let no = 0;
       for (const judoka of res.participants)
       {
-         var row = table.insertRow(-1);
-         var cell0 = row.insertCell(0);
-         var cell1 = row.insertCell(1);
-         var cell2 = row.insertCell(2);
-         var cell3 = row.insertCell(3);
-         var cell4 = row.insertCell(4);
-         var cell5 = row.insertCell(5);
+         let row = table.insertRow(-1);
+         let cell0 = row.insertCell(0);
+         let cell1 = row.insertCell(1);
+         let cell2 = row.insertCell(2);
+         let cell3 = row.insertCell(3);
+         let cell4 = row.insertCell(4);
+         let cell5 = row.insertCell(5);
 
          no++;
          if (no%2 == 0)
@@ -336,9 +338,10 @@ function GetMatchTable(id)
            cell0.innerHTML = judoka.start_pos + 1;
          cell0.style.textAlign = "center";
          cell0.style.fontSize  = "14pt";
-
+         
          cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.firstname + " " + judoka.lastname + "</a>";
-         cell2.innerHTML = "<a href=\"#club_add.html?id=" + judoka.club_uuid + "\">" + judoka.club_name + "</a>";
+         if (typeof judoka.club_uuid != 'undefined')
+           cell2.innerHTML = "<a href=\"#club_add.html?id=" + judoka.club_uuid + "\">" + judoka.club_name + "</a>";
 
          cell3.innerHTML = judoka.weight + " kg";
          cell3.style.textAlign = "center";

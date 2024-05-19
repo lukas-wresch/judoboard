@@ -45,7 +45,7 @@ void Application::SetupHttpServer()
 
 	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "participant_weight", "judoka_add", "judoka_list", "judoka_edit", "lots",
 		"club_list", "club_add", "association_list", "association_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
-		"matchtable_list", "matchtable_add", "matchtable_creator", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add",
+		"matchtable_list", "matchtable_add", "matchtable_creator", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add", "tournament_settings",
 		"server_config"
 	};
 
@@ -268,7 +268,6 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
-
 		return Ajax_OpenMat(Request);
 	});
 
@@ -277,7 +276,6 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
-
 		return Ajax_CloseMat(Request);
 	});
 
@@ -286,8 +284,16 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
-
 		return Ajax_PauseMat(Request);
+	});
+
+
+	m_Server.RegisterResource("/ajax/config/pause_all_mats", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_PauseAllMats(Request);
 	});
 
 
@@ -295,24 +301,7 @@ void Application::SetupHttpServer()
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
 			return error;
-
 		return Ajax_UpdateMat(Request);
-	});
-
-
-	m_Server.RegisterResource("/ajax/config/fullscreen", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-		return Ajax_SetFullscreen(true, Request);
-	});
-
-
-	m_Server.RegisterResource("/ajax/config/windowed", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-		return Ajax_SetFullscreen(false, Request);
 	});
 
 	m_Server.RegisterResource("/ajax/config/list_sound_files", [this](auto& Request) -> std::string {
@@ -362,13 +351,14 @@ void Application::SetupHttpServer()
 
 	m_Server.RegisterResource("/ajax/get_schedule", [this](auto& Request) -> std::string {
 		bool important_only = HttpServer::DecodeURLEncoded(Request.m_Query, "filter") == "2";
+		int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
 
 		auto guard = LockReadForScope();
 		
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		return GetTournament()->Schedule2String(important_only);
+		return GetTournament()->Schedule2String(important_only, mat);
 	});
 
 
@@ -412,7 +402,8 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		GetTournament()->MoveScheduleEntryUp(id);
+		if (!GetTournament()->MoveScheduleEntryUp(id))
+			return Error(Error::Type::OperationFailed);
 		return Error();//OK
 	});
 
@@ -429,8 +420,18 @@ void Application::SetupHttpServer()
 		if (!GetTournament())
 			return Error(Error::Type::TournamentNotOpen);
 
-		GetTournament()->MoveScheduleEntryDown(id);
+		if (!GetTournament()->MoveScheduleEntryDown(id))
+			return Error(Error::Type::OperationFailed);
 		return Error();//OK
+	});
+
+
+	m_Server.RegisterResource("/ajax/masterschedule/move", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_MoveMatchTable(Request);
 	});
 
 
@@ -454,35 +455,6 @@ void Application::SetupHttpServer()
 		YAML::Emitter ret;
 		match->ToString(ret);
 		return ret.c_str();
-	});
-
-
-	m_Server.RegisterResource("/ajax/masterschedule/set_mat", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-
-		UUID id  = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-		int  mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
-
-		if (mat <= 0)
-			return std::string("Invalid mat id");
-
-		auto guard = LockWriteForScope();
-
-		if (!GetTournament())
-			return std::string("No tournament open");
-
-		if (GetTournament()->GetStatus() == Status::Concluded)
-			return std::string("Tournament is already finalized");
-
-		auto entry = GetTournament()->FindMatchTable(id);
-
-		if (!entry)
-			return Error(Error::Type::ItemNotFound);
-
-		entry->SetMatID(mat);
-		return Error();//OK
 	});
 
 
@@ -512,11 +484,11 @@ void Application::SetupHttpServer()
 		auto guard = LockWriteForScope();
 
 		if (!GetTournament())
-			return std::string("No tournament open");
+			return Error(Error::Type::TournamentNotOpen);
 
-		bool success = GetTournament()->RemoveMatch(id);
-
-		return std::string();
+		if (!GetTournament()->RemoveMatch(id))
+			return Error(Error::Type::OperationFailed);
+		return Error(Error::Type::NoError);
 	});
 
 	m_Server.RegisterResource("/ajax/match/get_log", [this](auto& Request) -> std::string {
@@ -673,21 +645,6 @@ void Application::SetupHttpServer()
 	});
 
 	//Serialization
-	m_Server.RegisterResource("/ajax/mat/current_time", [this](auto& Request) -> std::string {
-		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
-
-		int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-		if (id <= 0)
-			return Error(Error::Type::InvalidID);
-
-		auto mat = FindMat(id);
-
-		if (!mat)
-			return Error(Error::Type::MatNotFound);
-
-		return std::to_string(mat->GetTimeElapsed()) + "," + (mat->IsHajime() ? "1" : "0");
-	});
 
 	m_Server.RegisterResource("/ajax/mat/get_score", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
@@ -1735,9 +1692,7 @@ void Application::SetupHttpServer()
 
 		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-		bool ret = GetTournament()->RemoveMatchTable(id);
-
-		if (!ret)
+		if (!GetTournament()->RemoveMatchTable(id))
 			return std::string("Failed to delete match table");
 
 		return Error();//OK
@@ -1753,6 +1708,15 @@ void Application::SetupHttpServer()
 	});
 
 
+	m_Server.RegisterResource("/ajax/matchtable/move_all", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
+		if (!error)
+			return error;
+
+		return Ajax_MoveAllMatchTables(Request);
+	});
+
+
 
 	m_Server.RegisterResource("/ajax/match/add", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
@@ -1761,6 +1725,7 @@ void Application::SetupHttpServer()
 
 		UUID whiteID = HttpServer::DecodeURLEncoded(Request.m_Body, "white");
 		UUID blueID  = HttpServer::DecodeURLEncoded(Request.m_Body, "blue");
+		int  matID   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
 
 		auto guard = LockReadForScope();
 
@@ -1778,7 +1743,11 @@ void Application::SetupHttpServer()
 		if (!white || !blue)//Judokas exist?
 			return std::string("Judoka not found in database");
 
-		GetTournament()->AddMatch(Match(white, blue, GetTournament(), FindDefaultMatID()));
+		if (matID <= 0)//Illegal mat?
+			matID = FindDefaultMatID();//Use the default
+
+		if (!GetTournament()->AddMatch(Match(white, blue, GetTournament(), matID)))
+			return Error(Error::Type::OperationFailed);
 
 		return Error();//OK
 	});
@@ -2030,6 +1999,20 @@ void Application::SetupHttpServer()
 
 		tournament->DeleteAllMatchResults();
 		return Error();//OK
+	});
+
+	m_Server.RegisterResource("/ajax/tournament/delete_matchless_tables", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+		return Ajax_DeleteMatchlessMatchTables();
+	});
+
+	m_Server.RegisterResource("/ajax/tournament/delete_completed_tables", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+		return Ajax_DeleteCompletedMatchTables();
 	});
 
 	m_Server.RegisterResource("/ajax/tournament/delete", [this](auto& Request) -> std::string {
@@ -2832,6 +2815,46 @@ Error Application::Ajax_SwapMatchesOfTournament(const HttpServer::Request& Reque
 
 
 
+Error Application::Ajax_DeleteMatchlessMatchTables()
+{
+	auto guard = LockWriteForScope();
+
+	auto tournament = GetTournament();
+	if (!tournament)
+		return Error::Type::OperationFailed;
+
+	auto tables = tournament->GetMatchTables();//Make copy of list
+	for (auto table : tables)
+	{
+		if (table && table->GetNumberOfMatches() == 0)
+			tournament->RemoveMatchTable(*table);//This modifies the original list
+	}
+
+	return Error::Type::NoError;
+}
+
+
+
+Error Application::Ajax_DeleteCompletedMatchTables()
+{
+	auto guard = LockWriteForScope();
+
+	auto tournament = GetTournament();
+	if (!tournament)
+		return Error::Type::OperationFailed;
+
+	auto tables = tournament->GetMatchTables();//Make copy of list
+	for (auto table : tables)
+	{
+		if (table && table->GetStatus() == Status::Concluded)
+			tournament->RemoveMatchTable(*table);//This modifies the original list
+	}
+
+	return Error::Type::NoError;
+}
+
+
+
 std::string Application::Ajax_GetMats() const
 {
 	YAML::Emitter ret;
@@ -2844,6 +2867,34 @@ std::string Application::Ajax_GetMats() const
 
 		ret << YAML::BeginMap;
 		ret << YAML::Key << "highest_mat_id" << YAML::Value << max;
+
+		ret << YAML::Key << "monitors" << YAML::Value;
+		ret << YAML::BeginSeq;
+
+		auto monitors = Window::EnumerateMonitors();
+		for (auto& monitor : monitors)
+		{
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "index"  << YAML::Value << monitor.index;
+			ret << YAML::Key << "width"  << YAML::Value << monitor.right;
+			ret << YAML::Key << "height" << YAML::Value << monitor.bottom;
+			ret << YAML::EndMap;
+		}
+
+		ret << YAML::EndSeq;
+
+		ret << YAML::Key << "audio_devices" << YAML::Value;
+		ret << YAML::BeginSeq;
+
+		for (int i = 0; i < ZED::SoundDevice::GetNumberOfDevices(); i++)
+		{
+			ret << YAML::BeginMap;
+			ret << YAML::Key << "index" << YAML::Value << i;
+			ret << YAML::Key << "name"  << YAML::Value << ZED::SoundDevice::GetDeviceName(i);
+			ret << YAML::EndMap;
+		}
+
+		ret << YAML::EndSeq;
 
 		ret << YAML::Key << "mats" << YAML::Value;
 		ret << YAML::BeginSeq;
@@ -2874,8 +2925,10 @@ std::string Application::Ajax_GetMats() const
 				ret << YAML::Key << "timer_style"    << YAML::Value << (int)mat->GetTimerStyle();
 				ret << YAML::Key << "name_style"     << YAML::Value << (int)mat->GetNameStyle();
 				ret << YAML::Key << "is_fullscreen"  << YAML::Value << mat->IsFullscreen();
+				ret << YAML::Key << "monitor"        << YAML::Value << mat->GetMonitor();
 				ret << YAML::Key << "sound_enabled"  << YAML::Value << mat->IsSoundEnabled();
 				ret << YAML::Key << "sound_filename" << YAML::Value << mat->GetSoundFilename();
+				ret << YAML::Key << "sound_device"   << YAML::Value << mat->GetAudioDeviceID();
 
 				if (mat->GetType() == IMat::Type::RemoteMat)
 				{
@@ -2901,35 +2954,33 @@ std::string Application::Ajax_GetMats() const
 Error Application::Ajax_OpenMat(const HttpServer::Request& Request)
 {
 	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-	if (id <= 0)
+	if (id < 0)
 		return Error::Type::InvalidID;
 
 	auto guard = LockWriteForScope();
 
-	/*if (id == 0)//Create virtual mat
+	if (id == 0)//Create new mat
 	{
 		id = 1;
 		while (FindMat(id))//Find first empty id
 			id++;
 
-		VirtualMat* new_mat = new VirtualMat(id);
-		new_mat->Open();
-
-		SetMats().emplace_back(new_mat);
+		if (!StartLocalMat(id))
+			return Error::Type::OperationFailed;
 		return Error();//OK
 	}
 
 	else
-	{*/
-	for (auto mat : SetMats())
 	{
-		if (mat && mat->GetMatID() == id)
+		for (auto mat : SetMats())
 		{
-			mat->Open();
-			return Error::Type::NoError;//OK
+			if (mat && mat->GetMatID() == id)
+			{
+				mat->Open();
+				return Error::Type::NoError;//OK
+			}
 		}
 	}
-	//}
 
 	return Error::Type::OperationFailed;
 }
@@ -2960,6 +3011,8 @@ Error Application::Ajax_PauseMat(const HttpServer::Request& Request)
 	if (id <= 0)
 		return Error(Error::Type::InvalidID);
 
+	auto guard = LockWriteForScope();
+
 	auto mat = FindMat(id);
 
 	if (!mat)
@@ -2973,16 +3026,43 @@ Error Application::Ajax_PauseMat(const HttpServer::Request& Request)
 
 
 
+Error Application::Ajax_PauseAllMats(const HttpServer::Request& Request)
+{
+	bool enable = HttpServer::DecodeURLEncoded(Request.m_Query, "enable") == "true";
+
+	auto guard = LockWriteForScope();
+
+	bool success = true;
+	for (auto mat : GetMats())
+	{
+		if (!mat || !mat->Pause(enable))
+			success = false;	
+	}
+
+	if (!success)
+		return Error(Error::Type::OperationFailed);
+
+	return Error();//OK
+}
+
+
+
 Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 {
 	int id     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 	int new_id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body,  "id"));
+
+	bool fullscreen = HttpServer::DecodeURLEncoded(Request.m_Body, "fullscreen") == "true";
+	int monitor = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "monitor"));
+
 	auto name  = HttpServer::DecodeURLEncoded(Request.m_Body, "name");
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int osaekomiStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomiStyle"));
 	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
 	bool sound     = HttpServer::DecodeURLEncoded(Request.m_Body, "sound") == "true";
 	std::string soundFilename = HttpServer::DecodeURLEncoded(Request.m_Body, "sound_filename");
+	int audio_device = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "sound_device"));
+
 	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
 
 	if (id <= 0 || new_id <= 0)
@@ -2994,6 +3074,8 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 
 	if (id != new_id)//Check if new_id is an unused id
 	{
+		auto guard = LockReadForScope();
+
 		for (const auto mat : GetMats())
 		{
 			if (mat && mat->GetMatID() == new_id)
@@ -3010,12 +3092,12 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 			if (id != new_id)
 				mat->SetMatID(new_id);
 
+			mat->SetFullscreen(fullscreen, monitor);
 			mat->SetName(name);
 			mat->SetIpponStyle((Mat::IpponStyle)ipponStyle);
 			mat->SetOsaekomiStyle((Mat::OsaekomiStyle)osaekomiStyle);
 			mat->SetTimerStyle((Mat::TimerStyle)timerStyle);
-			mat->EnableSound(sound);
-			mat->SetSoundFilename(soundFilename);
+			mat->SetAudio(sound, soundFilename, audio_device);
 			mat->SetNameStyle((NameStyle)nameStyle);
 
 			return Error();//OK
@@ -3258,6 +3340,7 @@ std::string Application::Ajax_SearchJudoka(const HttpServer::Request& Request)
 		ret << YAML::Key << "uuid" << YAML::Value << (std::string)judoka->GetUUID();
 		ret << YAML::Key << "firstname" << YAML::Value << judoka->GetFirstname();
 		ret << YAML::Key << "lastname" << YAML::Value << judoka->GetLastname();
+		ret << YAML::Key << "gender" << YAML::Value << (int)judoka->GetGender();
 		ret << YAML::Key << "weight" << YAML::Value << judoka->GetWeight().ToString();
 		ret << YAML::Key << "birthyear" << YAML::Value << judoka->GetBirthyear();
 
@@ -3776,6 +3859,8 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 	age_group->SetGender(gender);
 	age_group->SetRuleSet(rule);
 
+	GetTournament()->AddRuleSet(rule);
+
 	return Error::Type::NoError;
 }
 
@@ -3996,7 +4081,10 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		auto error = Ajax_AddMatchTable(Request);
 		if (!error)
+		{
+			GetTournament()->AddMatchTable(table);//Add match table again since we just deleted it
 			return error;
+		}
 
 		table = GetTournament()->FindMatchTable(id);
 
@@ -4035,11 +4123,8 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 	//Update filter
 
-	if (!table->IsSubMatchTable())
+	if (!table->IsSubMatchTable() && table->GetFilter() && table->GetFilter()->GetType() == IFilter::Type::Weightclass)
 	{
-		if (!table->GetFilter() || table->GetFilter()->GetType() != IFilter::Type::Weightclass)
-			return Error::Type::OperationFailed;
-
 		auto weightclass = (Weightclass*)table->GetFilter();
 
 		auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
@@ -4065,6 +4150,18 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 			GetTournament()->LockWrite();
 
 			round_robin->IsBestOfThree(bo3);
+
+			GetTournament()->UnlockWrite();
+			break;
+		}
+
+		case MatchTable::Type::Custom:
+		{
+			CustomTable* custom = (CustomTable*)table;
+
+			GetTournament()->LockWrite();
+
+			custom->IsBestOfThree(bo3);
 
 			GetTournament()->UnlockWrite();
 			break;
@@ -4119,6 +4216,65 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	if (!GetTournament()->OnUpdateMatchTable(id))
 		return Error(Error::Type::OperationFailed);
 	return Error();//OK
+}
+
+
+
+Error Application::Ajax_MoveMatchTable(const HttpServer::Request& Request)
+{
+	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	int  schedule_index = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "schedule_index"));
+	int  mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
+
+	if (mat <= 0 && schedule_index < 0)
+		return Error::Type::InvalidInput;
+
+	auto guard = LockWriteForScope();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	if (GetTournament()->GetStatus() == Status::Concluded)
+		return Error::Type::OperationFailed;
+
+	auto entry = GetTournament()->FindMatchTable(id);
+
+	if (!entry)
+		return Error::Type::ItemNotFound;
+
+	if (mat >= 1)
+		entry->SetMatID(mat);
+	if (schedule_index >= 0)
+	{
+		entry->SetScheduleIndex(schedule_index);
+		GetTournament()->BuildSchedule();
+	}
+
+	return Error::Type::NoError;//OK
+}
+
+
+
+Error Application::Ajax_MoveAllMatchTables(const HttpServer::Request& Request)
+{
+	int mat = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mat"));
+
+	if (mat <= 0)
+		return Error::Type::InvalidInput;
+
+	auto guard = LockWriteForScope();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	if (GetTournament()->GetStatus() == Status::Concluded)
+		return Error::Type::OperationFailed;
+
+	auto& match_tables = GetTournament()->GetMatchTables();
+	for (auto table : match_tables)
+		table->SetMatID(mat);
+
+	return Error::Type::NoError;//OK
 }
 
 
@@ -4341,7 +4497,7 @@ std::string Application::Ajax_ListSoundFiles()
 	ret << YAML::BeginSeq;
 
 	ZED::Core::Indexer([&](const std::string& Filename) {
-		auto pos = Filename.find_last_of('/');
+		auto pos = Filename.find_last_of(ZED::Core::Separator);
 		if (pos == std::string::npos) return true;
 
 		auto onlyFilename = Filename.substr(pos + 1);
@@ -4371,20 +4527,25 @@ Error Application::Ajax_PlaySoundFile(const HttpServer::Request& Request)
 {
 	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 	auto filename = HttpServer::DecodeURLEncoded(Request.m_Query, "filename");
+	int audio_device = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "sound_device"));
 
 	auto mat = FindMat(id);
 	if (!mat)
 		return Error::Type::MatNotFound;
 
-	auto temp = mat->GetSoundFilename();
+	auto temp_enabled  = mat->IsSoundEnabled();
+	auto temp_filename = mat->GetSoundFilename();
+	auto temp_device   = mat->GetAudioDeviceID();
 
-	mat->SetSoundFilename(filename);
+	mat->SetAudio(true, filename, audio_device);
 
-	mat->PlaySoundFile();
+	mat->QueueSoundFile();
 
-	ZED::Core::Pause(20 * 1000);
+	ZED::Core::Pause(500);
+	if (audio_device == -1)
+		ZED::Core::Pause(10 * 1000);
 
-	mat->SetSoundFilename(temp);
+	mat->SetAudio(temp_enabled, temp_filename, temp_device);
 
 	return Error::Type::NoError;
 }
@@ -4400,11 +4561,15 @@ std::string Application::Ajax_GetSetup()
 	ret << YAML::Key << "version"        << YAML::Value << Version;
 	ret << YAML::Key << "uptime"         << YAML::Value << (Timer::GetTimestamp() - m_StartupTimestamp);
 	ret << YAML::Key << "language"       << YAML::Value << (int)Localizer::GetLanguage();
+	ret << YAML::Key << "mat_count"      << YAML::Value << GetDatabase().GetMatCount();
 	ret << YAML::Key << "port"           << YAML::Value << GetDatabase().GetServerPort();
 	ret << YAML::Key << "ippon_style"    << YAML::Value << (int)GetDatabase().GetIpponStyle();
 	ret << YAML::Key << "osaekomi_style" << YAML::Value << (int)GetDatabase().GetOsaekomiStyle();
 	ret << YAML::Key << "timer_style"    << YAML::Value << (int)GetDatabase().GetTimerStyle();
 	ret << YAML::Key << "name_style"     << YAML::Value << (int)GetDatabase().GetNameStyle();
+	ret << YAML::Key << "results_server"     << YAML::Value << GetDatabase().IsResultsServer();
+	ret << YAML::Key << "results_server_url" << YAML::Value << GetDatabase().GetResultsServer();
+	ret << YAML::Key << "http_workers_free"  << YAML::Value << std::to_string(m_Server.GetFreeWorkerCount()) + "/" + std::to_string(m_Server.GetWorkerCount());
 
 	ret << YAML::EndMap;
 	return ret.c_str();
@@ -4415,18 +4580,31 @@ std::string Application::Ajax_GetSetup()
 Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 {
 	int language   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "language"));
+	int mat_count  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat_count"));
 	int port       = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "port"));
 	int ipponStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "ipponStyle"));
 	int osaekomiStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "osaekomiStyle"));
-	int timerStyle = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
-	int nameStyle  = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
+	int timerStyle    = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "timerStyle"));
+	int nameStyle     = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "nameStyle"));
+	bool results_server      = HttpServer::DecodeURLEncoded(Request.m_Body, "results_server") == "true";
+	auto results_server_url  = HttpServer::DecodeURLEncoded(Request.m_Body, "results_server_url");
 
 	Localizer::SetLanguage((Language)language);
-	GetDatabase().SetServerPort(port);
+	
+	auto guard = LockWriteForScope();
+
+	if (mat_count >= 0)
+		GetDatabase().SetMatCount(mat_count);
+	if (port > 0)
+		GetDatabase().SetServerPort(port);
 	GetDatabase().SetIpponStyle((Mat::IpponStyle)ipponStyle);
 	GetDatabase().SetOsaekomiStyle((Mat::OsaekomiStyle)osaekomiStyle);
 	GetDatabase().SetTimerStyle((Mat::TimerStyle)timerStyle);
 	GetDatabase().SetNameStyle((NameStyle)nameStyle);
+	GetDatabase().SetNameStyle((NameStyle)nameStyle);
+	GetDatabase().IsResultsServer(results_server);
+	GetDatabase().SetResultsServer(results_server_url);
+  GetDatabase().Save();
 
 	return Error::Type::NoError;
 }
@@ -4595,6 +4773,7 @@ std::string Application::Ajax_GetHansokumake() const
 		if (!match)
 			continue;
 
+
 		for (Fighter fighter = Fighter::White; fighter <= Fighter::Blue; ++fighter)
 		{
 			if (mat->GetScoreboard(fighter).m_HansokuMake && mat->GetScoreboard(fighter).m_HansokuMake_Direct)
@@ -4617,26 +4796,6 @@ std::string Application::Ajax_GetHansokumake() const
 
 
 
-Error Application::Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request)
-{
-	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
-
-	if (id <= 0)
-		return Error::Type::InvalidID;
-
-	auto guard = LockWriteForScope();
-
-	auto mat = FindMat(id);
-
-	if (!mat)
-		return Error::Type::MatNotFound;
-
-	mat->SetFullscreen(Fullscreen);
-	return Error();//OK
-}
-
-
-
 std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 {
 	int id = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
@@ -4645,6 +4804,11 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 		return Error(Error::Type::InvalidID);
 
 	auto guard = LockReadForScope();
+
+	if (!GetTournament())
+		return Error(Error::Type::TournamentNotOpen);
+
+	auto next_matches = GetTournament()->GetNextMatches(id);
 
 	auto mat = FindMat(id);
 
@@ -4672,14 +4836,13 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 
 	ret << YAML::Key << "match_table_name" << YAML::Value;
 	if (current_match && current_match->GetMatchTable())
-		ret << current_match->GetMatchTable()->GetDescription();//TODO secure via mutex
+		ret << current_match->GetMatchTable()->GetDescription();
 	else
 		ret << "- - -";
 
 	ret << YAML::Key << "next_matches" << YAML::Value << YAML::BeginSeq;
 
-	auto nextMatches = mat->GetNextMatches();
-	for (const auto& match : nextMatches)
+	for (const auto& match : next_matches)
 	{
 		ret << YAML::BeginMap;
 

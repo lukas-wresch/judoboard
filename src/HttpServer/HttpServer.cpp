@@ -132,8 +132,10 @@ void* HttpServer::Callback(mg_event Event, mg_connection* Connection)
 
 
 
-HttpServer::HttpServer(uint16_t Port) : m_Port(Port)
+void HttpServer::Start(uint16_t Port)
 {
+    m_Port = Port;
+
     char port_string[32];
 #ifdef _WIN32
     _itoa_s(Port, port_string, 10);
@@ -145,7 +147,7 @@ HttpServer::HttpServer(uint16_t Port) : m_Port(Port)
 #ifdef _DEBUG
     const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", "num_threads", "10", nullptr};
 #else
-    const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", "num_threads", "25", nullptr};
+    const char* options[] = { "listening_ports", port_string, "enable_keep_alive", "yes", "num_threads", "30", nullptr};
 #endif
 
     m_Context = mg_start([](mg_event Event, mg_connection* Connection) { ((HttpServer*)Connection->ctx->user_data)->Callback(Event, Connection); }, this, options);
@@ -168,6 +170,32 @@ HttpServer::~HttpServer()
 //{
     //m_Resources.insert({ URI, Resource(Type, Callback) });
 //}
+
+
+
+uint32_t HttpServer::GetWorkerCount() const
+{
+    if (m_Context)
+        return m_Context->num_threads;
+    return 0;
+}
+
+
+
+uint32_t HttpServer::GetFreeWorkerCount() const
+{
+    if (m_Context)
+        return m_Context->free_threads;
+    return 0;
+}
+
+
+
+void HttpServer::IncreaseWorkerCount(uint32_t Amount)
+{
+    if (m_Context)
+        mg_increase_worker_count(m_Context, Amount);
+}
 
 
 

@@ -293,6 +293,9 @@
     <ClInclude Include="..\..\src\loser_bracket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\external\mongoose\mongoose.h">
+      <Filter>HttpServer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\compile.sh">
@@ -428,6 +431,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\bin\html\lots.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\bin\html\tournament_settings.html">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\bin\html\participant_weight.html">

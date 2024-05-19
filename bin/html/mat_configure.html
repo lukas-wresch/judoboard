@@ -1,4 +1,4 @@
-<!--<button class="neutral" id="new_match" onclick="return OpenMat(0);">Create new mat</button>-->
+<button class="add" id="new_mat" onclick="return OpenMat(0);"></button>
 
 
 <h2 id="headline"></h2>
@@ -45,24 +45,33 @@ function Command(cmd, id)
 
 
 
+let updateMatsRunning = false;
+
 function Update()
 {
+  if (updateMatsRunning)
+    return;
+
+  updateMatsRunning = true;
+
   AjaxCallback("ajax/config/get_mats", function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
-    var table = document.getElementById("mats");
+    updateMatsRunning = false;
+
+    let table = document.getElementById("mats");
     
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
     
     for (const mat of res.mats)
     {
-      var row = table.insertRow(-1);
-      var cell1 = row.insertCell(0);
-      var cell2 = row.insertCell(1);
-      var cell3 = row.insertCell(2);
-      var cell4 = row.insertCell(3);
+      let row = table.insertRow(-1);
+      let cell1 = row.insertCell(0);
+      let cell2 = row.insertCell(1);
+      let cell3 = row.insertCell(2);
+      let cell4 = row.insertCell(3);
 
       cell1.innerHTML = mat.id;
       cell2.innerHTML = "???";
@@ -72,7 +81,11 @@ function Update()
       if (typeof mat.type === 'undefined' || mat.type == 0)
         cell3.innerHTML = "Not available";
       else if (mat.type == 1)
-        cell3.innerHTML = "Local mat";
+      {
+        cell3.innerHTML = "Local mat<br/>";
+        cell3.innerHTML += "Monitor: " + (mat.monitor+1) + "<br/>";
+        cell3.innerHTML += "Audio device: " + mat.sound_device;
+      }
       else if (mat.type == 2)
         cell3.innerHTML = "Virtual mat";
       else if (mat.type == 3)
@@ -85,11 +98,6 @@ function Update()
           cell4.innerHTML = "<button class=\"remove\" onclick=\"return CloseMat(" + mat.id + ");\">"+ translate('close') +"</button>";
         else
           cell4.innerHTML = "<button class=\"add\" onclick=\"return OpenMat(" + mat.id + ");\">"+ translate('start') +"</button>";
-
-        if (!mat.is_fullscreen)
-          cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('fullscreen'," + mat.id + ");\">Fullscreen</button>";
-        else
-          cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('windowed'," + mat.id + ");\">Window Mode</button>";
 
         if (!mat.is_paused)
           cell4.innerHTML += "<button class=\"neutral\" onclick=\"return Command('pause','" + mat.id + "&enable=true');\">"+ translate('pause') +"</button>";
@@ -109,10 +117,11 @@ function Update()
 
 
 Update();
-TimerID = window.setInterval(Update, 2000);
+TimerID = window.setInterval(Update, 3000);
 
 document.getElementById("headline").innerHTML = translate('mats');
 document.getElementById("type").innerHTML     = translate('type');
 document.getElementById("options").innerHTML  = translate('options');
+document.getElementById("new_mat").innerHTML  = translate('new_mat');
 
 </script>

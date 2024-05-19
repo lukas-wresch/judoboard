@@ -3,11 +3,17 @@
 <form>
 
 <div id="div_showParticipantsOnly">
-  <label style="width:200px;float:left;margin-top:4px;" id="label_showParticipantsOnly">Show only participants</label>
+  <label style="width:200px;float:left;margin-top:4px;" id="label_showParticipantsOnly"></label>
   <input type="checkbox" id="showParticipantsOnly" class="switch-input" checked onclick="ToggleFilter();">
   <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="showParticipantsOnly">
     <span class="toggle-on" id="showParticipantsOnly_enabled"></span><span class="toggle-off" id="showParticipantsOnly_disabled"></span>
   </label>
+</div>
+
+<div>
+  <label id="label_mat" style="width:100px;float:left;margin-top:5px;"></label>
+  <select style="padding-top:5px;margin-bottom:20px; width: 5.5cm;" id="mat">
+  </select>
 </div>
 
 <div>
@@ -73,9 +79,10 @@ function Add(color, name, uuid)
 
 function AddMatch()
 {
-  var params = URLEncode({
+  let params = URLEncode({
     white: document.getElementById("white_id").value,
-    blue:  document.getElementById("blue_id").value
+    blue:  document.getElementById("blue_id").value,
+    mat:   document.getElementById("mat").value
   });
 
   AjaxPost('ajax/match/add', params, function() {
@@ -117,13 +124,13 @@ function Update(color)
       //if (!judoka.is_participant && filter)
         //continue;
 
-      var row = table.insertRow(-1);
-      var cell0 = row.insertCell(0);
-      var cell1 = row.insertCell(1);
-      var cell2 = row.insertCell(2);
-      var cell3 = row.insertCell(3);
-      var cell4 = row.insertCell(4);
-      var cell5 = row.insertCell(5);
+      let row = table.insertRow(-1);
+      let cell0 = row.insertCell(0);
+      let cell1 = row.insertCell(1);
+      let cell2 = row.insertCell(2);
+      let cell3 = row.insertCell(3);
+      let cell4 = row.insertCell(4);
+      let cell5 = row.insertCell(5);
 
       if (no%2 == 0)
         row.style.backgroundColor = "#eee";
@@ -133,7 +140,7 @@ function Update(color)
       cell0.style.textAlign = "center";
       cell0.style.fontSize  = "16pt";
 
-      cell1.innerHTML = judoka.name;
+      cell1.innerHTML = judoka.firstname + '&nbsp;' + judoka.lastname;
       cell1.style.fontSize  = "16pt";
 
       if (typeof judoka.club_name === 'undefined')
@@ -150,7 +157,7 @@ function Update(color)
       cell4.style.textAlign = "center";
       cell4.style.fontSize  = "16pt";
 
-      cell5.innerHTML = "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return Add('"+ color + "','" + judoka.name + "','"+judoka.uuid+"')\">" + translate('add') + "</button>";
+      cell5.innerHTML = "<button class=\"add\" style=\"width: 2.8cm; height: 0.9cm;\" onclick=\"return Add('"+ color + "','" + judoka.firstname + " " + judoka.lastname + "','"+judoka.uuid+"')\">" + translate('add') + "</button>";
       cell5.style.textAlign = "right";
     }
   });
@@ -166,6 +173,7 @@ document.getElementById("blue").oninput = function(e)
   Update("blue");
 };
 
+GetMats();
 
 for (const el of document.getElementsByClassName("no"))
     el.innerHTML = translate('no');
@@ -181,6 +189,8 @@ for (const el of document.getElementsByClassName("options"))
     el.innerHTML = translate('options');
 
 document.getElementById("headline").innerHTML    = translate('new_match');
+document.getElementById("label_showParticipantsOnly").innerHTML = translate('show_only_participants');
+document.getElementById("label_mat").innerHTML   = translate('mat');
 document.getElementById("label_white").innerHTML = translate('name_white');
 document.getElementById("label_blue").innerHTML  = translate('name_blue');
 document.getElementById("add").innerHTML         = translate('add_match');

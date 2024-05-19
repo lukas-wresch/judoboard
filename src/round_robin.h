@@ -26,6 +26,7 @@ namespace Judoboard
 		virtual size_t GetMaxStartPositions() const override { return GetParticipants().size(); }
 
 		virtual MatchTable::Results CalculateResults() const override;
+		virtual size_t ResultsCount() const override { return GetParticipants().size(); }
 		virtual void GenerateSchedule() override;
 
 		//Serialization

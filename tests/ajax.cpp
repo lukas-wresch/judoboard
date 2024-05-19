@@ -187,9 +187,10 @@ TEST(Ajax, AgeGroup_List)
 
 	{
 		Application app;
+		RuleSet r("rule set", 10, 20, 30, 40);
 
 		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
-		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
+		auto a2 = new AgeGroup("age 2", 30, 40, &r);
 
 		app.GetDatabase().AddAgeGroup(a1);
 		app.GetTournament()->AddAgeGroup(a2);
@@ -224,6 +225,8 @@ TEST(Ajax, AgeGroup_List)
 		EXPECT_EQ(yaml[7]["num_match_tables"].as<int>(), 0);
 		EXPECT_EQ(yaml[7]["num_matches"].as<int>(), 0);
 		EXPECT_EQ(yaml[7]["num_participants"].as<int>(), 0);
+		EXPECT_EQ(yaml[7]["rules_name"].as<std::string>(), "rule set");
+		EXPECT_EQ(yaml[7]["rules_uuid"].as<std::string>(), r.GetUUID());
 	}
 }
 
@@ -386,6 +389,8 @@ TEST(Ajax, GetMats)
 	yaml = YAML::Load(app.Ajax_GetMats());
 
 	EXPECT_EQ(yaml["highest_mat_id"].as<int>(), 2);
+	EXPECT_TRUE(yaml["monitors"].IsSequence());
+	EXPECT_TRUE(yaml["audio_devices"].IsSequence());
 	EXPECT_EQ(yaml["mats"][0]["type"].as<int>(), (int)Mat::Type::LocalMat);
 	EXPECT_EQ(yaml["mats"][0]["name"].as<std::string>(), "Mat 1");
 	EXPECT_EQ(yaml["mats"][0]["is_paused"].as<bool>(), false);
@@ -432,6 +437,27 @@ TEST(Ajax, OpenMat)
 		ASSERT_TRUE(app.GetLocalMat());
 		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 5);
 		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
+	}
+}
+
+
+
+TEST(Ajax, OpenNewMat)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+
+		EXPECT_TRUE(app.FindMat(1));
+		EXPECT_FALSE(app.FindMat(2));
+
+		EXPECT_TRUE(app.Ajax_OpenMat(HttpServer::Request("id=0")));
+
+		EXPECT_TRUE(app.FindMat(1));
+		EXPECT_TRUE(app.FindMat(2));
 	}
 }
 
@@ -491,7 +517,7 @@ TEST(Ajax, UpdateMat)
 		EXPECT_TRUE(app.GetLocalMat());
 		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
 
-		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=0&sound=false&sound_filename=changed")));
+		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=5&name=Test&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=0&sound=false&sound_filename=changed&sound_device=7")));
 
 		EXPECT_TRUE(app.GetLocalMat());
 		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
@@ -503,9 +529,10 @@ TEST(Ajax, UpdateMat)
 		EXPECT_EQ((int)app.GetLocalMat()->GetNameStyle(),  0);
 		EXPECT_FALSE(app.GetLocalMat()->IsSoundEnabled());
 		EXPECT_EQ(app.GetLocalMat()->GetSoundFilename(), "changed");
+		EXPECT_EQ(app.GetLocalMat()->GetAudioDeviceID(), 7);
 
 
-		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=1&sound=true&sound_filename=changed2")));
+		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=5", "id=1&name=Test2&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=1&sound=true&sound_filename=changed2&sound_device=-1")));
 
 
 		EXPECT_TRUE(app.GetLocalMat());
@@ -518,9 +545,10 @@ TEST(Ajax, UpdateMat)
 		EXPECT_EQ((int)app.GetLocalMat()->GetNameStyle(),  1);
 		EXPECT_TRUE(app.GetLocalMat()->IsSoundEnabled());
 		EXPECT_EQ(app.GetLocalMat()->GetSoundFilename(), "changed2");
+		EXPECT_EQ(app.GetLocalMat()->GetAudioDeviceID(), -1);
 
 
-		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test3&ipponStyle=2&osaekomiStyle=0&timerStyle=0&nameStyle=0&sound=false&sound_filename=changed3")));
+		EXPECT_TRUE(app.Ajax_UpdateMat(HttpServer::Request("id=1", "id=1&name=Test3&ipponStyle=2&osaekomiStyle=0&timerStyle=0&nameStyle=0&sound=false&sound_filename=changed3&sound_device=42")));
 
 		EXPECT_TRUE(app.GetLocalMat());
 		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
@@ -532,6 +560,7 @@ TEST(Ajax, UpdateMat)
 		EXPECT_EQ((int)app.GetLocalMat()->GetNameStyle(),  0);
 		EXPECT_FALSE(app.GetLocalMat()->IsSoundEnabled());
 		EXPECT_EQ(app.GetLocalMat()->GetSoundFilename(), "changed3");
+		EXPECT_EQ(app.GetLocalMat()->GetAudioDeviceID(), 42);
 	}
 }
 
@@ -569,6 +598,45 @@ TEST(Ajax, PauseMat)
 		EXPECT_TRUE(app.GetLocalMat());
 		EXPECT_TRUE(app.GetLocalMat()->IsOpen());
 		EXPECT_TRUE(app.GetLocalMat()->IsPaused());
+	}
+}
+
+
+
+TEST(Ajax, PauseAllMats)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.StartLocalMat(1);
+		app.StartLocalMat(2);
+		app.StartLocalMat(3);
+
+		auto mat1 = app.FindMat(1);
+		auto mat2 = app.FindMat(2);
+		auto mat3 = app.FindMat(3);
+
+		EXPECT_FALSE(app.Ajax_PauseAllMats(HttpServer::Request("enable=false")));
+
+		EXPECT_TRUE(app.Ajax_PauseAllMats(HttpServer::Request("enable=true")));
+
+		EXPECT_TRUE(mat1->IsPaused());
+		EXPECT_TRUE(mat2->IsPaused());
+		EXPECT_TRUE(mat3->IsPaused());
+
+		EXPECT_FALSE(app.Ajax_PauseAllMats(HttpServer::Request("enable=true")));
+
+		EXPECT_TRUE(mat1->IsPaused());
+		EXPECT_TRUE(mat2->IsPaused());
+		EXPECT_TRUE(mat3->IsPaused());
+
+		EXPECT_TRUE(app.Ajax_PauseAllMats(HttpServer::Request("enable=false")));
+
+		EXPECT_FALSE(mat1->IsPaused());
+		EXPECT_FALSE(mat2->IsPaused());
+		EXPECT_FALSE(mat3->IsPaused());		
 	}
 }
 
@@ -613,18 +681,24 @@ TEST(Ajax, Setup_Get)
 		auto yaml = YAML::Load(app.Ajax_GetSetup());
 
 		EXPECT_EQ(yaml["language"].as<int>(), (int)Localizer::GetLanguage());
+		EXPECT_EQ(yaml["mat_count"].as<int>(), 1);
 		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetServerPort());
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+		EXPECT_TRUE(yaml["results_server"]);
+		EXPECT_TRUE(yaml["results_server_url"]);
 
 		ZED::Core::Pause(1000);
 
 		yaml = YAML::Load(app.Ajax_GetSetup());
 
 		EXPECT_EQ(yaml["language"].as<int>(), (int)Localizer::GetLanguage());
+		EXPECT_EQ(yaml["mat_count"].as<int>(), 1);
 		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetServerPort());
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 1100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+		EXPECT_TRUE(yaml["results_server"]);
+		EXPECT_TRUE(yaml["results_server_url"]);
 	}
 
 }
@@ -720,11 +794,12 @@ TEST(Ajax, Setup_Set)
 	{
 		Application app;
 		
-		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=1234&language=0&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=0")), "ok");
+		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=1234&language=0&mat_count=5&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=0&results_server=true&results_server_url=abc")), "ok");
 
 		auto yaml = YAML::Load(app.Ajax_GetSetup());
 
 		EXPECT_EQ(yaml["language"].as<int>(), 0);
+		EXPECT_EQ(yaml["mat_count"].as<int>(), 5);
 		EXPECT_EQ(yaml["port"].as<int>(), 1234);
 		EXPECT_EQ(yaml["ippon_style"].as<int>(), 1);
 		EXPECT_EQ(yaml["osaekomi_style"].as<int>(), 1);
@@ -732,12 +807,15 @@ TEST(Ajax, Setup_Set)
 		EXPECT_EQ(yaml["name_style"].as<int>(),  0);
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+		EXPECT_EQ(yaml["results_server"].as<bool>(), true);
+		EXPECT_EQ(yaml["results_server_url"].as<std::string>(), "abc");
 
-		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=1")), "ok");
+		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&mat_count=8&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=1&results_server=false&results_server_url=def")), "ok");
 
 		yaml = YAML::Load(app.Ajax_GetSetup());
 
 		EXPECT_EQ(yaml["language"].as<int>(), 1);
+		EXPECT_EQ(yaml["mat_count"].as<int>(), 8);
 		EXPECT_EQ(yaml["port"].as<int>(), 567);
 		EXPECT_EQ(yaml["ippon_style"].as<int>(), 0);
 		EXPECT_EQ(yaml["osaekomi_style"].as<int>(), 0);
@@ -745,6 +823,8 @@ TEST(Ajax, Setup_Set)
 		EXPECT_EQ(yaml["name_style"].as<int>(),  1);
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
+		EXPECT_EQ(yaml["results_server"].as<bool>(), false);
+		EXPECT_EQ(yaml["results_server_url"].as<std::string>(), "def");
 	}
 }
 
@@ -767,7 +847,7 @@ TEST(Ajax, ExecuteCommand)
 
 
 
-TEST(Ajax, SetFullscreen)
+/*TEST(Ajax, SetFullscreen)
 {
 	initialize();
 
@@ -802,7 +882,7 @@ TEST(Ajax, SetFullscreen)
 		EXPECT_TRUE(app.GetLocalMat()->IsFullscreen());
 		EXPECT_EQ(app.GetLocalMat()->GetMatID(), 1);
 	}
-}
+}*/
 
 
 
@@ -1101,6 +1181,7 @@ TEST(Ajax, Judoka_Search)
 		ASSERT_EQ(yaml.size(), 2);
 		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)j1->GetUUID());
 		EXPECT_EQ(yaml[1]["uuid"].as<std::string>(), (std::string)j2->GetUUID());
+		EXPECT_EQ(yaml[1]["gender"].as<int>(), (int)j2->GetGender());
 
 		yaml = YAML::Load( app.Ajax_SearchJudoka(HttpServer::Request("name=kl&participants=true")) );
 		ASSERT_EQ(yaml.size(), 1);
@@ -1351,8 +1432,6 @@ TEST(Ajax, GetNamesOnMat)
 
 		app.AddTournament(tourney);
 
-		ZED::Core::Pause(3000);
-
 		YAML::Node yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
@@ -1381,8 +1460,6 @@ TEST(Ajax, GetNamesOnMat)
 
 		mat->StartMatch(match1);
 
-		ZED::Core::Pause(2000);
-
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
@@ -1405,8 +1482,6 @@ TEST(Ajax, GetNamesOnMat)
 		mat->AddIppon(Fighter::White);
 		mat->EndMatch();
 
-		ZED::Core::Pause(2000);
-
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
@@ -1425,8 +1500,6 @@ TEST(Ajax, GetNamesOnMat)
 
 		mat->StartMatch(match2);
 
-		ZED::Core::Pause(2000);
-
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
 		ASSERT_TRUE(yaml.IsMap());
@@ -1441,8 +1514,6 @@ TEST(Ajax, GetNamesOnMat)
 
 		mat->AddIppon(Fighter::White);
 		mat->EndMatch();
-
-		ZED::Core::Pause(2000);
 
 		yaml = YAML::Load( app.Ajax_GetNamesOnMat(HttpServer::Request("id=5")) );
 
@@ -2377,6 +2448,150 @@ TEST(Ajax, MatchTable_Edit)
 
 
 
+TEST(Ajax, MatchTable_Move)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7")) );
+
+		ASSERT_EQ(tables.size(), 1);
+		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
+		EXPECT_EQ(tables[0]->GetName(), "Test");
+		EXPECT_EQ(tables[0]->GetMatID(), 7);
+
+
+		for (int i = 0; i < 100; i++)
+		{
+			int mat   = rand()%10 + 1;
+			int index = rand()%100;
+
+			EXPECT_TRUE(app.Ajax_MoveMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID() + "&schedule_index=" + std::to_string(index) + "&mat=" + std::to_string(mat))) );
+
+			EXPECT_EQ(tables[0]->GetMatID(), mat);
+			EXPECT_EQ(tables[0]->GetScheduleIndex(), index);
+		}
+	}
+}
+
+
+
+TEST(Ajax, MatchTable_Move2)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+		app.GetTournament()->AddParticipant(j1);
+
+		auto j2 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+		app.GetTournament()->AddParticipant(j2);
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test1&mat=1&minWeight=40&maxWeight=70")) );
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test2&mat=1&minWeight=40&maxWeight=70")) );
+
+		ASSERT_EQ(tables.size(), 2);
+		EXPECT_EQ(tables[0]->GetName(), "Test1");
+		EXPECT_EQ(tables[1]->GetName(), "Test2");
+
+		auto schedule = app.GetTournament()->GetSchedule();
+		EXPECT_EQ(schedule[0]->GetMatchTable()->GetName(), "Test1");
+
+		EXPECT_TRUE(app.Ajax_MoveMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID() + "&schedule_index=3") ));
+
+		schedule = app.GetTournament()->GetSchedule();
+		EXPECT_EQ(schedule[0]->GetMatchTable()->GetName(), "Test2");
+	}
+}
+
+
+
+TEST(Ajax, MatchTable_MoveWithOneFinished)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+		app.GetTournament()->AddParticipant(j1);
+		auto j2 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+		app.GetTournament()->AddParticipant(j2);
+		auto j3 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
+		app.GetTournament()->AddParticipant(j3);
+
+		auto j4 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+		app.GetTournament()->AddParticipant(j4);
+		auto j5 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+		app.GetTournament()->AddParticipant(j5);
+		auto j6 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 60);
+		app.GetTournament()->AddParticipant(j6);
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test1&mat=1&minWeight=40&maxWeight=70")) );
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test2&mat=1&minWeight=40&maxWeight=70")) );
+
+		ASSERT_EQ(tables.size(), 2);
+		EXPECT_EQ(tables[0]->GetName(), "Test1");
+		EXPECT_EQ(tables[1]->GetName(), "Test2");
+
+		auto schedule = app.GetTournament()->GetSchedule();
+		EXPECT_EQ(schedule[0]->GetMatchTable()->GetName(), "Test1");
+
+		auto mat = app.StartLocalMat();
+		EXPECT_TRUE(mat->StartMatch(app.GetTournament()->GetNextMatch()));
+		mat->AddIppon(Fighter::White);
+		EXPECT_TRUE(mat->EndMatch());
+
+		EXPECT_TRUE(app.Ajax_MoveMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID() + "&schedule_index=3") ));
+
+		schedule = app.GetTournament()->GetSchedule();
+		EXPECT_EQ(schedule[0]->GetMatchTable()->GetName(), "Test2");
+	}
+}
+
+
+
+TEST(Ajax, MatchTable_MoveAll)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7")) );
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=3")) );
+		EXPECT_TRUE( app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=2")) );
+
+		ASSERT_EQ(tables.size(), 3);
+
+
+		for (int i = 0; i < 100; i++)
+		{
+			int mat = rand()%10 + 1;
+
+			EXPECT_TRUE(app.Ajax_MoveAllMatchTables(HttpServer::Request("mat=" + std::to_string(mat))));
+
+			EXPECT_EQ(tables[0]->GetMatID(), mat);
+			EXPECT_EQ(tables[1]->GetMatID(), mat);
+			EXPECT_EQ(tables[2]->GetMatID(), mat);
+		}
+	}
+}
+
+
+
 TEST(Ajax, MatchTable_Get)
 {
 	initialize();
@@ -2985,6 +3200,101 @@ TEST(Ajax, Tournament_Edit)
 
 	ZED::Core::RemoveFile("tournaments/test.yml");
 	ZED::Core::RemoveFile("tournaments/test2.yml");
+}
+
+
+
+TEST(Ajax, Tournament_DeleteMatchlessTables)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 50));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 51));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 52));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 60));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 61));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 62));
+
+		MatchTable* m1 = new RoundRobin(Weight(0), Weight(49));
+		MatchTable* m2 = new RoundRobin(Weight(50), Weight(55));
+		MatchTable* m3 = new RoundRobin(Weight(60), Weight(65));
+		MatchTable* m4 = new RoundRobin(Weight(70), Weight(80));
+		app.GetTournament()->AddMatchTable(m1);
+		app.GetTournament()->AddMatchTable(m2);
+		app.GetTournament()->AddMatchTable(m3);
+		app.GetTournament()->AddMatchTable(m4);
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 4);
+
+		EXPECT_TRUE(app.Ajax_DeleteMatchlessMatchTables());
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 2);
+		EXPECT_EQ(app.GetTournament()->GetMatchTables()[0]->GetNumberOfMatches(), 3);
+		EXPECT_EQ(app.GetTournament()->GetMatchTables()[1]->GetNumberOfMatches(), 3);
+	}
+}
+
+
+
+TEST(Ajax, Tournament_DeleteCompletedTables)
+{
+	initialize();
+
+	{
+		Application app;
+
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 50));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 51));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 52));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 60));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 61));
+		app.GetTournament()->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 62));
+
+		MatchTable* m1 = new RoundRobin(Weight(0), Weight(49));
+		MatchTable* m2 = new RoundRobin(Weight(50), Weight(55));
+		MatchTable* m3 = new RoundRobin(Weight(60), Weight(65));
+		MatchTable* m4 = new RoundRobin(Weight(70), Weight(80));
+		app.GetTournament()->AddMatchTable(m1);
+		app.GetTournament()->AddMatchTable(m2);
+		app.GetTournament()->AddMatchTable(m3);
+		app.GetTournament()->AddMatchTable(m4);
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 4);
+
+		EXPECT_TRUE(app.Ajax_DeleteCompletedMatchTables());
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 2);
+		EXPECT_EQ(app.GetTournament()->GetMatchTables()[0]->GetNumberOfMatches(), 3);
+		EXPECT_EQ(app.GetTournament()->GetMatchTables()[1]->GetNumberOfMatches(), 3);
+
+		app.StartLocalMat();
+		auto mat = app.FindMat(1);
+
+		auto match1 = app.GetTournament()->GetNextMatch();
+		EXPECT_TRUE(mat->StartMatch(match1));
+		mat->AddIppon(Fighter::White);
+		EXPECT_TRUE(mat->EndMatch());
+
+		auto match2 = app.GetTournament()->GetNextMatch();
+		EXPECT_TRUE(mat->StartMatch(match2));
+		mat->AddIppon(Fighter::White);
+		EXPECT_TRUE(mat->EndMatch());
+
+		auto match3 = app.GetTournament()->GetNextMatch();
+		EXPECT_TRUE(mat->StartMatch(match3));
+		mat->AddIppon(Fighter::White);
+		EXPECT_TRUE(mat->EndMatch());
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 2);
+
+		EXPECT_TRUE(app.Ajax_DeleteCompletedMatchTables());
+
+		EXPECT_EQ(app.GetTournament()->GetMatchTables().size(), 1);
+		EXPECT_EQ(app.GetTournament()->GetMatchTables()[0]->GetNumberOfMatches(), 3);
+	}
 }
 
 

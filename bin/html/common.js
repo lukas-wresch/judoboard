@@ -8,9 +8,10 @@ var lang_en = {
     age_group:  [ "Age group", "Altersklasse" ],
     age_groups: [ "Age groups", "Altersklassen" ],
     all:   [ "All", "Alle" ],
-    all_mats: [ "All Mats", "Alle Matten" ],
-    birthyear: [ "Birthyear", "Geburtsjahr" ],
-    break_time: [ "Break Time", "Ruhepause" ],
+    all_mats:  [ "All Mats", "Alle Matten" ],
+    audio_device:  [ "Audio Device", "Audioger&auml;t" ],
+    birthyear:  [ "Birthyear", "Geburtsjahr" ],
+    break_time:  [ "Break Time", "Ruhepause" ],
     blue:   [ "Blue", "Blau" ],
     blue_wins:  [ "Blue Wins",  "Sieger Blau" ],
     both:  [ "Both",  "Beide" ],
@@ -21,6 +22,7 @@ var lang_en = {
     configuration: [ "Configuration", "Konfiguration" ],
     database:  [ "Database", "Stammdaten" ],
     details:  [ "Details", "Details" ],
+    default:  [ "Default", "Standard" ],
     default_rule_set: [ "Default Rule Set", "Standard Regelwerk" ],
     description:  [ "Description", "Beschreibung" ],
     delete:  [ "Delete", "L&ouml;schen" ],
@@ -55,6 +57,7 @@ var lang_en = {
     firstname:  [ "Given name", "Vorname" ],
     fixed_at_bottom:  [ "Fixed at bottom", "Unten fixiert" ],
     for:  [ "For", "F&uuml;r" ],
+    fullscreen:  [ "Fullscreen", "Vollbild" ],
     gachi_revoked:  [ "Gachi revoked!", "Gachi zur&uuml;ckgenommen!" ],
     gender:  [ "Gender", "Geschlecht" ],
     goldenscore_time:  [ "Golden Score Time", "Golden Score Zeit" ],
@@ -95,6 +98,7 @@ var lang_en = {
     matches: [ "Matches", "K&auml;mpfe" ],
     mat:  [ "Mat", "Matte" ],
     mats:  [ "Mats", "Matten" ],
+    mats_on_startup:  [ "Mats on startup", "Matten bei Programmstart" ],
     match_log:  [ "Match Log", "Kampfprotokoll" ],
     male:  [ "Male", "M&auml;nnlich" ],
     medical_examiniation:   [ "Medical Examination",  "Medizinische Untersuchung" ],
@@ -105,7 +109,9 @@ var lang_en = {
     min_participants:  [ "Min participants", "Mindestteilnehmer" ],
     max_participants:  [ "Max participants", "Maximalteilnehmer" ],
     max_weight_diff:  [ "Weight difference", "Gewichtsunterschied" ],
+    monitor:  [ "Monitor", "Monitor" ],
     more:  [ "More", "Mehr" ],
+    move_to_mat:  [ "Move to mat", "Auf Matte verschieben" ],
     match_revised:  [ "Match revised", "Kampf revidiert" ],
     match_started:  [ "Match started", "Kampf gestartet" ],
     match_time:  [ "Match Time", "Kampfzeit" ],
@@ -115,6 +121,7 @@ var lang_en = {
     neutral:  [ "Neutral", "Neutral" ],
     new_account:  [ "New Account", "Neues Benutzerkonto" ],
     new_club:  [ "New Club", "Neuer Verein" ],
+    new_mat: [ "New Mat", "Neue Matte" ],
     new_match: [ "New Match", "Neuer Kampf" ],
     new_matchtable: [ "New Matchtable", "Neuer Kampflist" ],
     none: [ "None", "Keine" ],
@@ -132,7 +139,7 @@ var lang_en = {
     osaekomi_time_wazaari:  [ "Osaekomi Time (Waza-Ari)", "Osaekomi Zeit (Waza-Ari)" ],
     osaekomi_switched: [ "Osaekomi switched to other fighter" , "Osaekomi auf anderen K&auml;pfer gewechselt"],
     overview:  [ "Overview", "&Uuml;bersicht" ],
-    open:  [ "Oppen", "&Ouml;ffnen" ],
+    open:  [ "Open", "&Ouml;ffnen" ],
     optional:  [ "Optional", "Optional" ],
     participants: [ "Participants", "Teilnehmer" ],
     revoke_goldenscore: [ "Revoke Golden Score", "Golden Score zur&uuml;cknehmen" ],
@@ -141,11 +148,14 @@ var lang_en = {
     rule_set:   [ "Rule Set", "Regelwerk" ],
     rule_sets:  [ "Rule Sets", "Regelwerke" ],
     remove:  [ "Remove", "Entfernen" ],
-    revise:  [ "Revise", "Revidiern" ],
+    remove_completed_matchtables:  [ "Remove completed match tables", "Abgeschlossene Kampflisten entfernen" ],
+    remove_matchtables_without_matches:  [ "Remove match tables without matches", "Kampflisten ohne K&auml;mpfe entfernen" ],
+    revise:  [ "Revise", "Revidieren" ],
     revise_match_confirm:  [ "Are you sure you want to revise/restart this match?", "Soll dieser Kampf wirklich revidiert/neugestartet werden?" ],
     running:   [ "Running", "am K&auml;mpfen" ],
     search:  [ "Search", "Suchen" ],
     show:  [ "Show", "Anzeigen" ],
+    show_only_participants:  [ "Show only participants", "Nur Turnierteilnehmer" ],
     shutdown_confirm:  [ "Are you sure you want to shutdown Judoboard?", "Soll Judoboard wirklich heruntergefahren werden?" ],
     start:  [ "Start", "Starten" ],
     start_next_match:  [ "Start Next Match", "Kampf starten" ],
@@ -171,10 +181,12 @@ var lang_en = {
     push_up:  [ "Push Up", "Vorziehen" ],
     options:  [ "Options", "Optionen" ],
     pause:  [ "Pause", "Pause" ],
+    pause_all_mats:  [ "Pause all mats", "Alle Matten pausieren" ],
     parent_association:  [ "Parent Association", "H&ouml;herer Verband" ],
     progressbar:  [ "Progress bar", "Fortschrittsbalken" ],
     organizer:  [ "Organizer", "Organisator" ],
     unpause:  [ "Unpause", "Pause beenden" ],
+    unpause_all_mats:  [ "Unpause all mats", "Pause aufheben" ],
     upload_md5_file: [ "Upload MD5 File", "MD5 Datei hochladen" ],
     user:  [ "User", "Benutzer" ],
     username:  [ "Username", "Benutzername" ],
@@ -226,6 +238,21 @@ function NiceTimeMS(timestamp)
 function NiceLargeTime(timestamp)
 {
   return Math.floor(timestamp/(1000*60*60)) + ':' + zeroPad(Math.floor(timestamp/(1000*60)%60), 2) + ':' + zeroPad(Math.floor((timestamp/1000))%60, 2);
+}
+
+
+
+function ContainsNonPrintableCharacters(str)
+{
+  let regex = /[\x00-\x20\x7F-\x9F\u00A0]+$/;
+  return regex.test(str);
+}
+
+
+function ContainsPrintableCharacters(str)
+{
+  let regex = /^[\x20-\x7E\u00A0]+$/;
+  return regex.test(str);
 }
 
 
@@ -437,10 +464,15 @@ function navigate(url)
 {
   window.clearInterval(TimerID);
 
-  g_LastURL = URL;
-
   window.location = '/#' + url;
-  URL = url;
+
+  if (URL != url)
+  {
+    g_LastURL = URL;
+    URL = url;
+  }
+
+  $( "#main" ).load(URL);
 
   if (window.innerWidth <= 900)//Mobile
     slideout.close();
@@ -461,7 +493,6 @@ window.onhashchange = function(e)
 {
   console.log(location.hash.slice(1));
   navigate(location.hash.slice(1));
-  $( "#main" ).load(URL);
 };
 
 
@@ -491,26 +522,26 @@ function GetRuleSets(callback)
 {
   AjaxCallback("ajax/rule/list", function(response) {
     console.log(response);
-    var res = YAML.parse(response);
+    const res = YAML.parse(response);
 
-    var rules = document.getElementById("rule");
+    let rules = document.getElementById("rule");
 
     while (rules.length >= 1)
       rules.remove(rules.length-1);
 
-    var option = document.createElement("option");
+    let option = document.createElement("option");
     option.value = 0;
     option.text = "(None)";
     rules.add(option);
 
     for (const rule of res.rules)
     {
-      var option = document.createElement("option");
+      let option = document.createElement("option");
 
       option.value = rule.uuid;
 
       if (typeof res.default !== 'undefined' && rule.uuid == res.default)
-        option.text = rule.name + " (" + lang.tournament_default + ")";
+        option.text = rule.name + " (" + translate('tournament_default') + ")";
       else
         option.text = rule.name;
 

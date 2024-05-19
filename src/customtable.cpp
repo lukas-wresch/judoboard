@@ -14,7 +14,7 @@ using namespace Judoboard;
 
 CustomTable::CustomTable(const ITournament* Tournament) : MatchTable(nullptr, Tournament)
 {
-	SetName(Localizer::Translate("Custom"));
+	SetName(Localizer::Translate("Friendly Match"));
 }
 
 
@@ -38,6 +38,7 @@ void CustomTable::operator >> (YAML::Emitter& Yaml) const
 	if (!IsSubMatchTable())
 		Yaml << YAML::EndMap;
 }
+
 
 
 const std::string CustomTable::ToHTML() const
@@ -86,7 +87,7 @@ const std::string CustomTable::ToHTML() const
 		+ "</th><th style=\"width: 1.0cm;\">" + Localizer::Translate("Wins") + "</th><th style=\"width: 1.0cm;\">"
 		+ Localizer::Translate("Score") + "</th><th style=\"width: 1.3cm;\">" + Localizer::Translate("Time") + "</th></tr>";
 
-	for (size_t i = 0; i < GetParticipants().size(); i++)
+	for (size_t i = 0; i < results.GetSize(); i++)
 	{
 		const auto& score = results[i];
 
@@ -108,10 +109,4 @@ const std::string CustomTable::ToHTML() const
 	ret += "</table>";
 
 	return ret;
-}
-
-
-
-void CustomTable::ToString(YAML::Emitter& Yaml) const
-{
 }

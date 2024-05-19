@@ -244,6 +244,24 @@ bool MatchTable::RemoveParticipant(const Judoka* Participant)
 
 
 
+bool MatchTable::DeleteMatch(const UUID& UUID)
+{
+	for (auto it = m_Schedule.begin(); it != m_Schedule.end(); ++it)
+	{
+		if ((*it)->GetUUID() == UUID)
+		{
+			if (!IsSubMatchTable())
+				delete *it;
+			m_Schedule.erase(it);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
 std::string MatchTable::GetDescription() const
 {
 	auto name = GetName();
@@ -251,12 +269,12 @@ std::string MatchTable::GetDescription() const
 	if (name.length() > 0 && GetAgeGroup())
 		return GetAgeGroup()->GetName() + " " + name;
 
-	else if (m_Filter)
+	else if (GetFilter())
 	{
 		if (name.length() > 0)
-			return m_Filter->GetDescription() + " " + name;
+			return GetFilter()->GetDescription() + " " + name;
 		else
-			return m_Filter->GetDescription();
+			return GetFilter()->GetDescription();
 	}
 
 	return name;
@@ -392,6 +410,12 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, co
 	if (Yaml["rule_set"] && Tournament)
 		m_Rules = Tournament->FindRuleSet(Yaml["rule_set"].as<std::string>());
 
+	if (Yaml["matches"] && Yaml["matches"].IsSequence())
+	{
+		for (const auto& node : Yaml["matches"])
+			m_Schedule.emplace_back(new Match(node, this, Tournament));
+	}
+
 	if (Yaml["filter"] && Yaml["filter"].IsMap())
 	{
 		switch ((IFilter::Type)Yaml["filter"]["type"].as<int>())
@@ -409,12 +433,6 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, co
 		}
 
 		assert(GetFilter());
-	}
-
-	if (Yaml["matches"] && Yaml["matches"].IsSequence())
-	{
-		for (const auto& node : Yaml["matches"])
-			m_Schedule.emplace_back(new Match(node, this, Tournament));
 	}
 }
 
@@ -496,7 +514,7 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 		if (GetFilter()->GetType() == IFilter::Type::Weightclass)
 			*GetFilter() >> Yaml;
 		else//Export as fixed participants
-		{
+		{//TODO this should be improved for double elimination filter is losersof
 			Fixed temp(*GetFilter());
 			temp >> Yaml;
 		}
@@ -576,6 +594,15 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 
 
 
+void MatchTable::operator >>(nlohmann::json& Json) const
+{
+	Json["uuid"] = (std::string)GetUUID();
+	Json["mat_id"] = m_MatID;
+	Json["html"] = ToHTML();	
+}
+
+
+
 void MatchTable::OnLotteryPerformed()
 {
 	if (!m_Filter || !GetTournament())
@@ -631,9 +658,10 @@ const std::string MatchTable::GetHTMLTop() const
 		ret += "<div style=\"border-style: dashed; border-width: 2px; border-color: #ccc; padding: 0.3cm; margin-bottom: 0.3cm;\">";
 
 	if (!IsSubMatchTable())
-		ret += "<h3>";
+		ret += "<h3><a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
+	else
+		ret += GetDescription();
 
-	ret += "<a href=\"#matchtable_add.html?id=" + (std::string)GetUUID() + "\">" + GetDescription() + "</a>";
 	if (GetMatID() != 0)
 		ret += " / " + Localizer::Translate("Mat") + " " + std::to_string(GetMatID()) + " / " + GetRuleSet().GetName();
 

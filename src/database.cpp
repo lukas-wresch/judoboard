@@ -86,6 +86,7 @@ bool Database::Load(const std::string& Filename)
 		Localizer::SetLanguage((Language)yaml["language"].as<int>());
 	if (yaml["port"])
 		SetServerPort(yaml["port"].as<int>());
+
 	if (yaml["ippon_style"])
 		SetIpponStyle((Mat::IpponStyle)yaml["ippon_style"].as<int>());
 	if (yaml["osaekomi_style"])
@@ -94,6 +95,13 @@ bool Database::Load(const std::string& Filename)
 		SetTimerStyle((Mat::TimerStyle)yaml["timer_style"].as<int>());
 	if (yaml["name_style"])
 		SetNameStyle((NameStyle)yaml["name_style"].as<int>());
+
+	if (yaml["mat_count"])
+		SetMatCount(yaml["mat_count"].as<int>());
+	if (yaml["results_server"])
+		IsResultsServer(yaml["results_server"].as<bool>());
+	if (yaml["results_server_url"])
+		SetResultsServer(yaml["results_server_url"].as<std::string>());
 
 	//Read standing data
 	StandingData::operator <<(yaml);
@@ -132,10 +140,15 @@ bool Database::Save(const std::string& Filename) const
 	yaml << YAML::Key << "last_tournament_name" << YAML::Value << m_CurrentTournament;
 	yaml << YAML::Key << "language" << YAML::Value << (int)Localizer::GetLanguage();
 	yaml << YAML::Key << "port" << YAML::Value << GetServerPort();
+
 	yaml << YAML::Key << "ippon_style" << YAML::Value << (int)GetIpponStyle();
 	yaml << YAML::Key << "osaekomi_style" << YAML::Value << (int)GetOsaekomiStyle();
 	yaml << YAML::Key << "timer_style" << YAML::Value << (int)GetTimerStyle();
 	yaml << YAML::Key << "name_style"  << YAML::Value << (int)GetNameStyle();
+
+	yaml << YAML::Key << "mat_count" << YAML::Value << (int)GetMatCount();
+	yaml << YAML::Key << "results_server"     << YAML::Value << (bool)IsResultsServer();
+	yaml << YAML::Key << "results_server_url" << YAML::Value << GetResultsServer();
 	
 	StandingData::operator >>(yaml);
 
@@ -271,16 +284,18 @@ bool Database::DoLogin(const std::string& Username, uint32_t IP, const std::stri
 	{
 		if (nonce_it->HasExpired())
 			nonce_it = m_OpenNonces.erase(nonce_it);
+		else
+			++nonce_it;
+	}
 
-		else if (account->Verify(*nonce_it, Response))
+	for (auto nonce_it = m_OpenNonces.cbegin(); nonce_it != m_OpenNonces.cend(); ++nonce_it)
+	{
+		if (account->Verify(*nonce_it, Response))
 		{
 			m_ClosedNonces.insert({ Response, {*nonce_it, account} });
 			m_OpenNonces.erase(nonce_it);
-
 			return true;
 		}
-		else
-			++nonce_it;
 	}
 
 	return false;

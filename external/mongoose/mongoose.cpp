@@ -4106,6 +4106,7 @@ static void process_new_connection(struct mg_connection *conn)
 static int consume_socket(struct mg_context *ctx, struct socket *sp)
 {
   pthread_mutex_lock(&ctx->mutex);
+  ctx->free_threads++;
   ZED::Log::Debug(("going idle"));
 
   // If the queue is empty, wait. We're idle at this point.
@@ -4118,6 +4119,7 @@ static int consume_socket(struct mg_context *ctx, struct socket *sp)
     // Copy socket from the queue and increment tail
     *sp = ctx->queue[ctx->sq_tail % ARRAY_SIZE(ctx->queue)];
     ctx->sq_tail++;
+    ctx->free_threads--;
     //ZED::Log::Debug("grabbed socket, going busy " +  std::to_string(sp->sock));
 
     // Wrap pointers if needed
@@ -4457,4 +4459,25 @@ struct mg_context* mg_start(void (*user_callback)(enum mg_event event, struct mg
   }
 
   return ctx;
+}
+
+
+
+int mg_get_free_worker_count(struct mg_context* ctx)
+{
+    return ctx->free_threads;
+}
+
+
+
+void mg_increase_worker_count(struct mg_context* ctx, int amount)
+{
+    // Start worker threads
+    for (int i = 0; i < amount; i++)
+    {
+        if (mg_start_thread((mg_thread_func_t) worker_thread, ctx) != 0)
+            cry(fc(ctx), "Cannot start worker thread: %d", ERRNO);
+        else
+            ctx->num_threads++;
+    }
 }

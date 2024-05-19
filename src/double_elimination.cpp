@@ -47,11 +47,14 @@ DoubleElimination::DoubleElimination(const YAML::Node& Yaml, const ITournament* 
 	if (Yaml["loser_bracket"])
 		m_LoserBracket = LoserBracket(Yaml["loser_bracket"], Tournament, this);
 
+	//Rebuild schedule
+	BuildSchedule();
+
 #ifdef _DEBUG
 	for (auto match : m_WinnerBracket.GetSchedule())
-		assert(match->GetMatchTable() == &m_WinnerBracket);
+		assert(*match->GetMatchTable() == *this);
 	for (auto match : m_LoserBracket.GetSchedule())
-		assert(match->GetMatchTable() == &m_LoserBracket);
+		assert(*match->GetMatchTable() == *this);
 #endif
 }
 
@@ -62,7 +65,13 @@ void DoubleElimination::operator >> (YAML::Emitter& Yaml) const
 	if (!IsSubMatchTable())
 		Yaml << YAML::BeginMap;
 
+	//Remove schedule so that it doesn't get saved
+	auto temp = GetSchedule();
+	SetSchedule().clear();
+
 	MatchTable::operator >>(Yaml);
+
+	SetSchedule() = std::move(temp);
 
 	Yaml << YAML::Key << "winner_bracket" << YAML::Value;
 	Yaml << YAML::BeginMap;
@@ -105,6 +114,27 @@ size_t DoubleElimination::GetMaxStartPositions() const
 		return 0;
 
 	return m_WinnerBracket.GetMaxStartPositions();
+}
+
+
+
+Match* DoubleElimination::FindMatch(const UUID& UUID) const
+{
+	auto match = m_WinnerBracket.FindMatch(UUID);
+	if (!match)
+		match = m_LoserBracket.FindMatch(UUID);
+	return match;
+}
+
+
+
+bool DoubleElimination::DeleteMatch(const UUID& UUID)
+{
+	bool success = MatchTable::DeleteMatch(UUID);
+
+	success |= m_WinnerBracket.DeleteMatch(UUID);
+	success |= m_LoserBracket.DeleteMatch(UUID);
+	return success;
 }
 
 
@@ -156,20 +186,42 @@ void DoubleElimination::GenerateSchedule()
 
 	m_LoserBracket.GenerateSchedule();
 
-	if (m_WinnerBracket.GetNumberOfRounds() == 4)
+	BuildSchedule();
+}
+
+
+
+void DoubleElimination::BuildSchedule()
+{
+	if (m_WinnerBracket.GetNumberOfRounds() == 3)//8 participants
+	{
+		for (size_t i = 0; i < 4 + 2; i++)
+			AddMatch(m_WinnerBracket.GetSchedule()[i]);
+		for (size_t i = 0; i < 2 + 2; i++)
+			AddMatch(m_LoserBracket.GetSchedule()[i]);
+
+		for (size_t i = 4 + 2; i < m_WinnerBracket.GetSchedule().size(); i++)
+			AddMatch(m_WinnerBracket.GetSchedule()[i]);
+		for (size_t i = 2 + 2; i < m_LoserBracket.GetSchedule().size(); i++)
+			AddMatch(m_LoserBracket.GetSchedule()[i]);
+	}
+
+	else if (m_WinnerBracket.GetNumberOfRounds() == 4)//16 participants
 	{
 		for (size_t i = 0; i < 8 + 4; i++)
 			AddMatch(m_WinnerBracket.GetSchedule()[i]);
-		for (size_t i = 0; i < 4 + 2; i++)
+		for (size_t i = 0; i < 4 + 4; i++)
 			AddMatch(m_LoserBracket.GetSchedule()[i]);
 
 		for (size_t i = 8 + 4; i < 8 + 4 + 2; i++)
 			AddMatch(m_WinnerBracket.GetSchedule()[i]);
-
-		for (size_t i = 4 + 2; i < m_LoserBracket.GetSchedule().size(); i++)
+		for (size_t i = 4 + 4; i < 4 + 4 + 2 + 2; i++)
 			AddMatch(m_LoserBracket.GetSchedule()[i]);
+
 		for (size_t i = 8 + 4 + 2; i < m_WinnerBracket.GetSchedule().size(); i++)
 			AddMatch(m_WinnerBracket.GetSchedule()[i]);
+		for (size_t i = 4 + 4 + 2 + 2; i < m_LoserBracket.GetSchedule().size(); i++)
+			AddMatch(m_LoserBracket.GetSchedule()[i]);
 	}
 
 	else if (m_WinnerBracket.GetNumberOfRounds() == 5)

@@ -66,12 +66,26 @@ namespace Judoboard
 		void SetTimerStyle(Mat::TimerStyle NewStyle) { m_DefaultTimerStyle = NewStyle; }
 		void SetNameStyle(NameStyle NewStyle) { m_DefaultNameStyle = NewStyle; }
 
+		auto GetMatCount() const { return m_MatCount; }
+		auto SetMatCount(uint32_t NewMatCount) { m_MatCount = NewMatCount; }
+
+		bool IsResultsServer() const { return m_ResultsServer; }
+		void IsResultsServer(bool Enable) { m_ResultsServer = Enable; }
+
+		auto GetResultsServer() const { return m_ResultsServerURL; }
+		void SetResultsServer(const std::string& URL) { m_ResultsServerURL = URL; }
+
 	private:
 		mutable std::string m_Filename;
 		bool m_AutoSave = true;
 
 		std::string m_CurrentTournament;//Name of tournament that is currently open
 		uint16_t m_Port = 8080;//Port of the webserver
+
+		uint16_t m_MatCount = 1;//Mat the be created when the application starts
+
+		bool m_ResultsServer = false;//Results server enabled?
+		std::string m_ResultsServerURL = "www.example.com/judoboard/update.php";
 
 		//Mat default settings
 		Mat::IpponStyle m_DefaultIpponStyle = Mat::IpponStyle::DoubleDigit;

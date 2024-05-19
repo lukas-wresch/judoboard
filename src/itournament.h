@@ -34,20 +34,20 @@ namespace Judoboard
 		[[nodiscard]]
 		virtual StandingData& GetDatabase() { return m_StandingData; }//Returns a database containing all participants
 
-		virtual const Association* GetOrganizer() const { return nullptr; }
+		virtual const Association* GetOrganizer() const { assert(false); return nullptr; }
 
-		virtual bool AddMatch(Match* NewMatch) { return false; }
+		virtual bool AddMatch(Match* NewMatch) { assert(false); return false; }
 		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(std::move(NewMatch))); }
 
 		//const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
-		virtual Match* GetNextOngoingMatch(int32_t MatID) { return nullptr; }//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
+		virtual Match* GetNextOngoingMatch(int32_t MatID) { assert(false); return nullptr; }//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
 
 		virtual std::vector<Match> GetNextMatches(int32_t MatID) const = 0;
 		virtual Match* GetNextMatch(int32_t MatID = -1) const = 0;//Returns the next match for a given mat if available, otherwise null pointer is returned
 
-		virtual bool RemoveMatch(const UUID& MatchID) { return false; }
-		virtual bool MoveMatchUp(const UUID& MatchID, uint32_t MatID = 0) { return false; }
-		virtual bool MoveMatchDown(const UUID& MatchID, uint32_t MatID = 0) { return false; }
+		virtual bool RemoveMatch(const UUID& MatchID) { assert(false); return false; }
+		virtual bool MoveMatchUp(const UUID& MatchID, uint32_t MatID = 0) { assert(false); return false; }
+		virtual bool MoveMatchDown(const UUID& MatchID, uint32_t MatID = 0) { assert(false); return false; }
 
 		//Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;
@@ -55,21 +55,21 @@ namespace Judoboard
 			std::vector<Judoka*> ret;
 			return ret;
 		}
-		virtual const Judoka* FindParticipant(const UUID& UUID) const { return nullptr; }
-		virtual Judoka* FindParticipant(const UUID& UUID) { return nullptr; }
+		virtual const Judoka* FindParticipant(const UUID& UUID) const { assert(false); return nullptr; }
+		virtual Judoka* FindParticipant(const UUID& UUID) { assert(false); return nullptr; }
 			
-		virtual bool AddParticipant(Judoka* Judoka) { return false; }
-		virtual bool RemoveParticipant(const UUID& ID) { return false; }
+		virtual bool AddParticipant(Judoka* Judoka) { assert(false); return false; }
+		virtual bool RemoveParticipant(const UUID& ID) { assert(false); return false; }
 
 		virtual bool MarkedAsWeighted(const Judoka& Judoka) { return false; }
 		virtual bool IsMarkedAsWeighted(const Judoka& Judoka) const { return false; }
 
-		virtual uint32_t GetHighestMatIDUsed() const { return 0; }//Returns the highest ID of all mats that are used in the tournament. Returns zero if no mats are used
-		virtual bool IsMatUsed(uint32_t ID) const { return false; }
+		virtual uint32_t GetHighestMatIDUsed() const { assert(false); return 0; }//Returns the highest ID of all mats that are used in the tournament. Returns zero if no mats are used
+		virtual bool IsMatUsed(uint32_t ID) const { assert(false); return false; }
 
 		//Match tables
-		virtual void AddMatchTable(MatchTable* NewMatchTable) {}
-		virtual bool RemoveMatchTable(const UUID& UUID) { return false; }
+		virtual void AddMatchTable(MatchTable* NewMatchTable) { assert(false); }
+		virtual bool RemoveMatchTable(const UUID& UUID) { assert(false); return false; }
 		virtual const std::vector<MatchTable*>& GetMatchTables() const {
 			assert(false);
 			static std::vector<MatchTable*> ret;
@@ -142,16 +142,17 @@ namespace Judoboard
 		virtual std::vector<std::pair<UUID, size_t>> GetLots() const { std::vector<std::pair<UUID, size_t>> ret; return ret; }
 
 		//Events
+		virtual void OnMatchStarted(const Match& Match) const = 0;
 		virtual void OnMatchConcluded(const Match& Match) const = 0;
-		virtual bool OnUpdateParticipant(const UUID& UUID) { return false; }//Calling this function we recalculate the given judoka
-		virtual bool OnUpdateMatchTable(const UUID& UUID)  { return false; }//Calling this function we recalculate the given match table
+		virtual bool OnUpdateParticipant(const UUID& UUID) { assert(false); return false; }//Calling this function we recalculate the given judoka
+		virtual bool OnUpdateMatchTable(const UUID& UUID)  { assert(false); return false; }//Calling this function we recalculate the given match table
 
 		//Serialization
-		virtual const std::string Schedule2String(bool ImportantOnly) const { return ""; }
-		[[deprecated]]
-		virtual const std::string Participants2String() const { return ""; }
-		virtual const std::string MasterSchedule2String() const { return ""; }
+		virtual const std::string Schedule2String(bool ImportantOnly, int Mat = -1) const { assert(false); return ""; }
+		virtual const std::string MasterSchedule2String() const { assert(false); return ""; }
+		virtual nlohmann::json Schedule2ResultsServer() const { assert(false); return ""; }
 
+		virtual void BuildSchedule() {}
 		virtual void GenerateSchedule() {}
 
 		virtual bool Save() { return false; }
@@ -166,7 +167,6 @@ namespace Judoboard
 	protected:
 		StandingData m_StandingData;//Local database for the tournament containing all participants and rule sets
 
-		//mutable std::recursive_mutex m_mutex;
 		ZED::RecursiveReadWriteMutex m_mutex;
 	};
 }

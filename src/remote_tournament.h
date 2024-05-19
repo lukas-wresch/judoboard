@@ -38,6 +38,7 @@ namespace Judoboard
 		virtual RuleSet* FindRuleSet(const UUID& UUID) override;
 
 		//Events
+		virtual void OnMatchStarted(const Match& Match) const { assert(false); }
 		virtual void OnMatchConcluded(const Match& Match) const override;
 
 	private:

@@ -31,10 +31,13 @@ namespace Judoboard
 		virtual size_t GetMaxStartPositions() const override;
 
 		virtual Results CalculateResults() const override { return m_Finals.CalculateResults(); }
+		virtual size_t ResultsCount() const override  { return m_Finals.ResultsCount(); }
 		virtual void GenerateSchedule() override;
 
 		virtual Match* FindMatch(const UUID& UUID) const override;
 		virtual const MatchTable* FindMatchTable(const UUID& UUID) const override;
+
+		virtual bool DeleteMatch(const UUID& UUID) override;
 
 		bool IsThirdPlaceMatch() const { return m_Finals.IsThirdPlaceMatch(); }
 		bool IsFifthPlaceMatch() const { return m_Finals.IsFifthPlaceMatch(); }

@@ -23,11 +23,21 @@
 </div>
 
 <div style="margin-top: 5mm;">
+    <label style="width:200px;float:left;" id="label_http_threads">Free http threads</label>
+    <span  id="http_threads">- - -</span>
+</div>
+
+<div style="margin-top: 5mm;">
   <label style="width:200px;float:left;" id="label_language">Language</label>
   <select style="margin-bottom:0px;" id="language">
     <option value="0" id="english">English</option>
     <option value="1" id="german">German</option>
   </select>
+</div>
+
+<div style="margin-top: 5mm;">
+    <label style="width:200px;float:left;" id="label_startup_mats"></label>
+    <input style="margin-bottom:20px;" type="number" id="mat_count" value="" min="0" max="10" />
 </div>
 
 <div style="margin-top: 5mm;">
@@ -70,6 +80,19 @@
   </select>
 </div>
 
+<div style="margin-top: 5mm;">
+  <label style="width:200px;float:left;" id="label_results_server">Results Server</label>
+  <input type="checkbox" id="results_server" class="switch-input">
+  <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="results_server">
+    <span class="toggle-on" id="results_server_enabled">Enabled</span><span class="toggle-off" id="results_server_disabled">Disabled</span>
+  </label>
+</div>
+
+<div style="margin-top: 5mm;">
+  <label style="width:200px;float:left;" id="label_results_server_url">URL endpoint</label>
+  <input style="margin-bottom:20px;" type="text" id="results_server_url" value="www.example.com/Judoboard/update.php" size="30" maxlength="64"/>
+</div>
+
 <br/>
 
 <button class="neutral" style="margin-right: 2cm;" onclick="return UpdateConfig()" id="update">Save</button>
@@ -100,7 +123,7 @@
 
 function TestConnection()
 {
-  var xhttp = new XMLHttpRequest();
+  let xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function()
   {
     if (this.readyState == 4 && this.status == 200)
@@ -122,7 +145,7 @@ function TestConnection()
 
 function ConnectToMaster()
 {
-  var xhttp = new XMLHttpRequest();
+  let xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function()
   {
     if (this.readyState == 4 && this.status == 200)
@@ -174,12 +197,15 @@ function Update()
 function UpdateConfig()
 {
   let params = URLEncode({
-    language:    document.getElementById("language").value,
-    port:        document.getElementById("port").value,
-    ipponStyle:  document.getElementById("ipponStyle").value,
-    osaekomiStyle:  document.getElementById("osaekomiStyle").value,
-    timerStyle:  document.getElementById("timerStyle").value,
-    nameStyle:   document.getElementById("nameStyle").value,
+    language:      document.getElementById("language").value,
+    mat_count:     document.getElementById("mat_count").value,
+    port:          document.getElementById("port").value,
+    ipponStyle:    document.getElementById("ipponStyle").value,
+    osaekomiStyle: document.getElementById("osaekomiStyle").value,
+    timerStyle:    document.getElementById("timerStyle").value,
+    nameStyle:     document.getElementById("nameStyle").value,
+    results_server:      document.getElementById("results_server").checked,
+    results_server_url:  document.getElementById("results_server_url").value,
   });
 
   AjaxPost("ajax/config/set_setup", params, function(){
@@ -209,15 +235,22 @@ function GetStatus()
       document.getElementById("version").innerHTML = res.version;
       document.getElementById("uptime").innerHTML  = NiceLargeTime(res.uptime);
       document.getElementById("language").value = res.language;
+      document.getElementById("mat_count").value = res.mat_count;
       language = res.language;
       document.getElementById("port").value = res.port;
       document.getElementById("ipponStyle").value = res.ippon_style;
       document.getElementById("osaekomiStyle").value = res.osaekomi_style;
       document.getElementById("timerStyle").value = res.timer_style;
       document.getElementById("nameStyle").value  = res.name_style;
+      document.getElementById("results_server").checked   = res.results_server;
+      document.getElementById("results_server_url").value = res.results_server_url;
+      document.getElementById("http_threads").innerHTML = res.http_workers_free;
     }
     else
+    {
       document.getElementById("uptime").innerHTML = NiceLargeTime(res.uptime);
+      document.getElementById("http_threads").innerHTML = res.http_workers_free;
+    }
   });
 }
 
@@ -229,3 +262,7 @@ TimerID = window.setInterval(GetStatus, 1000);
 
 document.getElementById("progressbar").innerHTML     = translate('progressbar');
 document.getElementById("fixed_at_bottom").innerHTML = translate('fixed_at_bottom');
+document.getElementById("label_startup_mats").innerHTML = translate('mats_on_startup');
+
+document.getElementById("results_server_enabled").innerHTML  = translate('enabled');
+document.getElementById("results_server_disabled").innerHTML = translate('disabled');

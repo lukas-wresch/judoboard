@@ -57,6 +57,7 @@ public:
 		Request(const Request& Org)//Deep copy
 			: m_Query(Org.m_Query), m_Body(Org.m_Body, Org.m_Body.GetSize()), m_RequestInfo(Org.m_RequestInfo), m_ResponseHeader(Org.m_ResponseHeader) {
 		}
+		void operator =(const Request& Org) = delete;
 
 		Request(const std::string& Query) : m_Query(Query) {}
 		Request(const std::string& Query, ZED::Blob&& Body) : m_Query(Query), m_Body(std::move(Body)) {}
@@ -72,10 +73,12 @@ public:
 	};
 
 	HttpServer() : m_Port(0) {}
-	HttpServer(uint16_t Port);
 	HttpServer(HttpServer&) = delete;
 	HttpServer(const HttpServer&) = delete;
+	HttpServer(HttpServer&& rhs) = delete;
 	~HttpServer();
+
+	void Start(uint16_t Port);
 
 	[[nodiscard]]
 	uint16_t GetPort() const { return m_Port; }
@@ -102,6 +105,14 @@ public:
 
 	[[nodiscard]]
 	bool IsRunning() const { return m_Context; }
+
+	[[nodiscard]]
+	uint32_t GetWorkerCount() const;
+
+	[[nodiscard]]
+	uint32_t GetFreeWorkerCount() const;
+
+	void IncreaseWorkerCount(uint32_t Amount = 1);
 		
 	//void RegisterResource(const std::string& URI, std::string (*Callback)(const std::string Query), ResourceType Type = ResourceType::HTML);
 	//void RegisterResource(const std::string& URI, std::function<std::string(Request&)> Callback, ResourceType Type = ResourceType::HTML);
@@ -123,6 +134,7 @@ private:
 	};
 
 	void* Callback(mg_event Event, mg_connection* Connection);
+
 
 	mg_context* m_Context = nullptr;
 	uint16_t m_Port;

@@ -44,7 +44,7 @@
 
 function AddAgeGroup()
 {
-  var params = URLEncode({
+  let params = URLEncode({
     name:    document.getElementById("name").value,
     min_age: document.getElementById("min_age").value,
     max_age: document.getElementById("max_age").value,
@@ -100,7 +100,7 @@ function GetAgeGroup(id)
 
 function UpdateAgeGroup()
 {
-  var params = URLEncode({
+  let params = URLEncode({
     name:    document.getElementById("name").value,
     min_age: document.getElementById("min_age").value,
     max_age: document.getElementById("max_age").value,

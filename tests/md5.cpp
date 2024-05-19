@@ -3370,7 +3370,7 @@ TEST(MD5, ExportSingleElimination32)
 
 
 
-TEST(MD5, ReadMD7TestData)
+TEST(MD7, ReadMD7TestData)
 {
 	initialize();
 
@@ -3381,4 +3381,330 @@ TEST(MD5, ReadMD7TestData)
 	file.Dump();
 
 	Tournament t(file);
+}
+
+
+
+TEST(MD7, ImportKEM_U13_2024_05_05)
+{
+	initialize();
+
+	{
+		Localizer::SetLanguage(Language::German);
+
+		MD5 file("test-data/KEM_U13_05052024_02.md7");
+
+		ASSERT_TRUE(file);
+
+		file.Dump();
+
+		Database db;
+		Tournament tour(file, &db);
+
+		auto table = tour.FindMatchTableByDescription("weibliche Jugend U13 -10 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 0);
+		EXPECT_EQ(table->GetSchedule().size(),    0);
+
+
+		table = tour.FindMatchTableByDescription("weibliche Jugend U13 -27 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 0);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+
+
+		table = tour.FindMatchTableByDescription("weibliche Jugend U13 -30 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 1);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+
+
+		table = tour.FindMatchTableByDescription("weibliche Jugend U13 -33 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 1);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+
+
+		table = tour.FindMatchTableByDescription("weibliche Jugend U13 -36 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 3);
+		EXPECT_EQ(table->GetSchedule().size(),     3);//!!!
+
+
+		table = tour.FindMatchTableByDescription("weibliche Jugend U13 -40 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 1);
+		EXPECT_EQ(table->GetSchedule().size(),    0);
+
+
+		table = tour.FindMatchTableByDescription("weibliche Jugend U13 -44 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 1);
+		EXPECT_EQ(table->GetSchedule().size(),    0);
+
+
+		table = tour.FindMatchTableByDescription("weibliche Jugend U13 -48 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 2);
+		EXPECT_EQ(table->GetSchedule().size(),    3);
+		EXPECT_TRUE(table->GetSchedule()[2]->HasDependentMatches());
+
+
+		table = tour.FindMatchTableByDescription("weibliche Jugend U13 -52 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 0);
+		EXPECT_EQ(table->GetSchedule().size(),    0);
+
+
+		table = tour.FindMatchTableByDescription("weibliche Jugend U13 -57 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 2);
+		EXPECT_EQ(table->GetSchedule().size(),    3);
+		EXPECT_TRUE(table->GetSchedule()[2]->HasDependentMatches());
+
+
+		table = tour.FindMatchTableByDescription("weibliche Jugend U13 +57 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 1);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -10 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 1);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -28 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 0);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -31 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 2);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+		EXPECT_TRUE(table->GetSchedule()[2]->HasDependentMatches());
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -34 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 2);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+		EXPECT_TRUE(table->GetSchedule()[2]->HasDependentMatches());
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -37 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 4);
+		EXPECT_EQ(table->GetSchedule().size(),     6);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -40 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 3);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -43 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 6);
+		EXPECT_EQ(table->GetSchedule().size(),     4 + 2 + 1 + 2 + 2 + 1 + 1);
+		EXPECT_EQ(table->GetType(), MatchTable::Type::DoubleElimination);
+		EXPECT_TRUE( ((DoubleElimination*)table)->IsThirdPlaceMatch() );
+		EXPECT_TRUE( ((DoubleElimination*)table)->IsFifthPlaceMatch() );
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -46 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 3);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -50 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 1);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -55 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 0);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 +55 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 4);
+		EXPECT_EQ(table->GetSchedule().size(),     6);
+
+		tour.OnUpdateMatchTable(*table);
+		EXPECT_EQ(table->GetParticipants().size(), 4);
+		EXPECT_EQ(table->GetSchedule().size(),     6);
+	}
+
+	ZED::Core::RemoveFile("tournaments/KEM_U13_05052024_02.yml");
+}
+
+
+
+TEST(MD7, ImportKT_U11_U15_2024_05_05)
+{
+	initialize();
+
+	{
+		Localizer::SetLanguage(Language::German);
+
+		MD5 file("test-data/KT_U11_U15_05052024_04.md7");
+
+		ASSERT_TRUE(file);
+
+		file.Dump();
+
+		Database db;
+		Tournament tour(file, &db);
+
+		auto table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend u11 -25,3 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 3);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend u11 -27,5 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 4);
+		EXPECT_EQ(table->GetSchedule().size(),     6);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend u11 -28,6 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 4);
+		EXPECT_EQ(table->GetSchedule().size(),     6);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend u11 -30,9 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 3);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend u11 -33,7 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 4);
+		EXPECT_EQ(table->GetSchedule().size(),     6);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend u11 -37,3 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 4);
+		EXPECT_EQ(table->GetSchedule().size(),     6);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend u11 -43,2 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 4);
+		EXPECT_EQ(table->GetSchedule().size(),     6);
+
+
+		table = tour.FindMatchTableByDescription(u8"weibliche Jugend U11 -10 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 1);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+
+
+		table = tour.FindMatchTableByDescription(u8"weibliche Jugend U11 -26 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 3);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+
+
+		table = tour.FindMatchTableByDescription(u8"weibliche Jugend U11 -31 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 4);
+		EXPECT_EQ(table->GetSchedule().size(),     6);
+
+
+		table = tour.FindMatchTableByDescription(u8"weibliche Jugend U11 -36,2 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 5);
+		EXPECT_EQ(table->GetSchedule().size() ,   10);
+
+
+		table = tour.FindMatchTableByDescription(u8"weibliche Jugend U11 -36,2 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 5);
+		EXPECT_EQ(table->GetSchedule().size(),    10);
+
+
+		table = tour.FindMatchTableByDescription(u8"weibliche Jugend U11 -43,1 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 3);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+
+
+		table = tour.FindMatchTableByDescription(u8"weibliche Jugend U11 -55,8 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 1);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+
+
+		table = tour.FindMatchTableByDescription(u8"weibliche Jugend U15 -42,9 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 2);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+		EXPECT_TRUE(table->GetSchedule()[2]->HasDependentMatches());
+		EXPECT_EQ(table->GetSchedule()[2]->GetStatus(), Status::Optional);
+
+
+		table = tour.FindMatchTableByDescription(u8"weibliche Jugend U15 -54,9 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 3);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+
+
+		table = tour.FindMatchTableByDescription(u8"weibliche Jugend U15 -61,3 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 2);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+		EXPECT_TRUE(table->GetSchedule()[2]->HasDependentMatches());
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U15 -10 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 2);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U15 -32,9 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 1);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U15 -44,6 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 2);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U15 -54 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 3);
+		EXPECT_EQ(table->GetSchedule().size(),     3);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U15 -62,1 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 4);
+		EXPECT_EQ(table->GetSchedule().size(),     6);
+
+
+		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U15 -88 kg");
+		ASSERT_TRUE(table);
+		EXPECT_EQ(table->GetParticipants().size(), 1);
+		EXPECT_EQ(table->GetSchedule().size(),     0);
+	}
+
+	ZED::Core::RemoveFile("tournaments/KT_U11_U15_05052024_04.yml");
 }

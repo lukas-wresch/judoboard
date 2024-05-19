@@ -22,15 +22,10 @@ namespace Judoboard
 	class Application : public ZED::RecursiveReadWriteMutex//TODO should be private/or private member
 	{
 	public:
-		Application() : m_StartupTimestamp(Timer::GetTimestamp()) {
-			m_TempTournament.EnableAutoSave(false);
-			m_CurrentTournament = &m_TempTournament;
-
-			std::string token = (std::string)ID::GenerateUUID();
-			m_SecurityToken   = token.substr(0, 32);
-		}
-		Application(uint16_t Port);
+		Application();
 		~Application();
+
+		bool StartHttpServer(uint16_t Port);
 
 		bool CheckAccessToken(const std::string& Token) const {
 			return m_SecurityToken == Token;
@@ -54,7 +49,7 @@ namespace Judoboard
 
 		bool LoadDataFromDisk();
 		const Account* GetDefaultAdminAccount() const;
-
+		
 		//DM4
 		std::string AddDM4File(const DM4& File, bool ParseOnly = false, bool* pSuccess = nullptr);
 
@@ -90,7 +85,7 @@ namespace Judoboard
 		const IMat* FindMat(uint32_t ID) const;
 		uint32_t GetHighestMatID() const;
 
-		bool StartLocalMat(uint32_t ID = 1);
+		IMat* StartLocalMat(uint32_t ID = 1);
 		bool CloseMat(uint32_t ID);
 
 		bool RegisterMatWithMaster(IMat* Mat);
@@ -98,6 +93,8 @@ namespace Judoboard
 		std::vector<Match> GetNextMatches(uint32_t MatID, bool& Success) const;
 
 		bool ConnectToMaster(const std::string& Hostname, uint16_t Port = 8080);
+
+		void RequestPushToResultsServer() const { m_RequestResultsServer = true; }
 
 		void Run();
 		void Shutdown() const { m_Running = false; }
@@ -117,14 +114,16 @@ namespace Judoboard
 		Error Ajax_AssignAgeGroup(const HttpServer::Request& Request);
 		std::string Ajax_ListTournaments();
 		Error Ajax_SwapMatchesOfTournament(const HttpServer::Request& Request);
+		Error Ajax_DeleteMatchlessMatchTables();
+		Error Ajax_DeleteCompletedMatchTables();
 
 		//Mat
 		std::string Ajax_GetMats() const;
-		Error Ajax_OpenMat(  const HttpServer::Request& Request);
-		Error Ajax_CloseMat( const HttpServer::Request& Request);
-		Error Ajax_PauseMat( const HttpServer::Request& Request);
+		Error Ajax_OpenMat( const HttpServer::Request& Request);
+		Error Ajax_CloseMat(const HttpServer::Request& Request);
+		Error Ajax_PauseMat(const HttpServer::Request& Request);
+		Error Ajax_PauseAllMats(const HttpServer::Request& Request);
 		Error Ajax_UpdateMat(const HttpServer::Request& Request);
-		Error Ajax_SetFullscreen(bool Fullscreen, const HttpServer::Request& Request);
 
 		std::string Ajax_GetNamesOnMat(const HttpServer::Request& Request);
 
@@ -176,6 +175,8 @@ namespace Judoboard
 		//Match tables
 		Error Ajax_AddMatchTable(HttpServer::Request Request);
 		Error Ajax_EditMatchTable(const HttpServer::Request& Request);
+		Error Ajax_MoveMatchTable(const HttpServer::Request& Request);
+		Error Ajax_MoveAllMatchTables(const HttpServer::Request& Request);
 		std::string Ajax_GetMatchTable(const HttpServer::Request& Request);
 		std::string Ajax_ListAllMatchTables(const HttpServer::Request& Request);
 		std::string Ajax_GetParticipantsFromMatchTable(const HttpServer::Request& Request);
@@ -255,6 +256,9 @@ namespace Judoboard
 
 		//mutable std::recursive_mutex m_mutex;
 		//ZED::ReadWriteMutex m_mutex;
+
+		mutable volatile bool m_RequestResultsServer = false;//If true a push to the results server has been requested
+		uint32_t m_ResultsServer_LastUpdate = 0;//Timestamp of the last update
 
 		mutable volatile bool m_Running = true;
 		const uint32_t m_StartupTimestamp;

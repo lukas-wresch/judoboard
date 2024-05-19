@@ -21,7 +21,7 @@ bool Application::NoWindow = false;
 
 
 
-Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Timer::GetTimestamp())
+Application::Application() : m_StartupTimestamp(Timer::GetTimestamp())
 {
 	m_TempTournament.EnableAutoSave(false);
 	m_TempTournament.SetDefaultRuleSet(new RuleSet);//Take default rule set as rule set for temporary tournaments
@@ -29,28 +29,37 @@ Application::Application(uint16_t Port) : m_Server(Port), m_StartupTimestamp(Tim
 
 	std::string token = (std::string)ID::GenerateUUID();
 	m_SecurityToken   = token.substr(0, 32);
+}
 
-	if (!m_Server.IsRunning())
+
+
+bool Application::StartHttpServer(uint16_t Port)
+{
+	m_Server.Start(Port);
+
+	if (m_Server.IsRunning())
 	{
-		ZED::Log::Error("Could not start http server!");
-		Shutdown();
-	}
-	else
 		SetupHttpServer();
+		return true;
+	}
+
+	ZED::Log::Error("Could not start http server!");
+	Shutdown();
+	return false;	
 }
 
 
 
 Application::~Application()
 {
+	m_Running = false;
+	m_CurrentTournament = nullptr;
+
 	if (!m_Database.Save("database.yml"))
 		ZED::Log::Error("Could not save database!");
 
 	for (auto mat : m_Mats)
 		delete mat;
-
-	m_Running = false;
-	m_CurrentTournament = nullptr;
 
 	for (auto tournament : m_Tournaments)
 		delete tournament;
@@ -232,6 +241,7 @@ bool Application::OpenTournament(const UUID& UUID)
 
 	auto guard = LockWriteForScope();
 
+	tournament->SetApplication(this);
 	m_CurrentTournament = tournament;
 
 	//Restart ongoing matches
@@ -396,7 +406,7 @@ bool Application::CloseMat(uint32_t ID)
 
 
 
-bool Application::StartLocalMat(uint32_t ID)
+IMat* Application::StartLocalMat(uint32_t ID)
 {
 	ZED::Log::Info("Starting local mat");
 
@@ -408,11 +418,11 @@ bool Application::StartLocalMat(uint32_t ID)
 
 		for (auto mat : m_Mats)
 		{
-			if (mat && mat->GetType() == IMat::Type::LocalMat && mat->IsOpen())
+			/*if (mat && mat->GetType() == IMat::Type::LocalMat && mat->IsOpen())
 			{
 				ZED::Log::Warn("A local mat is already open, can not open another mat");
 				return false;
-			}
+			}*/
 
 			if (mat && mat->GetMatID() == ID)
 			{
@@ -451,11 +461,11 @@ bool Application::StartLocalMat(uint32_t ID)
 		if (!RegisterMatWithMaster(new_mat))
 		{
 			ZED::Log::Error("Could not register mat with master");
-			return false;
+			return nullptr;
 		}
 	}
 
-	return true;
+	return new_mat;
 }
 
 
@@ -675,6 +685,8 @@ void Application::Run()
 	while (IsRunning())
 	{
 		LockRead();
+
+		//Check if there is a mat that should be removed
 		for (auto it = m_Mats.begin(); it != m_Mats.end();)
 		{
 			if (*it && !(*it)->IsConnected())
@@ -694,6 +706,7 @@ void Application::Run()
 				++it;
 		}
 
+		//Auto-save
 		if (GetTournament() && GetTournament()->IsLocal())
 		{
 			Tournament* tournament = (Tournament*)GetTournament();
@@ -703,12 +716,82 @@ void Application::Run()
 				if (!tournament->Save())
 					ZED::Log::Error("Failed to save!");
 			}
+
+			if (m_Database.IsResultsServer())
+			{
+				auto time_since_last_update = (Timer::GetTimestamp() - m_ResultsServer_LastUpdate) / 1000;
+				if (time_since_last_update >= 60 ||
+					(m_RequestResultsServer && time_since_last_update >= 10) )
+				{
+					auto endpoint = m_Database.GetResultsServer();
+					auto data = GetTournament()->Schedule2ResultsServer();
+
+					auto guard = LockReadForScope();
+					for (auto mat : GetMats())
+					{
+						if (mat)
+						{
+							data["mats"].push_back({ "id",   mat->GetMatID(),
+													 "name", mat->GetName()});
+						}
+					}
+
+					auto index = endpoint.find_first_of('/', 0);
+					if (index != std::string::npos)
+					{
+						auto host = endpoint.substr(0, index);
+						auto path = endpoint.substr(index);
+
+						FILE* file = nullptr;
+						fopen_s(&file, "results.json", "w");
+						if (file)
+						{
+							fprintf(file, "%s", data.dump().c_str());
+							fclose(file);
+						}
+
+#ifdef _WIN32
+						std::string command = endpoint + " -k -d " + "@results.json";
+						ShellExecuteA(NULL, "open", "curl.exe", command.c_str(), NULL, SW_HIDE);
+#else
+						std::string command = "curl.exe " + endpoint + " -k -d " + "@results.json";
+						system(command.c_str());
+#endif
+
+						/*std::thread([data, host, path]() {
+							ZED::HttpClient client(host);
+							client.POST(path, data);
+							auto response = client.RecvResponse();
+							assert(response.header == "ok");
+						}).detach();*/
+
+						m_ResultsServer_LastUpdate = Timer::GetTimestamp();
+						m_RequestResultsServer = false;
+						ZED::Log::Info("Pushed update to results server");
+					}
+				}
+			}
 		}
+
 		UnlockRead();
 
-		ZED::Core::Pause(10 * 1000);
-		runtime += 10;
+#ifdef _DEBUG
+		if (m_Server.GetFreeWorkerCount() == 0)
+		{
+			m_Server.IncreaseWorkerCount();
+			ZED::Log::Debug("Increased http worker count");
+		}
+#else
+		if (m_Server.GetFreeWorkerCount() == 0)
+			m_Server.IncreaseWorkerCount(3);
+		else if (m_Server.GetFreeWorkerCount() <= 2)
+			m_Server.IncreaseWorkerCount();
+#endif
 
+		ZED::Core::Pause(5 * 1000);
+		runtime += 5;
+
+		//Auto-save database
 		if (runtime % (5 * 60) == 0)//Every 5 minutes
 		{
 			if (!m_Database.Save())

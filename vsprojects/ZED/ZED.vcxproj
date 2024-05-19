@@ -56,6 +56,8 @@
     <ClInclude Include="..\..\ZED\include\sha512.h" />
     <ClInclude Include="..\..\ZED\include\socket.h" />
     <ClInclude Include="..\..\ZED\include\socket_tcp.h" />
+    <ClInclude Include="..\..\ZED\include\sound.h" />
+    <ClInclude Include="..\..\ZED\include\zed.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

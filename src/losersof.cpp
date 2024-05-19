@@ -72,6 +72,8 @@ void LosersOf::Recalculate() const
 	std::unordered_map<size_t, const DependentJudoka> ret;
 	size_t i = 0;
 
+	m_Mutex.lock();
+
 	for (auto match : m_MatchTable.GetSchedule())
 		ret.insert({ i++, DependentJudoka(DependencyType::TakeLoser, *match) });
 
@@ -79,4 +81,5 @@ void LosersOf::Recalculate() const
 		ret.erase(i-1);
 
 	SetParticipants(std::move(ret));//Save to cache
+	m_Mutex.unlock();
 }

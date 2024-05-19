@@ -24,13 +24,15 @@ namespace Judoboard
 			Results ret;
 			return ret;
 		}
+		virtual size_t ResultsCount() const override {
+			return 0;
+		}
 
 		virtual size_t GetMaxStartPositions() const { return 0; }
 
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const;
 		virtual const std::string ToHTML() const override;
-		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 
 	private:

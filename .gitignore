@@ -382,6 +382,7 @@ FodyWeavers.xsd
 *.csv
 *.dll
 *.txt
+*.zip
 *.testdurations
 
 
@@ -390,6 +391,7 @@ FodyWeavers.xsd
 /bin/Judoboard.exe
 /bin/Judoboard_Debug.exe
 *.yml
+*.json
 /bin/tournaments/*.md5
 /bin/*.md5
 *.lastcodeanalysissucceeded

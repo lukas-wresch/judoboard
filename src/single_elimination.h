@@ -65,9 +65,18 @@ namespace Judoboard
 			MatchTable::DeleteSchedule();
 		}
 
+		virtual bool DeleteMatch(const UUID& UUID) override;
+
 		virtual const std::vector<Match*> GetSchedule() const override;
 
 		virtual Results CalculateResults() const override;
+		virtual size_t ResultsCount() const override {
+			if (IsThirdPlaceMatch() && IsFifthPlaceMatch())
+				return std::min((size_t)6, GetParticipants().size());
+			else if (!IsThirdPlaceMatch() && !IsFifthPlaceMatch())
+				return std::min((size_t)2, GetParticipants().size());
+			return std::min((size_t)4, GetParticipants().size());
+		}
 		virtual void GenerateSchedule() override;
 
 		virtual bool AddMatch(Match* NewMatch) override;
@@ -87,7 +96,7 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	protected:
-		std::string RenderMatch(const Match& match, std::string style = "") const;
+		std::string RenderMatch(const Match& Match, const std::string& Style = "") const;
 
 		std::vector<Match*> m_ThirdPlaceMatches;
 		std::vector<Match*> m_FifthPlaceMatches;
