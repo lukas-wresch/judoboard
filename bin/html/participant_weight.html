@@ -45,6 +45,8 @@ function WeighParticipant(id)
     if (resp == "ok")
     {
       document.getElementById("weight_" + id).parentElement.style.backgroundColor = "#0b0";
+      delete weight_upload[id];
+      localStorage.setItem('weight_upload', JSON.stringify(weight_upload));
     }
   });
 

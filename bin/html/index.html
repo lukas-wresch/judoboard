@@ -197,6 +197,25 @@ function Update_MatCount()
       }
     }
   });
+
+
+  var g_weight_upload = localStorage.getItem("weight_upload");
+  if (typeof g_weight_upload == 'string')
+  {
+    g_weight_upload = JSON.parse(g_weight_upload);
+
+    for (let id in g_weight_upload)
+    {
+      AjaxCallback('ajax/participant/weight/update?id=' + id + "&weight=" + g_weight_upload[id], function(resp) {
+        if (resp == "ok")
+        {
+          document.getElementById("weight_" + id).parentElement.style.backgroundColor = "#0b0";
+          delete g_weight_upload[id];
+          localStorage.setItem('weight_upload', JSON.stringify(g_weight_upload));
+        }
+       });
+    }
+  }
 }
 
 
