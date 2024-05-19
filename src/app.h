@@ -8,6 +8,7 @@
 #include "dmf.h"
 #include "imat.h"
 #include "error.h"
+#include "../external/license/license.h"
 #include "HttpServer/HttpServer.h"
 
 
@@ -21,6 +22,8 @@ namespace Judoboard
 
 	class Application : public ZED::RecursiveReadWriteMutex//TODO should be private/or private member
 	{
+		friend class License;
+
 	public:
 		Application();
 		~Application();
@@ -86,7 +89,7 @@ namespace Judoboard
 		uint32_t GetHighestMatID() const;
 
 		IMat* StartLocalMat(uint32_t ID = 1);
-		bool CloseMat(uint32_t ID);
+		bool  CloseMat(uint32_t ID);
 
 		bool RegisterMatWithMaster(IMat* Mat);
 
@@ -128,6 +131,8 @@ namespace Judoboard
 		std::string Ajax_GetNamesOnMat(const HttpServer::Request& Request);
 
 		//Commands
+		Error Ajax_StartMatch(const HttpServer::Request& Request);
+		Error Ajax_EndMatch(const HttpServer::Request& Request);
 		Error Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request);
 		Error Ajax_RemoveDisqualification(Fighter Whom, const HttpServer::Request& Request);
 		Error Ajax_NoDisqualification(Fighter Whom, const HttpServer::Request& Request);

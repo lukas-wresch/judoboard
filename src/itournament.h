@@ -126,16 +126,16 @@ namespace Judoboard
 			std::vector<WeightclassDescCollection> ret;
 			return ret;
 		}
-		virtual bool ApplyWeightclasses(const std::vector<WeightclassDescCollection>& Descriptors) { return false; }
+		virtual bool ApplyWeightclasses(const std::vector<WeightclassDescCollection>& Descriptors) { assert(false); return false; }
 
 		//Disqualifications
-		virtual void Disqualify(const Judoka& Judoka) {}
-		virtual void RevokeDisqualification(const Judoka& Judoka) {}
+		virtual void Disqualify(const Judoka& Judoka) { assert(false); }
+		virtual void RevokeDisqualification(const Judoka& Judoka) { assert(false); }
 
 		//Lots
-		virtual bool PerformLottery() { return false; }
-		virtual uint32_t GetLotteryTier() const { return 0; }
-		virtual void SetLotteryTier(uint32_t NewLotteryTier) {}
+		virtual bool PerformLottery() { assert(false); return false; }
+		virtual uint32_t GetLotteryTier() const { assert(false); return 0; }
+		virtual bool SetLotteryTier(uint32_t NewLotteryTier) { assert(false); return false; }
 		virtual std::vector<std::pair<UUID, size_t>> GetLots() const { std::vector<std::pair<UUID, size_t>> ret; return ret; }
 
 		//Events
