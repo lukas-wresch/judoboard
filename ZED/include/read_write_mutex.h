@@ -232,7 +232,7 @@ namespace ZED
                 m_WritingCount++;
                 m_OwnerID = std::this_thread::get_id();
             }
-            return true;
+            return success;
         }
 
         bool HasWriteLock() const

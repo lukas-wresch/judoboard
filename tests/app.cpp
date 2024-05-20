@@ -672,7 +672,7 @@ TEST(App, FullTournament_StressTest)
 		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
 
 		const int mat_count = 8;
-		const int judoka_count = 50;
+		const int judoka_count = 60;
 
 		Judoka* j[judoka_count];
 
@@ -845,6 +845,9 @@ TEST(App, FullTournament_StressTest)
 
 		ZED::Core::Pause(25 * 1000);
 
+		for (int i = 0; i < thread_count; i++)
+			mat_update_thread[i].join();
+
 		for (auto mat : mats)
 		{
 			mat->EndMatch();
@@ -860,8 +863,6 @@ TEST(App, FullTournament_StressTest)
 			swp[i].join();
 		for (int i = 0; i < thread_count; i++)
 			html[i].join();
-		for (int i = 0; i < thread_count; i++)
-			mat_update_thread[i].join();
 
 		delete tourney;
 	}
