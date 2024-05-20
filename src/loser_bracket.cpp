@@ -361,7 +361,7 @@ const std::string LoserBracket::ToHTML() const
 					style += "border-left-style: hidden;";
 				else if (infuse)
 					style += "border-left-style: hidden;";
-				else if (!infuse && (y + offset) % split >= round)
+				else if ((y + offset) % split >= round)//For not infuse stage
 					style += "border-left-style: hidden;";
 				if (round+1 == rounds)
 					style += "border-right-style: hidden;";

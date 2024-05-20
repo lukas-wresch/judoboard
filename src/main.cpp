@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 	//Log start time
 	auto date = ZED::Core::GetDate();
 	char buffer[128];
-	snprintf(buffer, sizeof(buffer), "Application start at %d.%d.%d at %d:%d:%d",
+	snprintf(buffer, sizeof(buffer), "Application start at %u.%u.%u at %u:%u:%u",
 		date.day, date.month, date.year, date.hour, date.minute, date.second);
 	ZED::Log::Info(buffer);
 
@@ -395,14 +395,14 @@ int main(int argc, char** argv)
 	switch (Judoboard::License::GetLicenseState())
 	{
 	case Judoboard::License::State::FileNotExist:
-#ifdef _WIN32
 		do_update = true;
+#ifdef _WIN32
 		MessageBox(NULL, L"Demo version! The program will close after 30 minutes.", L"Judoboard", MB_OK | MB_ICONINFORMATION);
 #endif
 		break;
 	case Judoboard::License::State::Expired:
-#ifdef _WIN32
 		do_update = true;
+#ifdef _WIN32
 		MessageBox(NULL, L"License expired!", L"Judoboard", MB_OK | MB_ICONERROR);
 #endif
 		break;
