@@ -601,8 +601,8 @@ TEST(DoubleElimination, Count6_Example)
 {
 	initialize();
 
-	Tournament* t = new Tournament("Tournament Name");
-	t->EnableAutoSave(false);
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
 
 	Judoka* j[33];
 	bool has_match[33];
@@ -905,8 +905,8 @@ TEST(DoubleElimination, Count7_Example)
 {
 	initialize();
 
-	Tournament* t = new Tournament("Tournament Name");
-	t->EnableAutoSave(false);
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
 
 	Judoka* j[33];
 	bool has_match[33];
@@ -1072,8 +1072,8 @@ TEST(DoubleElimination, Count11_Example)
 {
 	initialize();
 
-	Tournament* t = new Tournament("Tournament Name");
-	t->EnableAutoSave(false);
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
 
 	Judoka* j[33] = {};
 	const size_t count = 11;
@@ -1344,6 +1344,96 @@ TEST(DoubleElimination, Count11_Example)
 	EXPECT_TRUE(m.StartMatch(schedule[29 - 1]));
 	m.AddIppon(Fighter::White);
 	EXPECT_TRUE(m.EndMatch());
+
+
+	auto results = group->CalculateResults();
+
+	ASSERT_EQ(results.GetSize(), 6);
+	EXPECT_EQ(results[0].Judoka->GetFirstname(), "Wulf");
+	EXPECT_EQ(results[1].Judoka->GetFirstname(), "Petra");
+	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Matthias");
+	EXPECT_EQ(results[3].Judoka->GetFirstname(), "Alexa");
+	EXPECT_EQ(results[4].Judoka->GetFirstname(), "Peter");
+	EXPECT_EQ(results[5].Judoka->GetFirstname(), "Hans");
+
+	delete t;
+}
+
+
+
+TEST(DoubleElimination, Count20_Example)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
+
+	Judoka* j[33] = {};
+	const size_t count = 11;
+
+	j[1]  = new Judoka("Alexa", "", 50);
+	j[2]  = new Judoka("Hans", "", 50);
+	j[3]  = new Judoka("Johann", "", 50);
+	j[4]  = new Judoka("Peter", "", 50);
+	j[5]  = new Judoka("Wulf", "", 50);
+	j[6]  = new Judoka("Tim", "", 50);
+	j[7]  = new Judoka("Matthias", "", 50);
+	j[8]  = new Judoka("Petra", "", 50);
+	j[9]  = new Judoka("Sophie", "", 50);
+	j[10] = new Judoka("Luft", "", 50);
+	j[11] = new Judoka("Kathrin", "", 50);
+	j[12] = new Judoka("12", "", 50);
+	j[13] = new Judoka("13", "", 50);
+	j[14] = new Judoka("14", "", 50);
+	j[15] = new Judoka("15", "", 50);
+	j[16] = new Judoka("16", "", 50);
+	j[17] = new Judoka("17", "", 50);
+	j[18] = new Judoka("18", "", 50);
+	j[19] = new Judoka("19", "", 50);
+	j[20] = new Judoka("20", "", 50);
+
+	DoubleElimination* group = new DoubleElimination(0, 200);
+	group->IsThirdPlaceMatch(true);
+	group->IsFifthPlaceMatch(true);
+	group->SetMatID(1);
+	t->AddMatchTable(group);
+
+	for (int i = 1; i <= 32; ++i)
+	{
+		if (j[i])
+			t->AddParticipant(j[i]);
+	}
+
+	for (int i = 1; i <= 32; ++i)
+	{
+		if (j[i])
+			group->SetStartPosition(j[i], i-1);
+	}
+
+	for (int i = 1; i <= 32; ++i)
+	{
+		if (j[i])
+			EXPECT_EQ(*group->GetJudokaByStartPosition(i-1), *j[i]);
+	}
+
+	EXPECT_EQ(group->GetMaxStartPositions(), 16);
+	group->GenerateSchedule();
+
+	auto& winner_schedule = group->GetWinnerBracket().GetSchedule();
+	auto& loser_schedule  = group->GetLoserBracket() .GetSchedule();
+
+	ASSERT_EQ(winner_schedule.size(),  16 + 8 + 4 + 2 + 1);
+	EXPECT_EQ(loser_schedule.size(),    8 + 8 + 4 + 4 + 2 + 2 + 1 + 1);
+
+	Mat m(1);
+
+	auto& schedule = group->GetSchedule();
+	EXPECT_EQ(schedule.size(), winner_schedule.size() + loser_schedule.size());
+
+	t->Save();
+	
+
+	//TODO
 
 
 	auto results = group->CalculateResults();
