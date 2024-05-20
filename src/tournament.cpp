@@ -1284,6 +1284,8 @@ bool Tournament::MarkedAsWeighted(const Judoka& Judoka)
 	if (!FindParticipant(Judoka))
 		return false;
 
+	auto guard = LockWriteForScope();
+
 	m_JudokaWeighted.insert(Judoka);
 	return true;
 }
@@ -1292,6 +1294,8 @@ bool Tournament::MarkedAsWeighted(const Judoka& Judoka)
 
 bool Tournament::IsMarkedAsWeighted(const Judoka& Judoka) const
 {
+	auto guard = LockReadForScope();
+
 #ifdef _DEBUG
 	if (!FindParticipant(Judoka))
 		assert(m_JudokaWeighted.find(Judoka) == m_JudokaWeighted.cend());

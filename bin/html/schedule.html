@@ -696,10 +696,15 @@ function Update_Participants()
       cell0.style.fontSize  = "14pt";
       
       cell1.innerHTML = "<a href=\"#judoka_add.html?id=" + judoka.uuid + "\">" + judoka.firstname + '&nbsp;' + judoka.lastname + '</a>';
+
       cell1.style.fontSize  = "16pt";
       cell2.innerHTML = judoka.weight + ' kg';
       cell2.style.textAlign = "center";
       cell2.style.fontSize  = "16pt";
+      if (judoka.is_weighted)
+        cell2.style.backgroundColor = "#0b0";
+      else
+        cell2.style.backgroundColor = "#c00";
 
       if (typeof judoka.club_name !== 'undefined')
         cell6.innerHTML = judoka.club_name;

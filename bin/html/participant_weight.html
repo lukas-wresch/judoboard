@@ -2,7 +2,7 @@
 
 <div>
   <label id="label_name" style="width:150px;float:left;margin-top:5px;">Name</label>
-  <input style="margin-bottom:20px;" size="50" id="name" value="">
+  <input style="margin-bottom:20px;" size="50" id="search" value="">
 </div>
 
 <table id="judokas" border="1" rules="all" style="margin-bottom: 1cm;">
@@ -47,6 +47,14 @@ function WeighParticipant(id)
       document.getElementById("weight_" + id).parentElement.style.backgroundColor = "#0b0";
       delete weight_upload[id];
       localStorage.setItem('weight_upload', JSON.stringify(weight_upload));
+
+      for (let judoka of g_WeightData)
+      {
+        if (judoka.uuid == id)
+          judoka.weight = weight;
+      }
+
+      DownloadData();
     }
   });
 
@@ -154,10 +162,10 @@ function RenderTable(name)
     if (e.target && e.target.type === "number" && e.key === "Enter")
       WeighParticipant(e.target.id);
   });
-  table.addEventListener('change', function (e) {
-    if (e.target && e.target.type === "number")
-      WeighParticipant(e.target.id);
-  });
+  //table.addEventListener('change', function (e) {
+    //if (e.target && e.target.type === "number")
+      //WeighParticipant(e.target.id);
+  //});
 }
 
 
@@ -172,15 +180,15 @@ function DownloadData()
 
     g_WeightData = res;
 
-    RenderTable(document.getElementById("name").value);
+    RenderTable(document.getElementById("search").value);
   });
 }
 
 
 
-document.getElementById("name").oninput = function(e)
+document.getElementById("search").oninput = function(e)
 {
-  RenderTable(document.getElementById("name").value);
+  RenderTable(document.getElementById("search").value);
 };
 
 DownloadData();

@@ -209,9 +209,9 @@ function Update_MatCount()
       AjaxCallback('ajax/participant/weight/update?id=' + id + "&weight=" + g_weight_upload[id], function(resp) {
         if (resp == "ok")
         {
-          document.getElementById("weight_" + id).parentElement.style.backgroundColor = "#0b0";
           delete g_weight_upload[id];
           localStorage.setItem('weight_upload', JSON.stringify(g_weight_upload));
+          document.getElementById("weight_" + id).parentElement.style.backgroundColor = "#0b0";
         }
        });
     }
@@ -257,6 +257,7 @@ AjaxCallback("ajax/config/get_setup", function(response) {
   document.getElementById("navi_schedule").innerHTML = translate('schedule');
   document.getElementById("navi_new_participant").innerHTML = translate('new_participant');
   document.getElementById("navi_label_mats").innerHTML = translate('mats');
+  document.getElementById("navi_weigh_participants").innerHTML = translate('weigh_participants');
   document.getElementById("navi_new_match").innerHTML = translate('new_match');
   document.getElementById("navi_lots").innerHTML = translate('lots');
 
@@ -296,7 +297,7 @@ AjaxCallback("/ajax/get_status", function(response) {
         $("#navi_list_age").show();
     }
 
-    else if (status >= 3)
+    if (status >= 3)
     {
         $("#navi_server_config").show();
     }

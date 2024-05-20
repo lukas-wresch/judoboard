@@ -196,6 +196,7 @@ var lang_en = {
     update_account:  [ "Update Account", "Benutzerkonto &auml;ndern" ],
     update_club:   [ "Update Club", "Verein &auml;ndern" ],
     wazaari_revoked:  [ "Wazaari revoked!", "Wazaari zur&uuml;ckgenommen!" ],
+    weigh_participants:  [ "Weigh Participants", "Teilnehmer wiegen" ],
     weight:  [ "Weight", "Gewicht" ],
     weightclass:  [ "Weightclass", "Gewichtsklasse" ],
     white:  [ "White", "Wei&szlig;" ],
