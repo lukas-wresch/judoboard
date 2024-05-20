@@ -2433,6 +2433,51 @@ TEST(Ajax, MatchTable_MoveAll)
 
 
 
+TEST(Ajax, MatchTable_DistributeEvenly)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto& tables = app.GetTournament()->GetMatchTables();
+
+		for (int i = 0; i < 100; i++)
+			app.GetTournament()->AddMatchTable(new RoundRobin(10, 50));
+
+		for (int i = 0; i < 10; i++)
+		{
+			int mats = rand() % 10 + 1;
+			int sim  = rand() % 10 + 1;
+			EXPECT_TRUE(app.Ajax_DistributeMatchTablesEvenly(HttpServer::Request("mats=" + std::to_string(mats) + "&simultaneous=" + std::to_string(sim))) );
+
+			int data[20][100];//mats, schedule_index
+			for (int i = 0; i < 20; i++)
+				for (int j = 0; j < 100; j++)
+					data[i][j] = 0;
+
+			for (auto table : tables)
+				data[table->GetMatID()][table->GetScheduleIndex()]++;
+			
+			for (int i = 1; i < 20; i++)
+				for (int j = 0; j < 100; j++)
+			{
+				if (i > mats)
+					EXPECT_EQ(data[i][j], 0);
+				else
+				{
+					EXPECT_LE(data[i][j], sim);
+
+					if (j == 0)
+						EXPECT_EQ(data[i][j], sim);
+				}
+			}
+		}
+	}
+}
+
+
+
 TEST(Ajax, MatchTable_Get)
 {
 	initialize();
