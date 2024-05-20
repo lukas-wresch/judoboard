@@ -665,6 +665,9 @@ TEST(App, FullTournament_StressTest)
 	Application::NoWindow = false;
 
 	{
+		Application app;
+		app.LoadDataFromDisk();
+
 		auto tournament_name = GetRandomName();
 		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
 
@@ -679,11 +682,11 @@ TEST(App, FullTournament_StressTest)
 			tourney->AddParticipant(j[i]);
 		}
 
-		MatchTable* m1 = new RoundRobin(Weight(0),  Weight(60));
-		MatchTable* m2 = new RoundRobin(Weight(60), Weight(70));
-		MatchTable* m3 = new RoundRobin(Weight(70), Weight(80));
-		MatchTable* m4 = new RoundRobin(Weight(80), Weight(90));
-		MatchTable* m5 = new RoundRobin(Weight(90), Weight(100));
+		MatchTable* m1 = new DoubleElimination(Weight(0),  Weight(60));
+		MatchTable* m2 = new DoubleElimination(Weight(60), Weight(70));
+		MatchTable* m3 = new DoubleElimination(Weight(70), Weight(80));
+		MatchTable* m4 = new DoubleElimination(Weight(80), Weight(90));
+		MatchTable* m5 = new DoubleElimination(Weight(90), Weight(100));
 
 		tourney->AddMatchTable(m1);
 		tourney->AddMatchTable(m2);
@@ -695,8 +698,7 @@ TEST(App, FullTournament_StressTest)
 		IMat* mats[mat_count];
 		for (int i = 0; i < mat_count; ++i)
 		{
-			mats[i] = new Mat(i + 1);
-			//mats[i]->SetAudio(false, "", 0);
+			mats[i] = new Mat(i + 1, &app);
 		}
 
 
@@ -778,11 +780,24 @@ TEST(App, FullTournament_StressTest)
 			}
 		};
 
+		auto mat_update = [&]() {
+			for (int i = 0; tourney->GetStatus() != Status::Concluded && i < 8000; ++i)
+			{
+				for (int i = 0; i < mat_count; ++i)
+				{
+					mats[i]->SetAudio(rand()%2 == 0 ? true : false, rand()%2 == 0 ? "gong" : "airhorn", 0);
+				}
+
+				ZED::Core::Pause(10);
+			}
+		};
+
 		const int thread_count = 4;
 		std::thread add[thread_count];
 		std::thread rem[thread_count];
 		std::thread swp[thread_count];
 		std::thread html[thread_count];
+		std::thread mat_update_thread[thread_count];
 
 		for (int i = 0; i < thread_count; i++)
 			add[i] = std::thread(adder);
@@ -792,6 +807,8 @@ TEST(App, FullTournament_StressTest)
 			swp[i] = std::thread(swapper);
 		for (int i = 0; i < thread_count; i++)
 			html[i] = std::thread(show_schedule);
+		for (int i = 0; i < thread_count; i++)
+			mat_update_thread[i] = std::thread(mat_update);
 
 
 		while (tourney->GetSchedule().size() > 0 && tourney->GetStatus() != Status::Concluded)
@@ -843,6 +860,8 @@ TEST(App, FullTournament_StressTest)
 			swp[i].join();
 		for (int i = 0; i < thread_count; i++)
 			html[i].join();
+		for (int i = 0; i < thread_count; i++)
+			mat_update_thread[i].join();
 
 		delete tourney;
 	}

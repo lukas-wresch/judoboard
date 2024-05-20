@@ -162,18 +162,11 @@ namespace Judoboard
 
 		virtual void SetAudio(bool Enabled, const std::string& NewFilename, int DeviceID) override
 		{
-			if (!m_Sound || GetSoundFilename() != NewFilename)
-			{
-				m_Sound = std::move(ZED::Sound("assets/sounds/" + NewFilename + ".wav"));
-				if (m_Sound)
-					ZED::Log::Info("Sound file loaded");
-				else
-					ZED::Log::Warn("Could not load sound file");
-			}
-
+			m_mutex.LockWrite();
 			SetSoundFilename(NewFilename);
 			EnableSound(Enabled);
 			SetAudioDeviceID(DeviceID);
+			m_mutex.UnlockWrite();
 		}
 
 		virtual void QueueSoundFile() const override {
@@ -192,26 +185,13 @@ namespace Judoboard
 
 
 	private:
-		void PlaySoundFile() const {
-			if (!IsSoundEnabled()) return;
-
-			if (GetAudioDeviceID() <= -1)//Default
-				m_Sound.Play();
-			else
-			{
-				if (m_AudioDevice.GetDeviceIndex() != GetAudioDeviceID())
-					m_AudioDevice = ZED::SoundDevice(GetAudioDeviceID());
-
-				assert(m_AudioDevice.IsValid());
-				m_AudioDevice.Play(m_Sound);
-			}
-		}
+		void PlaySoundFile() const;
 		virtual void StopSoundFile() const override {
 			if (!IsSoundEnabled()) return;
 
-			if (GetAudioDeviceID() <= -1)//Default
+			/*if (GetAudioDeviceID() <= -1)//Default
 				m_Sound.Stop();
-			else
+			else*/
 				m_AudioDevice.Stop();
 		}
 
@@ -578,7 +558,6 @@ namespace Judoboard
 		mutable ZED::Ref<ZED::Texture> m_Logo;
 		mutable ZED::Ref<ZED::Texture> m_Winner;
     
-		mutable ZED::Sound m_Sound;//Sound file
 		mutable ZED::SoundDevice m_AudioDevice;
 		mutable volatile bool m_QueueSound = false;//Flag to notify the main thread to play the sound file
 

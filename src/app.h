@@ -96,6 +96,14 @@ namespace Judoboard
 
 		void RequestPushToResultsServer() const { m_RequestResultsServer = true; }
 
+		const ZED::Sound* GetSound(const std::string& Name) const {
+			auto ret = m_Sounds.find(Name);
+			assert(ret != m_Sounds.end());
+			if (ret == m_Sounds.end())
+				return nullptr;
+			return &ret->second;
+		}
+
 		void Run();
 		void Shutdown() const { m_Running = false; }
 
@@ -251,6 +259,8 @@ namespace Judoboard
 		ITournament* m_CurrentTournament = nullptr;//Tournament that is currently open
 
 		std::vector<IMat*> m_Mats;//List of all mats this application is aware of
+
+		std::map<std::string, ZED::Sound> m_Sounds;
 
 		//mutable std::recursive_mutex m_mutex;
 		//ZED::ReadWriteMutex m_mutex;
