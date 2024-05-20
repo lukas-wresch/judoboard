@@ -416,9 +416,12 @@ int main(int argc, char** argv)
 	{
 		std::thread([]() {
 			char url[512];
-			char computer_name[MAX_COMPUTERNAME_LENGTH + 1] = {};
 #ifdef _WIN32
-			GetComputerNameA(computer_name, NULL);
+			char computer_name[MAX_COMPUTERNAME_LENGTH + 1] = {};
+			DWORD size = MAX_COMPUTERNAME_LENGTH;
+			GetComputerNameA(computer_name, &size);
+#else
+			char computer_name[] = "Linux";
 #endif
 			snprintf(url, sizeof(url), "/judoboard/license.php?id=%s&name=%s", Judoboard::License::GetUserID(), computer_name);
 
