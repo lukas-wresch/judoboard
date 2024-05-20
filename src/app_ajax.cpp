@@ -4346,12 +4346,12 @@ Error Application::Ajax_SetStartPosition(const HttpServer::Request& Request)
 Error Application::Ajax_DistributeMatchTablesEvenly(const HttpServer::Request& Request)
 {
 	int mats = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mats"));
-	int tables_simultaneously = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "tables_simultaneously"));
+	int tables_simultaneous = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "simultaneous"));
 
 	if (mats <= 0)
 		mats = 1;
-	if (tables_simultaneously <= 0)
-		tables_simultaneously = 1;
+	if (tables_simultaneous <= 0)
+		tables_simultaneous = 1;
 
 	auto guard = LockWriteForScope();
 
@@ -4393,7 +4393,7 @@ Error Application::Ajax_DistributeMatchTablesEvenly(const HttpServer::Request& R
 		table->SetScheduleIndex(index);
 
 		sub_index++;
-		if (sub_index % tables_simultaneously == 0)
+		if (sub_index % tables_simultaneous == 0)
 		{
 			mat_index++;//Next mat
 
