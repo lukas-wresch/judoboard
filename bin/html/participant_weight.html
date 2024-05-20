@@ -1,0 +1,203 @@
+<h1 id="headline"></h1>
+
+<div>
+  <label id="label_name" style="width:150px;float:left;margin-top:5px;">Name</label>
+  <input style="margin-bottom:20px;" size="50" id="search" value="">
+</div>
+
+<table id="judokas" border="1" rules="all" style="margin-bottom: 1cm;">
+  <tr>
+    <th style="width: 0.5cm;" id="no">No.</th>
+    <th style="width: 6.2cm;" id="name">Name</th>
+    <th style="width: 6.2cm;" id="club">Club</th>
+    <th style="width: 2cm; text-align: center;" id="weight">Weight</th>
+    <th style="width: 2cm; text-align: center;" id="birthyear">Birthyear</th>
+    <th style="width: 5.1cm; text-align: center;" id="options">Options</th>
+  </tr>
+</table>
+
+
+<script>
+
+function WeighParticipant(id)
+{
+  let weight = document.getElementById(id).value;
+
+  let weight_upload = localStorage.getItem("weight_upload");
+  if (typeof weight_upload != 'string')
+  {
+    weight_upload = {};
+    weight_upload[id] = weight;
+  }
+  else
+  {
+    weight_upload = JSON.parse(weight_upload);
+    weight_upload[id] = weight;
+  }
+  localStorage.setItem('weight_upload', JSON.stringify(weight_upload));
+  
+  document.getElementById("weight_" + id).parentElement.style.backgroundColor = "#ff0";
+  document.getElementById(id).value = "";
+  document.getElementById("button_" + id).disabled  = true;
+  document.getElementById("weight_" + id).innerHTML = weight + " kg";
+
+  AjaxCallback('ajax/participant/weight/update?id=' + id + "&weight=" + weight, function(resp) {
+    if (resp == "ok")
+    {
+      document.getElementById("weight_" + id).parentElement.style.backgroundColor = "#0b0";
+      delete weight_upload[id];
+      localStorage.setItem('weight_upload', JSON.stringify(weight_upload));
+
+      for (let judoka of g_WeightData)
+      {
+        if (judoka.uuid == id)
+          judoka.weight = weight;
+      }
+
+      DownloadData();
+    }
+  });
+
+  return false;
+}
+
+
+
+function RemoveWeighParticipant(id)
+{
+  AjaxCallback('ajax/participant/weight/remove?id=' + id, Update);
+  return false;
+}
+
+
+
+var g_WeightData;
+
+function RenderTable(name)
+{
+  let table = document.getElementById("judokas");
+
+  while (table.rows.length > 1)
+    table.deleteRow(table.rows.length-1);
+
+  let no = 0;
+  for (const judoka of g_WeightData)
+  {
+    //Filter judoka by name in JS
+    if (!JudokaContainsSearchString(judoka, name))
+      continue;
+
+    let row = table.insertRow(-1);
+    let cell0 = row.insertCell(0);
+    let cell1 = row.insertCell(1);
+    let cell2 = row.insertCell(2);
+    let cell3 = row.insertCell(3);
+    let cell4 = row.insertCell(4);
+    let cell5 = row.insertCell(5);
+
+    if (judoka.is_weighted)
+    {
+      if (no%2 == 0)
+        row.style.backgroundColor = "#0c0";
+      else
+        row.style.backgroundColor = "#0b0";        
+    }
+    else
+    {
+      if (no%2 == 0)
+        row.style.backgroundColor = "#c00";
+      else
+        row.style.backgroundColor = "#b00";
+    }
+    //if (no%2 == 0)
+      //row.style.backgroundColor = "#eee";
+    no++;
+
+    cell0.innerHTML = no;
+    cell0.style.textAlign = "center";
+    cell0.style.fontSize  = "16pt";
+
+    cell1.innerHTML = judoka.firstname + ' ' + judoka.lastname;
+    cell1.style.fontSize  = "16pt";
+
+    if (typeof judoka.club_name === 'undefined')
+      cell2.innerHTML = "- - -";
+    else
+      cell2.innerHTML = judoka.club_name;
+    cell2.style.fontSize  = "16pt";
+
+    cell3.innerHTML = judoka.weight + " kg";
+    cell3.id = "weight_" + judoka.uuid;
+    cell3.style.textAlign = "center";
+    cell3.style.fontSize  = "16pt";
+
+    cell4.innerHTML = judoka.birthyear;
+    cell4.style.textAlign = "center";
+    cell4.style.fontSize  = "16pt";
+
+        
+    let numberInput = document.createElement("input");
+    numberInput.setAttribute("type", "number");
+    //numberInput.setAttribute("inputmode", "decimal");
+    //numberInput.setAttribute("inputmode", "search");
+    numberInput.style.width = "1.4cm";
+    numberInput.style.fontSize = "14pt";
+    numberInput.id  = judoka.uuid;
+    numberInput.min = 1;
+    numberInput.max = 999;
+
+    cell5.appendChild(numberInput);
+
+    cell5.innerHTML += "<button disabled id=\"button_" + judoka.uuid + "\" class=\"neutral\" style=\"width: 2.8cm; height: 0.9cm; margin-left: 5mm;\" onclick=\"return WeighParticipant('"+judoka.uuid+"')\">" + translate('update') + "</button>";
+    cell5.style.textAlign = "right";
+  }
+
+
+  table.addEventListener('input', function (e) {
+    if (e.target && e.target.type === "number")
+      document.getElementById("button_" + e.target.id).disabled = false;
+  });
+
+  table.addEventListener('keydown', function (e) {
+    if (e.target && e.target.type === "number" && e.key === "Enter")
+      WeighParticipant(e.target.id);
+  });
+  //table.addEventListener('change', function (e) {
+    //if (e.target && e.target.type === "number")
+      //WeighParticipant(e.target.id);
+  //});
+}
+
+
+
+function DownloadData()
+{
+  //let name = document.getElementById("name").value;
+
+  AjaxCallback('ajax/judoka/search?participants=true', function(response) {
+    console.log(response);
+    const res = YAML.parse(response);
+
+    g_WeightData = res;
+
+    RenderTable(document.getElementById("search").value);
+  });
+}
+
+
+
+document.getElementById("search").oninput = function(e)
+{
+  RenderTable(document.getElementById("search").value);
+};
+
+DownloadData();
+
+document.getElementById("headline").innerHTML = translate('weigh_participants');
+document.getElementById("no").innerHTML   = translate('no');
+document.getElementById("club").innerHTML = translate('club');
+document.getElementById("weight").innerHTML = translate('weight');
+document.getElementById("birthyear").innerHTML = translate('birthyear');
+document.getElementById("options").innerHTML = translate('options');
+
+</script>

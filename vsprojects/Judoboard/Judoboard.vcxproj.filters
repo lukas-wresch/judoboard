@@ -439,5 +439,8 @@
     <None Include="..\..\bin\html\tournament_settings.html">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\bin\html\participant_weight.html">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

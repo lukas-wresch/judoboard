@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="jquery-ui.css">
 <script type="text/javascript" src="jquery-latest.min.js"></script>
 <script type="text/javascript" src="common.js"></script>
+<script type="text/javascript" src="sha512.min.js"></script>
 <script type="text/javascript" src="slideout.min.js"></script>
 <script type="text/javascript" src="jquery-ui.min.js"></script>
 <script type="text/javascript" src="yaml.min.js"></script>
@@ -30,6 +31,7 @@
       <li><a id="navi_schedule" href="#schedule.html">Schedule</a></li>
       <li><a id="navi_list_class" href="#matchtable_list.html">List Classes</a></li>
       <li><a id="navi_new_participant" href="#participant_add.html">New Participant</a></li>
+      <li><a id="navi_weigh_participants" href="#participant_weight.html">Weigh Participants</a></li>
       <li><a id="navi_new_match" href="#add_match.html">New Match</a></li>
       <li><a id="navi_lots" href="#lots.html">Lots</a></li>
     </ul>
@@ -159,6 +161,26 @@ function Update_MatCount()
     console.log(response);
     const res = YAML.parse(response);
     
+    if (typeof res == 'string')
+    {
+      let username = sessionStorage.getItem('username');
+      let password = sessionStorage.getItem('password');
+
+      AjaxCallback('ajax/get_nonce', function(challenge) {
+        let challenge_response = sha512(username + challenge + password);
+
+        let params = URLEncode({
+          username:  username,
+          challenge: challenge,
+          response:  challenge_response
+        });
+
+        AjaxPost('ajax/login', params, function(resp) {});
+      });
+
+      return;
+    }
+
     g_MatList = res;
     let matlist = document.getElementById("navi_mats");
 
@@ -175,6 +197,25 @@ function Update_MatCount()
       }
     }
   });
+
+
+  var g_weight_upload = localStorage.getItem("weight_upload");
+  if (typeof g_weight_upload == 'string')
+  {
+    g_weight_upload = JSON.parse(g_weight_upload);
+
+    for (let id in g_weight_upload)
+    {
+      AjaxCallback('ajax/participant/weight/update?id=' + id + "&weight=" + g_weight_upload[id], function(resp) {
+        if (resp == "ok")
+        {
+          delete g_weight_upload[id];
+          localStorage.setItem('weight_upload', JSON.stringify(g_weight_upload));
+          document.getElementById("weight_" + id).parentElement.style.backgroundColor = "#0b0";
+        }
+       });
+    }
+  }
 }
 
 
@@ -216,6 +257,7 @@ AjaxCallback("ajax/config/get_setup", function(response) {
   document.getElementById("navi_schedule").innerHTML = translate('schedule');
   document.getElementById("navi_new_participant").innerHTML = translate('new_participant');
   document.getElementById("navi_label_mats").innerHTML = translate('mats');
+  document.getElementById("navi_weigh_participants").innerHTML = translate('weigh_participants');
   document.getElementById("navi_new_match").innerHTML = translate('new_match');
   document.getElementById("navi_lots").innerHTML = translate('lots');
 
@@ -241,7 +283,7 @@ AjaxCallback("ajax/config/get_setup", function(response) {
 
 
 AjaxCallback("/ajax/get_status", function(response) {
-    var status = response;
+    let status = response;
 
     if (status >= 2)
     {

@@ -43,7 +43,7 @@ void Application::SetupHttpServer()
 	m_Server.RegisterResource("/de.png", [](auto& Request) { return HttpServer::LoadFile("html/de.png"); }, HttpServer::ResourceType::Image_PNG, 24*60*60);
 
 
-	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "judoka_add", "judoka_list", "judoka_edit", "lots",
+	std::string urls[] = { "schedule", "mat", "mat_configure", "mat_edit", "participant_add", "participant_weight", "judoka_add", "judoka_list", "judoka_edit", "lots",
 		"club_list", "club_add", "association_list", "association_add", "add_match", "edit_match", "account_add", "account_edit", "account_change_password", "account_list",
 		"matchtable_list", "matchtable_add", "matchtable_creator", "rule_add", "rule_list", "age_groups_add", "age_groups_list", "age_groups_select", "tournament_list", "tournament_add", "tournament_settings",
 		"server_config"
@@ -1364,6 +1364,15 @@ void Application::SetupHttpServer()
 			return Error();//OK
 
 		return Error(Error::Type::OperationFailed);
+	});
+
+
+	m_Server.RegisterResource("/ajax/participant/weight/update", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::User);
+		if (!error)
+			return error;
+
+		return Ajax_UpdateParticipantWeight(Request);
 	});
 
 
@@ -3207,7 +3216,7 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 	{
 		change_judoka(judoka);
 		success = true;
-	}	
+	}
 
 	//Search for participant
 	if (GetTournament())
@@ -3224,7 +3233,10 @@ Error Application::Ajax_EditJudoka(const HttpServer::Request& Request)
 			success = true;
 
 			if (weight_changed || gender_changed || birthyear_changed)
+			{
+				GetTournament()->MarkedAsWeighted(*judoka);
 				GetTournament()->OnUpdateParticipant(*judoka);
+			}
 		}
 	}
 
@@ -3300,6 +3312,9 @@ std::string Application::Ajax_SearchJudoka(const HttpServer::Request& Request)
 		if (judoka_age_group)
 			to_search += judoka_age_group->GetName();
 
+		to_search += std::to_string(judoka->GetBirthyear());
+
+		//Convert to lower case
 		std::transform(to_search.begin(), to_search.end(), to_search.begin(),
 			[](unsigned char c) { return std::tolower(c); });
 
@@ -3351,6 +3366,8 @@ std::string Application::Ajax_SearchJudoka(const HttpServer::Request& Request)
 
 		LockRead();
 		ret << YAML::Key << "is_participant" << YAML::Value << GetTournament()->IsParticipant(*judoka);
+		ret << YAML::Key << "is_weighted"    << YAML::Value << GetTournament()->IsMarkedAsWeighted(*judoka);
+
 		auto age_groups = GetTournament()->GetEligableAgeGroupsOfJudoka(judoka);
 		UnlockRead();
 
@@ -3421,6 +3438,29 @@ Error Application::Ajax_DeleteJudoka(const HttpServer::Request& Request)
 		return Error::Type::OperationFailed;
 
 	return Error();//OK
+}
+
+
+
+Error Application::Ajax_UpdateParticipantWeight(const HttpServer::Request& Request)
+{
+	UUID id       = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+	Weight weight = Weight(HttpServer::DecodeURLEncoded(Request.m_Query, "weight"));
+
+	auto guard = LockWriteForScope();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	auto judoka = GetTournament()->FindParticipant(id);
+	if (!judoka)
+		return Error::Type::ItemNotFound;
+
+	judoka->SetWeight(weight);
+	GetTournament()->MarkedAsWeighted(*judoka);
+	GetTournament()->OnUpdateParticipant(*judoka);
+
+	return Error::Type::NoError;
 }
 
 

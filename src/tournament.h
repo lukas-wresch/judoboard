@@ -103,6 +103,9 @@ namespace Judoboard
 		virtual       Judoka* FindParticipant(const UUID& UUID)       override { return m_StandingData.FindJudoka(UUID); }
 		virtual const Judoka* FindParticipant(const UUID& UUID) const override { return m_StandingData.FindJudoka(UUID); }
 
+		virtual bool MarkedAsWeighted(const Judoka& Judoka) override;
+		virtual bool IsMarkedAsWeighted(const Judoka& Judoka) const override;
+
 		uint32_t GetHighestMatIDUsed() const;//Returns the highest ID of all mats that are used in the tournament. Returns zero if no mats are used
 		bool IsMatUsed(uint32_t ID) const;
 
@@ -259,6 +262,7 @@ namespace Judoboard
 		std::unordered_set<UUID> m_DisqualifiedJudoka;
 
 		std::unordered_map<UUID, UUID> m_JudokaToAgeGroup;//Maps judoka to the age group he/she is starting in
+		std::set<UUID> m_JudokaWeighted;
 		std::vector<std::pair<UUID, size_t>> m_AssociationToLotNumber;//Maps associations to the lot number
 	};
 }

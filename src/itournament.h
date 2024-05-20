@@ -61,6 +61,9 @@ namespace Judoboard
 		virtual bool AddParticipant(Judoka* Judoka) { assert(false); return false; }
 		virtual bool RemoveParticipant(const UUID& ID) { assert(false); return false; }
 
+		virtual bool MarkedAsWeighted(const Judoka& Judoka) { assert(false); return false; }
+		virtual bool IsMarkedAsWeighted(const Judoka& Judoka) const { assert(false); return false; }
+
 		virtual uint32_t GetHighestMatIDUsed() const { assert(false); return 0; }//Returns the highest ID of all mats that are used in the tournament. Returns zero if no mats are used
 		virtual bool IsMatUsed(uint32_t ID) const { assert(false); return false; }
 

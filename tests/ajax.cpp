@@ -1196,6 +1196,7 @@ TEST(Ajax, Judoka_Search)
 		EXPECT_EQ(yaml[0]["uuid"].as<std::string>(), (std::string)j3->GetUUID());
 		EXPECT_EQ(yaml[1]["uuid"].as<std::string>(), (std::string)j4->GetUUID());
 		EXPECT_EQ(yaml[2]["uuid"].as<std::string>(), (std::string)j5->GetUUID());
+		EXPECT_EQ(yaml[2]["is_weighted"].as<bool>(), false);
 	}
 }
 
@@ -1249,7 +1250,13 @@ TEST(Ajax, Judoka_Edit_Participant)
 		j2->SetClub(c1);
 		t->AddParticipant(j2);
 
+		EXPECT_FALSE(t->IsMarkedAsWeighted(*j1));
+		EXPECT_FALSE(t->IsMarkedAsWeighted(*j2));
+
 		EXPECT_TRUE(app.Ajax_EditJudoka(HttpServer::Request("id="+(std::string)j1->GetUUID(), "firstname=first2&lastname=last2&weight=12,5&gender=1&birthyear=2001&number=A1234&club=" + (std::string)c1->GetUUID())));
+
+		EXPECT_TRUE(t->IsMarkedAsWeighted(*j1));
+		EXPECT_FALSE(t->IsMarkedAsWeighted(*j2));
 
 		EXPECT_EQ(j1->GetFirstname(), "first2");
 		EXPECT_EQ(j1->GetLastname(),  "last2");
@@ -1282,6 +1289,45 @@ TEST(Ajax, Judoka_Edit_Participant)
 		EXPECT_EQ(app.GetDatabase().GetAllJudokas()[0]->GetNumber(), "A12345");
 		ASSERT_TRUE(app.GetDatabase().GetAllJudokas()[0]->GetClub());
 		EXPECT_EQ(*app.GetDatabase().GetAllJudokas()[0]->GetClub(), *c1);		
+	}
+}
+
+
+
+TEST(Ajax, Judoka_Update_Participant_Weight)
+{
+	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Application app;
+
+		auto t = new Tournament("deleteMe");
+		t->EnableAutoSave(false);
+
+		app.AddTournament(t);
+
+		auto j1 = new Judoka("firstname", "lastname");
+		t->AddParticipant(j1);
+
+		auto j2 = new Judoka("firstname", "lastname");
+		t->AddParticipant(j2);
+
+		EXPECT_FALSE(t->IsMarkedAsWeighted(*j1));
+		EXPECT_FALSE(t->IsMarkedAsWeighted(*j2));
+
+		EXPECT_TRUE(app.Ajax_UpdateParticipantWeight(HttpServer::Request("id="+(std::string)j1->GetUUID()+"&weight=12,5")));
+
+		EXPECT_TRUE(t->IsMarkedAsWeighted(*j1));
+		EXPECT_FALSE(t->IsMarkedAsWeighted(*j2));
+		EXPECT_EQ(j1->GetWeight(),  Weight("12,5"));
+
+		app.GetDatabase().AddJudoka(new Judoka(*j1));
+
+		EXPECT_TRUE(app.Ajax_UpdateParticipantWeight(HttpServer::Request("id="+(std::string)j1->GetUUID()+"&weight=13,5")));
+
+		EXPECT_TRUE(t->IsMarkedAsWeighted(*j1));
+		EXPECT_EQ(j1->GetWeight(),  Weight("13,5"));
 	}
 }
 

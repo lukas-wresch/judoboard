@@ -190,11 +190,13 @@ var lang_en = {
     upload_md5_file: [ "Upload MD5 File", "MD5 Datei hochladen" ],
     user:  [ "User", "Benutzer" ],
     username:  [ "Username", "Benutzername" ],
+    update:  [ "Update", "&Auml;ndern" ],
     update_rule_set:  [ "Update Rule Set", "&Auml;ndere Regelwerk" ],
     update_tournament:  [ "Update Tournament", "&Auml;ndere Turnier" ],
     update_account:  [ "Update Account", "Benutzerkonto &auml;ndern" ],
     update_club:   [ "Update Club", "Verein &auml;ndern" ],
     wazaari_revoked:  [ "Wazaari revoked!", "Wazaari zur&uuml;ckgenommen!" ],
+    weigh_participants:  [ "Weigh Participants", "Teilnehmer wiegen" ],
     weight:  [ "Weight", "Gewicht" ],
     weightclass:  [ "Weightclass", "Gewichtsklasse" ],
     white:  [ "White", "Wei&szlig;" ],
@@ -266,6 +268,30 @@ function URLEncode(obj)
       str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
   }
   return str.join("&");
+}
+
+
+
+function JudokaContainsSearchString(judoka, searchString)
+{
+  if (typeof judoka === 'undefined')
+    return false;
+
+  let haystack = judoka.firstname + judoka.lastname;
+  if (typeof judoka.club_name !== 'undefined')
+    haystack += judoka.club_name;
+  haystack += judoka.birthyear;
+  console.log(haystack);
+  haystack = haystack.toLowerCase();
+
+  const query = searchString.split(" ");
+
+  for (let i=0;i < query.length;i++)
+  {    
+    if (!haystack.includes(query[i].toLowerCase()))
+      return false;
+  }
+  return true;
 }
 
 

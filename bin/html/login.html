@@ -94,20 +94,22 @@ async function sha(message)
 
 function Login()
 {
-  var username = document.getElementById("username").value;
-  var password = document.getElementById("password").value;
+  let username = document.getElementById("username").value;
+  let password = document.getElementById("password").value;
 
-  var response = sha512(document.getElementById("username").value + challenge + password)
+  let response = sha512(document.getElementById("username").value + challenge + password);
 
-    var params = URLEncode({
-      username:  username,
-      challenge: challenge,
-      response:  response
-    });
+  let params = URLEncode({
+    username:  username,
+    challenge: challenge,
+    response:  response
+  });
 
-    AjaxPost('ajax/login', params, function(resp) {
-      window.location = '/';
-    });
+  AjaxPost('ajax/login', params, function(resp) {
+    window.location = '/';
+    sessionStorage.setItem('username', username);
+    sessionStorage.setItem('password', password);
+  });
 
   AjaxCallback('ajax/get_nonce', function(resp) {
     challenge = resp;
@@ -118,7 +120,7 @@ function Login()
 
 
 AjaxCallback("ajax/config/get_setup", function(response) {
-  var res = YAML.parse(response);
+  const res = YAML.parse(response);
   console.log(response);
 
   language = res.language;
@@ -128,7 +130,7 @@ AjaxCallback("ajax/config/get_setup", function(response) {
 });
 
 
-var challenge;
+let challenge;
 
 AjaxCallback('ajax/get_nonce', function(resp) {
   challenge = resp;
