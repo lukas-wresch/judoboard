@@ -414,7 +414,7 @@ int main(int argc, char** argv)
 
 	if (do_update)
 	{
-		std::thread([]() {
+		std::thread([&app]() {
 			char url[512];
 #ifdef _WIN32
 			char computer_name[MAX_COMPUTERNAME_LENGTH + 1] = {};
@@ -436,6 +436,9 @@ int main(int argc, char** argv)
 				{
 					fwrite(packet.body.c_str(), sizeof(char), packet.body.length(), file);
 					fclose(file);
+
+					if (Judoboard::License::GetLicenseState() != Judoboard::License::State::Valid)
+						Judoboard::License::Check(&app);
 				}
 			}
 		}).detach();
