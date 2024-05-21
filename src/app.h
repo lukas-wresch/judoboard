@@ -200,7 +200,7 @@ namespace Judoboard
 		Error Ajax_PlaySoundFile(const HttpServer::Request& Request);
 
 		//Config
-		std::string Ajax_GetSetup();
+		std::string Ajax_GetSetup(const HttpServer::Request& Request);
 		Error Ajax_SetSetup(const HttpServer::Request& Request);
 		std::string Ajax_Execute(const HttpServer::Request& Request);
 
