@@ -42,6 +42,7 @@ var lang_en = {
     disabled:  [ "Disabled", "Deaktiviert" ],
     disqualification:  [ "Disqualification", "Disqualifiziert" ],
     disqualification_revoked:  [ "Disqualification revoked!", "Disqualifiziert zur&uuml;ckgenommen!" ],
+    distribute_evenly:  [ "Distribute Evenly", "Gleichverteilen" ],
     end_match:  [ "End Match", "Kampf beenden" ],
     end_of_match:  [ "End of match", "Kampf beendet" ],
     edit: [ "Edit", "&Auml;ndern" ],

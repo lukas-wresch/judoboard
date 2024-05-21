@@ -24,6 +24,13 @@ Remove match tables.
 <div style="margin-top:1cm;margin-bottom:1cm;">
 	<button class="remove" style="width: 6.3cm;" id="remove_completed_matchtables" onclick="RemoveCompletedMatchTables();"></button>
 </div>
+<div style="margin-top:1cm;margin-bottom:1cm;">
+	<select style="margin-bottom:20px; width: 100px;" id="distribute_mats">
+	</select>
+	<select style="margin-bottom:20px; width: 100px;" id="distribute_simultaneous">
+	</select>
+	<button class="neutral" style="width: 6.0cm;" id="distribute_match_tables_evenly" onclick="DistributeMatchTablesEvenly();"></button>
+</div>
 
 <script>
 
@@ -51,6 +58,17 @@ function RemoveCompletedMatchTables()
 }
 
 
+function DistributeMatchTablesEvenly()
+{
+	let mats = document.getElementById("distribute_mats").value;
+	let simultaneous = document.getElementById("distribute_simultaneous").value;
+
+	AjaxCallback("ajax/tournament/distribute_evenly?mats=" + mats + "&simultaneous=" + simultaneous, function(response) {
+		goBack();
+	});	
+}
+
+
 function MoveMatchTableToMat()
 {
 	AjaxCallback("ajax/matchtable/move_all?mat=" + document.getElementById("mats").value, function(response) {
@@ -65,6 +83,7 @@ document.getElementById("unpause_all").innerHTML = translate('unpause_all_mats')
 document.getElementById("move_matchtables_to_mat").innerHTML      = translate('move_to_mat');
 document.getElementById("remove_empty_matchtables").innerHTML     = translate('remove_matchtables_without_matches');
 document.getElementById("remove_completed_matchtables").innerHTML = translate('remove_completed_matchtables');
+document.getElementById("distribute_match_tables_evenly").innerHTML = translate('distribute_evenly');
 
 for (let i = 1;i <= 8; i++)
 {
@@ -72,6 +91,16 @@ for (let i = 1;i <= 8; i++)
     option.value = i;
     option.text  = translate("mat") + ' ' + i;
     document.getElementById("mats").add(option);
+
+	option = document.createElement("option");
+    option.value = i;
+    option.text  = i + ' ' + translate("mats");
+	document.getElementById("distribute_mats").add(option);
+
+	option = document.createElement("option");
+    option.value = i;
+    option.text  = i + " " + translate('match_tables');
+	document.getElementById("distribute_simultaneous").add(option);
 }
 
 </script>

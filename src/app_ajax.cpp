@@ -2013,6 +2013,13 @@ void Application::SetupHttpServer()
 		return Ajax_DeleteCompletedMatchTables();
 	});
 
+	m_Server.RegisterResource("/ajax/tournament/distribute_evenly", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+		return Ajax_DistributeMatchTablesEvenly(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/tournament/delete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
 		if (!error)
@@ -4391,6 +4398,73 @@ Error Application::Ajax_SetStartPosition(const HttpServer::Request& Request)
 
 	table->SetStartPosition(judoka, startpos);
 	GetTournament()->GenerateSchedule();
+
+	return Error::Type::NoError;//OK
+}
+
+
+
+Error Application::Ajax_DistributeMatchTablesEvenly(const HttpServer::Request& Request)
+{
+	int mats = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "mats"));
+	int tables_simultaneous = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "simultaneous"));
+
+	if (mats <= 0)
+		mats = 1;
+	if (tables_simultaneous <= 0)
+		tables_simultaneous = 1;
+
+	auto guard = LockWriteForScope();
+
+	auto tournament = GetTournament();
+	if (!tournament)
+		return Error(Error::Type::TournamentNotOpen);
+
+	if (tournament->GetStatus() == Status::Concluded)
+		return Error::Type::OperationFailed;
+
+	auto age_groups = GetTournament()->GetAgeGroups();
+	auto tables = GetTournament()->GetMatchTables();
+
+	//Sort by age group
+	std::sort(tables.begin(), tables.end(),
+		[](const auto& a, const auto& b) {
+			auto age1 = a->GetAgeGroup();
+			auto age2 = b->GetAgeGroup();
+
+			if (!age1 && !age2)
+				return a->GetUUID() < b->GetUUID();
+			if (age1 && !age2)
+				return true;
+			if (!age1 && age2)
+				return false;
+			if (age1->GetMinAge() != age2->GetMinAge())
+				return age1->GetMinAge() < age2->GetMinAge();
+			return age1->GetUUID() < age2->GetUUID();
+		});
+
+
+	//Distribute evenly accross time and mats
+	int sub_index = 0;
+	int index = 0;
+	int mat_index = 0;
+	for (auto table : tables)
+	{
+		table->SetMatID(mat_index + 1);
+		table->SetScheduleIndex(index);
+
+		sub_index++;
+		if (sub_index % tables_simultaneous == 0)
+		{
+			mat_index++;//Next mat
+
+			if (mat_index % mats == 0)//Out of mats?
+			{
+				index++;//Next schedule index
+				mat_index = 0;//Start with first mat
+			}
+		}
+	}
 
 	return Error::Type::NoError;//OK
 }
