@@ -253,7 +253,7 @@ function ContainsNonPrintableCharacters(str)
 
 function ContainsPrintableCharacters(str)
 {
-  let regex = /^[\x20-\x7E\u00A0]+$/;
+  let regex = /[\x21-\x7E]/;
   return regex.test(str);
 }
 
