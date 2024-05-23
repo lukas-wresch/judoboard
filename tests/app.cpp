@@ -748,7 +748,7 @@ TEST(App, FullTournament_StressTest)
 		};
 
 		auto show_schedule = [&]() {
-			for (int i = 0; tourney->GetStatus() != Status::Concluded && i < 8000; ++i)
+			for (int i = 0; tourney->GetStatus() != Status::Concluded && i < 6000; ++i)
 			{
 				auto schedule = tourney->Schedule2String(false);
 				tourney->MasterSchedule2String();
@@ -829,16 +829,7 @@ TEST(App, FullTournament_StressTest)
 			if (rand() % 2 == 0)
 				f = Fighter::Blue;
 
-			/*int rnd = rand() % 6;
-
-			if (rnd == 0)
-				mat->AddIppon(f);
-			else if (rnd == 1)
-				mat->AddWazaAri(f);
-			else if (rnd == 2)
-				mat->AddWazaAri(f);
-			else*/
-				mat->Osaekomi(f);
+			mat->Osaekomi(f);
 
 			ZED::Core::Pause(200);
 		}

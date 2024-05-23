@@ -4501,9 +4501,7 @@ Error Application::Ajax_PlaySoundFile(const HttpServer::Request& Request)
 
 	mat->QueueSoundFile();
 
-	ZED::Core::Pause(500);
-	if (audio_device == -1)
-		ZED::Core::Pause(10 * 1000);
+	ZED::Core::Pause(100);
 
 	mat->SetAudio(temp_enabled, temp_filename, temp_device);
 

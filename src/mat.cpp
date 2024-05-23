@@ -1239,21 +1239,18 @@ void Mat::PlaySoundFile() const
 {
 	if (!IsSoundEnabled()) return;
 
-	/*if (GetAudioDeviceID() <= -1)//Default
-	m_Sound.Play();
-	else*/
-	{
-		if (m_AudioDevice.GetDeviceIndex() != GetAudioDeviceID())
-			m_AudioDevice = ZED::SoundDevice(GetAudioDeviceID());
+	if (!m_AudioDevice.IsValid() || m_AudioDevice.GetDeviceIndex() != GetAudioDeviceID())
+		m_AudioDevice = ZED::SoundDevice(GetAudioDeviceID());
 
-		assert(m_AudioDevice.IsValid());
-		assert(m_Application);
-		if (m_Application)
-		{
-			auto sound = m_Application->GetSound(GetSoundFilename());
-			if (sound)
-				m_AudioDevice.Play(*sound);
-		}
+	assert(m_AudioDevice.IsValid());
+	assert(m_Application);
+	if (m_Application)
+	{
+		auto sound = m_Application->GetSound(GetSoundFilename());
+		assert(sound);
+		assert(sound->IsValid());
+		if (sound)
+			m_AudioDevice.Play(*sound);
 	}
 }
 

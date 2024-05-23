@@ -69,10 +69,12 @@ Application::~Application()
 
 bool Application::LoadDataFromDisk()
 {
+	bool success = true;
+
 	if (!m_Database.Load("database.yml"))
 	{
 		ZED::Log::Warn("Could not load database!");
-		//return false;
+		success = false;
 	}
 
 	//Has to be done here, otherwise it will be overwritten when loading tournament files
@@ -98,6 +100,9 @@ bool Application::LoadDataFromDisk()
 		CloseTournament();
 
 
+	if (!ZED::SoundEngine::Init())
+		ZED::Log::Warn("Could not start sound engine");
+
 	ZED::Core::Indexer([&](const std::string& Filename) {
 		auto pos = Filename.find_last_of(ZED::Core::Separator);
 		if (pos == std::string::npos) return true;
@@ -118,7 +123,6 @@ bool Application::LoadDataFromDisk()
 
 		return true;
 	}, "assets/sounds");
-
 
 	return true;
 }
