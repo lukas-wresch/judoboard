@@ -63,7 +63,7 @@ void RoundRobin::GenerateSchedule()
 
 	if (GetParticipants().size() <= 3)
 		m_RecommendedNumMatches_Before_Break = 1;
-	else if (GetParticipants().size() >= 6)
+	else if (GetParticipants().size() >= 7)
 		m_RecommendedNumMatches_Before_Break = 3;
 	else
 		m_RecommendedNumMatches_Before_Break = 2;
