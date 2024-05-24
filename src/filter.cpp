@@ -133,6 +133,8 @@ void IFilter::FindFreeStartPos(const DependentJudoka NewParticipant)
 {
 	auto old_pos = GetStartPosition(NewParticipant);
 
+	m_Mutex.lock();
+
 	if (old_pos != SIZE_MAX)
 		m_Participants.erase(old_pos);
 
@@ -144,6 +146,8 @@ void IFilter::FindFreeStartPos(const DependentJudoka NewParticipant)
 			break;
 		}
 	}
+
+	m_Mutex.unlock();
 }
 
 
@@ -157,12 +161,16 @@ bool IFilter::AddParticipant(const Judoka* NewParticipant, bool Force)
 		if (!IsElgiable(*NewParticipant))//Is the judoka allowed in this match table?
 			return false;
 
+	m_Mutex.lock();
+
 	//Is the judoka already a participant?
 	for (const auto& [pos, judoka] : GetParticipants())
 		if (judoka == NewParticipant)
 			return false;
 
 	FindFreeStartPos(NewParticipant);
+
+	m_Mutex.unlock();
 
 	return true;
 }
@@ -184,7 +192,9 @@ bool IFilter::RemoveParticipant(const DependentJudoka Participant)
 
 	if (pos != SIZE_MAX)
 	{
+		m_Mutex.lock();
 		m_Participants.erase(pos);
+		m_Mutex.unlock();
 		return true;
 	}
 
@@ -204,12 +214,18 @@ const ITournament* IFilter::GetTournament() const
 
 size_t IFilter::GetStartPosition(const DependentJudoka Judoka) const
 {
+	m_Mutex.lock();
+
 	for (auto [pos, participant] : m_Participants)
 	{
 		if (participant == Judoka)
+		{
+			m_Mutex.unlock();
 			return pos;
+		}
 	}
 
+	m_Mutex.unlock();
 	return SIZE_MAX;
 }
 
@@ -220,12 +236,17 @@ size_t IFilter::GetStartPosition(const Judoka* Judoka) const
 	if (!Judoka)
 		return SIZE_MAX;
 
+	m_Mutex.lock();
 	for (auto [pos, participant] : m_Participants)
 	{
 		if (participant.GetJudoka() && *participant.GetJudoka() == *Judoka)
+		{
+			m_Mutex.unlock();
 			return pos;
+		}
 	}
 
+	m_Mutex.unlock();
 	return SIZE_MAX;
 }
 
@@ -233,6 +254,8 @@ size_t IFilter::GetStartPosition(const Judoka* Judoka) const
 
 void IFilter::SetStartPosition(const DependentJudoka Judoka, size_t NewStartPosition)
 {
+	m_Mutex.lock();
+
 	auto my_old_pos = GetStartPosition(Judoka);
 	m_Participants.erase(my_old_pos);
 
@@ -251,6 +274,8 @@ void IFilter::SetStartPosition(const DependentJudoka Judoka, size_t NewStartPosi
 		m_Participants.erase(GetStartPosition(Judoka));
 		m_Participants.insert({ NewStartPosition, Judoka });
 	}
+
+	m_Mutex.unlock();
 }
 
 

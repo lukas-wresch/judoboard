@@ -2105,6 +2105,7 @@ TEST(DoubleElimination, ExportImport)
 		bool has_match[65];
 
 		Tournament t;
+		t.SetName("deleteMe");
 		DoubleElimination* group = new DoubleElimination(0, 200);
 
 		for (int i = 1; i <= count; ++i)
@@ -2138,7 +2139,7 @@ TEST(DoubleElimination, ExportImport)
 		EXPECT_EQ((void*)group->GetSchedule()[0], (void*)group->GetWinnerBracket().GetSchedule()[0]);
 		EXPECT_EQ((void*)group2.GetSchedule()[0], (void*)group2.GetWinnerBracket().GetSchedule()[0]);
 
-		for (int i = 1; i <= count; ++i)
-			delete j[i];
+		t.Save();
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 	}
 }

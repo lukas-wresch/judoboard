@@ -35,7 +35,5 @@ namespace Judoboard
 		const MatchTable& m_MatchTable;
 
 		bool m_RemoveLast = false;
-
-		mutable std::mutex m_Mutex;
 	};
 }

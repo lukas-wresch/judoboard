@@ -74,12 +74,14 @@ namespace ZED
 		SoundDevice(SoundDevice&) = delete;
 		SoundDevice(const SoundDevice&) = delete;
 		SoundDevice(SoundDevice&& rhs) noexcept {
-			this->m_Device = rhs.m_Device;
-			rhs.m_Device   = 0;
+			m_Device      = rhs.m_Device;
+			m_DeviceIndex = rhs.m_DeviceIndex;
+			rhs.m_Device  = 0;
 		}
 		void operator =(SoundDevice&& rhs) noexcept {
-			this->m_Device = rhs.m_Device;
-			rhs.m_Device   = 0;
+			m_Device      = rhs.m_Device;
+			m_DeviceIndex = rhs.m_DeviceIndex;
+			rhs.m_Device  = 0;
 		}
 		DLLEXPORT SoundDevice(int Index);
 		//DLLEXPORT SoundDevice(const char* DeviceName);

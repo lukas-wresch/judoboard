@@ -56,7 +56,7 @@ bool Mat::Open()
 		if (display_width <= 0.0)//No display?
 			display_width = 1920.0;//Simulate 1080p
 
-		double tiny = 20.0, middle = 50.0, large = 70.0, huge = 100.0, gigantic = 170.0, gigantic2 = 230.0;
+		double tiny = 20.0, middle = 55.0, large = 70.0, huge = 100.0, gigantic = 170.0, gigantic2 = 230.0;
 		m_ScalingFactor = display_width / 1920.0;
 
 		tiny   *= m_ScalingFactor;
@@ -92,8 +92,7 @@ bool Mat::Open()
 
 		ZED::Log::Info("Logo loaded");
 			
-		if (!m_Sound)
-			SetAudio(IsSoundEnabled(), GetSoundFilename(), GetAudioDeviceID());
+		SetAudio(IsSoundEnabled(), GetSoundFilename(), GetAudioDeviceID());
 
 		while (m_Window.IsRunning())
 			Mainloop();
@@ -1212,7 +1211,8 @@ void Mat::Osaekomi(Fighter Whom)
 		else if (!IsHajime() && WasMateRecent())
 		{
 			Hajime();
-			Osaekomi(Whom);
+			if (IsHajime())//Hajime() could fail, if someone has an ippon -> stack overflow
+				Osaekomi(Whom);
 
 			if (IsSoundEnabled())
 				StopSoundFile();
@@ -1232,6 +1232,27 @@ uint32_t Mat::GetMaxMatchTime()
 	if (!IsGoldenScore())
 		return m_pMatch->GetRuleSet().GetMatchTime() * 1000;
 	return m_pMatch->GetRuleSet().GetGoldenScoreTime() * 1000;
+}
+
+
+
+void Mat::PlaySoundFile() const
+{
+	if (!IsSoundEnabled()) return;
+
+	if (!m_AudioDevice.IsValid() || m_AudioDevice.GetDeviceIndex() != GetAudioDeviceID())
+		m_AudioDevice = ZED::SoundDevice(GetAudioDeviceID());
+
+	assert(m_AudioDevice.IsValid());
+	assert(m_Application);
+	if (m_Application)
+	{
+		auto sound = m_Application->GetSound(GetSoundFilename());
+		assert(sound);
+		assert(sound->IsValid());
+		if (sound)
+			m_AudioDevice.Play(*sound);
+	}
 }
 
 
@@ -1280,8 +1301,8 @@ void Mat::Tokeda()
 
 			SetScoreboard(osaekomi_holder).m_Ippon = 0;
 
-			m_Graphics["osaekomi_bar"].m_width = 0;//To force an update
-			UpdateOsaekomiGraphics();
+			//m_Graphics["osaekomi_bar"].m_width = 0;//To force an update
+			//UpdateOsaekomiGraphics();
 
 			//Shift hajime timer for lost time
 			m_HajimeTimer.Shift(Timer::GetTimestamp() - m_MateTimestamp);
@@ -1481,13 +1502,13 @@ void Mat::NextState(State NextState) const
 	auto height = m_Window.GetRenderer().GetHeight();
 
 	const int name_height   = (int)(30.0 * m_ScalingFactor);
-	const int club_height   = name_height + (int)(95.0 * m_ScalingFactor);
+	const int club_height   = name_height + (int)(100.0 * m_ScalingFactor);
 
-	const int score_height  = (int)(290.0 * m_ScalingFactor);
+	const int score_height  = (int)(300.0 * m_ScalingFactor);
 	const int score_margin  = (int)(120.0 * m_ScalingFactor);
 	const int score_padding = (int)(200.0 * m_ScalingFactor);
 
-	const int effect_row1 = height/2    + (int)(38.0 * m_ScalingFactor);
+	const int effect_row1 = height/2    + (int)(55.0 * m_ScalingFactor);
 	const int effect_row2 = effect_row1 + (int)(90.0 * m_ScalingFactor);
 	const int effect_row3 = effect_row2 + (int)(90.0 * m_ScalingFactor);
 
@@ -1796,7 +1817,7 @@ void Mat::NextState(State NextState) const
 
 			m_Graphics["timer"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -33.0));
 
-			m_Graphics["mat_name"].SetPosition(20, height - (int)(60.0 * m_ScalingFactor))
+			m_Graphics["mat_name"].SetPosition(20, height - (int)(70.0 * m_ScalingFactor))
 								  .AddAnimation(Animation::CreateLinear(0.0, 0.0, 10.0, [=](auto& g) { return g.m_a < 255.0; }));
 
 			m_Graphics["winner_blue" ].AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0));
@@ -1901,7 +1922,6 @@ void Mat::UpdateGraphics() const
 			while (m_Graphics["next_matches_blue_"  + std::to_string(i)] && m_Graphics["next_matches_blue_"  + std::to_string(i)]->GetWidth() > std::max((width - 25.0 * m_ScalingFactor)/2, 100.0))
 				m_Graphics["next_matches_blue_"  + std::to_string(i)].Shorten(renderer);
 
-			//FontSize = ZED::FontSize::Large;
 			i++;
 
 			if (i == 2)
@@ -2003,11 +2023,6 @@ void Mat::UpdateGraphics() const
 
 		if (m_pMatch)
 		{
-			//if (m_pMatch->GetMatchTable())//Update match table
-				//m_Graphics["matchtable"].UpdateTexture(renderer, m_pMatch->GetMatchTable()->GetName(), ZED::Color(255, 255, 255), ZED::FontSize::Middle);
-			//else
-				//m_Graphics["matchtable"].Clear();
-
 			std::string mat_matchtable = GetName();
 			if (m_pMatch->GetMatchTable())
 				mat_matchtable += "   " + m_pMatch->GetMatchTable()->GetDescription();
@@ -2030,7 +2045,7 @@ void Mat::UpdateGraphics() const
 			//Update text effects
 			if (m_Graphics["timer"])
 			{
-				m_Graphics["hajime"].SetPosition(width/2  - m_Graphics["timer"]->GetWidth()/2 - (int)(50.0*m_ScalingFactor),
+				m_Graphics["hajime"].SetPosition(width/2  - m_Graphics["timer"]->GetWidth()/2 - (int)(100.0*m_ScalingFactor),
 												 height/2 + (int)(m_Graphics["timer"]->GetHeight() * 0.40));
 
 				m_Graphics["mate"  ].SetPosition(width/2  + (int)(100.0*m_ScalingFactor),
@@ -2070,29 +2085,28 @@ void Mat::UpdateOsaekomiGraphics() const
 	{
 		osaekomi_text.UpdateTexture(renderer, m_OsaekomiTimer[(int)fighter].ToStringOnlySeconds(), ZED::Color(0, 0, 0), ZED::FontSize::Huge);
 
-		const int new_width = m_OsaekomiTimer[(int)fighter].GetElapsedTime() * osaekomi_max_width / (EndTimeOfOsaekomi() * 1000);
+		int new_width = m_OsaekomiTimer[(int)fighter].GetElapsedTime() * osaekomi_max_width / (EndTimeOfOsaekomi() * 1000);
+		if (new_width == 0)//Seems like no osaekomi is running
+			new_width = -100;//Move way to the left
 
-		if (osaekomi_text && new_width > osaekomi_bar.m_width || osaekomi_bar.m_a <= 0.0)
+		if (osaekomi_text)
 		{
-			if (osaekomi_text)
-			{
-				const int new_text_x = new_width - osaekomi_text->GetWidth() - 2;
-				osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
-			}
-
-			auto& osaekomi_bar_border = m_Graphics["osaekomi_bar_border"];
-			osaekomi_bar_border.SetPosition(0, osaekomi_y, 255);
-			osaekomi_bar_border.m_width  = new_width + 5;
-			osaekomi_bar_border.m_height = (int)(100.0 * m_ScalingFactor) + 10;
-			osaekomi_bar_border.m_color  = ZED::Color(0, 0, 0);
-
-
-			osaekomi_bar.SetPosition(0, osaekomi_y + 5, 255);
-			//osaekomi_bar.m_color = ZED::Color(30, 150, 30);
-			osaekomi_bar.m_color = ZED::Color(255, 0, 0);
-			osaekomi_bar.m_width = new_width;
-			osaekomi_bar.m_height = (int)(100.0 * m_ScalingFactor);
+			const int new_text_x = new_width - osaekomi_text->GetWidth() - 2;
+			osaekomi_text.StopAllAnimations().SetPosition(new_text_x, osaekomi_y + 1, 255);
 		}
+
+		auto& osaekomi_bar_border = m_Graphics["osaekomi_bar_border"];
+		osaekomi_bar_border.SetPosition(0, osaekomi_y, 255);
+		osaekomi_bar_border.m_width  = new_width + 5;
+		osaekomi_bar_border.m_height = (int)(100.0 * m_ScalingFactor) + 10;
+		osaekomi_bar_border.m_color  = ZED::Color(0, 0, 0);
+
+
+		osaekomi_bar.SetPosition(0, osaekomi_y + 5, 255);
+		//osaekomi_bar.m_color = ZED::Color(30, 150, 30);
+		osaekomi_bar.m_color = ZED::Color(255, 0, 0);
+		osaekomi_bar.m_width = new_width;
+		osaekomi_bar.m_height = (int)(100.0 * m_ScalingFactor);
 	}
 	else
 	{
@@ -2196,12 +2210,11 @@ void Mat::RenderShidos(double dt) const
 	for (Fighter fighter = Fighter::White; fighter <= Fighter::Blue; fighter++)
 	{
 		//Render shidos
-		int shido_start_x = (int)(50.0 * m_ScalingFactor);
-		int shido_start_y = (int)(380.0 * m_ScalingFactor);
+		int shido_start_x = (int)( 50.0 * m_ScalingFactor);
+		int shido_start_y = (int)(400.0 * m_ScalingFactor);
 
 		if (fighter == Fighter::White)
 			shido_start_x = width - (int)(630.0 * m_ScalingFactor);
-			//shido_start_x = width - (int)(540.0 * m_ScalingFactor);
 
 		int shido_x = shido_start_x;
 		int shido_y = shido_start_y;
@@ -2230,10 +2243,8 @@ void Mat::RenderShidos(double dt) const
 		}
 
 		//Render medical examinations
-		//int medical_x = shido_start_x + (int)(300.0 * m_ScalingFactor);
 		int medical_x = shido_start_x + (int)(350.0 * m_ScalingFactor);
 		int medical_y = shido_start_y;
-		//int medical_y = shido_start_y + (int)( 30.0 * m_ScalingFactor);
 
 		for (int examinations = 0; examinations < GetScoreboard(fighter).m_MedicalExamination; examinations++)
 		{
