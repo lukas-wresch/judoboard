@@ -2278,7 +2278,8 @@ void Application::SetupHttpServer()
 	});*/
 
 	m_Server.RegisterResource("/ajax/config/get_setup", [this](auto& Request) -> std::string {
-		return Ajax_GetSetup(Request);
+		const bool is_admin = CheckPermission(Request, Account::AccessLevel::Admin);
+		return Ajax_GetSetup(is_admin);
 	});
 
 	m_Server.RegisterResource("/ajax/config/set_setup", [this](auto& Request) -> std::string {
@@ -4671,7 +4672,7 @@ Error Application::Ajax_EndMatch(const HttpServer::Request& Request)
 
 
 
-std::string Application::Ajax_GetSetup(const HttpServer::Request& Request)
+std::string Application::Ajax_GetSetup(bool IsAdmin)
 {
 	YAML::Emitter ret;
 
@@ -4689,7 +4690,7 @@ std::string Application::Ajax_GetSetup(const HttpServer::Request& Request)
 	ret << YAML::Key << "timer_style"    << YAML::Value << (int)GetDatabase().GetTimerStyle();
 	ret << YAML::Key << "name_style"     << YAML::Value << (int)GetDatabase().GetNameStyle();
 
-	if (CheckPermission(Request, Account::AccessLevel::Admin))
+	if (IsAdmin)
 	{
 		ret << YAML::Key << "results_server"     << YAML::Value << GetDatabase().IsResultsServer();
 		ret << YAML::Key << "results_server_url" << YAML::Value << GetDatabase().GetResultsServer();
