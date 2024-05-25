@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: configure
-      run: chmod u+x *.sh && ./dependencies.sh && rm external/license/license.a && mv external/license/license-x64.a external/license/license.a
+      run: chmod u+x *.sh && ./dependencies.sh
     - name: make
       run: ./compile.sh
       
