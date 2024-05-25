@@ -10,7 +10,7 @@ using namespace ZED;
 
 bool HttpClient::SendGETRequest(const char* Path, const char* AdditionalHeaders)
 {
-	if (!m_Socket.IsConnected())
+	if (!GetSocket().IsConnected())
 		return false;
 	
 
@@ -31,14 +31,14 @@ bool HttpClient::SendGETRequest(const char* Path, const char* AdditionalHeaders)
 	else
 		strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
 
-	return m_Socket.Send(request, strlen(request));
+	return GetSocket().Send(request, strlen(request));
 }
 
 
 
 bool HttpClient::SendPOSTRequest(const char* Path, const Blob& Data, const char* AdditionalHeaders)
 {
-	if (!m_Socket.IsConnected())
+	if (!GetSocket().IsConnected())
 		return false;
 
 
@@ -61,7 +61,7 @@ bool HttpClient::SendPOSTRequest(const char* Path, const Blob& Data, const char*
 	else
 		strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
 
-	if (!m_Socket.Send(request, strlen(request)))
+	if (!GetSocket().Send(request, strlen(request)))
 		return false;
 
 	const int packet_size = 1024;
@@ -71,7 +71,7 @@ bool HttpClient::SendPOSTRequest(const char* Path, const Blob& Data, const char*
 		if (bytes_sent + packet_size > Data.GetSize())
 			bytes_to_send = Data.GetSize() - bytes_sent;
 
-		if (!m_Socket.Send(&Data[bytes_sent], bytes_to_send))
+		if (!GetSocket().Send(&Data[bytes_sent], bytes_to_send))
 			return false;
 
 		bytes_sent += bytes_to_send;
@@ -106,7 +106,7 @@ bool HttpClient::SendFile(const char* Path, const char* Filename)
 	else
 		strcat_s(request, sizeof(request), "\r\nConnection: close\r\n\r\n");
 
-	if (!m_Socket.Send(request, strlen(request)))
+	if (!GetSocket().Send(request, strlen(request)))
 		return false;
 
 	while (file)
@@ -116,8 +116,8 @@ bool HttpClient::SendFile(const char* Path, const char* Filename)
 
 		auto read = file.readsome(buffer, 1024);
 
-		//if (!m_Socket.Send(buffer, (uint32_t)file.gcount()))
-		if (!m_Socket.Send(buffer, (uint32_t)read))
+		//if (!GetSocket().Send(buffer, (uint32_t)file.gcount()))
+		if (!GetSocket().Send(buffer, (uint32_t)read))
 			return false;
 	}
 
@@ -128,7 +128,9 @@ bool HttpClient::SendFile(const char* Path, const char* Filename)
 
 HttpClient::Packet HttpClient::RecvResponse()
 {
-	if (!m_Socket.IsConnected())//Not connected
+	auto& socket = GetSocket();
+
+	if (!socket.IsConnected())//Not connected
 		return Packet("", "");//Return empty packet
 
 	std::string response;
@@ -136,43 +138,44 @@ HttpClient::Packet HttpClient::RecvResponse()
 	int header_length  = -1;
 	uint32_t downloaded = 0;
 
-	while (m_Socket.Recv())
+	while (socket.Recv())
 	{
-		const char* buffer = m_Socket.GetBuffer();
-		int end = m_Socket.GetBufferLength();
+		const char* buffer = socket.GetBuffer();
+		int end = socket.GetBufferLength();
 
-		if (end > 0)
+		if (end == 0)
+			break;
+
+		response   += socket;
+		downloaded += end;
+
+		if (content_length == -1)
 		{
-			response   += m_Socket;
-			downloaded += end;
+			auto pos = response.find("Content-Length: ");
 
-			if (content_length == -1)
+			if (pos != std::string::npos)
 			{
-				auto pos = response.find("Content-Length: ");
-
-				if (pos != std::string::npos)
-				{
-					pos += sizeof("Content-Length: ") - 1;
-					content_length = Core::ToInt(&response[pos]);
-				}
+				pos += sizeof("Content-Length: ") - 1;
+				content_length = Core::ToInt(&response[pos]);
 			}
-
-			if (header_length == -1)
-			{
-				auto pos = response.find("\r\n\r\n");
-
-				if (pos != std::string::npos)
-					header_length = pos + sizeof("\r\n\r\n") - 1;
-			}
-
-			if (header_length != -1 && content_length != -1 &&
-				downloaded >= (uint32_t)header_length + (uint32_t)content_length)
-				break;
 		}
+
+		if (header_length == -1)
+		{
+			auto pos = response.find("\r\n\r\n");
+
+			if (pos != std::string::npos)
+				header_length = pos + sizeof("\r\n\r\n") - 1;
+		}
+
+		if (header_length != -1 && content_length != -1 &&
+			downloaded >= (uint32_t)header_length + (uint32_t)content_length)
+			break;
 	}
 
 	if (header_length == -1)
 		return Packet("", "");
 
-	return Packet(std::string(response.c_str(), header_length), std::string(response.c_str() + header_length, content_length));
+	return Packet(std::string(response.c_str(), header_length), std::string(response.c_str() + header_length));
+	//return Packet(std::string(response.c_str(), header_length), std::string(response.c_str() + header_length, content_length));
 }

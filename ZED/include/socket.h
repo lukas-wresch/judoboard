@@ -19,6 +19,8 @@ namespace ZED
 		virtual bool Connect(const char* Host, uint16_t Port) = 0;
 		bool Connect(const std::string& Host, uint16_t Port) { return Connect(Host.c_str(), Port); }
 
+		virtual bool IsConnected() const = 0;
+
 		virtual bool Listen(uint16_t Port) = 0;
 
 		bool IsValid() const { return m_Socket != -1; }

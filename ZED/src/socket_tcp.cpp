@@ -106,7 +106,7 @@ bool SocketTCP::Listen(uint16_t Port)
 		return false;
 	}
 
-	if (listen(m_Socket, 5) == -1)
+	if (listen(m_Socket, 16) == -1)
 	{
 		m_Socket = -1;
 		Log::Error("Error can not listen to port " + Port);
@@ -143,7 +143,7 @@ bool SocketTCP::Send(const void* Data, uint32_t Size)
 
 
 
-SocketTCP SocketTCP::AcceptClients()
+SocketTCP SocketTCP::AcceptClient()
 {
 	sockaddr_in addr;
 	int addr_len = sizeof(addr);

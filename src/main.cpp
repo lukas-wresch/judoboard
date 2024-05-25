@@ -372,8 +372,8 @@ int main(int argc, char** argv)
 
 		return 0;
 	}
-
 	
+
 	ZED::Log::Info("Initializing application");
 	Judoboard::Application app;
 
