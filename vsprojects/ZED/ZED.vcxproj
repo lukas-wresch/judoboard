@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\ZED\src\file.cpp" />
     <ClCompile Include="..\..\ZED\src\https_client.cpp" />
     <ClCompile Include="..\..\ZED\src\http_client.cpp" />
+    <ClCompile Include="..\..\ZED\src\http_server.cpp" />
     <ClCompile Include="..\..\ZED\src\image.cpp" />
     <ClCompile Include="..\..\ZED\src\log.cpp" />
     <ClCompile Include="..\..\ZED\src\opengl_extensions.cpp" />
@@ -38,6 +39,7 @@
     <ClCompile Include="..\..\ZED\src\socket.cpp" />
     <ClCompile Include="..\..\ZED\src\socket_ssl.cpp" />
     <ClCompile Include="..\..\ZED\src\socket_tcp.cpp" />
+    <ClCompile Include="..\..\ZED\src\socket_udp.cpp" />
     <ClCompile Include="..\..\ZED\src\sound.cpp" />
     <ClCompile Include="..\..\ZED\src\timer.cpp" />
   </ItemGroup>
@@ -48,6 +50,7 @@
     <ClInclude Include="..\..\ZED\include\file.h" />
     <ClInclude Include="..\..\ZED\include\https_client.h" />
     <ClInclude Include="..\..\ZED\include\http_client.h" />
+    <ClInclude Include="..\..\ZED\include\http_server.h" />
     <ClInclude Include="..\..\ZED\include\image.h" />
     <ClInclude Include="..\..\ZED\include\log.h" />
     <ClInclude Include="..\..\ZED\include\png.h" />
@@ -60,6 +63,7 @@
     <ClInclude Include="..\..\ZED\include\socket.h" />
     <ClInclude Include="..\..\ZED\include\socket_ssl.h" />
     <ClInclude Include="..\..\ZED\include\socket_tcp.h" />
+    <ClInclude Include="..\..\ZED\include\socket_udp.h" />
     <ClInclude Include="..\..\ZED\include\sound.h" />
     <ClInclude Include="..\..\ZED\include\zed.h" />
   </ItemGroup>

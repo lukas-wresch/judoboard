@@ -14,7 +14,7 @@ namespace ZED
 	class DLLEXPORT SocketSSL : public SocketTCP
 	{
 	public:
-		SocketSSL();
+		SocketSSL() = default;
 		SocketSSL(const SocketTCP& Original);
 		SocketSSL(const SocketSSL& Original) = delete;
 		SocketSSL(SocketSSL&& Original) noexcept = delete;
@@ -31,7 +31,7 @@ namespace ZED
 		}
 
 		virtual bool Listen(uint16_t Port) override;
-		//virtual SocketSSL AcceptClient();
+		virtual Socket* AcceptClient() const override;
 
 		//const char* GetBuffer() const { return m_Buffer; }
 		//uint32_t GetBufferLength() const { return m_BufferPosition; }

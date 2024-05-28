@@ -24,6 +24,8 @@ namespace ZED
 
 		virtual bool Listen(uint16_t Port) = 0;
 
+		virtual Socket* AcceptClient() const = 0;
+
 		bool IsValid() const { return m_Socket != -1; }
 
 		virtual bool Send(const void* Data, uint32_t Size) = 0;

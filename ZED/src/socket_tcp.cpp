@@ -106,7 +106,7 @@ bool SocketTCP::Listen(uint16_t Port)
 		return false;
 	}
 
-	if (listen(m_Socket, 16) == -1)
+	if (listen(m_Socket, 16) == -1)//Backlog
 	{
 		m_Socket = -1;
 		Log::Error("Error can not listen to port " + Port);
@@ -143,11 +143,14 @@ bool SocketTCP::Send(const void* Data, uint32_t Size)
 
 
 
-SocketTCP SocketTCP::AcceptClient()
+Socket* SocketTCP::AcceptClient() const
 {
 	sockaddr_in addr;
 	int addr_len = sizeof(addr);
 	int new_socket = accept(m_Socket, (sockaddr*)&addr, &addr_len);
+
+	if (new_socket == -1)
+		return nullptr;
 
 	//accept
 	if (new_socket != -1)//got one, so lets put him in
@@ -164,7 +167,7 @@ SocketTCP SocketTCP::AcceptClient()
 			Log::Warn("Error setting SO_SNDBUF");*/
 	}
 
-	return new_socket;
+	return new SocketTCP(new_socket);
 }
 
 

@@ -157,17 +157,26 @@ bool SocketSSL::Send(const void* Data, uint32_t Size)
 
 
 
-/*SocketSSL SocketSSL::AcceptClients()
+Socket* SocketSSL::AcceptClient() const
 {
-	auto new_socket = SocketTCP::AcceptClients();
-	if (m_Socket != -1)
+	Socket* new_socket = SocketTCP::AcceptClient();
+	if (!new_socket)
+		return nullptr;
 
-	sockaddr_in addr;
-	int addr_len = sizeof(addr);
-	int new_socket = accept(m_Socket, (sockaddr*)&addr, &addr_len);
+	SocketSSL* ret = new SocketSSL;
+	ret->m_Socket  = new_socket->GetSocket();
+	ret->m_SSL = SSL_new(m_SSL_Context);
 
-	return new_socket;
-}*/
+	delete new_socket;
+
+	if (ret->m_SSL <= 0)
+	{
+		delete ret;
+		return nullptr;
+	}
+
+	return ret;
+}
 
 
 
