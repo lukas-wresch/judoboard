@@ -64,7 +64,7 @@ bool HttpClient::SendPOSTRequest(const char* Path, const Blob& Data, const char*
 	if (!GetSocket().Send(request, strlen(request)))
 		return false;
 
-	const int packet_size = 1024;
+	const size_t packet_size = 1024;
 	for (size_t bytes_sent = 0; bytes_sent < Data.GetSize();)
 	{
 		int bytes_to_send = packet_size;

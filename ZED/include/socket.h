@@ -15,6 +15,7 @@ namespace ZED
 		int GetSocket() { return m_Socket; }
 
 		void MakeBlocking(bool Enable = true);
+		void SetTimeout(int Seconds);//Sets timeout for send and receive operations for blocking sockets
 
 		virtual bool Connect(const char* Host, uint16_t Port) = 0;
 		bool Connect(const std::string& Host, uint16_t Port) { return Connect(Host.c_str(), Port); }

@@ -38,6 +38,19 @@ void Socket::MakeBlocking(bool Enable)
 
 
 
+void Socket::SetTimeout(int Seconds)
+{
+	MakeBlocking(true);//Doesn't make send for non-blocking sockets
+
+	struct timeval timeout;
+	timeout.tv_sec  = Seconds;
+	timeout.tv_usec = 0;
+	setsockopt(m_Socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
+	setsockopt(m_Socket, SOL_SOCKET, SO_SNDTIMEO, (const char*)&timeout, sizeof(timeout));
+}
+
+
+
 void Socket::Disconnect()
 {
 	if (!IsValid())
