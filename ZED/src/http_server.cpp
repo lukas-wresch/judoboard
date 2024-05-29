@@ -39,19 +39,20 @@ void HttpServer::AddListeningPort(SocketTCP* NewSocket, uint16_t Port)
 
 
 
-void HttpServer::SendResponse(SocketTCP* Client, const ResponseHeader& Header, const std::string& Body) const
+void HttpServer::SendResponse(SocketTCP* Client, const Response& Response) const
 {
-	assert(!Header.m_Fields.empty());
+	assert(!Response.m_Header.empty());
 
 	std::string data = "HTTP/1.1 200 OK\r\n";
-	for (auto& field : Header.m_Fields)
+	for (auto& field : Response.m_Header)
 	{
 		data += field.Name + ": " + field.Value + "\r\n";
 	}
 
-	data += "\r\n" + Body;
-
+	data += "\r\n";
 	Client->SendText(data);
+
+	Client->Send(Response.m_Body, Response.m_Body.GetSize());
 }
 
 
@@ -181,12 +182,13 @@ void HttpServer::HandleClient(SocketTCP* Client) const
 			value[value_index++%256] = req[i];
 	}
 
-	ResponseHeader response_header;
-	response_header.Add("Content-Type", "text/plain");
-	response_header.Add("Connection", "close");
-	response_header.Add("Content-Length", "12");
+	Response response;
+	response.Add("Content-Type", "text/plain");
+	response.Add("Connection", "close");
+	response.Add("Content-Length", "12");
+	response.m_Body = std::string("Hello World!");
 
-	SendResponse(Client, response_header, "Hello World!");
+	SendResponse(Client, response);
 
 	delete Client;
 }
