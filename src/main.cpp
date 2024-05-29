@@ -8,6 +8,8 @@
 #include "standing_data.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/http_client.h"
+#include "../ZED/include/http_server.h"
+#include "../ZED/include/socket_tcp.h"
 
 
 
@@ -372,6 +374,10 @@ int main(int argc, char** argv)
 
 		return 0;
 	}
+
+	ZED::HttpServer server(1);
+	server.AddListeningPort(new ZED::SocketTCP, 8081);
+	server.Start();
 	
 
 	ZED::Log::Info("Initializing application");

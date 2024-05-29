@@ -51,13 +51,6 @@ SocketTCP::SocketTCP()
 SocketTCP::SocketTCP(int Socket)
 {
 	m_Socket = Socket;
-
-	u_long on_mode = 1;
-#ifdef _WIN32
-	ioctlsocket(m_Socket, FIONBIO, &on_mode);
-#else		
-	ioctl(m_Socket, FIONBIO, &on_mode);
-#endif
 }
 
 
@@ -85,7 +78,6 @@ bool SocketTCP::Connect(const char* Host, uint16_t Port)
 		return false;
 	}
 
-	MakeBlocking(false);
 	return true;
 }
 
@@ -113,7 +105,6 @@ bool SocketTCP::Listen(uint16_t Port)
 		return false;
 	}
 
-	MakeBlocking(false);
 	return true;
 }
 

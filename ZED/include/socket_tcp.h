@@ -48,9 +48,7 @@ namespace ZED
 			return ret;
 		}
 
-		bool Send(const void* Data, uint32_t Size);
-		template <typename T>
-		bool Send(const T& Data) { return Send((const char*)&Data, sizeof(T)); }
+		virtual bool Send(const void* Data, uint32_t Size) override;
 
 		bool Recv();
 

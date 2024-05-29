@@ -12,7 +12,7 @@
 #include <net/if.h>
 #include <unistd.h>
 #endif
-#include <stdio.h>
+#include <cassert>
 #include "../include/http_server.h"
 #include "../include/log.h"
 
@@ -21,7 +21,13 @@ using namespace ZED;
 
 
 
-void HttpServer::AddListeningPort(Socket* NewSocket, uint16_t Port)
+HttpServer::HttpServer(size_t WorkerCount) : m_ThreadPool(1)
+{
+}
+
+
+
+void HttpServer::AddListeningPort(SocketTCP* NewSocket, uint16_t Port)
 {
 	if (NewSocket)
 	{
@@ -33,13 +39,162 @@ void HttpServer::AddListeningPort(Socket* NewSocket, uint16_t Port)
 
 
 
+void HttpServer::SendResponse(SocketTCP* Client, const ResponseHeader& Header, const std::string& Body) const
+{
+	assert(!Header.m_Fields.empty());
+
+	std::string data = "HTTP/1.1 200 OK\r\n";
+	for (auto& field : Header.m_Fields)
+	{
+		data += field.Name + ": " + field.Value + "\r\n";
+	}
+
+	data += "\r\n" + Body;
+
+	Client->SendText(data);
+}
+
+
+
+void HttpServer::HandleClient(SocketTCP* Client) const
+{
+	std::string request;
+
+	int content_length  = -1;
+	int header_length   = -1;
+	uint32_t downloaded = 0;
+
+	while (Client->Recv())
+	{
+		const char* buffer = Client->GetBuffer();
+		int end = Client->GetBufferLength();
+
+		request    += *Client;
+		downloaded += end;
+
+		if (content_length == -1)
+		{
+			auto pos = request.find("Content-Length: ");
+
+			if (pos != std::string::npos)
+			{
+				pos += sizeof("Content-Length: ") - 1;
+				content_length = Core::ToInt(&request[pos]);
+			}
+		}
+
+		if (header_length == -1)
+		{
+			auto pos = request.find("\r\n\r\n");
+
+			if (pos != std::string::npos)
+				header_length = pos + sizeof("\r\n\r\n") - 1;
+		}
+
+		if (header_length != -1 && content_length != -1 &&
+			downloaded >= (uint32_t)header_length + (uint32_t)content_length)
+			break;
+		if (header_length != -1 && content_length == -1 &&
+			downloaded >= (uint32_t)header_length)
+			break;
+	}
+
+
+	RequestHeader request_header;
+
+	//Parse request
+	const char* req = request.c_str();
+	char value[256];
+	int  value_index = 0;
+
+	size_t i = 0;
+	if (req[0] == 'G' && req[1] == 'E' && req[2] == 'T')
+	{
+		request_header.method = RequestHeader::Method::Get;
+		i += 4;
+	}
+	else if (req[0] == 'P' && req[1] == 'O' && req[2] == 'S' && req[3] == 'T')
+	{
+		request_header.method = RequestHeader::Method::Post;
+		i += 5;
+	}
+
+	for (; req[i]; ++i)
+	{
+		if (req[i] == ' ')
+		{
+			value[value_index%256] = '\0';
+			request_header.url = std::string(value);
+			i++;
+			break;
+		}
+		else
+			value[value_index++%256] = req[i];
+	}
+
+	value_index = 0;
+	for (; req[i]; ++i)
+	{
+		if (req[i] == '\r' && req[i+1] == '\n')
+			break;
+		else
+			value[value_index++%256] = req[i];
+	}
+
+	value[value_index%256] = '\0';
+	request_header.protocol = std::string(value);
+	value_index = 0;
+	i += 2;
+	char key[256];
+	int  key_index = 0;
+	int  mode = 1;//0 none, 1 at key, 2 at value
+
+	for (; req[i]; ++i)
+	{
+		if (req[i] == '\r' && req[++i] == '\n')
+		{
+			//End of field
+			key[key_index%256] = '\0';
+			value[value_index%256] = '\0';
+			request_header.Add(key, value);
+			key_index = value_index = 0;
+
+			if (req[i+1] == '\r' && req[i+2] == '\n')
+				break;
+
+			mode = 1;
+			i++;
+		}
+
+		if (mode == 1)//At key
+		{
+			if (req[i] == ':')
+			{
+				i++;
+				mode = 2;
+			}
+			else
+				key[key_index++%256] = req[i];
+		}
+
+		else//At value
+			value[value_index++%256] = req[i];
+	}
+
+	ResponseHeader response_header;
+	response_header.Add("Content-Type", "text/plain");
+	response_header.Add("Connection", "close");
+	response_header.Add("Content-Length", "12");
+
+	SendResponse(Client, response_header, "Hello World!");
+
+	delete Client;
+}
+
+
+
 bool HttpServer::Start()
 {
-	//if (!m_ServerSocket.Listen(80))
-		//return false;
-
-	//m_ServerSocket.MakeBlocking(true);
-
 	m_Thread = std::thread([this]()
 	{
 		FD_SET original_fds;
@@ -56,7 +211,10 @@ bool HttpServer::Start()
 				{
 					if (FD_ISSET(listening_socket->GetSocket(), &read_fds))
 					{
-						auto new_connection = listening_socket->AcceptClient();
+						SocketTCP* new_connection = (SocketTCP*)listening_socket->AcceptClient();
+
+						m_ThreadPool.Enqueue([this, new_connection]() {
+							HandleClient(new_connection); });
 					}
 				}
 			}
@@ -64,4 +222,14 @@ bool HttpServer::Start()
 	});
 	
 	return true;
+}
+
+
+
+HttpServer::~HttpServer()
+{
+	m_Running = false;
+
+	if (m_Thread.joinable())
+		m_Thread.join();
 }

@@ -41,6 +41,7 @@
     <ClCompile Include="..\..\ZED\src\socket_tcp.cpp" />
     <ClCompile Include="..\..\ZED\src\socket_udp.cpp" />
     <ClCompile Include="..\..\ZED\src\sound.cpp" />
+    <ClCompile Include="..\..\ZED\src\thread_pool.cpp" />
     <ClCompile Include="..\..\ZED\src\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -65,6 +66,7 @@
     <ClInclude Include="..\..\ZED\include\socket_tcp.h" />
     <ClInclude Include="..\..\ZED\include\socket_udp.h" />
     <ClInclude Include="..\..\ZED\include\sound.h" />
+    <ClInclude Include="..\..\ZED\include\thread_pool.h" />
     <ClInclude Include="..\..\ZED\include\zed.h" />
   </ItemGroup>
   <ItemGroup>

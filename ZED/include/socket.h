@@ -29,6 +29,7 @@ namespace ZED
 		bool IsValid() const { return m_Socket != -1; }
 
 		virtual bool Send(const void* Data, uint32_t Size) = 0;
+		bool SendText(const std::string& Data) { return Send(Data.c_str(), Data.length()); }
 		template <typename T>
 		bool Send(const T& Data) { return Send((const char*)&Data, sizeof(T)); }
 
