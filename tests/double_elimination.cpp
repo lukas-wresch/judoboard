@@ -601,8 +601,8 @@ TEST(DoubleElimination, Count6_Example)
 {
 	initialize();
 
-	Tournament* t = new Tournament("Tournament Name");
-	t->EnableAutoSave(false);
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
 
 	Judoka* j[33];
 	bool has_match[33];
@@ -905,8 +905,8 @@ TEST(DoubleElimination, Count7_Example)
 {
 	initialize();
 
-	Tournament* t = new Tournament("Tournament Name");
-	t->EnableAutoSave(false);
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
 
 	Judoka* j[33];
 	bool has_match[33];
@@ -1072,8 +1072,8 @@ TEST(DoubleElimination, Count11_Example)
 {
 	initialize();
 
-	Tournament* t = new Tournament("Tournament Name");
-	t->EnableAutoSave(false);
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
 
 	Judoka* j[33] = {};
 	const size_t count = 11;
@@ -1361,6 +1361,544 @@ TEST(DoubleElimination, Count11_Example)
 
 
 
+TEST(DoubleElimination, Count20_Example)
+{
+	initialize();
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+	Tournament* t = new Tournament("deleteMe");
+
+	Judoka* j[33] = {};
+	const size_t count = 11;
+
+	j[1]  = new Judoka("Carla", "", 50);
+	j[2]  = new Judoka("Andreas", "", 50);
+	j[3]  = new Judoka("Julian", "", 50);
+	j[4]  = new Judoka("Stephanie", "", 50);
+	j[5]  = new Judoka("Phillip", "", 50);
+	j[6]  = new Judoka("Dresdner", "", 50);
+	j[7]  = new Judoka("Stephan", "", 50);
+	j[8]  = new Judoka("Emma", "", 50);
+	j[9]  = new Judoka("Maximilian", "", 50);
+	j[10] = new Judoka("Carla", "", 50);
+	j[11] = new Judoka("Paulina", "", 50);
+	j[12] = new Judoka("Tim", "", 50);
+	j[13] = new Judoka("Anna", "", 50);
+	j[14] = new Judoka("Soeren", "", 50);
+	j[15] = new Judoka("Kerstin", "", 50);
+	j[16] = new Judoka("Emily", "", 50);
+	j[17] = new Judoka("Hans", "", 50);
+	j[18] = new Judoka("Jade", "", 50);
+	j[19] = new Judoka("Sophia", "", 50);
+	j[20] = new Judoka("Wurst", "", 50);
+
+	DoubleElimination* group = new DoubleElimination(0, 200);
+	group->IsThirdPlaceMatch(true);
+	group->IsFifthPlaceMatch(true);
+	group->SetMatID(1);
+	t->AddMatchTable(group);
+
+	for (int i = 1; i <= 32; ++i)
+	{
+		if (j[i])
+			t->AddParticipant(j[i]);
+	}
+
+	for (int i = 1; i <= 32; ++i)
+	{
+		if (j[i])
+			group->SetStartPosition(j[i], i-1);
+	}
+
+	for (int i = 1; i <= 32; ++i)
+	{
+		if (j[i])
+			EXPECT_EQ(*group->GetJudokaByStartPosition(i-1), *j[i]);
+	}
+
+	EXPECT_EQ(group->GetMaxStartPositions(), 32);
+	group->GenerateSchedule();
+
+	auto& winner_schedule = group->GetWinnerBracket().GetSchedule();
+	auto& loser_schedule  = group->GetLoserBracket() .GetSchedule();
+
+	ASSERT_EQ(winner_schedule.size(),  16 + 8 + 4 + 2 + 1);
+	EXPECT_EQ(loser_schedule.size(),    8 + 8 + 4 + 4 + 2 + 2 + 1 + 1);
+
+	Mat m(1);
+
+	auto& schedule = group->GetSchedule();
+	EXPECT_EQ(schedule.size(), winner_schedule.size() + loser_schedule.size());
+
+	t->Save();
+	
+
+	EXPECT_EQ(schedule[1 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Carla");
+	EXPECT_EQ(schedule[1 - 1]->GetFighter(Fighter::Blue )->GetFirstname(), "Hans");
+	EXPECT_TRUE(m.StartMatch(schedule[1 - 1]));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	EXPECT_EQ(schedule[2 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Maximilian");
+	EXPECT_EQ(schedule[2 - 1]->GetFighter(Fighter::Blue ), nullptr);
+
+	EXPECT_EQ(schedule[3 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Phillip");
+	EXPECT_EQ(schedule[3 - 1]->GetFighter(Fighter::Blue ), nullptr);
+
+	EXPECT_EQ(schedule[4 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Anna");
+	EXPECT_EQ(schedule[4 - 1]->GetFighter(Fighter::Blue ), nullptr);
+
+	EXPECT_EQ(schedule[5 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Julian");
+	EXPECT_EQ(schedule[5 - 1]->GetFighter(Fighter::Blue )->GetFirstname(), "Sophia");
+	EXPECT_TRUE(m.StartMatch(schedule[5 - 1]));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	EXPECT_EQ(schedule[6 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Paulina");
+	EXPECT_EQ(schedule[6 - 1]->GetFighter(Fighter::Blue ), nullptr);
+
+	EXPECT_EQ(schedule[7 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Stephan");
+	EXPECT_EQ(schedule[7 - 1]->GetFighter(Fighter::Blue ), nullptr);
+
+	EXPECT_EQ(schedule[8 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Kerstin");
+	EXPECT_EQ(schedule[8 - 1]->GetFighter(Fighter::Blue ), nullptr);
+
+	EXPECT_EQ(schedule[9 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Andreas");
+	EXPECT_EQ(schedule[9 - 1]->GetFighter(Fighter::Blue )->GetFirstname(), "Jade");
+	EXPECT_TRUE(m.StartMatch(schedule[9 - 1]));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	EXPECT_EQ(schedule[10 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Carla");
+	EXPECT_EQ(schedule[10 - 1]->GetFighter(Fighter::Blue ), nullptr);
+
+	EXPECT_EQ(schedule[11 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Dresdner");
+	EXPECT_EQ(schedule[11 - 1]->GetFighter(Fighter::Blue ), nullptr);
+
+	EXPECT_EQ(schedule[12 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Soeren");
+	EXPECT_EQ(schedule[12 - 1]->GetFighter(Fighter::Blue ), nullptr);
+
+	EXPECT_EQ(schedule[13 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Stephanie");
+	EXPECT_EQ(schedule[13 - 1]->GetFighter(Fighter::Blue )->GetFirstname(), "Wurst");
+	EXPECT_TRUE(m.StartMatch(schedule[13 - 1]));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	EXPECT_EQ(schedule[14 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Tim");
+	EXPECT_EQ(schedule[14 - 1]->GetFighter(Fighter::Blue ), nullptr);
+
+	EXPECT_EQ(schedule[15 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Emma");
+	EXPECT_EQ(schedule[15 - 1]->GetFighter(Fighter::Blue ), nullptr);
+
+	EXPECT_EQ(schedule[16 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Emily");
+	EXPECT_EQ(schedule[16 - 1]->GetFighter(Fighter::Blue ), nullptr);
+
+	//
+
+	auto match = schedule[17 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[1 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[2 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Carla");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Maximilian");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[18 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[3 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[4 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Phillip");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Anna");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[19 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[5 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[6 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Sophia");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Paulina");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[20 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[7 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[8 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Stephan");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Kerstin");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[21 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[9 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[10 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Andreas");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Carla");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[22 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[11 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[12 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Dresdner");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Soeren");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[23 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[13 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[14 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Wurst");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Tim");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[24 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[15 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[16 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Emma");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Emily");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	//
+
+	match = schedule[25 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[13 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[14 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Stephanie");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue ), nullptr);
+
+	match = schedule[26 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[15 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[16 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White), nullptr);
+	EXPECT_EQ(match->GetFighter(Fighter::Blue ), nullptr);
+
+	match = schedule[27 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[9 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[10 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Jade");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue ), nullptr);
+	
+	match = schedule[28 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[11 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[12 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White), nullptr);
+	EXPECT_EQ(match->GetFighter(Fighter::Blue ), nullptr);
+
+	match = schedule[29 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[5 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[6 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Julian");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue ), nullptr);
+
+	match = schedule[30 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[7 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[8 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White), nullptr);
+	EXPECT_EQ(match->GetFighter(Fighter::Blue ), nullptr);
+
+	match = schedule[31 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[1 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[2 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Hans");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue ), nullptr);
+
+	match = schedule[32 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[3 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[4 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White), nullptr);
+	EXPECT_EQ(match->GetFighter(Fighter::Blue ), nullptr);
+
+	//
+
+	match = schedule[33 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[17 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[18 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Carla");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Anna");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[34 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[19 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[20 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Sophia");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Kerstin");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[35 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[21 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[22 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Andreas");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Soeren");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[36 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[23 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[24 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Wurst");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Emily");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	//
+
+	match = schedule[37 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[25 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[21 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Stephanie");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Carla");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[38 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[26 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[22 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White), nullptr);
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Dresdner");
+
+	match = schedule[39 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[27 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[23 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Jade");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Tim");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[40 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[28 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[24 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White), nullptr);
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Emma");
+
+	match = schedule[41 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[29 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[17 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Julian");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Maximilian");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[42 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[30 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[18 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White), nullptr);
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Phillip");
+
+	match = schedule[43 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[31 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[19 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Hans");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Paulina");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[44 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[32 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[20 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White), nullptr);
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Stephan");
+
+	//
+
+	match = schedule[45 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[33 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[34 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Carla");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Kerstin");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[46 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[35 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[36 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Andreas");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Emily");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	//
+
+	match = schedule[47 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[37 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[38 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Stephanie");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Dresdner");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[48 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[39 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[40 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Tim");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Emma");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[49 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[41 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[42 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Julian");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Phillip");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[50 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[43 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[44 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Paulina");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Stephan");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	//
+
+	match = schedule[51 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[47 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[33 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Stephanie");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Anna");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[52 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[48 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[34 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Emma");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Sophia");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[53 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[49 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[35 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Julian");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Soeren");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[54 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[50 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[36 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Stephan");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Wurst");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	//
+
+	match = schedule[55 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[51 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[52 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Stephanie");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Sophia");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[56 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[53 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[54 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Julian");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Wurst");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	//
+
+	match = schedule[57 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[55 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[46 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Stephanie");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Emily");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[58 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[56 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[45 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Wurst");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Carla");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+	//
+
+	match = schedule[59 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[45 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[46 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Kerstin");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Andreas");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[60 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[57 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[58 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Stephanie");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Carla");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::White);
+	EXPECT_TRUE(m.EndMatch());
+
+	match = schedule[61 - 1];
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[57 - 1]->GetUUID());
+	EXPECT_EQ(match->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[58 - 1]->GetUUID());
+	EXPECT_EQ(match->GetFighter(Fighter::White)->GetFirstname(), "Emily");
+	EXPECT_EQ(match->GetFighter(Fighter::Blue )->GetFirstname(), "Wurst");
+	EXPECT_TRUE(m.StartMatch(match));
+	m.AddIppon(Fighter::Blue);
+	EXPECT_TRUE(m.EndMatch());
+
+
+
+	auto results = group->CalculateResults();
+
+	ASSERT_EQ(results.GetSize(), 6);
+	EXPECT_EQ(results[0].Judoka->GetFirstname(), "Kerstin");
+	EXPECT_EQ(results[1].Judoka->GetFirstname(), "Andreas");
+	EXPECT_EQ(results[2].Judoka->GetFirstname(), "Stephanie");
+	EXPECT_EQ(results[3].Judoka->GetFirstname(), "Carla");
+	EXPECT_EQ(results[4].Judoka->GetFirstname(), "Wurst");
+	EXPECT_EQ(results[5].Judoka->GetFirstname(), "Emily");
+
+	delete t;
+}
+
+
+
 TEST(DoubleElimination, Count8)
 {
 	initialize();
@@ -1567,6 +2105,7 @@ TEST(DoubleElimination, ExportImport)
 		bool has_match[65];
 
 		Tournament t;
+		t.SetName("deleteMe");
 		DoubleElimination* group = new DoubleElimination(0, 200);
 
 		for (int i = 1; i <= count; ++i)
@@ -1600,7 +2139,7 @@ TEST(DoubleElimination, ExportImport)
 		EXPECT_EQ((void*)group->GetSchedule()[0], (void*)group->GetWinnerBracket().GetSchedule()[0]);
 		EXPECT_EQ((void*)group2.GetSchedule()[0], (void*)group2.GetWinnerBracket().GetSchedule()[0]);
 
-		for (int i = 1; i <= count; ++i)
-			delete j[i];
+		t.Save();
+		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 	}
 }

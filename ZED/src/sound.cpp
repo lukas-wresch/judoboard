@@ -89,6 +89,8 @@ SoundDevice::~SoundDevice()
 
 const char* SoundDevice::GetDeviceName(int Index)
 {
+	if (Index < 0)
+		return nullptr;
 	return SDL_GetAudioDeviceName(Index, 0);
 }
 

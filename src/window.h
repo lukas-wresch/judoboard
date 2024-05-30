@@ -40,10 +40,7 @@ namespace Judoboard
 #endif
 
 		Window(const std::string& Title) : m_Renderer(IsDisplayConnected() ? new ZED::RendererOpenGL : new ZED::RendererSDL2), m_Title(Title)
-		{
-			if (!ZED::SoundEngine::Init())
-				ZED::Log::Warn("Could not start sound engine");
-		}
+		{}
 		//Window(const std::string& Title) : m_Renderer(new ZED::RendererOpenGLES1_1), m_Title(Title) {}
 		//Window(const std::string& Title) : m_Renderer(new ZED::RendererSDL2), m_Title(Title) {}
 

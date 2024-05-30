@@ -250,8 +250,8 @@ bool MatchTable::DeleteMatch(const UUID& UUID)
 	{
 		if ((*it)->GetUUID() == UUID)
 		{
-			if (!IsSubMatchTable())
-				delete *it;
+			//if (!IsSubMatchTable())
+				//delete *it;
 			m_Schedule.erase(it);
 			return true;
 		}
