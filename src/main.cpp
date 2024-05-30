@@ -397,19 +397,34 @@ int main(int argc, char** argv)
 	bool do_update = false;
 	switch (Judoboard::License::GetLicenseState())
 	{
+	case Judoboard::License::State::Unknown:
+		ZED::Log::Error("Unknown license issue");
+		break;
+	case Judoboard::License::State::NotInitialized:
+		ZED::Log::Error("License service not initialized");
+		break;
+	case Judoboard::License::State::WrongSignature:
+		ZED::Log::Error("License: Incorrect signature");
+		break;
+	case Judoboard::License::State::WrongHash:
+		ZED::Log::Error("License: Incorrect hash");
+		break;
 	case Judoboard::License::State::FileNotExist:
+		ZED::Log::Warn("No license found, started demo mode");
 		do_update = true;
 #ifdef _WIN32
 		MessageBox(NULL, L"Demo version! The program will close after 30 minutes.", L"Judoboard", MB_OK | MB_ICONINFORMATION);
 #endif
 		break;
 	case Judoboard::License::State::Expired:
+		ZED::Log::Warn("License expired");
 		do_update = true;
 #ifdef _WIN32
 		MessageBox(NULL, L"License expired!", L"Judoboard", MB_OK | MB_ICONERROR);
 #endif
 		break;
 	case Judoboard::License::State::Valid:
+		ZED::Log::Info("License verified");
 		//do_update = true;
 		//MessageBox(NULL, L"License valid!", L"Judoboard", MB_OK | MB_ICONINFORMATION);
 		break;
@@ -441,7 +456,12 @@ int main(int argc, char** argv)
 					fclose(file);
 
 					if (Judoboard::License::GetLicenseState() != Judoboard::License::State::Valid)
+					{
 						Judoboard::License::Check(&app);
+#ifdef _WIN32
+						MessageBox(NULL, L"License has been downloaded.", L"Judoboard", MB_OK | MB_ICONINFORMATION);
+#endif
+					}
 				}
 			}
 		}).detach();

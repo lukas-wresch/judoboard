@@ -2278,12 +2278,8 @@ void Application::SetupHttpServer()
 	});*/
 
 	m_Server.RegisterResource("/ajax/config/get_setup", [this](auto& Request) -> std::string {
-		//auto error = CheckPermission(Request, Account::AccessLevel::Admin);
-		//if (!error)
-			//return error;
-		//Needs to be accessable before login to obtain the language
-
-		return Ajax_GetSetup();
+		const bool is_admin = CheckPermission(Request, Account::AccessLevel::Admin);
+		return Ajax_GetSetup(is_admin);
 	});
 
 	m_Server.RegisterResource("/ajax/config/set_setup", [this](auto& Request) -> std::string {
@@ -4674,7 +4670,7 @@ Error Application::Ajax_EndMatch(const HttpServer::Request& Request)
 
 
 
-std::string Application::Ajax_GetSetup()
+std::string Application::Ajax_GetSetup(bool IsAdmin)
 {
 	YAML::Emitter ret;
 
@@ -4691,9 +4687,20 @@ std::string Application::Ajax_GetSetup()
 	ret << YAML::Key << "osaekomi_style" << YAML::Value << (int)GetDatabase().GetOsaekomiStyle();
 	ret << YAML::Key << "timer_style"    << YAML::Value << (int)GetDatabase().GetTimerStyle();
 	ret << YAML::Key << "name_style"     << YAML::Value << (int)GetDatabase().GetNameStyle();
-	ret << YAML::Key << "results_server"     << YAML::Value << GetDatabase().IsResultsServer();
-	ret << YAML::Key << "results_server_url" << YAML::Value << GetDatabase().GetResultsServer();
-	ret << YAML::Key << "http_workers_free"  << YAML::Value << std::to_string(m_Server.GetFreeWorkerCount()) + "/" + std::to_string(m_Server.GetWorkerCount());
+
+	if (IsAdmin)
+	{
+		ret << YAML::Key << "results_server"     << YAML::Value << GetDatabase().IsResultsServer();
+		ret << YAML::Key << "results_server_url" << YAML::Value << GetDatabase().GetResultsServer();
+		ret << YAML::Key << "http_workers_free"  << YAML::Value << std::to_string(m_Server.GetFreeWorkerCount()) + "/" + std::to_string(m_Server.GetWorkerCount());
+
+		auto state = License::GetLicenseState();
+		ret << YAML::Key << "license_valid"   << YAML::Value << (state == License::State::Valid);
+		ret << YAML::Key << "license_expired" << YAML::Value << (state == License::State::Expired);
+		ret << YAML::Key << "license_expiration_date" << YAML::Value << License::GetLicenseExpiration();
+		ret << YAML::Key << "license_type" << YAML::Value << (int)License::GetLicenseType();
+		ret << YAML::Key << "license_id"   << YAML::Value << License::GetUserID();
+	}
 
 	ret << YAML::EndMap;
 	return ret.c_str();

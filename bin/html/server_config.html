@@ -88,9 +88,25 @@
   </label>
 </div>
 
-<div style="margin-top: 5mm;">
+<div style="margin-top: 0mm;">
   <label style="width:200px;float:left;" id="label_results_server_url">URL endpoint</label>
   <input style="margin-bottom:20px;" type="text" id="results_server_url" value="www.example.com/Judoboard/update.php" size="30" maxlength="64"/>
+</div>
+
+<div id="div_license" style="border-style: dashed; border-width: 2px; border-color: #ccc; width: 10cm; padding: 0.3cm; margin-bottom: 0.3cm;">
+
+<label style="width:200px;float:left;" id="license_status_label">License Status:</label>
+<label style="width:200px;" id="license_status"></label>
+<br/><br/>
+<label style="width:200px;float:left;" id="license_type_label">Type:</label>
+<label style="" id="license_type"></label>
+<br/><br/>
+<label style="width:200px;float:left;" id="license_expiration_label">Expiration Date:</label>
+<label style="width:200px;" id="license_expiration"></label>
+<br/><br/>
+<label style="width:200px;float:left;" id="license_id_label">License ID:</label>
+<label style="width:200px;" id="license_id"></label>
+
 </div>
 
 <br/>
@@ -245,6 +261,25 @@ function GetStatus()
       document.getElementById("results_server").checked   = res.results_server;
       document.getElementById("results_server_url").value = res.results_server_url;
       document.getElementById("http_threads").innerHTML = res.http_workers_free;
+
+      if (res.license_valid)
+        document.getElementById("license_status").innerHTML = translate('valid');
+      else if (res.license_expired)
+        document.getElementById("license_status").innerHTML = translate('expired');
+      else
+        document.getElementById("license_status").innerHTML = translate('invalid');
+
+      if (res.license_type == 0)
+        document.getElementById("license_type").innerHTML = translate('basic');
+      else if (res.license_type == 1)
+        document.getElementById("license_type").innerHTML = translate('standard');
+      else if (res.license_type == 2)
+        document.getElementById("license_type").innerHTML = translate('professional');
+      else
+        document.getElementById("license_type").innerHTML = '???';
+
+      document.getElementById("license_expiration").innerHTML = res.license_expiration_date;
+      document.getElementById("license_id").innerHTML         = res.license_id;
     }
     else
     {
