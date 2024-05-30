@@ -1,5 +1,7 @@
 #pragma once
 #include <thread>
+#include <fstream>
+#include <sstream>
 #include "core.h"
 #include "socket_tcp.h"
 #include "thread_pool.h"
@@ -98,6 +100,18 @@ namespace ZED
 			void SetCacheControl(uint32_t TimeInSeconds)
 			{
 				Add("Cache-Control", "max-age="+std::to_string(TimeInSeconds));
+			}
+
+			void LoadFile(const std::string& Filename)
+			{
+				std::ifstream file(Filename, std::ios::binary);//open the input file
+
+				if (file)
+				{
+					std::stringstream strStream;
+					strStream << file.rdbuf();//read the file
+					m_Body = std::move(strStream.str());//str holds the content of the file
+				}
 			}
 
 			std::vector<HeaderValue> m_Header;

@@ -180,15 +180,32 @@ void HttpServer::HandleClient(SocketTCP* Client) const
 
 		else//At value
 			value[value_index++%256] = req[i];
+	}	
+
+
+	//Parsing complete, searching for endpoint
+
+	auto item = m_Resources.find(request_header.url);
+
+	if (item != m_Resources.end())
+	{
+		if (item->second)
+		{
+			auto content = item->second(request_header);//Execute endpoint
+			SendResponse(Client, content);//Return content
+		}
 	}
 
-	Response response;
-	response.Add("Content-Type", "text/plain");
-	response.Add("Connection", "close");
-	response.Add("Content-Length", "12");
-	response.m_Body = std::string("Hello World!");
+	else//No endpoint found
+	{
+		Response response;
+		response.Add("Content-Type", "text/plain");
+		response.Add("Connection", "close");
+		response.Add("Content-Length", "12");
+		response.m_Body = std::string("Hello World!");
 
-	SendResponse(Client, response);
+		SendResponse(Client, response);
+	}
 
 	delete Client;
 }
