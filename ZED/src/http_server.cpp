@@ -232,8 +232,11 @@ bool HttpServer::Start()
 					{
 						SocketTCP* new_connection = (SocketTCP*)listening_socket->AcceptClient();
 
-						m_ThreadPool.Enqueue([this, new_connection]() {
-							HandleClient(new_connection); });
+						assert(new_connection);
+
+						if (new_connection)
+							m_ThreadPool.Enqueue([this, new_connection]() {
+								HandleClient(new_connection); });
 					}
 				}
 			}

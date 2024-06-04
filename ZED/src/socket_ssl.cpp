@@ -14,6 +14,7 @@
 #endif
 #include <stdio.h>
 #include <openssl/ssl.h>
+#include <openssl/err.h>
 #include "../include/socket_ssl.h"
 #include "../include/log.h"
 
@@ -26,42 +27,6 @@
 
 
 using namespace ZED;
-
-
-
-/*SocketSSL::SocketSSL()
-{
-	if (m_Socket != -1)
-	{
-		Log::Warn("Socket object has already been created");
-		return;
-	}
-
-#ifdef _WIN32
-	WSADATA wsaData;
-	WSAStartup(0x202, &wsaData);
-#endif
-
-	if ((m_Socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
-	{
-		Log::Error("Could not create socket!");
-		return;
-	}
-}
-
-
-
-SocketSSL::SocketSSL(int Socket)
-{
-	m_Socket = Socket;
-
-	u_long on_mode = 1;
-#ifdef _WIN32
-	ioctlsocket(m_Socket, FIONBIO, &on_mode);
-#else		
-	ioctl(m_Socket, FIONBIO, &on_mode);
-#endif
-}*/
 
 
 
@@ -115,13 +80,19 @@ bool SocketSSL::CreateSSLContext()
 	if (!SocketTCP::IsConnected())
 		return false;
 
-	m_SSL_Context = SSL_CTX_new(TLS_client_method());
-	if (!m_SSL_Context)
-		return false;
+	if (!m_SSL_Context && !m_SSL)
+	{
+		m_SSL_Context = SSL_CTX_new(TLS_client_method());
+		if (!m_SSL_Context)
+			return false;
+	}
 
-	m_SSL = SSL_new(m_SSL_Context);
 	if (!m_SSL)
-		return false;
+	{
+		m_SSL = SSL_new(m_SSL_Context);
+		if (!m_SSL)
+			return false;
+	}
 
 	if (SSL_set_fd(m_SSL, m_Socket) == 0)
 		return false;
@@ -135,10 +106,34 @@ bool SocketSSL::CreateSSLContext()
 
 bool SocketSSL::Listen(uint16_t Port)
 {
+	m_SSL_Context = SSL_CTX_new(TLS_server_method());
+
+	//if (!CreateSSLContext())
+		//return false;
+
+	/* set the local certificate from CertFile */
+	if (SSL_CTX_use_certificate_file(m_SSL_Context, "cert.pem", SSL_FILETYPE_PEM) <= 0)
+	{
+		ERR_print_errors_fp(stderr);
+		return false;
+	}
+	/* set the private key from KeyFile (may be the same as CertFile) */
+	if (SSL_CTX_use_PrivateKey_file(m_SSL_Context, "key.pem", SSL_FILETYPE_PEM) <= 0)
+	{
+		ERR_print_errors_fp(stderr);
+		return false;
+	}
+	/* verify private key */
+	if (!SSL_CTX_check_private_key(m_SSL_Context))
+	{
+		fprintf(stderr, "Private key does not match the public certificate\n");
+		return false;
+	}
+
 	if (!SocketTCP::Listen(Port))
 		return false;
 
-	return CreateSSLContext();
+	return true;
 }
 
 
@@ -159,20 +154,75 @@ bool SocketSSL::Send(const void* Data, uint32_t Size)
 
 Socket* SocketSSL::AcceptClient() const
 {
-	Socket* new_socket = SocketTCP::AcceptClient();
-	if (!new_socket)
+	sockaddr_in addr;
+	int addr_len = sizeof(addr);
+	int new_socket = accept(m_Socket, (sockaddr*)&addr, &addr_len);
+
+	if (new_socket == -1)
 		return nullptr;
 
 	SocketSSL* ret = new SocketSSL;
-	ret->m_Socket  = new_socket->GetSocket();
-	ret->m_SSL = SSL_new(m_SSL_Context);
+	ret->m_Socket  = new_socket;
+	ret->m_SSL     = SSL_new(m_SSL_Context);
 
-	delete new_socket;
-
-	if (ret->m_SSL <= 0)
+	if (!ret->CreateSSLContext())
 	{
 		delete ret;
 		return nullptr;
+	}
+
+	/*if (SSL_use_certificate_chain_file(ret->m_SSL, "E:\\Workspace\\Judoboard\\bin\\cert.pem") == 0)
+	{
+		delete ret;
+		return nullptr;
+	}
+
+	if (SSL_use_PrivateKey_file(ret->m_SSL, "E:\\Workspace\\Judoboard\\bin\\key.pem", SSL_FILETYPE_PEM) == 0)
+	{
+		delete ret;
+		return nullptr;
+	}
+
+	//Verify that the private key matches the public certificate
+	if (!SSL_check_private_key(ret->m_SSL))
+	{
+		//fprintf(stderr, "Private key does not match the public certificate\n");
+		exit(EXIT_FAILURE);
+	}*/
+
+	if (SSL_accept(ret->m_SSL) <= 0)
+	{
+		int err = SSL_get_error(ret->m_SSL, -1);
+
+		switch (err) {
+		case SSL_ERROR_NONE:
+			// No error
+			break;
+		case SSL_ERROR_ZERO_RETURN:
+			//std::cerr << "SSL connection closed by peer" << std::endl;
+			break;
+		case SSL_ERROR_WANT_READ:
+		case SSL_ERROR_WANT_WRITE:
+			// Non-fatal error, try again later
+			//std::cerr << "SSL operation did not complete, try again" << std::endl;
+			break;
+		case SSL_ERROR_SYSCALL:
+			char buffer[1024];
+			strerror_s(buffer, errno);
+			break;
+		case SSL_ERROR_SSL:
+			//std::cerr << "SSL library error" << std::endl;
+			ERR_print_errors_fp(stderr);
+			break;
+		default:
+			//std::cerr << "Unknown SSL error" << std::endl;
+			ERR_print_errors_fp(stderr);
+			break;
+		}
+
+
+		//delete ret;
+		//return nullptr;
 	}
 
 	return ret;
