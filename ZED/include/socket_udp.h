@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
@@ -79,7 +80,8 @@ namespace ZED
 		virtual bool Connect(const char* Host, uint16_t Port) override;
 		bool Connect(const std::string& Host, uint16_t Port) { return Connect(Host.c_str(), Port); }
 
-		virtual bool Listen(uint16_t Port) override;		
+		virtual bool Listen(uint16_t Port) override;
+		virtual Socket* AcceptClient() const override { assert(false); return nullptr; }
 
 		bool IsConnected() const { return m_Socket != -1 && m_Addr.sin_addr.s_addr != 0; }
 

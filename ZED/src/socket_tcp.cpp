@@ -51,13 +51,6 @@ SocketTCP::SocketTCP()
 SocketTCP::SocketTCP(int Socket)
 {
 	m_Socket = Socket;
-
-	u_long on_mode = 1;
-#ifdef _WIN32
-	ioctlsocket(m_Socket, FIONBIO, &on_mode);
-#else		
-	ioctl(m_Socket, FIONBIO, &on_mode);
-#endif
 }
 
 
@@ -85,7 +78,6 @@ bool SocketTCP::Connect(const char* Host, uint16_t Port)
 		return false;
 	}
 
-	MakeBlocking(false);
 	return true;
 }
 
@@ -106,14 +98,13 @@ bool SocketTCP::Listen(uint16_t Port)
 		return false;
 	}
 
-	if (listen(m_Socket, 5) == -1)
+	if (listen(m_Socket, 16) == -1)//Backlog
 	{
 		m_Socket = -1;
 		Log::Error("Error can not listen to port " + Port);
 		return false;
 	}
 
-	MakeBlocking(false);
 	return true;
 }
 
@@ -143,11 +134,14 @@ bool SocketTCP::Send(const void* Data, uint32_t Size)
 
 
 
-SocketTCP SocketTCP::AcceptClients()
+Socket* SocketTCP::AcceptClient() const
 {
 	sockaddr_in addr;
 	int addr_len = sizeof(addr);
 	int new_socket = accept(m_Socket, (sockaddr*)&addr, &addr_len);
+
+	if (new_socket == -1)
+		return nullptr;
 
 	//accept
 	if (new_socket != -1)//got one, so lets put him in
@@ -164,7 +158,7 @@ SocketTCP SocketTCP::AcceptClients()
 			Log::Warn("Error setting SO_SNDBUF");*/
 	}
 
-	return new_socket;
+	return new SocketTCP(new_socket);
 }
 
 

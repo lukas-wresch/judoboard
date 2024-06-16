@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include "core.h"
 #include "socket_tcp.h"
 #include "socket_udp.h"
@@ -14,6 +15,8 @@ namespace ZED
 		DLLEXPORT Server(uint16_t Port);
 		~Server() { Disconnect(); }
 
+		bool Listen(uint16_t Port) { return m_ServerSocket.Listen(Port); }
+
 		void MakeBlocking(bool Enable = true) { m_ServerSocket.MakeBlocking(Enable); }
 
 		bool IsValid() const { return m_ServerSocket.IsValid(); }
@@ -28,7 +31,7 @@ namespace ZED
 
 		DLLEXPORT virtual void Recv() = 0;
 
-		DLLEXPORT void Disconnect() {}//NOT IMPLEMENTED
+		DLLEXPORT void Disconnect() { assert(false); }//NOT IMPLEMENTED
 
 	protected:
 

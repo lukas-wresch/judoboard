@@ -43,7 +43,9 @@ namespace ZED
 
 		void SetKeepAlive(bool Enable = true) { m_KeepAlive = Enable; }
 
-	private:
+	protected:
+		virtual SocketTCP& GetSocket() { return m_Socket; }
+
 		SocketTCP m_Socket;
 
 		std::string m_Hostname;
