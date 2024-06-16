@@ -111,14 +111,15 @@ bool SocketSSL::Listen(uint16_t Port)
 	//if (!CreateSSLContext())
 		//return false;
 
-	/* set the local certificate from CertFile */
-	if (SSL_CTX_use_certificate_file(m_SSL_Context, "cert.pem", SSL_FILETYPE_PEM) <= 0)
+	//set the local certificate from CertFile
+	//if (SSL_CTX_use_certificate_file(m_SSL_Context, "cert.pem", SSL_FILETYPE_PEM) <= 0)
+	if (SSL_CTX_use_certificate_file(m_SSL_Context, "certificate.pem", SSL_FILETYPE_PEM) <= 0)
 	{
 		ERR_print_errors_fp(stderr);
 		return false;
 	}
-	/* set the private key from KeyFile (may be the same as CertFile) */
-	if (SSL_CTX_use_PrivateKey_file(m_SSL_Context, "key.pem", SSL_FILETYPE_PEM) <= 0)
+	//set the private key from KeyFile (may be the same as CertFile)
+	if (SSL_CTX_use_PrivateKey_file(m_SSL_Context, "private.key", SSL_FILETYPE_PEM) <= 0)
 	{
 		ERR_print_errors_fp(stderr);
 		return false;
@@ -192,37 +193,11 @@ Socket* SocketSSL::AcceptClient() const
 
 	if (SSL_accept(ret->m_SSL) <= 0)
 	{
-		int err = SSL_get_error(ret->m_SSL, -1);
-
-		switch (err) {
-		case SSL_ERROR_NONE:
-			// No error
-			break;
-		case SSL_ERROR_ZERO_RETURN:
-			//std::cerr << "SSL connection closed by peer" << std::endl;
-			break;
-		case SSL_ERROR_WANT_READ:
-		case SSL_ERROR_WANT_WRITE:
-			// Non-fatal error, try again later
-			//std::cerr << "SSL operation did not complete, try again" << std::endl;
-			break;
-		case SSL_ERROR_SYSCALL:
-			char buffer[1024];
-			strerror_s(buffer, errno);
-			break;
-		case SSL_ERROR_SSL:
-			//std::cerr << "SSL library error" << std::endl;
-			ERR_print_errors_fp(stderr);
-			break;
-		default:
-			//std::cerr << "Unknown SSL error" << std::endl;
-			ERR_print_errors_fp(stderr);
-			break;
-		}
+		//int err = SSL_get_error(ret->m_SSL, -1);
 
 
-		//delete ret;
-		//return nullptr;
+		delete ret;
+		return nullptr;
 	}
 
 	return ret;
