@@ -227,7 +227,7 @@ const MatchTable* RemoteTournament::FindMatchTable(const UUID& ID) const
 
 
 
-const RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID) const
+std::shared_ptr<const RuleSet> RemoteTournament::FindRuleSet(const UUID& UUID) const
 {
 	auto response = Request2Master("/ajax/master/find_ruleset?uuid=" + (std::string)UUID);
 
@@ -242,7 +242,7 @@ const RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID) const
 	if (!yaml)
 		return nullptr;
 
-	RuleSet* rule_set = new RuleSet(yaml);
+	auto rule_set = std::make_shared<RuleSet>(yaml);
 	m_StandingData.AddRuleSet(rule_set);//Add to cache
 
 	return rule_set;
@@ -250,7 +250,7 @@ const RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID) const
 
 
 
-RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID)
+std::shared_ptr<RuleSet> RemoteTournament::FindRuleSet(const UUID& UUID)
 {
 	auto response = Request2Master("/ajax/master/find_ruleset?uuid=" + (std::string)UUID);
 
@@ -265,7 +265,7 @@ RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID)
 	if (!yaml)
 		return nullptr;
 
-	RuleSet* rule_set = new RuleSet(yaml);
+	auto rule_set = std::make_shared<RuleSet>(yaml);
 	m_StandingData.AddRuleSet(rule_set);//Add to cache
 
 	return rule_set;

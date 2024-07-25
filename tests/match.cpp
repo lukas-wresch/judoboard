@@ -101,11 +101,11 @@ TEST(Match, ExportImport)
 		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		int matid = rand();
-		RuleSet rule_set("test", rand(), rand(), rand(), rand());
+		auto rule_set = std::make_shared<RuleSet>("test", rand(), rand(), rand(), rand());
 		Tournament tourney;
 
 		Match* match = new Match(&j1, &j2, &tourney, matid);
-		match->SetRuleSet(&rule_set);
+		match->SetRuleSet(rule_set);
 		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
 
 		YAML::Emitter yaml;
@@ -155,11 +155,11 @@ TEST(Match, ExportImport_CopyConstructor)
 		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		int matid = rand();
-		RuleSet rule_set("test", rand(), rand(), rand(), rand());
+		auto rule_set = std::make_shared<RuleSet>("test", rand(), rand(), rand(), rand());
 		Tournament tourney;
 
 		Match* match = new Match(&j1, &j2, &tourney, matid);
-		match->SetRuleSet(&rule_set);
+		match->SetRuleSet(rule_set);
 		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
 
 		Match match2(*match);

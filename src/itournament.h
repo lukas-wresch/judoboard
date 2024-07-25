@@ -95,13 +95,13 @@ namespace Judoboard
 		virtual bool RemoveAssociation(const UUID& UUID) { return false; }
 
 		//Rule Sets
-		virtual const RuleSet* GetDefaultRuleSet() const { return nullptr; }
-		virtual void SetDefaultRuleSet(RuleSet* NewDefaultRuleSet) {}
-		virtual bool AddRuleSet(RuleSet* NewRuleSet) { return false; }
-		virtual const RuleSet* FindRuleSetByName(const std::string& Name) const { return nullptr; }
-		virtual RuleSet* FindRuleSetByName(const std::string& Name) { return nullptr; }
-		virtual const RuleSet* FindRuleSet(const UUID& UUID) const = 0;
-		virtual RuleSet* FindRuleSet(const UUID& UUID) = 0;
+		virtual std::shared_ptr<const RuleSet> GetDefaultRuleSet() const { return nullptr; }
+		virtual void SetDefaultRuleSet(std::shared_ptr<RuleSet> NewDefaultRuleSet) {}
+		virtual bool AddRuleSet(std::shared_ptr<RuleSet> NewRuleSet) { return false; }
+		virtual std::shared_ptr<const RuleSet> FindRuleSetByName(const std::string& Name) const { return nullptr; }
+		virtual std::shared_ptr<RuleSet> FindRuleSetByName(const std::string& Name) { return nullptr; }
+		virtual std::shared_ptr<const RuleSet> FindRuleSet(const UUID& UUID) const = 0;
+		virtual std::shared_ptr<RuleSet> FindRuleSet(const UUID& UUID) = 0;
 
 		//Age groups
 		virtual bool AddAgeGroup(AgeGroup* NewAgeGroup) { return false; }

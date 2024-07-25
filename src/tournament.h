@@ -31,7 +31,7 @@ namespace Judoboard
 
 		Tournament() = default;
 		Tournament(const std::string& Name);
-		Tournament(const std::string& Name, const RuleSet* RuleSet);
+		Tournament(const std::string& Name, std::shared_ptr<const RuleSet> RuleSet);
 		Tournament(const MD5& File, Database* pDatabase = nullptr);
 		~Tournament();
 
@@ -130,19 +130,19 @@ namespace Judoboard
 		virtual bool RemoveAssociation(const UUID& UUID) override { return m_StandingData.DeleteAssociation(UUID); }
 
 		//Rule Sets
-		virtual const RuleSet* GetDefaultRuleSet() const override { return m_pDefaultRules; }
-		virtual void SetDefaultRuleSet(RuleSet* NewDefaultRuleSet) override {
+		virtual std::shared_ptr<const RuleSet> GetDefaultRuleSet() const override { return m_pDefaultRules; }
+		virtual void SetDefaultRuleSet(std::shared_ptr<RuleSet> NewDefaultRuleSet) override {
 			if (!IsReadonly())
 			{
 				m_StandingData.AddRuleSet(NewDefaultRuleSet);
 				m_pDefaultRules = NewDefaultRuleSet;
 			}
 		}
-		virtual bool AddRuleSet(RuleSet* NewRuleSet) override { return m_StandingData.AddRuleSet(NewRuleSet); }
-		virtual const RuleSet* FindRuleSetByName(const std::string& Name) const override { return m_StandingData.FindRuleSetByName(Name); }
-		virtual RuleSet* FindRuleSetByName(const std::string& Name) override { return m_StandingData.FindRuleSetByName(Name); }
-		virtual const RuleSet* FindRuleSet(const UUID& UUID) const override { return m_StandingData.FindRuleSet(UUID); }
-		virtual RuleSet* FindRuleSet(const UUID& UUID) override { return m_StandingData.FindRuleSet(UUID); }
+		virtual bool AddRuleSet(std::shared_ptr<RuleSet> NewRuleSet) override { return m_StandingData.AddRuleSet(NewRuleSet); }
+		virtual std::shared_ptr<const RuleSet> FindRuleSetByName(const std::string& Name) const override { return m_StandingData.FindRuleSetByName(Name); }
+		virtual std::shared_ptr<RuleSet> FindRuleSetByName(const std::string& Name) override { return m_StandingData.FindRuleSetByName(Name); }
+		virtual std::shared_ptr<const RuleSet> FindRuleSet(const UUID& UUID) const override { return m_StandingData.FindRuleSet(UUID); }
+		virtual std::shared_ptr<RuleSet> FindRuleSet(const UUID& UUID) override { return m_StandingData.FindRuleSet(UUID); }
 
 		//Age groups
 		virtual bool AddAgeGroup(AgeGroup* NewAgeGroup) override;
@@ -257,7 +257,7 @@ namespace Judoboard
 		//std::vector<Match*> m_Schedule;
 		std::vector<std::pair<MatchTable*, size_t>> m_Schedule;
 
-		const RuleSet* m_pDefaultRules = nullptr;//Default rule set of the tournament
+		std::shared_ptr<const RuleSet> m_pDefaultRules;//Default rule set of the tournament
 
 		std::unordered_set<UUID> m_DisqualifiedJudoka;
 

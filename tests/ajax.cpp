@@ -148,7 +148,7 @@ TEST(Ajax, AgeGroup_Get)
 	{
 		Application app;
 
-		auto r  = new RuleSet("test", 1, 2, 3, 4);
+		auto r  = std::make_shared<RuleSet>("test", 1, 2, 3, 4);
 		auto a1 = new AgeGroup("age 1", 10, 20, r);
 		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
 
@@ -187,10 +187,10 @@ TEST(Ajax, AgeGroup_List)
 
 	{
 		Application app;
-		RuleSet r("rule set", 10, 20, 30, 40);
+		auto r = std::make_shared<RuleSet>("rule set", 10, 20, 30, 40);
 
 		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
-		auto a2 = new AgeGroup("age 2", 30, 40, &r);
+		auto a2 = new AgeGroup("age 2", 30, 40, r);
 
 		app.GetDatabase().AddAgeGroup(a1);
 		app.GetTournament()->AddAgeGroup(a2);
@@ -226,7 +226,7 @@ TEST(Ajax, AgeGroup_List)
 		EXPECT_EQ(yaml[7]["num_matches"].as<int>(), 0);
 		EXPECT_EQ(yaml[7]["num_participants"].as<int>(), 0);
 		EXPECT_EQ(yaml[7]["rules_name"].as<std::string>(), "rule set");
-		EXPECT_EQ(yaml[7]["rules_uuid"].as<std::string>(), r.GetUUID());
+		EXPECT_EQ(yaml[7]["rules_uuid"].as<std::string>(), r->GetUUID());
 	}
 }
 
@@ -2233,7 +2233,7 @@ TEST(Ajax, Match_Edit)
 		auto j1 = new Judoka("a", "b");
 		auto j2 = new Judoka("c", "d");
 
-		auto r1 = new RuleSet("test", 60, 30, 10, 5);
+		auto r1 = std::make_shared<RuleSet>("test", 60, 30, 10, 5);
 
 		auto match = new Match(j1, j2, nullptr);
 		app.GetTournament()->AddMatch(match);
@@ -2419,7 +2419,7 @@ TEST(Ajax, MatchTable_Edit)
 
 		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
 		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
-		auto r  = new RuleSet("rules", 30, 60, 40, 30);
+		auto r  = std::make_shared<RuleSet>("rules", 30, 60, 40, 30);
 
 		app.GetTournament()->AddAgeGroup(a1);
 		app.GetTournament()->AddAgeGroup(a2);
@@ -3106,7 +3106,7 @@ TEST(Ajax, Tournament_Add)
 
 	Application app;
 
-	auto rules = new RuleSet("Test Rules", 100, 100, 20, 10);
+	auto rules = std::make_shared<RuleSet>("Test Rules", 100, 100, 20, 10);
 	app.GetDatabase().AddRuleSet(rules);
 
 	auto assoc = new Association("Organizer", nullptr);
@@ -3132,7 +3132,7 @@ TEST(Ajax, Tournament_Get)
 
 	Application app;
 
-	auto rules = new RuleSet("Test Rules", 100, 100, 20, 10);
+	auto rules = std::make_shared<RuleSet>("Test Rules", 100, 100, 20, 10);
 	app.GetDatabase().AddRuleSet(rules);
 
 	auto assoc = new Association("Organizer", nullptr);
@@ -3191,8 +3191,8 @@ TEST(Ajax, Tournament_Edit)
 	{
 		Application app;
 
-		auto rules1 = new RuleSet("Test Rules1", 100, 100, 20, 10);
-		auto rules2 = new RuleSet("Test Rules2", 100, 100, 20, 10);
+		auto rules1 = std::make_shared<RuleSet>("Test Rules1", 100, 100, 20, 10);
+		auto rules2 = std::make_shared<RuleSet>("Test Rules2", 100, 100, 20, 10);
 		app.GetDatabase().AddRuleSet(rules1);
 		app.GetDatabase().AddRuleSet(rules2);
 

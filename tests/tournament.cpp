@@ -273,8 +273,8 @@ TEST(Tournament, AddAgeGroup)
 	auto tourney = new Judoboard::Tournament("Demo Tournament");
 	tourney->EnableAutoSave(false);
 
-	auto rule_set  = Judoboard::RuleSet("Demo", 180, 60, 20, 10);
-	auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set);
+	auto rule_set  = std::make_shared<Judoboard::RuleSet>("Demo", 180, 60, 20, 10);
+	auto age_group = Judoboard::AgeGroup("U18", 0, 100, rule_set);
 
 	auto m1 = new Judoboard::RoundRobin(Weight(0), Weight(120));
 	m1->SetMatID(1);
@@ -282,7 +282,7 @@ TEST(Tournament, AddAgeGroup)
 	tourney->AddMatchTable(m1);
 
 	EXPECT_TRUE(tourney->FindAgeGroup(age_group.GetUUID()));
-	EXPECT_TRUE(tourney->FindRuleSet(rule_set.GetUUID()));
+	EXPECT_TRUE(tourney->FindRuleSet(rule_set->GetUUID()));
 
 	app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
 	app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
@@ -876,7 +876,7 @@ TEST(Tournament, HasDefaultRuleSet2)
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
-	auto rules = new RuleSet("Default", 60, 30, 20, 10);
+	auto rules = std::make_shared<RuleSet>("Default", 60, 30, 20, 10);
 	d.AddRuleSet(rules);
 
 	Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
@@ -950,7 +950,7 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 	{
 		Database d;
 		d.EnableAutoSave(false);
-		d.AddRuleSet(new RuleSet("Test", 10, 20, 30, 40));
+		d.AddRuleSet(std::make_shared<RuleSet>("Test", 10, 20, 30, 40));
 
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 		Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
@@ -1084,7 +1084,7 @@ TEST(Tournament, StressTest_DeletionMovingAdding)
 
 	{
 		auto tournament_name = GetRandomName();
-		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
+		auto tourney = new Tournament(tournament_name, std::make_shared<RuleSet>("Test", 3 * 60, 3 * 60, 20, 10));
 
 		Judoka* j[100];
 

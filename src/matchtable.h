@@ -351,8 +351,8 @@ namespace Judoboard
 
 		//Rule sets
 		const RuleSet& GetRuleSet() const;
-		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
-		const RuleSet* GetOwnRuleSet() const { return m_Rules; }
+		void SetRuleSet(std::shared_ptr<const RuleSet> NewRuleSet) { m_Rules = NewRuleSet; }
+		std::shared_ptr<const RuleSet> GetOwnRuleSet() const { return m_Rules; }
 
 		//Age groups
 		const AgeGroup* GetAgeGroup() const;
@@ -425,7 +425,7 @@ namespace Judoboard
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
 
 	private:
-		const RuleSet* m_Rules = nullptr;//Custom rule set for the matches (if available)
+		std::shared_ptr<const RuleSet> m_Rules;//Custom rule set for the matches (if available)
 
 		std::string m_Name;
 

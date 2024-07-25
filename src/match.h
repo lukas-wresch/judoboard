@@ -190,7 +190,7 @@ namespace Judoboard
 		}
 
 		const RuleSet& GetRuleSet() const;
-		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
+		void  SetRuleSet(std::shared_ptr<const RuleSet> NewRuleSet) { m_Rules = NewRuleSet; }
 
 		uint32_t GetCurrentBreaktime() const;
 
@@ -234,7 +234,7 @@ namespace Judoboard
 		MatchLog m_Log;//Log of the match
 
 		const MatchTable* m_Table = nullptr;//Match table this fight is associated with (if any)
-		const RuleSet*    m_Rules = nullptr;//Custom rule set for the match (if available)
+		std::shared_ptr<const RuleSet> m_Rules = nullptr;//Custom rule set for the match (if available)
 
 		const ITournament* m_Tournament = nullptr;
 

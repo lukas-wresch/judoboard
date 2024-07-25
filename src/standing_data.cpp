@@ -19,8 +19,6 @@ void StandingData::Reset()
 		delete judoka;
 	m_Judokas.clear();
 
-	for (auto rule : m_RuleSets)
-		delete rule;
 	m_RuleSets.clear();
 
 	for (auto age_group : m_AgeGroups)
@@ -429,7 +427,7 @@ bool StandingData::AssociationHasChildren(const Association* Association) const
 
 
 
-RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName)
+std::shared_ptr<RuleSet> StandingData::FindRuleSetByName(const std::string& RuleSetName)
 {
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetName() == RuleSetName)
@@ -440,7 +438,7 @@ RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName)
 
 
 
-const RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName) const
+std::shared_ptr<const RuleSet> StandingData::FindRuleSetByName(const std::string& RuleSetName) const
 {
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetName() == RuleSetName)
@@ -451,7 +449,7 @@ const RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName) c
 
 
 
-RuleSet* StandingData::FindRuleSet(const UUID& UUID)
+std::shared_ptr<RuleSet> StandingData::FindRuleSet(const UUID& UUID)
 {
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetUUID() == UUID)
@@ -462,7 +460,7 @@ RuleSet* StandingData::FindRuleSet(const UUID& UUID)
 
 
 
-const RuleSet* StandingData::FindRuleSet(const UUID& UUID) const
+std::shared_ptr<const RuleSet> StandingData::FindRuleSet(const UUID& UUID) const
 {
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetUUID() == UUID)
@@ -479,7 +477,6 @@ bool StandingData::DeleteRuleSet(const UUID& UUID)
 	{
 		if ((*it)->GetUUID() == UUID)
 		{
-			delete *it;
 			m_RuleSets.erase(it);
 			return true;
 		}
@@ -490,7 +487,7 @@ bool StandingData::DeleteRuleSet(const UUID& UUID)
 
 
 
-bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
+bool StandingData::AddRuleSet(std::shared_ptr<RuleSet> NewRuleSet)
 {
 	if (!NewRuleSet || FindRuleSet(NewRuleSet->GetUUID()))
 		return false;

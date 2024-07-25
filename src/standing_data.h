@@ -82,21 +82,21 @@ namespace Judoboard
 		bool AssociationHasChildren(const Association* Association) const;
 
 		//Rule sets
-		bool AddRuleSet(RuleSet* NewRuleSet);
+		bool AddRuleSet(std::shared_ptr<RuleSet> NewRuleSet);
 		[[nodiscard]]
 
 		[[nodiscard]]
-		RuleSet* FindRuleSetByName(const std::string& RuleSetName);
+		std::shared_ptr<RuleSet> FindRuleSetByName(const std::string& RuleSetName);
 		[[nodiscard]]
-		const RuleSet* FindRuleSetByName(const std::string& RuleSetName) const;
+		std::shared_ptr<const RuleSet> FindRuleSetByName(const std::string& RuleSetName) const;
 		[[nodiscard]]
-		RuleSet* FindRuleSet(const UUID& UUID);
+		std::shared_ptr<RuleSet> FindRuleSet(const UUID& UUID);
 		[[nodiscard]]
-		const RuleSet* FindRuleSet(const UUID& UUID) const;
+		std::shared_ptr<const RuleSet> FindRuleSet(const UUID& UUID) const;
 
-		std::vector<RuleSet*>& GetRuleSets() { return m_RuleSets; }
+		std::vector<std::shared_ptr<RuleSet>>& GetRuleSets() { return m_RuleSets; }
 		[[nodiscard]]
-		const std::vector<RuleSet*>& GetRuleSets() const { return m_RuleSets; }
+		const std::vector<std::shared_ptr<RuleSet>>& GetRuleSets() const { return m_RuleSets; }
 
 		[[nodiscard]]
 		bool DeleteRuleSet(const UUID& UUID);
@@ -124,7 +124,7 @@ namespace Judoboard
 		std::vector<Club*> m_Clubs;
 		std::vector<Association*> m_Associations;
 
-		std::vector<RuleSet*> m_RuleSets;
+		std::vector<std::shared_ptr<RuleSet>> m_RuleSets;
 		std::vector<AgeGroup*> m_AgeGroups;
 
 	private:

@@ -31,10 +31,10 @@ void Database::Reset()
 	//No rule set defined and no age groups defined
 	if (m_RuleSets.empty() && m_AgeGroups.empty())
 	{
-		auto children = new RuleSet(Localizer::Translate("Children"),		2*60, 0,    20, 10, false, false, false, 2*60);
-		auto youth    = new RuleSet(Localizer::Translate("Youth") + " U13", 3*60, 0,    20, 10, false, false, false, 3*60);
-		auto youth2   = new RuleSet(Localizer::Translate("Youth") + " U15", 3*60, 3*60, 20, 10, false, false, false, 3*60, true);
-		auto adults   = new RuleSet(Localizer::Translate("Adults"),         4*60, -1,   20, 10, false, false, false, 4*60, true);
+		auto children = std::make_shared<RuleSet>(Localizer::Translate("Children"),	      2*60, 0,    20, 10, false, false, false, 2*60);
+		auto youth    = std::make_shared<RuleSet>(Localizer::Translate("Youth") + " U13", 3*60, 0,    20, 10, false, false, false, 3*60);
+		auto youth2   = std::make_shared<RuleSet>(Localizer::Translate("Youth") + " U15", 3*60, 3*60, 20, 10, false, false, false, 3*60, true);
+		auto adults   = std::make_shared<RuleSet>(Localizer::Translate("Adults"),         4*60, -1,   20, 10, false, false, false, 4*60, true);
 
 		AddRuleSet(children);
 		AddRuleSet(youth);

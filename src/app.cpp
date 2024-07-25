@@ -24,7 +24,7 @@ bool Application::NoWindow = false;
 Application::Application() : m_StartupTimestamp(Timer::GetTimestamp())
 {
 	m_TempTournament.EnableAutoSave(false);
-	m_TempTournament.SetDefaultRuleSet(new RuleSet);//Take default rule set as rule set for temporary tournaments
+	m_TempTournament.SetDefaultRuleSet(std::make_shared<RuleSet>());//Take default rule set as rule set for temporary tournaments
 	m_CurrentTournament = &m_TempTournament;
 
 	std::string token = (std::string)ID::GenerateUUID();

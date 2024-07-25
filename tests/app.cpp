@@ -407,7 +407,7 @@ TEST(App, FullTournament)
 		app.GetDatabase().AddJudoka(std::move(j6));
 
 		auto tournament_name = GetRandomName();
-		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
+		auto tourney = new Tournament(tournament_name, std::make_shared<RuleSet>("Test", 3 * 60, 3 * 60, 20, 10));
 		tourney->EnableAutoSave(false);
 		EXPECT_TRUE(app.AddTournament(tourney));
 
@@ -506,7 +506,7 @@ TEST(App, FullTournament_SingleElimination14)
 		ZED::Core::Pause(5000);
 
 		auto tournament_name = GetRandomName();
-		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
+		auto tourney = new Tournament(tournament_name, std::make_shared<RuleSet>("Test", 3 * 60, 3 * 60, 20, 10));
 		tourney->EnableAutoSave(false);
 		EXPECT_TRUE(app.AddTournament(tourney));
 
@@ -590,7 +590,7 @@ TEST(App, FullTournament_SingleElimination7_BO3)
 		app.GetDatabase().AddAccount(acc);
 
 		auto tournament_name = GetRandomName();
-		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
+		auto tourney = new Tournament(tournament_name, std::make_shared<RuleSet>("Test", 3 * 60, 3 * 60, 20, 10));
 		tourney->EnableAutoSave(false);
 		EXPECT_TRUE(app.AddTournament(tourney));
 
@@ -670,7 +670,7 @@ TEST(App, VeryLongNameTest)
 
 	Match match(&j1, &j2, nullptr);
 	match.SetMatID(1);
-	match.SetRuleSet(new RuleSet("Test", 25, 0, 30, 20, true, true, true, 0));
+	match.SetRuleSet(std::make_shared<RuleSet>("Test", 25, 0, 30, 20, true, true, true, 0));
 
 	ZED::Core::Pause(5000);
 

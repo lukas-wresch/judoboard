@@ -30,7 +30,7 @@ Tournament::Tournament(const std::string& Name) : m_Name(Name)
 
 
 
-Tournament::Tournament(const std::string& Name, const RuleSet* RuleSet) : m_pDefaultRules(RuleSet), m_Name(Name)
+Tournament::Tournament(const std::string& Name, std::shared_ptr<const RuleSet> RuleSet) : m_pDefaultRules(RuleSet), m_Name(Name)
 {
 	LoadYAML("tournaments/" + Name + ".yml");
 }
@@ -853,7 +853,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 
 	//Do we have the rule set already?
 	if (!m_StandingData.FindRuleSet(NewMatch->GetRuleSet().GetUUID()))
-		m_StandingData.AddRuleSet(new RuleSet(NewMatch->GetRuleSet()));//Copy rule set
+		m_StandingData.AddRuleSet(std::make_shared<RuleSet>(NewMatch->GetRuleSet()));//Copy rule set
 
 	auto dependencies = NewMatch->GetDependentMatches();//Does this match depend on any other match?
 
@@ -1481,7 +1481,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 		AddAgeGroup(const_cast<AgeGroup*>(NewMatchTable->GetAgeGroup()));
 
 	if (NewMatchTable->GetOwnRuleSet())
-		AddRuleSet(const_cast<RuleSet*>(NewMatchTable->GetOwnRuleSet()));
+		AddRuleSet(std::const_pointer_cast<RuleSet>(NewMatchTable->GetOwnRuleSet()));
 
 	//Add all eligable participants to the match table
 	for (auto judoka : m_StandingData.GetAllJudokas())
@@ -1711,7 +1711,7 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 		return false;
 
 	if (NewAgeGroup->GetRuleSet())
-		m_StandingData.AddRuleSet(const_cast<RuleSet*>(NewAgeGroup->GetRuleSet()));
+		m_StandingData.AddRuleSet(std::const_pointer_cast<RuleSet>(NewAgeGroup->GetRuleSet()));
 
 	for (auto judoka : m_StandingData.GetAllJudokas())
 	{

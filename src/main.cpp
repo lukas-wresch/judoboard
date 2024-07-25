@@ -205,9 +205,9 @@ int main(int argc, char** argv)
 		auto j1 = CreateRandomJudoka(&app.GetDatabase());
 		auto j2 = CreateRandomJudoka(&app.GetDatabase());
 		Judoboard::Match match(&j1, &j2, nullptr, mat->GetMatID());
-		Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, false, false);
-		Judoboard::AgeGroup age_group("U18", 15, 18, &rules);
-		match.SetRuleSet(&rules);
+		auto rules = std::make_shared<Judoboard::RuleSet>("ScreenTest", 1, 3*60, 20, 10, false, false);
+		Judoboard::AgeGroup age_group("U18", 15, 18, rules);
+		match.SetRuleSet(rules);
 		Judoboard::RoundRobin* table = new Judoboard::RoundRobin(new Judoboard::Weightclass(10, 100));
 		table->SetAgeGroup(&age_group);
 		match.SetMatchTable(table);
@@ -271,8 +271,8 @@ int main(int argc, char** argv)
 		auto tourney = new Judoboard::Tournament("Demo Tournament");
 		tourney->EnableAutoSave(false);
 
-		auto rule_set  = Judoboard::RuleSet("Demo", 180, 60, 20, 10);
-		auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set);
+		auto rule_set  = std::make_shared<Judoboard::RuleSet>("Demo", 180, 60, 20, 10);
+		auto age_group = Judoboard::AgeGroup("U18", 0, 100, rule_set);
 
 		auto m1 = new Judoboard::RoundRobin(new Judoboard::Weightclass(0, 120));
 		m1->SetMatID(1);

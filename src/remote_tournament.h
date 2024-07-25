@@ -34,8 +34,8 @@ namespace Judoboard
 		virtual const MatchTable* FindMatchTable(const UUID& ID) const override;
 
 		//Rule Sets
-		virtual const RuleSet* FindRuleSet(const UUID& UUID) const override;
-		virtual RuleSet* FindRuleSet(const UUID& UUID) override;
+		virtual std::shared_ptr<const RuleSet> FindRuleSet(const UUID& UUID) const override;
+		virtual std::shared_ptr<RuleSet> FindRuleSet(const UUID& UUID) override;
 
 		//Events
 		virtual void OnMatchStarted(const Match& Match) const { assert(false); }

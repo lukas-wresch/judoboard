@@ -3701,7 +3701,7 @@ Error Application::Ajax_AddRuleSet(const HttpServer::Request& Request)
 	int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
 	bool extend_break_time = HttpServer::DecodeURLEncoded(Request.m_Body, "extend_break_time") == "true";
 
-	RuleSet* new_rule_set = new RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time, extend_break_time);
+	auto new_rule_set = std::make_shared<RuleSet>(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time, extend_break_time);
 
 	auto guard = LockWriteForScope();
 

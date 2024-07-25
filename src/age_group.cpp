@@ -11,7 +11,7 @@ using namespace Judoboard;
 
 
 
-AgeGroup::AgeGroup(const std::string& Name, uint32_t MinAge, uint32_t MaxAge, const RuleSet* Rules, Gender Gender)
+AgeGroup::AgeGroup(const std::string& Name, uint32_t MinAge, uint32_t MaxAge, std::shared_ptr<const RuleSet> Rules, Gender Gender)
 	: m_Name(Name), m_pRules(Rules)
 {
 	m_MinAge = MinAge;
