@@ -669,7 +669,7 @@ TEST(App, FullTournament_StressTest)
 		app.LoadDataFromDisk();
 
 		auto tournament_name = GetRandomName();
-		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
+		auto tourney = new Tournament(tournament_name, std::make_shared<RuleSet>("Test", 3 * 60, 3 * 60, 20, 10));
 
 		const int mat_count = 8;
 		const int judoka_count = 60;
