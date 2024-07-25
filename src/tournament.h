@@ -145,27 +145,27 @@ namespace Judoboard
 		virtual std::shared_ptr<RuleSet> FindRuleSet(const UUID& UUID) override { return m_StandingData.FindRuleSet(UUID); }
 
 		//Age groups
-		virtual bool AddAgeGroup(AgeGroup* NewAgeGroup) override;
+		virtual bool AddAgeGroup(std::shared_ptr<AgeGroup> NewAgeGroup) override;
 		virtual bool RemoveAgeGroup(const UUID& UUID) override;
-		virtual bool AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup) override;
-		virtual const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) const override {
+		virtual bool AssignJudokaToAgeGroup(const Judoka* Judoka, std::shared_ptr<const AgeGroup> AgeGroup) override;
+		virtual std::shared_ptr<const AgeGroup> GetAgeGroupOfJudoka(const Judoka* Judoka) const override {
 			if (!Judoka) return nullptr;
 			auto it = m_JudokaToAgeGroup.find(Judoka->GetUUID());
 			if (it != m_JudokaToAgeGroup.end())
 				return m_StandingData.FindAgeGroup(it->second);
 			return nullptr;
 		}
-		AgeGroup* FindAgeGroup(const UUID& UUID) { return m_StandingData.FindAgeGroup(UUID); }
-		const AgeGroup* FindAgeGroup(const UUID& UUID) const { return m_StandingData.FindAgeGroup(UUID); }
-		virtual std::vector<const AgeGroup*> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const override;
-		virtual std::vector<const AgeGroup*> GetAgeGroups() const override;
-		virtual void GetAgeGroupInfo(YAML::Emitter& Yaml, const AgeGroup* AgeGroup) const override;
+		std::shared_ptr<AgeGroup> FindAgeGroup(const UUID& UUID) { return m_StandingData.FindAgeGroup(UUID); }
+		std::shared_ptr<const AgeGroup> FindAgeGroup(const UUID& UUID) const { return m_StandingData.FindAgeGroup(UUID); }
+		virtual std::vector<std::shared_ptr<const AgeGroup>> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const override;
+		virtual std::vector<std::shared_ptr<const AgeGroup>> GetAgeGroups() const override;
+		virtual void GetAgeGroupInfo(YAML::Emitter& Yaml, std::shared_ptr<const AgeGroup> AgeGroup) const override;
 
 		//Master schedule / schedule entries
 		bool MoveScheduleEntryUp(const UUID& UUID) override;
 		bool MoveScheduleEntryDown(const UUID& UUID) override;
 
-		virtual std::vector<WeightclassDescCollection> GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) const override;
+		virtual std::vector<WeightclassDescCollection> GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<std::shared_ptr<const AgeGroup>>& AgeGroups, bool SplitGenders) const override;
 		virtual bool ApplyWeightclasses(const std::vector<WeightclassDescCollection>& Descriptors) override;
 
 		//Disqualifications

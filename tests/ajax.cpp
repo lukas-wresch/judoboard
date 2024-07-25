@@ -50,8 +50,8 @@ TEST(Ajax, AgeGroup_Edit)
 		EXPECT_EQ(*age_groups[6]->GetRuleSet(), *r);
 
 
-		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
-		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
+		auto a1 = std::make_shared<AgeGroup>("age 1", 10, 20, nullptr);
+		auto a2 = std::make_shared<AgeGroup>("age 2", 30, 40, nullptr);
 
 		app.GetTournament()->AddAgeGroup(a1);
 		app.GetTournament()->AddAgeGroup(a2);
@@ -86,8 +86,8 @@ TEST(Ajax, AgeGroup_Import)
 
 		Tournament* tourney = new Tournament;
 
-		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
-		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
+		auto a1 = std::make_shared<AgeGroup>("age 1", 10, 20, nullptr);
+		auto a2 = std::make_shared<AgeGroup>("age 2", 30, 40, nullptr);
 
 		tourney->AddAgeGroup(a1);
 		tourney->AddAgeGroup(a2);
@@ -149,8 +149,8 @@ TEST(Ajax, AgeGroup_Get)
 		Application app;
 
 		auto r  = std::make_shared<RuleSet>("test", 1, 2, 3, 4);
-		auto a1 = new AgeGroup("age 1", 10, 20, r);
-		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
+		auto a1 = std::make_shared<AgeGroup>("age 1", 10, 20, r);
+		auto a2 = std::make_shared<AgeGroup>("age 2", 30, 40, nullptr);
 
 		app.GetDatabase().AddAgeGroup(a1);
 		app.GetTournament()->AddAgeGroup(a2);
@@ -189,8 +189,8 @@ TEST(Ajax, AgeGroup_List)
 		Application app;
 		auto r = std::make_shared<RuleSet>("rule set", 10, 20, 30, 40);
 
-		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
-		auto a2 = new AgeGroup("age 2", 30, 40, r);
+		auto a1 = std::make_shared<AgeGroup>("age 1", 10, 20, nullptr);
+		auto a2 = std::make_shared<AgeGroup>("age 2", 30, 40, r);
 
 		app.GetDatabase().AddAgeGroup(a1);
 		app.GetTournament()->AddAgeGroup(a2);
@@ -1101,8 +1101,8 @@ TEST(Ajax, Judoka_Assign_AgeGroup)
 
 		app.AddTournament(t);
 
-		auto a1 = new AgeGroup("a1", 0, 0, nullptr);
-		auto a2 = new AgeGroup("a2", 0, 0, nullptr);
+		auto a1 = std::make_shared<AgeGroup>("a1", 0, 0, nullptr);
+		auto a2 = std::make_shared<AgeGroup>("a2", 0, 0, nullptr);
 
 		auto j1 = new Judoka("firstname", "lastname");
 		t->AddParticipant(j1);
@@ -1144,7 +1144,7 @@ TEST(Ajax, Judoka_Search)
 		Application app;
 		app.GetDatabase().EnableAutoSave(false);
 
-		auto a1 = new AgeGroup("u100", 0, 0, nullptr);
+		auto a1 = std::make_shared<AgeGroup>("u100", 0, 0, nullptr);
 
 		auto c1 = new Club("c1");
 		auto c2 = new Club("c2");
@@ -2417,8 +2417,8 @@ TEST(Ajax, MatchTable_Edit)
 
 
 
-		auto a1 = new AgeGroup("age 1", 10, 20, nullptr);
-		auto a2 = new AgeGroup("age 2", 30, 40, nullptr);
+		auto a1 = std::make_shared<AgeGroup>("age 1", 10, 20, nullptr);
+		auto a2 = std::make_shared<AgeGroup>("age 2", 30, 40, nullptr);
 		auto r  = std::make_shared<RuleSet>("rules", 30, 60, 40, 30);
 
 		app.GetTournament()->AddAgeGroup(a1);
@@ -3369,7 +3369,7 @@ TEST(Ajax, UpdateWeight)
 		app.GetTournament()->AddParticipant(j7);
 		app.GetTournament()->AddParticipant(j8);
 
-		auto a1 =  new AgeGroup("Age", 100, 200, nullptr);
+		auto a1 = std::make_shared<AgeGroup>("Age", 100, 200, nullptr);
 		app.GetTournament()->AddAgeGroup(a1);
 
 		auto& tables = app.GetTournament()->GetMatchTables();

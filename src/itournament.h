@@ -104,28 +104,28 @@ namespace Judoboard
 		virtual std::shared_ptr<RuleSet> FindRuleSet(const UUID& UUID) = 0;
 
 		//Age groups
-		virtual bool AddAgeGroup(AgeGroup* NewAgeGroup) { return false; }
+		virtual bool AddAgeGroup(std::shared_ptr<AgeGroup> NewAgeGroup) { return false; }
 		virtual bool RemoveAgeGroup(const UUID& UUID) { return false; }
-		virtual bool AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup) { return false; }
-		virtual AgeGroup* FindAgeGroup(const UUID& UUID) { return nullptr; }
-		virtual const AgeGroup* FindAgeGroup(const UUID& UUID) const { return nullptr; }
-		virtual const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) const { return nullptr; }
-		virtual std::vector<const AgeGroup*> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const {
-			std::vector<const AgeGroup*> ret;
+		virtual bool AssignJudokaToAgeGroup(const Judoka* Judoka, std::shared_ptr<const AgeGroup> AgeGroup) { return false; }
+		virtual std::shared_ptr<AgeGroup> FindAgeGroup(const UUID& UUID) { return nullptr; }
+		virtual std::shared_ptr<const AgeGroup> FindAgeGroup(const UUID& UUID) const { return nullptr; }
+		virtual std::shared_ptr<const AgeGroup> GetAgeGroupOfJudoka(const Judoka* Judoka) const { return nullptr; }
+		virtual std::vector<std::shared_ptr<const AgeGroup>> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const {
+			std::vector<std::shared_ptr<const AgeGroup>> ret;
 			return ret;
 		}
-		virtual std::vector<const AgeGroup*> GetAgeGroups() const {
-			std::vector<const AgeGroup*> ret;
+		virtual std::vector<std::shared_ptr<const AgeGroup>> GetAgeGroups() const {
+			std::vector<std::shared_ptr<const AgeGroup>> ret;
 			return ret;
 		}
-		virtual void GetAgeGroupInfo(YAML::Emitter& Yaml, const AgeGroup* AgeGroup) const {}
+		virtual void GetAgeGroupInfo(YAML::Emitter& Yaml, std::shared_ptr<const AgeGroup> AgeGroup) const {}
 
 		//Master schedule / schedule entries
 		virtual MatchTable* GetScheduleEntry(const UUID& UUID) { return nullptr; }
 		virtual bool MoveScheduleEntryUp(const UUID& UUID) { return false; }
 		virtual bool MoveScheduleEntryDown(const UUID& UUID) { return false; }
 
-		virtual std::vector<WeightclassDescCollection> GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) const {
+		virtual std::vector<WeightclassDescCollection> GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<std::shared_ptr<const AgeGroup>>& AgeGroups, bool SplitGenders) const {
 			std::vector<WeightclassDescCollection> ret;
 			return ret;
 		}

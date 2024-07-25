@@ -102,21 +102,21 @@ namespace Judoboard
 		bool DeleteRuleSet(const UUID& UUID);
 
 		//Age groups
-		bool AddAgeGroup(AgeGroup* NewAgeGroup);
+		bool AddAgeGroup(std::shared_ptr<AgeGroup> NewAgeGroup);
 		[[nodiscard]]
-		AgeGroup* FindAgeGroupByName(const std::string& AgeGroupName);
+		std::shared_ptr<AgeGroup> FindAgeGroupByName(const std::string& AgeGroupName);
 		[[nodiscard]]
-		const AgeGroup* FindAgeGroupByName(const std::string& AgeGroupName) const;
+		std::shared_ptr<const AgeGroup> FindAgeGroupByName(const std::string& AgeGroupName) const;
 		[[nodiscard]]
-		AgeGroup* FindAgeGroup(const UUID& UUID);
+		std::shared_ptr<AgeGroup> FindAgeGroup(const UUID& UUID);
 		[[nodiscard]]
-		const AgeGroup* FindAgeGroup(const UUID& UUID) const;
+		std::shared_ptr<const AgeGroup> FindAgeGroup(const UUID& UUID) const;
 
 		bool RemoveAgeGroup(const UUID& UUID);
 		[[nodiscard]]
-		std::vector<AgeGroup*>& GetAgeGroups() { return m_AgeGroups; }
+		std::vector<std::shared_ptr<AgeGroup>>& GetAgeGroups() { return m_AgeGroups; }
 		[[nodiscard]]
-		const std::vector<AgeGroup*>& GetAgeGroups() const { return m_AgeGroups; }
+		const std::vector<std::shared_ptr<AgeGroup>>& GetAgeGroups() const { return m_AgeGroups; }
 
 	protected:
 		std::vector<Judoka*> m_Judokas;
@@ -124,8 +124,8 @@ namespace Judoboard
 		std::vector<Club*> m_Clubs;
 		std::vector<Association*> m_Associations;
 
-		std::vector<std::shared_ptr<RuleSet>> m_RuleSets;
-		std::vector<AgeGroup*> m_AgeGroups;
+		std::vector<std::shared_ptr<RuleSet>>  m_RuleSets;
+		std::vector<std::shared_ptr<AgeGroup>> m_AgeGroups;
 
 	private:
 		uint32_t m_Year = 0;//Relative year for calculating the age groups. Set to 0 to use the current year

@@ -470,7 +470,7 @@ void MatchTable::SetStartPosition(const Judoka* Judoka, size_t NewStartPosition)
 
 
 
-const AgeGroup* MatchTable::GetAgeGroup() const
+std::shared_ptr<const AgeGroup> MatchTable::GetAgeGroup() const
 {
 	if (m_Filter)
 		return m_Filter->GetAgeGroup();
@@ -479,7 +479,7 @@ const AgeGroup* MatchTable::GetAgeGroup() const
 
 
 
-void MatchTable::SetAgeGroup(const AgeGroup* NewAgeGroup)
+void MatchTable::SetAgeGroup(std::shared_ptr<const AgeGroup> NewAgeGroup)
 {
 	if (m_Filter)
 		m_Filter->SetAgeGroup(NewAgeGroup);

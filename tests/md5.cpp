@@ -2470,8 +2470,8 @@ TEST(MD5, ExportCompletedTournament)
 	clubs.push_back(new Judoboard::Club("Brackwede", biegue));
 	clubs.push_back(new Judoboard::Club("Senne", biegue));
 
-	auto age_group1 = new AgeGroup("U11",  8,  10, nullptr);
-	auto age_group2 = new AgeGroup("U15", 12,  14, nullptr);
+	auto age_group1 = std::make_shared<AgeGroup>("U11",  8,  10, nullptr);
+	auto age_group2 = std::make_shared<AgeGroup>("U15", 12,  14, nullptr);
 	tour.AddAgeGroup(age_group1);
 	tour.AddAgeGroup(age_group2);
 
@@ -3072,7 +3072,7 @@ TEST(MD5, ExportSingleElimination16)
 	clubs.push_back(new Judoboard::Club("Senne", biegue));
 
 
-	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr);
+	auto age = std::make_shared<AgeGroup>("Youth", 1, 99, nullptr);
 	t->AddAgeGroup(age);
 
 	Judoka* j[17];
@@ -3184,7 +3184,7 @@ TEST(MD5, ExportSingleElimination16_3rd_5th)
 	clubs.push_back(new Judoboard::Club("Senne", biegue));
 
 
-	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr);
+	auto age = std::make_shared<AgeGroup>("Youth", 1, 99, nullptr);
 	t->AddAgeGroup(age);
 
 	Judoka* j[17];
@@ -3297,7 +3297,7 @@ TEST(MD5, ExportSingleElimination32)
 	clubs.push_back(new Judoboard::Club("Senne", biegue));
 
 
-	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr);
+	auto age = std::make_shared<AgeGroup>("Youth", 1, 99, nullptr);
 	t->AddAgeGroup(age);
 
 	Judoka* j[33];

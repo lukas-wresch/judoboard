@@ -41,12 +41,12 @@ void Database::Reset()
 		AddRuleSet(youth2);
 		AddRuleSet(adults);
 
-		AddAgeGroup(new AgeGroup("U11", 8,  10, children));
-		AddAgeGroup(new AgeGroup("U13", 10, 12, youth));
-		AddAgeGroup(new AgeGroup("U15", 12, 14, youth2));
-		AddAgeGroup(new AgeGroup("U18", 15, 17, adults));
-		AddAgeGroup(new AgeGroup("U21", 17, 20, adults));
-		AddAgeGroup(new AgeGroup(Localizer::Translate("Seniors"), 17, 0, adults));
+		AddAgeGroup(std::make_shared<AgeGroup>("U11", 8,  10, children));
+		AddAgeGroup(std::make_shared<AgeGroup>("U13", 10, 12, youth));
+		AddAgeGroup(std::make_shared<AgeGroup>("U15", 12, 14, youth2));
+		AddAgeGroup(std::make_shared<AgeGroup>("U18", 15, 17, adults));
+		AddAgeGroup(std::make_shared<AgeGroup>("U21", 17, 20, adults));
+		AddAgeGroup(std::make_shared<AgeGroup>(Localizer::Translate("Seniors"), 17, 0, adults));
 	}
 }
 

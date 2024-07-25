@@ -38,8 +38,8 @@ namespace Judoboard
 		const ITournament* GetTournament() const;
 
 		//Age groups
-		const AgeGroup* GetAgeGroup() const { return m_pAgeGroup;}
-		void SetAgeGroup(const AgeGroup* NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
+		std::shared_ptr<const AgeGroup> GetAgeGroup() const { return m_pAgeGroup;}
+		void SetAgeGroup(std::shared_ptr<const AgeGroup> NewAgeGroup) { m_pAgeGroup = NewAgeGroup; }
 
 		//Participants + Start Positions
 		virtual std::unordered_map<size_t, const DependentJudoka> GetParticipants() const { return m_Participants; }
@@ -87,7 +87,7 @@ namespace Judoboard
 
 		mutable std::unordered_map<size_t, const DependentJudoka> m_Participants;//List of all participants that are in the match table
 
-		const AgeGroup* m_pAgeGroup = nullptr;//Age group for the matches (if available)
+		std::shared_ptr<const AgeGroup> m_pAgeGroup = nullptr;//Age group for the matches (if available)
 
 		const MatchTable* m_Parent = nullptr;
 	};

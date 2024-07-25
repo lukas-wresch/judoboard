@@ -1876,7 +1876,7 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::ItemNotFound);
 
 		//Insert a copy
-		if (!GetTournament()->AddAgeGroup(new AgeGroup(*age_group)))
+		if (!GetTournament()->AddAgeGroup(age_group))
 			return Error(Error::Type::OperationFailed);
 
 		return Error();//OK
@@ -3819,13 +3819,10 @@ Error Application::Ajax_AddAgeGroup(const HttpServer::Request& Request)
 	if (!rule)
 		ZED::Log::Warn("Could not find rule set.");
 
-	auto new_age_group = new AgeGroup(name, min_age, max_age, rule, gender);
+	auto new_age_group = std::make_shared<AgeGroup>(name, min_age, max_age, rule, gender);
 
 	if (!GetDatabase().AddAgeGroup(new_age_group))
-	{
-		delete new_age_group;
 		return Error::Type::OperationFailed;
-	}
 
 	return Error::Type::NoError;
 }
@@ -3941,7 +3938,7 @@ std::string Application::Ajax_ListAllAgeGroups() const
 
 			bool is_used = false;
 			if (GetTournament())
-				is_used = GetTournament()->FindAgeGroup(age_group->GetUUID());
+				is_used = (bool)GetTournament()->FindAgeGroup(age_group->GetUUID());
 
 			if (is_used)
 				GetTournament()->GetAgeGroupInfo(ret, age_group);

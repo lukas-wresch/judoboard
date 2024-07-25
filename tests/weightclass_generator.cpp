@@ -153,8 +153,8 @@ TEST(WeightclassGenerator, FullTest)
 		clubs.push_back(new Judoboard::Club("Brackwede"));
 		clubs.push_back(new Judoboard::Club("Senne"));
 
-		auto age_group1 = new AgeGroup("U11", 8,  10, nullptr);
-		auto age_group2 = new AgeGroup("U15", 12, 14, nullptr);
+		auto age_group1 = std::make_shared<AgeGroup>("U11", 8,  10, nullptr);
+		auto age_group2 = std::make_shared<AgeGroup>("U15", 12, 14, nullptr);
 		tour.AddAgeGroup(age_group1);
 		tour.AddAgeGroup(age_group2);
 

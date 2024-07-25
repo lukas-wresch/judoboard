@@ -78,8 +78,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add age groups
 	for (auto age_group : File.GetAgeGroups())
 	{
-		auto new_age_group = new AgeGroup(*age_group, m_StandingData);
-		age_group->pUserData = new_age_group;
+		auto new_age_group = std::make_shared<AgeGroup>(*age_group, m_StandingData);
+		age_group->pUserData = (void*)new_age_group.get();
 		m_StandingData.AddAgeGroup(new_age_group);
 	}
 
@@ -131,7 +131,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		//Connect to age group
 		if (weightclass->AgeGroup)
-			new_table->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
+			new_table->SetAgeGroup(std::make_shared<const AgeGroup>(*(const AgeGroup*)weightclass->AgeGroup->pUserData));
 
 		new_table->SetName(weightclass->Description);
 		//new_table->IsBestOfThree(weightclass->BestOfThree);
@@ -1478,7 +1478,7 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 		AddParticipant(const_cast<Judoka*>(judoka));
 
 	if (NewMatchTable->GetAgeGroup())
-		AddAgeGroup(const_cast<AgeGroup*>(NewMatchTable->GetAgeGroup()));
+		AddAgeGroup(std::const_pointer_cast<AgeGroup>(NewMatchTable->GetAgeGroup()));
 
 	if (NewMatchTable->GetOwnRuleSet())
 		AddRuleSet(std::const_pointer_cast<RuleSet>(NewMatchTable->GetOwnRuleSet()));
@@ -1695,7 +1695,7 @@ bool Tournament::RemoveMatchTable(const UUID& UUID)
 
 
 
-bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
+bool Tournament::AddAgeGroup(std::shared_ptr<AgeGroup> NewAgeGroup)
 {
 	if (IsReadonly())
 		return false;
@@ -1769,7 +1769,7 @@ bool Tournament::RemoveAgeGroup(const UUID& UUID)
 
 
 
-bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup)
+bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, std::shared_ptr<const AgeGroup> AgeGroup)
 {
 	if (IsReadonly())
 		return false;
@@ -1800,9 +1800,9 @@ bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* Ag
 
 
 
-std::vector<const AgeGroup*> Tournament::GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const
+std::vector<std::shared_ptr<const AgeGroup>> Tournament::GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const
 {
-	std::vector<const AgeGroup*> ret;
+	std::vector<std::shared_ptr<const AgeGroup>> ret;
 
 	auto guard = LockReadForScope();
 
@@ -1817,9 +1817,9 @@ std::vector<const AgeGroup*> Tournament::GetEligableAgeGroupsOfJudoka(const Judo
 
 
 
-std::vector<const AgeGroup*> Tournament::GetAgeGroups() const
+std::vector<std::shared_ptr<const AgeGroup>> Tournament::GetAgeGroups() const
 {
-	std::vector<const AgeGroup*> ret;
+	std::vector<std::shared_ptr<const AgeGroup>> ret;
 
 	auto guard = LockReadForScope();
 
@@ -1831,7 +1831,7 @@ std::vector<const AgeGroup*> Tournament::GetAgeGroups() const
 
 
 
-void Tournament::GetAgeGroupInfo(YAML::Emitter& Yaml, const AgeGroup* AgeGroup) const
+void Tournament::GetAgeGroupInfo(YAML::Emitter& Yaml, std::shared_ptr<const AgeGroup> AgeGroup) const
 {
 	if (!AgeGroup)
 		return;
@@ -1946,7 +1946,7 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 
 
 
-std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) const
+std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<std::shared_ptr<const AgeGroup>>& AgeGroups, bool SplitGenders) const
 {
 	std::vector<WeightclassDescCollection> ret;
 
@@ -2458,16 +2458,16 @@ void Tournament::FindAgeGroupForJudoka(const Judoka& Judoka)
 	auto guard = LockReadForScope();
 
 	//Find age groups this judoka can belong to
-	std::vector<AgeGroup*> EligableAgeGroups;
+	std::vector<std::shared_ptr<AgeGroup>> eligableAgeGroups;
 	for (auto age_group : m_StandingData.GetAgeGroups())
 	{
 		if (age_group && age_group->IsElgiable(Judoka, GetDatabase()))
-			EligableAgeGroups.emplace_back(age_group);
+			eligableAgeGroups.emplace_back(age_group);
 	}
 
 	//Only one choice?
-	if (EligableAgeGroups.size() == 1)//Add judoka to age group
-		m_JudokaToAgeGroup.insert({ Judoka.GetUUID(), EligableAgeGroups[0]->GetUUID() });
+	if (eligableAgeGroups.size() == 1)//Add judoka to age group
+		m_JudokaToAgeGroup.insert({ Judoka.GetUUID(), eligableAgeGroups[0]->GetUUID() });
 }
 
 

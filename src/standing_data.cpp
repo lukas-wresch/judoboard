@@ -20,9 +20,6 @@ void StandingData::Reset()
 	m_Judokas.clear();
 
 	m_RuleSets.clear();
-
-	for (auto age_group : m_AgeGroups)
-		delete age_group;
 	m_AgeGroups.clear();
 
 	m_Year = 0;
@@ -498,7 +495,7 @@ bool StandingData::AddRuleSet(std::shared_ptr<RuleSet> NewRuleSet)
 
 
 
-AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName)
+std::shared_ptr<AgeGroup> StandingData::FindAgeGroupByName(const std::string& AgeGroupName)
 {
 	for (auto age_group : m_AgeGroups)
 		if (age_group && age_group->GetName() == AgeGroupName)
@@ -509,7 +506,7 @@ AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName)
 
 
 
-const AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName) const
+std::shared_ptr<const AgeGroup> StandingData::FindAgeGroupByName(const std::string& AgeGroupName) const
 {
 	for (auto age_group : m_AgeGroups)
 		if (age_group && age_group->GetName() == AgeGroupName)
@@ -520,7 +517,7 @@ const AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName
 
 
 
-AgeGroup* StandingData::FindAgeGroup(const UUID& UUID)
+std::shared_ptr<AgeGroup> StandingData::FindAgeGroup(const UUID& UUID)
 {
 	for (auto age_group : m_AgeGroups)
 		if (age_group && age_group->GetUUID() == UUID)
@@ -531,7 +528,7 @@ AgeGroup* StandingData::FindAgeGroup(const UUID& UUID)
 
 
 
-const AgeGroup* StandingData::FindAgeGroup(const UUID& UUID) const
+std::shared_ptr<const AgeGroup> StandingData::FindAgeGroup(const UUID& UUID) const
 {
 	for (auto age_group : m_AgeGroups)
 		if (age_group && age_group->GetUUID() == UUID)
@@ -542,7 +539,7 @@ const AgeGroup* StandingData::FindAgeGroup(const UUID& UUID) const
 
 
 
-bool StandingData::AddAgeGroup(AgeGroup* NewAgeGroup)
+bool StandingData::AddAgeGroup(std::shared_ptr<AgeGroup> NewAgeGroup)
 {
 	if (!NewAgeGroup || FindAgeGroup(NewAgeGroup->GetUUID()))
 		return false;
@@ -559,7 +556,6 @@ bool StandingData::RemoveAgeGroup(const UUID& UUID)
 	{
 		if ((*it)->GetUUID() == UUID)
 		{
-			delete *it;
 			m_AgeGroups.erase(it);
 			return true;
 		}

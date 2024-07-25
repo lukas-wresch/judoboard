@@ -29,7 +29,7 @@ namespace Judoboard
 
 		std::vector<WeightclassDesc> m_Collection;
 
-		const AgeGroup* m_AgeGroup = nullptr;
+		std::shared_ptr<const AgeGroup> m_AgeGroup;
 		Gender m_Gender = Gender::Unknown;
 	};
 

@@ -355,8 +355,8 @@ namespace Judoboard
 		std::shared_ptr<const RuleSet> GetOwnRuleSet() const { return m_Rules; }
 
 		//Age groups
-		const AgeGroup* GetAgeGroup() const;
-		void SetAgeGroup(const AgeGroup* NewAgeGroup);
+		std::shared_ptr<const AgeGroup> GetAgeGroup() const;
+		void SetAgeGroup(std::shared_ptr<const AgeGroup> NewAgeGroup);
 
 		//Scheduler
 		int32_t GetScheduleIndex() const { return m_ScheduleIndex; }
