@@ -69,10 +69,12 @@ Application::~Application()
 
 bool Application::LoadDataFromDisk()
 {
+	bool success = true;
+
 	if (!m_Database.Load("database.yml"))
 	{
 		ZED::Log::Warn("Could not load database!");
-		//return false;
+		success = false;
 	}
 
 	//Has to be done here, otherwise it will be overwritten when loading tournament files
@@ -85,7 +87,7 @@ bool Application::LoadDataFromDisk()
 		Filename = Filename.substr(0, Filename.length() - 4);//Remove .yml
 		AddTournament(new Tournament(Filename));
 		return true;
-		}, "tournaments");
+	}, "tournaments");
 
 
 	if (last_tournament_name.length() > 0)
@@ -96,6 +98,31 @@ bool Application::LoadDataFromDisk()
 	}
 	else
 		CloseTournament();
+
+
+	if (!ZED::SoundEngine::Init())
+		ZED::Log::Warn("Could not start sound engine");
+
+	ZED::Core::Indexer([&](const std::string& Filename) {
+		auto pos = Filename.find_last_of(ZED::Core::Separator);
+		if (pos == std::string::npos) return true;
+
+		auto onlyFilename = Filename.substr(pos + 1);
+		auto pos_dot = onlyFilename.find_last_of('.');
+		if (pos_dot == std::string::npos) return true;
+
+		if (onlyFilename.length() < 5) return true;
+
+		auto name = onlyFilename.substr(0, pos_dot);
+		auto extension = onlyFilename.substr(pos_dot + 1);
+
+		if (extension != "wav") return true;
+
+		m_Sounds.insert({name, ZED::Sound("assets/sounds/" + name + ".wav")});
+		ZED::Log::Info("Sound file " + name + " loaded");
+
+		return true;
+	}, "assets/sounds");
 
 	return true;
 }

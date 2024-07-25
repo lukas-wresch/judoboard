@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: configure
-      run: chmod u+x *.sh && ./dependencies.sh && XDG_RUNTIME_DIR=. && sudo apt-get install gdb  && rm external/license/license.a && mv external/license/license-x64.a external/license/license.a
+      run: chmod u+x *.sh && ./dependencies.sh && XDG_RUNTIME_DIR=. && sudo apt-get install gdb
     - name: make
       run: ./compile.sh
     - name: run tests

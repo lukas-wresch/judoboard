@@ -1,1 +1,0 @@
-Judoboard.exe --testscreen

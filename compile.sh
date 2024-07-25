@@ -18,6 +18,13 @@ g++  -c    -g   -D_DEBUG  -DLINUX -DNO_OPENGLES    -std=c++17 -fpermissive      
 ar rcs libZEDd.a *.o; rm *.o
 cd ..
 
+#Copy libraries
+arch=$(uname -m)
+if [[ "$arch" == "arm"* || "$arch" == "aarch64" ]]; then
+  cp external/license/license-arm.a external/license/license.a
+else
+  cp external/license/license-x64.a external/license/license.a
+fi
 
 #Compile release build
 g++  -c -fpermissive  -O3  -s -std=c++17 -DNDEBUG -DLINUX                                 -Wno-attributes -Wno-format -Wno-conversion-null -Wno-format-extra-args -Wno-unused-result -Wno-deprecated-declarations -Wno-trigraphs       -I"."  -I"src"    -I"external"  `pkg-config --cflags gtk+-3.0`  "src/app.cpp"  "src/app_ajax.cpp"   "src/account.cpp"  "src/age_group.cpp" "src/association.cpp" "src/club.cpp"  "src/dm4.cpp"  "src/database.cpp"  "src/double_elimination.cpp"  "src/fuser.cpp"  "src/judoka.cpp"   "src/club.cpp"  "src/customtable.cpp"  "src/dmf.cpp"  "src/filter.cpp"  "src/fixed.cpp"  "src/md5.cpp"  "src/mat.cpp"  "src/mixer.cpp"  "src/remote_mat.cpp"   "src/loser_bracket.cpp"  "src/losersof.cpp"  "src/match.cpp"  "src/matchtable.cpp"  "src/matchlog.cpp"  "src/pool.cpp"  "src/round_robin.cpp"  "src/splitter.cpp"  "src/timer.cpp"   "src/take_top_ranks.cpp"  "src/tournament.cpp"  "src/remote_tournament.cpp"   "src/weightclass.cpp" src/weightclass_generator.cpp  "src/rule_set.cpp" src/single_elimination.cpp "src/standing_data.cpp" "src/id.cpp" "src/error.cpp"    "src/localizer.cpp"  "src/window_linux.cpp"     "src/HttpServer/HttpServer.cpp" "external/mongoose/mongoose.cpp"     -ldl  -lpthread    `pkg-config --libs gtk+-3.0`     -ldl  -lpthread -lSDL2 -lSDL2_ttf -lSDL2_mixer -lfreetype  -lGL  -lpng  "dep/yaml-cpp/libyaml-cpp.a"  -no-pie

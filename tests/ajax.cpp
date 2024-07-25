@@ -678,7 +678,7 @@ TEST(Ajax, Setup_Get)
 	{
 		Application app;
 
-		auto yaml = YAML::Load(app.Ajax_GetSetup());
+		auto yaml = YAML::Load(app.Ajax_GetSetup(false));
 
 		EXPECT_EQ(yaml["language"].as<int>(), (int)Localizer::GetLanguage());
 		EXPECT_EQ(yaml["mat_count"].as<int>(), 1);
@@ -690,7 +690,7 @@ TEST(Ajax, Setup_Get)
 
 		ZED::Core::Pause(1000);
 
-		yaml = YAML::Load(app.Ajax_GetSetup());
+		yaml = YAML::Load(app.Ajax_GetSetup(true));
 
 		EXPECT_EQ(yaml["language"].as<int>(), (int)Localizer::GetLanguage());
 		EXPECT_EQ(yaml["mat_count"].as<int>(), 1);
@@ -796,7 +796,7 @@ TEST(Ajax, Setup_Set)
 		
 		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=1234&language=0&mat_count=5&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=0&results_server=true&results_server_url=abc")), "ok");
 
-		auto yaml = YAML::Load(app.Ajax_GetSetup());
+		auto yaml = YAML::Load(app.Ajax_GetSetup(false));
 
 		EXPECT_EQ(yaml["language"].as<int>(), 0);
 		EXPECT_EQ(yaml["mat_count"].as<int>(), 5);
@@ -812,7 +812,7 @@ TEST(Ajax, Setup_Set)
 
 		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&mat_count=8&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=1&results_server=false&results_server_url=def")), "ok");
 
-		yaml = YAML::Load(app.Ajax_GetSetup());
+		yaml = YAML::Load(app.Ajax_GetSetup(true));
 
 		EXPECT_EQ(yaml["language"].as<int>(), 1);
 		EXPECT_EQ(yaml["mat_count"].as<int>(), 8);
@@ -825,6 +825,11 @@ TEST(Ajax, Setup_Set)
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
 		EXPECT_EQ(yaml["results_server"].as<bool>(), false);
 		EXPECT_EQ(yaml["results_server_url"].as<std::string>(), "def");
+		EXPECT_EQ(yaml["license_valid"].as<bool>(), false);
+		EXPECT_EQ(yaml["license_expired"].as<bool>(), false);
+		EXPECT_TRUE(yaml["license_expiration_date"]);
+		EXPECT_TRUE(yaml["license_expiration_type"]);
+		EXPECT_TRUE(yaml["license_expiration_id"]);
 	}
 }
 

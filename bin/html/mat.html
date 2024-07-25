@@ -1014,7 +1014,10 @@ function UpdateTimer()
   if (ScoreUpdate_Counter == 0)
   {
     GetScore();
-    GetOsaekomiList();
+    if (CurrentScore.are_fighters_on_mat)
+      GetOsaekomiList();
+    else
+      GetJudokaName();
     ScoreUpdate_Counter = 20;
   }
   else if (ScoreUpdate_Counter == 5)
