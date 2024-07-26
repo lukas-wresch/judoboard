@@ -172,7 +172,7 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 			ret += "Adding new club: " + club->Name + "<br/>";
 
 			if (!ParseOnly)
-				GetTournament()->GetDatabase().AddClub(new Club(club->Name));
+				GetTournament()->GetDatabase().AddClub(std::make_shared<Club>(club->Name));
 		}
 	}
 
@@ -232,7 +232,7 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 
 		ret += "Adding new club: " + File.GetClub().Name + "<br/>";
 
-		club = new Club(File.GetClub().Name);
+		club = std::make_shared<Club>(File.GetClub().Name);
 	}
 
 	for (auto dmf_judoka : File.GetParticipants())

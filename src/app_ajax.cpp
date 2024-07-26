@@ -3408,7 +3408,7 @@ Error Application::Ajax_ImportJudoka(const HttpServer::Request& Request)
 	if (!judoka)
 		return Error::Type::ItemNotFound;
 
-	Club* club = (Club*)judoka->GetClub();
+	auto club = judoka->GetClub();
 
 	//Already in database?
 	if (m_Database.FindJudoka(id))
@@ -3418,7 +3418,7 @@ Error Application::Ajax_ImportJudoka(const HttpServer::Request& Request)
 		return Error::Type::OperationFailed;
 
 	if (club && !m_Database.FindClubByName(club->GetName()))
-		if (!m_Database.AddClub(club))
+		if (!m_Database.AddClub(std::const_pointer_cast<Club>(club)))
 			return Error::Type::OperationFailed;
 
 	return Error();//OK
@@ -3480,7 +3480,7 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 
 	auto guard = LockWriteForScope();
 
-	Association* parent = nullptr;
+	std::shared_ptr<Association> parent = nullptr;
 
 	if (parent_id)
 	{
@@ -3492,14 +3492,14 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 
 	if (!is_assoc)
 	{
-		auto new_club = new Club(name, parent);
+		auto new_club = std::make_shared<Club>(name, parent);
 		if (!shortname.empty())
 			new_club->SetShortName(shortname);
 		m_Database.AddClub(new_club);
 	}
 	else
 	{
-		auto new_assoc = new Association(name, parent);
+		auto new_assoc = std::make_shared<Association>(name, parent);
 		if (!shortname.empty())
 			new_assoc->SetShortName(shortname);
 		m_Database.AddAssociation(new_assoc);
@@ -3517,31 +3517,39 @@ std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
 
 	auto guard = LockReadForScope();
 
-	const Association* club = m_Database.FindAssociation(id);
-
-	if (!club)
-	{
-		club = m_Database.FindClub(id);
+	{//From database
+		auto club = m_Database.FindAssociation(id);
 
 		if (!club)
+			club = m_Database.FindClub(id);
+
+		if (club)
 		{
-			assert(GetTournament()->IsLocal());
-			auto guard = GetTournament()->LockReadForScope();
-
-			auto tour = (Tournament*)GetTournament();//TODO: could be remote tournament
-			club = tour->GetDatabase().FindAssociation(id);
-
-			if (!club)
-				club = tour->GetDatabase().FindClub(id);
-
-			if (!club)
-				return Error(Error::Type::ItemNotFound);
+			YAML::Emitter ret;
+			club->ToString(ret);
+			return ret.c_str();
 		}
 	}
 
-	YAML::Emitter ret;
-	club->ToString(ret);
-	return ret.c_str();
+	{//From tournament
+		assert(GetTournament()->IsLocal());
+		auto guard2 = GetTournament()->LockReadForScope();
+
+		auto tour = (Tournament*)GetTournament();//TODO: could be remote tournament
+		auto club = tour->GetDatabase().FindAssociation(id);
+
+		if (!club)
+			club = tour->GetDatabase().FindClub(id);
+
+		if (club)
+		{
+			YAML::Emitter ret;
+			club->ToString(ret);
+			return ret.c_str();
+		}
+	}
+
+	return Error(Error::Type::ItemNotFound);
 }
 
 
@@ -4123,7 +4131,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 	if (!table->IsSubMatchTable() && table->GetFilter() && table->GetFilter()->GetType() == IFilter::Type::Weightclass)
 	{
-		auto weightclass = (Weightclass*)table->GetFilter();
+		auto weightclass = std::dynamic_pointer_cast<Weightclass>(table->GetFilter());
 
 		auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
 		auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");

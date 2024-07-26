@@ -63,12 +63,12 @@ namespace Judoboard
 		const std::string& GetDescription() const { return m_Description; }
 		void SetDescription(const std::string& Description) { m_Description = Description; }
 
-		virtual const Association* GetOrganizer() const override { return m_Organizer; }
-		void SetOrganizer(Association* NewOrganizer) {
+		virtual std::shared_ptr<const Association> GetOrganizer() const override { return m_Organizer; }
+		void SetOrganizer(std::shared_ptr<Association> NewOrganizer) {
 			if (!NewOrganizer || IsReadonly())
 				return;
 			if (NewOrganizer->GetLevel() == -1)
-				m_StandingData.AddClub((Club*)NewOrganizer);
+				m_StandingData.AddClub(std::dynamic_pointer_cast<Club>(NewOrganizer));
 			else
 				m_StandingData.AddAssociation(NewOrganizer);
 			m_Organizer = NewOrganizer;
@@ -121,12 +121,12 @@ namespace Judoboard
 		MatchTable* FindMatchTableByDescription(const std::string& Description);
 
 		//Clubs
-		virtual Club* FindClub(const UUID& UUID) override { return m_StandingData.FindClub(UUID); }
-		virtual Club* FindClubByName(const std::string& Name) override { return m_StandingData.FindClubByName(Name); }
+		virtual std::shared_ptr<Club> FindClub(const UUID& UUID) override { return m_StandingData.FindClub(UUID); }
+		virtual std::shared_ptr<Club> FindClubByName(const std::string& Name) override { return m_StandingData.FindClubByName(Name); }
 		virtual bool RemoveClub(const UUID& UUID) override { return m_StandingData.DeleteClub(UUID); }
 
 		//Associations
-		virtual Association* FindAssociation(const UUID& UUID) override { return m_StandingData.FindAssociation(UUID); }
+		virtual std::shared_ptr<Association> FindAssociation(const UUID& UUID) override { return m_StandingData.FindAssociation(UUID); }
 		virtual bool RemoveAssociation(const UUID& UUID) override { return m_StandingData.DeleteAssociation(UUID); }
 
 		//Rule Sets
@@ -248,7 +248,7 @@ namespace Judoboard
 		std::string m_Description;
 		bool m_Readonly = false;
 
-		const Association* m_Organizer = nullptr;//Tournament is organized by this association, only childen of this association can participate
+		std::shared_ptr<const Association> m_Organizer;//Tournament is organized by this association, only childen of this association can participate
 		uint32_t m_LotteryTier = 0;//Tier for performing lottery (usually organizer tier + 1)
 
 		const Application* m_Application = nullptr;

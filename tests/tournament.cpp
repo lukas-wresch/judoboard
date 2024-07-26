@@ -284,9 +284,9 @@ TEST(Tournament, AddAgeGroup)
 	EXPECT_TRUE(tourney->FindAgeGroup(age_group->GetUUID()));
 	EXPECT_TRUE(tourney->FindRuleSet(rule_set->GetUUID()));
 
-	app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
-	app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
-	app.GetDatabase().AddClub(new Judoboard::Club("Senne"));
+	app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Altenhagen"));
+	app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Brackwede"));
+	app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Senne"));
 
 	for (int i = 0; i < 5; i++)
 		tourney->AddParticipant(new Judoboard::Judoka(Test_CreateRandomJudoka(&app.GetDatabase())));
@@ -593,10 +593,10 @@ TEST(Tournament, Lottery)
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 		Tournament tourney("deleteMe");
 
-		Association* assoc = new Association(GetRandomName(), nullptr);
-		Club* c1 = new Club(GetRandomName());
+		auto assoc = std::make_shared<Association>(GetRandomName(), nullptr);
+		auto c1 = std::make_shared<Club>(GetRandomName());
 		c1->SetParent(assoc);
-		Club* c2 = new Club(GetRandomName());
+		auto c2 = std::make_shared<Club>(GetRandomName());
 		c2->SetParent(assoc);
 
 		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
@@ -639,10 +639,10 @@ TEST(Tournament, CorrectLotInSingleElimination)
 		Tournament tourney("deleteMe");
 		tourney.EnableAutoSave(false);
 
-		Association* assoc = new Association(GetRandomName(), nullptr);
-		Club* c1 = new Club(GetRandomName());
+		auto assoc = std::make_shared<Association>(GetRandomName(), nullptr);
+		auto c1 = std::make_shared<Club>(GetRandomName());
 		c1->SetParent(assoc);
-		Club* c2 = new Club(GetRandomName());
+		auto c2 = std::make_shared<Club>(GetRandomName());
 		c2->SetParent(assoc);
 
 		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
@@ -711,30 +711,30 @@ TEST(Tournament, LotteryTier)
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 		Tournament tourney("deleteMe");
 
-		auto inter = new Judoboard::Association("International", nullptr);
+		auto inter = std::make_shared<Judoboard::Association>("International", nullptr);
 
-		auto de = new Judoboard::Association("Deutschland", inter);
+		auto de = std::make_shared<Judoboard::Association>("Deutschland", inter);
 
-		auto dn = new Judoboard::Association("Deutschland-Nord", de);
-		auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+		auto dn = std::make_shared<Judoboard::Association>("Deutschland-Nord", de);
+		auto ds = std::make_shared<Judoboard::Association>(u8"Deutschland-S\u00fcd", de);
 
-		auto nord  = new Judoboard::Association("Nord", dn);
-		auto west  = new Judoboard::Association("West", dn);
-		auto nost  = new Judoboard::Association("Nordost", dn);
-		auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
-		auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+		auto nord  = std::make_shared<Judoboard::Association>("Nord", dn);
+		auto west  = std::make_shared<Judoboard::Association>("West", dn);
+		auto nost  = std::make_shared<Judoboard::Association>("Nordost", dn);
+		auto sued  = std::make_shared<Judoboard::Association>(u8"S\u00fcd", ds);
+		auto swest = std::make_shared<Judoboard::Association>(u8"S\u00fcdwest", ds);
 
-		auto nieder  = new Judoboard::Association("Niedersachsen", nord);
-		auto hamburg = new Judoboard::Association("Hamburg", nord);
-		auto berlin  = new Judoboard::Association("Berlin", nost);
-		auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+		auto nieder  = std::make_shared<Judoboard::Association>("Niedersachsen", nord);
+		auto hamburg = std::make_shared<Judoboard::Association>("Hamburg", nord);
+		auto berlin  = std::make_shared<Judoboard::Association>("Berlin", nost);
+		auto nrw     = std::make_shared<Judoboard::Association>("Nordrhein-Westfalen", west);
 
-		auto detmold = new Judoboard::Association("Detmold", nrw);
+		auto detmold = std::make_shared<Judoboard::Association>("Detmold", nrw);
 
-		auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+		auto biegue = std::make_shared<Judoboard::Association>(u8"Bielefeld/G\u00fctersloh", detmold);
 
-		Club* c1 = new Club("club1", biegue);
-		Club* c2 = new Club("club2", biegue);
+		auto c1 = std::make_shared<Club>("club1", biegue);
+		auto c2 = std::make_shared<Club>("club2", biegue);
 
 		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
 		j1->SetClub(c1);
@@ -772,10 +772,10 @@ TEST(Tournament, Lottery_Histogram)
 		Tournament tourney("deleteMe");
 		tourney.EnableAutoSave(false);
 
-		Association* assoc = new Association(GetRandomName(), nullptr);
-		Club* c1 = new Club(GetRandomName());
+		auto assoc = std::make_shared<Association>(GetRandomName(), nullptr);
+		auto c1 = std::make_shared<Club>(GetRandomName());
 		c1->SetParent(assoc);
-		Club* c2 = new Club(GetRandomName());
+		auto c2 = std::make_shared<Club>(GetRandomName());
 		c2->SetParent(assoc);
 
 		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
@@ -809,8 +809,8 @@ TEST(Tournament, CanNotAddParticipantOfWrongAssociation)
 {
 	initialize();
 	
-	auto club1 = new Club("Club1");
-	auto club2 = new Club("Club2");
+	auto club1 = std::make_shared<Club>("Club1");
+	auto club2 = std::make_shared<Club>("Club2");
 	Judoka* j1 = new Judoka("Firstname", "Lastname", 50, Gender::Male);
 
 	j1->SetClub(club1);
@@ -1320,9 +1320,9 @@ TEST(Tournament, WeightclassesAreSorted)
 		int current = 0;
 		for (auto table : tables)
 		{
-			EXPECT_LE(current, (int)((Weightclass*)table->GetFilter())->GetMinWeight());
+			EXPECT_LE(current, (int)std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMinWeight());
 
-			current = (int)((Weightclass*)table->GetFilter())->GetMinWeight();
+			current = (int)std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMinWeight();
 		}
 	}
 
@@ -1447,17 +1447,17 @@ TEST(Tournament, SaveAndLoad_Clubs)
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
-		Club c("Club name");
+		auto c = std::make_shared<Club>("Club name");
 
 		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
 		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
 		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
 		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
 
-		j1.SetClub(&c);
-		j2.SetClub(&c);
-		j3.SetClub(&c);
-		j4.SetClub(&c);
+		j1.SetClub(c);
+		j2.SetClub(c);
+		j3.SetClub(c);
+		j4.SetClub(c);
 
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 		Tournament tourney("deleteMe");
@@ -1476,8 +1476,8 @@ TEST(Tournament, SaveAndLoad_Clubs)
 		for (auto j : t.GetParticipants())
 		{
 			ASSERT_TRUE(j->GetClub());
-			EXPECT_EQ(j->GetClub()->GetUUID(), c.GetUUID());
-			EXPECT_EQ(j->GetClub()->GetName(), c.GetName());
+			EXPECT_EQ(j->GetClub()->GetUUID(), c->GetUUID());
+			EXPECT_EQ(j->GetClub()->GetName(), c->GetName());
 		}
 	}
 
@@ -1906,8 +1906,8 @@ TEST(Tournament, PruneUnusedClubs)
 		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
 		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
-		Club* c1 = new Club("Club 1");
-		Club* c2 = new Club("Club 1");
+		auto c1 = std::make_shared<Club>("Club 1");
+		auto c2 = std::make_shared<Club>("Club 2");
 
 		Tournament* tourney = new Tournament("deleteMe");
 		tourney->Reset();

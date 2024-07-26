@@ -54,32 +54,32 @@ namespace Judoboard
 		//Clubs
 		[[nodiscard]]
 		auto& GetAllClubs() const { return m_Clubs; }
-		Club* AddClub(const MD5::Club& NewClub);
-		bool  AddClub(Club* NewClub);
+		std::shared_ptr<Club> AddClub(const MD5::Club& NewClub);
+		bool AddClub(std::shared_ptr<Club> NewClub);
 
 		[[nodiscard]]
-		Club* FindClub(const UUID& UUID);
+		std::shared_ptr<Club> FindClub(const UUID& UUID);
 		[[nodiscard]]
-		const Club* FindClub(const UUID& UUID) const;
+		std::shared_ptr<const Club> FindClub(const UUID& UUID) const;
 		[[nodiscard]]
-		Club* FindClubByName(const std::string& Name);
+		std::shared_ptr<Club> FindClubByName(const std::string& Name);
 		[[nodiscard]]
-		const Club* FindClubByName(const std::string& Name) const;
+		std::shared_ptr<const Club> FindClubByName(const std::string& Name) const;
 
 		bool DeleteClub(const UUID& UUID);
 
 		//Associations
 		[[nodiscard]]
 		auto& GetAllAssociations() const { return m_Associations; }
-		bool AddAssociation(Association* NewAssociation);
+		bool AddAssociation(std::shared_ptr<Association> NewAssociation);
 		[[nodiscard]]
-		Association* FindAssociation(const UUID& UUID);
+		std::shared_ptr<Association> FindAssociation(const UUID& UUID);
 		[[nodiscard]]
-		const Association* FindAssociation(const UUID& UUID) const;
+		std::shared_ptr<const Association> FindAssociation(const UUID& UUID) const;
 		[[nodiscard]]
-		const Association* FindAssociationByName(const std::string& Name) const;
+		std::shared_ptr<const Association> FindAssociationByName(const std::string& Name) const;
 		bool DeleteAssociation(const UUID& UUID);
-		bool AssociationHasChildren(const Association* Association) const;
+		bool AssociationHasChildren(std::shared_ptr<const Association> Association) const;
 
 		//Rule sets
 		bool AddRuleSet(std::shared_ptr<RuleSet> NewRuleSet);
@@ -121,8 +121,8 @@ namespace Judoboard
 	protected:
 		std::vector<Judoka*> m_Judokas;
 
-		std::vector<Club*> m_Clubs;
-		std::vector<Association*> m_Associations;
+		std::vector<std::shared_ptr<Club>> m_Clubs;
+		std::vector<std::shared_ptr<Association>> m_Associations;
 
 		std::vector<std::shared_ptr<RuleSet>>  m_RuleSets;
 		std::vector<std::shared_ptr<AgeGroup>> m_AgeGroups;

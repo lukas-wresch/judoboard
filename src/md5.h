@@ -59,8 +59,6 @@ namespace Judoboard
 
 			int OfficialClubNo = 0;//Official no. of the club
 			int StatusChanged  = -1;
-
-			mutable void* pUserData = nullptr;
 		};
 
 		struct RelationClubAssociation//Relational table to connect clubs to associations
@@ -102,8 +100,6 @@ namespace Judoboard
 			int Tolerance = 0;
 
 			int Team = 0;
-
-			mutable void* pUserData = nullptr;
 		};
 
 		struct Participant
@@ -146,7 +142,7 @@ namespace Judoboard
 			bool MoneyIncreased = false;
 			int  WeightInGrams  = -1;
 
-			mutable void* pUserData = nullptr;
+			mutable void* pUserData = nullptr;//Deprecated
 		};
 
 		struct Weightclass
@@ -198,7 +194,7 @@ namespace Judoboard
 			//Version 7
 			bool BestOfThree = false;
 
-			mutable void* pUserData = nullptr;
+			mutable void* pUserData = nullptr;//Deprecated
 		};
 
 		struct Lottery

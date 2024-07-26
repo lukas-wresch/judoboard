@@ -9,7 +9,7 @@ namespace Judoboard
 	{
 	public:
 		Mixer(const MatchTable* Parent = nullptr) : IFilter(Parent) {}
-		Mixer(const IFilter& pSource1, const IFilter& pSource2, const MatchTable* Parent = nullptr);
+		Mixer(std::shared_ptr<const IFilter> pSource1, std::shared_ptr<const IFilter> pSource2, const MatchTable* Parent = nullptr);
 		Mixer(const YAML::Node& Yaml, const MatchTable* Parent);
 
 		virtual Type GetType() const override { return Type::Mixer; }
@@ -34,6 +34,6 @@ namespace Judoboard
 	private:
 		void Recalculate();
 
-		std::vector<const IFilter*> m_pSources;
+		std::vector<std::shared_ptr<const IFilter>> m_pSources;
 	};
 }

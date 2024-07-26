@@ -206,7 +206,7 @@ MD5::MD5(const Tournament& Tournament)
 			continue;
 
 		
-		const auto weightclass = (Judoboard::Weightclass*)filter;
+		const auto weightclass = std::dynamic_pointer_cast<Judoboard::Weightclass>(filter);
 		new_weightclass = new Weightclass;
 
 		new_weightclass->WeightLargerThan          = (uint32_t)weightclass->GetMinWeight() / 1000;

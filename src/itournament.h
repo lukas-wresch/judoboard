@@ -34,7 +34,7 @@ namespace Judoboard
 		[[nodiscard]]
 		virtual StandingData& GetDatabase() { return m_StandingData; }//Returns a database containing all participants
 
-		virtual const Association* GetOrganizer() const { assert(false); return nullptr; }
+		virtual std::shared_ptr<const Association> GetOrganizer() const { assert(false); return nullptr; }
 
 		virtual bool AddMatch(Match* NewMatch) { assert(false); return false; }
 		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(std::move(NewMatch))); }
@@ -86,12 +86,12 @@ namespace Judoboard
 		virtual const MatchTable* FindMatchTable(const UUID& ID) const = 0;
 
 		//Clubs
-		virtual Club* FindClub(const UUID& UUID) { return nullptr; }
-		virtual Club* FindClubByName(const std::string& Name) { return nullptr; }
+		virtual std::shared_ptr<Club> FindClub(const UUID& UUID) { return nullptr; }
+		virtual std::shared_ptr<Club> FindClubByName(const std::string& Name) { return nullptr; }
 		virtual bool RemoveClub(const UUID& UUID) { return false; }
 
 		//Associations
-		virtual Association* FindAssociation(const UUID& UUID) { return nullptr; }
+		virtual std::shared_ptr<Association> FindAssociation(const UUID& UUID) { return nullptr; }
 		virtual bool RemoveAssociation(const UUID& UUID) { return false; }
 
 		//Rule Sets

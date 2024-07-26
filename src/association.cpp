@@ -9,7 +9,7 @@ using namespace Judoboard;
 
 
 
-Association::Association(const std::string& Name, const Association* Parent) : m_Name(Name), m_pParent(Parent)
+Association::Association(const std::string& Name, std::shared_ptr<const Association> Parent) : m_Name(Name), m_pParent(Parent)
 {
 	m_ShortName = m_Name.substr(0, 5);
 }
@@ -34,7 +34,7 @@ Association::Association(const YAML::Node& Yaml, const StandingData* StandingDat
 Association::Association(const MD5::Association& MD5Association) : Association(MD5Association.Description, nullptr)
 {
 	if (MD5Association.NextAsscociation && MD5Association.NextAsscociation->Description != m_Name)
-		m_pParent = new Association(*MD5Association.NextAsscociation);
+		m_pParent = std::make_shared<Association>(*MD5Association.NextAsscociation);
 }
 
 

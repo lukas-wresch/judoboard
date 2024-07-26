@@ -76,10 +76,10 @@ TEST(Database, SaveAndLoad)
 		EXPECT_EQ(d.FindJudoka(j1->GetUUID())->GetWeight(), Weight(50));
 		EXPECT_EQ(d.FindJudoka(j2->GetUUID())->GetWeight(), Weight(60));
 
-		auto club1 = new Club("Club name");
+		auto club1 = std::make_shared<Club>("Club name");
 		d.AddClub(club1);
 
-		auto club2 = new Club("Club name 2");
+		auto club2 = std::make_shared<Club>("Club name 2");
 		d.AddClub(club2);
 
 		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Female);

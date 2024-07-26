@@ -47,18 +47,21 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 	m_LotteryTier = File.GetLotteryTierID() - 2;
 
+	std::unordered_map<int, std::shared_ptr<Club>>     new_clubs;
+	std::unordered_map<int, std::shared_ptr<AgeGroup>> new_age_groups;
+
 	//Add clubs
 	for (auto club : File.GetClubs())
 	{
-		Club* new_club = nullptr;
+		std::shared_ptr<Club> new_club;
 
 		if (pDatabase && pDatabase->FindClubByName(club->Name))
 			new_club = pDatabase->FindClubByName(club->Name);
 		else
-			new_club = new Club(*club);
+			new_club = std::make_shared<Club>(*club);
 		
+		new_clubs[club->ID]= new_club;
 		m_StandingData.AddClub(new_club);
-		club->pUserData = new_club;
 	}
 
 	//Find organizer
@@ -79,7 +82,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	for (auto age_group : File.GetAgeGroups())
 	{
 		auto new_age_group = std::make_shared<AgeGroup>(*age_group, m_StandingData);
-		age_group->pUserData = (void*)new_age_group.get();
+		new_age_groups[age_group->ID] = new_age_group;
 		m_StandingData.AddAgeGroup(new_age_group);
 	}
 
@@ -110,8 +113,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			auto de = new DoubleElimination(*weightclass, this);
 			de->IsThirdPlaceMatch(weightclass->MatchForThirdPlace);
 			de->IsFifthPlaceMatch(weightclass->MatchForFifthPlace);
-			delete de->GetLoserBracket().GetFilter();
-			de->GetLoserBracket().SetFilter(new Fixed);
+			de->GetLoserBracket().SetFilter(std::make_shared<Fixed>());
 			new_table = de;
 		}
 		else if (weightclass->FightSystemID == 24)//Pool (3+3 system)
@@ -131,7 +133,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		//Connect to age group
 		if (weightclass->AgeGroup)
-			new_table->SetAgeGroup(std::make_shared<const AgeGroup>(*(const AgeGroup*)weightclass->AgeGroup->pUserData));
+			new_table->SetAgeGroup(new_age_groups[weightclass->AgeGroup->ID]);
 
 		new_table->SetName(weightclass->Description);
 		//new_table->IsBestOfThree(weightclass->BestOfThree);
@@ -163,7 +165,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			m_StandingData.AddJudoka(new_judoka);
 
 			if (judoka->Club)//Connect to club
-				new_judoka->SetClub((Club*)judoka->Club->pUserData);
+				new_judoka->SetClub(new_clubs[judoka->Club->ID]);
 
 			if (judoka->Weightclass)
 			{
@@ -183,7 +185,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 			if (judoka->AgeGroup)
 			{
-				auto age_group = (AgeGroup*)judoka->AgeGroup->pUserData;
+				auto age_group = new_age_groups[judoka->AgeGroup->ID];
 				if (age_group)
 					m_JudokaToAgeGroup.insert({ new_judoka->GetUUID(), age_group->GetUUID() });
 					//AssignJudokaToAgeGroup(new_judoka, age_group);
@@ -900,7 +902,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 	else
 	{
 		auto new_match_table = new CustomTable(this);
-		new_match_table->SetFilter(new Fixed);
+		new_match_table->SetFilter(std::make_shared<Fixed>());
 		new_match_table->AddMatch(NewMatch);
 		new_match_table->SetMatID(NewMatch->GetMatID());
 		AddMatchTable(new_match_table);
@@ -1261,7 +1263,7 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		return false;
 	}
 
-	const bool club_added = m_StandingData.AddClub((Club*)Judoka->GetClub());
+	const bool club_added = m_StandingData.AddClub(std::const_pointer_cast<Club>(Judoka->GetClub()));
 
 	FindAgeGroupForJudoka(*Judoka);
 
@@ -1684,8 +1686,8 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 		//Both weightclasses?
 		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
 		{
-			auto weightclassA = (const Weightclass*)a->GetFilter();
-			auto weightclassB = (const Weightclass*)b->GetFilter();
+			auto weightclassA = std::reinterpret_pointer_cast<const Weightclass>(a->GetFilter());
+			auto weightclassB = std::reinterpret_pointer_cast<const Weightclass>(b->GetFilter());
 
 			//Sort by age group
 			if (weightclassA->GetAgeGroup() && weightclassB->GetAgeGroup() && weightclassA->GetAgeGroup()->GetMinAge() != weightclassB->GetAgeGroup()->GetMinAge())
@@ -2281,7 +2283,7 @@ bool Tournament::PerformLottery()
 
 	for (auto judoka : GetDatabase().GetAllJudokas())
 	{
-		const Association* club = judoka->GetClub();
+		std::shared_ptr<const Association> club = judoka->GetClub();
 
 		//Move up the tree till we are on the right level
 		while (club && club->GetLevel() > lottery_level)

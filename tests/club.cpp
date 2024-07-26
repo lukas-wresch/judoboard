@@ -42,23 +42,23 @@ TEST(Club, IsChildOf)
 	initialize();
 	Application app;
 
-	auto inter = new Judoboard::Association("International", nullptr);
+	auto inter = std::make_shared<Judoboard::Association>("International", nullptr);
 
-	auto de = new Judoboard::Association("Deutschland", inter);
+	auto de = std::make_shared<Judoboard::Association>("Deutschland", inter);
 
-	auto dn = new Judoboard::Association("Deutschland-Nord", de);
-	auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+	auto dn = std::make_shared<Judoboard::Association>("Deutschland-Nord", de);
+	auto ds = std::make_shared<Judoboard::Association>(u8"Deutschland-S\u00fcd", de);
 
-	auto nord  = new Judoboard::Association("Nord", dn);
-	auto west  = new Judoboard::Association("West", dn);
-	auto nost  = new Judoboard::Association("Nordost", dn);
-	auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
-	auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+	auto nord  = std::make_shared<Judoboard::Association>("Nord", dn);
+	auto west  = std::make_shared<Judoboard::Association>("West", dn);
+	auto nost  = std::make_shared<Judoboard::Association>("Nordost", dn);
+	auto sued  = std::make_shared<Judoboard::Association>(u8"S\u00fcd", ds);
+	auto swest = std::make_shared<Judoboard::Association>(u8"S\u00fcdwest", ds);
 
-	auto nieder  = new Judoboard::Association("Niedersachsen", nord);
-	auto hamburg = new Judoboard::Association("Hamburg", nord);
-	auto berlin  = new Judoboard::Association("Berlin", nost);
-	auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+	auto nieder  = std::make_shared<Judoboard::Association>("Niedersachsen", nord);
+	auto hamburg = std::make_shared<Judoboard::Association>("Hamburg", nord);
+	auto berlin  = std::make_shared<Judoboard::Association>("Berlin", nost);
+	auto nrw     = std::make_shared<Judoboard::Association>("Nordrhein-Westfalen", west);
 
 	app.GetDatabase().AddAssociation(nieder);
 	app.GetDatabase().AddAssociation(hamburg);

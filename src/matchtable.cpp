@@ -421,11 +421,11 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, co
 		switch ((IFilter::Type)Yaml["filter"]["type"].as<int>())
 		{
 			case IFilter::Type::Weightclass:
-				SetFilter(new Weightclass(Yaml["filter"], m_Parent ? m_Parent : this));
+				SetFilter(std::make_shared<Weightclass>(Yaml["filter"], m_Parent ? m_Parent : this));
 				break;
 			case IFilter::Type::Fixed:
 			case IFilter::Type::Standard://Deprecated
-				SetFilter(new Fixed(Yaml["filter"], m_Parent ? m_Parent : this));
+				SetFilter(std::make_shared<Fixed>(Yaml["filter"], m_Parent ? m_Parent : this));
 				break;
 			default:
 				ZED::Log::Error("Unknown filter in match table");

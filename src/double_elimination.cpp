@@ -25,7 +25,7 @@ DoubleElimination::DoubleElimination(IFilter* Filter, const ITournament* Tournam
 
 	m_WinnerBracket.SetFilter(this->GetFilter());
 
-	auto losers = new LosersOf(m_WinnerBracket);
+	auto losers = std::make_shared<LosersOf>(m_WinnerBracket);
 	losers->RemoveLast();
 	m_LoserBracket.SetFilter(losers);
 }
@@ -170,8 +170,6 @@ void DoubleElimination::GenerateSchedule()
 
 	m_WinnerBracket.SetFilter(this->GetFilter());
 	m_WinnerBracket.GenerateSchedule();
-
-	delete m_LoserBracket.GetFilter();
 	
 	/*LosersOf losers_of(m_WinnerBracket);
 
@@ -180,7 +178,7 @@ void DoubleElimination::GenerateSchedule()
 	auto last = losers_of.GetJudokaByStartPosition(num_participants - 2);
 	losers_of.RemoveParticipant(last);*/
 
-	auto losers = new LosersOf(m_WinnerBracket);
+	auto losers = std::make_shared<LosersOf>(m_WinnerBracket);
 	losers->RemoveLast();
 	m_LoserBracket.SetFilter(losers);
 

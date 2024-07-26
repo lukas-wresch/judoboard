@@ -339,9 +339,9 @@ namespace Judoboard
 
 		const std::vector<const Judoka*> GetParticipants() const;
 
-		const IFilter* GetFilter() const { return m_Filter; }
-		IFilter* GetFilter() { return m_Filter; }
-		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
+		std::shared_ptr<const IFilter> GetFilter() const { return m_Filter; }
+		std::shared_ptr<IFilter> GetFilter() { return m_Filter; }
+		void SetFilter(std::shared_ptr<IFilter> NewFilter) { m_Filter = NewFilter; }
 		const ITournament* GetTournament() const { return m_Tournament; }
 
 		void AutoGenerateSchedule(bool Enable = true) { m_RegenerateSchedule = Enable; }
@@ -429,7 +429,7 @@ namespace Judoboard
 
 		std::string m_Name;
 
-		IFilter* m_Filter = nullptr;
+		std::shared_ptr<IFilter> m_Filter;
 
 		const ITournament* m_Tournament = nullptr;
 

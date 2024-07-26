@@ -115,7 +115,7 @@ namespace Judoboard
 		const std::string GetFirstname() const { return m_Firstname; }
 		const std::string GetLastname()  const { return m_Lastname;  }
 		auto GetBirthyear() const { return m_Birthyear; }
-		const Club* GetClub() const { return m_pClub; }
+		std::shared_ptr<const Club> GetClub() const { return m_pClub; }
 		auto GetNumber() const { return m_Number; }
 
 		void SetFirstname(const std::string& Firstname) { m_Firstname = Firstname; }
@@ -123,7 +123,7 @@ namespace Judoboard
 		void SetGender(Gender NewGender) { m_Gender = NewGender; }
 		void SetWeight(Weight NewWeight);
 		void SetBirthyear(uint16_t NewBirthyear) { m_Birthyear = NewBirthyear; }
-		void SetClub(const Club* NewClub) { m_pClub = NewClub; }
+		void SetClub(std::shared_ptr<const Club> NewClub) { m_pClub = NewClub; }
 		void SetNumber(const std::string& NewNumber) { m_Number = NewNumber; }
 
 		void StartBreak(uint32_t BreakTime) const {//Start break for 'BreakTime' seconds
@@ -162,7 +162,7 @@ namespace Judoboard
 
 		std::string m_Number;//Official number of this judoka according to his "judo passport"
 
-		const Club* m_pClub = nullptr;//Club the judoka belongs to
+		std::shared_ptr<const Club> m_pClub;//Club the judoka belongs to
 
 		mutable uint32_t m_LastMatch_Timestamp = 0;//Timestamp when the last match for this judoka ended to determine break between matches
 		mutable uint32_t m_RequiredBreakTime = 0;//Required break time for this judoka in seconds

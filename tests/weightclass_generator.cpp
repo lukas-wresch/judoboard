@@ -148,10 +148,10 @@ TEST(WeightclassGenerator, FullTest)
 		Tournament tour("deleteMe");
 		tour.EnableAutoSave(false);
 
-		std::vector<Club*> clubs;
-		clubs.push_back(new Judoboard::Club("Altenhagen"));
-		clubs.push_back(new Judoboard::Club("Brackwede"));
-		clubs.push_back(new Judoboard::Club("Senne"));
+		std::vector<std::shared_ptr<Club>> clubs;
+		clubs.push_back(std::make_shared<Judoboard::Club>("Altenhagen"));
+		clubs.push_back(std::make_shared<Judoboard::Club>("Brackwede"));
+		clubs.push_back(std::make_shared<Judoboard::Club>("Senne"));
 
 		auto age_group1 = std::make_shared<AgeGroup>("U11", 8,  10, nullptr);
 		auto age_group2 = std::make_shared<AgeGroup>("U15", 12, 14, nullptr);
