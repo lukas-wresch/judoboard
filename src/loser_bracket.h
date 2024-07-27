@@ -52,7 +52,7 @@ namespace Judoboard
 			return (size_t)pow(2, GetNumberOfBaseRounds()) - 2;
 		}
 
-		virtual const std::vector<Match*> GetSchedule() const { return MatchTable::GetSchedule(); }
+		virtual const std::vector<std::shared_ptr<Match>> GetSchedule() const { return MatchTable::GetSchedule(); }
 
 		virtual Results CalculateResults() const override;
 		virtual void GenerateSchedule() override;

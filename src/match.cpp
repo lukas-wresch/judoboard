@@ -32,7 +32,7 @@ Match::Match(const DependentJudoka& White, const DependentJudoka& Blue, const IT
 
 
 
-Match::Match(const YAML::Node& Yaml, MatchTable* MatchTable, const ITournament* Tournament) : m_Tournament(Tournament)
+Match::Match(const YAML::Node& Yaml, std::shared_ptr<MatchTable> MatchTable, const ITournament* Tournament) : m_Tournament(Tournament)
 {
 	if (!Yaml.IsMap())
 		return;
@@ -608,7 +608,7 @@ const Judoka* Match::GetLoser() const
 
 
 
-void Match::SetDependency(Fighter Fighter, DependencyType Type, Match* Reference)
+void Match::SetDependency(Fighter Fighter, DependencyType Type, std::shared_ptr<Match> Reference)
 {
 	if (Fighter == Fighter::White)
 	{
@@ -624,7 +624,7 @@ void Match::SetDependency(Fighter Fighter, DependencyType Type, Match* Reference
 
 
 
-void Match::SetBestOfThree(Match* Reference1, Match* Reference2)
+void Match::SetBestOfThree(std::shared_ptr<Match> Reference1, std::shared_ptr<Match> Reference2)
 {
 	SetDependency(Fighter::White, DependencyType::BestOfThree, Reference1);
 	SetDependency(Fighter::Blue,  DependencyType::BestOfThree, Reference2);
@@ -647,9 +647,9 @@ bool Match::HasUnresolvedDependency() const
 
 
 
-const std::vector<const Match*> Match::GetDependentMatches() const
+const std::vector<std::shared_ptr<const Match>> Match::GetDependentMatches() const
 {
-	std::vector<const Match*> ret;
+	std::vector<std::shared_ptr<const Match>> ret;
 
 	if (m_White.m_DependentMatch)
 		ret.emplace_back(m_White.m_DependentMatch);

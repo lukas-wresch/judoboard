@@ -68,7 +68,7 @@ bool RemoteTournament::IsMatchInCache(const UUID& UUID) const
 
 
 
-Match* RemoteTournament::FindInCache(const UUID& UUID) const
+std::shared_ptr<Match> RemoteTournament::FindInCache(const UUID& UUID) const
 {
 	auto guard = m_Mutex.LockReadForScope();
 
@@ -80,7 +80,7 @@ Match* RemoteTournament::FindInCache(const UUID& UUID) const
 
 
 
-MatchTable* RemoteTournament::FindMatchTableInCache(const UUID& UUID) const
+std::shared_ptr<MatchTable> RemoteTournament::FindMatchTableInCache(const UUID& UUID) const
 {
 	auto guard = m_Mutex.LockReadForScope();
 
@@ -92,7 +92,7 @@ MatchTable* RemoteTournament::FindMatchTableInCache(const UUID& UUID) const
 
 
 
-bool RemoteTournament::AddMatch(Match* NewMatch)
+bool RemoteTournament::AddMatch(std::shared_ptr<Match> NewMatch)
 {
 	if (!NewMatch)
 	{
@@ -177,7 +177,7 @@ const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 
 
 
-MatchTable* RemoteTournament::FindMatchTable(const UUID& ID)
+std::shared_ptr<MatchTable> RemoteTournament::FindMatchTable(const UUID& ID)
 {
 	auto response = Request2Master("/ajax/master/find_match_table?uuid=" + (std::string)ID);
 
@@ -194,7 +194,7 @@ MatchTable* RemoteTournament::FindMatchTable(const UUID& ID)
 
 	auto guard = m_Mutex.LockWriteForScope();
 
-	MatchTable* table = MatchTable::CreateMatchTable(yaml, this);
+	auto table = MatchTable::CreateMatchTable(yaml, this);
 	m_MatchTables.push_back(table);
 
 	return table;
@@ -202,7 +202,7 @@ MatchTable* RemoteTournament::FindMatchTable(const UUID& ID)
 
 
 
-const MatchTable* RemoteTournament::FindMatchTable(const UUID& ID) const
+std::shared_ptr<const MatchTable> RemoteTournament::FindMatchTable(const UUID& ID) const
 {
 	auto response = Request2Master("/ajax/master/find_match_table?uuid=" + (std::string)ID);
 
@@ -219,7 +219,7 @@ const MatchTable* RemoteTournament::FindMatchTable(const UUID& ID) const
 
 	auto guard = m_Mutex.LockWriteForScope();
 
-	MatchTable* table = MatchTable::CreateMatchTable(yaml, this);
+	auto table = MatchTable::CreateMatchTable(yaml, this);
 	m_MatchTables.push_back(table);
 
 	return table;

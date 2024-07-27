@@ -22,7 +22,7 @@ using namespace Judoboard;
 Pool::Pool(IFilter* Filter, const ITournament* Tournament)
 	: MatchTable(Filter, Tournament), m_Finals(nullptr, Tournament)
 {
-	m_Finals.SetParent(this);
+	m_Finals->SetParent(this);
 	GenerateSchedule();
 }
 
@@ -46,7 +46,7 @@ Pool::Pool(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTab
 	if (Yaml["pools"] && Yaml["pools"].IsSequence())
 	{
 		for (const auto& node : Yaml["pools"])
-			m_Pools.push_back(new RoundRobin(node, Tournament, this));
+			m_Pools.push_back(std::make_shared<RoundRobin>(node, Tournament, this));
 	}
 
 	if (Yaml["finals"] && Yaml["finals"].IsMap())
@@ -136,7 +136,7 @@ size_t Pool::GetMaxStartPositions() const
 
 
 
-Match* Pool::FindMatch(const UUID& UUID) const
+std::shared_ptr<Match> Pool::FindMatch(const UUID& UUID) const
 {
 	for (auto pool : m_Pools)
 	{
@@ -145,19 +145,19 @@ Match* Pool::FindMatch(const UUID& UUID) const
 			return ret;
 	}
 
-	return m_Finals.FindMatch(UUID);
+	return m_Finals->FindMatch(UUID);
 }
 
 
 
-const MatchTable* Pool::FindMatchTable(const UUID& UUID) const
+std::shared_ptr<const MatchTable> Pool::FindMatchTable(const UUID& UUID) const
 {
 	for (auto pool : m_Pools)
 		if (*pool == UUID)
 			return pool;
 
-	if (m_Finals == UUID)
-		return &m_Finals;
+	if (*m_Finals == UUID)
+		return m_Finals;
 
 	return nullptr;
 }
@@ -171,7 +171,7 @@ bool Pool::DeleteMatch(const UUID& UUID)
 	for (auto pool : m_Pools)
 		success |= pool->DeleteMatch(UUID);
 
-	success |= m_Finals.DeleteMatch(UUID);
+	success |= m_Finals->DeleteMatch(UUID);
 	return success;
 }
 
@@ -200,9 +200,9 @@ void Pool::GenerateSchedule()
 	for (int i = 0; i < pool_count; ++i)
 	{
 		if (GetFilter())
-			m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
+			m_Pools[i] = std::make_shared<RoundRobin>(new Splitter(*GetFilter(), pool_count, i));
 		else
-			m_Pools[i] = new RoundRobin(nullptr);
+			m_Pools[i] = std::make_shared<RoundRobin>(nullptr);
 
 		std::string name = Localizer::Translate("Pool") + " ";
 		name.append(&letters[i % 26], 1);
@@ -218,9 +218,6 @@ void Pool::GenerateSchedule()
 			m_Pools[i]->IsBestOfThree(old_pools[i]->IsBestOfThree());
 		}
 	}
-
-	for (auto old_pools : old_pools)
-		delete old_pools;
 
 	//Create filter(s) for final round
 	IFilter* final_input = nullptr;
@@ -301,23 +298,23 @@ void Pool::GenerateSchedule()
 
 
 	assert(final_input);
-	bool third_place = m_Finals.IsThirdPlaceMatch();
-	bool fifth_place = m_Finals.IsFifthPlaceMatch();
-	auto color  = m_Finals.GetColor();
-	auto name   = m_Finals.GetName();
-	auto mat_id = m_Finals.GetMatID();
-	auto bo3    = m_Finals.IsBestOfThree();
+	bool third_place = m_Finals->IsThirdPlaceMatch();
+	bool fifth_place = m_Finals->IsFifthPlaceMatch();
+	auto color  = m_Finals->GetColor();
+	auto name   = m_Finals->GetName();
+	auto mat_id = m_Finals->GetMatID();
+	auto bo3    = m_Finals->IsBestOfThree();
 
-	m_Finals = SingleElimination(final_input);
-	m_Finals.SetName(Localizer::Translate("Finals"));
-	m_Finals.SetParent(this);
-	m_Finals.IsThirdPlaceMatch(third_place);
-	m_Finals.IsFifthPlaceMatch(fifth_place);
-	m_Finals.SetColor(color);
+	m_Finals = std::make_shared<SingleElimination>(final_input);
+	m_Finals->SetName(Localizer::Translate("Finals"));
+	m_Finals->SetParent(this);
+	m_Finals->IsThirdPlaceMatch(third_place);
+	m_Finals->IsFifthPlaceMatch(fifth_place);
+	m_Finals->SetColor(color);
 	if (!name.empty())
-		m_Finals.SetName(name);
-	m_Finals.SetMatID(mat_id);
-	m_Finals.IsBestOfThree(bo3);
+		m_Finals->SetName(name);
+	m_Finals->SetMatID(mat_id);
+	m_Finals->IsBestOfThree(bo3);
 
 	//Four or less get forwarded, need to a fifth place match manually
 	if (pool_count * m_TakeTop <= 4 && IsFifthPlaceMatch())
@@ -325,11 +322,11 @@ void Pool::GenerateSchedule()
 		assert(pool_count == 2);//TODO
 		assert(m_TakeTop == 2);//TODO
 
-		auto fifth_place_match = new Match(DependentJudoka(DependencyType::TakeRank3, *m_Pools[0]),
-										   DependentJudoka(DependencyType::TakeRank3, *m_Pools[1]), GetTournament());
+		auto fifth_place_match = new Match(DependentJudoka(DependencyType::TakeRank3, m_Pools[0]),
+										   DependentJudoka(DependencyType::TakeRank3, m_Pools[1]), GetTournament());
 		fifth_place_match->SetTag(Match::Tag::Fifth() & Match::Tag::Finals());
 
-		m_Finals.AddMatch(fifth_place_match);
+		m_Finals->AddMatch(fifth_place_match);
 
 		//TODO do the more general case
 	}
@@ -366,7 +363,7 @@ void Pool::CopyMatchesFromSubtables()
 
 
 	//Add matches for single elimination phase
-	auto final_schedule = m_Finals.GetSchedule();
+	auto final_schedule = m_Finals->GetSchedule();
 	for (auto match : final_schedule)
 		AddMatch(match);
 }
@@ -380,7 +377,7 @@ const std::string Pool::ToHTML() const
 	for (auto pool : m_Pools)
 		ret += pool->ToHTML() + "<br/><br/>";
 
-	ret += m_Finals.ToHTML();
+	ret += m_Finals->ToHTML();
 
 	if (!IsSubMatchTable())
 		ret += ResultsToHTML() + "</div>";

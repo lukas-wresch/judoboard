@@ -171,7 +171,7 @@ bool Mat::Reset()
 
 
 
-bool Mat::StartMatch(Match* NewMatch, bool UseForce)
+bool Mat::StartMatch(std::shared_ptr<Match> NewMatch, bool UseForce)
 {
 	if (!NewMatch)
 	{

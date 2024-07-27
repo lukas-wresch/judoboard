@@ -525,7 +525,7 @@ bool Tournament::Load(const YAML::Node& yaml)
 				continue;
 			}
 
-			MatchTable* new_table = MatchTable::CreateMatchTable(node, this);
+			auto new_table = MatchTable::CreateMatchTable(node, this);
 
 			if (new_table)
 				m_MatchTables.push_back(new_table);
@@ -812,7 +812,7 @@ void Tournament::DeleteAllMatchResults()
 
 
 
-bool Tournament::AddMatch(Match* NewMatch)
+bool Tournament::AddMatch(std::shared_ptr<Match> NewMatch)
 {
 	if (IsReadonly())
 	{
@@ -923,7 +923,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 
 
 
-Match* Tournament::GetNextMatch(int32_t MatID) const
+std::shared_ptr<Match> Tournament::GetNextMatch(int32_t MatID) const
 {
 	auto guard = LockReadForScope();
 
@@ -942,7 +942,7 @@ Match* Tournament::GetNextMatch(int32_t MatID) const
 
 
 
-const Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
+std::shared_ptr<const Match> Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
 {
 	auto guard = LockReadForScope();
 
@@ -964,7 +964,7 @@ const Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
 
 
 
-Match* Tournament::GetNextOngoingMatch(int32_t MatID)
+std::shared_ptr<Match> Tournament::GetNextOngoingMatch(int32_t MatID)
 {
 	auto guard = LockReadForScope();
 
@@ -1022,7 +1022,7 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
 	}
 #endif
 
-	MatchTable* table = nullptr;
+	std::shared_ptr<MatchTable> table;
 	size_t sub_index  = SIZE_MAX;
 	for (size_t i = 0; i < m_MatchTables.size(); ++i)
 	{
@@ -1401,7 +1401,7 @@ void Tournament::SwapAllFighters()
 
 
 
-MatchTable* Tournament::FindMatchTable(const UUID& ID)
+std::shared_ptr<MatchTable> Tournament::FindMatchTable(const UUID& ID)
 {
 	if (IsReadonly())
 		return nullptr;
@@ -1423,10 +1423,10 @@ MatchTable* Tournament::FindMatchTable(const UUID& ID)
 
 			for (size_t i = 0; i < pool->GetPoolCount(); ++i)
 				if (*pool->GetPool(i) == ID)
-					return (MatchTable*)pool->GetPool(i);
+					return pool->GetPool(i);
 
 			if (pool->GetFinals() == ID)
-				return (MatchTable*)&pool->GetFinals();
+				return pool->GetFinals();
 		}
 	}
 
@@ -1435,7 +1435,7 @@ MatchTable* Tournament::FindMatchTable(const UUID& ID)
 
 
 
-const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
+std::shared_ptr<const MatchTable> Tournament::FindMatchTable(const UUID& ID) const
 {
 	auto guard = LockReadForScope();
 
@@ -1457,7 +1457,7 @@ const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 					return pool->GetPool(i);
 
 			if (pool->GetFinals() == ID)
-				return &pool->GetFinals();
+				return pool->GetFinals();
 		}
 	}
 
@@ -1466,7 +1466,7 @@ const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 
 
 
-MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
+std::shared_ptr<MatchTable> Tournament::FindMatchTableByName(const std::string& Name)
 {
 	if (IsReadonly())
 		return nullptr;
@@ -1484,7 +1484,7 @@ MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
 
 
 
-MatchTable* Tournament::FindMatchTableByDescription(const std::string& Description)
+std::shared_ptr<MatchTable> Tournament::FindMatchTableByDescription(const std::string& Description)
 {
 	if (IsReadonly())
 		return nullptr;
@@ -1502,7 +1502,7 @@ MatchTable* Tournament::FindMatchTableByDescription(const std::string& Descripti
 
 
 
-void Tournament::AddMatchTable(MatchTable* NewMatchTable)
+void Tournament::AddMatchTable(std::shared_ptr<MatchTable> NewMatchTable)
 {
 	if (IsReadonly())
 		return;

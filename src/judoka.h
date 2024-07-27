@@ -27,18 +27,18 @@ namespace Judoboard
 			m_Judoka = Judoka;
 			m_Type   = DependencyType::None;
 		}
-		DependentJudoka(DependencyType DependencyType, Match& DependentMatch) {
+		DependentJudoka(DependencyType DependencyType, std::shared_ptr<Match> DependentMatch) {
 			m_Type = DependencyType;
-			m_DependentMatch = &DependentMatch;
+			m_DependentMatch = DependentMatch;
 		}
-		DependentJudoka(DependencyType DependencyType, const MatchTable& DependentMatchTable) {
+		DependentJudoka(DependencyType DependencyType, std::shared_ptr<const MatchTable> DependentMatchTable) {
 			m_Type = DependencyType;
-			m_DependentMatchTable = &DependentMatchTable;
+			m_DependentMatchTable = DependentMatchTable;
 		}
 
 		const Judoka* GetJudoka() const;
 		auto GetDependency() const { return m_Type; }
-		const Match* GetDependentMatch() const { return m_DependentMatch; }
+		std::shared_ptr<const Match> GetDependentMatch() const { return m_DependentMatch; }
 		auto GetDependentMatchTable() const { return m_DependentMatchTable; }
 
 		bool operator == (const Judoka* rhs) const;
@@ -53,8 +53,8 @@ namespace Judoboard
 
 		const Judoka* m_Judoka  = nullptr;
 		DependencyType m_Type   = DependencyType::None;
-		Match* m_DependentMatch = nullptr;
-		const MatchTable* m_DependentMatchTable = nullptr;
+		std::shared_ptr<Match> m_DependentMatch;
+		std::shared_ptr<const MatchTable> m_DependentMatchTable;
 	};
 
 

@@ -75,7 +75,7 @@ void LosersOf::Recalculate() const
 	m_Mutex.lock();
 
 	for (auto match : m_MatchTable.GetSchedule())
-		ret.insert({ i++, DependentJudoka(DependencyType::TakeLoser, *match) });
+		ret.insert({ i++, DependentJudoka(DependencyType::TakeLoser, match) });
 
 	if (m_RemoveLast)
 		ret.erase(i-1);

@@ -26,7 +26,7 @@ namespace Judoboard
 		virtual bool AreFightersOnMat() const override;
 
 		virtual bool CanNextMatchStart() const override;
-		virtual bool StartMatch(Match* NewMatch, bool UseForce = false) override;
+		virtual bool StartMatch(std::shared_ptr<Match> NewMatch, bool UseForce = false) override;
 		virtual bool HasConcluded() const override;
 		virtual bool EndMatch() override;
 

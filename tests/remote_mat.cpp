@@ -163,8 +163,8 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 	tourney->AddParticipant(j5);
 	tourney->AddParticipant(j6);
 
-	MatchTable* m1 = new RoundRobin(0, 49);
-	MatchTable* m2 = new RoundRobin(50, 100);
+	auto m1 = std::make_shared<RoundRobin>(0, 49);
+	auto m2 = std::make_shared<RoundRobin>(50, 100);
 	m1->SetMatID(1);
 	m2->SetMatID(2);
 	tourney->AddMatchTable(m1);
@@ -307,7 +307,7 @@ TEST(RemoteMat, SendMatchTable)
 	master.GetTournament()->AddParticipant(j1);
 	master.GetTournament()->AddParticipant(j2);
 
-	MatchTable* m1 = new RoundRobin(0, 1000);
+	auto m1 = std::make_shared<RoundRobin>(0, 1000);
 	m1->SetMatID(1);
 	master.GetTournament()->AddMatchTable(m1);
 
@@ -380,7 +380,7 @@ TEST(RemoteMat, CorrectWinner)
 			master.GetDatabase().AddJudoka(j1);
 			master.GetDatabase().AddJudoka(j2);
 
-			Match* match = new Match(j1, j2, nullptr);
+			auto match = std::make_shared<Match>(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -444,9 +444,9 @@ TEST(RemoteMat, ForceClose)
 
 	ZED::Core::Pause(500);
 
-	Match match(&j1, &j2, nullptr);
-	match.SetMatID(1);
-	EXPECT_TRUE(m->StartMatch(&match));
+	auto match = std::make_shared<Match>(&j1, &j2, nullptr);
+	match->SetMatID(1);
+	EXPECT_TRUE(m->StartMatch(match));
 }
 
 
@@ -471,7 +471,7 @@ TEST(RemoteMat, RemoveIpponShouldRecoverPreviousWazaari)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -518,7 +518,7 @@ TEST(RemoteMat, RemoveWazariShouldRemoveIppon)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -565,7 +565,7 @@ TEST(RemoteMat, Scores)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -612,7 +612,7 @@ TEST(RemoteMat, Shido)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -688,7 +688,7 @@ TEST(RemoteMat, ShidoDoesntEndGoldenScore)
 		auto rules = std::make_shared<RuleSet>("Test", 2, 60, 30, 20, false, true, true, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -743,7 +743,7 @@ TEST(RemoteMat, ScoreEndsGoldenScore)
 			auto rules = std::make_shared<RuleSet>("Test", 5, 60, 30, 20, true, true, true, 0);
 			master.GetDatabase().AddRuleSet(rules);
 
-			Match* match = new Match(j1, j2, nullptr);
+			auto match = std::make_shared<Match>(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -794,7 +794,7 @@ TEST(RemoteMat, ShidosResultInIndirectHansokumake)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -839,7 +839,7 @@ TEST(RemoteMat, HansokumakeResultsInDirectHansokumake)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -886,7 +886,7 @@ TEST(RemoteMat, DirectHansokumakeDoesNotConcludeMatch)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -926,7 +926,7 @@ TEST(RemoteMat, DirectHansokumakeAndDisqDoesConcludeMatch)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -963,7 +963,7 @@ TEST(RemoteMat, Gachi)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -998,7 +998,7 @@ TEST(RemoteMat, GachiResultsInMate)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1037,7 +1037,7 @@ TEST(RemoteMat, DoubleIppon)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1088,7 +1088,7 @@ TEST(RemoteMat, DoubleIpponFightersKeepWazaari)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1142,7 +1142,7 @@ TEST(RemoteMat, DoubleIpponDuringGoldenScore)
 		auto rules = std::make_shared<RuleSet>("Test", 1, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1195,7 +1195,7 @@ TEST(RemoteMat, DoubleIpponDuringGoldenScoreFightersKeepWazaari)
 		auto rules = std::make_shared<RuleSet>("Test", 1, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1255,7 +1255,7 @@ TEST(RemoteMat, IpponResultsInMate)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1292,7 +1292,7 @@ TEST(RemoteMat, HansokumakeResultsInMate)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1333,7 +1333,7 @@ TEST(RemoteMat, ThirdShidoIsHansokumake)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1378,7 +1378,7 @@ TEST(RemoteMat, DoubleHansokumake)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1437,7 +1437,7 @@ TEST(RemoteMat, DoubleGachi)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1481,7 +1481,7 @@ TEST(RemoteMat, Hansokumake)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1532,7 +1532,7 @@ TEST(RemoteMat, MedicalExaminiations)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -1612,7 +1612,7 @@ TEST(RemoteMat, MatchTime)
 		auto rules = std::make_shared<RuleSet>("Test" + std::to_string(time), time, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1661,7 +1661,7 @@ TEST(RemoteMat, GoldenScoreTime)
 		auto rules = std::make_shared<RuleSet>("Test" + std::to_string(time), 5, time, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1721,7 +1721,7 @@ TEST(RemoteMat, OsaekomiTime)
 			auto rules = std::make_shared<RuleSet>("Test", 100, 0, time, 20, false, false, false, 0);
 			master.GetDatabase().AddRuleSet(rules);
 
-			Match* match = new Match(j1, j2, nullptr);
+			auto match = std::make_shared<Match>(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -1774,7 +1774,7 @@ TEST(RemoteMat, OsaekomiWithWazaAriTime)
 			auto rules = std::make_shared<RuleSet>("Test", 100, 0, 100, time, false, false, false, 0);
 			master.GetDatabase().AddRuleSet(rules);
 
-			Match* match = new Match(j1, j2, nullptr);
+			auto match = std::make_shared<Match>(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -1825,7 +1825,7 @@ TEST(RemoteMat, OsaekomiUkeGainsIppon)
 		auto rules = std::make_shared<RuleSet>("Test", 100, 0, 100, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1873,7 +1873,7 @@ TEST(RemoteMat, OsaekomiToriGivesUp)
 		auto rules = std::make_shared<RuleSet>("Test", 100, 0, 100, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -1924,7 +1924,7 @@ TEST(RemoteMat, OsaekomiWithWazaAriRemoved)
 			auto rules = std::make_shared<RuleSet>("Test", 100, 0, time*2, time, false, false, false, 0);
 			master.GetDatabase().AddRuleSet(rules);
 
-			Match* match = new Match(j1, j2, nullptr);
+			auto match = std::make_shared<Match>(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -1992,7 +1992,7 @@ TEST(RemoteMat, OsaekomiTillEndDuringGoldenScore)
 			auto rules = std::make_shared<RuleSet>("Test", 5, 60, 2*time, time, false, false, false, 0);
 			master.GetDatabase().AddRuleSet(rules);
 
-			Match* match = new Match(j1, j2, nullptr);
+			auto match = std::make_shared<Match>(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -2047,7 +2047,7 @@ TEST(RemoteMat, Sonomama)
 		auto rules = std::make_shared<RuleSet>("Test", 500, 0, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2120,7 +2120,7 @@ TEST(RemoteMat, Tokeda)
 		auto rules = std::make_shared<RuleSet>("Test", 500, 0, 20, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2219,7 +2219,7 @@ TEST(RemoteMat, OsaekomiSwitch)
 		auto rules = std::make_shared<RuleSet>("Test", 500, 0, 25, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2294,7 +2294,7 @@ TEST(RemoteMat, MatchContinuesDuringOsaekomi)
 		auto rules = std::make_shared<RuleSet>("Test", 10, 0, 10, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2347,7 +2347,7 @@ TEST(RemoteMat, Yuko)
 		auto rules = std::make_shared<RuleSet>("Test", 60, 60, 30, 20, true, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2400,7 +2400,7 @@ TEST(RemoteMat, Yuko2)
 		auto rules = std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2461,7 +2461,7 @@ TEST(RemoteMat, ShidoForToriDuringOsaekomi)
 		auto rules = std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2517,7 +2517,7 @@ TEST(RemoteMat, MateDuringSonomama)
 		auto rules = std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2577,7 +2577,7 @@ TEST(RemoteMat, HansokumakeDuringOsaekomi)
 			auto rules = std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0);
 			master.GetDatabase().AddRuleSet(rules);
 
-			Match* match = new Match(j1, j2, nullptr);
+			auto match = std::make_shared<Match>(j1, j2, nullptr);
 			match->SetMatID(1);
 			match->SetRuleSet(rules);
 			master.GetTournament()->AddMatch(match);
@@ -2634,7 +2634,7 @@ TEST(RemoteMat, Koka)
 		auto rules = std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, true, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2684,7 +2684,7 @@ TEST(RemoteMat, Koka2)
 		auto rules = std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -2732,7 +2732,7 @@ TEST(RemoteMat, WazariAwaseteIppon)
 		master.GetDatabase().AddJudoka(j1);
 		master.GetDatabase().AddJudoka(j2);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		master.GetTournament()->AddMatch(match);
 
@@ -2795,7 +2795,7 @@ TEST(RemoteMat, GoldenScore)
 	auto rules = std::make_shared<RuleSet>("Test", 10, 10, 30, 20, false, false, true, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match* match = new Match(j1, j2, nullptr);
+	auto match = std::make_shared<Match>(j1, j2, nullptr);
 	match->SetMatID(1);
 	match->SetRuleSet(rules);
 	master.GetTournament()->AddMatch(match);
@@ -2849,7 +2849,7 @@ TEST(RemoteMat, GoldenScore2)
 	auto rules = std::make_shared<RuleSet>("Test", 10, 0, 30, 20, false, false, true, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match* match = new Match(j1, j2, nullptr);
+	auto match = std::make_shared<Match>(j1, j2, nullptr);
 	match->SetMatID(1);
 	match->SetRuleSet(rules);
 	master.GetTournament()->AddMatch(match);
@@ -2898,7 +2898,7 @@ TEST(RemoteMat, GoldenScoreResetTime)
 	auto rules = std::make_shared<RuleSet>("Test", 5, 5, 30, 20, false, false, true, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match* match = new Match(j1, j2, nullptr);
+	auto match = std::make_shared<Match>(j1, j2, nullptr);
 	match->SetMatID(1);
 	match->SetRuleSet(rules);
 	master.GetTournament()->AddMatch(match);
@@ -2945,7 +2945,7 @@ TEST(RemoteMat, GoldenScoreKeepsShidosAndMedicalExaminations)
 	auto rules = std::make_shared<RuleSet>("Test", 5, 5, 30, 20, false, false, true, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match* match = new Match(j1, j2, nullptr);
+	auto match = std::make_shared<Match>(j1, j2, nullptr);
 	match->SetMatID(1);
 	match->SetRuleSet(rules);
 	master.GetTournament()->AddMatch(match);
@@ -3001,7 +3001,7 @@ TEST(RemoteMat, Draw)
 	auto rules = std::make_shared<RuleSet>("Test", 5, 60, 30, 20, false, false, true, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match* match = new Match(j1, j2, nullptr);
+	auto match = std::make_shared<Match>(j1, j2, nullptr);
 	match->SetMatID(1);
 	match->SetRuleSet(rules);
 	master.GetTournament()->AddMatch(match);
@@ -3047,7 +3047,7 @@ TEST(RemoteMat, Draw2)
 	auto rules = std::make_shared<RuleSet>("Test", 5, 60, 30, 20, false, false, false, 0);
 	master.GetDatabase().AddRuleSet(rules);
 
-	Match* match = new Match(j1, j2, nullptr);
+	auto match = std::make_shared<Match>(j1, j2, nullptr);
 	match->SetMatID(1);
 	match->SetRuleSet(rules);
 	master.GetTournament()->AddMatch(match);
@@ -3102,7 +3102,7 @@ TEST(RemoteMat, Hantei)
 		auto rules = std::make_shared<RuleSet>("Test", 2, 60, 30, 20, false, false, false, 0);
 		master.GetDatabase().AddRuleSet(rules);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rules);
 		master.GetTournament()->AddMatch(match);
@@ -3156,7 +3156,7 @@ TEST(RemoteMat, BreakTime)
 		master.GetDatabase().AddJudoka(j2);
 		master.GetDatabase().AddJudoka(j3);
 
-		Match* match = new Match(j1, j2, nullptr);
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
 		match->SetMatID(1);
 		match->SetRuleSet(rule_set);
 		master.GetTournament()->AddMatch(match);
@@ -3172,7 +3172,7 @@ TEST(RemoteMat, BreakTime)
 		EXPECT_TRUE(m->EndMatch());
 		ZED::Core::Pause(100);
 
-		Match* match2 = new Match(j1, j3, nullptr);
+		auto match2 = std::make_shared<Match>(j1, j3, nullptr);
 		match2->SetMatID(1);
 		match2->SetRuleSet(rule_set);
 		master.GetTournament()->AddMatch(match2);

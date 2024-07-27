@@ -127,8 +127,8 @@ TEST(Mat, ForcedCloseDuringMatch)
 	tourney->AddParticipant(&j5);
 	tourney->AddParticipant(&j6);
 
-	MatchTable* m1 = new RoundRobin(0, 49);
-	MatchTable* m2 = new RoundRobin(50, 100);
+	auto m1 = std::make_shared<RoundRobin>(0, 49);
+	auto m2 = std::make_shared<RoundRobin>(50, 100);
 	m1->SetMatID(1);
 	m2->SetMatID(1);
 	tourney->AddMatchTable(m1);
@@ -170,9 +170,9 @@ TEST(Mat, StartMatch)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 		EXPECT_TRUE(m.AreFightersOnMat());
 
 		for (Fighter f = Fighter::White; f <= Fighter::Blue; f++)
@@ -210,11 +210,11 @@ TEST(Mat, CorrectWinner)
 			Application app;
 			Mat m(1);
 
-			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-			match.SetMatID(1);
-			match.SetRuleSet(std::make_shared<RuleSet>("Test", 2, 0, 30, 20, true, true, true, 0));
+			auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+			match->SetMatID(1);
+			match->SetRuleSet(std::make_shared<RuleSet>("Test", 2, 0, 30, 20, true, true, true, 0));
 
-			EXPECT_TRUE(m.StartMatch(&match));
+			EXPECT_TRUE(m.StartMatch(match));
 			EXPECT_TRUE(m.AreFightersOnMat());
 			m.Hajime();
 					
@@ -242,12 +242,12 @@ TEST(Mat, CorrectWinner)
 			EXPECT_TRUE(m.EndMatch());
 
 			if (i == 4)
-				EXPECT_EQ(match.GetResult().m_Winner, Winner::Draw);
+				EXPECT_EQ(match->GetResult().m_Winner, Winner::Draw);
 			else
-				EXPECT_EQ(match.GetResult().m_Winner, Fighter2Winner(f));
+				EXPECT_EQ(match->GetResult().m_Winner, Fighter2Winner(f));
 
 			if (i != 0 && i != 5)
-				EXPECT_EQ(match.GetResult().m_Time, 2000);
+				EXPECT_EQ(match->GetResult().m_Time, 2000);
 		}
 	}
 }
@@ -262,9 +262,9 @@ TEST(Mat, ForceClose)
 
 	ZED::Core::Pause(500);
 
-	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-	match.SetMatID(1);
-	EXPECT_TRUE(m.StartMatch(&match));
+	auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+	match->SetMatID(1);
+	EXPECT_TRUE(m.StartMatch(match));
 }
 
 
@@ -278,9 +278,9 @@ TEST(Mat, RemoveIpponShouldRecoverPreviousWazaari)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.AddWazaAri(f);
 		m.AddIppon(f);
@@ -312,9 +312,9 @@ TEST(Mat, RemoveIpponShouldRecoverPreviousWazaari2)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.AddWazaAri(f);
 		m.AddWazaAri(f);
@@ -346,9 +346,9 @@ TEST(Mat, RemoveWazariShouldRemoveIppon)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.AddWazaAri(f);
 		m.AddWazaAri(f);
@@ -380,9 +380,9 @@ TEST(Mat, Scores)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		EXPECT_EQ(m.GetScoreboard(f).m_Ippon, 0);
 		m.AddIppon(f);
@@ -414,9 +414,9 @@ TEST(Mat, Shido)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		EXPECT_EQ(m.GetScoreboard(f).m_Shido, 0);
@@ -469,10 +469,10 @@ TEST(Mat, ShidoDoesntEndGoldenScore)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 2, 60, 30, 20, false, false, true, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 2, 60, 30, 20, false, false, true, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 
@@ -507,11 +507,11 @@ TEST(Mat, ScoreEndsGoldenScore)
 			Application app;
 			Mat m(1);
 
-			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-			match.SetMatID(1);
-			match.SetRuleSet(std::make_shared<RuleSet>("Test", 2, 60, 30, 20, true, true, true, 0));
+			auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+			match->SetMatID(1);
+			match->SetRuleSet(std::make_shared<RuleSet>("Test", 2, 60, 30, 20, true, true, true, 0));
 
-			EXPECT_TRUE(m.StartMatch(&match));
+			EXPECT_TRUE(m.StartMatch(match));
 			m.Hajime();
 
 			ZED::Core::Pause(2500);
@@ -530,7 +530,7 @@ TEST(Mat, ScoreEndsGoldenScore)
 
 			EXPECT_FALSE(m.IsHajime());
 			EXPECT_TRUE(m.EndMatch());
-			EXPECT_EQ(match.GetResult().m_Winner, Fighter2Winner(f));
+			EXPECT_EQ(match->GetResult().m_Winner, Fighter2Winner(f));
 		}
 	}
 }
@@ -546,9 +546,9 @@ TEST(Mat, ShidosResultInIndirectHansokumake)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		
 		m.AddShido(f);
@@ -557,7 +557,7 @@ TEST(Mat, ShidosResultInIndirectHansokumake)
 
 		EXPECT_TRUE(m.EndMatch());
 
-		auto& events = match.GetLog().GetEvents();
+		auto& events = match->GetLog().GetEvents();
 
 		ASSERT_TRUE(events.size() >= 3);
 		EXPECT_TRUE(events[events.size() - 3].m_BiasedEvent == MatchLog::BiasedEvent::AddHansokuMake_Indirect);
@@ -579,9 +579,9 @@ TEST(Mat, HansokumakeResultsInDirectHansokumake)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		m.AddHansokuMake(f);
@@ -589,7 +589,7 @@ TEST(Mat, HansokumakeResultsInDirectHansokumake)
 
 		EXPECT_TRUE(m.EndMatch());
 
-		auto& events = match.GetLog().GetEvents();
+		auto& events = match->GetLog().GetEvents();
 
 		EXPECT_TRUE(events[events.size() - 4].m_BiasedEvent == MatchLog::BiasedEvent::AddHansokuMake_Direct);
 		EXPECT_EQ(events[events.size() - 4].m_Group, f);
@@ -613,9 +613,9 @@ TEST(Mat, DirectHansokumakeDoesNotConcludeMatch)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		m.AddHansokuMake(f);
@@ -636,9 +636,9 @@ TEST(Mat, DirectHansokumakeAndDisqDoesConcludeMatch)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		m.AddHansokuMake(f);
@@ -660,9 +660,9 @@ TEST(Mat, DisqualificationCanBeRemoved)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		m.AddHansokuMake(f);
@@ -698,9 +698,9 @@ TEST(Mat, Gachi)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.AddGachi(f);
 
@@ -720,9 +720,9 @@ TEST(Mat, GachiResultsInMate)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.AddGachi(f);
 
@@ -746,9 +746,9 @@ TEST(Mat, DoubleIppon)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.AddIppon(f);
 		m.AddIppon(!f);
@@ -780,9 +780,9 @@ TEST(Mat, DoubleIpponFightersKeepWazaari)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.AddWazaAri(f);
 		m.AddWazaAri(!f);
@@ -818,11 +818,11 @@ TEST(Mat, DoubleIpponDuringGoldenScore)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 1, 60, 30, 20, false, false, false, 0));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 1, 60, 30, 20, false, false, false, 0));
 
-		EXPECT_TRUE(m.StartMatch(&match));
+		EXPECT_TRUE(m.StartMatch(match));
 		
 		m.Hajime();
 		ZED::Core::Pause(2000);
@@ -856,11 +856,11 @@ TEST(Mat, DoubleIpponDuringGoldenScoreFightersKeepWazaari)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 1, 60, 30, 20, false, false, false, 0));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 1, 60, 30, 20, false, false, false, 0));
 
-		EXPECT_TRUE(m.StartMatch(&match));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		m.AddWazaAri(f);
@@ -899,9 +899,9 @@ TEST(Mat, IpponResultsInMate)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.AddIppon(f);
 
@@ -923,9 +923,9 @@ TEST(Mat, HansokumakeResultsInMate)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.AddHansokuMake(f);
 
@@ -951,9 +951,9 @@ TEST(Mat, ThirdShidoIsHansokumake)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		m.AddShido(f);
@@ -983,9 +983,9 @@ TEST(Mat, DoubleHansokumake)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		m.AddShido(f);
@@ -1005,8 +1005,8 @@ TEST(Mat, DoubleHansokumake)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_EQ(match.GetResult().m_Winner, Judoboard::Winner::Draw);
-		EXPECT_EQ((int)match.GetResult().m_Score, 0);
+		EXPECT_EQ(match->GetResult().m_Winner, Judoboard::Winner::Draw);
+		EXPECT_EQ((int)match->GetResult().m_Score, 0);
 	}
 }
 
@@ -1025,9 +1025,9 @@ TEST(Mat, DoubleGachi)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		m.AddGachi(f);
@@ -1036,8 +1036,8 @@ TEST(Mat, DoubleGachi)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetResult().m_Winner == Judoboard::Winner::Draw);
-		EXPECT_TRUE((int)match.GetResult().m_Score == 0);
+		EXPECT_TRUE(match->GetResult().m_Winner == Judoboard::Winner::Draw);
+		EXPECT_TRUE((int)match->GetResult().m_Score == 0);
 	}
 }
 
@@ -1051,9 +1051,9 @@ TEST(Mat, Hansokumake)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
@@ -1088,9 +1088,9 @@ TEST(Mat, HansokumakeRemove)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		EXPECT_FALSE(m.GetScoreboard(f).m_HansokuMake);
@@ -1125,9 +1125,9 @@ TEST(Mat, HansokumakeRemoveWithWazaari)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.AddWazaAri(!f);
 
@@ -1164,9 +1164,9 @@ TEST(Mat, MedicalExaminiations)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		EXPECT_TRUE(m.GetScoreboard(f).m_MedicalExamination == 0);
@@ -1208,10 +1208,10 @@ TEST(Mat, MatchTime)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", time, 60, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", time, 60, 30, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 
@@ -1238,10 +1238,10 @@ TEST(Mat, MatchTimeCorrectAfterOsaekomi)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", time, 60, 20, 10, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", time, 60, 20, 10, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 
@@ -1255,7 +1255,7 @@ TEST(Mat, MatchTimeCorrectAfterOsaekomi)
 		EXPECT_TRUE(m.IsOutOfTime());
 		EXPECT_EQ(m.GetOsaekomiList().size(), 1);
 		EXPECT_TRUE(m.EndMatch());
-		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time-1 + 20)*1000), 100);
+		EXPECT_LE( std::abs((int)match->GetResult().m_Time - (time-1 + 20)*1000), 100);
 	}
 }
 
@@ -1271,10 +1271,10 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", time, time, 20, 10, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", time, time, 20, 10, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 
@@ -1294,7 +1294,7 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi)
 		EXPECT_TRUE(m.IsOutOfTime());
 		EXPECT_EQ(m.GetOsaekomiList().size(), 1);
 		EXPECT_TRUE(m.EndMatch());
-		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time + time-1 + 20)*1000), 100);
+		EXPECT_LE( std::abs((int)match->GetResult().m_Time - (time + time-1 + 20)*1000), 100);
 	}
 }
 
@@ -1310,10 +1310,10 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi2)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", time, time, 20, 10, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", time, time, 20, 10, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 
@@ -1338,7 +1338,7 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi2)
 		EXPECT_TRUE(m.IsOutOfTime());
 		EXPECT_EQ(m.GetOsaekomiList().size(), 2);
 		EXPECT_TRUE(m.EndMatch());
-		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time-2 + 9 + time-1 + 20)*1000), 100);
+		EXPECT_LE( std::abs((int)match->GetResult().m_Time - (time-2 + 9 + time-1 + 20)*1000), 100);
 	}
 }
 
@@ -1353,10 +1353,10 @@ TEST(Mat, GoldenScoreTime)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 2, time, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 2, time, 30, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 
@@ -1389,10 +1389,10 @@ TEST(Mat, OsaekomiTime)
 			Mat m(1);
 			ZED::Core::Pause(500);
 
-			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-			match.SetMatID(1);
-			match.SetRuleSet(std::make_shared<RuleSet>("Test", 100, 0, time, 20, false, false, false, 0));
-			EXPECT_TRUE(m.StartMatch(&match));
+			auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+			match->SetMatID(1);
+			match->SetRuleSet(std::make_shared<RuleSet>("Test", 100, 0, time, 20, false, false, false, 0));
+			EXPECT_TRUE(m.StartMatch(match));
 			ZED::Core::Pause(100);
 
 			m.Hajime();
@@ -1427,10 +1427,10 @@ TEST(Mat, OsaekomiWithWazaAriTime)
 			Application app;
 			Mat m(1);
 
-			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-			match.SetMatID(1);
-			match.SetRuleSet(std::make_shared<RuleSet>("Test", 100, 0, 100, time, false, false, false, 0));
-			EXPECT_TRUE(m.StartMatch(&match));
+			auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+			match->SetMatID(1);
+			match->SetRuleSet(std::make_shared<RuleSet>("Test", 100, 0, 100, time, false, false, false, 0));
+			EXPECT_TRUE(m.StartMatch(match));
 
 			m.Hajime();
 			m.AddWazaAri(f);
@@ -1462,10 +1462,10 @@ TEST(Mat, OsaekomiUkeGainsIppon)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 100, 0, 100, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 100, 0, 100, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -1478,8 +1478,8 @@ TEST(Mat, OsaekomiUkeGainsIppon)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetResult().m_Winner == !f);
-		EXPECT_TRUE(match.GetResult().m_Score  == Match::Score::Ippon);
+		EXPECT_TRUE(match->GetResult().m_Winner == !f);
+		EXPECT_TRUE(match->GetResult().m_Score  == Match::Score::Ippon);
 	}
 }
 
@@ -1494,10 +1494,10 @@ TEST(Mat, OsaekomiToriGivesUp)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 100, 0, 100, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 100, 0, 100, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -1510,8 +1510,8 @@ TEST(Mat, OsaekomiToriGivesUp)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_EQ(match.GetResult().m_Winner, !f);
-		EXPECT_EQ(match.GetResult().m_Score, Match::Score::Ippon);
+		EXPECT_EQ(match->GetResult().m_Winner, !f);
+		EXPECT_EQ(match->GetResult().m_Score, Match::Score::Ippon);
 	}
 }
 
@@ -1528,12 +1528,12 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 			Application app;
 			Mat m(1);
 
-			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-			match.SetMatID(1);
-			match.SetRuleSet(std::make_shared<RuleSet>("Test", 100, 0, time*2, time, false, false, false, 0));
+			auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+			match->SetMatID(1);
+			match->SetRuleSet(std::make_shared<RuleSet>("Test", 100, 0, time*2, time, false, false, false, 0));
 
 			ZED::Core::Pause(500);
-			EXPECT_TRUE(m.StartMatch(&match));
+			EXPECT_TRUE(m.StartMatch(match));
 			ZED::Core::Pause(100);
 
 			m.Hajime();
@@ -1583,10 +1583,10 @@ TEST(Mat, OsaekomiTillEndDuringGoldenScore)
 			Application app;
 			Mat m(1);
 
-			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-			match.SetMatID(1);
-			match.SetRuleSet(std::make_shared<RuleSet>("Test", 1, 60, 2*time, time, false, false, false, 0));
-			EXPECT_TRUE(m.StartMatch(&match));
+			auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+			match->SetMatID(1);
+			match->SetRuleSet(std::make_shared<RuleSet>("Test", 1, 60, 2*time, time, false, false, false, 0));
+			EXPECT_TRUE(m.StartMatch(match));
 
 			m.Hajime();
 			ZED::Core::Pause(1500);
@@ -1621,10 +1621,10 @@ TEST(Mat, Sonomama)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 500, 0, 15, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 500, 0, 15, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -1677,10 +1677,10 @@ TEST(Mat, Tokeda)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 500, 0, 20, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 500, 0, 20, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -1737,10 +1737,10 @@ TEST(Mat, TokedaAfterOsaekomi)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 10, 0, 2, 2, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 10, 0, 2, 2, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 
@@ -1791,10 +1791,10 @@ TEST(Mat, TokedaAfterOsaekomi_Wazaari)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 10, 0, 5, 2, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 10, 0, 5, 2, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 
@@ -1847,10 +1847,10 @@ TEST(Mat, TokedaAfterOsaekomi_WazaariRemoved)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 10, 0, 4, 2, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 10, 0, 4, 2, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 
@@ -1893,10 +1893,10 @@ TEST(Mat, TokedaAfterMate_OutOfTime)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 1, 0, 2, 2, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 1, 0, 2, 2, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 
@@ -1938,10 +1938,10 @@ TEST(Mat, OsaekomiTokedaOsaekomi)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 500, 0, 10, 10, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 500, 0, 10, 10, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -1980,10 +1980,10 @@ TEST(Mat, TokedaDuringSonomama)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 500, 0, 10, 10, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 500, 0, 10, 10, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -2016,10 +2016,10 @@ TEST(Mat, OsaekomiAfterMate)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 2, 0, 10, 5, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 2, 0, 10, 5, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 
@@ -2061,10 +2061,10 @@ TEST(Mat, OsaekomiSwitch)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 500, 0, 12, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 500, 0, 12, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -2102,10 +2102,10 @@ TEST(Mat, OsaekomiSwitchDuringSonomama)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 500, 0, 5, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 500, 0, 5, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -2140,10 +2140,10 @@ TEST(Mat, MatchContinuesDuringOsaekomi)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 10, 0, 10, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 10, 0, 10, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		ZED::Core::Pause(8 * 1000);
@@ -2175,10 +2175,10 @@ TEST(Mat, Yuko)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, true, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, true, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		EXPECT_EQ(m.GetScoreboard(f).m_Yuko, 0);
@@ -2207,10 +2207,10 @@ TEST(Mat, Yuko2)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		EXPECT_EQ(m.GetScoreboard(f).m_Yuko, 0);
@@ -2251,10 +2251,10 @@ TEST(Mat, ShidoForToriDuringOsaekomi)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		m.Osaekomi(f);
@@ -2291,10 +2291,10 @@ TEST(Mat, MateDuringSonomama)
 
 		EXPECT_TRUE(m.Open());
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		m.Osaekomi(osaekomi_holder);
@@ -2334,10 +2334,10 @@ TEST(Mat, HansokumakeDuringOsaekomi)
 
 			EXPECT_TRUE(m.Open());
 
-			Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-			match.SetMatID(1);
-			match.SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0));
-			EXPECT_TRUE(m.StartMatch(&match));
+			auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+			match->SetMatID(1);
+			match->SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0));
+			EXPECT_TRUE(m.StartMatch(match));
 
 			m.Hajime();
 			m.Osaekomi(osaekomi_holder);
@@ -2358,8 +2358,8 @@ TEST(Mat, HansokumakeDuringOsaekomi)
 
 
 			EXPECT_TRUE(m.EndMatch());
-			EXPECT_TRUE(match.GetResult().m_Winner == !hansokumake_committer);
-			EXPECT_TRUE(match.GetResult().m_Score  == Match::Score::Ippon);
+			EXPECT_TRUE(match->GetResult().m_Winner == !hansokumake_committer);
+			EXPECT_TRUE(match->GetResult().m_Score  == Match::Score::Ippon);
 		}
 	}
 }
@@ -2374,10 +2374,10 @@ TEST(Mat, Koka)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, true, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, true, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		EXPECT_TRUE(m.GetScoreboard(f).m_Koka == 0);
@@ -2406,10 +2406,10 @@ TEST(Mat, Koka2)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 60, 60, 30, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 
 		EXPECT_TRUE(m.GetScoreboard(f).m_Koka == 0);
@@ -2440,9 +2440,9 @@ TEST(Mat, WazariAwaseteIppon)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		EXPECT_TRUE(m.StartMatch(match));
 
 			
 		EXPECT_TRUE(m.GetScoreboard(f).m_Ippon == 0);
@@ -2482,10 +2482,10 @@ TEST(Mat, GoldenScore_Revoke)
 	Application app;
 	Mat m(1);
 
-	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-	match.SetMatID(1);
-	match.SetRuleSet(std::make_shared<RuleSet>("Test", 2, 10, 30, 20, false, false, true, 0));
-	EXPECT_TRUE(m.StartMatch(&match));
+	auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+	match->SetMatID(1);
+	match->SetRuleSet(std::make_shared<RuleSet>("Test", 2, 10, 30, 20, false, false, true, 0));
+	EXPECT_TRUE(m.StartMatch(match));
 
 	m.Hajime();
 
@@ -2517,10 +2517,10 @@ TEST(Mat, GoldenScore)
 	Application app;
 	Mat m(1);
 
-	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-	match.SetMatID(1);
-	match.SetRuleSet(std::make_shared<RuleSet>("Test", 2, 10, 30, 20, false, false, true, 0));
-	EXPECT_TRUE(m.StartMatch(&match));
+	auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+	match->SetMatID(1);
+	match->SetRuleSet(std::make_shared<RuleSet>("Test", 2, 10, 30, 20, false, false, true, 0));
+	EXPECT_TRUE(m.StartMatch(match));
 
 	m.Hajime();
 
@@ -2555,10 +2555,10 @@ TEST(Mat, GoldenScore2)
 	Application app;
 	Mat m(1);
 
-	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-	match.SetMatID(1);
-	match.SetRuleSet(std::make_shared<RuleSet>("Test", 2, 0, 30, 20, false, false, true, 0));
-	EXPECT_TRUE(m.StartMatch(&match));
+	auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+	match->SetMatID(1);
+	match->SetRuleSet(std::make_shared<RuleSet>("Test", 2, 0, 30, 20, false, false, true, 0));
+	EXPECT_TRUE(m.StartMatch(match));
 
 	m.Hajime();
 
@@ -2592,10 +2592,10 @@ TEST(Mat, GoldenScoreResetTime)
 	Application app;
 	Mat m(1);
 
-	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-	match.SetMatID(1);
-	match.SetRuleSet(std::make_shared<RuleSet>("Test", 5, 5, 30, 20, false, false, true, 0));
-	EXPECT_TRUE(m.StartMatch(&match));
+	auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+	match->SetMatID(1);
+	match->SetRuleSet(std::make_shared<RuleSet>("Test", 5, 5, 30, 20, false, false, true, 0));
+	EXPECT_TRUE(m.StartMatch(match));
 
 	m.Hajime();
 
@@ -2624,10 +2624,10 @@ TEST(Mat, GoldenScoreKeepsShidosAndMedicalExaminations)
 
 	ZED::Core::Pause(100);
 
-	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-	match.SetMatID(1);
-	match.SetRuleSet(std::make_shared<RuleSet>("Test", 5, 5, 30, 20, false, false, true, 0));
-	EXPECT_TRUE(m.StartMatch(&match));
+	auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+	match->SetMatID(1);
+	match->SetRuleSet(std::make_shared<RuleSet>("Test", 5, 5, 30, 20, false, false, true, 0));
+	EXPECT_TRUE(m.StartMatch(match));
 
 	m.Hajime();
 
@@ -2663,10 +2663,10 @@ TEST(Mat, Draw)
 	Application app;
 	Mat m(1);
 
-	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-	match.SetMatID(1);
-	match.SetRuleSet(std::make_shared<RuleSet>("Test", 10, 60, 30, 20, false, false, true, 0));
-	EXPECT_TRUE(m.StartMatch(&match));
+	auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+	match->SetMatID(1);
+	match->SetRuleSet(std::make_shared<RuleSet>("Test", 10, 60, 30, 20, false, false, true, 0));
+	EXPECT_TRUE(m.StartMatch(match));
 
 	m.Hajime();
 
@@ -2695,10 +2695,10 @@ TEST(Mat, Draw2)
 	Application app;
 	Mat m(1, &app);
 
-	Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-	match.SetMatID(1);
-	match.SetRuleSet(std::make_shared<RuleSet>("Test", 10, 60, 30, 20, false, false, false, 0));
-	EXPECT_TRUE(m.StartMatch(&match));
+	auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+	match->SetMatID(1);
+	match->SetRuleSet(std::make_shared<RuleSet>("Test", 10, 60, 30, 20, false, false, false, 0));
+	EXPECT_TRUE(m.StartMatch(match));
 	EXPECT_TRUE(m.AreFightersOnMat());
 	ZED::Core::Pause(1000);
 
@@ -2734,10 +2734,10 @@ TEST(Mat, Hantei)
 		Application app;
 		Mat m(1);
 
-		Match match(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(std::make_shared<RuleSet>("Test", 2, 60, 30, 20, false, false, false, 0));
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(new Judoka("White", "LastnameW"), new Judoka("Blue", "LastnameB"), nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(std::make_shared<RuleSet>("Test", 2, 60, 30, 20, false, false, false, 0));
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 
@@ -2751,9 +2751,9 @@ TEST(Mat, Hantei)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		EXPECT_TRUE(match.GetResult().m_Winner == Fighter2Winner(f));
-		EXPECT_TRUE(match.GetResult().m_Score  == Match::Score::Hantei);
-		EXPECT_TRUE(match.GetResult().m_Score  == (Match::Score)1);
+		EXPECT_TRUE(match->GetResult().m_Winner == Fighter2Winner(f));
+		EXPECT_TRUE(match->GetResult().m_Score  == Match::Score::Hantei);
+		EXPECT_TRUE(match->GetResult().m_Score  == (Match::Score)1);
 	}
 }
 
@@ -2774,10 +2774,10 @@ TEST(Mat, BreakTime)
 		Judoka* j2 = new Judoka("White", "LastnameW");
 		Judoka* j3 = new Judoka("Blue",  "LastnameB");
 
-		Match match(j1, j2, nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(rule_set);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(rule_set);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		m.AddIppon((Fighter)(rand()%2));
@@ -2785,18 +2785,18 @@ TEST(Mat, BreakTime)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		Match match2(j1, j3, nullptr, 1);
-		match2.SetRuleSet(rule_set);
+		auto match2 = std::make_shared<Match>(j1, j3, nullptr, 1);
+		match2->SetRuleSet(rule_set);
 
 		for (int k = 0; k < time-2; k++)
 		{
-			EXPECT_FALSE(m.StartMatch(&match2));
+			EXPECT_FALSE(m.StartMatch(match2));
 			ZED::Core::Pause(1000);
 		}
 
 		ZED::Core::Pause(3800);
 
-		EXPECT_TRUE(m.StartMatch(&match2));
+		EXPECT_TRUE(m.StartMatch(match2));
 
 		delete j1;
 		delete j2;
@@ -2820,10 +2820,10 @@ TEST(Mat, BreakTime_Extended)
 		Judoka* j2 = new Judoka("White", "LastnameW");
 		Judoka* j3 = new Judoka("Blue",  "LastnameB");
 
-		Match match(j1, j2, nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(rule_set);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(rule_set);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		ZED::Core::Pause(10 * 1000);
@@ -2832,18 +2832,18 @@ TEST(Mat, BreakTime_Extended)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		Match match2(j1, j3, nullptr, 1);
-		match2.SetRuleSet(rule_set);
+		auto match2 = std::make_shared<Match>(j1, j3, nullptr, 1);
+		match2->SetRuleSet(rule_set);
 
 		for (int k = 0; k < 4; k++)
 		{
-			EXPECT_FALSE(m.StartMatch(&match2));
+			EXPECT_FALSE(m.StartMatch(match2));
 			ZED::Core::Pause(1000);
 		}
 
 		ZED::Core::Pause(3000);
 
-		EXPECT_TRUE(m.StartMatch(&match2));
+		EXPECT_TRUE(m.StartMatch(match2));
 
 		delete j1;
 		delete j2;
@@ -2867,10 +2867,10 @@ TEST(Mat, BreakTime_Extended2)
 		Judoka* j2 = new Judoka("White", "LastnameW");
 		Judoka* j3 = new Judoka("Blue",  "LastnameB");
 
-		Match match(j1, j2, nullptr);
-		match.SetMatID(1);
-		match.SetRuleSet(rule_set);
-		EXPECT_TRUE(m.StartMatch(&match));
+		auto match = std::make_shared<Match>(j1, j2, nullptr);
+		match->SetMatID(1);
+		match->SetRuleSet(rule_set);
+		EXPECT_TRUE(m.StartMatch(match));
 
 		m.Hajime();
 		ZED::Core::Pause(10 * 1000);
@@ -2879,18 +2879,18 @@ TEST(Mat, BreakTime_Extended2)
 		EXPECT_TRUE(m.HasConcluded());
 		EXPECT_TRUE(m.EndMatch());
 
-		Match match2(j1, j3, nullptr, 1);
-		match2.SetRuleSet(rule_set);
+		auto match2 = std::make_shared<Match>(j1, j3, nullptr, 1);
+		match2->SetRuleSet(rule_set);
 
 		for (int k = 0; k < 9; k++)
 		{
-			EXPECT_FALSE(m.StartMatch(&match2));
+			EXPECT_FALSE(m.StartMatch(match2));
 			ZED::Core::Pause(1000);
 		}
 
 		ZED::Core::Pause(3000);
 
-		EXPECT_TRUE(m.StartMatch(&match2));
+		EXPECT_TRUE(m.StartMatch(match2));
 
 		delete j1;
 		delete j2;

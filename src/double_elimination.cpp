@@ -118,7 +118,7 @@ size_t DoubleElimination::GetMaxStartPositions() const
 
 
 
-Match* DoubleElimination::FindMatch(const UUID& UUID) const
+std::shared_ptr<Match> DoubleElimination::FindMatch(const UUID& UUID) const
 {
 	auto match = m_WinnerBracket.FindMatch(UUID);
 	if (!match)
@@ -257,7 +257,7 @@ void DoubleElimination::BuildSchedule()
 
 
 
-void DoubleElimination::AddMatchToWinnerBracket(Match* NewMatch)
+void DoubleElimination::AddMatchToWinnerBracket(std::shared_ptr<Match> NewMatch)
 {
 	if (!NewMatch)
 		return;
@@ -273,7 +273,7 @@ void DoubleElimination::AddMatchToWinnerBracket(Match* NewMatch)
 
 
 
-void DoubleElimination::AddMatchToLoserBracket(Match* NewMatch)
+void DoubleElimination::AddMatchToLoserBracket(std::shared_ptr<Match> NewMatch)
 {
 	if (!NewMatch)
 		return;

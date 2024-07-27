@@ -16,9 +16,9 @@ using namespace Judoboard;
 
 
 
-MatchTable* MatchTable::CreateMatchTable(const YAML::Node& Yaml, const ITournament* Tournament)
+std::shared_ptr<MatchTable> MatchTable::CreateMatchTable(const YAML::Node& Yaml, const ITournament* Tournament)
 {
-	MatchTable* new_table = nullptr;
+	std::shared_ptr<MatchTable> new_table;
 
 	if (!Yaml.IsMap() || !Yaml["type"])
 		return new_table;
@@ -26,19 +26,19 @@ MatchTable* MatchTable::CreateMatchTable(const YAML::Node& Yaml, const ITourname
 	switch ((MatchTable::Type)Yaml["type"].as<int>())
 	{
 	case MatchTable::Type::RoundRobin:
-		new_table = new RoundRobin(Yaml, Tournament);
+		new_table = std::make_shared<RoundRobin>(Yaml, Tournament);
 		break;
 	case MatchTable::Type::Custom:
-		new_table = new CustomTable(Yaml, Tournament);
+		new_table = std::make_shared<CustomTable>(Yaml, Tournament);
 		break;
 	case MatchTable::Type::SingleElimination:
-		new_table = new SingleElimination(Yaml, Tournament);
+		new_table = std::make_shared<SingleElimination>(Yaml, Tournament);
 		break;
 	case MatchTable::Type::Pool:
-		new_table = new Pool(Yaml, Tournament);
+		new_table = std::make_shared<Pool>(Yaml, Tournament);
 		break;
 	case MatchTable::Type::DoubleElimination:
-		new_table = new DoubleElimination(Yaml, Tournament);
+		new_table = std::make_shared<DoubleElimination>(Yaml, Tournament);
 		break;
 	}
 
@@ -70,7 +70,7 @@ bool MatchTable::HasConcluded() const
 
 
 
-Match* MatchTable::FindMatch(const UUID& UUID) const
+std::shared_ptr<Match> MatchTable::FindMatch(const UUID& UUID) const
 {
 	auto schedule = GetSchedule();
 	for (auto match : schedule)
@@ -170,7 +170,7 @@ Status MatchTable::GetStatus() const
 
 
 
-bool MatchTable::AddMatch(Match* NewMatch)
+bool MatchTable::AddMatch(std::shared_ptr<Match> NewMatch)
 {
 	if (!NewMatch)
 		return false;
@@ -282,9 +282,9 @@ std::string MatchTable::GetDescription() const
 
 
 
-const std::vector<const Match*> MatchTable::FindMatches(const Judoka& Fighter1, const Judoka& Fighter2) const
+const std::vector<std::shared_ptr<const Match>> MatchTable::FindMatches(const Judoka& Fighter1, const Judoka& Fighter2) const
 {
-	std::vector<const Match*> ret;
+	std::vector<std::shared_ptr<const Match>> ret;
 
 	auto schedule = GetSchedule();
 
@@ -413,7 +413,7 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, co
 	if (Yaml["matches"] && Yaml["matches"].IsSequence())
 	{
 		for (const auto& node : Yaml["matches"])
-			m_Schedule.emplace_back(new Match(node, this, Tournament));
+			m_Schedule.emplace_back(std::make_shared<Match>(node, this, Tournament));
 	}
 
 	if (Yaml["filter"] && Yaml["filter"].IsMap())
@@ -674,7 +674,7 @@ const std::string MatchTable::GetHTMLTop() const
 
 
 
-Match* MatchTable::AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosition)
+std::shared_ptr<Match> MatchTable::AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosition)
 {
 	if (!GetJudokaByStartPosition(WhiteStartPosition) || !GetJudokaByStartPosition(BlueStartPosition))
 	{
@@ -687,9 +687,9 @@ Match* MatchTable::AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosit
 
 
 
-Match* MatchTable::CreateAutoMatch(const DependentJudoka& White, const DependentJudoka& Blue)
+std::shared_ptr<Match> MatchTable::CreateAutoMatch(const DependentJudoka& White, const DependentJudoka& Blue)
 {
-	Match* new_match = new Match(White, Blue, GetTournament(), GetMatID());
+	auto new_match = std::make_shared<Match>(White, Blue, GetTournament(), GetMatID());
 	new_match->SetMatchTable(this);
 	m_Schedule.emplace_back(new_match);
 	return new_match;
@@ -697,9 +697,9 @@ Match* MatchTable::CreateAutoMatch(const DependentJudoka& White, const Dependent
 
 
 
-Match* MatchTable::AddMatchForWinners(Match* Match1, Match* Match2)
+std::shared_ptr<Match> MatchTable::AddMatchForWinners(std::shared_ptr<Match> Match1, std::shared_ptr<Match> Match2)
 {
-	Match* new_match = CreateAutoMatch(nullptr, nullptr);
+	auto new_match = CreateAutoMatch(nullptr, nullptr);
 
 	if (!new_match)
 		return nullptr;
@@ -723,9 +723,9 @@ void MatchTable::AddMatchesForBestOfThree()
 	{
 		auto match1 = schedule_copy[i];
 
-		auto match2 = new Match(*match1);
+		auto match2 = std::make_shared<Match>(*match1);
 		match2->SwapFighters();
-		auto match3 = new Match(*match1);
+		auto match3 = std::make_shared<Match>(*match1);
 		match3->SetBestOfThree(match1, match2);
 
 		m_Schedule.emplace_back(match1);

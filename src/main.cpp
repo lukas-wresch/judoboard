@@ -138,7 +138,7 @@ int main(int argc, char** argv)
 			{
 				Judoboard::Judoka* white = new Judoboard::Judoka("Max" + std::to_string(2 * i + 1), "Mustermann");
 				Judoboard::Judoka* blue  = new Judoboard::Judoka("Max" + std::to_string(2 * i + 2), "Mustermann");
-				Judoboard::Match* match  = new Judoboard::Match(white, blue, &tournament1, (i % 2) + 1);
+				auto match = std::make_shared<Judoboard::Match>(white, blue, &tournament1, (i % 2) + 1);
 				tournament1.AddMatch(match);
 			}
 			for (auto table : tournament1.GetMatchTables())
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 			{
 				Judoboard::Judoka* white = new Judoboard::Judoka("Max" + std::to_string(2 * i + 1), "Mustermann");
 				Judoboard::Judoka* blue  = new Judoboard::Judoka("Max" + std::to_string(2 * i + 2), "Mustermann");
-				Judoboard::Match* match  = new Judoboard::Match(white, blue, &tournament2, (i % 2) + 1);
+				auto match = std::make_shared<Judoboard::Match>(white, blue, &tournament2, (i % 2) + 1);
 				tournament2.AddMatch(match);
 			}
 			for (auto table : tournament2.GetMatchTables())
@@ -204,15 +204,15 @@ int main(int argc, char** argv)
 		srand(ZED::Core::CurrentTimestamp());
 		auto j1 = CreateRandomJudoka(&app.GetDatabase());
 		auto j2 = CreateRandomJudoka(&app.GetDatabase());
-		Judoboard::Match match(&j1, &j2, nullptr, mat->GetMatID());
+		auto match = std::make_shared<Judoboard::Match>(&j1, &j2, nullptr, mat->GetMatID());
 		auto rules = std::make_shared<Judoboard::RuleSet>("ScreenTest", 1, 3*60, 20, 10, false, false);
 		auto age_group = std::make_shared<Judoboard::AgeGroup>("U18", 15, 18, rules);
-		match.SetRuleSet(rules);
+		match->SetRuleSet(rules);
 		Judoboard::RoundRobin* table = new Judoboard::RoundRobin(new Judoboard::Weightclass(10, 100));
 		table->SetAgeGroup(age_group);
-		match.SetMatchTable(table);
+		match->SetMatchTable(table);
 
-		mat->StartMatch(&match);
+		mat->StartMatch(match);
 		ZED::Core::Pause(500);
 
 		mat->Hajime();

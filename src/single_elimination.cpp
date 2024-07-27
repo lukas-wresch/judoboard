@@ -105,8 +105,6 @@ bool SingleElimination::DeleteMatch(const UUID& UUID)
 	{
 		if ((*it)->GetUUID() == UUID)
 		{
-			if (!IsSubMatchTable())
-				delete *it;
 			m_ThirdPlaceMatches.erase(it);
 			success = true;
 		}
@@ -116,8 +114,6 @@ bool SingleElimination::DeleteMatch(const UUID& UUID)
 	{
 		if ((*it)->GetUUID() == UUID)
 		{
-			if (!IsSubMatchTable())
-				delete *it;
 			m_FifthPlaceMatches.erase(it);
 			success = true;
 		}
@@ -128,12 +124,12 @@ bool SingleElimination::DeleteMatch(const UUID& UUID)
 
 
 
-const std::vector<Match*> SingleElimination::GetSchedule() const
+const std::vector<std::shared_ptr<Match>> SingleElimination::GetSchedule() const
 {
-	std::vector<Match*> ret = MatchTable::GetSchedule();
+	std::vector<std::shared_ptr<Match>> ret = MatchTable::GetSchedule();
 
 	//Move last match to the end
-	Match* final_match = nullptr;
+	std::shared_ptr<Match> final_match;
 	if (!ret.empty())
 	{
 		final_match = ret.back();
@@ -204,8 +200,8 @@ void SingleElimination::GenerateSchedule()
 	const auto max_start_pos = GetMaxStartPositions();
 	
 	//Round 1
-	std::vector<Match*> lastRound;
-	std::vector<Match*> nextRound;
+	std::vector<std::shared_ptr<Match>> lastRound;
+	std::vector<std::shared_ptr<Match>> nextRound;
 
 	auto create_pair = [&](int i) {
 		auto new_match = CreateAutoMatch(GetFilter()->GetJudokaByStartPosition(i-1),
@@ -327,9 +323,9 @@ void SingleElimination::GenerateSchedule()
 		//third_place->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
 		//third_place->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
 
-		Match* third_place = new Match(DependentJudoka(DependencyType::TakeLoser, *match1),
-									   DependentJudoka(DependencyType::TakeLoser, *match2),
-									   GetTournament(), GetMatID());
+		auto third_place = std::make_shared<Match>(DependentJudoka(DependencyType::TakeLoser, match1),
+												   DependentJudoka(DependencyType::TakeLoser, match2),
+												   GetTournament(), GetMatID());
 
 		third_place->SetMatchTable(this);
 		third_place->SetTag(Match::Tag::Third());
@@ -358,17 +354,17 @@ void SingleElimination::GenerateSchedule()
 		auto fifth = CreateAutoMatch(nullptr, nullptr);
 		auto semi1 = CreateAutoMatch(nullptr, nullptr);*/
 
-		Match* semi1 = new Match(DependentJudoka(DependencyType::TakeLoser, *match1),
-								 DependentJudoka(DependencyType::TakeLoser, *match2),
-								 GetTournament(), GetMatID());
+		auto semi1 = std::make_shared<Match>(DependentJudoka(DependencyType::TakeLoser, match1),
+											 DependentJudoka(DependencyType::TakeLoser, match2),
+											 GetTournament(), GetMatID());
 
-		Match* semi2 = new Match(DependentJudoka(DependencyType::TakeLoser, *match3),
-								 DependentJudoka(DependencyType::TakeLoser, *match4),
-								 GetTournament(), GetMatID());
+		auto semi2 = std::make_shared<Match>(DependentJudoka(DependencyType::TakeLoser, match3),
+											 DependentJudoka(DependencyType::TakeLoser, match4),
+											 GetTournament(), GetMatID());
 
-		Match* fifth = new Match(DependentJudoka(DependencyType::TakeWinner, *semi1),
-								 DependentJudoka(DependencyType::TakeWinner, *semi2),
-								 GetTournament(), GetMatID());
+		auto fifth = std::make_shared<Match>(DependentJudoka(DependencyType::TakeWinner, semi1),
+											 DependentJudoka(DependencyType::TakeWinner, semi2),
+											 GetTournament(), GetMatID());
 
 		semi1->SetMatchTable(this);
 		semi1->SetTag(Match::Tag::Fifth() & Match::Tag::Semi());
@@ -455,7 +451,7 @@ MatchTable::Results SingleElimination::CalculateResults() const
 		return ret;
 
 	//Get final match
-	const Match* lastMatch = schedule[schedule.size() - 1];
+	auto lastMatch = schedule[schedule.size() - 1];
 
 	if (lastMatch->HasConcluded())
 	{
@@ -467,14 +463,14 @@ MatchTable::Results SingleElimination::CalculateResults() const
 
 	if (IsThirdPlaceMatch() && !m_ThirdPlaceMatches.empty())
 	{
-		const Match* third_place_match = m_ThirdPlaceMatches[m_ThirdPlaceMatches.size() - 1];
+		auto third_place_match = m_ThirdPlaceMatches[m_ThirdPlaceMatches.size() - 1];
 		ret.Add(third_place_match->GetWinner(), this);
 		ret.Add(third_place_match->GetLoser(),  this);
 	}
 
 	if (IsThirdPlaceMatch() && IsFifthPlaceMatch() && !m_FifthPlaceMatches.empty())
 	{
-		const Match* fifth_place_match = m_FifthPlaceMatches[m_FifthPlaceMatches.size() - 1];
+		auto fifth_place_match = m_FifthPlaceMatches[m_FifthPlaceMatches.size() - 1];
 		ret.Add(fifth_place_match->GetWinner(), this);
 		ret.Add(fifth_place_match->GetLoser(), this);
 	}
@@ -484,7 +480,7 @@ MatchTable::Results SingleElimination::CalculateResults() const
 
 
 
-bool SingleElimination::AddMatch(Match* NewMatch)
+bool SingleElimination::AddMatch(std::shared_ptr<Match> NewMatch)
 {
 	if (!NewMatch)
 		return false;

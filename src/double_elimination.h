@@ -30,7 +30,7 @@ namespace Judoboard
 			m_LoserBracket.SetMatID(MatID);
 		}
 
-		virtual Match* FindMatch(const UUID& UUID) const override;
+		virtual std::shared_ptr<Match> FindMatch(const UUID& UUID) const override;
 
 		virtual bool DeleteMatch(const UUID& UUID) override;
 
@@ -56,8 +56,8 @@ namespace Judoboard
 		SingleElimination& GetLoserBracket() { return m_LoserBracket; }
 		const SingleElimination& GetLoserBracket() const { return m_LoserBracket; }
 
-		void AddMatchToWinnerBracket(Match* NewMatch);
-		void AddMatchToLoserBracket(Match* NewMatch);
+		void AddMatchToWinnerBracket(std::shared_ptr<Match> NewMatch);
+		void AddMatchToLoserBracket(std::shared_ptr<Match> NewMatch);
 
 		//Serialization
 		virtual const std::string ToHTML() const override;

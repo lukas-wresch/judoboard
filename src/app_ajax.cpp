@@ -3998,32 +3998,32 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	IFilter::Type type = (IFilter::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "type"));
 	MatchTable::Type fight_system = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "fight_system"));
 
-	MatchTable* new_table = nullptr;
+	std::shared_ptr<MatchTable> new_table;
 
 	switch (fight_system)
 	{
 	case MatchTable::Type::RoundRobin:
 	{
-		new_table = new RoundRobin(new Weightclass(0, 0));
+		new_table = std::make_shared<RoundRobin>(new Weightclass(0, 0));
 		break;
 	}
 
 	case MatchTable::Type::SingleElimination:
 	{
-		new_table = new SingleElimination(new Weightclass(0, 0));
+		new_table = std::make_shared<SingleElimination>(new Weightclass(0, 0));
 		break;
 	}
 
 	case MatchTable::Type::Pool:
-		new_table = new Pool(new Weightclass(0, 0));
+		new_table = std::make_shared<Pool>(new Weightclass(0, 0));
 		break;
 
 	case MatchTable::Type::DoubleElimination:
-		new_table = new DoubleElimination(new Weightclass(0, 0));
+		new_table = std::make_shared<DoubleElimination>(new Weightclass(0, 0));
 		break;
 
 	case MatchTable::Type::Custom:
-		new_table = new CustomTable();
+		new_table = std::make_shared<CustomTable>();
 		break;
 
 	default:
@@ -4036,10 +4036,7 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	auto guard = LockWriteForScope();
 
 	if (!GetTournament())
-	{
-		delete new_table;
 		return Error::Type::TournamentNotOpen;
-	}
 
 	GetTournament()->AddMatchTable(new_table);
 
@@ -4151,7 +4148,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	{
 		case MatchTable::Type::RoundRobin:
 		{
-			RoundRobin* round_robin = (RoundRobin*)table;
+			auto round_robin = std::dynamic_pointer_cast<RoundRobin>(table);
 
 			GetTournament()->LockWrite();
 
@@ -4163,7 +4160,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		case MatchTable::Type::Custom:
 		{
-			CustomTable* custom = (CustomTable*)table;
+			auto custom = std::make_shared<CustomTable>(table);
 
 			GetTournament()->LockWrite();
 
@@ -4175,7 +4172,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		case MatchTable::Type::SingleElimination:
 		{
-			SingleElimination* single_table = (SingleElimination*)table;
+			auto single_table = std::dynamic_pointer_cast<SingleElimination>(table);
 
 			GetTournament()->LockWrite();
 
@@ -4189,7 +4186,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		case MatchTable::Type::Pool:
 		{
-			Pool* pool = (Pool*)table;
+			auto pool = std::dynamic_pointer_cast<Pool>(table);
 
 			GetTournament()->LockWrite();
 
@@ -4203,7 +4200,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		case MatchTable::Type::DoubleElimination:
 		{
-			DoubleElimination* doubleEli = (DoubleElimination*)table;
+			auto doubleEli = std::make_shared<DoubleElimination>(table);
 
 			GetTournament()->LockWrite();
 

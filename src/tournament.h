@@ -44,8 +44,8 @@ namespace Judoboard
 		[[nodiscard]]
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
 		[[nodiscard]]
-		virtual std::vector<Match*> GetSchedule() const override;
-		Match* FindMatch(const UUID& UUID) const override;
+		virtual std::vector<std::shared_ptr<Match>> GetSchedule() const override;
+		std::shared_ptr<Match> FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
 		virtual const StandingData& GetDatabase() const override { return m_StandingData; }//Returns a database containing all participants
 		void SetYear(uint32_t NewYear) {
@@ -81,11 +81,11 @@ namespace Judoboard
 		bool IsReadonly() const { return m_Readonly; }
 		void IsReadonly(bool Enable) { if (m_Name[0] != 0x00) m_Readonly = Enable; }
 
-		bool AddMatch(Match* NewMatch);
+		bool AddMatch(std::shared_ptr<Match> NewMatch);
 		//bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
-		virtual Match* GetNextMatch(int32_t MatID = -1) const override;//Returns the next match for a given mat if available, otherwise null pointer is returned
-		const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
-		virtual Match* GetNextOngoingMatch(int32_t MatID) override;//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
+		virtual std::shared_ptr<Match> GetNextMatch(int32_t MatID = -1) const override;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		std::shared_ptr<const Match> GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual std::shared_ptr<Match> GetNextOngoingMatch(int32_t MatID) override;//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
 		bool ReviseMatch(const UUID& MatchID, IMat& Mat);
 
 		virtual bool RemoveMatch(const UUID& MatchID) override;
@@ -112,13 +112,13 @@ namespace Judoboard
 		void SwapAllFighters();//Swaps the white with the blue fighter of all matches
 
 		//Match tables
-		void AddMatchTable(MatchTable* NewMatchTable);
+		void AddMatchTable(std::shared_ptr<MatchTable> NewMatchTable);
 		bool RemoveMatchTable(const UUID& UUID);
-		const std::vector<MatchTable*>& GetMatchTables() const { return m_MatchTables; }
-		virtual MatchTable* FindMatchTable(const UUID& ID) override;
-		virtual const MatchTable* FindMatchTable(const UUID& ID) const override;
-		MatchTable* FindMatchTableByName(const std::string& Name);
-		MatchTable* FindMatchTableByDescription(const std::string& Description);
+		const std::vector<std::shared_ptr<MatchTable>>& GetMatchTables() const { return m_MatchTables; }
+		virtual std::shared_ptr<MatchTable> FindMatchTable(const UUID& ID) override;
+		virtual std::shared_ptr<const MatchTable> FindMatchTable(const UUID& ID) const override;
+		std::shared_ptr<MatchTable> FindMatchTableByName(const std::string& Name);
+		std::shared_ptr<MatchTable> FindMatchTableByDescription(const std::string& Description);
 
 		//Clubs
 		virtual std::shared_ptr<Club> FindClub(const UUID& UUID) override { return m_StandingData.FindClub(UUID); }
@@ -227,7 +227,7 @@ namespace Judoboard
 		int32_t  GetMaxScheduleIndex(uint32_t Mat = 0) const;
 		uint32_t GetMaxEntriesAtScheduleIndex(uint32_t MatID, int32_t ScheduleIndex) const;
 
-		std::vector<MatchTable*>& SetMatchTables() { return m_MatchTables; }
+		std::vector<std::shared_ptr<MatchTable>>& SetMatchTables() { return m_MatchTables; }
 
 		class ScopedLock
 		{
@@ -253,9 +253,9 @@ namespace Judoboard
 
 		const Application* m_Application = nullptr;
 
-		std::vector<MatchTable*> m_MatchTables;
+		std::vector<std::shared_ptr<MatchTable>> m_MatchTables;
 		//std::vector<Match*> m_Schedule;
-		std::vector<std::pair<MatchTable*, size_t>> m_Schedule;
+		std::vector<std::pair<std::shared_ptr<MatchTable>, size_t>> m_Schedule;
 
 		std::shared_ptr<const RuleSet> m_pDefaultRules;//Default rule set of the tournament
 

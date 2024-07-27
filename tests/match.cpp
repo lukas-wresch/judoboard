@@ -321,9 +321,9 @@ TEST(Match, BestOf3ExportImport)
 	{
 		Tournament tourney("deleteMe");
 
-		Match* m1 = new Match(&j1, &j2, &tourney, 1);
-		Match* m2 = new Match(&j2, &j1, &tourney, 1);
-		Match* m3 = new Match(&j1, &j2, &tourney, 1);
+		auto m1 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
+		auto m2 = std::make_shared<Match>(&j2, &j1, &tourney, 1);
+		auto m3 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
 
 		m3->SetBestOfThree(m1, m2);
 

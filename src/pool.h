@@ -20,8 +20,6 @@ namespace Judoboard
 
 		~Pool() {
 			SetSchedule().clear();
-			for (auto pool : m_Pools)
-				delete pool;
 		}
 
 		static std::string GetHTMLForm();
@@ -30,38 +28,38 @@ namespace Judoboard
 
 		virtual size_t GetMaxStartPositions() const override;
 
-		virtual Results CalculateResults() const override { return m_Finals.CalculateResults(); }
-		virtual size_t ResultsCount() const override  { return m_Finals.ResultsCount(); }
+		virtual Results CalculateResults() const override { return m_Finals->CalculateResults(); }
+		virtual size_t ResultsCount() const override  { return m_Finals->ResultsCount(); }
 		virtual void GenerateSchedule() override;
 
-		virtual Match* FindMatch(const UUID& UUID) const override;
-		virtual const MatchTable* FindMatchTable(const UUID& UUID) const override;
+		virtual std::shared_ptr<Match> FindMatch(const UUID& UUID) const override;
+		virtual std::shared_ptr<const MatchTable> FindMatchTable(const UUID& UUID) const override;
 
 		virtual bool DeleteMatch(const UUID& UUID) override;
 
-		bool IsThirdPlaceMatch() const { return m_Finals.IsThirdPlaceMatch(); }
-		bool IsFifthPlaceMatch() const { return m_Finals.IsFifthPlaceMatch(); }
+		bool IsThirdPlaceMatch() const { return m_Finals->IsThirdPlaceMatch(); }
+		bool IsFifthPlaceMatch() const { return m_Finals->IsFifthPlaceMatch(); }
 
-		void IsThirdPlaceMatch(bool Enable) { m_Finals.IsThirdPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
-		void IsFifthPlaceMatch(bool Enable) { m_Finals.IsFifthPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
+		void IsThirdPlaceMatch(bool Enable) { m_Finals->IsThirdPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
+		void IsFifthPlaceMatch(bool Enable) { m_Finals->IsFifthPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
 
 		void SetPoolCount(uint32_t PoolCount) { m_PoolCount = PoolCount; GenerateSchedule(); }
 		size_t GetPoolCount() const { return m_Pools.size(); }
 
-		RoundRobin* GetPool(size_t Index) {
+		std::shared_ptr<RoundRobin> GetPool(size_t Index) {
 			if (Index >= m_Pools.size())
 				return nullptr;
 			return m_Pools[Index];
 		}
 
-		const RoundRobin* GetPool(size_t Index) const {
+		std::shared_ptr<const RoundRobin> GetPool(size_t Index) const {
 			if (Index >= m_Pools.size())
 				return nullptr;
 			return m_Pools[Index];
 		}
 
-		SingleElimination& GetFinals() { return m_Finals; }
-		const SingleElimination& GetFinals() const { return m_Finals; }
+		std::shared_ptr<SingleElimination> GetFinals() { return m_Finals; }
+		std::shared_ptr<const SingleElimination> GetFinals() const { return m_Finals; }
 
 		auto GetTakeTop() const { return m_TakeTop; }
 		void SetTakeTop(uint32_t NumJudoka) { m_TakeTop = NumJudoka; GenerateSchedule(); }
@@ -78,7 +76,8 @@ namespace Judoboard
 			for (auto pool : m_Pools)
 				if (pool)
 					pool->DeleteSchedule();
-			m_Finals.DeleteSchedule();
+			if (m_Finals)
+				m_Finals->DeleteSchedule();
 			MatchTable::DeleteSchedule();
 		}
 
@@ -100,7 +99,7 @@ namespace Judoboard
 		uint32_t m_PoolCount = 0;//0 for auto, otherwise number of pools
 		uint32_t m_TakeTop   = 2;//Number of judoka to go to the next round from each pool
 
-		std::vector<RoundRobin*> m_Pools;
-		SingleElimination m_Finals;
+		std::vector<std::shared_ptr<RoundRobin>> m_Pools;
+		std::shared_ptr<SingleElimination> m_Finals;
 	};
 }

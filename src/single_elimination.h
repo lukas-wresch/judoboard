@@ -53,13 +53,6 @@ namespace Judoboard
 		}
 
 		virtual void DeleteSchedule() override {
-			if (!IsSubMatchTable())
-			{
-				for (auto match : m_ThirdPlaceMatches)
-					delete match;
-				for (auto match : m_FifthPlaceMatches)
-					delete match;
-			}
 			m_ThirdPlaceMatches.clear();
 			m_FifthPlaceMatches.clear();
 			MatchTable::DeleteSchedule();
@@ -67,7 +60,7 @@ namespace Judoboard
 
 		virtual bool DeleteMatch(const UUID& UUID) override;
 
-		virtual const std::vector<Match*> GetSchedule() const override;
+		virtual const std::vector<std::shared_ptr<Match>> GetSchedule() const override;
 
 		virtual Results CalculateResults() const override;
 		virtual size_t ResultsCount() const override {
@@ -79,7 +72,7 @@ namespace Judoboard
 		}
 		virtual void GenerateSchedule() override;
 
-		virtual bool AddMatch(Match* NewMatch) override;
+		virtual bool AddMatch(std::shared_ptr<Match> NewMatch) override;
 
 		bool IsThirdPlaceMatch() const { return m_ThirdPlaceMatch; }
 		bool IsFifthPlaceMatch() const { return m_FifthPlaceMatch; }
@@ -98,8 +91,8 @@ namespace Judoboard
 	protected:
 		std::string RenderMatch(const Match& Match, const std::string& Style = "") const;
 
-		std::vector<Match*> m_ThirdPlaceMatches;
-		std::vector<Match*> m_FifthPlaceMatches;
+		std::vector<std::shared_ptr<Match>> m_ThirdPlaceMatches;
+		std::vector<std::shared_ptr<Match>> m_FifthPlaceMatches;
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;

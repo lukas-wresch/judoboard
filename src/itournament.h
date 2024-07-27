@@ -17,8 +17,8 @@ namespace Judoboard
 	public:
 		virtual bool IsLocal() const = 0;
 		virtual std::string GetName() const { return ""; }//Returns the name of the tournament
-		virtual std::vector<Match*> GetSchedule() const { std::vector<Match*> ret; return ret; }
-		virtual Match* FindMatch(const UUID& UUID) const { return nullptr; }
+		virtual std::vector<std::shared_ptr<Match>> GetSchedule() const { std::vector<std::shared_ptr<Match>> ret; return ret; }
+		virtual std::shared_ptr<Match> FindMatch(const UUID& UUID) const { return nullptr; }
 		//[[nodiscard]]
 		//Match* FindMatch(const Match& Match) const { return FindMatch(Match.GetUUID()); }
 		//[[nodiscard]]
@@ -36,14 +36,14 @@ namespace Judoboard
 
 		virtual std::shared_ptr<const Association> GetOrganizer() const { assert(false); return nullptr; }
 
-		virtual bool AddMatch(Match* NewMatch) { assert(false); return false; }
-		bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(std::move(NewMatch))); }
+		virtual bool AddMatch(std::shared_ptr<Match> NewMatch) { assert(false); return false; }
+		bool AddMatch(Match&& NewMatch) { return AddMatch(std::make_shared<Match>(std::move(NewMatch))); }
 
 		//const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
-		virtual Match* GetNextOngoingMatch(int32_t MatID) { assert(false); return nullptr; }//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
+		virtual std::shared_ptr<Match> GetNextOngoingMatch(int32_t MatID) { assert(false); return nullptr; }//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
 
 		virtual std::vector<Match> GetNextMatches(int32_t MatID) const = 0;
-		virtual Match* GetNextMatch(int32_t MatID = -1) const = 0;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual std::shared_ptr<Match> GetNextMatch(int32_t MatID = -1) const = 0;//Returns the next match for a given mat if available, otherwise null pointer is returned
 
 		virtual bool RemoveMatch(const UUID& MatchID) { assert(false); return false; }
 		virtual bool MoveMatchUp(const UUID& MatchID, uint32_t MatID = 0) { assert(false); return false; }
@@ -68,22 +68,22 @@ namespace Judoboard
 		virtual bool IsMatUsed(uint32_t ID) const { assert(false); return false; }
 
 		//Match tables
-		virtual void AddMatchTable(MatchTable* NewMatchTable) { assert(false); }
+		virtual void AddMatchTable(std::shared_ptr<MatchTable> NewMatchTable) { assert(false); }
 		virtual bool RemoveMatchTable(const UUID& UUID) { assert(false); return false; }
-		virtual const std::vector<MatchTable*>& GetMatchTables() const {
+		virtual const std::vector<std::shared_ptr<MatchTable>>& GetMatchTables() const {
 			assert(false);
-			static std::vector<MatchTable*> ret;
+			static std::vector<std::shared_ptr<MatchTable>> ret;
 			return ret;
 		}
 
-		virtual std::vector<MatchTable*>& SetMatchTables() {
+		virtual std::vector<std::shared_ptr<MatchTable>>& SetMatchTables() {
 			assert(false);
-			static std::vector<MatchTable*> ret;
+			static std::vector<std::shared_ptr<MatchTable>> ret;
 			return ret;
 		}
 
-		virtual MatchTable* FindMatchTable(const UUID& ID) = 0;
-		virtual const MatchTable* FindMatchTable(const UUID& ID) const = 0;
+		virtual std::shared_ptr<MatchTable> FindMatchTable(const UUID& ID) = 0;
+		virtual std::shared_ptr<const MatchTable> FindMatchTable(const UUID& ID) const = 0;
 
 		//Clubs
 		virtual std::shared_ptr<Club> FindClub(const UUID& UUID) { return nullptr; }
@@ -121,7 +121,7 @@ namespace Judoboard
 		virtual void GetAgeGroupInfo(YAML::Emitter& Yaml, std::shared_ptr<const AgeGroup> AgeGroup) const {}
 
 		//Master schedule / schedule entries
-		virtual MatchTable* GetScheduleEntry(const UUID& UUID) { return nullptr; }
+		virtual std::shared_ptr<MatchTable> GetScheduleEntry(const UUID& UUID) { return nullptr; }
 		virtual bool MoveScheduleEntryUp(const UUID& UUID) { return false; }
 		virtual bool MoveScheduleEntryDown(const UUID& UUID) { return false; }
 

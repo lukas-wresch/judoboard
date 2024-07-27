@@ -94,8 +94,8 @@ void LoserBracket::GenerateSchedule()
 	const auto max_initial_start_pos = (max_start_pos + 2) / 2;
 	
 	//Round 1
-	std::vector<Match*> lastRound;
-	std::vector<Match*> nextRound;
+	std::vector<std::shared_ptr<Match>> lastRound;
+	std::vector<std::shared_ptr<Match>> nextRound;
 
 	size_t current_start_pos = 0;
 
@@ -165,7 +165,7 @@ void LoserBracket::GenerateSchedule()
 
 		for (size_t i = 0; i < lastRound.size(); ++i)
 		{
-			Match* new_match = nullptr;
+			std::shared_ptr<Match> new_match;
 
 			if (infuse)//Infuse further participants
 			{
@@ -173,7 +173,7 @@ void LoserBracket::GenerateSchedule()
 				{
 					const size_t list[] = {37, 38, 39, 40, 33, 34, 35, 36, 45, 46, 47, 48, 41, 42, 43, 44};
 
-					new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, *lastRound[i]),
+					new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, lastRound[i]),
 						GetFilter()->GetJudokaByStartPosition(list[i] - 1));
 					current_start_pos++;
 				}
@@ -181,16 +181,16 @@ void LoserBracket::GenerateSchedule()
 				else if (swap)
 				{
 					if (i < lastRound.size()/2)
-						new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, *lastRound[i]),
+						new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, lastRound[i]),
 													GetFilter()->GetJudokaByStartPosition(current_start_pos++  + lastRound.size()/2));
 					else
-						new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, *lastRound[i]),
+						new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, lastRound[i]),
 													GetFilter()->GetJudokaByStartPosition(current_start_pos++  - lastRound.size()/2));
 				}
 
 				else
 				{
-					new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, *lastRound[i]),
+					new_match = CreateAutoMatch(DependentJudoka(DependencyType::TakeWinner, lastRound[i]),
 												GetFilter()->GetJudokaByStartPosition(current_start_pos++));
 				}
 			}
@@ -260,7 +260,7 @@ MatchTable::Results LoserBracket::CalculateResults() const
 	//Get final match
 	if (IsFinalMatch())
 	{
-		const Match* lastMatch = schedule[schedule.size() - 1];
+		auto lastMatch = schedule[schedule.size() - 1];
 		if (IsThirdPlaceMatch() && schedule.size() >= 2)
 			lastMatch = schedule[schedule.size() - 2];
 
@@ -273,7 +273,7 @@ MatchTable::Results LoserBracket::CalculateResults() const
 
 	if (IsThirdPlaceMatch())
 	{
-		const Match* third_place_match = schedule[schedule.size() - 1];
+		auto third_place_match = schedule[schedule.size() - 1];
 		if (third_place_match->HasConcluded())
 		{
 			ret.Add(third_place_match->GetWinner(), this);

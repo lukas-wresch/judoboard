@@ -110,7 +110,7 @@ namespace Judoboard
 
 		Match(const Judoka* White, const Judoka* Blue, const ITournament* Tournament, uint32_t MatID = 0);
 		Match(const DependentJudoka& White, const DependentJudoka& Blue, const ITournament* Tournament, uint32_t MatID = 0);
-		Match(const YAML::Node& Yaml, MatchTable* MatchTable, const ITournament* Tournament);
+		Match(const YAML::Node& Yaml, std::shared_ptr<MatchTable> MatchTable, const ITournament* Tournament);
 		Match(const Match&) = default;//Deep copy
 
 
@@ -128,7 +128,7 @@ namespace Judoboard
 		void EndMatch();
 
 		const MatchTable* GetMatchTable() const { return m_Table; }
-		void  SetMatchTable(const MatchTable* MatchTable) { m_Table = MatchTable; }
+		void SetMatchTable(const MatchTable* MatchTable) { m_Table = MatchTable; }
 
 		uint32_t GetMatID() const;
 
@@ -155,9 +155,9 @@ namespace Judoboard
 		const Judoka* GetLoser() const;
 
 		//Match dependencies
-		void SetDependency(Fighter Fighter, DependencyType Type, Match* Reference);
-		void SetDependency(Fighter Fighter, DependencyType Type, const MatchTable* Reference);
-		void SetBestOfThree(Match* Reference1, Match* Reference2);
+		void SetDependency(Fighter Fighter, DependencyType Type, std::shared_ptr<Match> Reference);
+		void SetDependency(Fighter Fighter, DependencyType Type, std::shared_ptr<const MatchTable> Reference);
+		void SetBestOfThree(std::shared_ptr<Match> Reference1, std::shared_ptr<Match> Reference2);
 		bool HasUnresolvedDependency() const;
 		bool HasDependentMatches() const {//Returns true if and only if this match depends upon other matches (as in the depend matches needs to conclude in order for this match to start)
 			return m_White.m_DependentMatch || m_Blue.m_DependentMatch;
@@ -172,18 +172,18 @@ namespace Judoboard
 		}
 		bool IsEmptySlot(Fighter Fighter) const;
 		bool IsEmptyMatch() const;
-		const std::vector<const Match*> GetDependentMatches() const;//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
+		const std::vector<std::shared_ptr<const Match>> GetDependentMatches() const;//Returns a list of matches this match depends upon as in the depend matches need to conclude in order for this match to be scheduled
 		auto GetDependencyTypeOf(Fighter Fighter) const {
 			if (Fighter == Fighter::White)
 				return m_White.m_Type;
 			return m_Blue.m_Type;
 		}
-		const Match* GetDependentMatchOf(Fighter Fighter) const {
+		std::shared_ptr<const Match> GetDependentMatchOf(Fighter Fighter) const {
 			if (Fighter == Fighter::White)
 				return m_White.m_DependentMatch;
 			return m_Blue.m_DependentMatch;
 		}
-		const MatchTable* GetDependentMatchTableOf(Fighter Fighter) const {
+		std::shared_ptr<const MatchTable> GetDependentMatchTableOf(Fighter Fighter) const {
 			if (Fighter == Fighter::White)
 				return m_White.m_DependentMatchTable;
 			return m_Blue.m_DependentMatchTable;
@@ -233,7 +233,7 @@ namespace Judoboard
 
 		MatchLog m_Log;//Log of the match
 
-		const MatchTable* m_Table = nullptr;//Match table this fight is associated with (if any)
+		const MatchTable* m_Table;//Match table this fight is associated with (if any)
 		std::shared_ptr<const RuleSet> m_Rules = nullptr;//Custom rule set for the match (if available)
 
 		const ITournament* m_Tournament = nullptr;
