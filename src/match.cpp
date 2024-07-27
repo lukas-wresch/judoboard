@@ -751,6 +751,14 @@ void Match::StartMatch()
 
 
 
+void Match::StopMatch()
+{
+	if (m_State == Status::Running)
+		m_State = Status::Scheduled;
+}
+
+
+
 void Match::EndMatch()
 {
 	m_State = Status::Concluded;

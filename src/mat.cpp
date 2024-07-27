@@ -385,6 +385,49 @@ bool Mat::EndMatch()
 
 
 
+bool Mat::CanStopMatch() const
+{
+	auto guard = m_mutex.LockReadForScope();
+
+	if (!AreFightersOnMat())
+		return false;
+	if (IsHajime())
+		return false;
+	if (m_HajimeTimer.GetElapsedTime() > 0)
+		return false;
+	if (IsGoldenScore())
+		return false;
+	if (!HasConcluded())
+		return false;//No need to call stop match
+	return true;
+}
+
+
+
+bool Mat::StopMatch()
+{
+	if (!CanStopMatch())
+		return false;
+
+	auto guard = m_mutex.LockWriteForScope();
+
+	if (m_pMatch)//Save result in match
+	{
+		AddEvent(MatchLog::NeutralEvent::StopMatch);
+		m_pMatch->StopMatch();
+	}
+
+	//Reset mat
+	NextState(State::TransitionToWaiting);
+
+	Reset();
+
+	ZED::Log::Info("Match stopped");
+	return true;
+}
+
+
+
 bool Mat::HasConcluded() const
 {
 	auto guard = m_mutex.LockReadForScope();
@@ -453,7 +496,7 @@ uint32_t Mat::GetTime2Display() const
 		const auto match_time = m_pMatch->GetRuleSet().GetMatchTime();
 
 		if (match_time > 0)//If match time is not infinite
-			return (match_time*1000 - m_HajimeTimer).GetElapsedTime();
+			return (match_time*1000 - m_HajimeTimer).GetElapsedTime();//Calculate remaining time
 	}
 
 	return m_HajimeTimer.GetElapsedTime();//Infinite match (and default if m_pMatch is nullptr)
@@ -540,11 +583,13 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "is_hajime"   << YAML::Value << IsHajime();
 	Yaml << YAML::Key << "is_osaekomi" << YAML::Value << IsOsaekomi();
 
-	const auto result = GetResult();
 	Yaml << YAML::Key << "was_mate_recent"      << YAML::Value << WasMateRecent();
 	Yaml << YAML::Key << "are_fighters_on_mat"  << YAML::Value << AreFightersOnMat();
 	Yaml << YAML::Key << "can_next_match_start" << YAML::Value << CanNextMatchStart();
 	Yaml << YAML::Key << "has_concluded"        << YAML::Value << HasConcluded();
+	Yaml << YAML::Key << "can_stop"             << YAML::Value << CanStopMatch();
+
+	const auto result = GetResult();
 	Yaml << YAML::Key << "winner"               << YAML::Value << (int)result.m_Winner;
 	Yaml << YAML::Key << "is_out_of_time"       << YAML::Value << IsOutOfTime();
 	Yaml << YAML::Key << "no_winner_yet"        << YAML::Value << (result.m_Winner == Winner::Draw);

@@ -240,6 +240,8 @@ function GetLog()
         cell3.innerHTML = translate('draw_revoked');
       else if (event.group == 2 && event.event == 12)
         cell3.innerHTML = translate('match_revised');
+      else if (event.group == 2 && event.event == 13)
+        cell3.innerHTML = translate('match_stopped');
 
       else if (event.event == 0)
         cell3.innerHTML = "Ippon";
