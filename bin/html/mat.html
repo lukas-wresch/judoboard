@@ -43,6 +43,7 @@
     </td>
 
     <td style="text-align: center; font-size: 18pt; width: 6.9cm; border-right-style: hidden; border-bottom-style: hidden;">
+      <button disabled class="neutral" style="height: 7vh; width: 45mm; margin-top: 3mm; margin-right: 20mm; display: none;" id="stop_match" onclick="StopMatch(event)" ontouchstart="EndMatch(event)">Stop match</button>
       <button disabled class="neutral" style="height: 7vh; width: 45mm; margin-top: 3mm; margin-right: 20mm; display: none;" id="end_match" onclick="EndMatch(event)" ontouchstart="EndMatch(event)">End match</button>
     </td>
   </tr>
@@ -333,6 +334,17 @@ function EndMatch(event)
   event.preventDefault();
 
   AjaxCallback(host + '/ajax/mat/end_match?id='+id + '&token=' + token, function(respone) {
+    GetJudokaName();
+    GetScore();
+  });
+}
+
+
+function StopMatch(event)
+{
+  event.preventDefault();
+
+  AjaxCallback(host + '/ajax/mat/stop?id='+id + '&token=' + token, function(respone) {
     GetJudokaName();
     GetScore();
   });
@@ -666,6 +678,17 @@ function GetScore()
     {
       document.getElementById("tokeda1").disabled = true;
       document.getElementById("tokeda2").disabled = true;
+    }
+
+    if (res.can_stop)
+    {
+      document.getElementById("stop_match").disabled = false;
+      $('#stop_match').show(1000);
+    }
+    else
+    {
+      document.getElementById("stop_match").disabled = true;
+      $("#stop_match").hide(1000);
     }
 
     if (res.has_concluded)

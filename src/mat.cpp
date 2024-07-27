@@ -397,7 +397,7 @@ bool Mat::CanStopMatch() const
 		return false;
 	if (IsGoldenScore())
 		return false;
-	if (!HasConcluded())
+	if (HasConcluded())
 		return false;//No need to call stop match
 	return true;
 }
