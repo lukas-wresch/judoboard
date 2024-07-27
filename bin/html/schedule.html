@@ -33,6 +33,15 @@
 </div>
 
 
+<div id="contextMenu" class="context-menu">
+        <ul>
+            <li><a href="#">Mat 1</a></li>
+            <li><a href="#">Mat 2</a></li>
+            <li><a href="#">Mat 3</a></li>
+        </ul>
+</div>
+
+
 <h2 id="headline">Schedule</h2>
 
 <label style="float:left;margin-top:0px;margin-right:10px;" id="label_show_matches">Show matches</label>
@@ -566,7 +575,7 @@ function Update_Schedule()
         cell6.innerHTML = '- - -';
       else
       {
-        var current_breaktime = Math.floor(match.current_breaktime/60) + ':' + zeroPad(Math.floor(match.current_breaktime)%60, 2);
+        let current_breaktime = Math.floor(match.current_breaktime/60) + ':' + zeroPad(Math.floor(match.current_breaktime)%60, 2);
         cell6.innerHTML = current_breaktime;
       
         if (match.current_breaktime < match.breaktime)
@@ -578,16 +587,42 @@ function Update_Schedule()
         }
       }
 
-      var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
-      var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 1.8cm; margin-right: 2mm;\" onclick=navigate(\"edit_match.html?id="+match.uuid+"\");>" + translate('details') + "</button></td>";
+      let style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
+      let options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 1.8cm; margin-right: 2mm;\" onclick=navigate(\"edit_match.html?id="+match.uuid+"\");>" + translate('details') + "</button></td>";
 
-      if (match.state == 0)
+      if (match.state == 0 || match.state == 3)
+        options += "<td rowspan=\"2\"><button class=\"contextButton white\" style=\"width: 1.8cm; margin-right: 2mm;\">" + translate('move') + "</button></td>";
+
+      if (match.state == 0 || match.state == 3)
         options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveUp('"+match.uuid+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return MoveDown('"+match.uuid+"');\"></a></td></tr></table>";
       else
         options += "<td></td></tr><tr><td></td></tr></table>";
 
       cell7.innerHTML = options;
     }
+
+
+    const buttons = document.querySelectorAll('.contextButton');
+    buttons.forEach(button => {
+      button.addEventListener('click', function(event) {
+        event.preventDefault();
+            
+        //Hide all context menus before showing the new one
+        //Object.values(contextMenus).forEach(menu => {
+          //menu.style.display = 'none';
+        //});
+            
+        const contextMenu = document.getElementById('contextMenu');
+        contextMenu.style.display = 'block';
+        
+        let offset = 0;
+        if (slideout.isOpen())
+          offset = 200;
+          
+        contextMenu.style.left = `${event.pageX - offset}px`;
+        contextMenu.style.top  = `${event.pageY}px`;
+      });
+    });
   });
 }
 
@@ -937,3 +972,11 @@ document.getElementById("master-schedule-hide").innerHTML = translate('hide');
 document.getElementById("label-all").innerHTML = translate('all');
 document.getElementById("label-important").innerHTML = translate('important');
 document.getElementById("label-none").innerHTML = translate('none');
+
+
+document.addEventListener('click', function(event) {
+  const menu = document.getElementById('contextMenu');
+  const buttons = document.querySelectorAll('.contextButton');
+  if (!menu.contains(event.target) && ![...buttons].includes(event.target))
+    menu.style.display = 'none';
+});
