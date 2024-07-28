@@ -520,7 +520,7 @@ void Application::SetupHttpServer()
 
 
 	//Mat commands
-	m_Server.RegisterResource("/ajax/mat/stop", [this](auto& Request) -> std::string {
+	m_Server.RegisterResource("/ajax/mat/stop_match", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 		if (!IsLoggedIn(Request))
 			return Error(Error::Type::NotLoggedIn);
