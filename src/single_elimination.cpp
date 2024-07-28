@@ -332,7 +332,7 @@ void SingleElimination::GenerateSchedule()
 									   GetTournament(), GetMatID());
 
 		third_place->SetMatchTable(this);
-		third_place->SetTag(Match::Tag::Third());
+		third_place->SetTag(Match::Tag::Third() && Match::Tag::Finals());
 
 		m_ThirdPlaceMatches.emplace_back(third_place);
 

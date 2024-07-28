@@ -556,6 +556,24 @@ function Update_Schedule()
       else
         cell5.innerHTML = "Unknown";
 
+      if (match.state != 2 && match.state != 4)
+      {
+        if (match.winner_bracket)
+          cell5.innerHTML += " - " + translate('winner_bracket');
+        if (match.loser_bracket)
+          cell5.innerHTML += " - " + translate('loser_bracket');
+        if (match.third)
+          cell5.innerHTML += " - " + translate('third_place');
+        if (match.fifth)
+          cell5.innerHTML += " - " + translate('fifth_place');
+        if (match.finals)
+          cell5.innerHTML += " - " + translate('finals');
+        if (match.semi)
+          cell5.innerHTML += " - " + translate('semifinals');
+        if (match.in_preparation && match.state != 1)
+          cell5.innerHTML += " - " + translate('in_preparation');
+      }
+
       cell5.style.textAlign = "center";
 
 

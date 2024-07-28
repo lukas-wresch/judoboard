@@ -284,6 +284,15 @@ void Match::ToString(YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "color" << YAML::Value << GetMatchTable()->GetColor().ToHexString();
 	}
 
+	//Tags
+	Yaml << YAML::Key << "finals" << YAML::Value << GetTag().finals;
+	Yaml << YAML::Key << "semi"   << YAML::Value << GetTag().semi;
+	Yaml << YAML::Key << "third"  << YAML::Value << GetTag().third;
+	Yaml << YAML::Key << "fifth"  << YAML::Value << GetTag().fifth;
+	Yaml << YAML::Key << "winner_bracket" << YAML::Value << GetTag().winner_bracket;
+	Yaml << YAML::Key << "loser_bracket"  << YAML::Value << GetTag().loser_bracket;
+	Yaml << YAML::Key << "in_preparation" << YAML::Value << GetTag().in_preparation;
+
 	Yaml << YAML::Key << "winner" << YAML::Value << (int)m_Result.m_Winner;
 	Yaml << YAML::Key << "score"  << YAML::Value << (int)m_Result.m_Score;
 	Yaml << YAML::Key << "time"   << YAML::Value << m_Result.m_Time;
