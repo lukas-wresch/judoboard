@@ -48,7 +48,7 @@ namespace Judoboard
 
 		//Events
 		virtual void OnMatchStarted(const Match& Match) const { assert(false); }
-		virtual void OnMatchConcluded(const Match& Match) const override;
+		virtual void OnMatchConcluded(Match& Match) const override;
 
 	private:
 		std::string Request2Master(const std::string& URL) const;

@@ -97,6 +97,9 @@ namespace Judoboard
 			}
 
 			bool IsNormal() const { return value == 0; }
+			void Remove(const Tag& rhs) {
+				value &= ~rhs.value;
+			}
 
 			bool operator ==(const Tag& rhs) const {
 				return value == rhs.value;
@@ -219,6 +222,7 @@ namespace Judoboard
 		Tag  GetTag() const { return m_Tag; }
 		void SetTag(Tag NewTag) { m_Tag = NewTag; }
 		void AddTag(Tag NewTag) { m_Tag = m_Tag && NewTag; }
+		void RemoveTag(Tag RemovalTag) { m_Tag.Remove(RemovalTag); }
 
 		//Serialize
 		void ToString(YAML::Emitter& Yaml) const;

@@ -1634,18 +1634,22 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 void Tournament::OnMatchStarted(const Match& Match) const
 {
-	ScheduleSave();
 	if (m_Application)
 		m_Application->RequestPushToResultsServer();
+
+	ScheduleSave();
 }
 
 
 
-void Tournament::OnMatchConcluded(const Match& Match) const
+void Tournament::OnMatchConcluded(Match& Match) const
 {
-	ScheduleSave();
+	Match.RemoveTag(Match::Tag::InPreparation());
+
 	if (m_Application)
 		m_Application->RequestPushToResultsServer();
+
+	ScheduleSave();
 }
 
 

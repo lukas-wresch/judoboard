@@ -193,7 +193,7 @@ namespace Judoboard
 
 		//Events
 		virtual void OnMatchStarted(const Match& Match) const override;
-		virtual void OnMatchConcluded(const Match& Match) const override;
+		virtual void OnMatchConcluded(Match& Match) const override;
 		virtual bool OnUpdateParticipant(const UUID& UUID) override;//Calling this function we recalculate the given judoka
 		virtual bool OnUpdateMatchTable(const UUID& UUID) override;//Calling this function we recalculate the given match table
 

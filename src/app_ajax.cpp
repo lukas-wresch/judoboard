@@ -4640,14 +4640,13 @@ Error Application::Ajax_StartMatch(const HttpServer::Request& Request)
 
 	auto tournament_guard = GetTournament()->LockReadForScope();
 
-	//TODO mark previous match as in preparation
-
 	auto next_matches = GetTournament()->GetNextMatches(mat->GetMatID());
 	if (!next_matches.empty())
 	{
 		if (!mat->StartMatch(next_matches[0]))
 			return Error::Type::OperationFailed;
 
+		//Mark next match as 'in preparation'
 		if (next_matches.size() >= 2)
 			next_matches[1]->AddTag(Match::Tag::InPreparation());
 	}

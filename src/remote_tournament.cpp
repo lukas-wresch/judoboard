@@ -273,7 +273,7 @@ RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID)
 
 
 
-void RemoteTournament::OnMatchConcluded(const Match& Match) const
+void RemoteTournament::OnMatchConcluded(Match& Match) const
 {
 	YAML::Emitter result;
 	Match >> result;
