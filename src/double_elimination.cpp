@@ -251,9 +251,15 @@ void DoubleElimination::BuildSchedule()
 	{
 		//Add matches
 		for (auto match : m_WinnerBracket.GetSchedule())
+		{
+			match->AddTag(Match::Tag::WinnerBracket());
 			AddMatch(match);
+		}
 		for (auto match : m_LoserBracket.GetSchedule())
+		{
+			match->AddTag(Match::Tag::LoserBracket());
 			AddMatch(match);
+		}
 	}
 }
 

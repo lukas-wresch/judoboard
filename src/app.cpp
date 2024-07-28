@@ -533,11 +533,11 @@ bool Application::RegisterMatWithMaster(IMat* Mat)
 
 
 
-std::vector<Match> Application::GetNextMatches(uint32_t MatID, bool& Success) const
+std::vector<const Match*> Application::GetNextMatches(uint32_t MatID, bool& Success) const
 {
 	if (!TryReadLock())//Can we get a lock?
 	{
-		std::vector<Match> empty;
+		std::vector<const Match*> empty;
 		Success = false;
 		return empty;
 	}
@@ -548,7 +548,7 @@ std::vector<Match> Application::GetNextMatches(uint32_t MatID, bool& Success) co
 
 	if (!GetTournament())
 	{
-		std::vector<Match> empty;
+		std::vector<const Match*> empty;
 		UnlockRead();
 		return empty;
 	}

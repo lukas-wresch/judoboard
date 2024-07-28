@@ -371,13 +371,13 @@ void SingleElimination::GenerateSchedule()
 								 GetTournament(), GetMatID());
 
 		semi1->SetMatchTable(this);
-		semi1->SetTag(Match::Tag::Fifth() & Match::Tag::Semi());
+		semi1->SetTag(Match::Tag::Fifth() && Match::Tag::Semi());
 
 		semi2->SetMatchTable(this);
-		semi2->SetTag(Match::Tag::Fifth() & Match::Tag::Semi());
+		semi2->SetTag(Match::Tag::Fifth() && Match::Tag::Semi());
 
 		fifth->SetMatchTable(this);
-		fifth->SetTag(Match::Tag::Fifth() & Match::Tag::Finals());
+		fifth->SetTag(Match::Tag::Fifth() && Match::Tag::Finals());
 
 		m_FifthPlaceMatches.emplace_back(semi1);
 		m_FifthPlaceMatches.emplace_back(semi2);

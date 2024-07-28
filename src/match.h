@@ -78,12 +78,30 @@ namespace Judoboard
 				return ret;
 			}
 
+			static Tag WinnerBracket() {
+				Tag ret;
+				ret.winner_bracket = true;
+				return ret;
+			}
+
+			static Tag LoserBracket() {
+				Tag ret;
+				ret.loser_bracket = true;
+				return ret;
+			}
+
+			static Tag InPreparation() {
+				Tag ret;
+				ret.in_preparation = true;
+				return ret;
+			}
+
 			bool IsNormal() const { return value == 0; }
 
 			bool operator ==(const Tag& rhs) const {
 				return value == rhs.value;
 			}
-			Tag operator &(const Tag& rhs) const {
+			Tag operator &&(const Tag& rhs) const {
 				Tag ret;
 				ret.value = this->value | rhs.value;
 				return ret;
@@ -96,13 +114,13 @@ namespace Judoboard
 				struct
 				{
 					bool finals : 1;
-					bool semi : 1;
-					bool third : 1;
-					bool fifth : 1;
-					bool reserved1 : 1;
-					bool reserved2 : 1;
-					bool reserved3 : 1;
-					bool reserved4 : 1;
+					bool semi   : 1;
+					bool third  : 1;
+					bool fifth  : 1;
+					bool winner_bracket : 1;//Match belongs to the winner bracket
+					bool loser_bracket  : 1;//Match belongs to the loser bracket
+					bool in_preparation : 1;//Match has been marked as 'in preparation'
+					bool reserved : 1;
 				};
 			};
 		};
@@ -200,6 +218,7 @@ namespace Judoboard
 
 		Tag  GetTag() const { return m_Tag; }
 		void SetTag(Tag NewTag) { m_Tag = NewTag; }
+		void AddTag(Tag NewTag) { m_Tag = m_Tag && NewTag; }
 
 		//Serialize
 		void ToString(YAML::Emitter& Yaml) const;

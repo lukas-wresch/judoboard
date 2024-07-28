@@ -2526,19 +2526,20 @@ void Application::SetupHttpServer()
 		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		bool success = false;
-		std::vector<Match> next_matches;
+		std::vector<const Match*> next_matches;
 
 		while (!success)
 		{
 			next_matches = GetNextMatches(matID, success);
-			ZED::Core::Pause(100);
+			if (!success)
+				ZED::Core::Pause(100);
 		}
 
 		YAML::Emitter ret;
 		ret << YAML::BeginSeq;
 
 		for (auto match : next_matches)
-			match >> ret;
+			*match >> ret;
 
 		ret << YAML::EndSeq;
 		return ret.c_str();
@@ -4639,10 +4640,17 @@ Error Application::Ajax_StartMatch(const HttpServer::Request& Request)
 
 	auto tournament_guard = GetTournament()->LockReadForScope();
 
-	auto nextMatch = GetTournament()->GetNextMatch(mat->GetMatID());
-	if (nextMatch)
-		if (!mat->StartMatch(nextMatch))
+	//TODO mark previous match as in preparation
+
+	auto next_matches = GetTournament()->GetNextMatches(mat->GetMatID());
+	if (!next_matches.empty())
+	{
+		if (!mat->StartMatch(next_matches[0]))
 			return Error::Type::OperationFailed;
+
+		if (next_matches.size() >= 2)
+			next_matches[1]->AddTag(Match::Tag::InPreparation());
+	}
 	return Error::Type::NoError;//OK
 }
 
@@ -4981,28 +4989,28 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 
 	ret << YAML::Key << "next_matches" << YAML::Value << YAML::BeginSeq;
 
-	for (const auto& match : next_matches)
+	for (const auto match : next_matches)
 	{
 		ret << YAML::BeginMap;
 
-		ret << YAML::Key << "uuid" << YAML::Value << (std::string)match.GetUUID();
-		ret << YAML::Key << "current_breaktime" << YAML::Value << match.GetCurrentBreaktime();
-		ret << YAML::Key << "breaktime"         << YAML::Value << match.GetRuleSet().GetBreakTime();
+		ret << YAML::Key << "uuid" << YAML::Value << (std::string)match->GetUUID();
+		ret << YAML::Key << "current_breaktime" << YAML::Value << match->GetCurrentBreaktime();
+		ret << YAML::Key << "breaktime"         << YAML::Value << match->GetRuleSet().GetBreakTime();
 
 		ret << YAML::Key << "white_name" << YAML::Value;
-		if (match.GetFighter(Fighter::White))
-			ret << match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+		if (match->GetFighter(Fighter::White))
+			ret << match->GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
 		else
 			ret << "- - -";
 
 		ret << YAML::Key << "blue_name" << YAML::Value;
-		if (match.GetFighter(Fighter::Blue))
-			ret << match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+		if (match->GetFighter(Fighter::Blue))
+			ret << match->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
 		else
 			ret << "- - -";
 
-		if (match.GetMatchTable())
-			ret << YAML::Key << "match_table_desc" << YAML::Value <<match.GetMatchTable()->GetDescription();
+		if (match->GetMatchTable())
+			ret << YAML::Key << "match_table_desc" << YAML::Value << match->GetMatchTable()->GetDescription();
 
 		ret << YAML::EndMap;
 	}

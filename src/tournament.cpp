@@ -921,7 +921,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 
 
 
-Match* Tournament::GetNextMatch(int32_t MatID) const
+Match* Tournament::GetNextMatch(int32_t MatID)
 {
 	auto guard = LockReadForScope();
 
@@ -933,6 +933,47 @@ Match* Tournament::GetNextMatch(int32_t MatID) const
 
 		if (MatID < 0 || match->GetMatID() == MatID)
 			return match;
+	}
+
+	return nullptr;
+}
+
+
+
+const Match* Tournament::GetNextMatch(int32_t MatID) const
+{
+	auto guard = LockReadForScope();
+
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
+	{
+		if (!match || match->HasConcluded() || match->IsRunning())
+			continue;
+
+		if (MatID < 0 || match->GetMatID() == MatID)
+			return match;
+	}
+
+	return nullptr;
+}
+
+
+
+Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex)
+{
+	auto guard = LockReadForScope();
+
+	auto schedule = GetSchedule();
+	for (; StartIndex < schedule.size(); StartIndex++)
+	{
+		if (schedule[StartIndex]->HasConcluded() || schedule[StartIndex]->IsRunning())
+			continue;
+
+		if (MatID < 0 || schedule[StartIndex]->GetMatID() == MatID)
+		{
+			StartIndex++;
+			return schedule[StartIndex-1];
+		}
 	}
 
 	return nullptr;
@@ -1206,19 +1247,39 @@ bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 
 
 
-std::vector<Match> Tournament::GetNextMatches(int32_t MatID) const
+std::vector<Match*> Tournament::GetNextMatches(int32_t MatID)
 {
-	std::vector<Match> ret;
+	std::vector<Match*> ret;
 
 	auto guard = LockReadForScope();
 
-	uint32_t id = 0;
+	uint32_t index = 0;
 	for (int i = 0; i < 3; i++)
 	{
-		auto nextMatch = GetNextMatch(MatID, id);
+		auto nextMatch = GetNextMatch(MatID, index);
 
 		if (nextMatch)
-			ret.push_back(*nextMatch);
+			ret.push_back(nextMatch);
+	}
+
+	return ret;
+}
+
+
+
+std::vector<const Match*> Tournament::GetNextMatches(int32_t MatID) const
+{
+	std::vector<const Match*> ret;
+
+	auto guard = LockReadForScope();
+
+	uint32_t index = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		auto nextMatch = GetNextMatch(MatID, index);
+
+		if (nextMatch)
+			ret.push_back(nextMatch);
 	}
 
 	return ret;

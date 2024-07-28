@@ -93,7 +93,7 @@ namespace Judoboard
 
 		bool RegisterMatWithMaster(IMat* Mat);
 
-		std::vector<Match> GetNextMatches(uint32_t MatID, bool& Success) const;
+		std::vector<const Match*> GetNextMatches(uint32_t MatID, bool& Success) const;
 
 		bool ConnectToMaster(const std::string& Hostname, uint16_t Port = 8080);
 

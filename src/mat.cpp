@@ -2692,7 +2692,10 @@ bool Mat::Mainloop()
 			if (nextMatches.size() == 0 && m_State == State::Waiting)
 				NextState(State::StartUp);
 
-			m_NextMatches = std::move(nextMatches);
+			//Copy over match data
+			m_NextMatches.clear();
+			for (auto match : nextMatches)
+				m_NextMatches.emplace_back(*match);
 		}
 	}
 
