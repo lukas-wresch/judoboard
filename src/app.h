@@ -115,6 +115,7 @@ namespace Judoboard
 		//General
 		Error Ajax_UpdatePassword(Account* Account, const HttpServer::Request& Request);
 
+		Error Ajax_SetMatOfMatch(const HttpServer::Request& Request);
 		Error Ajax_EditMatch(const HttpServer::Request& Request);
 		Error Ajax_ReviseMatch(const HttpServer::Request& Request);
 

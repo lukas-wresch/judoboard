@@ -80,7 +80,7 @@ function GetMatch()
 {
   AjaxCallback('ajax/match/get?id='+id, function(response) {
     console.log(response);
-    let res = YAML.parse(response);
+    const res = YAML.parse(response);
 
     if (typeof res.white_name !== 'undefined')
       document.getElementById("white").innerHTML = res.white_name;

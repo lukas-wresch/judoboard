@@ -34,11 +34,11 @@
 
 
 <div id="contextMenu" class="context-menu">
-        <ul>
-            <li><a href="#">Mat 1</a></li>
-            <li><a href="#">Mat 2</a></li>
-            <li><a href="#">Mat 3</a></li>
-        </ul>
+    <ul>
+        <li><a onclick="SetMat(1);" href="#">Mat 1</a></li>
+        <li><a onclick="SetMat(2);" href="#">Mat 2</a></li>
+        <li><a onclick="SetMat(3);" href="#">Mat 3</a></li>
+    </ul>
 </div>
 
 
@@ -125,7 +125,7 @@ function MoveEntryDown(id)
 
 
 
-function SetEntryMat(id, mat)
+function SetEntryMat(mat)
 {
   AjaxCallback('ajax/masterschedule/move?id='+id+'&mat='+mat, function() {
     Update_Masterschedule();
@@ -134,6 +134,15 @@ function SetEntryMat(id, mat)
   return false;
 }
 
+
+
+function SetMat(mat)
+{
+  AjaxCallback('/ajax/match/set_mat?id=' + context_menu_match_uuid + '&mat=' + mat, function() {
+    Update_Schedule();
+  });
+  return false;
+}
 
 
 function MoveUp(id)
@@ -591,7 +600,7 @@ function Update_Schedule()
       let options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 1.8cm; margin-right: 2mm;\" onclick=navigate(\"edit_match.html?id="+match.uuid+"\");>" + translate('details') + "</button></td>";
 
       if (match.state == 0 || match.state == 3)
-        options += "<td rowspan=\"2\"><button class=\"contextButton white\" style=\"width: 1.8cm; margin-right: 2mm;\">" + translate('move') + "</button></td>";
+        options += "<td rowspan=\"2\"><button class=\"contextButton white\" data-uuid=\""+match.uuid+"\" style=\"width: 1.8cm; margin-right: 2mm;\">" + translate('move') + "</button></td>";
 
       if (match.state == 0 || match.state == 3)
         options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveUp('"+match.uuid+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return MoveDown('"+match.uuid+"');\"></a></td></tr></table>";
@@ -611,6 +620,9 @@ function Update_Schedule()
         //Object.values(contextMenus).forEach(menu => {
           //menu.style.display = 'none';
         //});
+
+        console.log(button.dataset['uuid']);
+        context_menu_match_uuid = button.dataset['uuid'];
             
         const contextMenu = document.getElementById('contextMenu');
         contextMenu.style.display = 'block';
@@ -913,6 +925,7 @@ document.getElementById("participants_search").oninput = function(e)
 };
 
 var showHansokumake = false;
+var context_menu_match_uuid = "";
 
 
 Update();
