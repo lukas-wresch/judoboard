@@ -753,6 +753,7 @@ void Match::StartMatch()
 
 void Match::StopMatch()
 {
+	assert(m_State == Status::Running);
 	if (m_State == Status::Running)
 		m_State = Status::Scheduled;
 }

@@ -344,7 +344,7 @@ function StopMatch(event)
 {
   event.preventDefault();
 
-  AjaxCallback(host + '/ajax/mat/stop?id='+id + '&token=' + token, function(respone) {
+  AjaxCallback(host + '/ajax/mat/stop_match?id='+id + '&token=' + token, function(respone) {
     GetJudokaName();
     GetScore();
   });

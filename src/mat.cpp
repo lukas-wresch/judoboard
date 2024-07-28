@@ -411,7 +411,7 @@ bool Mat::StopMatch()
 
 	auto guard = m_mutex.LockWriteForScope();
 
-	if (m_pMatch)//Save result in match
+	if (m_pMatch)
 	{
 		AddEvent(MatchLog::NeutralEvent::StopMatch);
 		m_pMatch->StopMatch();
