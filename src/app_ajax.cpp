@@ -4643,6 +4643,7 @@ Error Application::Ajax_StartMatch(const HttpServer::Request& Request)
 	auto next_matches = GetTournament()->GetNextMatches(mat->GetMatID());
 	if (!next_matches.empty())
 	{
+		next_matches[0]->AddTag(Match::Tag::InPreparation());
 		if (!mat->StartMatch(next_matches[0]))
 			return Error::Type::OperationFailed;
 
