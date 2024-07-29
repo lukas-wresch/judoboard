@@ -102,27 +102,29 @@ bool Application::LoadDataFromDisk()
 
 	if (!ZED::SoundEngine::Init())
 		ZED::Log::Warn("Could not start sound engine");
+	else//Sound engine ok, start loading sounds
+	{
+		ZED::Core::Indexer([&](const std::string& Filename) {
+			auto pos = Filename.find_last_of(ZED::Core::Separator);
+			if (pos == std::string::npos) return true;
 
-	ZED::Core::Indexer([&](const std::string& Filename) {
-		auto pos = Filename.find_last_of(ZED::Core::Separator);
-		if (pos == std::string::npos) return true;
+			auto onlyFilename = Filename.substr(pos + 1);
+			auto pos_dot = onlyFilename.find_last_of('.');
+			if (pos_dot == std::string::npos) return true;
 
-		auto onlyFilename = Filename.substr(pos + 1);
-		auto pos_dot = onlyFilename.find_last_of('.');
-		if (pos_dot == std::string::npos) return true;
+			if (onlyFilename.length() < 5) return true;
 
-		if (onlyFilename.length() < 5) return true;
+			auto name = onlyFilename.substr(0, pos_dot);
+			auto extension = onlyFilename.substr(pos_dot + 1);
 
-		auto name = onlyFilename.substr(0, pos_dot);
-		auto extension = onlyFilename.substr(pos_dot + 1);
+			if (extension != "wav") return true;
 
-		if (extension != "wav") return true;
+			m_Sounds.insert({name, ZED::Sound("assets/sounds/" + name + ".wav")});
+			ZED::Log::Info("Sound file " + name + " loaded");
 
-		m_Sounds.insert({name, ZED::Sound("assets/sounds/" + name + ".wav")});
-		ZED::Log::Info("Sound file " + name + " loaded");
-
-		return true;
-	}, "assets/sounds");
+			return true;
+		}, "assets/sounds");
+	}
 
 	return true;
 }

@@ -22,6 +22,6 @@ then
 fi
 
 
-echo "All test ran successfull"
+echo "All tests ran successfull"
 cd ..
 exit 0
