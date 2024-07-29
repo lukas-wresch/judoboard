@@ -92,6 +92,8 @@ namespace Judoboard
 		//Commands by judge
 		virtual bool StartMatch(Match* NewMatch, bool UseForce = false) override;
 		virtual bool EndMatch() override;
+		virtual bool CanStopMatch() const override;
+		virtual bool StopMatch() override;
 
 		virtual void Hajime() override;
 		virtual void Mate() override;

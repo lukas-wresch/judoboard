@@ -520,6 +520,14 @@ void Application::SetupHttpServer()
 
 
 	//Mat commands
+	m_Server.RegisterResource("/ajax/mat/stop_match", [this](auto& Request) -> std::string {
+		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
+		if (!IsLoggedIn(Request))
+			return Error(Error::Type::NotLoggedIn);
+
+		return Ajax_StopMatch(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/mat/hajime", [this](auto& Request) -> std::string {
 		Request.m_ResponseHeader = "Access-Control-Allow-Origin: *";//CORS response
 		if (!IsLoggedIn(Request))
@@ -4663,6 +4671,28 @@ Error Application::Ajax_EndMatch(const HttpServer::Request& Request)
 		return Error::Type::MatNotFound;
 
 	if (!mat->EndMatch())
+		return Error::Type::OperationFailed;
+
+	return Error::Type::NoError;//OK
+}
+
+
+
+Error Application::Ajax_StopMatch(const HttpServer::Request& Request)
+{
+	int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
+
+	if (matID <= 0)
+		return Error::Type::InvalidID;
+
+	auto guard = LockReadForScope();
+
+	auto mat = FindMat(matID);
+
+	if (!mat)
+		return Error::Type::MatNotFound;
+
+	if (!mat->StopMatch())
 		return Error::Type::OperationFailed;
 
 	return Error::Type::NoError;//OK

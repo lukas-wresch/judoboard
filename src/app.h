@@ -142,6 +142,7 @@ namespace Judoboard
 		//Commands
 		Error Ajax_StartMatch(const HttpServer::Request& Request);
 		Error Ajax_EndMatch(const HttpServer::Request& Request);
+		Error Ajax_StopMatch(const HttpServer::Request& Request);
 		Error Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request);
 		Error Ajax_RemoveDisqualification(Fighter Whom, const HttpServer::Request& Request);
 		Error Ajax_NoDisqualification(Fighter Whom, const HttpServer::Request& Request);
