@@ -25,7 +25,7 @@ Match::Match(const Judoka* White, const Judoka* Blue, const ITournament* Tournam
 
 
 Match::Match(const DependentJudoka& White, const DependentJudoka& Blue, const ITournament* Tournament, uint32_t MatID)
-	: m_White(White), m_Blue(Blue)
+	: m_White(White), m_Blue(Blue), m_Tournament(Tournament)
 {
 	SetMatID(MatID);
 }

@@ -435,6 +435,9 @@ TEST(App, FullTournament)
 		tourney->AddMatchTable(m1);
 		tourney->AddMatchTable(m2);
 
+		for (auto match : tourney->GetSchedule())
+			EXPECT_TRUE(match->GetTournament());
+
 		auto mat = app.GetLocalMat();
 		ASSERT_TRUE(mat);
 
