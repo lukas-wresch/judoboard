@@ -1329,6 +1329,7 @@ TEST(DoubleElimination, Count11_Example)
 	m.AddIppon(Fighter::White);
 	EXPECT_TRUE(m.EndMatch());
 
+	EXPECT_EQ(schedule[28 - 1]->GetTag(), Match::Tag::LoserBracket() && Match::Tag::Third());
 	EXPECT_EQ(schedule[28 - 1]->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[25 - 1]->GetUUID());
 	EXPECT_EQ(schedule[28 - 1]->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[26 - 1]->GetUUID());
 	EXPECT_EQ(schedule[28 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Matthias");
@@ -1337,6 +1338,7 @@ TEST(DoubleElimination, Count11_Example)
 	m.AddIppon(Fighter::White);
 	EXPECT_TRUE(m.EndMatch());
 
+	EXPECT_EQ(schedule[29 - 1]->GetTag(), Match::Tag::LoserBracket() && Match::Tag::Fifth());
 	EXPECT_EQ(schedule[29 - 1]->GetDependentMatchOf(Fighter::White)->GetUUID(), schedule[25 - 1]->GetUUID());
 	EXPECT_EQ(schedule[29 - 1]->GetDependentMatchOf(Fighter::Blue )->GetUUID(), schedule[26 - 1]->GetUUID());
 	EXPECT_EQ(schedule[29 - 1]->GetFighter(Fighter::White)->GetFirstname(), "Peter");

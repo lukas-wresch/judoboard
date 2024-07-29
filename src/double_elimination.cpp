@@ -198,17 +198,19 @@ void DoubleElimination::BuildSchedule()
 		match->AddTag(Match::Tag::WinnerBracket());
 	for (auto match : m_LoserBracket.GetSchedule())
 	{
-		if (match->GetTag().finals)
+		if (match->GetTag().third)
+		{
+			match->RemoveTag(Match::Tag::Third());
+			match->RemoveTag(Match::Tag::Finals());
+			match->AddTag(Match::Tag::Fifth());
+		}
+
+		else if (match->GetTag().finals)
 		{
 			match->RemoveTag(Match::Tag::Finals());
 			match->AddTag(Match::Tag::Third());
 		}
 
-		else if (match->GetTag().third)
-		{
-			match->RemoveTag(Match::Tag::Third());
-			match->AddTag(Match::Tag::Fifth());
-		}
 		match->AddTag(Match::Tag::LoserBracket());
 	}
 
