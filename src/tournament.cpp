@@ -903,6 +903,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 		new_match_table->SetFilter(new Fixed);
 		new_match_table->AddMatch(NewMatch);
 		new_match_table->SetMatID(NewMatch->GetMatID());
+		new_match_table->SetScheduleIndex(GetMaxScheduleIndex() + 1);
 		AddMatchTable(new_match_table);
 
 #ifdef _DEBUG
@@ -1745,43 +1746,47 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 			need_to_rebuild = true;//Only rebuild schedule in this case
 	}
 
-	//Sort
-	std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
-		//Sort by filter
-		if (a->GetFilter() && !b->GetFilter())
-			return true;
-		if (!a->GetFilter() && b->GetFilter())
-			return false;
+	//Do we need to sort our match tables?
+	if (matchTable->GetType() != MatchTable::Type::Custom)
+	{
+		//Sort
+		std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
+			//Sort by filter
+			if (a->GetFilter() && !b->GetFilter())
+				return true;
+			if (!a->GetFilter() && b->GetFilter())
+				return false;
 
-		/*if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() != IFilter::Type::Weightclass)
-			return true;
-		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() != IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
-			return false;*/
+			/*if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() != IFilter::Type::Weightclass)
+				return true;
+			if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() != IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
+				return false;*/
 
-		//Both weightclasses?
-		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
-		{
-			auto weightclassA = (const Weightclass*)a->GetFilter();
-			auto weightclassB = (const Weightclass*)b->GetFilter();
+				//Both weightclasses?
+			if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
+			{
+				auto weightclassA = (const Weightclass*)a->GetFilter();
+				auto weightclassB = (const Weightclass*)b->GetFilter();
 
-			//Sort by age group
-			if (weightclassA->GetAgeGroup() && weightclassB->GetAgeGroup() && weightclassA->GetAgeGroup()->GetMinAge() != weightclassB->GetAgeGroup()->GetMinAge())
-				return weightclassA->GetAgeGroup()->GetMinAge() < weightclassB->GetAgeGroup()->GetMinAge();
+				//Sort by age group
+				if (weightclassA->GetAgeGroup() && weightclassB->GetAgeGroup() && weightclassA->GetAgeGroup()->GetMinAge() != weightclassB->GetAgeGroup()->GetMinAge())
+					return weightclassA->GetAgeGroup()->GetMinAge() < weightclassB->GetAgeGroup()->GetMinAge();
 
-			//Sort by gender
-			if (weightclassA->GetGender() != weightclassB->GetGender())
-				return (int)weightclassA->GetGender() < (int)weightclassB->GetGender();
+				//Sort by gender
+				if (weightclassA->GetGender() != weightclassB->GetGender())
+					return (int)weightclassA->GetGender() < (int)weightclassB->GetGender();
 
-			//Sort by weight
-			if (weightclassA->GetMinWeight() != weightclassB->GetMinWeight())
-				return weightclassA->GetMinWeight() < weightclassB->GetMinWeight();
-		}
+				//Sort by weight
+				if (weightclassA->GetMinWeight() != weightclassB->GetMinWeight())
+					return weightclassA->GetMinWeight() < weightclassB->GetMinWeight();
+			}
 
-		if (a->GetName() != b->GetName())
-			return a->GetName() < b->GetName();
+			if (a->GetName() != b->GetName())
+				return a->GetName() < b->GetName();
 
-		return a->GetUUID() < b->GetUUID();
-	});
+			return a->GetUUID() < b->GetUUID();
+		});
+	}
 
 	if (need_to_rebuild)//Do we need to rebuild the schedule?
 		BuildSchedule();
@@ -1803,8 +1808,8 @@ bool Tournament::RemoveMatchTable(const UUID& UUID)
 	if (!matchTable)
 		return false;
 
-	if (matchTable->GetStatus() != Status::Scheduled)//Can safely delete the match table
-		return false;
+	if (matchTable->GetStatus() == Status::Running)
+		return false;//Can't safely delete the match table
 
 	//Remove match table
 	for (auto table = m_MatchTables.begin(); table != m_MatchTables.end(); ++table)

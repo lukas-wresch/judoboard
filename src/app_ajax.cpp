@@ -2848,8 +2848,11 @@ Error Application::Ajax_DeleteCompletedMatchTables()
 	auto tables = tournament->GetMatchTables();//Make copy of list
 	for (auto table : tables)
 	{
-		if (table && table->GetStatus() == Status::Concluded)
-			tournament->RemoveMatchTable(*table);//This modifies the original list
+		if (table && (table->GetStatus() == Status::Concluded || table->GetSchedule().empty()))
+		{
+			if (!tournament->RemoveMatchTable(*table))//This modifies the original list
+				return Error::Type::OperationFailed;
+		}
 	}
 
 	return Error::Type::NoError;
