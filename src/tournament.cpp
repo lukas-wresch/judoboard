@@ -903,7 +903,6 @@ bool Tournament::AddMatch(Match* NewMatch)
 		new_match_table->SetFilter(new Fixed);
 		new_match_table->AddMatch(NewMatch);
 		new_match_table->SetMatID(NewMatch->GetMatID());
-		new_match_table->SetScheduleIndex(GetMaxScheduleIndex() + 1);
 		AddMatchTable(new_match_table);
 
 #ifdef _DEBUG

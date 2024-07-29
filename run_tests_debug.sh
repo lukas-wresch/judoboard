@@ -1,7 +1,7 @@
 cd bin
 echo "Running tests with gdb attached"
 gdb -ex=r -ex=bt -ex="set confirm off" -ex=q --args ./judoboard_test_debug --gtest_output=xml
-if [ $? -eq 0 ]
+if [ $? -ne 0 ]
 then
   echo "All test ran successfull"
   cd ..

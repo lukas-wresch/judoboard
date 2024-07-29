@@ -1771,8 +1771,8 @@ TEST(Tournament, NoReorderWhenAddingCustom)
 
 		EXPECT_TRUE(tourney->AddMatch(new Match(j1, j2, tourney)));
 
-		EXPECT_EQ(*tourney->GetSchedule()[0], *match2);
-		EXPECT_EQ(*tourney->GetSchedule()[1], *match1);
+		EXPECT_EQ(tourney->GetSchedule()[0]->GetUUID(), match2->GetUUID());
+		EXPECT_EQ(tourney->GetSchedule()[1]->GetUUID(), match1->GetUUID());
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
