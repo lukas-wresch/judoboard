@@ -455,8 +455,7 @@ TEST(App, FullTournament)
 
 			ASSERT_TRUE(match);
 			EXPECT_EQ(*match, *matches[0]);
-			//EXPECT_TRUE(mat->StartMatch(match));
-			ASSERT_TRUE(app.Ajax_StartMatch(HttpServer::Request("id=1")));
+			EXPECT_TRUE(mat->StartMatch(match));
 
 			if (matches.size() >= 3)
 			{
