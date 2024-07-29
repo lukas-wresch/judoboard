@@ -26,12 +26,11 @@ namespace Judoboard
 				return nullptr;
 			return FindInCache(ret[0]->GetUUID());
 		}
-		virtual std::vector<Match*> GetNextMatches(int32_t MatID) override {
-			return const_cast<RemoteTournament*>(this)->GetNextMatches(MatID);
-		}
 		virtual std::vector<const Match*> GetNextMatches(int32_t MatID) const override;
 
 		virtual bool AddMatch(Match* NewMatch) override;
+
+		virtual Match* GetNextOngoingMatch(int32_t MatID) override;
 
 		//Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const override;
@@ -48,7 +47,7 @@ namespace Judoboard
 
 		//Events
 		virtual void OnMatchStarted(const Match& Match) const { assert(false); }
-		virtual void OnMatchConcluded(Match& Match) const override;
+		virtual void OnMatchConcluded(const Match& Match) const override;
 
 	private:
 		std::string Request2Master(const std::string& URL) const;

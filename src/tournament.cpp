@@ -1003,6 +1003,32 @@ const Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
 
 
 
+const Match* Tournament::GetNextMatch(const UUID& MatchID, int32_t MatID) const
+{
+	auto guard = LockReadForScope();
+
+	auto schedule = GetSchedule();
+	bool return_next = false;
+	for (auto match : schedule)
+	{
+		if (!match || match->HasConcluded())
+			continue;
+
+		if (return_next)
+		{
+			if (MatID < 0 || match->GetMatID() == MatID)
+				return match;
+		}
+
+		else if (match->GetUUID() == MatchID)
+			return_next = true;
+	}
+
+	return nullptr;
+}
+
+
+
 Match* Tournament::GetNextOngoingMatch(int32_t MatID)
 {
 	auto guard = LockReadForScope();
@@ -1243,26 +1269,6 @@ bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 	ScheduleSave();
 
 	return true;
-}
-
-
-
-std::vector<Match*> Tournament::GetNextMatches(int32_t MatID)
-{
-	std::vector<Match*> ret;
-
-	auto guard = LockReadForScope();
-
-	uint32_t index = 0;
-	for (int i = 0; i < 3; i++)
-	{
-		auto nextMatch = GetNextMatch(MatID, index);
-
-		if (nextMatch)
-			ret.push_back(nextMatch);
-	}
-
-	return ret;
 }
 
 
@@ -1634,6 +1640,12 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 
 void Tournament::OnMatchStarted(const Match& Match) const
 {
+	Match.AddTag(Match::Tag::InPreparation());
+
+	auto next_match = GetNextMatch(Match.GetUUID(), Match.GetMatID());
+	if (next_match)
+		next_match->AddTag(Match::Tag::InPreparation());
+
 	if (m_Application)
 		m_Application->RequestPushToResultsServer();
 
@@ -1642,7 +1654,7 @@ void Tournament::OnMatchStarted(const Match& Match) const
 
 
 
-void Tournament::OnMatchConcluded(Match& Match) const
+void Tournament::OnMatchConcluded(const Match& Match) const
 {
 	Match.RemoveTag(Match::Tag::InPreparation());
 

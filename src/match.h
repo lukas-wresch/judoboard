@@ -221,8 +221,8 @@ namespace Judoboard
 
 		Tag  GetTag() const { return m_Tag; }
 		void SetTag(Tag NewTag) { m_Tag = NewTag; }
-		void AddTag(Tag NewTag) { m_Tag = m_Tag && NewTag; }
-		void RemoveTag(Tag RemovalTag) { m_Tag.Remove(RemovalTag); }
+		void AddTag(Tag NewTag) const { m_Tag = m_Tag && NewTag; }
+		void RemoveTag(Tag RemovalTag) const { m_Tag.Remove(RemovalTag); }
 
 		//Serialize
 		void ToString(YAML::Emitter& Yaml) const;
@@ -263,6 +263,6 @@ namespace Judoboard
 
 		uint32_t m_MatID = 0;
 
-		Tag m_Tag;
+		mutable Tag m_Tag;
 	};
 }

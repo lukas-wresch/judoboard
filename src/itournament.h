@@ -43,7 +43,7 @@ namespace Judoboard
 
 		virtual Match* GetNextMatch(int32_t MatID = -1) = 0;//Returns the next match for a given mat if available, otherwise null pointer is returned
 		virtual const Match* GetNextMatch(int32_t MatID = -1) const = 0;//Returns the next match for a given mat if available, otherwise null pointer is returned
-		virtual std::vector<Match*> GetNextMatches(int32_t MatID) = 0;
+		//virtual std::vector<Match*> GetNextMatches(int32_t MatID) = 0;
 		virtual std::vector<const Match*> GetNextMatches(int32_t MatID) const = 0;
 
 		virtual bool RemoveMatch(const UUID& MatchID) { assert(false); return false; }
@@ -144,7 +144,7 @@ namespace Judoboard
 
 		//Events
 		virtual void OnMatchStarted(const Match& Match) const = 0;
-		virtual void OnMatchConcluded(Match& Match) const = 0;
+		virtual void OnMatchConcluded(const Match& Match) const = 0;
 		virtual bool OnUpdateParticipant(const UUID& UUID) { assert(false); return false; }//Calling this function we recalculate the given judoka
 		virtual bool OnUpdateMatchTable(const UUID& UUID)  { assert(false); return false; }//Calling this function we recalculate the given match table
 

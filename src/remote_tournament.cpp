@@ -56,6 +56,23 @@ std::vector<const Match*> RemoteTournament::GetNextMatches(int32_t MatID) const
 
 
 
+Match* RemoteTournament::GetNextOngoingMatch(int32_t MatID)
+{
+	auto matches = GetNextMatches(MatID);
+	for (auto match : matches)
+	{
+		if (!match || !match->IsRunning())
+			continue;
+
+		if (MatID < 0 || match->GetMatID() == MatID)
+			return (Match*)match;
+	}
+
+	return nullptr;
+}
+
+
+
 bool RemoteTournament::IsMatchInCache(const UUID& UUID) const
 {
 	auto guard = m_Mutex.LockReadForScope();
@@ -273,7 +290,7 @@ RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID)
 
 
 
-void RemoteTournament::OnMatchConcluded(Match& Match) const
+void RemoteTournament::OnMatchConcluded(const Match& Match) const
 {
 	YAML::Emitter result;
 	Match >> result;
