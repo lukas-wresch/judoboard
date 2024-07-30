@@ -684,7 +684,7 @@ TEST(App, FullTournament_SingleElimination7_BO3)
 TEST(App, FullTournament_StressTest)
 {
 	initialize();
-	Application::NoWindow = false;
+	//Application::NoWindow = false;
 
 	{
 		Application app;
