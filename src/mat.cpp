@@ -1243,8 +1243,8 @@ void Mat::PlaySoundFile() const
 	if (!m_AudioDevice.IsValid() || m_AudioDevice.GetDeviceIndex() != GetAudioDeviceID())
 		m_AudioDevice = ZED::SoundDevice(GetAudioDeviceID());
 
-	assert(m_AudioDevice.IsValid());
-	assert(m_Application);
+	//assert(m_AudioDevice.IsValid());
+	//assert(m_Application);
 	if (m_Application)
 	{
 		auto sound = m_Application->GetSound(GetSoundFilename());
