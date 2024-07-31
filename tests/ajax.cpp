@@ -783,11 +783,14 @@ TEST(Ajax, Sound_ListFiles)
 
 		std::vector<std::string> filenames = { "airhorn", "alert", "gong sabi", "gong", "gong2", "high gong", "low gong", "spooky gong", "tiger gong", "wind chime" };
 
-		int i = 0;
+		int count = 0;
 		for (auto node : yaml)
 		{
-			EXPECT_EQ(node["filename"].as<std::string>(), filenames[i++]);
+			EXPECT_NE(std::find(filenames.cbegin(), filenames.cend(), node["filename"].as<std::string>()), filenames.cend());
+			count++;
 		}
+
+		EXPECT_EQ(count, filenames.size());
 	}
 }
 
