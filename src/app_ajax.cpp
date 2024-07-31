@@ -2585,10 +2585,12 @@ Error Application::Ajax_SetMatOfMatch(const HttpServer::Request& Request)
 	if (matID < 0)
 		return Error::Type::InvalidID;
 
-	auto guard = LockWriteForScope();
+	auto guard = LockReadForScope();
 
 	if (!GetTournament())
 		return Error::Type::TournamentNotOpen;
+
+	auto tournament_guard = GetTournament()->LockWriteForScope();
 
 	auto match = GetTournament()->FindMatch(matchID);
 
@@ -2613,10 +2615,12 @@ Error Application::Ajax_EditMatch(const HttpServer::Request& Request)
 	if (matID < 0)
 		return Error::Type::InvalidID;
 
-	auto guard = LockWriteForScope();
+	auto guard = LockReadForScope();
 
 	if (!GetTournament())
 		return Error::Type::TournamentNotOpen;
+
+	auto tournament_guard = GetTournament()->LockWriteForScope();
 
 	auto match = GetTournament()->FindMatch(matchID);
 
@@ -2641,13 +2645,15 @@ Error Application::Ajax_ReviseMatch(const HttpServer::Request& Request)
 {
 	UUID matchID = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
 
-	auto guard = LockWriteForScope();
+	auto guard = LockReadForScope();
 
 	auto tournament = GetTournament();
 	if (!tournament)
 		return Error::Type::TournamentNotOpen;
 	if (!tournament->IsLocal())
 		return Error::Type::InternalError;
+
+	auto tournament_guard = GetTournament()->LockWriteForScope();
 
 	auto match = tournament->FindMatch(matchID);
 	if (!match)
@@ -2675,8 +2681,6 @@ Error Application::Ajax_AddTournament(const HttpServer::Request& Request)
 
 	if (name.empty())
 		return Error::Type::InvalidInput;
-
-	//auto guard = LockTillScopeEnd();//In case the tournament gets closed at the same time
 
 	if (FindTournamentByName(name))
 		return Error::Type::OperationFailed;
@@ -2715,8 +2719,6 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 	if (name.empty())
 		return Error::Type::InvalidInput;
 
-	auto guard = LockWriteForScope();
-
 	auto tournament = FindTournament(id);
 	if (!tournament)
 		return Error(Error::Type::ItemNotFound);
@@ -2724,6 +2726,8 @@ Error Application::Ajax_EditTournament(const HttpServer::Request& Request)
 	//Check if the tournament is closed
 	if (GetTournament() && tournament->GetName() == GetTournament()->GetName())
 		return Error(Error::Type::OperationFailed);
+
+	auto tournament_guard = tournament->LockWriteForScope();
 
 	auto rules = m_Database.FindRuleSet(rule_id);
 	if (!rules)
@@ -2801,8 +2805,6 @@ Error Application::Ajax_AssignAgeGroup(const HttpServer::Request& Request)
 	if (!judoka || !age_group)
 		return Error::Type::ItemNotFound;
 
-	auto guard = LockWriteForScope();//In case the tournament gets closed at the same time
-
 	if (!GetTournament()->AssignJudokaToAgeGroup(judoka, age_group))
 		return Error(Error::Type::OperationFailed);
 
@@ -2843,8 +2845,6 @@ std::string Application::Ajax_ListTournaments()
 Error Application::Ajax_SwapMatchesOfTournament(const HttpServer::Request& Request)
 {
 	UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
-
-	auto guard = LockWriteForScope();
 
 	auto tournament = FindTournament(id);
 	if (!tournament)
