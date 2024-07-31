@@ -34,11 +34,6 @@
 
 
 <div id="contextMenu" class="context-menu">
-    <ul>
-        <li><a onclick="SetMat(1);" href="#">Mat 1</a></li>
-        <li><a onclick="SetMat(2);" href="#">Mat 2</a></li>
-        <li><a onclick="SetMat(3);" href="#">Mat 3</a></li>
-    </ul>
 </div>
 
 
@@ -64,7 +59,7 @@
     <th style="width: 1cm;" class="mat">Mat</th>
     <th style="width: 2.5cm; text-align: center;" class="status">Status</th>
     <th style="width: 2.5cm; text-align: center;" id="break">Break</th>
-    <th style="width: 2.5cm; text-align: center;" class="options">Options</th>
+    <th style="width: 6.5cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
 
@@ -286,8 +281,25 @@ function Update_Masterschedule()
     let i = 0;
     let mat_count = res.highest_mat_id;
 
+    contextMenu.innerHTML = '';
+
+    const ul = document.createElement('ul');
+
+    for (let j = 0; j < mat_count + 1; j++)
+    {
+      const li = document.createElement('li');
+      const a  = document.createElement('a');
+      a.href = '#';
+      a.onclick = function(event) { event.preventDefault(); SetMat(j + 1); };
+      a.textContent = translate('mat') + ' ' + (j + 1);
+      li.appendChild(a);
+      ul.appendChild(li);
+    }
+
+    contextMenu.appendChild(ul);
+
     let row = table.insertRow(-1);
-    for (var j=0; j < mat_count; j++)
+    for (let j=0; j < mat_count; j++)
     {
       let option = document.createElement("option");
       option.value = j+1;
@@ -600,7 +612,7 @@ function Update_Schedule()
       let options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 1.8cm; margin-right: 2mm;\" onclick=navigate(\"edit_match.html?id="+match.uuid+"\");>" + translate('details') + "</button></td>";
 
       if (match.state == 0 || match.state == 3)
-        options += "<td rowspan=\"2\"><button class=\"contextButton white\" data-uuid=\""+match.uuid+"\" style=\"width: 1.8cm; margin-right: 2mm;\">" + translate('move') + "</button></td>";
+        options += "<td rowspan=\"2\"><button class=\"contextButton white\" data-uuid=\""+match.uuid+"\" style=\"width: 3.2cm; margin-right: 2mm;\">" + translate('move_to_mat') + "</button></td>";
 
       if (match.state == 0 || match.state == 3)
         options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveUp('"+match.uuid+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return MoveDown('"+match.uuid+"');\"></a></td></tr></table>";
@@ -615,11 +627,6 @@ function Update_Schedule()
     buttons.forEach(button => {
       button.addEventListener('click', function(event) {
         event.preventDefault();
-            
-        //Hide all context menus before showing the new one
-        //Object.values(contextMenus).forEach(menu => {
-          //menu.style.display = 'none';
-        //});
 
         console.log(button.dataset['uuid']);
         context_menu_match_uuid = button.dataset['uuid'];
