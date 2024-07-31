@@ -690,7 +690,7 @@ TEST(App, FullTournament_StressTest)
 		Application app;
 		app.LoadDataFromDisk();
 
-		auto tournament_name = GetRandomName();
+		std::string tournament_name = "deleteMe";
 		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
 
 		const int mat_count = 8;
@@ -879,6 +879,8 @@ TEST(App, FullTournament_StressTest)
 
 		delete tourney;
 	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
 
 
