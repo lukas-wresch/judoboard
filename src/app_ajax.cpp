@@ -535,6 +535,14 @@ void Application::SetupHttpServer()
 		return Ajax_MoveMatchDown(Request);
 	});
 
+	m_Server.RegisterResource("/ajax/match/move_to", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::User);
+		if (!error)
+			return error;
+
+		return Ajax_MoveMatchTo(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/match/delete", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -4918,6 +4926,25 @@ Error Application::Ajax_MoveMatchDown(const HttpServer::Request& Request)
 		return Error::Type::TournamentNotOpen;
 
 	if (!GetTournament()->MoveMatchDown(id, mat))
+		return Error::Type::OperationFailed;
+
+	return Error::Type::NoError;
+}
+
+
+
+Error Application::Ajax_MoveMatchTo(const HttpServer::Request& Request)
+{
+	UUID from = HttpServer::DecodeURLEncoded(Request.m_Query, "from");
+	UUID to = HttpServer::DecodeURLEncoded(Request.m_Query, "to");
+	auto position = HttpServer::DecodeURLEncoded(Request.m_Query, "position");
+
+	auto guard = LockReadForScope();
+
+	if (!GetTournament())
+		return Error::Type::TournamentNotOpen;
+
+	if (!GetTournament()->MoveMatchTo(from, to, position == "above"))
 		return Error::Type::OperationFailed;
 
 	return Error::Type::NoError;

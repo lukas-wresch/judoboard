@@ -351,7 +351,7 @@ function Update_Masterschedule()
             contents += entry.schedule_size + ' ' + translate('matches') + ' / ' + entry.participant_count + ' ' + translate('participants');
             contents += "<br/>"
 
-            let dragable = "draggable=\"true\" data-uuid=\""+entry.uuid+"\" ";
+            let dragable = 'draggable="true" data-uuid="'+entry.uuid+'"';
             let data_string = "data-mat=\"" + entry.mat_id + "\" data-schedule_index=\"" + schedule_index + "\"";
 
             contents += "<table " + dragable + data_string + "><tr><td "+dragable+data_string+" rowspan=\"2\"><a "+dragable+data_string+" style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id-1) + ");\"></a></td>";
@@ -517,6 +517,14 @@ function Update_Schedule()
       cell0.style.fontSize  = "14pt";
       cell0.style.height    = "1.5cm";
 
+      row.draggable = true;
+      row.dataset.uuid = match.uuid;
+      row.addEventListener('dragstart', drag_schedule_start);
+      row.addEventListener('dragover',  drag_schedule_over);
+      row.addEventListener('dragleave', drag_schedule_leave);
+      row.addEventListener('dragend',   drag_schedule_end);
+      row.addEventListener('drop',      drop_schedule);
+
       if (typeof match.white_name !== 'undefined')
       {
         if (!ContainsPrintableCharacters(match.white_name))
@@ -642,6 +650,60 @@ function Update_Schedule()
         contextMenu.style.top  = `${event.pageY}px`;
       });
     });
+  });
+}
+
+
+
+let dragged_row;
+
+function drag_schedule_start(event)
+{
+  dragged_row = event.target.dataset['uuid'];
+  console.log('drag started ' + dragged_row);
+}
+
+function drag_schedule_over(event)
+{
+  event.preventDefault();
+}
+
+function drag_schedule_leave(event)
+{
+  event.preventDefault();
+}
+
+function drag_schedule_end(event)
+{
+  event.preventDefault();
+}
+
+function drop_schedule(event)
+{
+  event.preventDefault();
+
+  //console.log(event.target);
+  //console.log(event.target.parentNode);
+  //console.log('dropped ' + event.target.parentNode.dataset['uuid']);
+
+  let target = event.target.parentNode.dataset['uuid'];
+
+  if (target == dragged_row)
+    return;
+
+  let rect = event.target.getBoundingClientRect();
+
+  let relativeY = event.clientY - rect.top;
+
+  //Determine if the mouse is near the top or bottom
+  let position;
+  if (relativeY < rect.height/2)
+    position = 'above';
+  else
+    position = 'below';
+
+  AjaxCallback('ajax/match/move_to?from='+dragged_row+'&to='+target+'&position='+position, function() {
+    Update_Schedule();
   });
 }
 
