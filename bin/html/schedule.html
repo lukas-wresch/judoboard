@@ -723,13 +723,13 @@ function Update_Participants()
         cell4.innerHTML = "- - -";
       else if (judoka.age_groups.length >= 2)
       {
-        var select = document.createElement("select");
+        let select = document.createElement("select");
         select.style.width = "4.0cm";
         select.style.fontSize = "14pt";
 
         for (const age_group of judoka.age_groups)
         {
-          var option = document.createElement("option");
+          let option = document.createElement("option");
           option.value = age_group.uuid;
           option.text  = age_group.name;
 

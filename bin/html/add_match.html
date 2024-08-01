@@ -1,4 +1,4 @@
-<h1 id="headline">New Match</h1>
+<h1 id="headline"></h1>
 
 <form>
 
@@ -8,6 +8,18 @@
   <label style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:20px;" class="switch-label" for="showParticipantsOnly">
     <span class="toggle-on" id="showParticipantsOnly_enabled"></span><span class="toggle-off" id="showParticipantsOnly_disabled"></span>
   </label>
+</div>
+
+<div>
+  <label id="label_match_table" style="width:100px;float:left;margin-top:5px;"></label>
+  <select style="padding-top:5px;margin-bottom:20px; width: 5.5cm;" id="match_table">
+  </select>
+</div>
+
+<div>
+  <label id="label_rule_set" style="width:100px;float:left;margin-top:5px;"></label>
+  <select style="padding-top:5px;margin-bottom:20px; width: 5.5cm;" id="rule">
+  </select>
 </div>
 
 <div>
@@ -69,7 +81,7 @@ function Add(color, name, uuid)
   document.getElementById(color).value = name;
   document.getElementById(color + "_id").value = uuid;
 
-  var table = document.getElementById("search_" + color);
+  let table = document.getElementById("search_" + color);
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
@@ -82,17 +94,22 @@ function AddMatch()
   let params = URLEncode({
     white: document.getElementById("white_id").value,
     blue:  document.getElementById("blue_id").value,
+    match_table: document.getElementById("match_table").value,
+    rule:  document.getElementById("rule").value,
     mat:   document.getElementById("mat").value
   });
 
   AjaxPost('ajax/match/add', params, function() {
-    $("#note").text("Match added to tournament.");
+    $("#note").text(translate('match_added'));
     $("#note").show(1000).delay(3000).hide(2000);
 
     document.getElementById("white").value = "";
     document.getElementById("blue").value  = "";
     document.getElementById("white_id").value = "";
     document.getElementById("blue_id").value  = "";
+
+    if (document.getElementById("match_table").value == '')
+      AddMatch_GetMatchTables();
   });
 
   return false;
@@ -121,9 +138,6 @@ function Update(color)
     let no = 0;
     for (const judoka of res)
     {
-      //if (!judoka.is_participant && filter)
-        //continue;
-
       let row = table.insertRow(-1);
       let cell0 = row.insertCell(0);
       let cell1 = row.insertCell(1);
@@ -190,9 +204,38 @@ for (const el of document.getElementsByClassName("options"))
 
 document.getElementById("headline").innerHTML    = translate('new_match');
 document.getElementById("label_showParticipantsOnly").innerHTML = translate('show_only_participants');
+document.getElementById("label_match_table").innerHTML = translate('match_table');
+document.getElementById("label_rule_set").innerHTML = translate('rule_set');
 document.getElementById("label_mat").innerHTML   = translate('mat');
 document.getElementById("label_white").innerHTML = translate('name_white');
 document.getElementById("label_blue").innerHTML  = translate('name_blue');
 document.getElementById("add").innerHTML         = translate('add_match');
+
+
+function AddMatch_GetMatchTables()
+{
+  AjaxCallback("ajax/matchtable/get_all", function(response) {
+    console.log(response);
+    const res = YAML.parse(response);
+    console.log(res);
+
+    let select = document.getElementById("match_table")
+
+    for (const table of res)
+    {
+      if (table.type != 2)
+        continue;
+
+      let option = document.createElement("option");
+      option.value = table.uuid;
+      option.text  = table.description;
+
+      select.appendChild(option);
+    }
+  });
+}
+
+AddMatch_GetMatchTables();
+GetRuleSets();
 
 </script>
