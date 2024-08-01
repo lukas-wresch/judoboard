@@ -2571,9 +2571,6 @@ Error Application::Ajax_AddMatch(const HttpServer::Request& Request)
 	if (!white || !blue)//Judokas exist?
 		return Error(Error::Type::ItemNotFound);
 
-	if (matID <= 0)//Illegal mat?
-		matID = FindDefaultMatID();//Use the default
-
 	auto rule = GetTournament()->FindRuleSet(ruleID);
 	if (!rule)
 		rule = m_Database.FindRuleSet(ruleID);
@@ -2585,7 +2582,7 @@ Error Application::Ajax_AddMatch(const HttpServer::Request& Request)
 
 	if (match_table)
 	{
-		if (match_table->GetMatID() != matID)
+		if (matID >= 1 && match_table->GetMatID() != matID)
 			match->SetMatID(matID);
 		if (rule && match_table->GetRuleSet() != *rule)
 			match->SetRuleSet(rule);
@@ -2598,7 +2595,11 @@ Error Application::Ajax_AddMatch(const HttpServer::Request& Request)
 
 	else
 	{
-		match->SetMatID(matID);
+		if (matID <= 0)//Illegal mat?
+			matID = FindDefaultMatID();//Use the default
+		else
+			match->SetMatID(matID);
+
 		match->SetRuleSet(rule);
 
 		if (!GetTournament()->AddMatch(match))
