@@ -32,3 +32,13 @@ Management for tournaments, weightclasses and matches on multiple mats.
 Import of *.dm4 and *.md5 files.
 Scoreboard display with name of participants, scores, osaekomi, shidos and hansokumake.
 Support for advance IJF rules: Double ippon, double hansokumake.
+
+## License
+
+This project is open source but not free for commercial use. It is licensed under a proprietary license that allows the source code to be used for personal and non-commercial purposes.
+
+### Commercial Use
+
+For commercial use of this software, a separate license is required. Please contact us for more information and to purchase a commercial license.
+
+By purchasing a commercial license, you gain the right to use the software without the restrictions of the proprietary license.
