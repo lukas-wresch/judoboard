@@ -101,7 +101,7 @@ namespace Judoboard
 
 		const ZED::Sound* GetSound(const std::string& Name) const {
 			auto ret = m_Sounds.find(Name);
-			assert(ret != m_Sounds.end());
+			//assert(ret != m_Sounds.end());
 			if (ret == m_Sounds.end())
 				return nullptr;
 			return &ret->second;

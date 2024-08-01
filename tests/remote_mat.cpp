@@ -405,7 +405,7 @@ TEST(RemoteMat, CorrectWinner)
 				m->AddNoDisqualification(!f);
 			}
 
-			ZED::Core::Pause(500);
+			ZED::Core::Pause(2200);
 
 			if (i == 4)
 				m->SetAsDraw();

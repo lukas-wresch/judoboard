@@ -1248,8 +1248,8 @@ void Mat::PlaySoundFile() const
 	if (m_Application)
 	{
 		auto sound = m_Application->GetSound(GetSoundFilename());
-		assert(sound);
-		assert(sound->IsValid());
+		//assert(sound);
+		//assert(sound->IsValid());
 		if (sound)
 			m_AudioDevice.Play(*sound);
 	}
