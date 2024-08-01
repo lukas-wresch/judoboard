@@ -2255,6 +2255,7 @@ TEST(Ajax, Match_Add)
 		EXPECT_EQ(*match->GetFighter(Fighter::Blue),  *j2);
 		EXPECT_EQ(match->GetMatID(), 2);
 		EXPECT_EQ(match->GetRuleSet().GetUUID(), r1->GetUUID());
+		EXPECT_EQ(table->GetRuleSet().GetUUID(), r1->GetUUID());
 
 		EXPECT_TRUE(app.Ajax_AddMatch(HttpServer::Request("", "white=" + (std::string)j2->GetUUID() + "&blue=" + (std::string)j1->GetUUID() + "&mat=2&rule=" + (std::string)r1->GetUUID() + "&match_table=" + (std::string)table->GetUUID() )));
 

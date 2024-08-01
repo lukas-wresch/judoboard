@@ -187,8 +187,6 @@ document.getElementById("blue").oninput = function(e)
   Update("blue");
 };
 
-GetMats();
-
 for (const el of document.getElementsByClassName("no"))
     el.innerHTML = translate('no');
 for (const el of document.getElementsByClassName("name"))
@@ -219,7 +217,7 @@ function AddMatch_GetMatchTables()
     const res = YAML.parse(response);
     console.log(res);
 
-    let select = document.getElementById("match_table")
+    let select = document.getElementById("match_table");
 
     for (const table of res)
     {
@@ -232,10 +230,46 @@ function AddMatch_GetMatchTables()
 
       select.appendChild(option);
     }
+
+    let option = document.createElement("option");
+    option.value = 0;
+    option.text  = '- - -';
+    select.appendChild(option);
+
+    AddMatch_UpdateMatAndRules();
   });
 }
 
-AddMatch_GetMatchTables();
+
+GetMats();
 GetRuleSets();
+AddMatch_GetMatchTables();
+
+
+function AddMatch_UpdateMatAndRules()
+{
+  let selected_table = document.getElementById("match_table").value;
+
+  AjaxCallback("ajax/matchtable/get_all", function(response) {
+    console.log(response);
+    const res = YAML.parse(response);
+    console.log(res);
+
+    for (const table of res)
+    {
+      if (table.uuid != selected_table)
+        continue;
+
+      document.getElementById("mat").value  = table.mat_id;
+      document.getElementById("rule").value = table.rule_set;
+    }
+  });
+}
+
+
+document.getElementById("match_table").onchange = function(e)
+{
+  AddMatch_UpdateMatAndRules();
+};
 
 </script>
