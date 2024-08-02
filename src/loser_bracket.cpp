@@ -290,7 +290,7 @@ const std::string LoserBracket::ToHTML() const
 {
 	std::string ret = GetHTMLTop();
 
-	ret += "<table border='1' rules='all'>";
+	ret += "<table border=\"1\" rules=\"all\">";
 
 	const auto rounds = GetNumberOfRounds();
 	const auto max_start_pos = GetMaxStartPositions();
@@ -332,14 +332,14 @@ const std::string LoserBracket::ToHTML() const
 	if (rounds > 0)
 		width = 100 / rounds;
 
-	ret += "<tr style='height: 5mm; text-align: center'>";
+	ret += "<tr style=\"height: 5mm; text-align: center\">";
 	for (int round = 0; round < rounds; ++round)
 		ret += "<th width=\"" + std::to_string(width) + "%\">" + Localizer::Translate("Round") + " " + std::to_string(round + 1) + "</th>";
 	ret += "</tr>";
 
 	for (int y = 0; y < N; ++y)
 	{
-		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += "<tr style=\"height: 5mm; text-align: center\">";
 
 		for (size_t round = 0; round < rounds; ++round)
 		{
@@ -386,16 +386,16 @@ const std::string LoserBracket::ToHTML() const
 
 	if (IsThirdPlaceMatch())//3rd or 5th place match
 	{
-		ret += "<table width=\"" + std::to_string(width) + "%\" border='1' rules='all' style=\"margin-top: 10mm;\">";
+		ret += "<table width=\"" + std::to_string(width) + "%\" border=\"1\" rules=\"all\" style=\"margin-top: 10mm;\">";
 
-		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += "<tr style=\"height: 5mm; text-align: center\">";
 		if (!IsSubMatchTable())
 			ret += "<th>" + Localizer::Translate("3rd Place Match") + "</th>";
 		else
 			ret += "<th>" + Localizer::Translate("5th Place Match") + "</th>";
 		ret += "</tr>";
 
-		ret += "<tr style='height: 5mm; text-align: center'>";
+		ret += "<tr style=\"height: 5mm; text-align: center\">";
 
 		int matchIndex = (int)GetSchedule().size() - 1;
 
