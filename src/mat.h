@@ -74,7 +74,7 @@ namespace Judoboard
 		bool IsOsaekomi() const override { return m_IsOsaekomi; }//Returns true during an osaekomi situation (even during sonomama!)
 		bool IsSonomama() const { return !IsHajime() && IsOsaekomi(); }
 		Fighter GetOsaekomiHolder() const { return m_OsaekomiHolder; }
-		bool CanNextMatchStart() const override { return m_State == State::Waiting; }
+		bool CanNextMatchStart() const override { return m_State == State::Waiting || (m_State == State::TransitionToWaiting && Timer::GetTimestamp() - m_CurrentStateStarted >= 8 * 1000); }
 		bool IsDoingAnimation() const { return m_State == State::TransitionToMatch || m_State == State::TransitionToWaiting; }
 		bool AreFightersOnMat() const override { return m_State == State::TransitionToMatch || m_State == State::Running; }
 		const Match* GetMatch() const override { return m_pMatch; }
@@ -92,6 +92,8 @@ namespace Judoboard
 		//Commands by judge
 		virtual bool StartMatch(Match* NewMatch, bool UseForce = false) override;
 		virtual bool EndMatch() override;
+		virtual bool CanStopMatch() const override;
+		virtual bool StopMatch() override;
 
 		virtual void Hajime() override;
 		virtual void Mate() override;
@@ -251,6 +253,22 @@ namespace Judoboard
 				return ret;
 			}
 
+			void ChangeSpeed(double SpeedChange)
+			{
+				switch (m_Type)
+				{
+				case Type::MoveConstantVelocity:
+					m_vx *= SpeedChange;
+					m_vy *= SpeedChange;
+					m_va *= SpeedChange;
+					break;
+
+				case Type::ScaleSinus:
+					m_Frequency *= SpeedChange;
+					break;
+				}
+			}
+
 			bool Process(GraphicElement& Graphic, double dt);//Returns true when the animation ends
 
 			bool IsRunInParallel() const { return m_RunInParallelToNextAnimation; }
@@ -320,6 +338,12 @@ namespace Judoboard
 					m_Name = m_Name.substr(0, m_Name.length()-1) + ".";
 
 				m_Texture = Renderer.RenderFont(m_Size, m_Name, m_Color);
+			}
+
+			void ChangeSpeed(double SpeedChange)
+			{
+				if (!m_Animations.empty())
+					m_Animations[0].ChangeSpeed(SpeedChange);
 			}
 
 			void Render(const ZED::Renderer& Renderer, double dt)

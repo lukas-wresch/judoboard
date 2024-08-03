@@ -49,6 +49,7 @@ namespace Judoboard
 		virtual bool RemoveMatch(const UUID& MatchID) { assert(false); return false; }
 		virtual bool MoveMatchUp(const UUID& MatchID, uint32_t MatID = 0) { assert(false); return false; }
 		virtual bool MoveMatchDown(const UUID& MatchID, uint32_t MatID = 0) { assert(false); return false; }
+		virtual bool MoveMatchTo(const UUID& From, const UUID& To, bool Above) { assert(false); return false; }
 
 		//Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const = 0;

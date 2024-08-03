@@ -445,9 +445,19 @@ TEST(Match, MatchTimeOnlyForWinner)
 		tourney.AddMatchTable(r);
 
 		ASSERT_EQ(r->GetSchedule().size(), 1);
+
 		EXPECT_TRUE(mat.StartMatch(r->GetSchedule()[0]));
+		EXPECT_EQ(r->GetSchedule()[0]->GetLog().GetNumEvent(), 1);
+
+		EXPECT_TRUE(mat.StopMatch());
+		EXPECT_EQ(r->GetSchedule()[0]->GetLog().GetNumEvent(), 2);
+
+		EXPECT_TRUE(mat.StartMatch(r->GetSchedule()[0]));
+		EXPECT_EQ(r->GetSchedule()[0]->GetLog().GetNumEvent(), 3);
 
 		mat.Hajime();
+
+		EXPECT_FALSE(mat.StopMatch());
 
 		ZED::Core::Pause(3005);
 

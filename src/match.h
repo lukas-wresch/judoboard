@@ -146,6 +146,7 @@ namespace Judoboard
 		const MatchLog& GetLog() const { return m_Log; }
 
 		void StartMatch();
+		void StopMatch();
 		void EndMatch();
 
 		const MatchTable* GetMatchTable() const { return m_Table; }

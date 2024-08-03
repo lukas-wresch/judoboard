@@ -33,6 +33,10 @@
 </div>
 
 
+<div id="contextMenu" class="context-menu">
+</div>
+
+
 <h2 id="headline">Schedule</h2>
 
 <label style="float:left;margin-top:0px;margin-right:10px;" id="label_show_matches">Show matches</label>
@@ -55,7 +59,7 @@
     <th style="width: 1cm;" class="mat">Mat</th>
     <th style="width: 3.5cm; text-align: center;" class="status">Status</th>
     <th style="width: 2.5cm; text-align: center;" id="break">Break</th>
-    <th style="width: 2.5cm; text-align: center;" class="options">Options</th>
+    <th style="width: 6.5cm; text-align: center;" class="options">Options</th>
   </tr>
 </table>
 
@@ -116,7 +120,7 @@ function MoveEntryDown(id)
 
 
 
-function SetEntryMat(id, mat)
+function SetEntryMat(mat)
 {
   AjaxCallback('ajax/masterschedule/move?id='+id+'&mat='+mat, function() {
     Update_Masterschedule();
@@ -125,6 +129,15 @@ function SetEntryMat(id, mat)
   return false;
 }
 
+
+
+function SetMat(mat)
+{
+  AjaxCallback('/ajax/match/set_mat?id=' + context_menu_match_uuid + '&mat=' + mat, function() {
+    Update_Schedule();
+  });
+  return false;
+}
 
 
 function MoveUp(id)
@@ -268,8 +281,25 @@ function Update_Masterschedule()
     let i = 0;
     let mat_count = res.highest_mat_id;
 
+    contextMenu.innerHTML = '';
+
+    const ul = document.createElement('ul');
+
+    for (let j = 0; j < mat_count + 1; j++)
+    {
+      const li = document.createElement('li');
+      const a  = document.createElement('a');
+      a.href = '#';
+      a.onclick = function(event) { event.preventDefault(); SetMat(j + 1); };
+      a.textContent = translate('mat') + ' ' + (j + 1);
+      li.appendChild(a);
+      ul.appendChild(li);
+    }
+
+    contextMenu.appendChild(ul);
+
     let row = table.insertRow(-1);
-    for (var j=0; j < mat_count; j++)
+    for (let j=0; j < mat_count; j++)
     {
       let option = document.createElement("option");
       option.value = j+1;
@@ -321,7 +351,7 @@ function Update_Masterschedule()
             contents += entry.schedule_size + ' ' + translate('matches') + ' / ' + entry.participant_count + ' ' + translate('participants');
             contents += "<br/>"
 
-            let dragable = "draggable=\"true\" data-uuid=\""+entry.uuid+"\" ";
+            let dragable = 'draggable="true" data-uuid="'+entry.uuid+'"';
             let data_string = "data-mat=\"" + entry.mat_id + "\" data-schedule_index=\"" + schedule_index + "\"";
 
             contents += "<table " + dragable + data_string + "><tr><td "+dragable+data_string+" rowspan=\"2\"><a "+dragable+data_string+" style=\"" + style + "transform: rotate(135deg); \" href=\"#\" onclick=\"SetEntryMat('" + entry.uuid + "'," + (entry.mat_id-1) + ");\"></a></td>";
@@ -487,6 +517,14 @@ function Update_Schedule()
       cell0.style.fontSize  = "14pt";
       cell0.style.height    = "1.5cm";
 
+      row.draggable = true;
+      row.dataset.uuid = match.uuid;
+      row.addEventListener('dragstart', drag_schedule_start);
+      row.addEventListener('dragover',  drag_schedule_over);
+      row.addEventListener('dragleave', drag_schedule_leave);
+      row.addEventListener('dragend',   drag_schedule_end);
+      row.addEventListener('drop',      drop_schedule);
+
       if (typeof match.white_name !== 'undefined')
       {
         if (!ContainsPrintableCharacters(match.white_name))
@@ -584,7 +622,7 @@ function Update_Schedule()
         cell6.innerHTML = '- - -';
       else
       {
-        var current_breaktime = Math.floor(match.current_breaktime/60) + ':' + zeroPad(Math.floor(match.current_breaktime)%60, 2);
+        let current_breaktime = Math.floor(match.current_breaktime/60) + ':' + zeroPad(Math.floor(match.current_breaktime)%60, 2);
         cell6.innerHTML = current_breaktime;
       
         if (match.current_breaktime < match.breaktime)
@@ -596,16 +634,94 @@ function Update_Schedule()
         }
       }
 
-      var style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
-      var options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 1.8cm; margin-right: 2mm;\" onclick=navigate(\"edit_match.html?id="+match.uuid+"\");>" + translate('details') + "</button></td>";
+      let style = "border: solid black; border-width: 0 5px 5px 0; display: inline-block; padding: 5px;";
+      let options = "<table><tr><td rowspan=\"2\"><button class=\"white\" style=\"width: 1.8cm; margin-right: 2mm;\" onclick=navigate(\"edit_match.html?id="+match.uuid+"\");>" + translate('details') + "</button></td>";
 
-      if (match.state == 0)
+      if (match.state == 0 || match.state == 3)
+        options += "<td rowspan=\"2\"><button class=\"contextButton white\" data-uuid=\""+match.uuid+"\" style=\"width: 3.2cm; margin-right: 2mm;\">" + translate('move_to_mat') + "</button></td>";
+
+      if (match.state == 0 || match.state == 3)
         options += "<td><a style=\"" + style + "transform: rotate(-135deg); \" href=\"#\" onclick=\"return MoveUp('"+match.uuid+"')\"></a></td></tr><tr><td><a style=\"" + style + "transform: rotate(45deg);\"   href=\"#\" onclick=\"return MoveDown('"+match.uuid+"');\"></a></td></tr></table>";
       else
         options += "<td></td></tr><tr><td></td></tr></table>";
 
       cell7.innerHTML = options;
     }
+
+
+    const buttons = document.querySelectorAll('.contextButton');
+    buttons.forEach(button => {
+      button.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        console.log(button.dataset['uuid']);
+        context_menu_match_uuid = button.dataset['uuid'];
+            
+        const contextMenu = document.getElementById('contextMenu');
+        contextMenu.style.display = 'block';
+        
+        let offset = 0;
+        if (slideout.isOpen())
+          offset = 200;
+          
+        contextMenu.style.left = `${event.pageX - offset}px`;
+        contextMenu.style.top  = `${event.pageY}px`;
+      });
+    });
+  });
+}
+
+
+
+let dragged_row;
+
+function drag_schedule_start(event)
+{
+  dragged_row = event.target.dataset['uuid'];
+  console.log('drag started ' + dragged_row);
+}
+
+function drag_schedule_over(event)
+{
+  event.preventDefault();
+}
+
+function drag_schedule_leave(event)
+{
+  event.preventDefault();
+}
+
+function drag_schedule_end(event)
+{
+  event.preventDefault();
+}
+
+function drop_schedule(event)
+{
+  event.preventDefault();
+
+  //console.log(event.target);
+  //console.log(event.target.parentNode);
+  //console.log('dropped ' + event.target.parentNode.dataset['uuid']);
+
+  let target = event.target.parentNode.dataset['uuid'];
+
+  if (target == dragged_row)
+    return;
+
+  let rect = event.target.getBoundingClientRect();
+
+  let relativeY = event.clientY - rect.top;
+
+  //Determine if the mouse is near the top or bottom
+  let position;
+  if (relativeY < rect.height/2)
+    position = 'above';
+  else
+    position = 'below';
+
+  AjaxCallback('ajax/match/move_to?from='+dragged_row+'&to='+target+'&position='+position, function() {
+    Update_Schedule();
   });
 }
 
@@ -896,6 +1012,7 @@ document.getElementById("participants_search").oninput = function(e)
 };
 
 var showHansokumake = false;
+var context_menu_match_uuid = "";
 
 
 Update();
@@ -955,3 +1072,11 @@ document.getElementById("master-schedule-hide").innerHTML = translate('hide');
 document.getElementById("label-all").innerHTML = translate('all');
 document.getElementById("label-important").innerHTML = translate('important');
 document.getElementById("label-none").innerHTML = translate('none');
+
+
+document.addEventListener('click', function(event) {
+  const menu = document.getElementById('contextMenu');
+  const buttons = document.querySelectorAll('.contextButton');
+  if (!menu.contains(event.target) && ![...buttons].includes(event.target))
+    menu.style.display = 'none';
+});
