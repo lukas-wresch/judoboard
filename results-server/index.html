@@ -9,17 +9,24 @@
 <body>
 <div style="font-size: 25pt; margin-top: 4mm;">Judoboard</div>
 
+<button class="neutral" style="width: 2.5cm; height: 0.9cm;" onclick="Update(0);">&Uuml;bersicht</button>
+<button class="neutral" style="width: 2.5cm; height: 0.9cm;" onclick="Update(1);">Matte 1</button>
+<button class="neutral" style="width: 2.5cm; height: 0.9cm;" onclick="Update(2);">Matte 2</button>
+
 <div id="content">
 </div>
 
 </body>
 <script>
 
-function Update()
+function Update(mat)
 {
-  AjaxCallback("get.php", function(response) {
+  AjaxCallback("get.php?mat=" + mat, function(response) {
     document.getElementById("content").innerHTML = response;
   });
+
+  window.clearTimeout(timer);
+  timer = window.setTimeout(Update, 30*1000, mat);
 }
 
 function Update_Table(id)
@@ -27,10 +34,13 @@ function Update_Table(id)
   AjaxCallback("get_table.php?id=" + id, function(response) {
     document.getElementById("content").innerHTML = response;
   });
+
+  window.clearTimeout(timer);
+  timer = window.setTimeout(Update_Table, 45*1000, id);
 }
 
-Update();
-window.setInterval(Update, 30*1000);
+var timer;
+Update(0);
 
 </script>
 </html>
