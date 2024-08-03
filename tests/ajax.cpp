@@ -994,12 +994,12 @@ TEST(Ajax, GetHansokumake2)
 		app.StartLocalMat(1);
 		IMat* mat = app.FindMat(1);
 
-		Match match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
+		auto match = std::make_shared<Match>(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), nullptr, 1);
 
 		auto ret = app.Ajax_GetHansokumake();
 		EXPECT_EQ(ret, "[]");
 
-		EXPECT_TRUE(mat->StartMatch(&match));
+		EXPECT_TRUE(mat->StartMatch(match));
 		EXPECT_TRUE(mat->AreFightersOnMat());
 		for (int i = 0;i < 5; i++)
 			mat->AddShido(f);
@@ -2716,9 +2716,9 @@ TEST(Ajax, MatchTable_Get)
 		node = YAML::Load(output);
 
 		ASSERT_EQ(tables[3]->GetType(), MatchTable::Type::Pool);
-		Pool* pool = (Pool*)tables[3];
+		auto pool = std::dynamic_pointer_cast<Pool>(tables[3]);
 
-		output = app.Ajax_GetMatchTable(HttpServer::Request("id=" + (std::string)pool->GetFinals().GetUUID()));
+		output = app.Ajax_GetMatchTable(HttpServer::Request("id=" + (std::string)pool->GetFinals()->GetUUID()));
 
 		YAML::Emitter yaml5;
 		yaml5 << YAML::BeginMap;

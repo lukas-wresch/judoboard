@@ -2547,7 +2547,7 @@ void Application::SetupHttpServer()
 		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		bool success = false;
-		std::vector<Match> next_matches;
+		std::vector<std::shared_ptr<Match>> next_matches;
 
 		while (!success)
 		{
@@ -2559,7 +2559,7 @@ void Application::SetupHttpServer()
 		ret << YAML::BeginSeq;
 
 		for (auto match : next_matches)
-			match >> ret;
+			*match >> ret;
 
 		ret << YAML::EndSeq;
 		return ret.c_str();

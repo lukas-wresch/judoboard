@@ -7,7 +7,7 @@ using namespace Judoboard;
 
 
 
-TakeTopRanks::TakeTopRanks(const MatchTable& pSource, size_t NumRanks, const MatchTable* Parent) :
+TakeTopRanks::TakeTopRanks(std::shared_ptr<const MatchTable> pSource, size_t NumRanks, const MatchTable* Parent) :
 	m_pSource(pSource), IFilter(Parent)
 {
 	m_NumRanks = NumRanks;
@@ -33,7 +33,7 @@ void TakeTopRanks::operator >> (YAML::Emitter& Yaml) const
 
 	IFilter::operator>>(Yaml);
 
-	Yaml << YAML::Key << "source" << YAML::Value << (std::string)m_pSource.GetUUID();
+	Yaml << YAML::Key << "source" << YAML::Value << (std::string)m_pSource->GetUUID();
 
 	Yaml << YAML::EndMap;
 }
@@ -43,7 +43,7 @@ void TakeTopRanks::operator >> (YAML::Emitter& Yaml) const
 void TakeTopRanks::ToString(YAML::Emitter& Yaml) const
 {
 	Yaml << YAML::Key << "type" << YAML::Value << (int)GetType();
-	Yaml << YAML::Key << "source" << YAML::Value << (std::string)m_pSource.GetUUID();
+	Yaml << YAML::Key << "source" << YAML::Value << (std::string)m_pSource->GetUUID();
 }
 
 
@@ -59,7 +59,7 @@ std::string TakeTopRanks::GetHTMLForm() const
 
 bool TakeTopRanks::IsElgiable(const Judoka& Fighter) const
 {
-	return m_pSource.IsElgiable(Fighter);
+	return m_pSource->IsElgiable(Fighter);
 }
 
 
@@ -68,7 +68,7 @@ std::unordered_map<size_t, const DependentJudoka> TakeTopRanks::GetParticipants(
 {
 	std::unordered_map<size_t, const DependentJudoka> ret;
 
-	if (!m_pSource.HasConcluded())
+	if (!m_pSource->HasConcluded())
 	{
 		for (int i = 0; i < m_NumRanks; ++i)
 			ret.insert({ i, DependentJudoka( (DependencyType)((int)DependencyType::TakeRank1 + i), m_pSource ) });
@@ -76,7 +76,7 @@ std::unordered_map<size_t, const DependentJudoka> TakeTopRanks::GetParticipants(
 
 	else
 	{
-		auto results = m_pSource.CalculateResults();
+		auto results = m_pSource->CalculateResults();
 		for (int i = 0; i < m_NumRanks; ++i)
 		{
 			if (i < results.GetSize())

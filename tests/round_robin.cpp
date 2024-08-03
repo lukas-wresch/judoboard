@@ -310,7 +310,7 @@ TEST(RoundRobin, ExportImport)
 	Judoka j1(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 	Judoka j2(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 
-	auto w = new RoundRobin(Weight(10), Weight(100));
+	auto w = std::make_shared<RoundRobin>(Weight(10), Weight(100));
 
 	w->SetScheduleIndex(rand());
 

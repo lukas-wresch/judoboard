@@ -217,13 +217,13 @@ TEST(Mat, CorrectWinner)
 			m.SetAudio(false, "", 0);
 
 			EXPECT_FALSE(m.CanStopMatch());
-			EXPECT_TRUE(m.StartMatch(&match));
+			EXPECT_TRUE(m.StartMatch(match));
 			EXPECT_TRUE(m.AreFightersOnMat());
 
 			EXPECT_TRUE(m.CanStopMatch());
 			EXPECT_TRUE(m.StopMatch());
 			EXPECT_FALSE(m.AreFightersOnMat());
-			EXPECT_TRUE(m.StartMatch(&match));
+			EXPECT_TRUE(m.StartMatch(match));
 			EXPECT_TRUE(m.AreFightersOnMat());
 			EXPECT_TRUE(m.CanStopMatch());
 

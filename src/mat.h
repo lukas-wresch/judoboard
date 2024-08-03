@@ -77,8 +77,9 @@ namespace Judoboard
 		bool CanNextMatchStart() const override { return m_State == State::Waiting || (m_State == State::TransitionToWaiting && Timer::GetTimestamp() - m_CurrentStateStarted >= 8 * 1000); }
 		bool IsDoingAnimation() const { return m_State == State::TransitionToMatch || m_State == State::TransitionToWaiting; }
 		bool AreFightersOnMat() const override { return m_State == State::TransitionToMatch || m_State == State::Running; }
-		std::shared_ptr<const Match> GetMatch() const override { return m_pMatch; }
-		const std::vector<Match> GetNextMatches() const override;
+
+		virtual std::shared_ptr<const Match> GetMatch() const override { return m_pMatch; }
+		virtual const std::vector<std::shared_ptr<Match>> GetNextMatches() const override;
 
 		uint32_t EndTimeOfOsaekomi() const;//Returns the number of seconds the osaekomi end the match
 

@@ -187,7 +187,7 @@ TEST(App, Tournaments_OpenLastTournament)
 		Application app;
 
 		Tournament* t = new Tournament("deleteMe");
-		t->AddMatch(new Match(nullptr, nullptr, t));
+		t->AddMatch(std::make_shared<Match>(nullptr, nullptr, t));
 
 		EXPECT_TRUE(app.AddTournament(t));
 		t->Save();
@@ -428,8 +428,8 @@ TEST(App, FullTournament)
 		tourney->AddParticipant(&j5);
 		tourney->AddParticipant(&j6);
 
-		MatchTable* m1 = new RoundRobin(Weight(0), Weight(49));
-		MatchTable* m2 = new RoundRobin(Weight(0), Weight(49));
+		auto m1 = std::make_shared<RoundRobin>(Weight(0), Weight(49));
+		auto m2 = std::make_shared<RoundRobin>(Weight(0), Weight(49));
 		m1->SetMatID(1);
 		m2->SetMatID(1);
 		tourney->AddMatchTable(m1);
@@ -516,7 +516,7 @@ TEST(App, FullTournament_SingleElimination14)
 		for (int i = 0; i < 14; ++i)
 			tourney->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i));
 
-		tourney->AddMatchTable(new SingleElimination(10, 200, tourney));
+		tourney->AddMatchTable(std::make_shared<SingleElimination>(10, 200, tourney));
 		tourney->GetMatchTables()[0]->SetMatID(1);
 		tourney->GenerateSchedule();
 
@@ -600,7 +600,7 @@ TEST(App, FullTournament_SingleElimination7_BO3)
 		for (int i = 0; i < 7; ++i)
 			tourney->AddParticipant(new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + i));
 
-		auto group = new SingleElimination(10, 200, tourney);
+		auto group = std::make_shared<SingleElimination>(10, 200, tourney);
 		group->SetMatID(1);
 		group->IsBestOfThree(true);
 		tourney->AddMatchTable(group);
@@ -682,11 +682,11 @@ TEST(App, FullTournament_StressTest)
 			tourney->AddParticipant(j[i]);
 		}
 
-		MatchTable* m1 = new DoubleElimination(Weight(0),  Weight(60));
-		MatchTable* m2 = new DoubleElimination(Weight(60), Weight(70));
-		MatchTable* m3 = new DoubleElimination(Weight(70), Weight(80));
-		MatchTable* m4 = new DoubleElimination(Weight(80), Weight(90));
-		MatchTable* m5 = new DoubleElimination(Weight(90), Weight(100));
+		auto m1 = std::make_shared<DoubleElimination>(Weight(0),  Weight(60));
+		auto m2 = std::make_shared<DoubleElimination>(Weight(60), Weight(70));
+		auto m3 = std::make_shared<DoubleElimination>(Weight(70), Weight(80));
+		auto m4 = std::make_shared<DoubleElimination>(Weight(80), Weight(90));
+		auto m5 = std::make_shared<DoubleElimination>(Weight(90), Weight(100));
 
 		tourney->AddMatchTable(m1);
 		tourney->AddMatchTable(m2);
@@ -705,7 +705,7 @@ TEST(App, FullTournament_StressTest)
 		auto adder = [&]() {
 			for (int i = 0; i < 50; ++i)
 			{
-				Match* new_match = new Match(j[rand() % judoka_count], j[rand() % judoka_count], nullptr, rand()% mat_count + 1);
+				auto new_match = std::make_shared<Match>(j[rand() % judoka_count], j[rand() % judoka_count], nullptr, rand()% mat_count + 1);
 				tourney->AddMatch(new_match);
 
 				ZED::Core::Pause(100);
@@ -870,13 +870,13 @@ TEST(App, VeryLongNameTest)
 	Judoka j1("Very-Long-Firstname", "Very-Long-Lastname", rand() % 50);
 	Judoka j2("Very-Long-Firstname", "Very-Long-Lastname", rand() % 50);
 
-	Match match(&j1, &j2, nullptr);
-	match.SetMatID(1);
-	match.SetRuleSet(std::make_shared<RuleSet>("Test", 25, 0, 30, 20, true, true, true, 0));
+	auto match = std::make_shared<Match>(&j1, &j2, nullptr);
+	match->SetMatID(1);
+	match->SetRuleSet(std::make_shared<RuleSet>("Test", 25, 0, 30, 20, true, true, true, 0));
 
 	ZED::Core::Pause(5000);
 
-	EXPECT_TRUE(m.StartMatch(&match));
+	EXPECT_TRUE(m.StartMatch(match));
 	m.Hajime();
 
 	ZED::Core::Pause(30*1000);
@@ -953,7 +953,7 @@ TEST(App, MatchOnSlave)
 
 	Judoka j1("White", "LastnameW");
 	Judoka j2("Blue",  "LastnameB");
-	Match* match = new Match(&j1, &j2, nullptr);
+	auto match = std::make_shared<Match>(&j1, &j2, nullptr);
 	match->SetMatID(2);
 
 	master.GetTournament()->AddMatch(match);
@@ -1038,8 +1038,8 @@ TEST(App, MasterSlaveForceClose)
 	tourney->AddParticipant(&j5);
 	tourney->AddParticipant(&j6);
 
-	MatchTable* m1 = new RoundRobin( 0,  49, Gender::Unknown, tourney);
-	MatchTable* m2 = new RoundRobin(50, 100, Gender::Unknown, tourney);
+	auto m1 = std::make_shared<RoundRobin>( 0,  49, Gender::Unknown, tourney);
+	auto m2 = std::make_shared<RoundRobin>(50, 100, Gender::Unknown, tourney);
 	m1->SetMatID(1);
 	m2->SetMatID(2);
 	tourney->AddMatchTable(m1);
@@ -1094,8 +1094,8 @@ TEST(App, MasterSlaveFullTournament)
 	tourney->AddParticipant(&j5);
 	tourney->AddParticipant(&j6);
 
-	MatchTable* m1 = new RoundRobin( 0,  49, Gender::Unknown, tourney);
-	MatchTable* m2 = new RoundRobin(50, 100, Gender::Unknown, tourney);
+	auto m1 = std::make_shared<RoundRobin>( 0,  49, Gender::Unknown, tourney);
+	auto m2 = std::make_shared<RoundRobin>(50, 100, Gender::Unknown, tourney);
 	m1->SetMatID(2);
 	m2->SetMatID(2);
 	tourney->AddMatchTable(m1);

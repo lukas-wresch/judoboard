@@ -122,7 +122,7 @@ namespace Judoboard
 		virtual bool AreFightersOnMat() const = 0;
 
 		virtual std::shared_ptr<const Match> GetMatch() const { return nullptr; }
-		virtual const std::vector<Match> GetNextMatches() const { return m_NextMatches; }
+		virtual const std::vector<std::shared_ptr<Match>> GetNextMatches() const { return m_NextMatches; }
 
 		virtual bool CanNextMatchStart() const = 0;
 		virtual bool StartMatch(std::shared_ptr<Match> NewMatch, bool UseForce = false) = 0;//Creates a new match. Both judoka are copied to the mat. Returns false when a match is still progressing and hence a new match can not be started
@@ -227,7 +227,7 @@ namespace Judoboard
 		void SetSoundFilename(const std::string& NewFilename) { m_SoundFilename = NewFilename; }
 		void SetAudioDeviceID(int DeviceID) { m_AudioDeviceID = DeviceID; }
 
-		std::vector<Match> m_NextMatches;
+		std::vector<std::shared_ptr<Match>> m_NextMatches;
 
 	private:
 		std::string m_Name;

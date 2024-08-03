@@ -43,7 +43,7 @@ std::vector<std::shared_ptr<Match>> RemoteTournament::GetNextMatches(int32_t Mat
 		if (!IsMatchInCache(id))
 			m_MatchCache.push_back(std::make_shared<Match>(node, nullptr, (RemoteTournament*)this));
 
-		Match match(node, nullptr, (RemoteTournament*)this);
+		auto match = std::make_shared<Match>(node, nullptr, (RemoteTournament*)this);
 		ret.emplace_back(match);
 	}
 

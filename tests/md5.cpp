@@ -2791,9 +2791,9 @@ TEST(MD5, ExportPool)
 		t->AddParticipant(j[i]);
 	}
 
-	Pool* group1 = new Pool(50, 90);
-	Pool* group2 = new Pool(100, 140);
-	Pool* group3 = new Pool(150, 190);
+	auto group1 = std::make_shared<Pool>(50, 90);
+	auto group2 = std::make_shared<Pool>(100, 140);
+	auto group3 = std::make_shared<Pool>(150, 190);
 
 	group1->SetMatID(1);
 	group1->IsThirdPlaceMatch(true);
@@ -3085,7 +3085,7 @@ TEST(MD5, ExportSingleElimination16)
 		t->AddParticipant(j[i]);
 	}
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	group->SetAgeGroup(age);
 	t->AddMatchTable(group);
@@ -3197,7 +3197,7 @@ TEST(MD5, ExportSingleElimination16_3rd_5th)
 		t->AddParticipant(j[i]);
 	}
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	group->SetAgeGroup(age);
 	group->IsThirdPlaceMatch(true);
@@ -3310,7 +3310,7 @@ TEST(MD5, ExportSingleElimination32)
 		t->AddParticipant(j[i]);
 	}
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	group->SetAgeGroup(age);
 	t->AddMatchTable(group);
@@ -3512,8 +3512,8 @@ TEST(MD7, ImportKEM_U13_2024_05_05)
 		EXPECT_EQ(table->GetParticipants().size(), 6);
 		EXPECT_EQ(table->GetSchedule().size(),     4 + 2 + 1 + 2 + 2 + 1 + 1);
 		EXPECT_EQ(table->GetType(), MatchTable::Type::DoubleElimination);
-		EXPECT_TRUE( ((DoubleElimination*)table)->IsThirdPlaceMatch() );
-		EXPECT_TRUE( ((DoubleElimination*)table)->IsFifthPlaceMatch() );
+		EXPECT_TRUE( std::dynamic_pointer_cast<DoubleElimination>(table)->IsThirdPlaceMatch() );
+		EXPECT_TRUE( std::dynamic_pointer_cast<DoubleElimination>(table)->IsFifthPlaceMatch() );
 
 
 		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -46 kg");

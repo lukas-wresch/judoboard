@@ -227,8 +227,8 @@ void Pool::GenerateSchedule()
 
 	if (pool_count == 2)
 	{
-		TakeTopRanks topA(*m_Pools[0], m_TakeTop);
-		TakeTopRanks topB(*m_Pools[1], m_TakeTop);
+		TakeTopRanks topA(m_Pools[0], m_TakeTop);
+		TakeTopRanks topB(m_Pools[1], m_TakeTop);
 
 		Mixer mixer;
 
@@ -264,10 +264,10 @@ void Pool::GenerateSchedule()
 	{
 		Mixer mixer;
 
-		TakeTopRanks topA(*m_Pools[0], m_TakeTop);
-		TakeTopRanks topB(*m_Pools[1], m_TakeTop);
-		TakeTopRanks topC(*m_Pools[2], m_TakeTop);
-		TakeTopRanks topD(*m_Pools[3], m_TakeTop);
+		TakeTopRanks topA(m_Pools[0], m_TakeTop);
+		TakeTopRanks topB(m_Pools[1], m_TakeTop);
+		TakeTopRanks topC(m_Pools[2], m_TakeTop);
+		TakeTopRanks topD(m_Pools[3], m_TakeTop);
 
 		mixer.AddSource(topA);
 		mixer.AddSource(topB);
@@ -292,7 +292,7 @@ void Pool::GenerateSchedule()
 
 		for (int i = 0; i < pool_count; ++i)
 		{
-			IFilter* take_top_placed = new TakeTopRanks(*m_Pools[i], m_TakeTop);
+			IFilter* take_top_placed = new TakeTopRanks(m_Pools[i], m_TakeTop);
 			mixer->AddSource(*take_top_placed);
 		}
 

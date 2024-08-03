@@ -14,7 +14,7 @@ TEST(AgeGroup, MatchTableTakeRuleSet)
 		auto r = std::make_shared<RuleSet>(GetRandomName(), rand(), rand(), rand(), rand());
 		auto a = std::make_shared<AgeGroup>(GetRandomName(), rand(), rand(), r);
 
-		Match* match = new Match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), &t, 1);
+		auto match = std::make_shared<Match>(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), &t, 1);
 		t.AddMatch(match);
 
 		ASSERT_EQ(t.GetMatchTables().size(), 1);

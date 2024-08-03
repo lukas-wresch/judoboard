@@ -326,7 +326,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (table->GetType() == MatchTable::Type::Pool)
 		{
 			auto pool = std::dynamic_pointer_cast<Pool>(table);
-			if (pool->GetFinals().GetSchedule().empty())
+			if (pool->GetFinals()->GetSchedule().empty())
 			{
 				//pool->GetFinals().GenerateSchedule();
 				pool->AutoGenerateSchedule(true);
@@ -341,12 +341,12 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		}
 		else if (table->GetType() == MatchTable::Type::SingleElimination)
 		{
-			auto se = (SingleElimination*)table;
+			auto se = std::dynamic_pointer_cast<SingleElimination>(table);
 			//se->ReorderLastMatches();
 		}
 		else if (table->GetType() == MatchTable::Type::DoubleElimination)
 		{
-			auto de = (DoubleElimination*)table;
+			auto de = std::dynamic_pointer_cast<DoubleElimination>(table);
 			de->AutoGenerateSchedule(true);
 			de->GenerateSchedule();//Re-generated matches
 			//de->GetWinnerBracket().ReorderLastMatches();
@@ -893,7 +893,9 @@ bool Tournament::AddMatch(std::shared_ptr<Match> NewMatch)
 	
 	if (NewMatch->GetMatchTable())
 	{
-		AddMatchTable(std::make_shared<MatchTable>(NewMatch->GetMatchTable()));
+		auto copy_match_table = std::shared_ptr<MatchTable>((MatchTable*)(NewMatch->GetMatchTable()));
+		NewMatch->SetMatchTable(copy_match_table.get());
+		AddMatchTable(copy_match_table);
 		GenerateSchedule();
 	}
 	else
@@ -1247,7 +1249,7 @@ bool Tournament::MoveMatchTo(const UUID& From, const UUID& To, bool Above)
 
 
 
-std::vector<Match> Tournament::GetNextMatches(int32_t MatID) const
+std::vector<std::shared_ptr<Match>> Tournament::GetNextMatches(int32_t MatID) const
 {
 	std::vector<std::shared_ptr<Match>> ret;
 
@@ -1256,7 +1258,7 @@ std::vector<Match> Tournament::GetNextMatches(int32_t MatID) const
 	uint32_t id = 0;
 	for (int i = 0; i < 3; i++)
 	{
-		auto nextMatch = GetNextMatch(MatID, id);
+		auto nextMatch = std::const_pointer_cast<Match>(GetNextMatch(MatID, id));
 
 		if (nextMatch)
 			ret.push_back(nextMatch);
