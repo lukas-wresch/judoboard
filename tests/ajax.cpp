@@ -2415,7 +2415,7 @@ TEST(Ajax, MatchTable_Edit)
 
 		EXPECT_TRUE(app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)(std::dynamic_pointer_cast<Pool>(tables[0])->GetFinals())->GetUUID(), "name=Test4&fight_system=3&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")));
 
-		auto& finals = std::dynamic_pointer_cast<Pool>(tables[0])->GetFinals();
+		auto finals = std::dynamic_pointer_cast<Pool>(tables[0])->GetFinals();
 
 		EXPECT_EQ(finals->GetName(), "Test4");
 		EXPECT_EQ(finals->IsBestOfThree(), true);
