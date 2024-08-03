@@ -3101,6 +3101,42 @@ TEST(Ajax, MoveSchedule)
 	EXPECT_EQ(*tourney->GetSchedule()[3], *match1);
 	EXPECT_EQ(*tourney->GetSchedule()[4], *match3);
 	EXPECT_EQ(*tourney->GetSchedule()[5], *match4);
+
+	EXPECT_TRUE(app.Ajax_MoveMatchTo(HttpServer::Request("from=" + (std::string)match3->GetUUID() + "&to=" + (std::string)match6->GetUUID() + "&position=above")));
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match6);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match4);
+
+	EXPECT_TRUE(app.Ajax_MoveMatchTo(HttpServer::Request("from=" + (std::string)match2->GetUUID() + "&to=" + (std::string)match1->GetUUID() + "&position=below")));
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match6);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match4);
+
+	EXPECT_TRUE(app.Ajax_MoveMatchTo(HttpServer::Request("from=" + (std::string)match5->GetUUID() + "&to=" + (std::string)match4->GetUUID() + "&position=below")));
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match6);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match4);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match5);
+
+	EXPECT_TRUE(app.Ajax_MoveMatchTo(HttpServer::Request("from=" + (std::string)match4->GetUUID() + "&to=" + (std::string)match3->GetUUID() + "&position=above")));
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match4);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match6);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match5);
 }
 
 

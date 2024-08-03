@@ -29,6 +29,8 @@ namespace Judoboard
 		virtual bool StartMatch(std::shared_ptr<Match> NewMatch, bool UseForce = false) override;
 		virtual bool HasConcluded() const override;
 		virtual bool EndMatch() override;
+		virtual bool CanStopMatch() const override { assert(false); return false; }
+		virtual bool StopMatch() override { assert(false); return false; }
 
 		virtual uint32_t GetTime2Display() const override { return 0; }
 

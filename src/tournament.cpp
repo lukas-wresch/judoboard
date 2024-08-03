@@ -1205,7 +1205,49 @@ bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 
 
 
-std::vector<std::shared_ptr<Match>> Tournament::GetNextMatches(int32_t MatID) const
+bool Tournament::MoveMatchTo(const UUID& From, const UUID& To, bool Above)
+{
+	if (IsReadonly())
+		return false;
+
+	size_t from_match_index = SIZE_MAX;
+	size_t to_match_index   = SIZE_MAX;
+
+	auto guard = LockWriteForScope();
+
+	auto schedule = GetSchedule();
+	assert(schedule.size() == m_Schedule.size());
+	for (size_t index = 0; index < schedule.size(); index++)
+	{
+		if (schedule[index]->GetUUID() == From)
+			from_match_index = index;
+		else if (schedule[index]->GetUUID() == To)
+			to_match_index = index;
+	}
+
+	if (from_match_index >= schedule.size() || to_match_index >= schedule.size())
+		return false;
+
+	if (!Above)
+		to_match_index++;
+
+	auto element = std::move(m_Schedule[from_match_index]);
+
+	m_Schedule.erase(m_Schedule.begin() + from_match_index);
+
+	if (to_match_index > from_match_index)
+		to_match_index--;//The index changed, due to the above deletion
+
+	m_Schedule.insert(m_Schedule.begin() + to_match_index, std::move(element));
+
+	ScheduleSave();
+
+	return true;
+}
+
+
+
+std::vector<Match> Tournament::GetNextMatches(int32_t MatID) const
 {
 	std::vector<std::shared_ptr<Match>> ret;
 

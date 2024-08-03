@@ -100,7 +100,8 @@ namespace Judoboard
 			StartMatch, EndMatch,
 			EnableGoldenScore, DisableGoldenScore,
 			EnableDraw, DisableDraw,
-			ReviseMatch
+			ReviseMatch,
+			StopMatch
 		};
 
 		enum class BiasedEvent

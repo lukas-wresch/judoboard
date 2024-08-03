@@ -89,8 +89,9 @@ namespace Judoboard
 		bool ReviseMatch(const UUID& MatchID, IMat& Mat);
 
 		virtual bool RemoveMatch(const UUID& MatchID) override;
-		virtual bool MoveMatchUp(const UUID&  MatchID, uint32_t MatID = 0) override;
-		virtual bool MoveMatchDown(const UUID&  MatchID, uint32_t MatID = 0) override;
+		virtual bool MoveMatchUp(const UUID& MatchID, uint32_t MatID = 0) override;
+		virtual bool MoveMatchDown(const UUID& MatchID, uint32_t MatID = 0) override;
+		virtual bool MoveMatchTo(const UUID& From, const UUID& To, bool Above) override;
 
 		virtual std::vector<std::shared_ptr<Match>> GetNextMatches(int32_t MatID) const override;
 
