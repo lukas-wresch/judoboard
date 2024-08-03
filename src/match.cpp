@@ -32,7 +32,7 @@ Match::Match(const DependentJudoka& White, const DependentJudoka& Blue, const IT
 
 
 
-Match::Match(const YAML::Node& Yaml, std::shared_ptr<MatchTable> MatchTable, const ITournament* Tournament) : m_Tournament(Tournament)
+Match::Match(const YAML::Node& Yaml, const MatchTable* MatchTable, const ITournament* Tournament) : m_Tournament(Tournament)
 {
 	if (!Yaml.IsMap())
 		return;
@@ -68,7 +68,7 @@ Match::Match(const YAML::Node& Yaml, std::shared_ptr<MatchTable> MatchTable, con
 	if (MatchTable)
 		m_Table = MatchTable;
 	else if (Yaml["match_table"] && Tournament)
-		m_Table = Tournament->FindMatchTable(Yaml["match_table"].as<std::string>());
+		m_Table = Tournament->FindMatchTable(Yaml["match_table"].as<std::string>()).get();
 
 	if (Yaml["dependency_white"])
 		m_White.m_Type = (DependencyType)Yaml["dependency_white"].as<int>();

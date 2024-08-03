@@ -20,8 +20,9 @@ using namespace Judoboard;
 
 
 Pool::Pool(IFilter* Filter, const ITournament* Tournament)
-	: MatchTable(Filter, Tournament), m_Finals(nullptr, Tournament)
+	: MatchTable(Filter, Tournament)
 {
+	m_Finals = std::make_shared<SingleElimination>(nullptr, Tournament);
 	m_Finals->SetParent(this);
 	GenerateSchedule();
 }
@@ -36,8 +37,10 @@ Pool::Pool(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament*
 
 
 Pool::Pool(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
-	: MatchTable(Yaml, Tournament, Parent), m_Finals(nullptr, Tournament, Parent)
+	: MatchTable(Yaml, Tournament, Parent)
 {
+	m_Finals = std::make_shared<SingleElimination>(nullptr, Tournament, Parent);
+
 	if (Yaml["pool_count"])
 		m_PoolCount = Yaml["pool_count"].as<uint32_t>();
 	if (Yaml["take_top"])
@@ -50,7 +53,7 @@ Pool::Pool(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTab
 	}
 
 	if (Yaml["finals"] && Yaml["finals"].IsMap())
-		GetFinals() = SingleElimination(Yaml["finals"], Tournament, this);
+		m_Finals = std::make_shared<SingleElimination>(Yaml["finals"], Tournament, this);
 
 	CopyMatchesFromSubtables();
 }
@@ -82,7 +85,7 @@ void Pool::operator >> (YAML::Emitter& Yaml) const
 
 	Yaml << YAML::Key << "finals" << YAML::Value;
 	Yaml << YAML::BeginMap;
-	GetFinals() >> Yaml;
+	*m_Finals >> Yaml;
 	Yaml << YAML::EndMap;
 
 	SetSchedule(std::move(schedule_copy));
@@ -322,8 +325,8 @@ void Pool::GenerateSchedule()
 		assert(pool_count == 2);//TODO
 		assert(m_TakeTop == 2);//TODO
 
-		auto fifth_place_match = new Match(DependentJudoka(DependencyType::TakeRank3, m_Pools[0]),
-										   DependentJudoka(DependencyType::TakeRank3, m_Pools[1]), GetTournament());
+		auto fifth_place_match = std::make_shared<Match>(DependentJudoka(DependencyType::TakeRank3, m_Pools[0]),
+														 DependentJudoka(DependencyType::TakeRank3, m_Pools[1]), GetTournament());
 		fifth_place_match->SetTag(Match::Tag::Fifth() & Match::Tag::Finals());
 
 		m_Finals->AddMatch(fifth_place_match);

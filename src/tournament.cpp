@@ -247,7 +247,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		//if (!white && !blue)//Filter dummy matches
 			//continue;
 		
-		Match* new_match = new Match(white, blue, this);
+		auto new_match = std::make_shared<Match>(white, blue, this);
 
 		if (match.Result == 1)//Match completed?
 		{
@@ -305,7 +305,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 						else if (match.AreaID == 5)
 							new_match->SetTag(Match::Tag::Fifth());
 
-						pool->GetFinals().AddMatch(new_match);
+						pool->GetFinals()->AddMatch(new_match);
 					}
 				}
 				else if (match.Pool <= pool->GetPoolCount())
@@ -325,7 +325,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	{
 		if (table->GetType() == MatchTable::Type::Pool)
 		{
-			auto pool = (Pool*)table;
+			auto pool = std::dynamic_pointer_cast<Pool>(table);
 			if (pool->GetFinals().GetSchedule().empty())
 			{
 				//pool->GetFinals().GenerateSchedule();
@@ -405,8 +405,7 @@ Tournament::~Tournament()
 	if (m_Schedule.size() > 0 || GetParticipants().size() > 0 || m_MatchTables.size() > 0)
 		Save();
 
-	for (auto table : m_MatchTables)
-		delete table;
+	m_MatchTables.clear();
 }
 
 
@@ -424,8 +423,6 @@ void Tournament::Reset()
 	m_StandingData.GetAllJudokas().clear();
 	m_StandingData.GetRuleSets().clear();
 
-	for (auto table : m_MatchTables)
-		delete table;
 	m_MatchTables.clear();
 
 	m_Schedule.clear();
@@ -860,7 +857,7 @@ bool Tournament::AddMatch(std::shared_ptr<Match> NewMatch)
 	auto dependencies = NewMatch->GetDependentMatches();//Does this match depend on any other match?
 
 	for (auto prevMatch : dependencies)//For all dependencies
-		if (prevMatch) AddMatch(const_cast<Match*>(prevMatch));//Include them as well recursively
+		if (prevMatch) AddMatch(std::const_pointer_cast<Match>(prevMatch));//Include them as well recursively
 
 	//If the match has judoka attached, include them as participants
 	if (NewMatch->GetFighter(Fighter::White))
@@ -896,12 +893,12 @@ bool Tournament::AddMatch(std::shared_ptr<Match> NewMatch)
 	
 	if (NewMatch->GetMatchTable())
 	{
-		AddMatchTable((MatchTable*)NewMatch->GetMatchTable());
+		AddMatchTable(std::make_shared<MatchTable>(NewMatch->GetMatchTable()));
 		GenerateSchedule();
 	}
 	else
 	{
-		auto new_match_table = new CustomTable(this);
+		auto new_match_table = std::make_shared<CustomTable>(this);
 		new_match_table->SetFilter(std::make_shared<Fixed>());
 		new_match_table->AddMatch(NewMatch);
 		new_match_table->SetMatID(NewMatch->GetMatID());
@@ -1075,9 +1072,9 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
 
 
 
-std::vector<Match*> Tournament::GetSchedule() const
+std::vector<std::shared_ptr<Match>> Tournament::GetSchedule() const
 {
-	std::vector<Match*> ret;
+	std::vector<std::shared_ptr<Match>> ret;
 
 	auto guard = LockReadForScope();
 
@@ -1094,7 +1091,7 @@ std::vector<Match*> Tournament::GetSchedule() const
 
 
 
-Match* Tournament::FindMatch(const UUID& UUID) const
+std::shared_ptr<Match> Tournament::FindMatch(const UUID& UUID) const
 {
 	auto guard = LockReadForScope();
 
@@ -1208,9 +1205,9 @@ bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 
 
 
-std::vector<Match> Tournament::GetNextMatches(int32_t MatID) const
+std::vector<std::shared_ptr<Match>> Tournament::GetNextMatches(int32_t MatID) const
 {
-	std::vector<Match> ret;
+	std::vector<std::shared_ptr<Match>> ret;
 
 	auto guard = LockReadForScope();
 
@@ -1220,7 +1217,7 @@ std::vector<Match> Tournament::GetNextMatches(int32_t MatID) const
 		auto nextMatch = GetNextMatch(MatID, id);
 
 		if (nextMatch)
-			ret.push_back(*nextMatch);
+			ret.push_back(nextMatch);
 	}
 
 	return ret;
@@ -1419,13 +1416,13 @@ std::shared_ptr<MatchTable> Tournament::FindMatchTable(const UUID& ID)
 		//Check sub table of pool
 		if (table->GetType() == MatchTable::Type::Pool)
 		{
-			Pool* pool = (Pool*)table;
+			auto pool = std::dynamic_pointer_cast<Pool>(table);
 
 			for (size_t i = 0; i < pool->GetPoolCount(); ++i)
 				if (*pool->GetPool(i) == ID)
 					return pool->GetPool(i);
 
-			if (pool->GetFinals() == ID)
+			if (*pool->GetFinals() == ID)
 				return pool->GetFinals();
 		}
 	}
@@ -1450,13 +1447,13 @@ std::shared_ptr<const MatchTable> Tournament::FindMatchTable(const UUID& ID) con
 		//Check sub table of pool
 		if (table->GetType() == MatchTable::Type::Pool)
 		{
-			const Pool* pool = (const Pool*)table;
+			auto pool = std::dynamic_pointer_cast<const Pool>(table);
 
 			for (size_t i = 0; i < pool->GetPoolCount(); ++i)
 				if (*pool->GetPool(i) == ID)
 					return pool->GetPool(i);
 
-			if (pool->GetFinals() == ID)
+			if (*pool->GetFinals() == ID)
 				return pool->GetFinals();
 		}
 	}
@@ -2160,7 +2157,7 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 	{	
 		for (auto weight_desc : desc.m_Collection)
 		{
-			auto new_weightclass = new RoundRobin(weight_desc.m_Min, weight_desc.m_Max, desc.m_Gender, this);
+			auto new_weightclass = std::make_shared<RoundRobin>(weight_desc.m_Min, weight_desc.m_Max, desc.m_Gender, this);
 
 			new_weightclass->SetAgeGroup(desc.m_AgeGroup);
 			new_weightclass->SetMatID(1);
@@ -2346,9 +2343,9 @@ const std::string Tournament::Schedule2String(bool ImportantOnly, int Mat) const
 	auto guard = LockReadForScope();
 
 	auto schedule = GetSchedule();
-	Match* prev = nullptr;
+	std::shared_ptr<Match> prev;
 	int serialized_matches = 0;
-	std::vector<Match*> residual_matches;
+	std::vector<std::shared_ptr<Match>> residual_matches;
 
 	for (auto match : schedule)
 	{
@@ -2434,7 +2431,7 @@ const std::string Tournament::MasterSchedule2String() const
 				if (GetMaxEntriesAtScheduleIndex(matID, i) > max)
 					max = GetMaxEntriesAtScheduleIndex(matID, i);
 
-			std::vector<std::pair<uint32_t, MatchTable*>> entries;
+			std::vector<std::pair<uint32_t, std::shared_ptr<MatchTable>>> entries;
 			for (uint32_t it = 0; it < m_MatchTables.size(); ++it)//For all schedule entries
 			{
 				auto entry = m_MatchTables[it];
@@ -2643,8 +2640,7 @@ void Tournament::BuildSchedule()
 	//For all master schedule entries
 	for (int32_t index = 0; index <= GetMaxScheduleIndex(); index++)
 	{
-		//std::vector<std::pair<uint32_t, std::vector<Match*>>> Plan;
-		std::vector<std::pair<MatchTable*, size_t>> Plan;
+		std::vector<std::pair<std::shared_ptr<MatchTable>, size_t>> Plan;
 
 		//For each match table at this index
 		for (auto entry : m_MatchTables)
@@ -2665,7 +2661,7 @@ void Tournament::BuildSchedule()
 		{
 			bool done = true;
 
-			for (auto& [table, index] : Plan)
+			for (auto [table, index] : Plan)
 			{
 				auto num = table->GetRecommendedNumMatchesBeforeBreak();
 

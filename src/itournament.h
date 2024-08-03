@@ -42,7 +42,7 @@ namespace Judoboard
 		//const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
 		virtual std::shared_ptr<Match> GetNextOngoingMatch(int32_t MatID) { assert(false); return nullptr; }//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
 
-		virtual std::vector<Match> GetNextMatches(int32_t MatID) const = 0;
+		virtual std::vector<std::shared_ptr<Match>> GetNextMatches(int32_t MatID) const = 0;
 		virtual std::shared_ptr<Match> GetNextMatch(int32_t MatID = -1) const = 0;//Returns the next match for a given mat if available, otherwise null pointer is returned
 
 		virtual bool RemoveMatch(const UUID& MatchID) { assert(false); return false; }

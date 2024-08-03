@@ -219,7 +219,7 @@ MD5::MD5(const Tournament& Tournament)
 			new_weightclass->FightSystemID = 16;//Round robin
 		else if (match_table->GetType() == MatchTable::Type::SingleElimination)
 		{
-			const auto single_elimination = (Judoboard::SingleElimination*)match_table;
+			const auto single_elimination = std::dynamic_pointer_cast<Judoboard::SingleElimination>(match_table);
 
 			new_weightclass->FightSystemID = 19;
 			if (match_table->GetParticipants().size() > 16)
@@ -230,7 +230,7 @@ MD5::MD5(const Tournament& Tournament)
 		}
 		else if (match_table->GetType() == MatchTable::Type::DoubleElimination)
 		{
-			const auto double_elimination = (Judoboard::DoubleElimination*)match_table;
+			const auto double_elimination = std::dynamic_pointer_cast<Judoboard::DoubleElimination>(match_table);
 
 			new_weightclass->FightSystemID = 1;
 			//if (match_table->GetParticipants().size() > 16)
@@ -241,7 +241,7 @@ MD5::MD5(const Tournament& Tournament)
 		}
 		else if (match_table->GetType() == MatchTable::Type::Pool)
 		{
-			const auto pool = (Judoboard::Pool*)match_table;
+			const auto pool = std::dynamic_pointer_cast<Judoboard::Pool>(match_table);
 
 			new_weightclass->FightSystemID = 24;
 			new_weightclass->MatchForThirdPlace = pool->IsThirdPlaceMatch();

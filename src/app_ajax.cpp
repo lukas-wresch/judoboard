@@ -2216,7 +2216,7 @@ void Application::SetupHttpServer()
 		{
 			if (mat && mat->GetMatID() == matID)
 			{
-				Match* match = new Match(match_data, nullptr, GetTournament());
+				auto match = std::make_shared<Match>(match_data, nullptr, GetTournament());
 				GetTournament()->AddMatch(match);
 				
 				if (mat->StartMatch(match))
@@ -4160,7 +4160,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		case MatchTable::Type::Custom:
 		{
-			auto custom = std::make_shared<CustomTable>(table);
+			auto custom = std::dynamic_pointer_cast<CustomTable>(table);
 
 			GetTournament()->LockWrite();
 
@@ -4200,7 +4200,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		case MatchTable::Type::DoubleElimination:
 		{
-			auto doubleEli = std::make_shared<DoubleElimination>(table);
+			auto doubleEli = std::dynamic_pointer_cast<DoubleElimination>(table);
 
 			GetTournament()->LockWrite();
 
@@ -4983,28 +4983,28 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 
 	ret << YAML::Key << "next_matches" << YAML::Value << YAML::BeginSeq;
 
-	for (const auto& match : next_matches)
+	for (const auto match : next_matches)
 	{
 		ret << YAML::BeginMap;
 
-		ret << YAML::Key << "uuid" << YAML::Value << (std::string)match.GetUUID();
-		ret << YAML::Key << "current_breaktime" << YAML::Value << match.GetCurrentBreaktime();
-		ret << YAML::Key << "breaktime"         << YAML::Value << match.GetRuleSet().GetBreakTime();
+		ret << YAML::Key << "uuid" << YAML::Value << (std::string)match->GetUUID();
+		ret << YAML::Key << "current_breaktime" << YAML::Value << match->GetCurrentBreaktime();
+		ret << YAML::Key << "breaktime"         << YAML::Value << match->GetRuleSet().GetBreakTime();
 
 		ret << YAML::Key << "white_name" << YAML::Value;
-		if (match.GetFighter(Fighter::White))
-			ret << match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+		if (match->GetFighter(Fighter::White))
+			ret << match->GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
 		else
 			ret << "- - -";
 
 		ret << YAML::Key << "blue_name" << YAML::Value;
-		if (match.GetFighter(Fighter::Blue))
-			ret << match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+		if (match->GetFighter(Fighter::Blue))
+			ret << match->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
 		else
 			ret << "- - -";
 
-		if (match.GetMatchTable())
-			ret << YAML::Key << "match_table_desc" << YAML::Value <<match.GetMatchTable()->GetDescription();
+		if (match->GetMatchTable())
+			ret << YAML::Key << "match_table_desc" << YAML::Value << match->GetMatchTable()->GetDescription();
 
 		ret << YAML::EndMap;
 	}

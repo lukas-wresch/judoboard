@@ -14,13 +14,13 @@ RemoteTournament::RemoteTournament(const std::string& Host, uint16_t Port) : m_H
 
 
 
-std::vector<Match> RemoteTournament::GetNextMatches(int32_t MatID) const
+std::vector<std::shared_ptr<Match>> RemoteTournament::GetNextMatches(int32_t MatID) const
 {
 	if (Timer::GetTimestamp() - m_NextMatches_Timestamp < 5000)
 		return m_NextMatches;//Return cached value
 
 	auto response = Request2Master("/ajax/master/get_next_matches?id=" + std::to_string(MatID));
-	std::vector<Match> ret;
+	std::vector<std::shared_ptr<Match>> ret;
 
 	if (response.length() == 0)
 	{
@@ -41,7 +41,7 @@ std::vector<Match> RemoteTournament::GetNextMatches(int32_t MatID) const
 		UUID id(node["uuid"].as<std::string>());
 
 		if (!IsMatchInCache(id))
-			m_MatchCache.push_back(new Match(node, nullptr, (RemoteTournament*)this));
+			m_MatchCache.push_back(std::make_shared<Match>(node, nullptr, (RemoteTournament*)this));
 
 		Match match(node, nullptr, (RemoteTournament*)this);
 		ret.emplace_back(match);

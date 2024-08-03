@@ -52,7 +52,7 @@ TEST(SingleElimination, ExportImport_StartPositions)
 		Tournament* t = new Tournament("Tournament Name");
 		t->EnableAutoSave(false);
 
-		SingleElimination* group = new SingleElimination(0, 200);
+		auto group = std::make_shared<SingleElimination>(0, 200);
 		t->AddMatchTable(group);
 
 		auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
@@ -106,7 +106,7 @@ TEST(SingleElimination, Count1)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 	
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 
 	t->AddMatchTable(group);
 	auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
@@ -132,7 +132,7 @@ TEST(SingleElimination, Count2)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -172,7 +172,7 @@ TEST(SingleElimination, Count3)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -1268,7 +1268,7 @@ TEST(SingleElimination, Count8_3rd_5th)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	group->IsThirdPlaceMatch(true);
 	group->IsFifthPlaceMatch(true);
@@ -1357,7 +1357,7 @@ TEST(SingleElimination, Count8_5th)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	group->IsThirdPlaceMatch(false);
 	group->IsFifthPlaceMatch(true);

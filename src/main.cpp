@@ -277,7 +277,7 @@ int main(int argc, char** argv)
 		auto rule_set  = std::make_shared<Judoboard::RuleSet>("Demo", 180, 60, 20, 10);
 		auto age_group = std::make_shared<Judoboard::AgeGroup>("U18", 0, 100, rule_set);
 
-		auto m1 = new Judoboard::RoundRobin(new Judoboard::Weightclass(0, 120));
+		auto m1 = std::make_shared<Judoboard::RoundRobin>(new Judoboard::Weightclass(0, 120));
 		m1->SetMatID(1);
 		m1->SetAgeGroup(age_group);
 		tourney->AddMatchTable(m1);

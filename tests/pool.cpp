@@ -517,7 +517,7 @@ TEST(Pool, Count8_Pool2Top3_5Place)
 
 	EXPECT_EQ(w.GetSchedule().size(), 6*2 + 2+1 + 1 + 1);
 
-	EXPECT_EQ(w.GetFinals().GetSchedule().size(), 2+1 + 1 + 1);
+	EXPECT_EQ(w.GetFinals()->GetSchedule().size(), 2+1 + 1 + 1);
 
 	auto schedule = w.GetSchedule();
 	/*auto quater1 = schedule[w.GetSchedule().size() - 9];
@@ -597,7 +597,7 @@ TEST(Pool, Count8_Pool2Top3)
 
 	EXPECT_EQ(w.GetSchedule().size(), 6*2 + 4+2+1);
 
-	EXPECT_EQ(w.GetFinals().GetSchedule().size(), 4+2+1);
+	EXPECT_EQ(w.GetFinals()->GetSchedule().size(), 4+2+1);
 
 	auto schedule = w.GetSchedule();
 	auto quater1 = schedule[w.GetSchedule().size() - 7];
@@ -677,7 +677,7 @@ TEST(Pool, PoolsOnDifferentMats)
 	w.GetPool(1)->SetMatID(2);
 	w.GetPool(2)->SetMatID(3);
 	w.GetPool(3)->SetMatID(4);
-	w.GetFinals().SetMatID(5);
+	w.GetFinals()->SetMatID(5);
 	
 	w.GenerateSchedule();
 
@@ -696,7 +696,7 @@ TEST(Pool, PoolsOnDifferentMats)
 		if (1 <= mat_id && mat_id <= 4)
 			EXPECT_TRUE(w.GetPool(mat_id-1)->FindMatch(*match));
 		else
-			EXPECT_TRUE(w.GetFinals().FindMatch(*match));
+			EXPECT_TRUE(w.GetFinals()->FindMatch(*match));
 
 		m.SetMatID(match->GetMatID());
 		EXPECT_TRUE(m.StartMatch(match));
@@ -724,7 +724,7 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 
 	Tournament tourney;
 	Tournament tourney2;
-	Pool* w = new Pool(Weight(10), Weight(100));
+	auto w = std::make_shared<Pool>(Weight(10), Weight(100));
 	w->SetMatID(1);
 	tourney.AddMatchTable(w);
 
@@ -744,7 +744,7 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	w->GetPool(1)->SetMatID(2);
 	w->GetPool(2)->SetMatID(3);
 	w->GetPool(3)->SetMatID(4);
-	w->GetFinals().SetMatID(5);
+	w->GetFinals()->SetMatID(5);
 
 	w->GenerateSchedule();
 
@@ -759,7 +759,7 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	EXPECT_EQ(w2.GetPool(1)->GetMatID(), 2);
 	EXPECT_EQ(w2.GetPool(2)->GetMatID(), 3);
 	EXPECT_EQ(w2.GetPool(3)->GetMatID(), 4);
-	EXPECT_EQ(w2.GetFinals().GetMatID(), 5);
+	EXPECT_EQ(w2.GetFinals()->GetMatID(), 5);
 
 	//Check UUIDs
 	EXPECT_EQ(*w2.GetSchedule()[0], *w->GetSchedule()[0]);
@@ -769,8 +769,8 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	EXPECT_EQ(*w2.GetPool(3), *w->GetPool(3));
 	EXPECT_EQ( w2.GetFinals(), w->GetFinals());
 
-	EXPECT_EQ(w2.GetFinals().GetParticipants(), w->GetFinals().GetParticipants());
-	EXPECT_EQ(w2.GetFinals().GetFilter()->GetParticipants().size(), w->GetFinals().GetFilter()->GetParticipants().size());
+	EXPECT_EQ(w2->GetFinals()->GetParticipants(), w->GetFinals()->GetParticipants());
+	EXPECT_EQ(w2->GetFinals()->GetFilter()->GetParticipants().size(), w->GetFinals()->GetFilter()->GetParticipants().size());
 	EXPECT_EQ(w2.ToHTML(), w->ToHTML());
 
 	Mat m(1);
@@ -806,7 +806,7 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 		if (1 <= mat_id && mat_id <= 4)
 			EXPECT_TRUE(w2.GetPool(mat_id-1)->FindMatch(*match));
 		else
-			EXPECT_TRUE(w2.GetFinals().FindMatch(*match));
+			EXPECT_TRUE(w2.GetFinals()->FindMatch(*match));
 
 		m.SetMatID(match->GetMatID());
 		EXPECT_TRUE(m.StartMatch(match));

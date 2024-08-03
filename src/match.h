@@ -110,7 +110,7 @@ namespace Judoboard
 
 		Match(const Judoka* White, const Judoka* Blue, const ITournament* Tournament, uint32_t MatID = 0);
 		Match(const DependentJudoka& White, const DependentJudoka& Blue, const ITournament* Tournament, uint32_t MatID = 0);
-		Match(const YAML::Node& Yaml, std::shared_ptr<MatchTable> MatchTable, const ITournament* Tournament);
+		Match(const YAML::Node& Yaml, const MatchTable* MatchTable, const ITournament* Tournament);
 		Match(const Match&) = default;//Deep copy
 
 
