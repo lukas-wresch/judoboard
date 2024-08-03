@@ -116,6 +116,7 @@ var lang_en = {
     match_added:  [ "Match added to tournament", "Kampf zum Turnier hinzugef&uuml;gt"],
     match_revised:  [ "Match revised", "Kampf revidiert" ],
     match_started:  [ "Match started", "Kampf gestartet" ],
+    match_stopped:  [ "Match stopped", "Kampf gestoppt" ],
     match_time:  [ "Match Time", "Kampfzeit" ],
     name_white:  [ "Name (White)", "Name (Wei&szlig;)" ],
     name_blue:   [ "Name (Blue)", "Name (Blau)" ],

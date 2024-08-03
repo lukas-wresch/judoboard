@@ -116,6 +116,7 @@ namespace Judoboard
 		Error Ajax_UpdatePassword(Account* Account, const HttpServer::Request& Request);
 
 		Error Ajax_AddMatch(const HttpServer::Request& Request);
+		Error Ajax_SetMatOfMatch(const HttpServer::Request& Request);
 		Error Ajax_EditMatch(const HttpServer::Request& Request);
 		Error Ajax_ReviseMatch(const HttpServer::Request& Request);
 
@@ -143,6 +144,7 @@ namespace Judoboard
 		//Commands
 		Error Ajax_StartMatch(const HttpServer::Request& Request);
 		Error Ajax_EndMatch(const HttpServer::Request& Request);
+		Error Ajax_StopMatch(const HttpServer::Request& Request);
 		Error Ajax_AddDisqualification(Fighter Whom, const HttpServer::Request& Request);
 		Error Ajax_RemoveDisqualification(Fighter Whom, const HttpServer::Request& Request);
 		Error Ajax_NoDisqualification(Fighter Whom, const HttpServer::Request& Request);
@@ -151,6 +153,7 @@ namespace Judoboard
 		//Schedule
 		Error Ajax_MoveMatchUp(const HttpServer::Request& Request);
 		Error Ajax_MoveMatchDown(const HttpServer::Request& Request);
+		Error Ajax_MoveMatchTo(const HttpServer::Request& Request);
 		std::string Ajax_GetHansokumake() const;//Returns matches that are in progress and have a direct hansokumake
 
 		//Judoka
