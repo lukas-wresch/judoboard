@@ -227,6 +227,10 @@ void Match::operator >>(nlohmann::json& Json) const
 	else
 		Json["tag"] = 0;
 
+	Json["finals"] = (bool)m_Tag.finals;
+	Json["semi"]   = (bool)m_Tag.semi;
+	Json["in_preparation"] = (bool)m_Tag.in_preparation;
+
 	if (IsRunning())
 	{
 		//Export current state

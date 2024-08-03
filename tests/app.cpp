@@ -388,7 +388,7 @@ TEST(App, FullTournament)
 		Account acc("admin", "1234", Account::AccessLevel::Admin);
 		app.GetDatabase().AddAccount(acc);
 
-		ZED::Core::Pause(1000);
+		ZED::Core::Pause(5000);
 
 		Judoka j1(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
 		Judoka j2(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
