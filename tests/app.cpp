@@ -384,7 +384,7 @@ TEST(App, FullTournament)
 		app.CloseTournament();
 		app.SetTournamentList().clear();
 
-		app.StartLocalMat(1);
+		EXPECT_TRUE(app.StartLocalMat(1));
 
 		Account acc("admin", "1234", Account::AccessLevel::Admin);
 		app.GetDatabase().AddAccount(acc);
@@ -504,7 +504,7 @@ TEST(App, FullTournament)
 			ZED::Core::Pause(2000);
 
 			EXPECT_TRUE(mat->EndMatch());
-			ZED::Core::Pause(6000);
+			ZED::Core::Pause(11 * 1000);
 		}
 	}
 }

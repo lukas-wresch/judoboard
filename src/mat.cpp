@@ -804,7 +804,7 @@ void Mat::AddWazaAri(Fighter Whom)
 			Mate();
 	}
 
-	ZED::Log::Debug("Wazaari");
+	ZED::Log::Info("Wazaari");
 }
 
 
@@ -887,7 +887,7 @@ void Mat::AddYuko(Fighter Whom)
 			Mate();
 	}
 
-	ZED::Log::Debug("Yuko");
+	ZED::Log::Info("Yuko");
 }
 
 
@@ -924,7 +924,7 @@ void Mat::AddKoka(Fighter Whom)
 			Mate();
 	}
 
-	ZED::Log::Debug("Koka");
+	ZED::Log::Info("Koka");
 }
 
 
@@ -1003,7 +1003,7 @@ void Mat::SetAsDraw(bool Enable)
 		}
 	}
 
-	ZED::Log::Debug("Draw");
+	ZED::Log::Info("Draw");
 }
 
 
@@ -1023,7 +1023,7 @@ void Mat::AddShido(Fighter Whom)
 			AddHansokuMake(Whom, false);//Add indirect hansokumake
 	}
 
-	ZED::Log::Debug("Shido");
+	ZED::Log::Info("Shido");
 }
 
 
