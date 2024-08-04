@@ -5,6 +5,7 @@
 TEST(AgeGroup, MatchTableTakeRuleSet)
 {
 	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	for (int i = 0; i < 1000; i++)
 	{

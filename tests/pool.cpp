@@ -767,7 +767,7 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	EXPECT_EQ(*w2.GetPool(1), *w->GetPool(1));
 	EXPECT_EQ(*w2.GetPool(2), *w->GetPool(2));
 	EXPECT_EQ(*w2.GetPool(3), *w->GetPool(3));
-	EXPECT_EQ( w2.GetFinals(), w->GetFinals());
+	EXPECT_EQ(*w2.GetFinals(), *w->GetFinals());
 
 	EXPECT_EQ(w2.GetFinals()->GetParticipants(), w->GetFinals()->GetParticipants());
 	EXPECT_EQ(w2.GetFinals()->GetFilter()->GetParticipants().size(), w->GetFinals()->GetFilter()->GetParticipants().size());
