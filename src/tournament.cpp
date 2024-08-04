@@ -903,6 +903,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 		new_match_table->SetFilter(new Fixed);
 		new_match_table->AddMatch(NewMatch);
 		new_match_table->SetMatID(NewMatch->GetMatID());
+		new_match_table->SetRuleSet(NewMatch->GetOwnRuleSet());
 		AddMatchTable(new_match_table);
 
 #ifdef _DEBUG
