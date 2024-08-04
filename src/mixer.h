@@ -22,8 +22,8 @@ namespace Judoboard
 
 		//virtual const DependentJudoka GetJudokaByStartPosition(size_t StartPosition) const override;
 
-		void AddSource(const IFilter& Source) {
-			m_pSources.emplace_back(&Source);
+		void AddSource(std::shared_ptr<const IFilter> Source) {
+			m_pSources.emplace_back(Source);
 			Recalculate();
 		}
 

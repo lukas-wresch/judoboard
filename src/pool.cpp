@@ -223,19 +223,18 @@ void Pool::GenerateSchedule()
 	}
 
 	//Create filter(s) for final round
-	IFilter* final_input = nullptr;
+	std::shared_ptr<IFilter> final_input;
 
 	if (pool_count == 2)
 	{
-		TakeTopRanks topA(m_Pools[0], m_TakeTop);
-		TakeTopRanks topB(m_Pools[1], m_TakeTop);
+		auto topA = std::make_shared<TakeTopRanks>(m_Pools[0], m_TakeTop);
+		auto topB = std::make_shared<TakeTopRanks>(m_Pools[1], m_TakeTop);
 
-		Mixer mixer;
+		auto mixer = std::make_shared<Mixer>();
+		mixer->AddSource(topA);
+		mixer->AddSource(topB);
 
-		mixer.AddSource(topA);
-		mixer.AddSource(topB);
-
-		final_input = new Fixed(mixer);
+		final_input = std::make_shared<Fixed>(mixer);
 
 		if (m_TakeTop == 3)
 		{
@@ -262,19 +261,19 @@ void Pool::GenerateSchedule()
 
 	else if (pool_count == 4)
 	{
-		Mixer mixer;
+		auto mixer = std::make_shared<Mixer>();
 
-		TakeTopRanks topA(m_Pools[0], m_TakeTop);
-		TakeTopRanks topB(m_Pools[1], m_TakeTop);
-		TakeTopRanks topC(m_Pools[2], m_TakeTop);
-		TakeTopRanks topD(m_Pools[3], m_TakeTop);
+		auto topA = std::make_shared<TakeTopRanks>(m_Pools[0], m_TakeTop);
+		auto topB = std::make_shared<TakeTopRanks>(m_Pools[1], m_TakeTop);
+		auto topC = std::make_shared<TakeTopRanks>(m_Pools[2], m_TakeTop);
+		auto topD = std::make_shared<TakeTopRanks>(m_Pools[3], m_TakeTop);
 
-		mixer.AddSource(topA);
-		mixer.AddSource(topB);
-		mixer.AddSource(topC);
-		mixer.AddSource(topD);
+		mixer->AddSource(topA);
+		mixer->AddSource(topB);
+		mixer->AddSource(topC);
+		mixer->AddSource(topD);
 
-		final_input = new Fixed(mixer);
+		final_input = std::make_shared<Fixed>(mixer);
 
 		auto temp = final_input->GetJudokaByStartPosition(4);
 		if (temp)
@@ -288,15 +287,15 @@ void Pool::GenerateSchedule()
 
 	else
 	{
-		auto mixer = new Mixer;
+		auto mixer = std::make_shared<Mixer>();
 
 		for (int i = 0; i < pool_count; ++i)
 		{
-			IFilter* take_top_placed = new TakeTopRanks(m_Pools[i], m_TakeTop);
-			mixer->AddSource(*take_top_placed);
+			auto take_top_placed = std::make_shared<TakeTopRanks>(m_Pools[i], m_TakeTop);
+			mixer->AddSource(take_top_placed);
 		}
 
-		final_input = mixer;
+		final_input = std::make_shared<Fixed>(mixer);
 	}
 
 
@@ -308,7 +307,7 @@ void Pool::GenerateSchedule()
 	auto mat_id = m_Finals->GetMatID();
 	auto bo3    = m_Finals->IsBestOfThree();
 
-	m_Finals = std::make_shared<SingleElimination>(final_input);
+	m_Finals = std::make_shared<SingleElimination>(final_input.get());
 	m_Finals->SetName(Localizer::Translate("Finals"));
 	m_Finals->SetParent(this);
 	m_Finals->IsThirdPlaceMatch(third_place);

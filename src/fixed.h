@@ -8,7 +8,7 @@ namespace Judoboard
 	class Fixed : public IFilter
 	{
 	public:
-		Fixed(const IFilter& Source);
+		Fixed(std::shared_ptr<const IFilter> Source);
 		Fixed(const MatchTable* Parent = nullptr) : IFilter(Parent) {}
 		Fixed(const YAML::Node& Yaml, const MatchTable* Parent);
 

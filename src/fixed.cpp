@@ -6,11 +6,11 @@ using namespace Judoboard;
 
 
 
-Fixed::Fixed(const IFilter& Source) :
-	IFilter(Source.GetParent())
+Fixed::Fixed(std::shared_ptr<const IFilter> Source) :
+	IFilter(Source->GetParent())
 {
-	SetParticipants(Source.GetParticipants());
-	SetAgeGroup(Source.GetAgeGroup());
+	SetParticipants(Source->GetParticipants());
+	SetAgeGroup(Source->GetAgeGroup());
 }
 
 

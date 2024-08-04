@@ -515,7 +515,7 @@ void MatchTable::operator >> (YAML::Emitter& Yaml) const
 			*GetFilter() >> Yaml;
 		else//Export as fixed participants
 		{//TODO this should be improved for double elimination filter is losersof
-			Fixed temp(*GetFilter());
+			Fixed temp(GetFilter());
 			temp >> Yaml;
 		}
 	}
