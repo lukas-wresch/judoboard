@@ -15,7 +15,7 @@ using namespace Judoboard;
 
 
 
-DoubleElimination::DoubleElimination(IFilter* Filter, const ITournament* Tournament)
+DoubleElimination::DoubleElimination(std::shared_ptr<IFilter> Filter, const ITournament* Tournament)
 	: MatchTable(Filter, Tournament), m_WinnerBracket(nullptr, Tournament), m_LoserBracket(nullptr, Tournament)
 {
 	m_WinnerBracket.SetParent(this);
@@ -33,7 +33,7 @@ DoubleElimination::DoubleElimination(IFilter* Filter, const ITournament* Tournam
 
 
 DoubleElimination::DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
-	: DoubleElimination(new Weightclass(MinWeight, MaxWeight, Gender, this), Tournament)
+	: DoubleElimination(std::make_shared<Weightclass>(MinWeight, MaxWeight, Gender, this), Tournament)
 {
 }
 

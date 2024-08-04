@@ -19,7 +19,7 @@ using namespace Judoboard;
 
 
 
-Pool::Pool(IFilter* Filter, const ITournament* Tournament)
+Pool::Pool(std::shared_ptr<IFilter> Filter, const ITournament* Tournament)
 	: MatchTable(Filter, Tournament)
 {
 	m_Finals = std::make_shared<SingleElimination>(nullptr, Tournament);
@@ -30,7 +30,7 @@ Pool::Pool(IFilter* Filter, const ITournament* Tournament)
 
 
 Pool::Pool(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
-	: Pool(new Weightclass(MinWeight, MaxWeight, Gender, this), Tournament)
+	: Pool(std::make_shared<Weightclass>(MinWeight, MaxWeight, Gender, this), Tournament)
 {
 }
 
@@ -203,7 +203,7 @@ void Pool::GenerateSchedule()
 	for (int i = 0; i < pool_count; ++i)
 	{
 		if (GetFilter())
-			m_Pools[i] = std::make_shared<RoundRobin>(new Splitter(*GetFilter(), pool_count, i));
+			m_Pools[i] = std::make_shared<RoundRobin>(std::make_shared<Splitter>(GetFilter(), pool_count, i));
 		else
 			m_Pools[i] = std::make_shared<RoundRobin>(nullptr);
 
@@ -307,7 +307,7 @@ void Pool::GenerateSchedule()
 	auto mat_id = m_Finals->GetMatID();
 	auto bo3    = m_Finals->IsBestOfThree();
 
-	m_Finals = std::make_shared<SingleElimination>(final_input.get());
+	m_Finals = std::make_shared<SingleElimination>(final_input);
 	m_Finals->SetName(Localizer::Translate("Finals"));
 	m_Finals->SetParent(this);
 	m_Finals->IsThirdPlaceMatch(third_place);

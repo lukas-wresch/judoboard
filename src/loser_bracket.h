@@ -12,7 +12,7 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		LoserBracket(IFilter* Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
+		LoserBracket(std::shared_ptr<IFilter> Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 		LoserBracket(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
 		LoserBracket(const YAML::Node& Yaml, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 		LoserBracket(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);

@@ -12,7 +12,7 @@ using namespace Judoboard;
 
 
 
-SingleElimination::SingleElimination(IFilter* Filter, const ITournament* Tournament, const MatchTable* Parent)
+SingleElimination::SingleElimination(std::shared_ptr<IFilter> Filter, const ITournament* Tournament, const MatchTable* Parent)
 	: MatchTable(Filter, Tournament, Parent)
 {
 	if (Filter)
@@ -23,7 +23,7 @@ SingleElimination::SingleElimination(IFilter* Filter, const ITournament* Tournam
 
 
 SingleElimination::SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
-	: MatchTable(new Weightclass(MinWeight, MaxWeight, this), Tournament)
+	: MatchTable(std::make_shared<Weightclass>(MinWeight, MaxWeight, this), Tournament)
 {
 }
 

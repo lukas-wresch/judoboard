@@ -12,7 +12,7 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		RoundRobin(IFilter* Filter, const ITournament* Tournament = nullptr);
+		RoundRobin(std::shared_ptr<IFilter> Filter, const ITournament* Tournament = nullptr);
 		RoundRobin(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
 		RoundRobin(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent = nullptr);
 		RoundRobin(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);

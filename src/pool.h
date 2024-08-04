@@ -12,11 +12,11 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		Pool(IFilter* Filter, const ITournament* Tournament = nullptr);
+		Pool(std::shared_ptr<IFilter> Filter, const ITournament* Tournament = nullptr);
 		Pool(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
 		Pool(const YAML::Node& Yaml, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 		Pool(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
-			: Pool(new Weightclass(Weightclass_, this), Tournament) {}
+			: Pool(std::make_shared<Weightclass>(Weightclass_, this), Tournament) {}
 
 		~Pool() {
 			SetSchedule().clear();

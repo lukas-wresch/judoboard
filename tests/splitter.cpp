@@ -9,10 +9,10 @@ TEST(Splitter, Split2JudokaBy2)
 	Judoka j1(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 	Judoka j2(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 
-	Weightclass w(Weight(10), Weight(100));
+	auto w = std::make_shared<Weightclass>(Weight(10), Weight(100));
 
-	EXPECT_TRUE(w.AddParticipant(&j1));
-	EXPECT_TRUE(w.AddParticipant(&j2));
+	EXPECT_TRUE(w->AddParticipant(&j1));
+	EXPECT_TRUE(w->AddParticipant(&j2));
 
 	Splitter s1(w, 2, 0);
 	Splitter s2(w, 2, 1);
@@ -35,12 +35,12 @@ TEST(Splitter, Split4JudokaBy2)
 	Judoka j3(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 	Judoka j4(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 
-	Weightclass w(Weight(10), Weight(100));
+	auto w = std::make_shared<Weightclass>(Weight(10), Weight(100));
 
-	EXPECT_TRUE(w.AddParticipant(&j1));
-	EXPECT_TRUE(w.AddParticipant(&j2));
-	EXPECT_TRUE(w.AddParticipant(&j3));
-	EXPECT_TRUE(w.AddParticipant(&j4));
+	EXPECT_TRUE(w->AddParticipant(&j1));
+	EXPECT_TRUE(w->AddParticipant(&j2));
+	EXPECT_TRUE(w->AddParticipant(&j3));
+	EXPECT_TRUE(w->AddParticipant(&j4));
 
 	Splitter s1(w, 2, 0);
 	Splitter s2(w, 2, 1);
@@ -65,12 +65,12 @@ TEST(Splitter, Split4JudokaBy4)
 	Judoka j3(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 	Judoka j4(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 
-	Weightclass w(Weight(10), Weight(100));
+	auto w = std::make_shared<Weightclass>(Weight(10), Weight(100));
 
-	EXPECT_TRUE(w.AddParticipant(&j1));
-	EXPECT_TRUE(w.AddParticipant(&j2));
-	EXPECT_TRUE(w.AddParticipant(&j3));
-	EXPECT_TRUE(w.AddParticipant(&j4));
+	EXPECT_TRUE(w->AddParticipant(&j1));
+	EXPECT_TRUE(w->AddParticipant(&j2));
+	EXPECT_TRUE(w->AddParticipant(&j3));
+	EXPECT_TRUE(w->AddParticipant(&j4));
 
 	Splitter s1(w, 4, 0);
 	Splitter s2(w, 4, 1);

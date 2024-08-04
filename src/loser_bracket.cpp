@@ -12,7 +12,7 @@ using namespace Judoboard;
 
 
 
-LoserBracket::LoserBracket(IFilter* Filter, const ITournament* Tournament, const MatchTable* Parent)
+LoserBracket::LoserBracket(std::shared_ptr<IFilter> Filter, const ITournament* Tournament, const MatchTable* Parent)
 	: SingleElimination(Filter, Tournament, Parent)
 {
 }
@@ -20,7 +20,7 @@ LoserBracket::LoserBracket(IFilter* Filter, const ITournament* Tournament, const
 
 
 LoserBracket::LoserBracket(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament)
-	: LoserBracket(new Weightclass(MinWeight, MaxWeight, this), Tournament)
+	: LoserBracket(std::make_shared<Weightclass>(MinWeight, MaxWeight, this), Tournament)
 {
 }
 
@@ -38,7 +38,7 @@ LoserBracket::LoserBracket(const YAML::Node& Yaml, const ITournament* Tournament
 
 
 LoserBracket::LoserBracket(const MD5::Weightclass& Weightclass_, const ITournament* Tournament)
-	: LoserBracket(new Weightclass(Weightclass_, this), Tournament)
+	: LoserBracket(std::make_shared<Weightclass>(Weightclass_, this), Tournament)
 {
 }
 

@@ -4052,22 +4052,22 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	{
 	case MatchTable::Type::RoundRobin:
 	{
-		new_table = std::make_shared<RoundRobin>(new Weightclass(0, 0));
+		new_table = std::make_shared<RoundRobin>(std::make_shared<Weightclass>(0, 0));
 		break;
 	}
 
 	case MatchTable::Type::SingleElimination:
 	{
-		new_table = std::make_shared<SingleElimination>(new Weightclass(0, 0));
+		new_table = std::make_shared<SingleElimination>(std::make_shared<Weightclass>(0, 0));
 		break;
 	}
 
 	case MatchTable::Type::Pool:
-		new_table = std::make_shared<Pool>(new Weightclass(0, 0));
+		new_table = std::make_shared<Pool>(std::make_shared<Weightclass>(0, 0));
 		break;
 
 	case MatchTable::Type::DoubleElimination:
-		new_table = std::make_shared<DoubleElimination>(new Weightclass(0, 0));
+		new_table = std::make_shared<DoubleElimination>(std::make_shared<Weightclass>(0, 0));
 		break;
 
 	case MatchTable::Type::Custom:

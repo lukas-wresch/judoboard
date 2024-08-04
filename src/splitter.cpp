@@ -6,7 +6,7 @@ using namespace Judoboard;
 
 
 
-Splitter::Splitter(const IFilter& pSource, size_t Divisor, size_t Remainder, const MatchTable* Parent) :
+Splitter::Splitter(std::shared_ptr<const IFilter> pSource, size_t Divisor, size_t Remainder, const MatchTable* Parent) :
 	m_pSource(pSource), IFilter(Parent)
 {
 	m_Divisor   = Divisor;
@@ -57,7 +57,7 @@ std::string Splitter::GetHTMLForm() const
 
 bool Splitter::IsElgiable(const Judoka& Fighter) const
 {
-	return m_pSource.IsElgiable(Fighter);
+	return m_pSource->IsElgiable(Fighter);
 }
 
 
@@ -65,7 +65,7 @@ bool Splitter::IsElgiable(const Judoka& Fighter) const
 std::unordered_map<size_t, const DependentJudoka> Splitter::GetParticipants() const
 {
 	std::unordered_map<size_t, const DependentJudoka> ret;
-	for (auto [pos, judoka] : m_pSource.GetParticipants())
+	for (auto [pos, judoka] : m_pSource->GetParticipants())
 	{
 		if (pos % m_Divisor == m_Remainder)
 			ret.insert({ (pos - m_Remainder) / m_Divisor, judoka });
@@ -77,5 +77,5 @@ std::unordered_map<size_t, const DependentJudoka> Splitter::GetParticipants() co
 
 const DependentJudoka Splitter::GetJudokaByStartPosition(size_t StartPosition) const
 {
-	return m_pSource.GetJudokaByStartPosition(StartPosition * m_Divisor + m_Remainder);
+	return m_pSource->GetJudokaByStartPosition(StartPosition * m_Divisor + m_Remainder);
 }
