@@ -758,8 +758,10 @@ void Application::Run()
 					{
 						if (mat)
 						{
-							data["mats"].push_back({ "id",   mat->GetMatID(),
-													 "name", mat->GetName()});
+							nlohmann::json mat_json;
+							mat_json["id"]   = mat->GetMatID();
+							mat_json["name"] = mat->GetName();
+							data["mats"].push_back(mat_json);
 						}
 					}
 

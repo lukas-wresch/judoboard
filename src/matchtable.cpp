@@ -597,6 +597,7 @@ void MatchTable::ToString(YAML::Emitter& Yaml) const
 void MatchTable::operator >>(nlohmann::json& Json) const
 {
 	Json["uuid"] = (std::string)GetUUID();
+	Json["name"] = GetDescription();
 	Json["mat_id"] = m_MatID;
 	Json["html"] = ToHTML();	
 }

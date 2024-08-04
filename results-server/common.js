@@ -277,7 +277,7 @@ function navigate(url)
 
 
 
-function goBack()
+/*function goBack()
 {
   navigate(g_LastURL);
 }
@@ -288,4 +288,4 @@ window.onhashchange = function(e)
 {
   console.log(location.hash.slice(1));
   navigate(location.hash.slice(1));
-};
+};*/

@@ -14,6 +14,19 @@ sqlite_query("CREATE TABLE `setup` ("
 			.")");
 
 
+sqlite_query("CREATE TABLE `mats` ("
+			."`id`    INTEGER PRIMARY KEY,"
+			."`name`  TEXT"
+			.")");
+
+
+sqlite_query("CREATE TABLE `match_tables` ("
+			."`id`    TEXT PRIMARY KEY,"
+			."`name`  TEXT,"
+			."`html`  TEXT"
+			.")");
+
+
 sqlite_query("CREATE TABLE `schedule` ("
 			."`id`     INTEGER PRIMARY KEY AUTOINCREMENT,"
 			."`mat_id` INTEGER,"
@@ -31,6 +44,23 @@ sqlite_query("CREATE TABLE `schedule` ("
 sqlite_query("DELETE FROM `setup`;");
 
 sqlite_query("INSERT INTO `setup` (`name`, `language`) VALUES ('$json->name', '1');");
+
+
+sqlite_query("DELETE FROM `mats`;");
+
+foreach ($json->mats as $mat)
+{
+	sqlite_query("INSERT INTO `mats` (`id`, `name`) VALUES ('$mat->id', '$mat->name');");
+}
+
+
+sqlite_query("DELETE FROM `match_tables`;");
+
+foreach ($json->match_tables as $table)
+{
+	sqlite_query("INSERT INTO `match_tables` (`id`, `name`, `html`) VALUES ('$table->uuid', '$table->name', '$table->html');");
+	echo "INSERT INTO `match_tables` (`id`, `name`, `html`) VALUES ('$table->uuid', '$table->name', '$table->html');\n";
+}
 
 
 sqlite_query("DELETE FROM `schedule`;");
