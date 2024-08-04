@@ -1632,6 +1632,8 @@ TEST(RemoteMat, MatchTime)
 
 		ZED::Core::Pause(2000);
 		EXPECT_TRUE(m->IsOutOfTime());
+		m->AddIppon(Fighter::White);
+		ZED::Core::Pause(100);
 		EXPECT_TRUE(m->EndMatch());
 	}
 }
