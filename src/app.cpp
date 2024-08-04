@@ -297,6 +297,7 @@ bool Application::CloseTournament()
 	//Re-open temporary tournament
 	m_CurrentTournament = &m_TempTournament;
 	m_Database.SetLastTournamentName("");
+	ZED::Log::Info("Current tournament closed");
 	return true;
 }
 

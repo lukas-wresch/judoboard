@@ -379,6 +379,7 @@ TEST(App, FullTournament)
 
 	{
 		Application app;
+		ZED::Log::Info("Application initialized");
 
 		app.CloseTournament();
 		app.SetTournamentList().clear();
