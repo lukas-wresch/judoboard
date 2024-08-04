@@ -234,7 +234,7 @@ namespace Judoboard
 
 		MatchLog m_Log;//Log of the match
 
-		const MatchTable* m_Table;//Match table this fight is associated with (if any)
+		const MatchTable* m_Table = nullptr;//Match table this match is associated with (if any)
 		std::shared_ptr<const RuleSet> m_Rules = nullptr;//Custom rule set for the match (if available)
 
 		const ITournament* m_Tournament = nullptr;

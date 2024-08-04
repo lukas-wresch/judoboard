@@ -2705,7 +2705,7 @@ void Tournament::BuildSchedule()
 		{
 			bool done = true;
 
-			for (auto [table, index] : Plan)
+			for (auto& [table, index] : Plan)//Needs to be a reference, due to 'index' being modified
 			{
 				auto num = table->GetRecommendedNumMatchesBeforeBreak();
 
@@ -2721,7 +2721,7 @@ void Tournament::BuildSchedule()
 							done = false;
 						}
 
-						index++;
+						index++;//This updates the plan
 					}
 					else
 						break;
