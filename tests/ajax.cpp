@@ -1024,10 +1024,26 @@ TEST(Ajax, Judoka_Add)
 		auto judokas = app.GetDatabase().GetAllJudokas();
 
 		ASSERT_EQ(judokas.size(), 1);
+		EXPECT_EQ(app.GetTournament()->GetParticipants().size(), 0);
 		auto judoka = judokas[0];
 
 		EXPECT_EQ(judoka->GetFirstname(), "first");
 		EXPECT_EQ(judoka->GetLastname(),  "last");
+		EXPECT_EQ(judoka->GetWeight(),  Weight(10));
+		EXPECT_EQ(judoka->GetGender(),  Gender::Male);
+		EXPECT_EQ(judoka->GetBirthyear(), 2000);
+		EXPECT_EQ(judoka->GetNumber(), "A123");
+
+
+		EXPECT_EQ((std::string)app.Ajax_AddJudoka(HttpServer::Request("to_tournament=true", "firstname=first2&lastname=last2&weight=10&gender=0&birthyear=2000&number=A123")), "ok");
+
+		EXPECT_EQ(app.GetDatabase().GetAllJudokas().size(), 1);
+		ASSERT_EQ(app.GetTournament()->GetParticipants().size(), 1);
+
+		judoka = app.GetTournament()->GetParticipants()[0];
+
+		EXPECT_EQ(judoka->GetFirstname(), "first2");
+		EXPECT_EQ(judoka->GetLastname(),  "last2");
 		EXPECT_EQ(judoka->GetWeight(),  Weight(10));
 		EXPECT_EQ(judoka->GetGender(),  Gender::Male);
 		EXPECT_EQ(judoka->GetBirthyear(), 2000);

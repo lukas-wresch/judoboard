@@ -16,6 +16,8 @@
   </tr>
 </table>
 
+<button class="add" id="add_new_judoka" onclick="navigate('judoka_add.html?to_tournament=1')"></button>
+
 <form style="display: inline;" action="/upload/dm4" method="post" id="upload_form" enctype="multipart/form-data">
     <input id="file" name="file" type="file" accept="text/*.*" onchange="document.getElementById('upload_form').submit();" hidden/>
     <button class="add" id="add" onclick="document.getElementById('file').click(); return false;">Upload DM4 File</button>
@@ -160,5 +162,6 @@ document.getElementById("club").innerHTML = translate('club');
 document.getElementById("weight").innerHTML = translate('weight');
 document.getElementById("birthyear").innerHTML = translate('birthyear');
 document.getElementById("options").innerHTML = translate('options');
+document.getElementById("add_new_judoka").innerHTML = translate('new_judoka');
 
 </script>

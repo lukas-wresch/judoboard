@@ -3256,6 +3256,7 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 
 Error Application::Ajax_AddJudoka(const HttpServer::Request& Request)
 {
+	bool to_tournament = HttpServer::DecodeURLEncoded(Request.m_Query, "to_tournament") == "true";
 	auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
 	auto lastname  = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
 	auto weight    = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
@@ -3276,10 +3277,26 @@ Error Application::Ajax_AddJudoka(const HttpServer::Request& Request)
 
 	new_judoka.SetClub(GetDatabase().FindClub(clubID));
 
-	auto guard = LockWriteForScope();
+	if (to_tournament)
+	{
+		auto guard = LockReadForScope();
+		auto tournament = GetTournament();
 
-	m_Database.AddJudoka(std::move(new_judoka));
-	m_Database.Save();
+		if (!tournament)
+			return Error::Type::TournamentNotOpen;
+
+		if (!tournament->AddParticipant(new Judoka(new_judoka)))
+			return Error::Type::OperationFailed;
+	}
+
+	else
+	{
+		auto guard = LockWriteForScope();
+
+		if (!m_Database.AddJudoka(std::move(new_judoka)))
+			return Error::Type::OperationFailed;
+		m_Database.Save();
+	}
 	
 	return Error();//OK
 }
