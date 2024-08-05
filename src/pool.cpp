@@ -340,6 +340,34 @@ void Pool::GenerateSchedule()
 
 
 
+Delivery Pool::GetMatchParcels() const
+{
+	Delivery ret(*this);
+
+	std::vector<Delivery> pool_parcels;
+
+	for (auto pool : m_Pools)
+		pool_parcels.emplace_back(pool->GetMatchParcels());
+
+	bool added = false;
+	do//As long as we have parcel
+	{
+		added = false;
+		for (auto& parcel : pool_parcels)//For every pool
+		{
+			if (ret << parcel)//Add a single parcel (for each pool)
+				added = true;//On success
+		}
+	} while (added);
+
+	ret.AppendAll(m_Finals.GetMatchParcels());
+
+	assert(ret.GetSize() == GetSchedule().size());
+	return ret;
+}
+
+
+
 void Pool::CopyMatchesFromSubtables()
 {
 	SetSchedule().clear();

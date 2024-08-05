@@ -35,7 +35,7 @@ namespace Judoboard
 
 		void operator = (UUID&& NewUUID) noexcept { m_UUID = std::move(NewUUID.m_UUID); }
 
-	protected:
+	//protected:
 		void operator = (const UUID& NewUUID) noexcept { m_UUID = NewUUID.m_UUID; }
 
 	private:

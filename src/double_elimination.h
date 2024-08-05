@@ -44,6 +44,8 @@ namespace Judoboard
 		}
 		virtual void GenerateSchedule() override;
 
+		virtual Delivery GetMatchParcels() const override;
+
 		bool IsThirdPlaceMatch() const { return m_LoserBracket.IsFinalMatch(); }
 		bool IsFifthPlaceMatch() const { return m_LoserBracket.IsThirdPlaceMatch(); }
 

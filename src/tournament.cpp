@@ -2684,7 +2684,6 @@ void Tournament::BuildSchedule()
 	//For all master schedule entries
 	for (int32_t index = 0; index <= GetMaxScheduleIndex(); index++)
 	{
-		//std::vector<std::pair<uint32_t, std::vector<Match*>>> Plan;
 		std::vector<std::pair<MatchTable*, size_t>> Plan;
 
 		//For each match table at this index
