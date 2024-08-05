@@ -24,7 +24,9 @@
     <ClCompile Include="..\..\ZED\src\core.cpp" />
     <ClCompile Include="..\..\ZED\src\csv.cpp" />
     <ClCompile Include="..\..\ZED\src\file.cpp" />
+    <ClCompile Include="..\..\ZED\src\https_client.cpp" />
     <ClCompile Include="..\..\ZED\src\http_client.cpp" />
+    <ClCompile Include="..\..\ZED\src\http_server.cpp" />
     <ClCompile Include="..\..\ZED\src\image.cpp" />
     <ClCompile Include="..\..\ZED\src\log.cpp" />
     <ClCompile Include="..\..\ZED\src\opengl_extensions.cpp" />
@@ -35,8 +37,11 @@
     <ClCompile Include="..\..\ZED\src\sha256.cpp" />
     <ClCompile Include="..\..\ZED\src\sha512.cpp" />
     <ClCompile Include="..\..\ZED\src\socket.cpp" />
+    <ClCompile Include="..\..\ZED\src\socket_ssl.cpp" />
     <ClCompile Include="..\..\ZED\src\socket_tcp.cpp" />
+    <ClCompile Include="..\..\ZED\src\socket_udp.cpp" />
     <ClCompile Include="..\..\ZED\src\sound.cpp" />
+    <ClCompile Include="..\..\ZED\src\thread_pool.cpp" />
     <ClCompile Include="..\..\ZED\src\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -44,7 +49,9 @@
     <ClInclude Include="..\..\ZED\include\core.h" />
     <ClInclude Include="..\..\ZED\include\csv.h" />
     <ClInclude Include="..\..\ZED\include\file.h" />
+    <ClInclude Include="..\..\ZED\include\https_client.h" />
     <ClInclude Include="..\..\ZED\include\http_client.h" />
+    <ClInclude Include="..\..\ZED\include\http_server.h" />
     <ClInclude Include="..\..\ZED\include\image.h" />
     <ClInclude Include="..\..\ZED\include\log.h" />
     <ClInclude Include="..\..\ZED\include\png.h" />
@@ -55,8 +62,11 @@
     <ClInclude Include="..\..\ZED\include\sha256.h" />
     <ClInclude Include="..\..\ZED\include\sha512.h" />
     <ClInclude Include="..\..\ZED\include\socket.h" />
+    <ClInclude Include="..\..\ZED\include\socket_ssl.h" />
     <ClInclude Include="..\..\ZED\include\socket_tcp.h" />
+    <ClInclude Include="..\..\ZED\include\socket_udp.h" />
     <ClInclude Include="..\..\ZED\include\sound.h" />
+    <ClInclude Include="..\..\ZED\include\thread_pool.h" />
     <ClInclude Include="..\..\ZED\include\zed.h" />
   </ItemGroup>
   <ItemGroup>
@@ -128,11 +138,15 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\bin\</OutDir>
     <TargetName>$(ProjectName)d</TargetName>
+    <IncludePath>$(SolutionDir)..\ZED\external\OpenSSL-Win64\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\ZED\external\OpenSSL-Win64\lib\VC\x64\MTd;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)..\bin\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
+    <IncludePath>$(SolutionDir)..\ZED\external\OpenSSL-Win64\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\ZED\external\OpenSSL-Win64\lib\VC\x64\MT;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

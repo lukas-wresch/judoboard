@@ -1,0 +1,1 @@
+certutil -addstore -f "Root" certificate.pem

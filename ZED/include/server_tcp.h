@@ -12,6 +12,10 @@ namespace ZED
 	public:
 		ServerTCP(uint16_t Port) : Server<SocketTCP>(Port) {}
 
+		/*bool Listen(uint16_t Port) {
+			return Socket<SocketTCP>::Listen(Port);
+		}*/
+
 		const std::vector<SocketTCP>& GetClients() const { return m_Clients; }
 		std::vector<SocketTCP>& GetClients() { return m_Clients; }
 

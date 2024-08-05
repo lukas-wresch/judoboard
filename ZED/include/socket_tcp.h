@@ -24,13 +24,19 @@ namespace ZED
 		{
 			m_Socket = rhs.m_Socket;
 		}
+		void operator =(SocketTCP&& rhs) noexcept
+		{
+			m_Socket = rhs.m_Socket;
+			rhs.m_Socket = -1;
+		}
 
 		bool Connect(const char* Host, uint16_t Port) override;
 		bool Connect(const std::string& Host, uint16_t Port) { return Connect(Host.c_str(), Port); }
 
-		virtual bool Listen(uint16_t Port) override;
+		virtual bool IsConnected() const override { return m_Socket != -1; }
 
-		bool IsConnected() const { return m_Socket != -1; }
+		virtual bool Listen(uint16_t Port) override;
+		virtual Socket* AcceptClient() const override;
 
 		const char* GetBuffer() const { return m_Buffer; }
 		uint32_t GetBufferLength() const { return m_BufferPosition; }
@@ -42,11 +48,8 @@ namespace ZED
 			return ret;
 		}
 
-		bool Send(const void* Data, uint32_t Size);
-		template <typename T>
-		bool Send(const T& Data) { return Send((const char*)&Data, sizeof(T)); }
+		virtual bool Send(const void* Data, uint32_t Size) override;
 
-		SocketTCP AcceptClients();
 		bool Recv();
 
 
@@ -58,7 +61,7 @@ namespace ZED
 
 		static constexpr uint32_t BufferSize = 4096;
 
-	private:
+	protected:
 		SocketTCP(int Socket);
 
 		char m_Buffer[BufferSize] = {};
