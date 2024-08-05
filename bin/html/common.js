@@ -117,6 +117,7 @@ var lang_en = {
     monitor:  [ "Monitor", "Monitor" ],
     more:  [ "More", "Mehr" ],
     move_to_mat:  [ "Move to mat", "Auf Matte verschieben" ],
+    match_added:  [ "Match added to tournament", "Kampf zum Turnier hinzugef&uuml;gt"],
     match_revised:  [ "Match revised", "Kampf revidiert" ],
     match_started:  [ "Match started", "Kampf gestartet" ],
     match_stopped:  [ "Match stopped", "Kampf gestoppt" ],

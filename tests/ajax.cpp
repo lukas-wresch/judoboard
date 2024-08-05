@@ -2237,6 +2237,59 @@ TEST(Ajax, RemoveDisqualification)
 
 
 
+TEST(Ajax, Match_Add)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto j1 = new Judoka("a", "b");
+		auto j2 = new Judoka("c", "d");
+
+		auto r1 = new RuleSet("test1", 60, 30, 10, 5);
+		auto r2 = new RuleSet("test2", 60, 30, 10, 5);
+
+		app.GetTournament()->AddParticipant(j1);
+		app.GetTournament()->AddParticipant(j2);
+		app.GetTournament()->AddRuleSet(r1);
+		app.GetTournament()->AddRuleSet(r2);
+
+		EXPECT_TRUE(app.Ajax_AddMatch(HttpServer::Request("", "white=" + (std::string)j1->GetUUID() + "&blue=" + (std::string)j2->GetUUID() + "&mat=2&rule=" + (std::string)r1->GetUUID() )));
+
+		auto table = app.GetTournament()->GetMatchTables()[0];
+		auto match = app.GetTournament()->GetSchedule()[0];
+
+		EXPECT_EQ(*match->GetFighter(Fighter::White), *j1);
+		EXPECT_EQ(*match->GetFighter(Fighter::Blue),  *j2);
+		EXPECT_EQ(match->GetMatID(), 2);
+		EXPECT_EQ(match->GetRuleSet().GetUUID(), r1->GetUUID());
+		EXPECT_EQ(table->GetRuleSet().GetUUID(), r1->GetUUID());
+
+		EXPECT_TRUE(app.Ajax_AddMatch(HttpServer::Request("", "white=" + (std::string)j2->GetUUID() + "&blue=" + (std::string)j1->GetUUID() + "&mat=2&rule=" + (std::string)r1->GetUUID() + "&match_table=" + (std::string)table->GetUUID() )));
+
+		auto match2 = app.GetTournament()->GetSchedule()[1];
+
+		EXPECT_EQ(*match2->GetFighter(Fighter::White), *j2);
+		EXPECT_EQ(*match2->GetFighter(Fighter::Blue),  *j1);
+		EXPECT_EQ(match2->GetMatID(), 2);
+		EXPECT_EQ(match2->GetRuleSet().GetUUID(), r1->GetUUID());
+		EXPECT_EQ(*match2->GetMatchTable(), *table);
+
+		EXPECT_TRUE(app.Ajax_AddMatch(HttpServer::Request("", "white=" + (std::string)j1->GetUUID() + "&blue=" + (std::string)j2->GetUUID() + "&mat=1&rule=" + (std::string)r2->GetUUID() + "&match_table=" + (std::string)table->GetUUID() )));
+
+		auto match3 = app.GetTournament()->GetSchedule()[2];
+
+		EXPECT_EQ(*match3->GetFighter(Fighter::White), *j1);
+		EXPECT_EQ(*match3->GetFighter(Fighter::Blue),  *j2);
+		EXPECT_EQ(match3->GetMatID(), 1);
+		EXPECT_EQ(match3->GetRuleSet().GetUUID(), r2->GetUUID());
+		EXPECT_EQ(*match3->GetMatchTable(), *table);
+	}
+}
+
+
+
 TEST(Ajax, Match_Edit)
 {
 	initialize();
