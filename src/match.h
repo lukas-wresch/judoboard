@@ -193,7 +193,6 @@ namespace Judoboard
 		const RuleSet& GetRuleSet() const;
 		void SetRuleSet(std::shared_ptr<const RuleSet> NewRuleSet) { m_Rules = NewRuleSet; }
 		std::shared_ptr<const RuleSet> GetOwnRuleSet() const { return m_Rules; }
-		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
 
 		uint32_t GetCurrentBreaktime() const;
 

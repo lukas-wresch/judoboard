@@ -2238,8 +2238,8 @@ TEST(Ajax, Match_Add)
 		auto j1 = new Judoka("a", "b");
 		auto j2 = new Judoka("c", "d");
 
-		auto r1 = new RuleSet("test1", 60, 30, 10, 5);
-		auto r2 = new RuleSet("test2", 60, 30, 10, 5);
+		auto r1 = std::make_shared<RuleSet>("test1", 60, 30, 10, 5);
+		auto r2 = std::make_shared<RuleSet>("test2", 60, 30, 10, 5);
 
 		app.GetTournament()->AddParticipant(j1);
 		app.GetTournament()->AddParticipant(j2);

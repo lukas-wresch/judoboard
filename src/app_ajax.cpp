@@ -2648,7 +2648,7 @@ Error Application::Ajax_AddMatch(const HttpServer::Request& Request)
 
 	auto match_table = GetTournament()->FindMatchTable(match_tableID);
 
-	auto match = new Match(white, blue, GetTournament());
+	auto match = std::make_shared<Match>(white, blue, GetTournament());
 	match->SetRuleSet(rule);
 
 	if (match_table)
