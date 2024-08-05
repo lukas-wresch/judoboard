@@ -316,9 +316,8 @@ Status Match::GetStatus() const
 		//Check if won by the same person
 		if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
 		{
-			if (m_White.m_DependentMatch->GetWinner() &&
-				m_Blue.m_DependentMatch->GetWinner()  &&
-				m_White.m_DependentMatch->GetWinner()->GetUUID() == m_Blue.m_DependentMatch->GetWinner()->GetUUID())
+			if ( m_White.m_DependentMatch->GetWinner() &&  m_Blue.m_DependentMatch->GetWinner() &&
+				*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())
 				return Status::Skipped;//Skip match
 		}
 
@@ -336,15 +335,10 @@ bool Match::HasConcluded() const
 
 	if (IsBestOfThree() && m_White.m_DependentMatch && m_Blue.m_DependentMatch)
 	{
-		if (m_White.m_DependentMatch->HasConcluded() && m_Blue.m_DependentMatch->HasConcluded())
-		{
-			if (!m_White.m_DependentMatch->GetWinner())
-				return true;
-			if (!m_Blue.m_DependentMatch->GetWinner())
-				return true;
-			if (*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())
-				return true;
-		}
+		//Check if won by the same person
+		if ( m_White.m_DependentMatch->GetWinner() &&  m_Blue.m_DependentMatch->GetWinner() &&
+			*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())			
+			return true;
 	}
 
 	return m_State == Status::Concluded;

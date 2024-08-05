@@ -2887,7 +2887,7 @@ Error Application::Ajax_DeleteMatchlessMatchTables()
 
 Error Application::Ajax_DeleteCompletedMatchTables()
 {
-	auto guard = LockWriteForScope();
+	auto guard = LockReadForScope();
 
 	auto tournament = GetTournament();
 	if (!tournament)
@@ -4692,9 +4692,7 @@ Error Application::Ajax_StartMatch(const HttpServer::Request& Request)
 	auto tournament_guard = GetTournament()->LockReadForScope();
 
 	auto match = GetTournament()->GetNextMatch(mat->GetMatID());
-	if (!match)
-		return Error::Type::OperationFailed;
-	if (!mat->StartMatch(match))
+	if (!match || !mat->StartMatch(match))
 		return Error::Type::OperationFailed;
 
 	return Error::Type::NoError;//OK
