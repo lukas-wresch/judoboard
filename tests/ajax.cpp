@@ -2257,6 +2257,8 @@ TEST(Ajax, Match_Add)
 
 		EXPECT_TRUE(app.Ajax_AddMatch(HttpServer::Request("", "white=" + (std::string)j1->GetUUID() + "&blue=" + (std::string)j2->GetUUID() + "&mat=2&rule=" + (std::string)r1->GetUUID() )));
 
+		ASSERT_EQ(app.GetTournament()->GetMatchTables().size(), 1);
+		ASSERT_EQ(app.GetTournament()->GetSchedule().size(),    1);
 		auto table = app.GetTournament()->GetMatchTables()[0];
 		auto match = app.GetTournament()->GetSchedule()[0];
 

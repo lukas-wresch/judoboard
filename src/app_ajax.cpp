@@ -2615,6 +2615,8 @@ Error Application::Ajax_UpdatePassword(Account* Account, const HttpServer::Reque
 	if (password.length() <= 0)//Password not changed
 		return Error::Type::InvalidInput;
 
+	auto guard = LockWriteForScope();
+
 	Account->SetPassword(password);
 	m_Database.Save();
 	return Error::Type::NoError;//OK
@@ -2630,24 +2632,28 @@ Error Application::Ajax_AddMatch(const HttpServer::Request& Request)
 	UUID ruleID  = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 	int  matID   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
   
-  return Error(Error::Type::TournamentNotOpen);
+	auto guard = LockReadForScope();
 
-	auto white = GetTournament()->GetDatabase().FindJudoka(whiteID);
+	auto tournament = GetTournament();
+	if (!tournament)
+		return Error(Error::Type::TournamentNotOpen);
+
+	auto white = tournament->GetDatabase().FindJudoka(whiteID);
 	if (!white)
 		white = m_Database.FindJudoka(whiteID);
 
-	auto blue = GetTournament()->GetDatabase().FindJudoka(blueID);
+	auto blue = tournament->GetDatabase().FindJudoka(blueID);
 	if (!blue)
 		blue = m_Database.FindJudoka(blueID);
 
 	if (!white || !blue)//Judokas exist?
 		return Error(Error::Type::ItemNotFound);
 
-	auto rule = GetTournament()->FindRuleSet(ruleID);
+	auto rule = tournament->FindRuleSet(ruleID);
 	if (!rule)
 		rule = m_Database.FindRuleSet(ruleID);
 
-	auto match_table = GetTournament()->FindMatchTable(match_tableID);
+	auto match_table = tournament->FindMatchTable(match_tableID);
 
 	auto match = new Match(white, blue, GetTournament());
 	match->SetRuleSet(rule);
