@@ -7,6 +7,7 @@ var lang_en = {
     add_participant:  [ "Add Participant", "Teilnehmer  hinzuf&uuml;gen" ],
     age_group:  [ "Age group", "Altersklasse" ],
     age_groups: [ "Age groups", "Altersklassen" ],
+    add_to_tournament: [ "Add to Tournament", "Zum Turnier hinzuf&uuml;gen" ],
     all:   [ "All", "Alle" ],
     all_mats:  [ "All Mats", "Alle Matten" ],
     audio_device:  [ "Audio Device", "Audioger&auml;t" ],
