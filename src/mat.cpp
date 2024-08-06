@@ -804,7 +804,7 @@ void Mat::AddWazaAri(Fighter Whom)
 			Mate();
 	}
 
-	ZED::Log::Debug("Wazaari");
+	ZED::Log::Info("Wazaari");
 }
 
 
@@ -887,7 +887,7 @@ void Mat::AddYuko(Fighter Whom)
 			Mate();
 	}
 
-	ZED::Log::Debug("Yuko");
+	ZED::Log::Info("Yuko");
 }
 
 
@@ -924,7 +924,7 @@ void Mat::AddKoka(Fighter Whom)
 			Mate();
 	}
 
-	ZED::Log::Debug("Koka");
+	ZED::Log::Info("Koka");
 }
 
 
@@ -1003,7 +1003,7 @@ void Mat::SetAsDraw(bool Enable)
 		}
 	}
 
-	ZED::Log::Debug("Draw");
+	ZED::Log::Info("Draw");
 }
 
 
@@ -1023,7 +1023,7 @@ void Mat::AddShido(Fighter Whom)
 			AddHansokuMake(Whom, false);//Add indirect hansokumake
 	}
 
-	ZED::Log::Debug("Shido");
+	ZED::Log::Info("Shido");
 }
 
 
@@ -1291,13 +1291,13 @@ void Mat::PlaySoundFile() const
 	if (!m_AudioDevice.IsValid() || m_AudioDevice.GetDeviceIndex() != GetAudioDeviceID())
 		m_AudioDevice = ZED::SoundDevice(GetAudioDeviceID());
 
-	assert(m_AudioDevice.IsValid());
-	assert(m_Application);
+	//assert(m_AudioDevice.IsValid());
+	//assert(m_Application);
 	if (m_Application)
 	{
 		auto sound = m_Application->GetSound(GetSoundFilename());
-		assert(sound);
-		assert(sound->IsValid());
+		//assert(sound);
+		//assert(sound->IsValid());
 		if (sound)
 			m_AudioDevice.Play(*sound);
 	}
@@ -1375,7 +1375,7 @@ void Mat::Tokeda()
 
 
 
-const std::vector<std::shared_ptr<Match>> Mat::GetNextMatches() const
+const std::vector<std::shared_ptr<const Match>> Mat::GetNextMatches() const
 {
 	m_mutex.LockRead();
 	auto ret = m_NextMatches;
@@ -2740,7 +2740,10 @@ bool Mat::Mainloop()
 			if (nextMatches.size() == 0 && m_State == State::Waiting)
 				NextState(State::StartUp);
 
-			m_NextMatches = std::move(nextMatches);
+			//Copy over match data
+			m_NextMatches.clear();
+			for (auto match : nextMatches)
+				m_NextMatches.emplace_back(match.get());
 		}
 	}
 

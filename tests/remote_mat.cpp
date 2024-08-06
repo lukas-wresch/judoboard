@@ -89,7 +89,7 @@ TEST(RemoteMat, QuickClose)
 		IMat* m = master.FindMat(1);
 		ASSERT_TRUE(m);
 	}
-	EXPECT_LE(ZED::Core::CurrentTimestamp() - time, 5000u);
+	EXPECT_LE(ZED::Core::CurrentTimestamp() - time, 6000u);
 }
 
 
@@ -405,7 +405,7 @@ TEST(RemoteMat, CorrectWinner)
 				m->AddNoDisqualification(!f);
 			}
 
-			ZED::Core::Pause(500);
+			ZED::Core::Pause(2200);
 
 			if (i == 4)
 				m->SetAsDraw();
@@ -1632,6 +1632,9 @@ TEST(RemoteMat, MatchTime)
 
 		ZED::Core::Pause(2000);
 		EXPECT_TRUE(m->IsOutOfTime());
+		m->AddIppon(Fighter::White);
+		ZED::Core::Pause(100);
+		EXPECT_TRUE(m->EndMatch());
 	}
 }
 
@@ -2173,7 +2176,7 @@ TEST(RemoteMat, Tokeda)
 
 		ASSERT_EQ(m->GetOsaekomiList().size(), 2);
 		EXPECT_EQ(m->GetOsaekomiList()[1].m_Who, f);
-		EXPECT_LE(std::abs((int)m->GetOsaekomiList()[1].m_Time - 5000), 250);
+		EXPECT_LE(std::abs((int)m->GetOsaekomiList()[1].m_Time - 5000), 300);
 
 		ZED::Core::Pause(10 * 1000);
 

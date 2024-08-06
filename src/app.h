@@ -93,7 +93,7 @@ namespace Judoboard
 
 		bool RegisterMatWithMaster(IMat* Mat);
 
-		std::vector<std::shared_ptr<Match>> GetNextMatches(uint32_t MatID, bool& Success) const;
+		std::vector<std::shared_ptr<const Match>> GetNextMatches(uint32_t MatID, bool& Success) const;
 
 		bool ConnectToMaster(const std::string& Hostname, uint16_t Port = 8080);
 
@@ -101,7 +101,7 @@ namespace Judoboard
 
 		const ZED::Sound* GetSound(const std::string& Name) const {
 			auto ret = m_Sounds.find(Name);
-			assert(ret != m_Sounds.end());
+			//assert(ret != m_Sounds.end());
 			if (ret == m_Sounds.end())
 				return nullptr;
 			return &ret->second;

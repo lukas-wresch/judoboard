@@ -142,7 +142,7 @@ bool RemoteMat::HasConcluded() const
 
 bool RemoteMat::EndMatch()
 {
-	const bool ret = SendCommand("/ajax/mat/end_match?id=" + std::to_string(GetMatID()));
+	const bool ret = SendCommand("/ajax/slave/end_match?id=" + std::to_string(GetMatID()));
 
 	if (ret)
 		m_pMatch = nullptr;

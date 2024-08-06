@@ -100,7 +100,14 @@ TEST(Match, ExportImport)
 		auto rule_set = std::make_shared<RuleSet>("test", rand(), rand(), rand(), rand());
 		Tournament tourney;
 
-		auto match = std::make_shared<Match>(&j1, &j2, &tourney, 1);
+		std::shared_ptr<Match> match;
+		if (rand()%2 == 0)
+			match = std::make_shared<Match>(&j1, &j2, &tourney, matid);
+		else
+			match = std::make_shared<Match>(DependentJudoka(&j1), DependentJudoka(&j2), &tourney, matid);
+
+		EXPECT_TRUE(match->GetTournament());
+		EXPECT_EQ(match->GetMatID(), matid);
 		match->SetRuleSet(rule_set);
 		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
 

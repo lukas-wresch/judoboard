@@ -83,17 +83,21 @@ namespace Judoboard
 
 		bool AddMatch(std::shared_ptr<Match> NewMatch);
 		//bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
-		virtual std::shared_ptr<Match> GetNextMatch(int32_t MatID = -1) const override;//Returns the next match for a given mat if available, otherwise null pointer is returned
-		std::shared_ptr<const Match> GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual std::shared_ptr<Match> GetNextMatch(int32_t MatID = -1) override;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual std::shared_ptr<const Match> GetNextMatch(int32_t MatID = -1) const override;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual std::vector<std::shared_ptr<const Match>> GetNextMatches(int32_t MatID) const override;
 		virtual std::shared_ptr<Match> GetNextOngoingMatch(int32_t MatID) override;//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
+
 		bool ReviseMatch(const UUID& MatchID, IMat& Mat);
+
+		std::shared_ptr<Match> GetNextMatch(int32_t MatID, uint32_t& StartIndex);//Returns the next match for a given mat if available, otherwise null pointer is returned
+		std::shared_ptr<const Match> GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		std::shared_ptr<const Match> GetNextMatch(const UUID& MatchID, int32_t MatID) const;//Returns the next match in the schedule after a give match in a speified mat. Set MatID=-1 to select any mat
 
 		virtual bool RemoveMatch(const UUID& MatchID) override;
 		virtual bool MoveMatchUp(const UUID& MatchID, uint32_t MatID = 0) override;
 		virtual bool MoveMatchDown(const UUID& MatchID, uint32_t MatID = 0) override;
 		virtual bool MoveMatchTo(const UUID& From, const UUID& To, bool Above) override;
-
-		virtual std::vector<std::shared_ptr<Match>> GetNextMatches(int32_t MatID) const override;
 
 		//Participant / Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const override { return m_StandingData.FindJudoka(Judoka.GetUUID()); }

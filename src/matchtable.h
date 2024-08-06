@@ -406,7 +406,11 @@ namespace Judoboard
 			m_Schedule.clear();
 		}
 
-		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
+		void SetTournament(const ITournament* Tournament) {
+			m_Tournament = Tournament;
+			for (auto match : m_Schedule)
+				match->SetTournament(Tournament);
+		}
 
 		const std::string ResultsToHTML() const;
 

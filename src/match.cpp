@@ -25,7 +25,7 @@ Match::Match(const Judoka* White, const Judoka* Blue, const ITournament* Tournam
 
 
 Match::Match(const DependentJudoka& White, const DependentJudoka& Blue, const ITournament* Tournament, uint32_t MatID)
-	: m_White(White), m_Blue(Blue)
+	: m_White(White), m_Blue(Blue), m_Tournament(Tournament)
 {
 	SetMatID(MatID);
 }
@@ -227,6 +227,10 @@ void Match::operator >>(nlohmann::json& Json) const
 	else
 		Json["tag"] = 0;
 
+	Json["finals"] = (bool)m_Tag.finals;
+	Json["semi"]   = (bool)m_Tag.semi;
+	Json["in_preparation"] = (bool)m_Tag.in_preparation;
+
 	if (IsRunning())
 	{
 		//Export current state
@@ -284,6 +288,15 @@ void Match::ToString(YAML::Emitter& Yaml) const
 		Yaml << YAML::Key << "color" << YAML::Value << GetMatchTable()->GetColor().ToHexString();
 	}
 
+	//Tags
+	Yaml << YAML::Key << "finals" << YAML::Value << GetTag().finals;
+	Yaml << YAML::Key << "semi"   << YAML::Value << GetTag().semi;
+	Yaml << YAML::Key << "third"  << YAML::Value << GetTag().third;
+	Yaml << YAML::Key << "fifth"  << YAML::Value << GetTag().fifth;
+	Yaml << YAML::Key << "winner_bracket" << YAML::Value << GetTag().winner_bracket;
+	Yaml << YAML::Key << "loser_bracket"  << YAML::Value << GetTag().loser_bracket;
+	Yaml << YAML::Key << "in_preparation" << YAML::Value << GetTag().in_preparation;
+
 	Yaml << YAML::Key << "winner" << YAML::Value << (int)m_Result.m_Winner;
 	Yaml << YAML::Key << "score"  << YAML::Value << (int)m_Result.m_Score;
 	Yaml << YAML::Key << "time"   << YAML::Value << m_Result.m_Time;
@@ -303,9 +316,8 @@ Status Match::GetStatus() const
 		//Check if won by the same person
 		if (m_White.m_DependentMatch && m_Blue.m_DependentMatch)
 		{
-			if (m_White.m_DependentMatch->GetWinner() &&
-				m_Blue.m_DependentMatch->GetWinner()  &&
-				m_White.m_DependentMatch->GetWinner()->GetUUID() == m_Blue.m_DependentMatch->GetWinner()->GetUUID())
+			if ( m_White.m_DependentMatch->GetWinner() &&  m_Blue.m_DependentMatch->GetWinner() &&
+				*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())
 				return Status::Skipped;//Skip match
 		}
 
@@ -323,15 +335,10 @@ bool Match::HasConcluded() const
 
 	if (IsBestOfThree() && m_White.m_DependentMatch && m_Blue.m_DependentMatch)
 	{
-		if (m_White.m_DependentMatch->HasConcluded() && m_Blue.m_DependentMatch->HasConcluded())
-		{
-			if (!m_White.m_DependentMatch->GetWinner())
-				return true;
-			if (!m_Blue.m_DependentMatch->GetWinner())
-				return true;
-			if (*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())
-				return true;
-		}
+		//Check if won by the same person
+		if ( m_White.m_DependentMatch->GetWinner() &&  m_Blue.m_DependentMatch->GetWinner() &&
+			*m_White.m_DependentMatch->GetWinner() == *m_Blue.m_DependentMatch->GetWinner())			
+			return true;
 	}
 
 	return m_State == Status::Concluded;

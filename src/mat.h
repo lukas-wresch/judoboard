@@ -79,7 +79,7 @@ namespace Judoboard
 		bool AreFightersOnMat() const override { return m_State == State::TransitionToMatch || m_State == State::Running; }
 
 		virtual std::shared_ptr<const Match> GetMatch() const override { return m_pMatch; }
-		virtual const std::vector<std::shared_ptr<Match>> GetNextMatches() const override;
+		virtual const std::vector<std::shared_ptr<const Match>> GetNextMatches() const override;
 
 		uint32_t EndTimeOfOsaekomi() const;//Returns the number of seconds the osaekomi end the match
 

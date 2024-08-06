@@ -191,6 +191,29 @@ void DoubleElimination::GenerateSchedule()
 
 void DoubleElimination::BuildSchedule()
 {
+	//Set tags
+	for (auto match : m_WinnerBracket.GetSchedule())
+		match->AddTag(Match::Tag::WinnerBracket());
+	for (auto match : m_LoserBracket.GetSchedule())
+	{
+		if (match->GetTag().third)
+		{
+			match->RemoveTag(Match::Tag::Third());
+			match->RemoveTag(Match::Tag::Finals());
+			match->AddTag(Match::Tag::Fifth());
+		}
+
+		else if (match->GetTag().finals)
+		{
+			match->RemoveTag(Match::Tag::Finals());
+			match->AddTag(Match::Tag::Third());
+		}
+
+		match->AddTag(Match::Tag::LoserBracket());
+	}
+
+
+	//Copy matches over
 	if (m_WinnerBracket.GetNumberOfRounds() == 3)//8 participants
 	{
 		for (size_t i = 0; i < 4 + 2; i++)
@@ -267,6 +290,8 @@ void DoubleElimination::AddMatchToWinnerBracket(std::shared_ptr<Match> NewMatch)
 	if (NewMatch->GetFighter(Fighter::Blue))
 		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
 
+	NewMatch->AddTag(Match::Tag::WinnerBracket());
+
 	m_WinnerBracket.AddMatch(NewMatch);
 	SetSchedule().emplace_back(NewMatch);
 }
@@ -282,6 +307,8 @@ void DoubleElimination::AddMatchToLoserBracket(std::shared_ptr<Match> NewMatch)
 		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::White)), true);
 	if (NewMatch->GetFighter(Fighter::Blue))
 		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
+
+	NewMatch->AddTag(Match::Tag::LoserBracket());
 
 	m_LoserBracket.AddMatch(NewMatch);
 	SetSchedule().emplace_back(NewMatch);
