@@ -202,6 +202,8 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 	if (!NewJudoka)
 		return false;
 
+	AddClub((Club*)NewJudoka->GetClub());
+
 	m_Judokas.emplace_back(NewJudoka);
 
 	std::sort(m_Judokas.begin(), m_Judokas.end(), [](const Judoka* a, const Judoka* b)
