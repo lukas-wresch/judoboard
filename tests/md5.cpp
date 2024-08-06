@@ -3401,6 +3401,10 @@ TEST(MD7, ImportKEM_U13_2024_05_05)
 		Database db;
 		Tournament tour(file, &db);
 
+		ASSERT_TRUE(tour.GetOrganizer());
+		for (auto club : tour.GetDatabase().GetAllClubs())
+			EXPECT_TRUE(club->IsChildOf(*tour.GetOrganizer()));
+
 		auto table = tour.FindMatchTableByDescription("weibliche Jugend U13 -10 kg");
 		ASSERT_TRUE(table);
 		EXPECT_EQ(table->GetParticipants().size(), 0);

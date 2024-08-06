@@ -1035,9 +1035,14 @@ TEST(Ajax, Judoka_Add)
 		EXPECT_EQ(judoka->GetNumber(), "A123");
 
 
-		EXPECT_EQ((std::string)app.Ajax_AddJudoka(HttpServer::Request("to_tournament=true", "firstname=first2&lastname=last2&weight=10&gender=0&birthyear=2000&number=A123")), "ok");
+		auto c = new Club("Club 1");
+		c->SetShortName("c");
+		app.GetTournament()->GetDatabase().AddClub(c);
 
-		EXPECT_EQ(app.GetDatabase().GetAllJudokas().size(), 1);
+
+		EXPECT_TRUE(app.Ajax_AddJudoka(HttpServer::Request("to_tournament=true", "firstname=first2&lastname=last2&weight=10&gender=0&birthyear=2000&number=A123&club=" + (std::string)c->GetUUID())));
+
+		EXPECT_EQ(app.GetDatabase().GetAllJudokas().size(),      1);
 		ASSERT_EQ(app.GetTournament()->GetParticipants().size(), 1);
 
 		judoka = app.GetTournament()->GetParticipants()[0];
@@ -1048,6 +1053,8 @@ TEST(Ajax, Judoka_Add)
 		EXPECT_EQ(judoka->GetGender(),  Gender::Male);
 		EXPECT_EQ(judoka->GetBirthyear(), 2000);
 		EXPECT_EQ(judoka->GetNumber(), "A123");
+		ASSERT_TRUE(judoka->GetClub());
+		EXPECT_EQ(*judoka->GetClub(), *c);
 	}
 }
 
@@ -1816,6 +1823,43 @@ TEST(Ajax, Clubs_List_All)
 		ASSERT_EQ(yaml.size(), 1);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
 		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c");
+	}
+}
+
+
+
+TEST(Ajax, Clubs_List_Tournament)
+{
+	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Application app;
+
+		auto c1 = new Club("Club 1");
+		c1->SetShortName("c1");
+		auto c2 = new Club("Club 2");
+		c2->SetShortName("c2");
+
+		auto t = new Tournament("deleteMe");
+		t->EnableAutoSave(false);
+
+		app.AddTournament(t);
+
+		auto j = new Judoka("first", "last");
+		j->SetClub(c1);
+		t->AddParticipant(j);
+
+		app.GetDatabase().AddClub(c2);
+
+		auto yaml = YAML::Load(app.Ajax_ListClubs(HttpServer::Request("tournament_only=true")));
+
+		ASSERT_EQ(yaml.size(), 1);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
+		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c1");
+
+		yaml = YAML::Load(app.Ajax_ListClubs(HttpServer::Request("all=true")));
+		ASSERT_EQ(yaml.size(), 2);
 	}
 }
 

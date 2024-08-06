@@ -3282,6 +3282,10 @@ Error Application::Ajax_AddJudoka(const HttpServer::Request& Request)
 		auto guard = LockReadForScope();
 		auto tournament = GetTournament();
 
+		auto club = tournament->FindClub(clubID);//Take club of the tourament if the club is already in the tournament
+		if (club)
+			new_judoka.SetClub(club);
+
 		if (!tournament)
 			return Error::Type::TournamentNotOpen;
 
@@ -3782,13 +3786,14 @@ Error Application::Ajax_DeleteClub(const HttpServer::Request& Request)
 std::string Application::Ajax_ListClubs(const HttpServer::Request& Request)
 {
 	bool all = HttpServer::DecodeURLEncoded(Request.m_Query, "all") == "true";
+	bool tournament_only = HttpServer::DecodeURLEncoded(Request.m_Query, "tournament_only") == "true";
 
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
 
 	auto guard = LockReadForScope();
 
-	if (all && GetTournament())
+	if ((all || tournament_only) && GetTournament())
 	{
 		Tournament* tour = (Tournament*)GetTournament();//TODO: could be remote tournament
 
@@ -3801,10 +3806,13 @@ std::string Application::Ajax_ListClubs(const HttpServer::Request& Request)
 		tour->UnlockRead();
 	}
 
-	for (auto club : m_Database.GetAllClubs())
+	if (all || !tournament_only)
 	{
-		if (club)
-			*club >> ret;
+		for (auto club : m_Database.GetAllClubs())
+		{
+			if (club)
+				*club >> ret;
+		}
 	}
 
 	ret << YAML::EndSeq;

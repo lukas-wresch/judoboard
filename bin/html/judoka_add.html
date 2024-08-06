@@ -194,7 +194,10 @@ else
   document.getElementById("import").style.display = "none";
   document.getElementById("update").style.display = "none";
   document.getElementById("delete").style.display = "none";
-  GetClubs();
+  if (to_tournament)
+    GetClubs(undefined, "tournament_only=true");
+  else
+    GetClubs();
 }
 
 
