@@ -56,8 +56,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			new_club = pDatabase->FindClubByName(club->Name);
 		else
 			new_club = new Club(*club);
-		
-		m_StandingData.AddClub(new_club);
+
+		assert(m_StandingData.AddClub(new_club));
 		club->pUserData = new_club;
 	}
 
@@ -160,10 +160,11 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (new_judoka)
 		{
 			judoka->pUserData = new_judoka;
-			m_StandingData.AddJudoka(new_judoka);
 
 			if (judoka->Club)//Connect to club
 				new_judoka->SetClub((Club*)judoka->Club->pUserData);
+
+			m_StandingData.AddJudoka(new_judoka);
 
 			if (judoka->Weightclass)
 			{

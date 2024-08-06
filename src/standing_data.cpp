@@ -266,11 +266,29 @@ bool StandingData::AddClub(Club* NewClub)
 
 	if (FindClub(NewClub->GetUUID()))
 		return false;
+	if (FindClubByName(NewClub->GetName()))
+		return false;
 
-	AddAssociation(const_cast<Association*>(NewClub->GetParent()));
+	bool ret = true;
+
+	auto parent = NewClub->GetParent();
+	if (parent)
+	{
+		auto prev_added = FindAssociation(*parent);
+		if (prev_added)
+			NewClub->SetParent(prev_added);
+		else
+		{
+			auto prev_added = FindAssociationByName(parent->GetName());
+			if (prev_added)
+				NewClub->SetParent(prev_added);
+			else
+				ret = AddAssociation(const_cast<Association*>(NewClub->GetParent()));
+		}
+	}
 
 	m_Clubs.emplace_back(NewClub);
-	return true;
+	return ret;
 }
 
 
@@ -350,8 +368,21 @@ bool StandingData::AddAssociation(Association* NewAssociation)
 	if (FindAssociationByName(NewAssociation->GetName()))
 		return false;
 
-	//Add recursively
-	AddAssociation(const_cast<Association*>(NewAssociation->GetParent()));
+	auto parent = NewAssociation->GetParent();
+	if (parent)
+	{
+		auto prev_added = FindAssociation(*parent);
+		if (prev_added)
+			NewAssociation->SetParent(prev_added);
+		else
+		{
+			auto prev_added = FindAssociationByName(parent->GetName());
+			if (prev_added)
+				NewAssociation->SetParent(prev_added);
+			else//Add recursively
+				assert(AddAssociation(const_cast<Association*>(NewAssociation->GetParent())));
+		}
+	}	
 
 	m_Associations.emplace_back(NewAssociation);
 
