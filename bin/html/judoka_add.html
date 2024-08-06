@@ -77,7 +77,7 @@ function AddJudoka()
   else
   {
     AjaxPost('ajax/judoka/add', params, function() {
-      $("#note").text(document.getElementById("firstname").value + " " + document.getElementById("lastname").value + " added to database.");
+      document.getElementById("note").innerHTML = document.getElementById("firstname").value + " " + document.getElementById("lastname").value + " " + translate('added_to_database');
       $("#note").show(1000).delay(3000).hide(2000);
 
       document.getElementById("firstname").value = "";
