@@ -408,7 +408,7 @@ MD5::MD5(const Tournament& Tournament)
 						if (new_match.MatchNo == 19)//Final
 							new_match.MatchNo = 19;*/
 
-						Judoboard::Match::Tag fifth_final = Judoboard::Match::Tag::Fifth() & Judoboard::Match::Tag::Finals();
+						Judoboard::Match::Tag fifth_final = Judoboard::Match::Tag::Fifth() && Judoboard::Match::Tag::Finals();
 						if (match->GetTag() == fifth_final)
 							new_match.MatchNo = 21;
 						else if (match->GetTag().third)

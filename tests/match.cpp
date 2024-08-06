@@ -104,7 +104,14 @@ TEST(Match, ExportImport)
 		RuleSet rule_set("test", rand(), rand(), rand(), rand());
 		Tournament tourney;
 
-		Match* match = new Match(&j1, &j2, &tourney, matid);
+		Match* match = nullptr;
+		if (rand()%2 == 0)
+			match = new Match(&j1, &j2, &tourney, matid);
+		else
+			match = new Match(DependentJudoka(&j1), DependentJudoka(&j2), &tourney, matid);
+
+		EXPECT_TRUE(match->GetTournament());
+		EXPECT_EQ(match->GetMatID(), matid);
 		match->SetRuleSet(&rule_set);
 		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
 

@@ -1094,7 +1094,7 @@ TEST(Tournament, StressTest_DeletionMovingAdding)
 			tourney->AddParticipant(j[i]);
 		}
 
-		MatchTable* m1 = new RoundRobin(Weight(0), Weight(60));
+		MatchTable* m1 = new RoundRobin(Weight(0),  Weight(60));
 		MatchTable* m2 = new RoundRobin(Weight(60), Weight(70));
 		MatchTable* m3 = new RoundRobin(Weight(70), Weight(80));
 		MatchTable* m4 = new RoundRobin(Weight(80), Weight(90));
@@ -1120,10 +1120,13 @@ TEST(Tournament, StressTest_DeletionMovingAdding)
 			{
 				auto schedule = tourney->GetSchedule();
 
-				if (rand() % 2 == 0)
-					tourney->MoveMatchUp(schedule[rand() % schedule.size()]->GetUUID());
-				else
-					tourney->MoveMatchDown(schedule[rand() % schedule.size()]->GetUUID());
+				if (schedule.size() > 0)
+				{
+					if (rand() % 2 == 0)
+						tourney->MoveMatchUp(schedule[rand() % schedule.size()]->GetUUID());
+					else
+						tourney->MoveMatchDown(schedule[rand() % schedule.size()]->GetUUID());
+				}
 			}
 		};
 
@@ -1131,7 +1134,8 @@ TEST(Tournament, StressTest_DeletionMovingAdding)
 			for (int i = 0; i < 1000; i++)
 			{
 				auto schedule = tourney->GetSchedule();
-				tourney->RemoveMatch(schedule[rand() % schedule.size()]->GetUUID());
+				if (schedule.size() > 0)
+					tourney->RemoveMatch(schedule[rand() % schedule.size()]->GetUUID());
 			}
 		};
 
@@ -1734,7 +1738,7 @@ TEST(Tournament, NoReorderWhenAddingCustom)
 
 		EXPECT_EQ(d.GetNumJudoka(), 0);
 
-		Judoka* j1 = new Judoka("Firstname",  "Lastname",  50, Gender::Male);
+		Judoka* j1 = new Judoka("Firstname1", "Lastname1",  50, Gender::Male);
 		Judoka* j2 = new Judoka("Firstname2", "Lastname2", 51, Gender::Male);
 		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
 		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);

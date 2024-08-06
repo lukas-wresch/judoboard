@@ -379,16 +379,17 @@ TEST(App, FullTournament)
 
 	{
 		Application app;
+		ZED::Log::Info("Application initialized");
 
 		app.CloseTournament();
 		app.SetTournamentList().clear();
 
-		app.StartLocalMat(1);
+		EXPECT_TRUE(app.StartLocalMat(1));
 
 		Account acc("admin", "1234", Account::AccessLevel::Admin);
 		app.GetDatabase().AddAccount(acc);
 
-		ZED::Core::Pause(1000);
+		ZED::Core::Pause(5000);
 
 		Judoka j1(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
 		Judoka j2(GetFakeFirstname(), GetFakeLastname(), rand() % 50);
@@ -435,17 +436,39 @@ TEST(App, FullTournament)
 		tourney->AddMatchTable(m1);
 		tourney->AddMatchTable(m2);
 
+		for (auto match : tourney->GetSchedule())
+			EXPECT_TRUE(match->GetTournament());
+
 		auto mat = app.GetLocalMat();
 		ASSERT_TRUE(mat);
+
+		mat->SetAudio(false, "", 0);
 
 		for (int i = 0; i < 6; i++)
 		{
 			ZED::Core::Pause(6000);
-			auto match = tourney->GetNextMatch(mat->GetMatID());
+			auto match   = tourney->GetNextMatch(mat->GetMatID());
+			auto matches = tourney->GetNextMatches(mat->GetMatID());
+
+			if (matches.size() >= 3 && i > 0)
+			{
+				EXPECT_TRUE( matches[0]->GetTag().in_preparation);
+				EXPECT_FALSE(matches[1]->GetTag().in_preparation);
+				EXPECT_FALSE(matches[2]->GetTag().in_preparation);
+			}
+
 			ASSERT_TRUE(match);
+			EXPECT_EQ(*match, *matches[0]);
 			EXPECT_TRUE(mat->StartMatch(match));
 
-			ZED::Core::Pause(5000);
+			if (matches.size() >= 3)
+			{
+				EXPECT_TRUE( matches[0]->GetTag().in_preparation);
+				EXPECT_TRUE( matches[1]->GetTag().in_preparation);
+				EXPECT_FALSE(matches[2]->GetTag().in_preparation);
+			}
+
+			ZED::Core::Pause(4000);
 
 			mat->Hajime();
 
@@ -478,10 +501,10 @@ TEST(App, FullTournament)
 				ZED::Core::Pause(10 * 1000);
 			}
 
-			ZED::Core::Pause(3000);
+			ZED::Core::Pause(2000);
 
 			EXPECT_TRUE(mat->EndMatch());
-			ZED::Core::Pause(8000);
+			ZED::Core::Pause(11 * 1000);
 		}
 	}
 }
@@ -662,13 +685,13 @@ TEST(App, FullTournament_SingleElimination7_BO3)
 TEST(App, FullTournament_StressTest)
 {
 	initialize();
-	Application::NoWindow = false;
+	//Application::NoWindow = false;
 
 	{
 		Application app;
 		app.LoadDataFromDisk();
 
-		auto tournament_name = GetRandomName();
+		std::string tournament_name = "deleteMe";
 		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
 
 		const int mat_count = 8;
@@ -857,6 +880,8 @@ TEST(App, FullTournament_StressTest)
 
 		delete tourney;
 	}
+
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 }
 
 
