@@ -40,7 +40,7 @@ namespace Judoboard
 			m_FifthPlaceMatches = std::move(rhs.m_FifthPlaceMatches);
 
 			for (auto match : GetSchedule())
-				match->SetMatchTable(this);
+				match->SetMatchTable(shared_from_this());
 		}
 
 		static std::string GetHTMLForm();

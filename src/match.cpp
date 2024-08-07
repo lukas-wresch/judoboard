@@ -66,9 +66,9 @@ Match::Match(const YAML::Node& Yaml, const MatchTable* MatchTable, const ITourna
 		m_Rules = Tournament->FindRuleSet(Yaml["rule_set"].as<std::string>());
 
 	if (MatchTable)
-		m_Table = MatchTable;
+		m_Table = MatchTable->GetSharedFromThis();
 	else if (Yaml["match_table"] && Tournament)
-		m_Table = Tournament->FindMatchTable(Yaml["match_table"].as<std::string>()).get();
+		m_Table = Tournament->FindMatchTable(Yaml["match_table"].as<std::string>());
 
 	if (Yaml["dependency_white"])
 		m_White.m_Type = (DependencyType)Yaml["dependency_white"].as<int>();

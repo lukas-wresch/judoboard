@@ -181,9 +181,9 @@ bool MatchTable::AddMatch(std::shared_ptr<Match> NewMatch)
 		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
 
 	if (IsSubMatchTable())
-		NewMatch->SetMatchTable(GetParent());
+		NewMatch->SetMatchTable(GetParent()->GetSharedFromThis());
 	else
-		NewMatch->SetMatchTable(this);
+		NewMatch->SetMatchTable(shared_from_this());
 
 	m_Schedule.emplace_back(NewMatch);
 	return true;
@@ -690,7 +690,7 @@ std::shared_ptr<Match> MatchTable::AddAutoMatch(size_t WhiteStartPosition, size_
 std::shared_ptr<Match> MatchTable::CreateAutoMatch(const DependentJudoka& White, const DependentJudoka& Blue)
 {
 	auto new_match = std::make_shared<Match>(White, Blue, GetTournament(), GetMatID());
-	new_match->SetMatchTable(this);
+	new_match->SetMatchTable(shared_from_this());
 	m_Schedule.emplace_back(new_match);
 	return new_match;
 }

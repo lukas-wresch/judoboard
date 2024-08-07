@@ -893,8 +893,8 @@ bool Tournament::AddMatch(std::shared_ptr<Match> NewMatch)
 	
 	if (NewMatch->GetMatchTable())
 	{
-		auto copy_match_table = std::shared_ptr<MatchTable>((MatchTable*)(NewMatch->GetMatchTable()));
-		NewMatch->SetMatchTable(copy_match_table.get());
+		auto copy_match_table = std::const_pointer_cast<MatchTable>(NewMatch->GetMatchTable());
+		NewMatch->SetMatchTable(copy_match_table);
 		AddMatchTable(copy_match_table);
 		GenerateSchedule();
 	}
@@ -1078,8 +1078,6 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
     
 	auto guard = LockWriteForScope();
 
-	if (GetStatus() == Status::Running)
-		return false;
 	if (GetStatus() == Status::Concluded)
 		return false;
 

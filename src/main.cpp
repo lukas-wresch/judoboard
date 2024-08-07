@@ -210,7 +210,7 @@ int main(int argc, char** argv)
 		match->SetRuleSet(rules);
 		Judoboard::RoundRobin* table = new Judoboard::RoundRobin(std::make_shared<Judoboard::Weightclass>(10, 100));
 		table->SetAgeGroup(age_group);
-		match->SetMatchTable(table);
+		match->SetMatchTable(table->GetSharedFromThis());
 
 		mat->StartMatch(match);
 		ZED::Core::Pause(500);

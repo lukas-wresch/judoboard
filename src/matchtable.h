@@ -135,7 +135,7 @@ namespace Judoboard
 
 
 
-	class MatchTable : public ID
+	class MatchTable : public ID, public std::enable_shared_from_this<MatchTable>
 	{
 		friend class Tournament;
 		friend class Pool;
@@ -323,8 +323,11 @@ namespace Judoboard
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& Name) { m_Name = Name; }
 
-		virtual Color GetColor() const { return m_Color; }
+		Color GetColor() const { return m_Color; }
 		void  SetColor(Color NewColor) { m_Color = NewColor; }
+
+		auto GetSharedFromThis() { return shared_from_this(); }
+		auto GetSharedFromThis() const { return shared_from_this(); }
 
 		bool HasConcluded() const;
 

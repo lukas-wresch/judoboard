@@ -37,7 +37,7 @@ namespace Judoboard
 
 			SetSchedule(std::move(rhs.SetSchedule()));
 			for (auto match : GetSchedule())
-				match->SetMatchTable(this);
+				match->SetMatchTable(shared_from_this());
 		}
 
 		static std::string GetHTMLForm();

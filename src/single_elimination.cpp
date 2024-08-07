@@ -327,7 +327,7 @@ void SingleElimination::GenerateSchedule()
 												   DependentJudoka(DependencyType::TakeLoser, match2),
 												   GetTournament(), GetMatID());
 
-		third_place->SetMatchTable(this);
+		third_place->SetMatchTable(shared_from_this());
 		third_place->SetTag(Match::Tag::Third() && Match::Tag::Finals());
 
 		m_ThirdPlaceMatches.emplace_back(third_place);
@@ -366,13 +366,13 @@ void SingleElimination::GenerateSchedule()
 											 DependentJudoka(DependencyType::TakeWinner, semi2),
 											 GetTournament(), GetMatID());
 
-		semi1->SetMatchTable(this);
+		semi1->SetMatchTable(shared_from_this());
 		semi1->SetTag(Match::Tag::Fifth() && Match::Tag::Semi());
 
-		semi2->SetMatchTable(this);
+		semi2->SetMatchTable(shared_from_this());
 		semi2->SetTag(Match::Tag::Fifth() && Match::Tag::Semi());
 
-		fifth->SetMatchTable(this);
+		fifth->SetMatchTable(shared_from_this());
 		fifth->SetTag(Match::Tag::Fifth() && Match::Tag::Finals());
 
 		m_FifthPlaceMatches.emplace_back(semi1);
@@ -491,9 +491,9 @@ bool SingleElimination::AddMatch(std::shared_ptr<Match> NewMatch)
 		AddParticipant(const_cast<Judoka*>(NewMatch->GetFighter(Fighter::Blue)),  true);
 
 	if (IsSubMatchTable())
-		NewMatch->SetMatchTable(GetParent());
+		NewMatch->SetMatchTable(GetParent()->GetSharedFromThis());
 	else
-		NewMatch->SetMatchTable(this);
+		NewMatch->SetMatchTable(shared_from_this());
 
 	if (NewMatch->GetTag().third)
 		m_ThirdPlaceMatches.emplace_back(NewMatch);

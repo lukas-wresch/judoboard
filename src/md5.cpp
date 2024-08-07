@@ -383,7 +383,7 @@ MD5::MD5(const Tournament& Tournament)
 
 			if (match_table->GetType() == MatchTable::Type::SingleElimination)
 			{
-				auto table = (SingleElimination*)match_table;
+				auto table = std::dynamic_pointer_cast<const SingleElimination>(match_table);
 				//16 system
 				if (match_table->GetParticipants().size() > 8 && match_table->GetParticipants().size() <= 16)
 				{
@@ -428,7 +428,7 @@ MD5::MD5(const Tournament& Tournament)
 
 			else if (match_table->GetType() == MatchTable::Type::DoubleElimination)
 			{
-				auto de = (DoubleElimination*)match_table;
+				auto de = std::dynamic_pointer_cast<const DoubleElimination>(match_table);
 				if (de->GetWinnerBracket().FindMatch(*match))
 					new_match.AreaID = 0;
 				else
