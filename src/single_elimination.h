@@ -14,9 +14,10 @@ namespace Judoboard
 	public:
 		SingleElimination(std::shared_ptr<IFilter> Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
-		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent = nullptr);
 		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
 			: SingleElimination(std::make_shared<Weightclass>(Weightclass_, this), Tournament) {}
+
+		virtual void LoadYaml(const YAML::Node& Yaml) override;
 
 		void operator =(const SingleElimination& rhs) = delete;
 		void operator =(SingleElimination&& rhs) noexcept {

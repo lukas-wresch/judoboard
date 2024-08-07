@@ -16,7 +16,8 @@ TEST(SingleElimination, ExportImport)
 	YAML::Emitter yaml;
 	*group >> yaml;
 
-	SingleElimination group2(YAML::Load(yaml.c_str()), nullptr);
+	SingleElimination group2(nullptr);
+	group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 	EXPECT_EQ(group2.IsThirdPlaceMatch(), group->IsThirdPlaceMatch());
 	EXPECT_EQ(group2.IsFifthPlaceMatch(), group->IsFifthPlaceMatch());
@@ -29,7 +30,8 @@ TEST(SingleElimination, ExportImport)
 		YAML::Emitter yaml;
 		*group >> yaml;
 
-		SingleElimination group2(YAML::Load(yaml.c_str()), nullptr);
+		SingleElimination group2(nullptr);
+		group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 		EXPECT_EQ(group2.IsThirdPlaceMatch(), group->IsThirdPlaceMatch());
 		EXPECT_EQ(group2.IsFifthPlaceMatch(), group->IsFifthPlaceMatch());
@@ -84,7 +86,8 @@ TEST(SingleElimination, ExportImport_StartPositions)
 			YAML::Emitter yaml;
 			*group >> yaml;
 
-			SingleElimination group2(YAML::Load(yaml.c_str()), t);
+			SingleElimination group2(nullptr, t);
+			group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 			EXPECT_EQ(group2.GetStartPosition(j1), group->GetStartPosition(j1));
 			EXPECT_EQ(group2.GetStartPosition(j2), group->GetStartPosition(j2));
@@ -1129,7 +1132,8 @@ TEST(SingleElimination, Count4_ExportImport)
 	YAML::Emitter yaml;
 	*group >> yaml;
 
-	SingleElimination group2(YAML::Load(yaml.c_str()), t);
+	SingleElimination group2(nullptr, t);
+	group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 	EXPECT_EQ(group->GetMatID(), group2.GetMatID());
 	EXPECT_EQ(group->GetParticipants().size(), group2.GetParticipants().size());
@@ -1178,7 +1182,8 @@ TEST(SingleElimination, Count5_ExportImport)
 	YAML::Emitter yaml;
 	*group >> yaml;
 
-	SingleElimination group2(YAML::Load(yaml.c_str()), t);
+	SingleElimination group2(nullptr, t);
+	group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 	EXPECT_EQ(group->GetMatID(), group2.GetMatID());
 	EXPECT_EQ(group->GetParticipants().size(), group2.GetParticipants().size());
@@ -1488,7 +1493,8 @@ TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 	YAML::Emitter yaml;
 	*group >> yaml;
 
-	auto group2 = std::make_shared<SingleElimination>(YAML::Load(yaml.c_str()), t);
+	auto group2 = std::make_shared<SingleElimination>(nullptr, t);
+	group2->LoadYaml(YAML::Load(yaml.c_str()));
 
 	t->AddMatchTable(group2);
 

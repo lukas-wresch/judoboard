@@ -39,13 +39,14 @@ DoubleElimination::DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender 
 
 
 
-DoubleElimination::DoubleElimination(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
-	: MatchTable(Yaml, Tournament, Parent), m_WinnerBracket(nullptr, Tournament, this), m_LoserBracket(nullptr, Tournament, this)
+void DoubleElimination::LoadYaml(const YAML::Node& Yaml)
 {
+	MatchTable::LoadYaml(Yaml);
+
 	if (Yaml["winner_bracket"])
-		m_WinnerBracket = SingleElimination(Yaml["winner_bracket"], Tournament, this);
+		m_WinnerBracket.LoadYaml(Yaml["winner_bracket"]);
 	if (Yaml["loser_bracket"])
-		m_LoserBracket = LoserBracket(Yaml["loser_bracket"], Tournament, this);
+		m_LoserBracket.LoadYaml(Yaml["loser_bracket"]);
 
 	//Rebuild schedule
 	BuildSchedule();

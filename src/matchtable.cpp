@@ -26,21 +26,23 @@ std::shared_ptr<MatchTable> MatchTable::CreateMatchTable(const YAML::Node& Yaml,
 	switch ((MatchTable::Type)Yaml["type"].as<int>())
 	{
 	case MatchTable::Type::RoundRobin:
-		new_table = std::make_shared<RoundRobin>(Yaml, Tournament);
+		new_table = std::make_shared<RoundRobin>(nullptr, Tournament);
 		break;
 	case MatchTable::Type::Custom:
-		new_table = std::make_shared<CustomTable>(Yaml, Tournament);
+		new_table = std::make_shared<CustomTable>(Tournament);
 		break;
 	case MatchTable::Type::SingleElimination:
-		new_table = std::make_shared<SingleElimination>(Yaml, Tournament);
+		new_table = std::make_shared<SingleElimination>(nullptr, Tournament);
 		break;
 	case MatchTable::Type::Pool:
-		new_table = std::make_shared<Pool>(Yaml, Tournament);
+		new_table = std::make_shared<Pool>(nullptr, Tournament);
 		break;
 	case MatchTable::Type::DoubleElimination:
-		new_table = std::make_shared<DoubleElimination>(Yaml, Tournament);
+		new_table = std::make_shared<DoubleElimination>(nullptr, Tournament);
 		break;
 	}
+
+	new_table->LoadYaml(Yaml);
 
 	return new_table;
 }
@@ -390,8 +392,7 @@ bool MatchTable::Result::operator < (const Result& rhs) const
 
 
 
-MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
-	: m_Tournament(Tournament), m_Parent(Parent)
+void MatchTable::LoadYaml(const YAML::Node& Yaml)
 {
 	assert(Yaml.IsMap());
 
@@ -407,13 +408,13 @@ MatchTable::MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, co
 	if (Yaml["name"])
 		m_Name = Yaml["name"].as<std::string>();
 
-	if (Yaml["rule_set"] && Tournament)
-		m_Rules = Tournament->FindRuleSet(Yaml["rule_set"].as<std::string>());
+	if (Yaml["rule_set"] && m_Tournament)
+		m_Rules = m_Tournament->FindRuleSet(Yaml["rule_set"].as<std::string>());
 
 	if (Yaml["matches"] && Yaml["matches"].IsSequence())
 	{
 		for (const auto& node : Yaml["matches"])
-			m_Schedule.emplace_back(std::make_shared<Match>(node, this, Tournament));
+			m_Schedule.emplace_back(std::make_shared<Match>(node, this, m_Tournament));
 	}
 
 	if (Yaml["filter"] && Yaml["filter"].IsMap())

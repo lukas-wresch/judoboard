@@ -14,7 +14,6 @@ namespace Judoboard
 	public:
 		LoserBracket(std::shared_ptr<IFilter> Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 		LoserBracket(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
-		LoserBracket(const YAML::Node& Yaml, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 		LoserBracket(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 		LoserBracket(const LoserBracket& rhs) = delete;
 		LoserBracket(LoserBracket&& rhs) = delete;
@@ -39,6 +38,8 @@ namespace Judoboard
 			for (auto match : GetSchedule())
 				match->SetMatchTable(shared_from_this());
 		}
+
+		virtual void LoadYaml(const YAML::Node& Yaml) override;
 
 		static std::string GetHTMLForm();
 

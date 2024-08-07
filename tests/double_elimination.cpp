@@ -2152,7 +2152,8 @@ TEST(DoubleElimination, ExportImport)
 		YAML::Emitter yaml;
 		*group >> yaml;
 
-		DoubleElimination group2(YAML::Load(yaml.c_str()), &t);
+		DoubleElimination group2(nullptr, &t);
+		group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 		EXPECT_EQ(group->GetSchedule().size(), group2.GetSchedule().size());
 		EXPECT_EQ(group->ToHTML(), group2.ToHTML());

@@ -751,7 +751,8 @@ TEST(Pool, PoolsOnDifferentMats_ExportImport)
 	YAML::Emitter yaml;
 	*w >> yaml;
 
-	Pool w2(YAML::Load(yaml.c_str()), &tourney2);
+	Pool w2(nullptr, &tourney2);
+	w2.LoadYaml(YAML::Load(yaml.c_str()));
 
 	ASSERT_EQ(w2.GetSchedule().size(), w->GetSchedule().size());
 

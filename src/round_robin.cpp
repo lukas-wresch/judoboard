@@ -30,13 +30,6 @@ RoundRobin::RoundRobin(Weight MinWeight, Weight MaxWeight, Gender Gender, const 
 
 
 
-RoundRobin::RoundRobin(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
-	: MatchTable(Yaml, Tournament, Parent)
-{
-}
-
-
-
 RoundRobin::RoundRobin(const MD5::Weightclass& Weightclass_, const ITournament* Tournament)
 	: MatchTable(std::make_shared<Weightclass>(Weightclass_, this), Tournament)
 {

@@ -14,9 +14,10 @@ namespace Judoboard
 	public:
 		DoubleElimination(std::shared_ptr<IFilter> Filter, const ITournament* Tournament = nullptr);
 		DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
-		DoubleElimination(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent = nullptr);
 		DoubleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
 			: DoubleElimination(std::make_shared<Weightclass>(Weightclass_, this), Tournament) {}
+
+		virtual void LoadYaml(const YAML::Node& Yaml) override;
 
 		static std::string GetHTMLForm();
 

@@ -326,7 +326,8 @@ TEST(RoundRobin, ExportImport)
 		YAML::Emitter yaml;
 		*w >> yaml;
 
-		RoundRobin group2(YAML::Load(yaml.c_str()), &t);
+		RoundRobin group2(nullptr, &t);
+		group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 		EXPECT_EQ(group2.GetSchedule().size(), w->GetSchedule().size());
 		EXPECT_EQ(group2.ToHTML(),  w->ToHTML());

@@ -284,8 +284,9 @@ namespace Judoboard
 		//Factory method
 		static std::shared_ptr<MatchTable> CreateMatchTable(const YAML::Node& Yaml, const ITournament* Tournament);
 
-		virtual ~MatchTable() {
-		}
+		virtual ~MatchTable() {}
+
+		virtual void LoadYaml(const YAML::Node& Yaml);
 
 		virtual Type GetType() const { return Type::Unknown; }
 		virtual bool IsEditable() const { return true; }
@@ -393,7 +394,6 @@ namespace Judoboard
 			if (m_Filter && !m_Filter->GetParent())
 				m_Filter->SetParent(this);
 		}
-		MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent);
 
 		static std::string GetHTMLForm();
 

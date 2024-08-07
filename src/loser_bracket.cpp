@@ -26,10 +26,9 @@ LoserBracket::LoserBracket(Weight MinWeight, Weight MaxWeight, const ITournament
 
 
 
-LoserBracket::LoserBracket(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
-	: SingleElimination(Yaml, Tournament, Parent)
+void LoserBracket::LoadYaml(const YAML::Node& Yaml)
 {
-	assert(Yaml.IsMap());
+	MatchTable::LoadYaml(Yaml);
 
 	if (Yaml["final_match"])
 		m_FinalMatch = Yaml["final_match"].as<bool>();

@@ -36,10 +36,11 @@ Pool::Pool(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament*
 
 
 
-Pool::Pool(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
-	: MatchTable(Yaml, Tournament, Parent)
+void Pool::LoadYaml(const YAML::Node& Yaml)
 {
-	m_Finals = std::make_shared<SingleElimination>(nullptr, Tournament, Parent);
+	MatchTable::LoadYaml(Yaml);
+
+	m_Finals = std::make_shared<SingleElimination>(nullptr, m_Tournament, m_Parent);
 
 	if (Yaml["pool_count"])
 		m_PoolCount = Yaml["pool_count"].as<uint32_t>();
@@ -49,11 +50,18 @@ Pool::Pool(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTab
 	if (Yaml["pools"] && Yaml["pools"].IsSequence())
 	{
 		for (const auto& node : Yaml["pools"])
-			m_Pools.push_back(std::make_shared<RoundRobin>(node, Tournament, this));
+		{
+			auto new_pool = std::make_shared<RoundRobin>(nullptr, m_Tournament);
+			new_pool->LoadYaml(node);
+			m_Pools.push_back(new_pool);
+		}
 	}
 
 	if (Yaml["finals"] && Yaml["finals"].IsMap())
-		m_Finals = std::make_shared<SingleElimination>(Yaml["finals"], Tournament, this);
+	{
+		m_Finals = std::make_shared<SingleElimination>(nullptr, m_Tournament, this);
+		m_Finals->LoadYaml(Yaml["finals"]);
+	}
 
 	CopyMatchesFromSubtables();
 }
