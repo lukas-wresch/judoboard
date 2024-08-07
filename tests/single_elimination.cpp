@@ -1341,13 +1341,13 @@ TEST(SingleElimination, Count8_3rd_5th)
 	auto schedule = group->GetSchedule();
 	auto schedule_count = group->GetSchedule().size();
 
-	SingleElimination moved(nullptr, nullptr);
-	moved = std::move(*group);
+	auto moved = std::make_shared<SingleElimination>(nullptr, nullptr);
+	*moved = std::move(*group);
 	
-	ASSERT_EQ(moved.GetSchedule().size(), schedule_count);
+	ASSERT_EQ(moved->GetSchedule().size(), schedule_count);
 	for (size_t i = 0; i < schedule_count; ++i)
 	{
-		EXPECT_EQ(*moved.GetSchedule()[i], *schedule[i]);
+		EXPECT_EQ(*moved->GetSchedule()[i], *schedule[i]);
 	}
 
 	delete t;
