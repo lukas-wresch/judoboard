@@ -1078,6 +1078,8 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
     
 	auto guard = LockWriteForScope();
 
+	if (GetStatus() == Status::Running)
+		return false;
 	if (GetStatus() == Status::Concluded)
 		return false;
 
