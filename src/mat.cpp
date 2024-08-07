@@ -2743,7 +2743,7 @@ bool Mat::Mainloop()
 			//Copy over match data
 			m_NextMatches.clear();
 			for (auto match : nextMatches)
-				m_NextMatches.emplace_back(match.get());
+				m_NextMatches.emplace_back(match);
 		}
 	}
 
