@@ -24,7 +24,7 @@ Pool::Pool(std::shared_ptr<IFilter> Filter, const ITournament* Tournament)
 {
 	m_Finals = std::make_shared<SingleElimination>(nullptr, Tournament);
 	m_Finals->SetParent(this);
-	GenerateSchedule();
+	//GenerateSchedule();
 }
 
 
@@ -317,6 +317,7 @@ void Pool::GenerateSchedule()
 		m_Finals->SetName(name);
 	m_Finals->SetMatID(mat_id);
 	m_Finals->IsBestOfThree(bo3);
+	m_Finals->GenerateSchedule();
 
 	//Four or less get forwarded, need to a fifth place match manually
 	if (pool_count * m_TakeTop <= 4 && IsFifthPlaceMatch())

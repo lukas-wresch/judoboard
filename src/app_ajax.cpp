@@ -4187,6 +4187,8 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	if (id)
 		new_table->SetUUID(std::move(id));
 
+	new_table->GenerateSchedule();
+
 	auto guard = LockWriteForScope();
 
 	if (!GetTournament())

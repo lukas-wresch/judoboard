@@ -2424,7 +2424,7 @@ TEST(Ajax, MatchTable_Edit)
 
 		auto& tables = app.GetTournament()->GetMatchTables();
 
-		EXPECT_EQ((std::string)app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7")), "ok");
+		EXPECT_TRUE(app.Ajax_AddMatchTable(HttpServer::Request("", "type=1&fight_system=1&name=Test&mat=7")));
 
 		ASSERT_EQ(tables.size(), 1);
 		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
@@ -2432,7 +2432,7 @@ TEST(Ajax, MatchTable_Edit)
 		EXPECT_EQ(tables[0]->GetMatID(), 7);
 
 
-		EXPECT_EQ((std::string)app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&fight_system=1&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")), "ok");
+		EXPECT_TRUE(app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&fight_system=1&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")));
 
 		ASSERT_EQ(tables.size(), 1);
 		ASSERT_EQ(tables[0]->GetType(), MatchTable::Type::RoundRobin);
@@ -2460,7 +2460,7 @@ TEST(Ajax, MatchTable_Edit)
 		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(tables[0]->GetFilter())->GetMinWeight(), Weight("10,7"));
 		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(tables[0]->GetFilter())->GetMaxWeight(), Weight("20.3"));
 		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(tables[0]->GetFilter())->GetGender(), Gender::Male);
-		EXPECT_EQ(std::dynamic_pointer_cast<RoundRobin>(tables[0])->IsBestOfThree(), true);
+		EXPECT_EQ(std::dynamic_pointer_cast<SingleElimination>(tables[0])->IsBestOfThree(), true);
 
 
 		EXPECT_TRUE(app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID(), "name=Test2&fight_system=4&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")));
@@ -2475,7 +2475,7 @@ TEST(Ajax, MatchTable_Edit)
 		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(tables[0]->GetFilter())->GetMinWeight(), Weight("10,7"));
 		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(tables[0]->GetFilter())->GetMaxWeight(), Weight("20.3"));
 		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(tables[0]->GetFilter())->GetGender(), Gender::Male);
-		EXPECT_EQ(std::dynamic_pointer_cast<RoundRobin>(tables[0])->IsBestOfThree(), true);
+		EXPECT_EQ(std::dynamic_pointer_cast<Pool>(tables[0])->IsBestOfThree(), true);
 
 		EXPECT_TRUE(app.Ajax_EditMatchTable(HttpServer::Request("id=" + (std::string)(std::dynamic_pointer_cast<Pool>(tables[0])->GetFinals())->GetUUID(), "name=Test4&fight_system=3&mat=5&minWeight=10,7&maxWeight=20.3&gender=0&bo3=true")));
 

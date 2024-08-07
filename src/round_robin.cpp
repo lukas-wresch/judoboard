@@ -18,7 +18,7 @@ RoundRobin::RoundRobin(std::shared_ptr<IFilter> Filter, const ITournament* Tourn
 {
 	if (Filter)
 		SetTournament(Filter->GetTournament());
-	GenerateSchedule();
+	//GenerateSchedule();
 }
 
 

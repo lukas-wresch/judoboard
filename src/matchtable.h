@@ -344,6 +344,8 @@ namespace Judoboard
 		void SetFilter(std::shared_ptr<IFilter> NewFilter) { m_Filter = NewFilter; }
 		const ITournament* GetTournament() const { return m_Tournament; }
 
+		virtual void GenerateSchedule() = 0;
+
 		void AutoGenerateSchedule(bool Enable = true) { m_RegenerateSchedule = Enable; }
 		bool IsAutoGenerateSchedule() const { return m_RegenerateSchedule; }
 
@@ -392,8 +394,6 @@ namespace Judoboard
 				m_Filter->SetParent(this);
 		}
 		MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent);
-
-		virtual void GenerateSchedule() = 0;
 
 		static std::string GetHTMLForm();
 

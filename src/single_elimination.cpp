@@ -17,7 +17,7 @@ SingleElimination::SingleElimination(std::shared_ptr<IFilter> Filter, const ITou
 {
 	if (Filter)
 		SetTournament(Filter->GetTournament());
-	GenerateSchedule();
+	//GenerateSchedule();
 }
 
 
