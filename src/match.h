@@ -149,8 +149,8 @@ namespace Judoboard
 		void StopMatch();
 		void EndMatch();
 
-		const MatchTable* GetMatchTable() const { return m_Table; }
-		void SetMatchTable(const MatchTable* MatchTable) { m_Table = MatchTable; }
+		std::shared_ptr<const MatchTable> GetMatchTable() const { return m_Table; }
+		void SetMatchTable(std::shared_ptr<const MatchTable> MatchTable) { m_Table = MatchTable; }
 
 		uint32_t GetMatID() const;
 
@@ -258,7 +258,7 @@ namespace Judoboard
 
 		MatchLog m_Log;//Log of the match
 
-		const MatchTable* m_Table = nullptr;//Match table this match is associated with (if any)
+		std::shared_ptr<const MatchTable> m_Table;//Match table this match is associated with (if any)
 		std::shared_ptr<const RuleSet> m_Rules;//Custom rule set for the match (if available)
 
 		const ITournament* m_Tournament = nullptr;

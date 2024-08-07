@@ -230,7 +230,7 @@ bool Mat::StartMatch(std::shared_ptr<Match> NewMatch, bool UseForce)
 	else if (NewMatch->IsScheduled())
 		AddEvent(MatchLog::NeutralEvent::StartMatch);
 
-	NewMatch->StartMatch();//Mark match is 'is running'
+	NewMatch->StartMatch();//Mark match as 'is running'
 
 	NextState(State::TransitionToMatch);
 	assert(m_State == State::TransitionToMatch);
