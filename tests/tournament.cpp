@@ -1131,7 +1131,8 @@ TEST(Tournament, StressTest_DeletionMovingAdding)
 			for (int i = 0; i < 1000; i++)
 			{
 				auto schedule = tourney->GetSchedule();
-				tourney->RemoveMatch(schedule[rand() % schedule.size()]->GetUUID());
+				if (schedule.size() > 0)
+					tourney->RemoveMatch(schedule[rand() % schedule.size()]->GetUUID());
 			}
 		};
 
