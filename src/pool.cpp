@@ -327,7 +327,7 @@ void Pool::GenerateSchedule()
 
 		auto fifth_place_match = new Match(DependentJudoka(DependencyType::TakeRank3, *m_Pools[0]),
 										   DependentJudoka(DependencyType::TakeRank3, *m_Pools[1]), GetTournament());
-		fifth_place_match->SetTag(Match::Tag::Fifth() & Match::Tag::Finals());
+		fifth_place_match->SetTag(Match::Tag::Fifth() && Match::Tag::Finals());
 
 		m_Finals.AddMatch(fifth_place_match);
 

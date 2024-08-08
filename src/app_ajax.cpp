@@ -2583,19 +2583,20 @@ void Application::SetupHttpServer()
 		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		bool success = false;
-		std::vector<Match> next_matches;
+		std::vector<const Match*> next_matches;
 
 		while (!success)
 		{
 			next_matches = GetNextMatches(matID, success);
-			ZED::Core::Pause(100);
+			if (!success)
+				ZED::Core::Pause(100);
 		}
 
 		YAML::Emitter ret;
 		ret << YAML::BeginSeq;
 
 		for (auto match : next_matches)
-			match >> ret;
+			*match >> ret;
 
 		ret << YAML::EndSeq;
 		return ret.c_str();
@@ -2614,6 +2615,8 @@ Error Application::Ajax_UpdatePassword(Account* Account, const HttpServer::Reque
 	if (password.length() <= 0)//Password not changed
 		return Error::Type::InvalidInput;
 
+	auto guard = LockWriteForScope();
+
 	Account->SetPassword(password);
 	m_Database.Save();
 	return Error::Type::NoError;//OK
@@ -2629,24 +2632,28 @@ Error Application::Ajax_AddMatch(const HttpServer::Request& Request)
 	UUID ruleID  = HttpServer::DecodeURLEncoded(Request.m_Body, "rule");
 	int  matID   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
   
-  return Error(Error::Type::TournamentNotOpen);
+	auto guard = LockReadForScope();
 
-	auto white = GetTournament()->GetDatabase().FindJudoka(whiteID);
+	auto tournament = GetTournament();
+	if (!tournament)
+		return Error(Error::Type::TournamentNotOpen);
+
+	auto white = tournament->GetDatabase().FindJudoka(whiteID);
 	if (!white)
 		white = m_Database.FindJudoka(whiteID);
 
-	auto blue = GetTournament()->GetDatabase().FindJudoka(blueID);
+	auto blue = tournament->GetDatabase().FindJudoka(blueID);
 	if (!blue)
 		blue = m_Database.FindJudoka(blueID);
 
 	if (!white || !blue)//Judokas exist?
 		return Error(Error::Type::ItemNotFound);
 
-	auto rule = GetTournament()->FindRuleSet(ruleID);
+	auto rule = tournament->FindRuleSet(ruleID);
 	if (!rule)
 		rule = m_Database.FindRuleSet(ruleID);
 
-	auto match_table = GetTournament()->FindMatchTable(match_tableID);
+	auto match_table = tournament->FindMatchTable(match_tableID);
 
 	auto match = new Match(white, blue, GetTournament());
 	match->SetRuleSet(rule);
@@ -2982,7 +2989,7 @@ Error Application::Ajax_DeleteMatchlessMatchTables()
 
 Error Application::Ajax_DeleteCompletedMatchTables()
 {
-	auto guard = LockWriteForScope();
+	auto guard = LockReadForScope();
 
 	auto tournament = GetTournament();
 	if (!tournament)
@@ -2991,8 +2998,11 @@ Error Application::Ajax_DeleteCompletedMatchTables()
 	auto tables = tournament->GetMatchTables();//Make copy of list
 	for (auto table : tables)
 	{
-		if (table && table->GetStatus() == Status::Concluded)
-			tournament->RemoveMatchTable(*table);//This modifies the original list
+		if (table && (table->GetStatus() == Status::Concluded || table->GetSchedule().empty()))
+		{
+			if (!tournament->RemoveMatchTable(*table))//This modifies the original list
+				return Error::Type::OperationFailed;
+		}
 	}
 
 	return Error::Type::NoError;
@@ -4838,10 +4848,10 @@ Error Application::Ajax_StartMatch(const HttpServer::Request& Request)
 
 	auto tournament_guard = GetTournament()->LockReadForScope();
 
-	auto nextMatch = GetTournament()->GetNextMatch(mat->GetMatID());
-	if (nextMatch)
-		if (!mat->StartMatch(nextMatch))
-			return Error::Type::OperationFailed;
+	auto match = GetTournament()->GetNextMatch(mat->GetMatID());
+	if (!match || !mat->StartMatch(match))
+		return Error::Type::OperationFailed;
+
 	return Error::Type::NoError;//OK
 }
 
@@ -5221,28 +5231,28 @@ std::string Application::Ajax_GetNamesOnMat(const HttpServer::Request& Request)
 
 	ret << YAML::Key << "next_matches" << YAML::Value << YAML::BeginSeq;
 
-	for (const auto& match : next_matches)
+	for (const auto match : next_matches)
 	{
 		ret << YAML::BeginMap;
 
-		ret << YAML::Key << "uuid" << YAML::Value << (std::string)match.GetUUID();
-		ret << YAML::Key << "current_breaktime" << YAML::Value << match.GetCurrentBreaktime();
-		ret << YAML::Key << "breaktime"         << YAML::Value << match.GetRuleSet().GetBreakTime();
+		ret << YAML::Key << "uuid" << YAML::Value << (std::string)match->GetUUID();
+		ret << YAML::Key << "current_breaktime" << YAML::Value << match->GetCurrentBreaktime();
+		ret << YAML::Key << "breaktime"         << YAML::Value << match->GetRuleSet().GetBreakTime();
 
 		ret << YAML::Key << "white_name" << YAML::Value;
-		if (match.GetFighter(Fighter::White))
-			ret << match.GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
+		if (match->GetFighter(Fighter::White))
+			ret << match->GetFighter(Fighter::White)->GetName(NameStyle::GivenName);
 		else
 			ret << "- - -";
 
 		ret << YAML::Key << "blue_name" << YAML::Value;
-		if (match.GetFighter(Fighter::Blue))
-			ret << match.GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
+		if (match->GetFighter(Fighter::Blue))
+			ret << match->GetFighter(Fighter::Blue)->GetName(NameStyle::GivenName);
 		else
 			ret << "- - -";
 
-		if (match.GetMatchTable())
-			ret << YAML::Key << "match_table_desc" << YAML::Value <<match.GetMatchTable()->GetDescription();
+		if (match->GetMatchTable())
+			ret << YAML::Key << "match_table_desc" << YAML::Value << match->GetMatchTable()->GetDescription();
 
 		ret << YAML::EndMap;
 	}
