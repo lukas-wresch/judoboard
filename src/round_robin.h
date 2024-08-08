@@ -12,10 +12,6 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		RoundRobin(std::shared_ptr<IFilter> Filter, const ITournament* Tournament = nullptr);
-		RoundRobin(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
-		RoundRobin(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
-
 		void operator =(const RoundRobin& rhs) = delete;
 
 		static std::string GetHTMLForm();
@@ -31,6 +27,11 @@ namespace Judoboard
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const override;
 		virtual const std::string ToHTML() const override;
+
+	protected:
+		RoundRobin(const ITournament* Tournament = nullptr) : MatchTable(Tournament) {}
+		RoundRobin(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
+		RoundRobin(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 
 	private:
 	};

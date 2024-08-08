@@ -32,7 +32,7 @@ Match::Match(const DependentJudoka& White, const DependentJudoka& Blue, const IT
 
 
 
-Match::Match(const YAML::Node& Yaml, const MatchTable* MatchTable, const ITournament* Tournament) : m_Tournament(Tournament)
+void Match::LoadYaml(const YAML::Node& Yaml)
 {
 	if (!Yaml.IsMap())
 		return;
@@ -42,14 +42,14 @@ Match::Match(const YAML::Node& Yaml, const MatchTable* MatchTable, const ITourna
 	if (Yaml["mat_id"])
 		m_MatID = Yaml["mat_id"].as<int>();
 
-	if (Yaml["white"] && Tournament)
+	if (Yaml["white"] && m_Tournament)
 	{
-		m_White.m_Judoka = Tournament->FindParticipant(Yaml["white"].as<std::string>());
+		m_White.m_Judoka = m_Tournament->FindParticipant(Yaml["white"].as<std::string>());
 		assert(m_White.m_Judoka);
 	}
-	if (Yaml["blue"] && Tournament)
+	if (Yaml["blue"] && m_Tournament)
 	{
-		m_Blue.m_Judoka  = Tournament->FindParticipant(Yaml["blue"].as<std::string>());
+		m_Blue.m_Judoka  = m_Tournament->FindParticipant(Yaml["blue"].as<std::string>());
 		assert(m_Blue.m_Judoka);
 	}
 
@@ -62,13 +62,13 @@ Match::Match(const YAML::Node& Yaml, const MatchTable* MatchTable, const ITourna
 	if (Yaml["time"])
 		m_Result.m_Time = Yaml["time"].as<int>();
 
-	if (Yaml["rule_set"] && Tournament)
-		m_Rules = Tournament->FindRuleSet(Yaml["rule_set"].as<std::string>());
+	if (Yaml["rule_set"] && m_Tournament)
+		m_Rules = m_Tournament->FindRuleSet(Yaml["rule_set"].as<std::string>());
 
-	if (MatchTable)
-		m_Table = MatchTable->GetSharedFromThis();
-	else if (Yaml["match_table"] && Tournament)
-		m_Table = Tournament->FindMatchTable(Yaml["match_table"].as<std::string>());
+	//if (MatchTable)
+		//m_Table = MatchTable->GetSharedFromThis();
+	if (m_Table && Yaml["match_table"] && m_Tournament)
+		m_Table = m_Tournament->FindMatchTable(Yaml["match_table"].as<std::string>());
 
 	if (Yaml["dependency_white"])
 		m_White.m_Type = (DependencyType)Yaml["dependency_white"].as<int>();
@@ -85,8 +85,8 @@ Match::Match(const YAML::Node& Yaml, const MatchTable* MatchTable, const ITourna
 				m_White.m_DependentMatch = m_Table->FindMatch(Yaml["dependent_match_white"].as<std::string>());
 		}
 
-		if (!m_White.m_DependentMatch && Tournament)
-			m_White.m_DependentMatch = Tournament->FindMatch(Yaml["dependent_match_white"].as<std::string>());
+		if (!m_White.m_DependentMatch && m_Tournament)
+			m_White.m_DependentMatch = m_Tournament->FindMatch(Yaml["dependent_match_white"].as<std::string>());
 		assert(m_White.m_DependentMatch);
 	}
 	if (Yaml["dependent_match_blue"])
@@ -99,8 +99,8 @@ Match::Match(const YAML::Node& Yaml, const MatchTable* MatchTable, const ITourna
 				m_Blue.m_DependentMatch = m_Table->FindMatch(Yaml["dependent_match_blue"].as<std::string>());
 		}
 
-		if (!m_Blue.m_DependentMatch && Tournament)
-			m_Blue.m_DependentMatch = Tournament->FindMatch(Yaml["dependent_match_blue"].as<std::string>());
+		if (!m_Blue.m_DependentMatch && m_Tournament)
+			m_Blue.m_DependentMatch = m_Tournament->FindMatch(Yaml["dependent_match_blue"].as<std::string>());
 		assert(m_Blue.m_DependentMatch);
 	}
 
@@ -108,16 +108,16 @@ Match::Match(const YAML::Node& Yaml, const MatchTable* MatchTable, const ITourna
 	{
 		if (m_Table && m_Table->GetParent())
 			m_White.m_DependentMatchTable = m_Table->GetParent()->FindMatchTable(Yaml["dependent_match_table_white"].as<std::string>());
-		if (!m_White.m_DependentMatchTable && Tournament)
-			m_White.m_DependentMatchTable = Tournament->FindMatchTable(Yaml["dependent_match_table_white"].as<std::string>());
+		if (!m_White.m_DependentMatchTable && m_Tournament)
+			m_White.m_DependentMatchTable = m_Tournament->FindMatchTable(Yaml["dependent_match_table_white"].as<std::string>());
 		assert(m_White.m_DependentMatchTable);
 	}
 	if (Yaml["dependent_match_table_blue"])
 	{
 		if (m_Table && m_Table->GetParent())
 			m_Blue.m_DependentMatchTable = m_Table->GetParent()->FindMatchTable(Yaml["dependent_match_table_blue"].as<std::string>());
-		if (!m_Blue.m_DependentMatchTable && Tournament)
-			m_Blue.m_DependentMatchTable = Tournament->FindMatchTable(Yaml["dependent_match_table_blue"].as<std::string>());
+		if (!m_Blue.m_DependentMatchTable && m_Tournament)
+			m_Blue.m_DependentMatchTable = m_Tournament->FindMatchTable(Yaml["dependent_match_table_blue"].as<std::string>());
 		assert(m_Blue.m_DependentMatchTable);
 	}
 

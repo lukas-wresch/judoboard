@@ -16,6 +16,27 @@ using namespace Judoboard;
 
 
 
+template<typename T>
+std::shared_ptr<T> CreateMatchTable(const ITournament* Tournament, const MatchTable* Parent)
+{
+	auto ret = std::make_shared<T>(Tournament, Parent);
+	return ret;
+}
+
+
+
+template<typename T>
+std::shared_ptr<T> MatchTable::CreateMatchTable(Weight MinWeight, Weight MaxWeight)
+{
+	auto ret = std::make_shared<T>();
+
+	ret->SetFilter(Weightclass(MinWeight, MaxWeight));
+
+	return ret;
+}
+
+
+
 std::shared_ptr<MatchTable> MatchTable::CreateMatchTable(const YAML::Node& Yaml, const ITournament* Tournament)
 {
 	std::shared_ptr<MatchTable> new_table;

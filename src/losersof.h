@@ -9,14 +9,14 @@ namespace Judoboard
 	class LosersOf : public IFilter
 	{
 	public:
-		LosersOf(const MatchTable& Table, const MatchTable* Parent = nullptr);
+		LosersOf(std::shared_ptr<const MatchTable> Table);
 		//LosersOf(const YAML::Node& Yaml, const MatchTable* Parent);
 
 		virtual Type GetType() const override { return Type::LosersOf; }
 
 		virtual std::string GetHTMLForm() const;
 
-		virtual bool IsElgiable(const Judoka& Fighter) const override { return m_MatchTable.IsElgiable(Fighter); }
+		virtual bool IsElgiable(const Judoka& Fighter) const override { return m_MatchTable->IsElgiable(Fighter); }
 
 		virtual std::unordered_map<size_t, const DependentJudoka> GetParticipants() const override;
 
@@ -32,7 +32,7 @@ namespace Judoboard
 	private:
 		void Recalculate() const;
 
-		const MatchTable& m_MatchTable;
+		std::shared_ptr<const MatchTable> m_MatchTable;
 
 		bool m_RemoveLast = false;
 	};

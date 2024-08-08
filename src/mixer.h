@@ -8,9 +8,9 @@ namespace Judoboard
 	class Mixer : public IFilter
 	{
 	public:
-		Mixer(const MatchTable* Parent = nullptr) : IFilter(Parent) {}
-		Mixer(std::shared_ptr<const IFilter> pSource1, std::shared_ptr<const IFilter> pSource2, const MatchTable* Parent = nullptr);
-		Mixer(const YAML::Node& Yaml, const MatchTable* Parent);
+		Mixer() : IFilter() {}
+		Mixer(std::shared_ptr<const IFilter> pSource1, std::shared_ptr<const IFilter> pSource2);
+		Mixer(const YAML::Node& Yaml);
 
 		virtual Type GetType() const override { return Type::Mixer; }
 

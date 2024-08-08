@@ -22,7 +22,7 @@ namespace Judoboard
 			LosersOf
 		};
 
-		IFilter(const YAML::Node& Yaml, const MatchTable* Parent);
+		void LoadYaml(const YAML::Node& Yaml);
 
 		virtual Type GetType() const = 0;
 
@@ -34,7 +34,7 @@ namespace Judoboard
 		virtual bool RemoveParticipant(const Judoka* Participant);
 		bool RemoveParticipant(const DependentJudoka Participant);
 
-		const MatchTable*  GetParent() const { return m_Parent; }
+		//const MatchTable*  GetParent() const { return m_Parent; }
 		const ITournament* GetTournament() const;
 
 		//Age groups
@@ -81,7 +81,8 @@ namespace Judoboard
 
 
 	protected:
-		IFilter(const MatchTable* Parent) : m_Parent(Parent) {}
+		IFilter() = default;
+		//IFilter(const MatchTable* Parent) : m_Parent(Parent) {}
 
 		size_t GetStartPosition(const DependentJudoka Judoka) const;
 
@@ -101,13 +102,13 @@ namespace Judoboard
 		mutable std::recursive_mutex m_Mutex;
 
 	private:
-		void SetParent(const MatchTable* Parent) { m_Parent = Parent; }
+		//void SetParent(const MatchTable* Parent) { m_Parent = Parent; }
 
 
 		mutable std::unordered_map<size_t, const DependentJudoka> m_Participants;//List of all participants that are in the match table
 
 		std::shared_ptr<const AgeGroup> m_pAgeGroup = nullptr;//Age group for the matches (if available)
 
-		const MatchTable* m_Parent = nullptr;
+		//const MatchTable* m_Parent = nullptr;
 	};
 }

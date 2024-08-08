@@ -10,8 +10,7 @@ using namespace Judoboard;
 
 
 
-IFilter::IFilter(const YAML::Node& Yaml, const MatchTable* Parent)
-	: IFilter(Parent)
+void IFilter::LoadYaml(const YAML::Node& Yaml)
 {
 	if (Yaml["age_group"] && GetTournament())
 		SetAgeGroup(GetTournament()->FindAgeGroup(Yaml["age_group"].as<std::string>()));
@@ -203,12 +202,12 @@ bool IFilter::RemoveParticipant(const DependentJudoka Participant)
 
 
 
-const ITournament* IFilter::GetTournament() const
+/*const ITournament* IFilter::GetTournament() const
 {
 	if (!m_Parent)
 		return nullptr;
 	return m_Parent->GetTournament();
-}
+}*/
 
 
 

@@ -6,17 +6,10 @@ using namespace Judoboard;
 
 
 
-Fixed::Fixed(std::shared_ptr<const IFilter> Source) :
-	IFilter(Source->GetParent())
+Fixed::Fixed(std::shared_ptr<const IFilter> Source)
 {
 	SetParticipants(Source->GetParticipants());
 	SetAgeGroup(Source->GetAgeGroup());
-}
-
-
-
-Fixed::Fixed(const YAML::Node& Yaml, const MatchTable* Parent) : IFilter(Yaml, Parent)
-{
 }
 
 

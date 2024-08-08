@@ -282,6 +282,10 @@ namespace Judoboard
 		MatchTable(const MatchTable&) = delete;
 
 		//Factory method
+		template<typename T>
+		static std::shared_ptr<T> CreateMatchTable(const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
+		template<typename T>
+		static std::shared_ptr<T> CreateMatchTable(Weight MinWeight, Weight MaxWeight);
 		static std::shared_ptr<MatchTable> CreateMatchTable(const YAML::Node& Yaml, const ITournament* Tournament);
 
 		virtual ~MatchTable() {}
@@ -342,7 +346,11 @@ namespace Judoboard
 
 		std::shared_ptr<const IFilter> GetFilter() const { return m_Filter; }
 		std::shared_ptr<IFilter> GetFilter() { return m_Filter; }
-		void SetFilter(std::shared_ptr<IFilter> NewFilter) { m_Filter = NewFilter; }
+		void SetFilter(std::shared_ptr<IFilter> NewFilter) {
+			m_Filter = NewFilter;
+			if (!m_Tournament)
+				m_Tournament = m_Filter->GetTournament();
+		}
 		const ITournament* GetTournament() const { return m_Tournament; }
 
 		virtual void GenerateSchedule() = 0;
@@ -376,9 +384,9 @@ namespace Judoboard
 		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; GenerateSchedule(); }
 
 		//Sub match tables
-		bool IsSubMatchTable() const { return m_Parent; }
+		bool IsSubMatchTable() const { return (bool)m_Parent; }
 		auto GetParent() const { return m_Parent; }
-		void SetParent(const MatchTable* NewParent) { m_Parent = NewParent; }
+		void SetParent(std::shared_ptr<const MatchTable> NewParent) { m_Parent = NewParent; }
 
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const;
@@ -389,11 +397,8 @@ namespace Judoboard
 		virtual void OnLotteryPerformed();//Called when a lottery draw was performed
 
 	protected:
-		MatchTable(std::shared_ptr<IFilter> Filter, const ITournament* Tournament, const MatchTable* Parent = nullptr)
-			: m_Filter(Filter), m_Tournament(Tournament), m_Parent(Parent) {
-			if (m_Filter && !m_Filter->GetParent())
-				m_Filter->SetParent(this);
-		}
+		MatchTable(const ITournament* Tournament, const MatchTable* Parent = nullptr)
+			: m_Tournament(Tournament), m_Parent(Parent) {}
 
 		static std::string GetHTMLForm();
 
@@ -438,7 +443,7 @@ namespace Judoboard
 		uint32_t m_MatID = 0;
 		Color m_Color;
 
-		const MatchTable* m_Parent = nullptr;//Is this a match table that is purely used by another match table?
+		std::shared_ptr<const MatchTable> m_Parent;//Is this a match table that is purely used by another match table?
 
 		bool m_BestOfThree = false;
 

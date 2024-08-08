@@ -131,9 +131,9 @@ namespace Judoboard
 
 		Match(const Judoka* White, const Judoka* Blue, const ITournament* Tournament, uint32_t MatID = 0);
 		Match(const DependentJudoka& White, const DependentJudoka& Blue, const ITournament* Tournament, uint32_t MatID = 0);
-		Match(const YAML::Node& Yaml, const MatchTable* MatchTable, const ITournament* Tournament);
 		Match(const Match&) = default;//Deep copy
 
+		void LoadYaml(const YAML::Node& Yaml);
 
 		void SetMatID(int32_t MatID) { if (m_State == Status::Scheduled) m_MatID = MatID; }
 		Status GetStatus() const;

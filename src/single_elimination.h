@@ -12,11 +12,6 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		SingleElimination(std::shared_ptr<IFilter> Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
-		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
-		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
-			: SingleElimination(std::make_shared<Weightclass>(Weightclass_, this), Tournament) {}
-
 		virtual void LoadYaml(const YAML::Node& Yaml) override;
 
 		void operator =(const SingleElimination& rhs) = delete;
@@ -90,6 +85,14 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	protected:
+		SingleElimination(const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
+		SingleElimination(std::shared_ptr<IFilter> Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
+		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
+		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
+			: SingleElimination(Tournament) {
+			SetFilter(std::make_shared<Weightclass>(Weightclass_, this));
+		}
+
 		std::string RenderMatch(const Match& Match, const std::string& Style = "") const;
 
 		std::vector<std::shared_ptr<Match>> m_ThirdPlaceMatches;

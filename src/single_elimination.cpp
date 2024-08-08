@@ -12,6 +12,13 @@ using namespace Judoboard;
 
 
 
+SingleElimination::SingleElimination(const ITournament* Tournament, const MatchTable* Parent)
+	: MatchTable(Tournament, Parent)
+{
+}
+
+
+
 SingleElimination::SingleElimination(std::shared_ptr<IFilter> Filter, const ITournament* Tournament, const MatchTable* Parent)
 	: MatchTable(Filter, Tournament, Parent)
 {

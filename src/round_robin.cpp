@@ -13,16 +13,6 @@ using namespace Judoboard;
 
 
 
-RoundRobin::RoundRobin(std::shared_ptr<IFilter> Filter, const ITournament* Tournament)
-	: MatchTable(Filter, Tournament)
-{
-	if (Filter)
-		SetTournament(Filter->GetTournament());
-	//GenerateSchedule();
-}
-
-
-
 RoundRobin::RoundRobin(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
 	: MatchTable(std::make_shared<Weightclass>(MinWeight, MaxWeight, Gender, this), Tournament)
 {
