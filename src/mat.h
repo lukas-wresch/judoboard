@@ -77,8 +77,9 @@ namespace Judoboard
 		bool CanNextMatchStart() const override { return m_State == State::Waiting || (m_State == State::TransitionToWaiting && Timer::GetTimestamp() - m_CurrentStateStarted >= 8 * 1000); }
 		bool IsDoingAnimation() const { return m_State == State::TransitionToMatch || m_State == State::TransitionToWaiting; }
 		bool AreFightersOnMat() const override { return m_State == State::TransitionToMatch || m_State == State::Running; }
-		const Match* GetMatch() const override { return m_pMatch; }
-		const std::vector<Match> GetNextMatches() const override;
+
+		virtual std::shared_ptr<const Match> GetMatch() const override { return m_pMatch; }
+		virtual const std::vector<std::shared_ptr<const Match>> GetNextMatches() const override;
 
 		uint32_t EndTimeOfOsaekomi() const;//Returns the number of seconds the osaekomi end the match
 
@@ -90,7 +91,7 @@ namespace Judoboard
 		const Window& GetWindow() const { return m_Window; }
 
 		//Commands by judge
-		virtual bool StartMatch(Match* NewMatch, bool UseForce = false) override;
+		virtual bool StartMatch(std::shared_ptr<Match> NewMatch, bool UseForce = false) override;
 		virtual bool EndMatch() override;
 		virtual bool CanStopMatch() const override;
 		virtual bool StopMatch() override;
@@ -564,7 +565,7 @@ namespace Judoboard
 		bool m_GoldenScore = false;
 		bool m_IsDraw = false;
 
-		Match* m_pMatch = nullptr;//Current match (if the current fight is associated with a match)
+		std::shared_ptr<Match> m_pMatch;//Current match (if the current fight is associated with a match)
 
 		const Application* m_Application = nullptr;
 

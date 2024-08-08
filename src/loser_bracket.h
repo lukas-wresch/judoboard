@@ -12,9 +12,8 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		LoserBracket(IFilter* Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
+		LoserBracket(std::shared_ptr<IFilter> Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 		LoserBracket(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
-		LoserBracket(const YAML::Node& Yaml, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
 		LoserBracket(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr);
 		LoserBracket(const LoserBracket& rhs) = delete;
 		LoserBracket(LoserBracket&& rhs) = delete;
@@ -37,8 +36,10 @@ namespace Judoboard
 
 			SetSchedule(std::move(rhs.SetSchedule()));
 			for (auto match : GetSchedule())
-				match->SetMatchTable(this);
+				match->SetMatchTable(shared_from_this());
 		}
+
+		virtual void LoadYaml(const YAML::Node& Yaml) override;
 
 		static std::string GetHTMLForm();
 
@@ -52,7 +53,7 @@ namespace Judoboard
 			return (size_t)pow(2, GetNumberOfBaseRounds()) - 2;
 		}
 
-		virtual const std::vector<Match*> GetSchedule() const { return MatchTable::GetSchedule(); }
+		virtual const std::vector<std::shared_ptr<Match>> GetSchedule() const { return MatchTable::GetSchedule(); }
 
 		virtual Results CalculateResults() const override;
 		virtual void GenerateSchedule() override;

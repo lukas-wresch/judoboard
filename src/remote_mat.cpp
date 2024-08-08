@@ -106,7 +106,7 @@ bool RemoteMat::CanNextMatchStart() const
 
 
 
-bool RemoteMat::StartMatch(Match* NewMatch, bool UseForce)
+bool RemoteMat::StartMatch(std::shared_ptr<Match> NewMatch, bool UseForce)
 {
 	if (!NewMatch)
 	{
@@ -120,7 +120,7 @@ bool RemoteMat::StartMatch(Match* NewMatch, bool UseForce)
 	const bool ret = PostData("/ajax/slave/start_match?id=" + std::to_string(GetMatID()), yaml);
 
 	if (ret)
-		m_pMatch = NewMatch;
+		m_pMatch = NewMatch.get();
 
 	return ret;
 }

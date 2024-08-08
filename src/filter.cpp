@@ -10,8 +10,7 @@ using namespace Judoboard;
 
 
 
-IFilter::IFilter(const YAML::Node& Yaml, const MatchTable* Parent)
-	: IFilter(Parent)
+void IFilter::LoadYaml(const YAML::Node& Yaml)
 {
 	if (Yaml["age_group"] && GetTournament())
 		SetAgeGroup(GetTournament()->FindAgeGroup(Yaml["age_group"].as<std::string>()));
@@ -29,7 +28,7 @@ IFilter::IFilter(const YAML::Node& Yaml, const MatchTable* Parent)
 				else if (data[0].as<int>() == 1)//Type 1
 				{
 					UUID uuid = data[2].as<std::string>();
-					const MatchTable* match_table = nullptr;
+					std::shared_ptr<const MatchTable> match_table;
 
 					if (GetParent())
 						match_table = GetParent()->FindMatchTable(uuid);
@@ -39,12 +38,12 @@ IFilter::IFilter(const YAML::Node& Yaml, const MatchTable* Parent)
 					assert(match_table);
 
 					if (match_table)
-						m_Participants.insert({ node.first.as<int>(), DependentJudoka((DependencyType)data[1].as<int>(), *match_table) });
+						m_Participants.insert({ node.first.as<int>(), DependentJudoka((DependencyType)data[1].as<int>(), match_table) });
 				}
 				else if (data[0].as<int>() == 2)//Type 2
 				{
 					UUID uuid = data[2].as<std::string>();
-					Match* match = nullptr;
+					std::shared_ptr<Match> match;
 
 					if (GetParent())
 						match = GetParent()->FindMatch(uuid);
@@ -54,7 +53,7 @@ IFilter::IFilter(const YAML::Node& Yaml, const MatchTable* Parent)
 					assert(match);
 
 					if (match)
-						m_Participants.insert({ node.first.as<int>(), DependentJudoka((DependencyType)data[1].as<int>(), *match) });
+						m_Participants.insert({ node.first.as<int>(), DependentJudoka((DependencyType)data[1].as<int>(), match) });
 				}
 				else
 					assert(false);
@@ -203,12 +202,12 @@ bool IFilter::RemoveParticipant(const DependentJudoka Participant)
 
 
 
-const ITournament* IFilter::GetTournament() const
+/*const ITournament* IFilter::GetTournament() const
 {
 	if (!m_Parent)
 		return nullptr;
 	return m_Parent->GetTournament();
-}
+}*/
 
 
 

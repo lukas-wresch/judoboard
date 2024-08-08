@@ -6,8 +6,7 @@ using namespace Judoboard;
 
 
 
-Fuser::Fuser(const IFilter& pSource1, const IFilter& pSource2, const MatchTable* Parent)
-	: IFilter(Parent)
+Fuser::Fuser(const IFilter& pSource1, const IFilter& pSource2)
 {
 	m_pSources.push_back(&pSource1);
 	m_pSources.push_back(&pSource2);

@@ -30,7 +30,7 @@ Tournament::Tournament(const std::string& Name) : m_Name(Name)
 
 
 
-Tournament::Tournament(const std::string& Name, const RuleSet* RuleSet) : m_pDefaultRules(RuleSet), m_Name(Name)
+Tournament::Tournament(const std::string& Name, std::shared_ptr<const RuleSet> RuleSet) : m_pDefaultRules(RuleSet), m_Name(Name)
 {
 	LoadYAML("tournaments/" + Name + ".yml");
 }
@@ -47,18 +47,21 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 	m_LotteryTier = File.GetLotteryTierID() - 2;
 
+	std::unordered_map<int, std::shared_ptr<Club>>     new_clubs;
+	std::unordered_map<int, std::shared_ptr<AgeGroup>> new_age_groups;
+
 	//Add clubs
 	for (auto club : File.GetClubs())
 	{
-		Club* new_club = nullptr;
+		std::shared_ptr<Club> new_club;
 
 		if (pDatabase && pDatabase->FindClubByName(club->Name))
 			new_club = pDatabase->FindClubByName(club->Name);
 		else
-			new_club = new Club(*club);
+			new_club = std::make_shared<Club>(*club);
 		
+		new_clubs[club->ID]= new_club;
 		m_StandingData.AddClub(new_club);
-		club->pUserData = new_club;
 	}
 
 	//Find organizer
@@ -78,8 +81,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	//Add age groups
 	for (auto age_group : File.GetAgeGroups())
 	{
-		auto new_age_group = new AgeGroup(*age_group, m_StandingData);
-		age_group->pUserData = new_age_group;
+		auto new_age_group = std::make_shared<AgeGroup>(*age_group, m_StandingData);
+		new_age_groups[age_group->ID] = new_age_group;
 		m_StandingData.AddAgeGroup(new_age_group);
 	}
 
@@ -110,8 +113,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			auto de = new DoubleElimination(*weightclass, this);
 			de->IsThirdPlaceMatch(weightclass->MatchForThirdPlace);
 			de->IsFifthPlaceMatch(weightclass->MatchForFifthPlace);
-			delete de->GetLoserBracket().GetFilter();
-			de->GetLoserBracket().SetFilter(new Fixed);
+			de->GetLoserBracket().SetFilter(std::make_shared<Fixed>());
 			new_table = de;
 		}
 		else if (weightclass->FightSystemID == 24)//Pool (3+3 system)
@@ -131,7 +133,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 		//Connect to age group
 		if (weightclass->AgeGroup)
-			new_table->SetAgeGroup((AgeGroup*)weightclass->AgeGroup->pUserData);
+			new_table->SetAgeGroup(new_age_groups[weightclass->AgeGroup->ID]);
 
 		new_table->SetName(weightclass->Description);
 		//new_table->IsBestOfThree(weightclass->BestOfThree);
@@ -163,7 +165,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			m_StandingData.AddJudoka(new_judoka);
 
 			if (judoka->Club)//Connect to club
-				new_judoka->SetClub((Club*)judoka->Club->pUserData);
+				new_judoka->SetClub(new_clubs[judoka->Club->ID]);
 
 			if (judoka->Weightclass)
 			{
@@ -183,7 +185,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 
 			if (judoka->AgeGroup)
 			{
-				auto age_group = (AgeGroup*)judoka->AgeGroup->pUserData;
+				auto age_group = new_age_groups[judoka->AgeGroup->ID];
 				if (age_group)
 					m_JudokaToAgeGroup.insert({ new_judoka->GetUUID(), age_group->GetUUID() });
 					//AssignJudokaToAgeGroup(new_judoka, age_group);
@@ -245,7 +247,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		//if (!white && !blue)//Filter dummy matches
 			//continue;
 		
-		Match* new_match = new Match(white, blue, this);
+		auto new_match = std::make_shared<Match>(white, blue, this);
 
 		if (match.Result == 1)//Match completed?
 		{
@@ -303,7 +305,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 						else if (match.AreaID == 5)
 							new_match->SetTag(Match::Tag::Fifth());
 
-						pool->GetFinals().AddMatch(new_match);
+						pool->GetFinals()->AddMatch(new_match);
 					}
 				}
 				else if (match.Pool <= pool->GetPoolCount())
@@ -323,8 +325,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 	{
 		if (table->GetType() == MatchTable::Type::Pool)
 		{
-			auto pool = (Pool*)table;
-			if (pool->GetFinals().GetSchedule().empty())
+			auto pool = std::dynamic_pointer_cast<Pool>(table);
+			if (pool->GetFinals()->GetSchedule().empty())
 			{
 				//pool->GetFinals().GenerateSchedule();
 				pool->AutoGenerateSchedule(true);
@@ -339,12 +341,12 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		}
 		else if (table->GetType() == MatchTable::Type::SingleElimination)
 		{
-			auto se = (SingleElimination*)table;
+			auto se = std::dynamic_pointer_cast<SingleElimination>(table);
 			//se->ReorderLastMatches();
 		}
 		else if (table->GetType() == MatchTable::Type::DoubleElimination)
 		{
-			auto de = (DoubleElimination*)table;
+			auto de = std::dynamic_pointer_cast<DoubleElimination>(table);
 			de->AutoGenerateSchedule(true);
 			de->GenerateSchedule();//Re-generated matches
 			//de->GetWinnerBracket().ReorderLastMatches();
@@ -403,8 +405,7 @@ Tournament::~Tournament()
 	if (m_Schedule.size() > 0 || GetParticipants().size() > 0 || m_MatchTables.size() > 0)
 		Save();
 
-	for (auto table : m_MatchTables)
-		delete table;
+	m_MatchTables.clear();
 }
 
 
@@ -422,8 +423,6 @@ void Tournament::Reset()
 	m_StandingData.GetAllJudokas().clear();
 	m_StandingData.GetRuleSets().clear();
 
-	for (auto table : m_MatchTables)
-		delete table;
 	m_MatchTables.clear();
 
 	m_Schedule.clear();
@@ -523,7 +522,7 @@ bool Tournament::Load(const YAML::Node& yaml)
 				continue;
 			}
 
-			MatchTable* new_table = MatchTable::CreateMatchTable(node, this);
+			auto new_table = MatchTable::CreateMatchTable(node, this);
 
 			if (new_table)
 				m_MatchTables.push_back(new_table);
@@ -810,7 +809,7 @@ void Tournament::DeleteAllMatchResults()
 
 
 
-bool Tournament::AddMatch(Match* NewMatch)
+bool Tournament::AddMatch(std::shared_ptr<Match> NewMatch)
 {
 	if (IsReadonly())
 	{
@@ -853,12 +852,12 @@ bool Tournament::AddMatch(Match* NewMatch)
 
 	//Do we have the rule set already?
 	if (!m_StandingData.FindRuleSet(NewMatch->GetRuleSet().GetUUID()))
-		m_StandingData.AddRuleSet(new RuleSet(NewMatch->GetRuleSet()));//Copy rule set
+		m_StandingData.AddRuleSet(std::make_shared<RuleSet>(NewMatch->GetRuleSet()));//Copy rule set
 
 	auto dependencies = NewMatch->GetDependentMatches();//Does this match depend on any other match?
 
 	for (auto prevMatch : dependencies)//For all dependencies
-		if (prevMatch) AddMatch(const_cast<Match*>(prevMatch));//Include them as well recursively
+		if (prevMatch) AddMatch(std::const_pointer_cast<Match>(prevMatch));//Include them as well recursively
 
 	//If the match has judoka attached, include them as participants
 	if (NewMatch->GetFighter(Fighter::White))
@@ -894,13 +893,15 @@ bool Tournament::AddMatch(Match* NewMatch)
 	
 	if (NewMatch->GetMatchTable())
 	{
-		AddMatchTable((MatchTable*)NewMatch->GetMatchTable());
+		auto copy_match_table = std::const_pointer_cast<MatchTable>(NewMatch->GetMatchTable());
+		NewMatch->SetMatchTable(copy_match_table);
+		AddMatchTable(copy_match_table);
 		GenerateSchedule();
 	}
 	else
 	{
-		auto new_match_table = new CustomTable(this);
-		new_match_table->SetFilter(new Fixed);
+		auto new_match_table = std::make_shared<CustomTable>(this);
+		new_match_table->SetFilter(std::make_shared<Fixed>());
 		new_match_table->AddMatch(NewMatch);
 		new_match_table->SetMatID(NewMatch->GetMatID());
 		new_match_table->SetRuleSet(NewMatch->GetOwnRuleSet());
@@ -922,7 +923,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 
 
 
-Match* Tournament::GetNextMatch(int32_t MatID)
+std::shared_ptr<Match> Tournament::GetNextMatch(int32_t MatID)
 {
 	auto guard = LockReadForScope();
 
@@ -941,7 +942,7 @@ Match* Tournament::GetNextMatch(int32_t MatID)
 
 
 
-const Match* Tournament::GetNextMatch(int32_t MatID) const
+std::shared_ptr<const Match> Tournament::GetNextMatch(int32_t MatID) const
 {
 	auto guard = LockReadForScope();
 
@@ -960,7 +961,7 @@ const Match* Tournament::GetNextMatch(int32_t MatID) const
 
 
 
-Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex)
+std::shared_ptr<Match> Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex)
 {
 	auto guard = LockReadForScope();
 
@@ -982,7 +983,7 @@ Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex)
 
 
 
-const Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
+std::shared_ptr<const Match> Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
 {
 	auto guard = LockReadForScope();
 
@@ -1004,7 +1005,7 @@ const Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
 
 
 
-const Match* Tournament::GetNextMatch(const UUID& MatchID, int32_t MatID) const
+std::shared_ptr<const Match> Tournament::GetNextMatch(const UUID& MatchID, int32_t MatID) const
 {
 	auto guard = LockReadForScope();
 
@@ -1030,7 +1031,7 @@ const Match* Tournament::GetNextMatch(const UUID& MatchID, int32_t MatID) const
 
 
 
-Match* Tournament::GetNextOngoingMatch(int32_t MatID)
+std::shared_ptr<Match> Tournament::GetNextOngoingMatch(int32_t MatID)
 {
 	auto guard = LockReadForScope();
 
@@ -1088,7 +1089,7 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
 	}
 #endif
 
-	MatchTable* table = nullptr;
+	std::shared_ptr<MatchTable> table;
 	size_t sub_index  = SIZE_MAX;
 	for (size_t i = 0; i < m_MatchTables.size(); ++i)
 	{
@@ -1141,9 +1142,9 @@ bool Tournament::RemoveMatch(const UUID& MatchID)
 
 
 
-std::vector<Match*> Tournament::GetSchedule() const
+std::vector<std::shared_ptr<Match>> Tournament::GetSchedule() const
 {
-	std::vector<Match*> ret;
+	std::vector<std::shared_ptr<Match>> ret;
 
 	auto guard = LockReadForScope();
 
@@ -1160,7 +1161,7 @@ std::vector<Match*> Tournament::GetSchedule() const
 
 
 
-Match* Tournament::FindMatch(const UUID& UUID) const
+std::shared_ptr<Match> Tournament::FindMatch(const UUID& UUID) const
 {
 	auto guard = LockReadForScope();
 
@@ -1316,9 +1317,9 @@ bool Tournament::MoveMatchTo(const UUID& From, const UUID& To, bool Above)
 
 
 
-std::vector<const Match*> Tournament::GetNextMatches(int32_t MatID) const
+std::vector<std::shared_ptr<const Match>> Tournament::GetNextMatches(int32_t MatID) const
 {
-	std::vector<const Match*> ret;
+	std::vector<std::shared_ptr<const Match>> ret;
 
 	auto guard = LockReadForScope();
 
@@ -1371,7 +1372,7 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		return false;
 	}
 
-	const bool club_added = m_StandingData.AddClub((Club*)Judoka->GetClub());
+	const bool club_added = m_StandingData.AddClub(std::const_pointer_cast<Club>(Judoka->GetClub()));
 
 	FindAgeGroupForJudoka(*Judoka);
 
@@ -1509,7 +1510,7 @@ void Tournament::SwapAllFighters()
 
 
 
-MatchTable* Tournament::FindMatchTable(const UUID& ID)
+std::shared_ptr<MatchTable> Tournament::FindMatchTable(const UUID& ID)
 {
 	if (IsReadonly())
 		return nullptr;
@@ -1527,14 +1528,14 @@ MatchTable* Tournament::FindMatchTable(const UUID& ID)
 		//Check sub table of pool
 		if (table->GetType() == MatchTable::Type::Pool)
 		{
-			Pool* pool = (Pool*)table;
+			auto pool = std::dynamic_pointer_cast<Pool>(table);
 
 			for (size_t i = 0; i < pool->GetPoolCount(); ++i)
 				if (*pool->GetPool(i) == ID)
-					return (MatchTable*)pool->GetPool(i);
+					return pool->GetPool(i);
 
-			if (pool->GetFinals() == ID)
-				return (MatchTable*)&pool->GetFinals();
+			if (*pool->GetFinals() == ID)
+				return pool->GetFinals();
 		}
 	}
 
@@ -1543,7 +1544,7 @@ MatchTable* Tournament::FindMatchTable(const UUID& ID)
 
 
 
-const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
+std::shared_ptr<const MatchTable> Tournament::FindMatchTable(const UUID& ID) const
 {
 	auto guard = LockReadForScope();
 
@@ -1558,14 +1559,14 @@ const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 		//Check sub table of pool
 		if (table->GetType() == MatchTable::Type::Pool)
 		{
-			const Pool* pool = (const Pool*)table;
+			auto pool = std::dynamic_pointer_cast<const Pool>(table);
 
 			for (size_t i = 0; i < pool->GetPoolCount(); ++i)
 				if (*pool->GetPool(i) == ID)
 					return pool->GetPool(i);
 
-			if (pool->GetFinals() == ID)
-				return &pool->GetFinals();
+			if (*pool->GetFinals() == ID)
+				return pool->GetFinals();
 		}
 	}
 
@@ -1574,7 +1575,7 @@ const MatchTable* Tournament::FindMatchTable(const UUID& ID) const
 
 
 
-MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
+std::shared_ptr<MatchTable> Tournament::FindMatchTableByName(const std::string& Name)
 {
 	if (IsReadonly())
 		return nullptr;
@@ -1592,7 +1593,7 @@ MatchTable* Tournament::FindMatchTableByName(const std::string& Name)
 
 
 
-MatchTable* Tournament::FindMatchTableByDescription(const std::string& Description)
+std::shared_ptr<MatchTable> Tournament::FindMatchTableByDescription(const std::string& Description)
 {
 	if (IsReadonly())
 		return nullptr;
@@ -1610,7 +1611,7 @@ MatchTable* Tournament::FindMatchTableByDescription(const std::string& Descripti
 
 
 
-void Tournament::AddMatchTable(MatchTable* NewMatchTable)
+void Tournament::AddMatchTable(std::shared_ptr<MatchTable> NewMatchTable)
 {
 	if (IsReadonly())
 		return;
@@ -1631,10 +1632,10 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 		AddParticipant(const_cast<Judoka*>(judoka));
 
 	if (NewMatchTable->GetAgeGroup())
-		AddAgeGroup(const_cast<AgeGroup*>(NewMatchTable->GetAgeGroup()));
+		AddAgeGroup(std::const_pointer_cast<AgeGroup>(NewMatchTable->GetAgeGroup()));
 
 	if (NewMatchTable->GetOwnRuleSet())
-		AddRuleSet(const_cast<RuleSet*>(NewMatchTable->GetOwnRuleSet()));
+		AddRuleSet(std::const_pointer_cast<RuleSet>(NewMatchTable->GetOwnRuleSet()));
 
 	//Add all eligable participants to the match table
 	for (auto judoka : m_StandingData.GetAllJudokas())
@@ -1806,8 +1807,8 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 		//Both weightclasses?
 		if (a->GetFilter() && b->GetFilter() && a->GetFilter()->GetType() == IFilter::Type::Weightclass && b->GetFilter()->GetType() == IFilter::Type::Weightclass)
 		{
-			auto weightclassA = (const Weightclass*)a->GetFilter();
-			auto weightclassB = (const Weightclass*)b->GetFilter();
+			auto weightclassA = std::reinterpret_pointer_cast<const Weightclass>(a->GetFilter());
+			auto weightclassB = std::reinterpret_pointer_cast<const Weightclass>(b->GetFilter());
 
 			//Sort by age group
 			if (weightclassA->GetAgeGroup() && weightclassB->GetAgeGroup() && weightclassA->GetAgeGroup()->GetMinAge() != weightclassB->GetAgeGroup()->GetMinAge())
@@ -1869,7 +1870,7 @@ bool Tournament::RemoveMatchTable(const UUID& UUID)
 
 
 
-bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
+bool Tournament::AddAgeGroup(std::shared_ptr<AgeGroup> NewAgeGroup)
 {
 	if (IsReadonly())
 		return false;
@@ -1885,7 +1886,7 @@ bool Tournament::AddAgeGroup(AgeGroup* NewAgeGroup)
 		return false;
 
 	if (NewAgeGroup->GetRuleSet())
-		m_StandingData.AddRuleSet(const_cast<RuleSet*>(NewAgeGroup->GetRuleSet()));
+		m_StandingData.AddRuleSet(std::const_pointer_cast<RuleSet>(NewAgeGroup->GetRuleSet()));
 
 	for (auto judoka : m_StandingData.GetAllJudokas())
 	{
@@ -1943,7 +1944,7 @@ bool Tournament::RemoveAgeGroup(const UUID& UUID)
 
 
 
-bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup)
+bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, std::shared_ptr<const AgeGroup> AgeGroup)
 {
 	if (IsReadonly())
 		return false;
@@ -1974,9 +1975,9 @@ bool Tournament::AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* Ag
 
 
 
-std::vector<const AgeGroup*> Tournament::GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const
+std::vector<std::shared_ptr<const AgeGroup>> Tournament::GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const
 {
-	std::vector<const AgeGroup*> ret;
+	std::vector<std::shared_ptr<const AgeGroup>> ret;
 
 	auto guard = LockReadForScope();
 
@@ -1991,9 +1992,9 @@ std::vector<const AgeGroup*> Tournament::GetEligableAgeGroupsOfJudoka(const Judo
 
 
 
-std::vector<const AgeGroup*> Tournament::GetAgeGroups() const
+std::vector<std::shared_ptr<const AgeGroup>> Tournament::GetAgeGroups() const
 {
-	std::vector<const AgeGroup*> ret;
+	std::vector<std::shared_ptr<const AgeGroup>> ret;
 
 	auto guard = LockReadForScope();
 
@@ -2005,7 +2006,7 @@ std::vector<const AgeGroup*> Tournament::GetAgeGroups() const
 
 
 
-void Tournament::GetAgeGroupInfo(YAML::Emitter& Yaml, const AgeGroup* AgeGroup) const
+void Tournament::GetAgeGroupInfo(YAML::Emitter& Yaml, std::shared_ptr<const AgeGroup> AgeGroup) const
 {
 	if (!AgeGroup)
 		return;
@@ -2120,7 +2121,7 @@ bool Tournament::MoveScheduleEntryDown(const UUID& UUID)
 
 
 
-std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) const
+std::vector<WeightclassDescCollection> Tournament::GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<std::shared_ptr<const AgeGroup>>& AgeGroups, bool SplitGenders) const
 {
 	std::vector<WeightclassDescCollection> ret;
 
@@ -2280,7 +2281,7 @@ bool Tournament::ApplyWeightclasses(const std::vector<WeightclassDescCollection>
 	{	
 		for (auto weight_desc : desc.m_Collection)
 		{
-			auto new_weightclass = new RoundRobin(weight_desc.m_Min, weight_desc.m_Max, desc.m_Gender, this);
+			auto new_weightclass = std::make_shared<RoundRobin>(weight_desc.m_Min, weight_desc.m_Max, desc.m_Gender, this);
 
 			new_weightclass->SetAgeGroup(desc.m_AgeGroup);
 			new_weightclass->SetMatID(1);
@@ -2403,7 +2404,7 @@ bool Tournament::PerformLottery()
 
 	for (auto judoka : GetDatabase().GetAllJudokas())
 	{
-		const Association* club = judoka->GetClub();
+		std::shared_ptr<const Association> club = judoka->GetClub();
 
 		//Move up the tree till we are on the right level
 		while (club && club->GetLevel() > lottery_level)
@@ -2466,9 +2467,9 @@ const std::string Tournament::Schedule2String(bool ImportantOnly, int Mat) const
 	auto guard = LockReadForScope();
 
 	auto schedule = GetSchedule();
-	Match* prev = nullptr;
+	std::shared_ptr<Match> prev;
 	int serialized_matches = 0;
-	std::vector<Match*> residual_matches;
+	std::vector<std::shared_ptr<Match>> residual_matches;
 
 	for (auto match : schedule)
 	{
@@ -2554,7 +2555,7 @@ const std::string Tournament::MasterSchedule2String() const
 				if (GetMaxEntriesAtScheduleIndex(matID, i) > max)
 					max = GetMaxEntriesAtScheduleIndex(matID, i);
 
-			std::vector<std::pair<uint32_t, MatchTable*>> entries;
+			std::vector<std::pair<uint32_t, std::shared_ptr<MatchTable>>> entries;
 			for (uint32_t it = 0; it < m_MatchTables.size(); ++it)//For all schedule entries
 			{
 				auto entry = m_MatchTables[it];
@@ -2632,16 +2633,16 @@ void Tournament::FindAgeGroupForJudoka(const Judoka& Judoka)
 	auto guard = LockReadForScope();
 
 	//Find age groups this judoka can belong to
-	std::vector<AgeGroup*> EligableAgeGroups;
+	std::vector<std::shared_ptr<AgeGroup>> eligableAgeGroups;
 	for (auto age_group : m_StandingData.GetAgeGroups())
 	{
 		if (age_group && age_group->IsElgiable(Judoka, GetDatabase()))
-			EligableAgeGroups.emplace_back(age_group);
+			eligableAgeGroups.emplace_back(age_group);
 	}
 
 	//Only one choice?
-	if (EligableAgeGroups.size() == 1)//Add judoka to age group
-		m_JudokaToAgeGroup.insert({ Judoka.GetUUID(), EligableAgeGroups[0]->GetUUID() });
+	if (eligableAgeGroups.size() == 1)//Add judoka to age group
+		m_JudokaToAgeGroup.insert({ Judoka.GetUUID(), eligableAgeGroups[0]->GetUUID() });
 }
 
 
@@ -2763,8 +2764,7 @@ void Tournament::BuildSchedule()
 	//For all master schedule entries
 	for (int32_t index = 0; index <= GetMaxScheduleIndex(); index++)
 	{
-		//std::vector<std::pair<uint32_t, std::vector<Match*>>> Plan;
-		std::vector<std::pair<MatchTable*, size_t>> Plan;
+		std::vector<std::pair<std::shared_ptr<MatchTable>, size_t>> Plan;
 
 		//For each match table at this index
 		for (auto entry : m_MatchTables)
@@ -2785,7 +2785,7 @@ void Tournament::BuildSchedule()
 		{
 			bool done = true;
 
-			for (auto& [table, index] : Plan)
+			for (auto& [table, index] : Plan)//Needs to be a reference, due to 'index' being modified
 			{
 				auto num = table->GetRecommendedNumMatchesBeforeBreak();
 
@@ -2801,7 +2801,7 @@ void Tournament::BuildSchedule()
 							done = false;
 						}
 
-						index++;
+						index++;//This updates the plan
 					}
 					else
 						break;

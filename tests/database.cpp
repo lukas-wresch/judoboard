@@ -71,15 +71,15 @@ TEST(Database, SaveAndLoad)
 
 		EXPECT_NE(j1->GetUUID(), j2->GetUUID());
 
-		d.AddRuleSet(new RuleSet("Test", 60, 30, 20, 10, true, true, true, 1));
+		d.AddRuleSet(std::make_shared<RuleSet>("Test", 60, 30, 20, 10, true, true, true, 1));
 
 		EXPECT_EQ(d.FindJudoka(j1->GetUUID())->GetWeight(), Weight(50));
 		EXPECT_EQ(d.FindJudoka(j2->GetUUID())->GetWeight(), Weight(60));
 
-		auto club1 = new Club("Club name");
+		auto club1 = std::make_shared<Club>("Club name");
 		d.AddClub(club1);
 
-		auto club2 = new Club("Club name 2");
+		auto club2 = std::make_shared<Club>("Club name 2");
 		d.AddClub(club2);
 
 		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Female);
@@ -379,7 +379,7 @@ TEST(Database, RuleSets)
 	{
 		std::string name = "Rules" + std::to_string(rand()) + std::to_string(rand()) + std::to_string(rand());
 
-		RuleSet* rules = new RuleSet(name, 60, 30, 30, 20);
+		auto rules = std::make_shared<RuleSet>(name, 60, 30, 30, 20);
 
 		ASSERT_EQ(d.FindRuleSetByName(name), nullptr);
 

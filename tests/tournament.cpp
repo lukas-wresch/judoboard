@@ -56,7 +56,7 @@ TEST(Tournament, MatchAgainstOneself)
 	tourney->Reset();
 	tourney->EnableAutoSave(false);
 
-	EXPECT_FALSE(tourney->AddMatch(new Match(j1, j1, tourney)));
+	EXPECT_FALSE(tourney->AddMatch(std::make_shared<Match>(j1, j1, tourney)));
 
 	delete tourney;
 }
@@ -75,12 +75,12 @@ TEST(Tournament, MoveSchedule)
 	tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	auto match1 = new Match(&j1, &j2, &tourney, 1);
-	auto match2 = new Match(&j1, &j2, &tourney, 1);
-	auto match3 = new Match(&j1, &j2, &tourney, 1);
-	auto match4 = new Match(&j1, &j2, &tourney, 2);
-	auto match5 = new Match(&j1, &j2, &tourney, 2);
-	auto match6 = new Match(&j1, &j2, &tourney, 2);
+	auto match1 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
+	auto match2 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
+	auto match3 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
+	auto match4 = std::make_shared<Match>(&j1, &j2, &tourney, 2);
+	auto match5 = std::make_shared<Match>(&j1, &j2, &tourney, 2);
+	auto match6 = std::make_shared<Match>(&j1, &j2, &tourney, 2);
 
 	tourney.AddMatch(match1);
 	tourney.AddMatch(match2);
@@ -164,7 +164,7 @@ TEST(Tournament, DeleteMatch)
 		EXPECT_TRUE(tourney.AddParticipant(&j3));
 		EXPECT_TRUE(tourney.AddParticipant(&j4));
 
-		auto matchtable = new SingleElimination(Weight(50), Weight(60));
+		auto matchtable = std::make_shared<SingleElimination>(Weight(50), Weight(60));
 		matchtable->IsThirdPlaceMatch(true);
 		tourney.AddMatchTable(matchtable);
 		tourney.GenerateSchedule();
@@ -179,7 +179,7 @@ TEST(Tournament, DeleteMatch)
 		EXPECT_EQ(matchtable->GetSchedule().size(), 3);
 		EXPECT_EQ(tourney.GetSchedule().size(),     3);
 
-		tourney.AddMatch(new Match(&j1, &j2, nullptr));
+		tourney.AddMatch(std::make_shared<Match>(&j1, &j2, nullptr));
 
 		EXPECT_EQ(tourney.GetMatchTables().size(),  2);
 		EXPECT_EQ(matchtable->GetSchedule().size(), 3);
@@ -202,7 +202,7 @@ TEST(Tournament, Disqualification)
 	tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	Match* match = new Match(&j1, &j2, &tourney);
+	auto match = std::make_shared<Match>(&j1, &j2, &tourney);
 	tourney.AddMatch(match);
 
 	tourney.Disqualify(j1);
@@ -233,14 +233,14 @@ TEST(Tournament, AddMatchAfterDisqualification)
 	//tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	Match* match1 = new Match(j1, j2, &tourney);
+	auto match1 = std::make_shared<Match>(j1, j2, &tourney);
 	EXPECT_TRUE(tourney.AddMatch(match1));
-	Match* matchdummy = new Match(j2, j3, &tourney);
+	auto matchdummy = std::make_shared<Match>(j2, j3, &tourney);
 	EXPECT_TRUE(tourney.AddMatch(matchdummy));
 
 	tourney.Disqualify(*j1);
 
-	Match* match2 = new Match(j1, j2, &tourney);
+	auto match2 = std::make_shared<Match>(j1, j2, &tourney);
 	EXPECT_TRUE(tourney.AddMatch(match2));
 
 	EXPECT_TRUE(match1->HasConcluded());
@@ -273,20 +273,20 @@ TEST(Tournament, AddAgeGroup)
 	auto tourney = new Judoboard::Tournament("Demo Tournament");
 	tourney->EnableAutoSave(false);
 
-	auto rule_set  = Judoboard::RuleSet("Demo", 180, 60, 20, 10);
-	auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set);
+	auto rule_set  = std::make_shared<Judoboard::RuleSet>("Demo", 180, 60, 20, 10);
+	auto age_group = std::make_shared<Judoboard::AgeGroup>("U18", 0, 100, rule_set);
 
-	auto m1 = new Judoboard::RoundRobin(Weight(0), Weight(120));
+	auto m1 = std::make_shared<Judoboard::RoundRobin>(Weight(0), Weight(120));
 	m1->SetMatID(1);
-	m1->SetAgeGroup(&age_group);
+	m1->SetAgeGroup(age_group);
 	tourney->AddMatchTable(m1);
 
-	EXPECT_TRUE(tourney->FindAgeGroup(age_group.GetUUID()));
-	EXPECT_TRUE(tourney->FindRuleSet(rule_set.GetUUID()));
+	EXPECT_TRUE(tourney->FindAgeGroup(age_group->GetUUID()));
+	EXPECT_TRUE(tourney->FindRuleSet(rule_set->GetUUID()));
 
-	app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
-	app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
-	app.GetDatabase().AddClub(new Judoboard::Club("Senne"));
+	app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Altenhagen"));
+	app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Brackwede"));
+	app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Senne"));
 
 	for (int i = 0; i < 5; i++)
 		tourney->AddParticipant(new Judoboard::Judoka(Test_CreateRandomJudoka(&app.GetDatabase())));
@@ -309,7 +309,7 @@ TEST(Tournament, DoubleDisqualification)
 	tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	Match* match = new Match(&j1, &j2, &tourney);
+	auto match = std::make_shared<Match>(&j1, &j2, &tourney);
 	tourney.AddMatch(match);
 
 	tourney.Disqualify(j1);
@@ -338,8 +338,8 @@ TEST(Tournament, DoubleDisqualification2)
 		tourney.Reset();
 		tourney.EnableAutoSave(false);
 
-		Match* match1 = new Match(&j1, &j2, &tourney, 1);
-		Match* match2 = new Match(&j1, &j2, &tourney, 1);
+		auto match1 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
+		auto match2 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
 
 		tourney.AddMatch(match1);
 		tourney.AddMatch(match2);
@@ -387,7 +387,7 @@ TEST(Tournament, ReviseMatch)
 
 	for (Fighter f = Fighter::White; f <= Fighter::Blue; ++f)
 	{
-		Match* match = new Match(j1, j2, &tourney, 1);
+		auto match = std::make_shared<Match>(j1, j2, &tourney, 1);
 		tourney.AddMatch(match);
 
 		EXPECT_TRUE(mat.StartMatch(match));
@@ -431,7 +431,7 @@ TEST(Tournament, RevokeDisqualification)
 	tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	Match* match = new Match(j1, j2, &tourney);
+	auto match = std::make_shared<Match>(j1, j2, &tourney);
 	tourney.AddMatch(match);
 
 	tourney.Disqualify(*j1);
@@ -454,7 +454,7 @@ TEST(Tournament, RevokeDoubleDisqualification)
 	tourney.Reset();
 	tourney.EnableAutoSave(false);
 
-	Match* match = new Match(&j1, &j2, &tourney);
+	auto match = std::make_shared<Match>(&j1, &j2, &tourney);
 	tourney.AddMatch(match);
 
 	tourney.Disqualify(j1);
@@ -490,7 +490,7 @@ TEST(Tournament, BestOf3_Matchtable)
 		EXPECT_TRUE(tourney.AddParticipant(&j3));
 		EXPECT_TRUE(tourney.AddParticipant(&j4));
 
-		auto matchtable = new RoundRobin(Weight(50), Weight(60));
+		auto matchtable = std::make_shared<RoundRobin>(Weight(50), Weight(60));
 		matchtable->IsBestOfThree(true);
 		tourney.AddMatchTable(matchtable);
 		tourney.GenerateSchedule();
@@ -536,8 +536,8 @@ TEST(Tournament, ColorsForMatchTables)
 		EXPECT_TRUE(tourney.AddParticipant(j3));
 		EXPECT_TRUE(tourney.AddParticipant(j4));
 
-		tourney.AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
-		tourney.AddMatchTable(new RoundRobin(Weight(60), Weight(65)));
+		tourney.AddMatchTable(std::make_shared<RoundRobin>(Weight(50), Weight(55)));
+		tourney.AddMatchTable(std::make_shared<RoundRobin>(Weight(60), Weight(65)));
 
 		ASSERT_EQ(tourney.GetMatchTables().size(), 2);
 		EXPECT_EQ(tourney.GetMatchTables()[0]->GetColor(), Color::Name::Blue);
@@ -593,10 +593,10 @@ TEST(Tournament, Lottery)
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 		Tournament tourney("deleteMe");
 
-		Association* assoc = new Association(GetRandomName(), nullptr);
-		Club* c1 = new Club(GetRandomName());
+		auto assoc = std::make_shared<Association>(GetRandomName(), nullptr);
+		auto c1 = std::make_shared<Club>(GetRandomName());
 		c1->SetParent(assoc);
-		Club* c2 = new Club(GetRandomName());
+		auto c2 = std::make_shared<Club>(GetRandomName());
 		c2->SetParent(assoc);
 
 		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
@@ -639,10 +639,10 @@ TEST(Tournament, CorrectLotInSingleElimination)
 		Tournament tourney("deleteMe");
 		tourney.EnableAutoSave(false);
 
-		Association* assoc = new Association(GetRandomName(), nullptr);
-		Club* c1 = new Club(GetRandomName());
+		auto assoc = std::make_shared<Association>(GetRandomName(), nullptr);
+		auto c1 = std::make_shared<Club>(GetRandomName());
 		c1->SetParent(assoc);
-		Club* c2 = new Club(GetRandomName());
+		auto c2 = std::make_shared<Club>(GetRandomName());
 		c2->SetParent(assoc);
 
 		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName(), Weight(50));
@@ -668,7 +668,7 @@ TEST(Tournament, CorrectLotInSingleElimination)
 		EXPECT_TRUE(tourney.AddParticipant(j3));
 		EXPECT_TRUE(tourney.AddParticipant(j6));
 
-		tourney.AddMatchTable(new SingleElimination(Weight(10), Weight(200)));
+		tourney.AddMatchTable(std::make_shared<SingleElimination>(Weight(10), Weight(200)));
 		auto table = tourney.GetMatchTables()[0];
 
 		auto lot1 = tourney.GetLotOfAssociation(*c1);
@@ -711,30 +711,30 @@ TEST(Tournament, LotteryTier)
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 		Tournament tourney("deleteMe");
 
-		auto inter = new Judoboard::Association("International", nullptr);
+		auto inter = std::make_shared<Judoboard::Association>("International", nullptr);
 
-		auto de = new Judoboard::Association("Deutschland", inter);
+		auto de = std::make_shared<Judoboard::Association>("Deutschland", inter);
 
-		auto dn = new Judoboard::Association("Deutschland-Nord", de);
-		auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+		auto dn = std::make_shared<Judoboard::Association>("Deutschland-Nord", de);
+		auto ds = std::make_shared<Judoboard::Association>(u8"Deutschland-S\u00fcd", de);
 
-		auto nord  = new Judoboard::Association("Nord", dn);
-		auto west  = new Judoboard::Association("West", dn);
-		auto nost  = new Judoboard::Association("Nordost", dn);
-		auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
-		auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+		auto nord  = std::make_shared<Judoboard::Association>("Nord", dn);
+		auto west  = std::make_shared<Judoboard::Association>("West", dn);
+		auto nost  = std::make_shared<Judoboard::Association>("Nordost", dn);
+		auto sued  = std::make_shared<Judoboard::Association>(u8"S\u00fcd", ds);
+		auto swest = std::make_shared<Judoboard::Association>(u8"S\u00fcdwest", ds);
 
-		auto nieder  = new Judoboard::Association("Niedersachsen", nord);
-		auto hamburg = new Judoboard::Association("Hamburg", nord);
-		auto berlin  = new Judoboard::Association("Berlin", nost);
-		auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+		auto nieder  = std::make_shared<Judoboard::Association>("Niedersachsen", nord);
+		auto hamburg = std::make_shared<Judoboard::Association>("Hamburg", nord);
+		auto berlin  = std::make_shared<Judoboard::Association>("Berlin", nost);
+		auto nrw     = std::make_shared<Judoboard::Association>("Nordrhein-Westfalen", west);
 
-		auto detmold = new Judoboard::Association("Detmold", nrw);
+		auto detmold = std::make_shared<Judoboard::Association>("Detmold", nrw);
 
-		auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+		auto biegue = std::make_shared<Judoboard::Association>(u8"Bielefeld/G\u00fctersloh", detmold);
 
-		Club* c1 = new Club("club1", biegue);
-		Club* c2 = new Club("club2", biegue);
+		auto c1 = std::make_shared<Club>("club1", biegue);
+		auto c2 = std::make_shared<Club>("club2", biegue);
 
 		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
 		j1->SetClub(c1);
@@ -772,10 +772,10 @@ TEST(Tournament, Lottery_Histogram)
 		Tournament tourney("deleteMe");
 		tourney.EnableAutoSave(false);
 
-		Association* assoc = new Association(GetRandomName(), nullptr);
-		Club* c1 = new Club(GetRandomName());
+		auto assoc = std::make_shared<Association>(GetRandomName(), nullptr);
+		auto c1 = std::make_shared<Club>(GetRandomName());
 		c1->SetParent(assoc);
-		Club* c2 = new Club(GetRandomName());
+		auto c2 = std::make_shared<Club>(GetRandomName());
 		c2->SetParent(assoc);
 
 		Judoka* j1 = new Judoka(GetRandomName(), GetRandomName());
@@ -809,8 +809,8 @@ TEST(Tournament, CanNotAddParticipantOfWrongAssociation)
 {
 	initialize();
 	
-	auto club1 = new Club("Club1");
-	auto club2 = new Club("Club2");
+	auto club1 = std::make_shared<Club>("Club1");
+	auto club2 = std::make_shared<Club>("Club2");
 	Judoka* j1 = new Judoka("Firstname", "Lastname", 50, Gender::Male);
 
 	j1->SetClub(club1);
@@ -876,7 +876,7 @@ TEST(Tournament, HasDefaultRuleSet2)
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
-	auto rules = new RuleSet("Default", 60, 30, 20, 10);
+	auto rules = std::make_shared<RuleSet>("Default", 60, 30, 20, 10);
 	d.AddRuleSet(rules);
 
 	Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
@@ -917,7 +917,7 @@ TEST(Tournament, FindSubMatchTable)
 			tourney.AddParticipant(j);
 		}
 
-		Pool* pool = new Pool(Weight(10), Weight(100));
+		auto pool = std::make_shared<Pool>(Weight(10), Weight(100));
 		tourney.AddMatchTable(pool);
 
 		ASSERT_TRUE(tourney.FindMatchTable(pool->GetUUID()));
@@ -932,8 +932,8 @@ TEST(Tournament, FindSubMatchTable)
 		ASSERT_TRUE(tourney.FindMatchTable(pool->GetPool(3)->GetUUID()));
 		EXPECT_TRUE(tourney.FindMatchTable(pool->GetPool(3)->GetUUID())->IsSubMatchTable());
 
-		ASSERT_TRUE(tourney.FindMatchTable(pool->GetFinals().GetUUID()));
-		EXPECT_TRUE(tourney.FindMatchTable(pool->GetFinals().GetUUID())->IsSubMatchTable());
+		ASSERT_TRUE(tourney.FindMatchTable(pool->GetFinals()->GetUUID()));
+		EXPECT_TRUE(tourney.FindMatchTable(pool->GetFinals()->GetUUID())->IsSubMatchTable());
 	}
 
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
@@ -950,7 +950,7 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 	{
 		Database d;
 		d.EnableAutoSave(false);
-		d.AddRuleSet(new RuleSet("Test", 10, 20, 30, 40));
+		d.AddRuleSet(std::make_shared<RuleSet>("Test", 10, 20, 30, 40));
 
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 		Tournament tourney("deleteMe", d.FindRuleSetByName("Default"));
@@ -959,7 +959,7 @@ TEST(Tournament, RuleSetHasSameIDAsInDatabase)
 		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
 		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
 
-		Match* m = new Match(&j1, &j2, &tourney);
+		auto m = std::make_shared<Match>(&j1, &j2, &tourney);
 		m->SetRuleSet(d.FindRuleSetByName("Test"));
 		tourney.AddMatch(m);
 
@@ -995,7 +995,7 @@ TEST(Tournament, ConcludedStatus)
 		EXPECT_TRUE(tourney->AddParticipant(j1));
 		EXPECT_TRUE(tourney->AddParticipant(j2));
 
-		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
+		tourney->AddMatchTable(std::make_shared<RoundRobin>(Weight(50), Weight(55)));
 		tourney->GetMatchTables()[0]->IsBestOfThree(true);
 		tourney->GetMatchTables()[0]->SetMatID(1);
 		tourney->GenerateSchedule();
@@ -1084,7 +1084,7 @@ TEST(Tournament, StressTest_DeletionMovingAdding)
 
 	{
 		auto tournament_name = GetRandomName();
-		auto tourney = new Tournament(tournament_name, new RuleSet("Test", 3 * 60, 3 * 60, 20, 10));
+		auto tourney = new Tournament(tournament_name, std::make_shared<RuleSet>("Test", 3 * 60, 3 * 60, 20, 10));
 
 		Judoka* j[100];
 
@@ -1094,11 +1094,11 @@ TEST(Tournament, StressTest_DeletionMovingAdding)
 			tourney->AddParticipant(j[i]);
 		}
 
-		MatchTable* m1 = new RoundRobin(Weight(0),  Weight(60));
-		MatchTable* m2 = new RoundRobin(Weight(60), Weight(70));
-		MatchTable* m3 = new RoundRobin(Weight(70), Weight(80));
-		MatchTable* m4 = new RoundRobin(Weight(80), Weight(90));
-		MatchTable* m5 = new RoundRobin(Weight(90), Weight(100));
+		auto m1 = std::make_shared<RoundRobin>(Weight(0),  Weight(60));
+		auto m2 = std::make_shared<RoundRobin>(Weight(60), Weight(70));
+		auto m3 = std::make_shared<RoundRobin>(Weight(70), Weight(80));
+		auto m4 = std::make_shared<RoundRobin>(Weight(80), Weight(90));
+		auto m5 = std::make_shared<RoundRobin>(Weight(90), Weight(100));
 
 		tourney->AddMatchTable(m1);
 		tourney->AddMatchTable(m2);
@@ -1110,7 +1110,7 @@ TEST(Tournament, StressTest_DeletionMovingAdding)
 		auto adder = [&]() {
 			for (int i = 0; i < 1000; i++)
 			{
-				Match* new_match = new Match(j[rand() % 100], j[rand() % 100], nullptr);
+				auto new_match = std::make_shared<Match>(j[rand() % 100], j[rand() % 100], nullptr);
 				tourney->AddMatch(new_match);
 			}
 		};
@@ -1257,13 +1257,13 @@ TEST(Tournament, SaveAndLoad)
 		tourney->MarkedAsWeighted(*j1);
 		tourney->MarkedAsWeighted(*j2);
 
-		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
-		tourney->AddMatchTable(new RoundRobin(Weight(60), Weight(65)));
-		tourney->AddMatchTable(new Pool(Weight(50), Weight(65)));
-		tourney->AddMatchTable(new SingleElimination(Weight(50), Weight(65)));
-		tourney->AddMatchTable(new DoubleElimination(Weight(50), Weight(65)));
-		tourney->AddMatch(new Match(j1, j3, tourney, 1));
-		tourney->AddMatch(new Match(j1, j4, tourney, 2));
+		tourney->AddMatchTable(std::make_shared<RoundRobin>(Weight(50), Weight(55)));
+		tourney->AddMatchTable(std::make_shared<RoundRobin>(Weight(60), Weight(65)));
+		tourney->AddMatchTable(std::make_shared<Pool>(Weight(50), Weight(65)));
+		tourney->AddMatchTable(std::make_shared<SingleElimination>(Weight(50), Weight(65)));
+		tourney->AddMatchTable(std::make_shared<DoubleElimination>(Weight(50), Weight(65)));
+		tourney->AddMatch(std::make_shared<Match>(j1, j3, tourney, 1));
+		tourney->AddMatch(std::make_shared<Match>(j1, j4, tourney, 2));
 		tourney->GenerateSchedule();
 
 		tourney->Disqualify(*j1);
@@ -1317,16 +1317,16 @@ TEST(Tournament, WeightclassesAreSorted)
 		for (int j = 0; j < 30; ++j)
 		{
 			auto w = rand() % 100;
-			tourney.AddMatchTable(new RoundRobin(Weight(w), Weight(w + 10)));
+			tourney.AddMatchTable(std::make_shared<RoundRobin>(Weight(w), Weight(w + 10)));
 		}
 		
 		auto tables = tourney.GetMatchTables();
 		int current = 0;
 		for (auto table : tables)
 		{
-			EXPECT_LE(current, (int)((Weightclass*)table->GetFilter())->GetMinWeight());
+			EXPECT_LE(current, (int)std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMinWeight());
 
-			current = (int)((Weightclass*)table->GetFilter())->GetMinWeight();
+			current = (int)std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMinWeight();
 		}
 	}
 
@@ -1369,7 +1369,7 @@ TEST(Tournament, SaveAndLoad_MatchTableConnection)
 
 		tourney->SetDescription("test description");
 
-		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(155)));
+		tourney->AddMatchTable(std::make_shared<RoundRobin>(Weight(50), Weight(155)));
 		tourney->GenerateSchedule();
 
 		tourney->Save();
@@ -1415,9 +1415,9 @@ TEST(Tournament, SaveAndLoad_AgeGroups)
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 		Tournament tourney("deleteMe");
 
-		AgeGroup a("AgeGroup", 20, 1000, nullptr);
+		auto a = std::make_shared<AgeGroup>("AgeGroup", 20, 1000, nullptr);
 
-		tourney.AddAgeGroup(&a);
+		tourney.AddAgeGroup(a);
 		EXPECT_TRUE(tourney.AddParticipant(j1));
 		EXPECT_TRUE(tourney.AddParticipant(j2));
 		EXPECT_TRUE(tourney.AddParticipant(j3));
@@ -1434,8 +1434,8 @@ TEST(Tournament, SaveAndLoad_AgeGroups)
 			auto age_group = t.GetAgeGroupOfJudoka(j);
 
 			ASSERT_TRUE(age_group);
-			EXPECT_EQ(age_group->GetUUID(), a.GetUUID());
-			EXPECT_EQ(age_group->GetName(), a.GetName());
+			EXPECT_EQ(age_group->GetUUID(), a->GetUUID());
+			EXPECT_EQ(age_group->GetName(), a->GetName());
 		}
 	}
 
@@ -1451,17 +1451,17 @@ TEST(Tournament, SaveAndLoad_Clubs)
 	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 
 	{
-		Club c("Club name");
+		auto c = std::make_shared<Club>("Club name");
 
 		Judoka j1("Firstname",  "Lastname",  50, Gender::Male);
 		Judoka j2("Firstname2", "Lastname2", 51, Gender::Male);
 		Judoka j3("Firstname3", "Lastname3", 60, Gender::Male);
 		Judoka j4("Firstname4", "Lastname4", 61, Gender::Male);
 
-		j1.SetClub(&c);
-		j2.SetClub(&c);
-		j3.SetClub(&c);
-		j4.SetClub(&c);
+		j1.SetClub(c);
+		j2.SetClub(c);
+		j3.SetClub(c);
+		j4.SetClub(c);
 
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");
 		Tournament tourney("deleteMe");
@@ -1480,8 +1480,8 @@ TEST(Tournament, SaveAndLoad_Clubs)
 		for (auto j : t.GetParticipants())
 		{
 			ASSERT_TRUE(j->GetClub());
-			EXPECT_EQ(j->GetClub()->GetUUID(), c.GetUUID());
-			EXPECT_EQ(j->GetClub()->GetName(), c.GetName());
+			EXPECT_EQ(j->GetClub()->GetUUID(), c->GetUUID());
+			EXPECT_EQ(j->GetClub()->GetName(), c->GetName());
 		}
 	}
 
@@ -1522,10 +1522,10 @@ TEST(Tournament, SaveAndLoad_AutoMatches)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		tourney->AddMatchTable(new RoundRobin(Weight(50), Weight(55)));
-		tourney->AddMatchTable(new RoundRobin(Weight(60), Weight(65)));
-		tourney->AddMatch(new Match(j1, j3, tourney, 2));
-		tourney->AddMatch(new Match(j1, j4, tourney, 2));
+		tourney->AddMatchTable(std::make_shared<RoundRobin>(Weight(50), Weight(55)));
+		tourney->AddMatchTable(std::make_shared<RoundRobin>(Weight(60), Weight(65)));
+		tourney->AddMatch(std::make_shared<Match>(j1, j3, tourney, 2));
+		tourney->AddMatch(std::make_shared<Match>(j1, j4, tourney, 2));
 		tourney->GenerateSchedule();
 
 		tourney->Save();
@@ -1582,9 +1582,9 @@ TEST(Tournament, ChangeScheduleIndexAfterDeletion)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		auto w1 = new RoundRobin(Weight(50), Weight(55));
-		auto w2 = new RoundRobin(Weight(60), Weight(65));
-		auto w3 = new RoundRobin(Weight(70), Weight(80));
+		auto w1 = std::make_shared<RoundRobin>(Weight(50), Weight(55));
+		auto w2 = std::make_shared<RoundRobin>(Weight(60), Weight(65));
+		auto w3 = std::make_shared<RoundRobin>(Weight(70), Weight(80));
 		tourney->AddMatchTable(w1);
 		tourney->AddMatchTable(w2);
 		tourney->AddMatchTable(w3);
@@ -1624,9 +1624,9 @@ TEST(Tournament, ChangeTopmostScheduleIndexUp)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		auto w1 = new RoundRobin(Weight(50), Weight(55));
-		auto w2 = new RoundRobin(Weight(60), Weight(65));
-		auto w3 = new RoundRobin(Weight(70), Weight(80));
+		auto w1 = std::make_shared<RoundRobin>(Weight(50), Weight(55));
+		auto w2 = std::make_shared<RoundRobin>(Weight(60), Weight(65));
+		auto w3 = std::make_shared<RoundRobin>(Weight(70), Weight(80));
 		tourney->AddMatchTable(w1);
 		tourney->AddMatchTable(w2);
 		tourney->AddMatchTable(w3);
@@ -1694,9 +1694,9 @@ TEST(Tournament, ChangeScheduleIndexAfterChangingMat)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		auto w1 = new RoundRobin(Weight(50), Weight(55));
-		auto w2 = new RoundRobin(Weight(60), Weight(65));
-		auto w3 = new RoundRobin(Weight(70), Weight(80));
+		auto w1 = std::make_shared<RoundRobin>(Weight(50), Weight(55));
+		auto w2 = std::make_shared<RoundRobin>(Weight(60), Weight(65));
+		auto w3 = std::make_shared<RoundRobin>(Weight(70), Weight(80));
 		tourney->AddMatchTable(w1);
 		tourney->AddMatchTable(w2);
 		tourney->AddMatchTable(w3);
@@ -1757,9 +1757,9 @@ TEST(Tournament, NoReorderWhenAddingCustom)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		auto w1 = new RoundRobin(Weight(50), Weight(55));
-		auto w2 = new RoundRobin(Weight(60), Weight(65));
-		auto w3 = new RoundRobin(Weight(70), Weight(80));
+		auto w1 = std::make_shared<RoundRobin>(Weight(50), Weight(55));
+		auto w2 = std::make_shared<RoundRobin>(Weight(60), Weight(65));
+		auto w3 = std::make_shared<RoundRobin>(Weight(70), Weight(80));
 		tourney->AddMatchTable(w1);
 		tourney->AddMatchTable(w2);
 		tourney->AddMatchTable(w3);
@@ -1773,7 +1773,7 @@ TEST(Tournament, NoReorderWhenAddingCustom)
 		EXPECT_EQ(*tourney->GetSchedule()[0], *match2);
 		EXPECT_EQ(*tourney->GetSchedule()[1], *match1);
 
-		EXPECT_TRUE(tourney->AddMatch(new Match(j1, j2, tourney)));
+		EXPECT_TRUE(tourney->AddMatch(std::make_shared<Match>(j1, j2, tourney)));
 
 		EXPECT_EQ(*tourney->GetSchedule()[0], *match2);
 		EXPECT_EQ(*tourney->GetSchedule()[1], *match1);
@@ -1816,7 +1816,7 @@ TEST(Tournament, SaveAndLoad_SingleElimination)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		tourney->AddMatchTable(new SingleElimination(Weight(10), Weight(105)));
+		tourney->AddMatchTable(std::make_shared<SingleElimination>(Weight(10), Weight(105)));
 		tourney->GenerateSchedule();
 
 		EXPECT_EQ(tourney->GetParticipants().size(), 4);
@@ -1870,7 +1870,7 @@ TEST(Tournament, SaveAndLoad_DoubleElimination)
 		EXPECT_TRUE(tourney->AddParticipant(j3));
 		EXPECT_TRUE(tourney->AddParticipant(j4));
 
-		tourney->AddMatchTable(new DoubleElimination(Weight(10), Weight(105)));
+		tourney->AddMatchTable(std::make_shared<DoubleElimination>(Weight(10), Weight(105)));
 		tourney->GenerateSchedule();
 
 		EXPECT_EQ(tourney->GetParticipants().size(), 4);
@@ -1910,8 +1910,8 @@ TEST(Tournament, PruneUnusedClubs)
 		Judoka* j3 = new Judoka("Firstname3", "Lastname3", 60, Gender::Male);
 		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
-		Club* c1 = new Club("Club 1");
-		Club* c2 = new Club("Club 1");
+		auto c1 = std::make_shared<Club>("Club 1");
+		auto c2 = std::make_shared<Club>("Club 2");
 
 		Tournament* tourney = new Tournament("deleteMe");
 		tourney->Reset();
@@ -1977,8 +1977,8 @@ TEST(Tournament, AddMatchAfterConclusion)
 		EXPECT_TRUE(tourney.AddParticipant(j4));
 
 		//auto match1 = new Match(j1, j3, &tourney, 1);
-		auto match1 = new Match(j1, j3, nullptr);
-		auto match2 = new Match(j1, j4, &tourney, 1);
+		auto match1 = std::make_shared<Match>(j1, j3, nullptr);
+		auto match2 = std::make_shared<Match>(j1, j4, &tourney, 1);
 
 		EXPECT_FALSE(match1->GetTournament());
 		EXPECT_TRUE(tourney.AddMatch(match1));
@@ -2032,9 +2032,9 @@ TEST(Tournament, AddMatchAfterConclusionForTemporaryTournaments)
 	EXPECT_TRUE(tourney.AddParticipant(j3));
 	EXPECT_TRUE(tourney.AddParticipant(j4));
 
-	auto match1 = new Match(j1, j3, &tourney, 1);
-	auto match2 = new Match(j1, j4, &tourney, 1);
-	auto match3 = new Match(j1, j4, &tourney, 1);
+	auto match1 = std::make_shared<Match>(j1, j3, &tourney, 1);
+	auto match2 = std::make_shared<Match>(j1, j4, &tourney, 1);
+	auto match3 = std::make_shared<Match>(j1, j4, &tourney, 1);
 
 	EXPECT_TRUE(tourney.AddMatch(match1));
 
@@ -2067,7 +2067,7 @@ TEST(Tournament, AddParticpantsWhenAddingMatchTable)
 	Judoka j1(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 	Judoka j2(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 
-	auto w = new RoundRobin(Weight(10), Weight(100));
+	auto w = std::make_shared<RoundRobin>(Weight(10), Weight(100));
 
 	EXPECT_TRUE(w->AddParticipant(&j1));
 	EXPECT_TRUE(w->AddParticipant(&j2));

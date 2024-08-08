@@ -9,7 +9,7 @@ TEST(Match, NoDoubleEvents)
 	Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 	Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 
-	Match* match = new Match(&j1, &j2, nullptr, 1);
+	auto match = std::make_shared<Match>(&j1, &j2, nullptr, 1);
 	Mat mat(1);
 
 	EXPECT_TRUE(mat.StartMatch(match));
@@ -28,8 +28,6 @@ TEST(Match, NoDoubleEvents)
 
 	mat.AddIppon(Fighter::White);
 	mat.EndMatch();
-
-	delete match;
 }
 
 
@@ -41,7 +39,7 @@ TEST(Match, SwapEvents)
 	Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 	Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 
-	Match* match = new Match(&j1, &j2, nullptr, 1);
+	auto match = std::make_shared<Match>(&j1, &j2, nullptr, 1);
 	Mat mat(1);
 
 	EXPECT_EQ(*match->GetFighter(Fighter::White), j1);
@@ -86,8 +84,6 @@ TEST(Match, SwapEvents)
 	EXPECT_EQ(log.GetEvents()[5].m_BiasedEvent, MatchLog::BiasedEvent::AddIppon);
 	EXPECT_EQ(log.GetEvents()[5].m_Group, MatchLog::EventGroup::White);
 	EXPECT_EQ(log.GetEvents()[6].m_Event, MatchLog::NeutralEvent::EndMatch);
-
-	delete match;
 }
 
 
@@ -101,18 +97,18 @@ TEST(Match, ExportImport)
 		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		int matid = rand();
-		RuleSet rule_set("test", rand(), rand(), rand(), rand());
+		auto rule_set = std::make_shared<RuleSet>("test", rand(), rand(), rand(), rand());
 		Tournament tourney;
 
-		Match* match = nullptr;
+		std::shared_ptr<Match> match;
 		if (rand()%2 == 0)
-			match = new Match(&j1, &j2, &tourney, matid);
+			match = std::make_shared<Match>(&j1, &j2, &tourney, matid);
 		else
-			match = new Match(DependentJudoka(&j1), DependentJudoka(&j2), &tourney, matid);
+			match = std::make_shared<Match>(DependentJudoka(&j1), DependentJudoka(&j2), &tourney, matid);
 
 		EXPECT_TRUE(match->GetTournament());
 		EXPECT_EQ(match->GetMatID(), matid);
-		match->SetRuleSet(&rule_set);
+		match->SetRuleSet(rule_set);
 		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
 
 		YAML::Emitter yaml;
@@ -162,11 +158,11 @@ TEST(Match, ExportImport_CopyConstructor)
 		Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
 		int matid = rand();
-		RuleSet rule_set("test", rand(), rand(), rand(), rand());
+		auto rule_set = std::make_shared<RuleSet>("test", rand(), rand(), rand(), rand());
 		Tournament tourney;
 
-		Match* match = new Match(&j1, &j2, &tourney, matid);
-		match->SetRuleSet(&rule_set);
+		auto match = std::make_shared<Match>(&j1, &j2, &tourney, matid);
+		match->SetRuleSet(rule_set);
 		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
 
 		Match match2(*match);
@@ -202,29 +198,29 @@ TEST(Match, BestOf3)
 
 		Tournament tourney;
 
-		Match m1(&j1, &j2, &tourney, 1);
-		Match m2(&j2, &j1, &tourney, 1);
-		Match m3(&j1, &j2, &tourney, 1);
+		auto m1 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
+		auto m2 = std::make_shared<Match>(&j2, &j1, &tourney, 1);
+		auto m3 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
 
-		m3.SetBestOfThree(&m1, &m2);
+		m3->SetBestOfThree(m1, m2);
 
-		EXPECT_FALSE(m1.HasDependentMatches());
-		EXPECT_FALSE(m2.HasDependentMatches());
-		EXPECT_TRUE(m3.HasDependentMatches());
+		EXPECT_FALSE(m1->HasDependentMatches());
+		EXPECT_FALSE(m2->HasDependentMatches());
+		EXPECT_TRUE(m3->HasDependentMatches());
 
-		EXPECT_TRUE(m3.HasUnresolvedDependency());
-		EXPECT_EQ(m3.GetStatus(), Status::Optional);
+		EXPECT_TRUE(m3->HasUnresolvedDependency());
+		EXPECT_EQ(m3->GetStatus(), Status::Optional);
 
-		mat.StartMatch(&m1);
+		mat.StartMatch(m1);
 		mat.AddIppon(f);
 		mat.EndMatch();
 
-		mat.StartMatch(&m2);
+		mat.StartMatch(m2);
 		mat.AddIppon(f);
 		mat.EndMatch();
 
-		EXPECT_FALSE(m3.HasUnresolvedDependency());
-		EXPECT_EQ(m3.GetStatus(), Status::Scheduled);
+		EXPECT_FALSE(m3->HasUnresolvedDependency());
+		EXPECT_EQ(m3->GetStatus(), Status::Scheduled);
 	}
 }
 
@@ -244,29 +240,29 @@ TEST(Match, BestOf3_2)
 		Tournament tourney;
 		tourney.EnableAutoSave(false);
 
-		Match m1(&j1, &j2, &tourney, 1);
-		Match m2(&j2, &j1, &tourney, 1);
-		Match m3(&j1, &j2, &tourney, 1);
+		auto m1 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
+		auto m2 = std::make_shared<Match>(&j2, &j1, &tourney, 1);
+		auto m3 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
 
-		m3.SetBestOfThree(&m1, &m2);
+		m3->SetBestOfThree(m1, m2);
 
-		EXPECT_FALSE(m1.HasDependentMatches());
-		EXPECT_FALSE(m2.HasDependentMatches());
-		EXPECT_TRUE(m3.HasDependentMatches());
+		EXPECT_FALSE(m1->HasDependentMatches());
+		EXPECT_FALSE(m2->HasDependentMatches());
+		EXPECT_TRUE(m3->HasDependentMatches());
 
-		EXPECT_TRUE(m3.HasUnresolvedDependency());
-		EXPECT_EQ(m3.GetStatus(), Status::Optional);
+		EXPECT_TRUE(m3->HasUnresolvedDependency());
+		EXPECT_EQ(m3->GetStatus(), Status::Optional);
 
-		mat.StartMatch(&m1);
+		mat.StartMatch(m1);
 		mat.AddIppon(f);
 		mat.EndMatch();
 
-		mat.StartMatch(&m2);
+		mat.StartMatch(m2);
 		mat.AddIppon(!f);
 		mat.EndMatch();
 
-		EXPECT_FALSE(m3.HasUnresolvedDependency());
-		EXPECT_EQ(m3.GetStatus(), Status::Skipped);
+		EXPECT_FALSE(m3->HasUnresolvedDependency());
+		EXPECT_EQ(m3->GetStatus(), Status::Skipped);
 	}
 }
 
@@ -286,29 +282,29 @@ TEST(Match, BestOf3_3)
 		Tournament tourney;
 		tourney.EnableAutoSave(false);
 
-		Match m1(&j1, &j2, &tourney, 1);
-		Match m2(&j1, &j2, &tourney, 1);
-		Match m3(&j1, &j2, &tourney, 1);
+		auto m1 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
+		auto m2 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
+		auto m3 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
 
-		m3.SetBestOfThree(&m1, &m2);
+		m3->SetBestOfThree(m1, m2);
 
-		EXPECT_FALSE(m1.HasDependentMatches());
-		EXPECT_FALSE(m2.HasDependentMatches());
-		EXPECT_TRUE(m3.HasDependentMatches());
+		EXPECT_FALSE(m1->HasDependentMatches());
+		EXPECT_FALSE(m2->HasDependentMatches());
+		EXPECT_TRUE(m3->HasDependentMatches());
 
-		EXPECT_TRUE(m3.HasUnresolvedDependency());
-		EXPECT_EQ(m3.GetStatus(), Status::Optional);
+		EXPECT_TRUE(m3->HasUnresolvedDependency());
+		EXPECT_EQ(m3->GetStatus(), Status::Optional);
 
-		mat.StartMatch(&m1);
+		mat.StartMatch(m1);
 		mat.AddIppon(f);
 		mat.EndMatch();
 
-		mat.StartMatch(&m2);
+		mat.StartMatch(m2);
 		mat.AddIppon(f);
 		mat.EndMatch();
 
-		EXPECT_FALSE(m3.HasUnresolvedDependency());
-		EXPECT_EQ(m3.GetStatus(), Status::Skipped);
+		EXPECT_FALSE(m3->HasUnresolvedDependency());
+		EXPECT_EQ(m3->GetStatus(), Status::Skipped);
 	}
 }
 
@@ -328,9 +324,9 @@ TEST(Match, BestOf3ExportImport)
 	{
 		Tournament tourney("deleteMe");
 
-		Match* m1 = new Match(&j1, &j2, &tourney, 1);
-		Match* m2 = new Match(&j2, &j1, &tourney, 1);
-		Match* m3 = new Match(&j1, &j2, &tourney, 1);
+		auto m1 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
+		auto m2 = std::make_shared<Match>(&j2, &j1, &tourney, 1);
+		auto m3 = std::make_shared<Match>(&j1, &j2, &tourney, 1);
 
 		m3->SetBestOfThree(m1, m2);
 
@@ -437,7 +433,7 @@ TEST(Match, MatchTimeOnlyForWinner)
 
 		Tournament tourney;
 
-		RoundRobin* r = new RoundRobin(Weight(0), Weight(0));
+		auto r = std::make_shared<RoundRobin>(Weight(0), Weight(0));
 		r->AddParticipant(j1);
 		r->AddParticipant(j2);
 		r->SetMatID(1);

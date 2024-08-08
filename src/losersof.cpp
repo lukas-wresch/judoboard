@@ -6,12 +6,12 @@ using namespace Judoboard;
 
 
 
-LosersOf::LosersOf(const MatchTable& Table, const MatchTable* Parent) :
-	IFilter(Parent), m_MatchTable(Table)
+LosersOf::LosersOf(std::shared_ptr<const MatchTable> Table) :
+	m_MatchTable(Table)
 {
-	if (Table.GetFilter())
+	if (Table && Table->GetFilter())
 	{
-		SetAgeGroup(Table.GetFilter()->GetAgeGroup());
+		SetAgeGroup(Table->GetFilter()->GetAgeGroup());
 		Recalculate();
 	}
 }
@@ -69,13 +69,16 @@ const DependentJudoka LosersOf::GetJudokaByStartPosition(size_t StartPosition) c
 
 void LosersOf::Recalculate() const
 {
+	if (!m_MatchTable)
+		return;
+
 	std::unordered_map<size_t, const DependentJudoka> ret;
 	size_t i = 0;
 
 	m_Mutex.lock();
 
-	for (auto match : m_MatchTable.GetSchedule())
-		ret.insert({ i++, DependentJudoka(DependencyType::TakeLoser, *match) });
+	for (auto match : m_MatchTable->GetSchedule())
+		ret.insert({ i++, DependentJudoka(DependencyType::TakeLoser, match) });
 
 	if (m_RemoveLast)
 		ret.erase(i-1);

@@ -171,7 +171,7 @@ bool Mat::Reset()
 
 
 
-bool Mat::StartMatch(Match* NewMatch, bool UseForce)
+bool Mat::StartMatch(std::shared_ptr<Match> NewMatch, bool UseForce)
 {
 	if (!NewMatch)
 	{
@@ -230,7 +230,7 @@ bool Mat::StartMatch(Match* NewMatch, bool UseForce)
 	else if (NewMatch->IsScheduled())
 		AddEvent(MatchLog::NeutralEvent::StartMatch);
 
-	NewMatch->StartMatch();//Mark match is 'is running'
+	NewMatch->StartMatch();//Mark match as 'is running'
 
 	NextState(State::TransitionToMatch);
 	assert(m_State == State::TransitionToMatch);
@@ -1375,7 +1375,7 @@ void Mat::Tokeda()
 
 
 
-const std::vector<Match> Mat::GetNextMatches() const
+const std::vector<std::shared_ptr<const Match>> Mat::GetNextMatches() const
 {
 	m_mutex.LockRead();
 	auto ret = m_NextMatches;
@@ -1894,16 +1894,16 @@ void Mat::UpdateGraphics() const
 
 	std::string name = Localizer::Translate("Current Match");
 
-	if (m_NextMatches.size() >= 1 && m_NextMatches[0].GetMatchTable())
-		name += " (" + m_NextMatches[0].GetMatchTable()->GetDescription() + ")";
+	if (m_NextMatches.size() >= 1 && m_NextMatches[0]->GetMatchTable())
+		name += " (" + m_NextMatches[0]->GetMatchTable()->GetDescription() + ")";
 
 	m_Graphics["next_match"].UpdateTexture(renderer, name, ZED::Color(255, 0, 0), ZED::FontSize::Huge);
 	while (m_Graphics["next_match"]->GetWidth() > width)
 		m_Graphics["next_match"].Shorten(renderer);
 
 	name = Localizer::Translate("Next Match");
-	if (m_NextMatches.size() >= 2 && m_NextMatches[1].GetMatchTable())
-		name += " (" + m_NextMatches[1].GetMatchTable()->GetDescription() + ")";
+	if (m_NextMatches.size() >= 2 && m_NextMatches[1]->GetMatchTable())
+		name += " (" + m_NextMatches[1]->GetMatchTable()->GetDescription() + ")";
 
 	m_Graphics["following_match"].UpdateTexture(renderer, name, ZED::Color(255, 0, 0), ZED::FontSize::Huge);
 	while (m_Graphics["following_match"]->GetWidth() > width)
@@ -1934,33 +1934,33 @@ void Mat::UpdateGraphics() const
 		int i = 0;
 		for (auto match : m_NextMatches)
 		{
-			if (!match.HasValidFighters())
+			if (!match->HasValidFighters())
 				continue;
 
 			//Update judoka name
 			if (GetNameStyle() == NameStyle::GivenName)
 			{
-				m_Graphics["next_matches_white_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetFirstname(), ZED::Color(0, 0, 0), FontSize);
-				m_Graphics["next_matches_blue_"   + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue )->GetFirstname(), ZED::Color(255, 255, 255), FontSize);
-				m_Graphics["next_matches_white2_" + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetLastname(), ZED::Color(0, 0, 0), FontSize);
-				m_Graphics["next_matches_blue2_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue )->GetLastname(), ZED::Color(255, 255, 255), FontSize);
+				m_Graphics["next_matches_white_"  + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::White)->GetFirstname(), ZED::Color(0, 0, 0), FontSize);
+				m_Graphics["next_matches_blue_"   + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::Blue )->GetFirstname(), ZED::Color(255, 255, 255), FontSize);
+				m_Graphics["next_matches_white2_" + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::White)->GetLastname(), ZED::Color(0, 0, 0), FontSize);
+				m_Graphics["next_matches_blue2_"  + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::Blue )->GetLastname(), ZED::Color(255, 255, 255), FontSize);
 			}
 			else
 			{
-				m_Graphics["next_matches_white_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetLastname() + ",", ZED::Color(0, 0, 0), FontSize);
-				m_Graphics["next_matches_blue_"   + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue )->GetLastname() + ",", ZED::Color(255, 255, 255), FontSize);
-				m_Graphics["next_matches_white2_" + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetFirstname(), ZED::Color(0, 0, 0), FontSize);
-				m_Graphics["next_matches_blue2_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue )->GetFirstname(), ZED::Color(255, 255, 255), FontSize);
+				m_Graphics["next_matches_white_"  + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::White)->GetLastname() + ",", ZED::Color(0, 0, 0), FontSize);
+				m_Graphics["next_matches_blue_"   + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::Blue )->GetLastname() + ",", ZED::Color(255, 255, 255), FontSize);
+				m_Graphics["next_matches_white2_" + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::White)->GetFirstname(), ZED::Color(0, 0, 0), FontSize);
+				m_Graphics["next_matches_blue2_"  + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::Blue )->GetFirstname(), ZED::Color(255, 255, 255), FontSize);
 			}
 
 			//Update clubs of judokas
-			if (match.GetFighter(Fighter::White)->GetClub())
-				m_Graphics["next_matches_white_club_" + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::White)->GetClub()->GetName(), ZED::Color(0, 0, 0), ZED::FontSize::Middle);
+			if (match->GetFighter(Fighter::White)->GetClub())
+				m_Graphics["next_matches_white_club_" + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::White)->GetClub()->GetName(), ZED::Color(0, 0, 0), ZED::FontSize::Middle);
 			else
 				m_Graphics["next_matches_white_club_" + std::to_string(i)].Clear();
 
-			if (match.GetFighter(Fighter::Blue)->GetClub())
-				m_Graphics["next_matches_blue_club_"  + std::to_string(i)].UpdateTexture(renderer, match.GetFighter(Fighter::Blue)->GetClub()->GetName(), ZED::Color(255, 255, 255), ZED::FontSize::Middle);
+			if (match->GetFighter(Fighter::Blue)->GetClub())
+				m_Graphics["next_matches_blue_club_"  + std::to_string(i)].UpdateTexture(renderer, match->GetFighter(Fighter::Blue)->GetClub()->GetName(), ZED::Color(255, 255, 255), ZED::FontSize::Middle);
 			else
 				m_Graphics["next_matches_blue_club_"  + std::to_string(i)].Clear();
 
@@ -2743,7 +2743,7 @@ bool Mat::Mainloop()
 			//Copy over match data
 			m_NextMatches.clear();
 			for (auto match : nextMatches)
-				m_NextMatches.emplace_back(*match);
+				m_NextMatches.emplace_back(match);
 		}
 	}
 

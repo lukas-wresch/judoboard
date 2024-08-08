@@ -31,7 +31,7 @@ namespace Judoboard
 
 		Tournament() = default;
 		Tournament(const std::string& Name);
-		Tournament(const std::string& Name, const RuleSet* RuleSet);
+		Tournament(const std::string& Name, std::shared_ptr<const RuleSet> RuleSet);
 		Tournament(const MD5& File, Database* pDatabase = nullptr);
 		~Tournament();
 
@@ -44,8 +44,8 @@ namespace Judoboard
 		[[nodiscard]]
 		virtual std::string GetName() const override { return m_Name; }//Returns the name of the tournament
 		[[nodiscard]]
-		virtual std::vector<Match*> GetSchedule() const override;
-		Match* FindMatch(const UUID& UUID) const override;
+		virtual std::vector<std::shared_ptr<Match>> GetSchedule() const override;
+		std::shared_ptr<Match> FindMatch(const UUID& UUID) const override;
 		[[nodiscard]]
 		virtual const StandingData& GetDatabase() const override { return m_StandingData; }//Returns a database containing all participants
 		void SetYear(uint32_t NewYear) {
@@ -63,12 +63,12 @@ namespace Judoboard
 		const std::string& GetDescription() const { return m_Description; }
 		void SetDescription(const std::string& Description) { m_Description = Description; }
 
-		virtual const Association* GetOrganizer() const override { return m_Organizer; }
-		void SetOrganizer(Association* NewOrganizer) {
+		virtual std::shared_ptr<const Association> GetOrganizer() const override { return m_Organizer; }
+		void SetOrganizer(std::shared_ptr<Association> NewOrganizer) {
 			if (!NewOrganizer || IsReadonly())
 				return;
 			if (NewOrganizer->GetLevel() == -1)
-				m_StandingData.AddClub((Club*)NewOrganizer);
+				m_StandingData.AddClub(std::dynamic_pointer_cast<Club>(NewOrganizer));
 			else
 				m_StandingData.AddAssociation(NewOrganizer);
 			m_Organizer = NewOrganizer;
@@ -81,18 +81,18 @@ namespace Judoboard
 		bool IsReadonly() const { return m_Readonly; }
 		void IsReadonly(bool Enable) { if (m_Name[0] != 0x00) m_Readonly = Enable; }
 
-		bool AddMatch(Match* NewMatch);
+		bool AddMatch(std::shared_ptr<Match> NewMatch);
 		//bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
-		virtual Match* GetNextMatch(int32_t MatID = -1) override;//Returns the next match for a given mat if available, otherwise null pointer is returned
-		virtual const Match* GetNextMatch(int32_t MatID = -1) const override;//Returns the next match for a given mat if available, otherwise null pointer is returned
-		virtual std::vector<const Match*> GetNextMatches(int32_t MatID) const override;
-		virtual Match* GetNextOngoingMatch(int32_t MatID) override;//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
+		virtual std::shared_ptr<Match> GetNextMatch(int32_t MatID = -1) override;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual std::shared_ptr<const Match> GetNextMatch(int32_t MatID = -1) const override;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual std::vector<std::shared_ptr<const Match>> GetNextMatches(int32_t MatID) const override;
+		virtual std::shared_ptr<Match> GetNextOngoingMatch(int32_t MatID) override;//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
 
 		bool ReviseMatch(const UUID& MatchID, IMat& Mat);
 
-		Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex);//Returns the next match for a given mat if available, otherwise null pointer is returned
-		const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
-		const Match* GetNextMatch(const UUID& MatchID, int32_t MatID) const;//Returns the next match in the schedule after a give match in a speified mat. Set MatID=-1 to select any mat
+		std::shared_ptr<Match> GetNextMatch(int32_t MatID, uint32_t& StartIndex);//Returns the next match for a given mat if available, otherwise null pointer is returned
+		std::shared_ptr<const Match> GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		std::shared_ptr<const Match> GetNextMatch(const UUID& MatchID, int32_t MatID) const;//Returns the next match in the schedule after a give match in a speified mat. Set MatID=-1 to select any mat
 
 		virtual bool RemoveMatch(const UUID& MatchID) override;
 		virtual bool MoveMatchUp(const UUID& MatchID, uint32_t MatID = 0) override;
@@ -117,60 +117,60 @@ namespace Judoboard
 		void SwapAllFighters();//Swaps the white with the blue fighter of all matches
 
 		//Match tables
-		void AddMatchTable(MatchTable* NewMatchTable);
+		void AddMatchTable(std::shared_ptr<MatchTable> NewMatchTable);
 		bool RemoveMatchTable(const UUID& UUID);
-		const std::vector<MatchTable*>& GetMatchTables() const { return m_MatchTables; }
-		virtual MatchTable* FindMatchTable(const UUID& ID) override;
-		virtual const MatchTable* FindMatchTable(const UUID& ID) const override;
-		MatchTable* FindMatchTableByName(const std::string& Name);
-		MatchTable* FindMatchTableByDescription(const std::string& Description);
+		const std::vector<std::shared_ptr<MatchTable>>& GetMatchTables() const { return m_MatchTables; }
+		virtual std::shared_ptr<MatchTable> FindMatchTable(const UUID& ID) override;
+		virtual std::shared_ptr<const MatchTable> FindMatchTable(const UUID& ID) const override;
+		std::shared_ptr<MatchTable> FindMatchTableByName(const std::string& Name);
+		std::shared_ptr<MatchTable> FindMatchTableByDescription(const std::string& Description);
 
 		//Clubs
-		virtual Club* FindClub(const UUID& UUID) override { return m_StandingData.FindClub(UUID); }
-		virtual Club* FindClubByName(const std::string& Name) override { return m_StandingData.FindClubByName(Name); }
+		virtual std::shared_ptr<Club> FindClub(const UUID& UUID) override { return m_StandingData.FindClub(UUID); }
+		virtual std::shared_ptr<Club> FindClubByName(const std::string& Name) override { return m_StandingData.FindClubByName(Name); }
 		virtual bool RemoveClub(const UUID& UUID) override { return m_StandingData.DeleteClub(UUID); }
 
 		//Associations
-		virtual Association* FindAssociation(const UUID& UUID) override { return m_StandingData.FindAssociation(UUID); }
+		virtual std::shared_ptr<Association> FindAssociation(const UUID& UUID) override { return m_StandingData.FindAssociation(UUID); }
 		virtual bool RemoveAssociation(const UUID& UUID) override { return m_StandingData.DeleteAssociation(UUID); }
 
 		//Rule Sets
-		virtual const RuleSet* GetDefaultRuleSet() const override { return m_pDefaultRules; }
-		virtual void SetDefaultRuleSet(RuleSet* NewDefaultRuleSet) override {
+		virtual std::shared_ptr<const RuleSet> GetDefaultRuleSet() const override { return m_pDefaultRules; }
+		virtual void SetDefaultRuleSet(std::shared_ptr<RuleSet> NewDefaultRuleSet) override {
 			if (!IsReadonly())
 			{
 				m_StandingData.AddRuleSet(NewDefaultRuleSet);
 				m_pDefaultRules = NewDefaultRuleSet;
 			}
 		}
-		virtual bool AddRuleSet(RuleSet* NewRuleSet) override { return m_StandingData.AddRuleSet(NewRuleSet); }
-		virtual const RuleSet* FindRuleSetByName(const std::string& Name) const override { return m_StandingData.FindRuleSetByName(Name); }
-		virtual RuleSet* FindRuleSetByName(const std::string& Name) override { return m_StandingData.FindRuleSetByName(Name); }
-		virtual const RuleSet* FindRuleSet(const UUID& UUID) const override { return m_StandingData.FindRuleSet(UUID); }
-		virtual RuleSet* FindRuleSet(const UUID& UUID) override { return m_StandingData.FindRuleSet(UUID); }
+		virtual bool AddRuleSet(std::shared_ptr<RuleSet> NewRuleSet) override { return m_StandingData.AddRuleSet(NewRuleSet); }
+		virtual std::shared_ptr<const RuleSet> FindRuleSetByName(const std::string& Name) const override { return m_StandingData.FindRuleSetByName(Name); }
+		virtual std::shared_ptr<RuleSet> FindRuleSetByName(const std::string& Name) override { return m_StandingData.FindRuleSetByName(Name); }
+		virtual std::shared_ptr<const RuleSet> FindRuleSet(const UUID& UUID) const override { return m_StandingData.FindRuleSet(UUID); }
+		virtual std::shared_ptr<RuleSet> FindRuleSet(const UUID& UUID) override { return m_StandingData.FindRuleSet(UUID); }
 
 		//Age groups
-		virtual bool AddAgeGroup(AgeGroup* NewAgeGroup) override;
+		virtual bool AddAgeGroup(std::shared_ptr<AgeGroup> NewAgeGroup) override;
 		virtual bool RemoveAgeGroup(const UUID& UUID) override;
-		virtual bool AssignJudokaToAgeGroup(const Judoka* Judoka, const AgeGroup* AgeGroup) override;
-		virtual const AgeGroup* GetAgeGroupOfJudoka(const Judoka* Judoka) const override {
+		virtual bool AssignJudokaToAgeGroup(const Judoka* Judoka, std::shared_ptr<const AgeGroup> AgeGroup) override;
+		virtual std::shared_ptr<const AgeGroup> GetAgeGroupOfJudoka(const Judoka* Judoka) const override {
 			if (!Judoka) return nullptr;
 			auto it = m_JudokaToAgeGroup.find(Judoka->GetUUID());
 			if (it != m_JudokaToAgeGroup.end())
 				return m_StandingData.FindAgeGroup(it->second);
 			return nullptr;
 		}
-		AgeGroup* FindAgeGroup(const UUID& UUID) { return m_StandingData.FindAgeGroup(UUID); }
-		const AgeGroup* FindAgeGroup(const UUID& UUID) const { return m_StandingData.FindAgeGroup(UUID); }
-		virtual std::vector<const AgeGroup*> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const override;
-		virtual std::vector<const AgeGroup*> GetAgeGroups() const override;
-		virtual void GetAgeGroupInfo(YAML::Emitter& Yaml, const AgeGroup* AgeGroup) const override;
+		std::shared_ptr<AgeGroup> FindAgeGroup(const UUID& UUID) { return m_StandingData.FindAgeGroup(UUID); }
+		std::shared_ptr<const AgeGroup> FindAgeGroup(const UUID& UUID) const { return m_StandingData.FindAgeGroup(UUID); }
+		virtual std::vector<std::shared_ptr<const AgeGroup>> GetEligableAgeGroupsOfJudoka(const Judoka* Judoka) const override;
+		virtual std::vector<std::shared_ptr<const AgeGroup>> GetAgeGroups() const override;
+		virtual void GetAgeGroupInfo(YAML::Emitter& Yaml, std::shared_ptr<const AgeGroup> AgeGroup) const override;
 
 		//Master schedule / schedule entries
 		bool MoveScheduleEntryUp(const UUID& UUID) override;
 		bool MoveScheduleEntryDown(const UUID& UUID) override;
 
-		virtual std::vector<WeightclassDescCollection> GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<const AgeGroup*>& AgeGroups, bool SplitGenders) const override;
+		virtual std::vector<WeightclassDescCollection> GenerateWeightclasses(int Min, int Max, int Diff, const std::vector<std::shared_ptr<const AgeGroup>>& AgeGroups, bool SplitGenders) const override;
 		virtual bool ApplyWeightclasses(const std::vector<WeightclassDescCollection>& Descriptors) override;
 
 		//Disqualifications
@@ -232,7 +232,7 @@ namespace Judoboard
 		int32_t  GetMaxScheduleIndex(uint32_t Mat = 0) const;
 		uint32_t GetMaxEntriesAtScheduleIndex(uint32_t MatID, int32_t ScheduleIndex) const;
 
-		std::vector<MatchTable*>& SetMatchTables() { return m_MatchTables; }
+		std::vector<std::shared_ptr<MatchTable>>& SetMatchTables() { return m_MatchTables; }
 
 		class ScopedLock
 		{
@@ -253,16 +253,16 @@ namespace Judoboard
 		std::string m_Description;
 		bool m_Readonly = false;
 
-		const Association* m_Organizer = nullptr;//Tournament is organized by this association, only childen of this association can participate
+		std::shared_ptr<const Association> m_Organizer;//Tournament is organized by this association, only childen of this association can participate
 		uint32_t m_LotteryTier = 0;//Tier for performing lottery (usually organizer tier + 1)
 
 		const Application* m_Application = nullptr;
 
-		std::vector<MatchTable*> m_MatchTables;
+		std::vector<std::shared_ptr<MatchTable>> m_MatchTables;
 		//std::vector<Match*> m_Schedule;
-		std::vector<std::pair<MatchTable*, size_t>> m_Schedule;
+		std::vector<std::pair<std::shared_ptr<MatchTable>, size_t>> m_Schedule;
 
-		const RuleSet* m_pDefaultRules = nullptr;//Default rule set of the tournament
+		std::shared_ptr<const RuleSet> m_pDefaultRules;//Default rule set of the tournament
 
 		std::unordered_set<UUID> m_DisqualifiedJudoka;
 

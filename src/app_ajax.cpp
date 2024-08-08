@@ -1933,7 +1933,7 @@ void Application::SetupHttpServer()
 			return Error(Error::Type::ItemNotFound);
 
 		//Insert a copy
-		if (!GetTournament()->AddAgeGroup(new AgeGroup(*age_group)))
+		if (!GetTournament()->AddAgeGroup(age_group))
 			return Error(Error::Type::OperationFailed);
 
 		return Error();//OK
@@ -2273,7 +2273,7 @@ void Application::SetupHttpServer()
 		{
 			if (mat && mat->GetMatID() == matID)
 			{
-				Match* match = new Match(match_data, nullptr, GetTournament());
+				auto match = std::make_shared<Match>(match_data, nullptr, GetTournament());
 				GetTournament()->AddMatch(match);
 				
 				if (mat->StartMatch(match))
@@ -2583,7 +2583,7 @@ void Application::SetupHttpServer()
 		int matID = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Query, "id"));
 
 		bool success = false;
-		std::vector<const Match*> next_matches;
+		std::vector<std::shared_ptr<const Match>> next_matches;
 
 		while (!success)
 		{
@@ -2655,7 +2655,7 @@ Error Application::Ajax_AddMatch(const HttpServer::Request& Request)
 
 	auto match_table = tournament->FindMatchTable(match_tableID);
 
-	auto match = new Match(white, blue, GetTournament());
+	auto match = std::make_shared<Match>(white, blue, GetTournament());
 	match->SetRuleSet(rule);
 
 	if (match_table)
@@ -3562,7 +3562,7 @@ Error Application::Ajax_ImportJudoka(const HttpServer::Request& Request)
 	if (!judoka)
 		return Error::Type::ItemNotFound;
 
-	Club* club = (Club*)judoka->GetClub();
+	auto club = judoka->GetClub();
 
 	//Already in database?
 	if (m_Database.FindJudoka(id))
@@ -3572,7 +3572,7 @@ Error Application::Ajax_ImportJudoka(const HttpServer::Request& Request)
 		return Error::Type::OperationFailed;
 
 	if (club && !m_Database.FindClubByName(club->GetName()))
-		if (!m_Database.AddClub(club))
+		if (!m_Database.AddClub(std::const_pointer_cast<Club>(club)))
 			return Error::Type::OperationFailed;
 
 	return Error();//OK
@@ -3634,7 +3634,7 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 
 	auto guard = LockWriteForScope();
 
-	Association* parent = nullptr;
+	std::shared_ptr<Association> parent = nullptr;
 
 	if (parent_id)
 	{
@@ -3646,14 +3646,14 @@ Error Application::Ajax_AddClub(const HttpServer::Request& Request)
 
 	if (!is_assoc)
 	{
-		auto new_club = new Club(name, parent);
+		auto new_club = std::make_shared<Club>(name, parent);
 		if (!shortname.empty())
 			new_club->SetShortName(shortname);
 		m_Database.AddClub(new_club);
 	}
 	else
 	{
-		auto new_assoc = new Association(name, parent);
+		auto new_assoc = std::make_shared<Association>(name, parent);
 		if (!shortname.empty())
 			new_assoc->SetShortName(shortname);
 		m_Database.AddAssociation(new_assoc);
@@ -3671,31 +3671,39 @@ std::string Application::Ajax_GetClub(const HttpServer::Request& Request)
 
 	auto guard = LockReadForScope();
 
-	const Association* club = m_Database.FindAssociation(id);
-
-	if (!club)
-	{
-		club = m_Database.FindClub(id);
+	{//From database
+		auto club = m_Database.FindAssociation(id);
 
 		if (!club)
+			club = m_Database.FindClub(id);
+
+		if (club)
 		{
-			assert(GetTournament()->IsLocal());
-			auto guard = GetTournament()->LockReadForScope();
-
-			auto tour = (Tournament*)GetTournament();//TODO: could be remote tournament
-			club = tour->GetDatabase().FindAssociation(id);
-
-			if (!club)
-				club = tour->GetDatabase().FindClub(id);
-
-			if (!club)
-				return Error(Error::Type::ItemNotFound);
+			YAML::Emitter ret;
+			club->ToString(ret);
+			return ret.c_str();
 		}
 	}
 
-	YAML::Emitter ret;
-	club->ToString(ret);
-	return ret.c_str();
+	{//From tournament
+		assert(GetTournament()->IsLocal());
+		auto guard2 = GetTournament()->LockReadForScope();
+
+		auto tour = (Tournament*)GetTournament();//TODO: could be remote tournament
+		auto club = tour->GetDatabase().FindAssociation(id);
+
+		if (!club)
+			club = tour->GetDatabase().FindClub(id);
+
+		if (club)
+		{
+			YAML::Emitter ret;
+			club->ToString(ret);
+			return ret.c_str();
+		}
+	}
+
+	return Error(Error::Type::ItemNotFound);
 }
 
 
@@ -3851,7 +3859,7 @@ Error Application::Ajax_AddRuleSet(const HttpServer::Request& Request)
 	int break_time = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "break_time"));
 	bool extend_break_time = HttpServer::DecodeURLEncoded(Request.m_Body, "extend_break_time") == "true";
 
-	RuleSet* new_rule_set = new RuleSet(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time, extend_break_time);
+	auto new_rule_set = std::make_shared<RuleSet>(name, match_time, goldenscore_time, osaekomi_ippon, osaekomi_wazaari, yuko, koka, draw, break_time, extend_break_time);
 
 	auto guard = LockWriteForScope();
 
@@ -3969,13 +3977,10 @@ Error Application::Ajax_AddAgeGroup(const HttpServer::Request& Request)
 	if (!rule)
 		ZED::Log::Warn("Could not find rule set.");
 
-	auto new_age_group = new AgeGroup(name, min_age, max_age, rule, gender);
+	auto new_age_group = std::make_shared<AgeGroup>(name, min_age, max_age, rule, gender);
 
 	if (!GetDatabase().AddAgeGroup(new_age_group))
-	{
-		delete new_age_group;
 		return Error::Type::OperationFailed;
-	}
 
 	return Error::Type::NoError;
 }
@@ -4091,7 +4096,7 @@ std::string Application::Ajax_ListAllAgeGroups() const
 
 			bool is_used = false;
 			if (GetTournament())
-				is_used = GetTournament()->FindAgeGroup(age_group->GetUUID());
+				is_used = (bool)GetTournament()->FindAgeGroup(age_group->GetUUID());
 
 			if (is_used)
 				GetTournament()->GetAgeGroupInfo(ret, age_group);
@@ -4147,32 +4152,32 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	IFilter::Type type = (IFilter::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "type"));
 	MatchTable::Type fight_system = (MatchTable::Type)ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "fight_system"));
 
-	MatchTable* new_table = nullptr;
+	std::shared_ptr<MatchTable> new_table;
 
 	switch (fight_system)
 	{
 	case MatchTable::Type::RoundRobin:
 	{
-		new_table = new RoundRobin(new Weightclass(0, 0));
+		new_table = MatchTable::CreateMatchTable<RoundRobin>(0, 0);
 		break;
 	}
 
 	case MatchTable::Type::SingleElimination:
 	{
-		new_table = new SingleElimination(new Weightclass(0, 0));
+		new_table = MatchTable::CreateMatchTable<SingleElimination>(0, 0);
 		break;
 	}
 
 	case MatchTable::Type::Pool:
-		new_table = new Pool(new Weightclass(0, 0));
+		new_table = MatchTable::CreateMatchTable<Pool>(0, 0);
 		break;
 
 	case MatchTable::Type::DoubleElimination:
-		new_table = new DoubleElimination(new Weightclass(0, 0));
+		new_table = MatchTable::CreateMatchTable<DoubleElimination>(0, 0);
 		break;
 
 	case MatchTable::Type::Custom:
-		new_table = new CustomTable();
+		new_table = MatchTable::CreateMatchTable<CustomTable>();
 		break;
 
 	default:
@@ -4182,13 +4187,12 @@ Error Application::Ajax_AddMatchTable(HttpServer::Request Request)
 	if (id)
 		new_table->SetUUID(std::move(id));
 
+	new_table->GenerateSchedule();
+
 	auto guard = LockWriteForScope();
 
 	if (!GetTournament())
-	{
-		delete new_table;
 		return Error::Type::TournamentNotOpen;
-	}
 
 	GetTournament()->AddMatchTable(new_table);
 
@@ -4280,7 +4284,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 	if (!table->IsSubMatchTable() && table->GetFilter() && table->GetFilter()->GetType() == IFilter::Type::Weightclass)
 	{
-		auto weightclass = (Weightclass*)table->GetFilter();
+		auto weightclass = std::dynamic_pointer_cast<Weightclass>(table->GetFilter());
 
 		auto minWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "minWeight");
 		auto maxWeight = HttpServer::DecodeURLEncoded(Request.m_Body, "maxWeight");
@@ -4300,7 +4304,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 	{
 		case MatchTable::Type::RoundRobin:
 		{
-			RoundRobin* round_robin = (RoundRobin*)table;
+			auto round_robin = std::dynamic_pointer_cast<RoundRobin>(table);
 
 			GetTournament()->LockWrite();
 
@@ -4312,7 +4316,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		case MatchTable::Type::Custom:
 		{
-			CustomTable* custom = (CustomTable*)table;
+			auto custom = std::dynamic_pointer_cast<CustomTable>(table);
 
 			GetTournament()->LockWrite();
 
@@ -4324,7 +4328,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		case MatchTable::Type::SingleElimination:
 		{
-			SingleElimination* single_table = (SingleElimination*)table;
+			auto single_table = std::dynamic_pointer_cast<SingleElimination>(table);
 
 			GetTournament()->LockWrite();
 
@@ -4338,7 +4342,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		case MatchTable::Type::Pool:
 		{
-			Pool* pool = (Pool*)table;
+			auto pool = std::dynamic_pointer_cast<Pool>(table);
 
 			GetTournament()->LockWrite();
 
@@ -4352,7 +4356,7 @@ Error Application::Ajax_EditMatchTable(const HttpServer::Request& Request)
 
 		case MatchTable::Type::DoubleElimination:
 		{
-			DoubleElimination* doubleEli = (DoubleElimination*)table;
+			auto doubleEli = std::dynamic_pointer_cast<DoubleElimination>(table);
 
 			GetTournament()->LockWrite();
 

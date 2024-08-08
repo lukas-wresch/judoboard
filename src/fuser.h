@@ -8,9 +8,9 @@ namespace Judoboard
 	class Fuser : public IFilter
 	{
 	public:
-		Fuser(const MatchTable* Parent) : IFilter(Parent) {}
-		Fuser(const IFilter& pSource1, const IFilter& pSource2, const MatchTable* Parent = nullptr);
-		Fuser(const YAML::Node& Yaml, const MatchTable* Parent = nullptr);
+		Fuser() : IFilter() {}
+		Fuser(const IFilter& pSource1, const IFilter& pSource2);
+		Fuser(const YAML::Node& Yaml);
 
 		virtual Type GetType() const override { return Type::Fuser; }
 

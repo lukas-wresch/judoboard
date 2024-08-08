@@ -16,7 +16,8 @@ TEST(SingleElimination, ExportImport)
 	YAML::Emitter yaml;
 	*group >> yaml;
 
-	SingleElimination group2(YAML::Load(yaml.c_str()), nullptr);
+	SingleElimination group2(nullptr);
+	group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 	EXPECT_EQ(group2.IsThirdPlaceMatch(), group->IsThirdPlaceMatch());
 	EXPECT_EQ(group2.IsFifthPlaceMatch(), group->IsFifthPlaceMatch());
@@ -29,7 +30,8 @@ TEST(SingleElimination, ExportImport)
 		YAML::Emitter yaml;
 		*group >> yaml;
 
-		SingleElimination group2(YAML::Load(yaml.c_str()), nullptr);
+		SingleElimination group2(nullptr);
+		group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 		EXPECT_EQ(group2.IsThirdPlaceMatch(), group->IsThirdPlaceMatch());
 		EXPECT_EQ(group2.IsFifthPlaceMatch(), group->IsFifthPlaceMatch());
@@ -52,7 +54,7 @@ TEST(SingleElimination, ExportImport_StartPositions)
 		Tournament* t = new Tournament("Tournament Name");
 		t->EnableAutoSave(false);
 
-		SingleElimination* group = new SingleElimination(0, 200);
+		auto group = std::make_shared<SingleElimination>(0, 200);
 		t->AddMatchTable(group);
 
 		auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50);
@@ -84,7 +86,8 @@ TEST(SingleElimination, ExportImport_StartPositions)
 			YAML::Emitter yaml;
 			*group >> yaml;
 
-			SingleElimination group2(YAML::Load(yaml.c_str()), t);
+			SingleElimination group2(nullptr, t);
+			group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 			EXPECT_EQ(group2.GetStartPosition(j1), group->GetStartPosition(j1));
 			EXPECT_EQ(group2.GetStartPosition(j2), group->GetStartPosition(j2));
@@ -106,7 +109,7 @@ TEST(SingleElimination, Count1)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 	
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 
 	t->AddMatchTable(group);
 	auto j1 = new Judoka(GetFakeFirstname(), GetFakeLastname(), 50 + rand() % 50);
@@ -132,7 +135,7 @@ TEST(SingleElimination, Count2)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -172,7 +175,7 @@ TEST(SingleElimination, Count3)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -236,7 +239,7 @@ TEST(SingleElimination, Count3_BO3)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	group->IsBestOfThree(true);
 	t->AddMatchTable(group);
@@ -317,7 +320,7 @@ TEST(SingleElimination, Count4)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -376,7 +379,7 @@ TEST(SingleElimination, Count5)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -430,7 +433,7 @@ TEST(SingleElimination, Count8)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -497,7 +500,7 @@ TEST(SingleElimination, Count8_Dont_allow_illegal_start_pos)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -577,7 +580,7 @@ TEST(SingleElimination, Count8_BO3)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -652,7 +655,7 @@ TEST(SingleElimination, Count8_5th_BO3)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -730,7 +733,7 @@ TEST(SingleElimination, Count10)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -794,7 +797,7 @@ TEST(SingleElimination, Count14)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -868,7 +871,7 @@ TEST(SingleElimination, Count16)
 		t->AddParticipant(j[i]);
 	}
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -958,7 +961,7 @@ TEST(SingleElimination, Count32)
 		t->AddParticipant(j[i]);
 	}
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -1023,7 +1026,7 @@ TEST(SingleElimination, Count64)
 		t->AddParticipant(j[i]);
 	}
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -1110,7 +1113,7 @@ TEST(SingleElimination, Count4_ExportImport)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -1129,7 +1132,8 @@ TEST(SingleElimination, Count4_ExportImport)
 	YAML::Emitter yaml;
 	*group >> yaml;
 
-	SingleElimination group2(YAML::Load(yaml.c_str()), t);
+	SingleElimination group2(nullptr, t);
+	group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 	EXPECT_EQ(group->GetMatID(), group2.GetMatID());
 	EXPECT_EQ(group->GetParticipants().size(), group2.GetParticipants().size());
@@ -1156,7 +1160,7 @@ TEST(SingleElimination, Count5_ExportImport)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -1178,7 +1182,8 @@ TEST(SingleElimination, Count5_ExportImport)
 	YAML::Emitter yaml;
 	*group >> yaml;
 
-	SingleElimination group2(YAML::Load(yaml.c_str()), t);
+	SingleElimination group2(nullptr, t);
+	group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 	EXPECT_EQ(group->GetMatID(), group2.GetMatID());
 	EXPECT_EQ(group->GetParticipants().size(), group2.GetParticipants().size());
@@ -1214,7 +1219,7 @@ TEST(SingleElimination, Count4_ThirdPlace)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	group->IsThirdPlaceMatch(true);
 	t->AddMatchTable(group);
@@ -1268,7 +1273,7 @@ TEST(SingleElimination, Count8_3rd_5th)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	group->IsThirdPlaceMatch(true);
 	group->IsFifthPlaceMatch(true);
@@ -1336,13 +1341,13 @@ TEST(SingleElimination, Count8_3rd_5th)
 	auto schedule = group->GetSchedule();
 	auto schedule_count = group->GetSchedule().size();
 
-	SingleElimination moved(nullptr, nullptr);
-	moved = std::move(*group);
+	auto moved = std::make_shared<SingleElimination>(nullptr, nullptr);
+	*moved = std::move(*group);
 	
-	ASSERT_EQ(moved.GetSchedule().size(), schedule_count);
+	ASSERT_EQ(moved->GetSchedule().size(), schedule_count);
 	for (size_t i = 0; i < schedule_count; ++i)
 	{
-		EXPECT_EQ(*moved.GetSchedule()[i], *schedule[i]);
+		EXPECT_EQ(*moved->GetSchedule()[i], *schedule[i]);
 	}
 
 	delete t;
@@ -1357,7 +1362,7 @@ TEST(SingleElimination, Count8_5th)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	group->IsThirdPlaceMatch(false);
 	group->IsFifthPlaceMatch(true);
@@ -1429,7 +1434,7 @@ TEST(SingleElimination, Render_3rd_5th)
 	Tournament* t = new Tournament("Tournament Name");
 	t->EnableAutoSave(false);
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -1488,7 +1493,8 @@ TEST(SingleElimination, Count8_3rd_5th_ExportImport)
 	YAML::Emitter yaml;
 	*group >> yaml;
 
-	SingleElimination* group2 = new SingleElimination(YAML::Load(yaml.c_str()), t);
+	auto group2 = std::make_shared<SingleElimination>(nullptr, t);
+	group2->LoadYaml(YAML::Load(yaml.c_str()));
 
 	t->AddMatchTable(group2);
 

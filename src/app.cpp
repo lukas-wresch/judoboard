@@ -24,7 +24,7 @@ bool Application::NoWindow = false;
 Application::Application() : m_StartupTimestamp(Timer::GetTimestamp())
 {
 	m_TempTournament.EnableAutoSave(false);
-	m_TempTournament.SetDefaultRuleSet(new RuleSet);//Take default rule set as rule set for temporary tournaments
+	m_TempTournament.SetDefaultRuleSet(std::make_shared<RuleSet>());//Take default rule set as rule set for temporary tournaments
 	m_CurrentTournament = &m_TempTournament;
 
 	std::string token = (std::string)ID::GenerateUUID();
@@ -174,7 +174,7 @@ std::string Application::AddDM4File(const DM4& File, bool ParseOnly, bool* pSucc
 			ret += "Adding new club: " + club->Name + "<br/>";
 
 			if (!ParseOnly)
-				GetTournament()->GetDatabase().AddClub(new Club(club->Name));
+				GetTournament()->GetDatabase().AddClub(std::make_shared<Club>(club->Name));
 		}
 	}
 
@@ -234,7 +234,7 @@ std::string Application::AddDMFFile(const DMF& File, bool ParseOnly, bool* pSucc
 
 		ret += "Adding new club: " + File.GetClub().Name + "<br/>";
 
-		club = new Club(File.GetClub().Name);
+		club = std::make_shared<Club>(File.GetClub().Name);
 	}
 
 	for (auto dmf_judoka : File.GetParticipants())
@@ -536,11 +536,11 @@ bool Application::RegisterMatWithMaster(IMat* Mat)
 
 
 
-std::vector<const Match*> Application::GetNextMatches(uint32_t MatID, bool& Success) const
+std::vector<std::shared_ptr<const Match>> Application::GetNextMatches(uint32_t MatID, bool& Success) const
 {
 	if (!TryReadLock())//Can we get a lock?
 	{
-		std::vector<const Match*> empty;
+		std::vector<std::shared_ptr<const Match>> empty;
 		Success = false;
 		return empty;
 	}
@@ -551,7 +551,7 @@ std::vector<const Match*> Application::GetNextMatches(uint32_t MatID, bool& Succ
 
 	if (!GetTournament())
 	{
-		std::vector<const Match*> empty;
+		std::vector<std::shared_ptr<const Match>> empty;
 		UnlockRead();
 		return empty;
 	}

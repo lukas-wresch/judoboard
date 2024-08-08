@@ -12,11 +12,14 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		DoubleElimination(IFilter* Filter, const ITournament* Tournament = nullptr);
+		DoubleElimination(const ITournament* Tournament = nullptr);
 		DoubleElimination(Weight MinWeight, Weight MaxWeight, Gender Gender = Gender::Unknown, const ITournament* Tournament = nullptr);
-		DoubleElimination(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent = nullptr);
 		DoubleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
-			: DoubleElimination(new Weightclass(Weightclass_, this), Tournament) {}
+			: DoubleElimination(Tournament) {
+			SetFilter(std::make_shared<Weightclass>(Weightclass_, this));
+		}
+
+		virtual void LoadYaml(const YAML::Node& Yaml) override;
 
 		static std::string GetHTMLForm();
 
@@ -26,11 +29,11 @@ namespace Judoboard
 
 		virtual void SetMatID(int32_t MatID) override {
 			MatchTable::SetMatID(MatID);
-			m_WinnerBracket.SetMatID(MatID);
-			m_LoserBracket.SetMatID(MatID);
+			m_WinnerBracket->SetMatID(MatID);
+			m_LoserBracket->SetMatID(MatID);
 		}
 
-		virtual Match* FindMatch(const UUID& UUID) const override;
+		virtual std::shared_ptr<Match> FindMatch(const UUID& UUID) const override;
 
 		virtual bool DeleteMatch(const UUID& UUID) override;
 
@@ -44,20 +47,20 @@ namespace Judoboard
 		}
 		virtual void GenerateSchedule() override;
 
-		bool IsThirdPlaceMatch() const { return m_LoserBracket.IsFinalMatch(); }
-		bool IsFifthPlaceMatch() const { return m_LoserBracket.IsThirdPlaceMatch(); }
+		bool IsThirdPlaceMatch() const { return m_LoserBracket->IsFinalMatch(); }
+		bool IsFifthPlaceMatch() const { return m_LoserBracket->IsThirdPlaceMatch(); }
 
-		void IsThirdPlaceMatch(bool Enable) { m_LoserBracket.IsFinalMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
-		void IsFifthPlaceMatch(bool Enable) { m_LoserBracket.IsThirdPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
+		void IsThirdPlaceMatch(bool Enable) { m_LoserBracket->IsFinalMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
+		void IsFifthPlaceMatch(bool Enable) { m_LoserBracket->IsThirdPlaceMatch(Enable); SetSchedule().clear(); GenerateSchedule(); }
 
-		SingleElimination& GetWinnerBracket() { return m_WinnerBracket; }
-		const SingleElimination& GetWinnerBracket() const { return m_WinnerBracket; }
+		auto GetWinnerBracket() { return m_WinnerBracket; }
+		auto GetWinnerBracket() const { return m_WinnerBracket; }
 
-		SingleElimination& GetLoserBracket() { return m_LoserBracket; }
-		const SingleElimination& GetLoserBracket() const { return m_LoserBracket; }
+		auto GetLoserBracket() { return m_LoserBracket; }
+		auto GetLoserBracket() const { return m_LoserBracket; }
 
-		void AddMatchToWinnerBracket(Match* NewMatch);
-		void AddMatchToLoserBracket(Match* NewMatch);
+		void AddMatchToWinnerBracket(std::shared_ptr<Match> NewMatch);
+		void AddMatchToLoserBracket( std::shared_ptr<Match> NewMatch);
 
 		//Serialization
 		virtual const std::string ToHTML() const override;
@@ -68,13 +71,13 @@ namespace Judoboard
 	protected:
 		void BuildSchedule();
 		virtual void DeleteSchedule() override {
-			m_WinnerBracket.DeleteSchedule();
-			m_LoserBracket.DeleteSchedule();
+			m_WinnerBracket->DeleteSchedule();
+			m_LoserBracket->DeleteSchedule();
 			MatchTable::DeleteSchedule();
 		}
 
 	private:
-		SingleElimination m_WinnerBracket;
-		LoserBracket      m_LoserBracket;
+		std::shared_ptr<SingleElimination> m_WinnerBracket;
+		std::shared_ptr<LoserBracket>      m_LoserBracket;
 	};
 }

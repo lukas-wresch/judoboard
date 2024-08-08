@@ -19,25 +19,29 @@ using namespace Judoboard;
 
 
 
-Pool::Pool(IFilter* Filter, const ITournament* Tournament)
-	: MatchTable(Filter, Tournament), m_Finals(nullptr, Tournament)
+Pool::Pool(std::shared_ptr<IFilter> Filter, const ITournament* Tournament)
+	: MatchTable(Filter, Tournament)
 {
-	m_Finals.SetParent(this);
-	GenerateSchedule();
+	m_Finals = std::make_shared<SingleElimination>(nullptr, Tournament);
+	m_Finals->SetParent(this);
+	//GenerateSchedule();
 }
 
 
 
 Pool::Pool(Weight MinWeight, Weight MaxWeight, Gender Gender, const ITournament* Tournament)
-	: Pool(new Weightclass(MinWeight, MaxWeight, Gender, this), Tournament)
+	: Pool(std::make_shared<Weightclass>(MinWeight, MaxWeight, Gender, this), Tournament)
 {
 }
 
 
 
-Pool::Pool(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent)
-	: MatchTable(Yaml, Tournament, Parent), m_Finals(nullptr, Tournament, Parent)
+void Pool::LoadYaml(const YAML::Node& Yaml)
 {
+	MatchTable::LoadYaml(Yaml);
+
+	m_Finals = std::make_shared<SingleElimination>(nullptr, m_Tournament, m_Parent);
+
 	if (Yaml["pool_count"])
 		m_PoolCount = Yaml["pool_count"].as<uint32_t>();
 	if (Yaml["take_top"])
@@ -46,11 +50,18 @@ Pool::Pool(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTab
 	if (Yaml["pools"] && Yaml["pools"].IsSequence())
 	{
 		for (const auto& node : Yaml["pools"])
-			m_Pools.push_back(new RoundRobin(node, Tournament, this));
+		{
+			auto new_pool = std::make_shared<RoundRobin>(nullptr, m_Tournament);
+			new_pool->LoadYaml(node);
+			m_Pools.push_back(new_pool);
+		}
 	}
 
 	if (Yaml["finals"] && Yaml["finals"].IsMap())
-		GetFinals() = SingleElimination(Yaml["finals"], Tournament, this);
+	{
+		m_Finals = std::make_shared<SingleElimination>(nullptr, m_Tournament, this);
+		m_Finals->LoadYaml(Yaml["finals"]);
+	}
 
 	CopyMatchesFromSubtables();
 }
@@ -82,7 +93,7 @@ void Pool::operator >> (YAML::Emitter& Yaml) const
 
 	Yaml << YAML::Key << "finals" << YAML::Value;
 	Yaml << YAML::BeginMap;
-	GetFinals() >> Yaml;
+	*m_Finals >> Yaml;
 	Yaml << YAML::EndMap;
 
 	SetSchedule(std::move(schedule_copy));
@@ -136,7 +147,7 @@ size_t Pool::GetMaxStartPositions() const
 
 
 
-Match* Pool::FindMatch(const UUID& UUID) const
+std::shared_ptr<Match> Pool::FindMatch(const UUID& UUID) const
 {
 	for (auto pool : m_Pools)
 	{
@@ -145,19 +156,19 @@ Match* Pool::FindMatch(const UUID& UUID) const
 			return ret;
 	}
 
-	return m_Finals.FindMatch(UUID);
+	return m_Finals->FindMatch(UUID);
 }
 
 
 
-const MatchTable* Pool::FindMatchTable(const UUID& UUID) const
+std::shared_ptr<const MatchTable> Pool::FindMatchTable(const UUID& UUID) const
 {
 	for (auto pool : m_Pools)
 		if (*pool == UUID)
 			return pool;
 
-	if (m_Finals == UUID)
-		return &m_Finals;
+	if (*m_Finals == UUID)
+		return m_Finals;
 
 	return nullptr;
 }
@@ -171,7 +182,7 @@ bool Pool::DeleteMatch(const UUID& UUID)
 	for (auto pool : m_Pools)
 		success |= pool->DeleteMatch(UUID);
 
-	success |= m_Finals.DeleteMatch(UUID);
+	success |= m_Finals->DeleteMatch(UUID);
 	return success;
 }
 
@@ -200,9 +211,9 @@ void Pool::GenerateSchedule()
 	for (int i = 0; i < pool_count; ++i)
 	{
 		if (GetFilter())
-			m_Pools[i] = new RoundRobin(new Splitter(*GetFilter(), pool_count, i));
+			m_Pools[i] = std::make_shared<RoundRobin>(std::make_shared<Splitter>(GetFilter(), pool_count, i));
 		else
-			m_Pools[i] = new RoundRobin(nullptr);
+			m_Pools[i] = std::make_shared<RoundRobin>(nullptr);
 
 		std::string name = Localizer::Translate("Pool") + " ";
 		name.append(&letters[i % 26], 1);
@@ -219,23 +230,19 @@ void Pool::GenerateSchedule()
 		}
 	}
 
-	for (auto old_pools : old_pools)
-		delete old_pools;
-
 	//Create filter(s) for final round
-	IFilter* final_input = nullptr;
+	std::shared_ptr<IFilter> final_input;
 
 	if (pool_count == 2)
 	{
-		TakeTopRanks topA(*m_Pools[0], m_TakeTop);
-		TakeTopRanks topB(*m_Pools[1], m_TakeTop);
+		auto topA = std::make_shared<TakeTopRanks>(m_Pools[0], m_TakeTop);
+		auto topB = std::make_shared<TakeTopRanks>(m_Pools[1], m_TakeTop);
 
-		Mixer mixer;
+		auto mixer = std::make_shared<Mixer>();
+		mixer->AddSource(topA);
+		mixer->AddSource(topB);
 
-		mixer.AddSource(topA);
-		mixer.AddSource(topB);
-
-		final_input = new Fixed(mixer);
+		final_input = std::make_shared<Fixed>(mixer);
 
 		if (m_TakeTop == 3)
 		{
@@ -262,19 +269,19 @@ void Pool::GenerateSchedule()
 
 	else if (pool_count == 4)
 	{
-		Mixer mixer;
+		auto mixer = std::make_shared<Mixer>();
 
-		TakeTopRanks topA(*m_Pools[0], m_TakeTop);
-		TakeTopRanks topB(*m_Pools[1], m_TakeTop);
-		TakeTopRanks topC(*m_Pools[2], m_TakeTop);
-		TakeTopRanks topD(*m_Pools[3], m_TakeTop);
+		auto topA = std::make_shared<TakeTopRanks>(m_Pools[0], m_TakeTop);
+		auto topB = std::make_shared<TakeTopRanks>(m_Pools[1], m_TakeTop);
+		auto topC = std::make_shared<TakeTopRanks>(m_Pools[2], m_TakeTop);
+		auto topD = std::make_shared<TakeTopRanks>(m_Pools[3], m_TakeTop);
 
-		mixer.AddSource(topA);
-		mixer.AddSource(topB);
-		mixer.AddSource(topC);
-		mixer.AddSource(topD);
+		mixer->AddSource(topA);
+		mixer->AddSource(topB);
+		mixer->AddSource(topC);
+		mixer->AddSource(topD);
 
-		final_input = new Fixed(mixer);
+		final_input = std::make_shared<Fixed>(mixer);
 
 		auto temp = final_input->GetJudokaByStartPosition(4);
 		if (temp)
@@ -288,36 +295,37 @@ void Pool::GenerateSchedule()
 
 	else
 	{
-		auto mixer = new Mixer;
+		auto mixer = std::make_shared<Mixer>();
 
 		for (int i = 0; i < pool_count; ++i)
 		{
-			IFilter* take_top_placed = new TakeTopRanks(*m_Pools[i], m_TakeTop);
-			mixer->AddSource(*take_top_placed);
+			auto take_top_placed = std::make_shared<TakeTopRanks>(m_Pools[i], m_TakeTop);
+			mixer->AddSource(take_top_placed);
 		}
 
-		final_input = mixer;
+		final_input = std::make_shared<Fixed>(mixer);
 	}
 
 
 	assert(final_input);
-	bool third_place = m_Finals.IsThirdPlaceMatch();
-	bool fifth_place = m_Finals.IsFifthPlaceMatch();
-	auto color  = m_Finals.GetColor();
-	auto name   = m_Finals.GetName();
-	auto mat_id = m_Finals.GetMatID();
-	auto bo3    = m_Finals.IsBestOfThree();
+	bool third_place = m_Finals->IsThirdPlaceMatch();
+	bool fifth_place = m_Finals->IsFifthPlaceMatch();
+	auto color  = m_Finals->GetColor();
+	auto name   = m_Finals->GetName();
+	auto mat_id = m_Finals->GetMatID();
+	auto bo3    = m_Finals->IsBestOfThree();
 
-	m_Finals = SingleElimination(final_input);
-	m_Finals.SetName(Localizer::Translate("Finals"));
-	m_Finals.SetParent(this);
-	m_Finals.IsThirdPlaceMatch(third_place);
-	m_Finals.IsFifthPlaceMatch(fifth_place);
-	m_Finals.SetColor(color);
+	m_Finals = std::make_shared<SingleElimination>(final_input);
+	m_Finals->SetName(Localizer::Translate("Finals"));
+	m_Finals->SetParent(this);
+	m_Finals->IsThirdPlaceMatch(third_place);
+	m_Finals->IsFifthPlaceMatch(fifth_place);
+	m_Finals->SetColor(color);
 	if (!name.empty())
-		m_Finals.SetName(name);
-	m_Finals.SetMatID(mat_id);
-	m_Finals.IsBestOfThree(bo3);
+		m_Finals->SetName(name);
+	m_Finals->SetMatID(mat_id);
+	m_Finals->IsBestOfThree(bo3);
+	m_Finals->GenerateSchedule();
 
 	//Four or less get forwarded, need to a fifth place match manually
 	if (pool_count * m_TakeTop <= 4 && IsFifthPlaceMatch())
@@ -325,11 +333,11 @@ void Pool::GenerateSchedule()
 		assert(pool_count == 2);//TODO
 		assert(m_TakeTop == 2);//TODO
 
-		auto fifth_place_match = new Match(DependentJudoka(DependencyType::TakeRank3, *m_Pools[0]),
-										   DependentJudoka(DependencyType::TakeRank3, *m_Pools[1]), GetTournament());
+		auto fifth_place_match = std::make_shared<Match>(DependentJudoka(DependencyType::TakeRank3, m_Pools[0]),
+														 DependentJudoka(DependencyType::TakeRank3, m_Pools[1]), GetTournament());
 		fifth_place_match->SetTag(Match::Tag::Fifth() && Match::Tag::Finals());
 
-		m_Finals.AddMatch(fifth_place_match);
+		m_Finals->AddMatch(fifth_place_match);
 
 		//TODO do the more general case
 	}
@@ -366,7 +374,7 @@ void Pool::CopyMatchesFromSubtables()
 
 
 	//Add matches for single elimination phase
-	auto final_schedule = m_Finals.GetSchedule();
+	auto final_schedule = m_Finals->GetSchedule();
 	for (auto match : final_schedule)
 		AddMatch(match);
 }
@@ -380,7 +388,7 @@ const std::string Pool::ToHTML() const
 	for (auto pool : m_Pools)
 		ret += pool->ToHTML() + "<br/><br/>";
 
-	ret += m_Finals.ToHTML();
+	ret += m_Finals->ToHTML();
 
 	if (!IsSubMatchTable())
 		ret += ResultsToHTML() + "</div>";

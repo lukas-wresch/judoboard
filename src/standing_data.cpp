@@ -19,12 +19,7 @@ void StandingData::Reset()
 		delete judoka;
 	m_Judokas.clear();
 
-	for (auto rule : m_RuleSets)
-		delete rule;
 	m_RuleSets.clear();
-
-	for (auto age_group : m_AgeGroups)
-		delete age_group;
 	m_AgeGroups.clear();
 
 	m_Year = 0;
@@ -178,7 +173,7 @@ void StandingData::operator >> (YAML::Emitter& Yaml) const
 void StandingData::AddMD5File(const MD5& File)
 {
 	for (auto club : File.GetClubs())
-		AddClub(new Club(*club));
+		AddClub(std::make_shared<Club>(*club));
 
 	for (auto judoka : File.GetParticipants())
 		AddJudoka(new Judoka(JudokaData(*judoka), this));
@@ -234,7 +229,7 @@ bool StandingData::DeleteJudoka(const UUID& UUID)
 
 
 
-Club* StandingData::AddClub(const MD5::Club& NewClub)
+std::shared_ptr<Club> StandingData::AddClub(const MD5::Club& NewClub)
 {
 	auto club_to_update = FindClubByName(NewClub.Name);
 	if (club_to_update)
@@ -244,11 +239,10 @@ Club* StandingData::AddClub(const MD5::Club& NewClub)
 	}
 
 	//Add the club to the database
-	auto new_club = new Club(NewClub);
+	auto new_club = std::make_shared<Club>(NewClub);
 	if (!AddClub(new_club))
 	{
 		ZED::Log::Error("Could not add MD5 club to database");
-		delete new_club;
 		new_club = nullptr;
 	}
 
@@ -257,7 +251,7 @@ Club* StandingData::AddClub(const MD5::Club& NewClub)
 
 
 
-bool StandingData::AddClub(Club* NewClub)
+bool StandingData::AddClub(std::shared_ptr<Club> NewClub)
 {
 	if (!NewClub)
 		return false;
@@ -265,7 +259,7 @@ bool StandingData::AddClub(Club* NewClub)
 	if (FindClub(NewClub->GetUUID()))
 		return false;
 
-	AddAssociation(const_cast<Association*>(NewClub->GetParent()));
+	AddAssociation(std::const_pointer_cast<Association>(NewClub->GetParent()));
 
 	m_Clubs.emplace_back(NewClub);
 	return true;
@@ -273,7 +267,7 @@ bool StandingData::AddClub(Club* NewClub)
 
 
 
-Club* StandingData::FindClub(const UUID& UUID)
+std::shared_ptr<Club> StandingData::FindClub(const UUID& UUID)
 {
 	for (auto club : m_Clubs)
 		if (club && club->GetUUID() == UUID)
@@ -284,7 +278,7 @@ Club* StandingData::FindClub(const UUID& UUID)
 
 
 
-const Club* StandingData::FindClub(const UUID& UUID) const
+std::shared_ptr<const Club> StandingData::FindClub(const UUID& UUID) const
 {
 	for (auto club : m_Clubs)
 		if (club && club->GetUUID() == UUID)
@@ -295,7 +289,7 @@ const Club* StandingData::FindClub(const UUID& UUID) const
 
 
 
-Club* StandingData::FindClubByName(const std::string& Name)
+std::shared_ptr<Club> StandingData::FindClubByName(const std::string& Name)
 {
 	for (auto club : m_Clubs)
 		if (club && club->GetName() == Name)
@@ -306,7 +300,7 @@ Club* StandingData::FindClubByName(const std::string& Name)
 
 
 
-const Club* StandingData::FindClubByName(const std::string& Name) const
+std::shared_ptr<const Club> StandingData::FindClubByName(const std::string& Name) const
 {
 	for (auto club : m_Clubs)
 		if (club && club->GetName() == Name)
@@ -338,7 +332,7 @@ bool StandingData::DeleteClub(const UUID& UUID)
 
 
 
-bool StandingData::AddAssociation(Association* NewAssociation)
+bool StandingData::AddAssociation(std::shared_ptr<Association> NewAssociation)
 {
 	if (!NewAssociation)
 		return false;
@@ -349,7 +343,7 @@ bool StandingData::AddAssociation(Association* NewAssociation)
 		return false;
 
 	//Add recursively
-	AddAssociation(const_cast<Association*>(NewAssociation->GetParent()));
+	AddAssociation(std::const_pointer_cast<Association>(NewAssociation->GetParent()));
 
 	m_Associations.emplace_back(NewAssociation);
 
@@ -361,7 +355,7 @@ bool StandingData::AddAssociation(Association* NewAssociation)
 
 
 
-Association* StandingData::FindAssociation(const UUID& UUID)
+std::shared_ptr<Association> StandingData::FindAssociation(const UUID& UUID)
 {
 	for (auto assoc : m_Associations)
 		if (assoc && assoc->GetUUID() == UUID)
@@ -372,7 +366,7 @@ Association* StandingData::FindAssociation(const UUID& UUID)
 
 
 
-const Association* StandingData::FindAssociation(const UUID& UUID) const
+std::shared_ptr<const Association> StandingData::FindAssociation(const UUID& UUID) const
 {
 	for (auto assoc : m_Associations)
 		if (assoc && assoc->GetUUID() == UUID)
@@ -383,7 +377,7 @@ const Association* StandingData::FindAssociation(const UUID& UUID) const
 
 
 
-const Association* StandingData::FindAssociationByName(const std::string& Name) const
+std::shared_ptr<const Association> StandingData::FindAssociationByName(const std::string& Name) const
 {
 	for (auto assoc : m_Associations)
 		if (assoc && assoc->GetName() == Name)
@@ -413,7 +407,7 @@ bool StandingData::DeleteAssociation(const UUID& UUID)
 
 
 
-bool StandingData::AssociationHasChildren(const Association* Association) const
+bool StandingData::AssociationHasChildren(std::shared_ptr<const Association> Association) const
 {
 	if (!Association)
 		return false;
@@ -429,7 +423,7 @@ bool StandingData::AssociationHasChildren(const Association* Association) const
 
 
 
-RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName)
+std::shared_ptr<RuleSet> StandingData::FindRuleSetByName(const std::string& RuleSetName)
 {
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetName() == RuleSetName)
@@ -440,7 +434,7 @@ RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName)
 
 
 
-const RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName) const
+std::shared_ptr<const RuleSet> StandingData::FindRuleSetByName(const std::string& RuleSetName) const
 {
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetName() == RuleSetName)
@@ -451,7 +445,7 @@ const RuleSet* StandingData::FindRuleSetByName(const std::string& RuleSetName) c
 
 
 
-RuleSet* StandingData::FindRuleSet(const UUID& UUID)
+std::shared_ptr<RuleSet> StandingData::FindRuleSet(const UUID& UUID)
 {
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetUUID() == UUID)
@@ -462,7 +456,7 @@ RuleSet* StandingData::FindRuleSet(const UUID& UUID)
 
 
 
-const RuleSet* StandingData::FindRuleSet(const UUID& UUID) const
+std::shared_ptr<const RuleSet> StandingData::FindRuleSet(const UUID& UUID) const
 {
 	for (auto rule : m_RuleSets)
 		if (rule && rule->GetUUID() == UUID)
@@ -479,7 +473,6 @@ bool StandingData::DeleteRuleSet(const UUID& UUID)
 	{
 		if ((*it)->GetUUID() == UUID)
 		{
-			delete *it;
 			m_RuleSets.erase(it);
 			return true;
 		}
@@ -490,7 +483,7 @@ bool StandingData::DeleteRuleSet(const UUID& UUID)
 
 
 
-bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
+bool StandingData::AddRuleSet(std::shared_ptr<RuleSet> NewRuleSet)
 {
 	if (!NewRuleSet || FindRuleSet(NewRuleSet->GetUUID()))
 		return false;
@@ -501,7 +494,7 @@ bool StandingData::AddRuleSet(RuleSet* NewRuleSet)
 
 
 
-AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName)
+std::shared_ptr<AgeGroup> StandingData::FindAgeGroupByName(const std::string& AgeGroupName)
 {
 	for (auto age_group : m_AgeGroups)
 		if (age_group && age_group->GetName() == AgeGroupName)
@@ -512,7 +505,7 @@ AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName)
 
 
 
-const AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName) const
+std::shared_ptr<const AgeGroup> StandingData::FindAgeGroupByName(const std::string& AgeGroupName) const
 {
 	for (auto age_group : m_AgeGroups)
 		if (age_group && age_group->GetName() == AgeGroupName)
@@ -523,7 +516,7 @@ const AgeGroup* StandingData::FindAgeGroupByName(const std::string& AgeGroupName
 
 
 
-AgeGroup* StandingData::FindAgeGroup(const UUID& UUID)
+std::shared_ptr<AgeGroup> StandingData::FindAgeGroup(const UUID& UUID)
 {
 	for (auto age_group : m_AgeGroups)
 		if (age_group && age_group->GetUUID() == UUID)
@@ -534,7 +527,7 @@ AgeGroup* StandingData::FindAgeGroup(const UUID& UUID)
 
 
 
-const AgeGroup* StandingData::FindAgeGroup(const UUID& UUID) const
+std::shared_ptr<const AgeGroup> StandingData::FindAgeGroup(const UUID& UUID) const
 {
 	for (auto age_group : m_AgeGroups)
 		if (age_group && age_group->GetUUID() == UUID)
@@ -545,7 +538,7 @@ const AgeGroup* StandingData::FindAgeGroup(const UUID& UUID) const
 
 
 
-bool StandingData::AddAgeGroup(AgeGroup* NewAgeGroup)
+bool StandingData::AddAgeGroup(std::shared_ptr<AgeGroup> NewAgeGroup)
 {
 	if (!NewAgeGroup || FindAgeGroup(NewAgeGroup->GetUUID()))
 		return false;
@@ -562,7 +555,6 @@ bool StandingData::RemoveAgeGroup(const UUID& UUID)
 	{
 		if ((*it)->GetUUID() == UUID)
 		{
-			delete *it;
 			m_AgeGroups.erase(it);
 			return true;
 		}

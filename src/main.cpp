@@ -138,7 +138,7 @@ int main(int argc, char** argv)
 			{
 				Judoboard::Judoka* white = new Judoboard::Judoka("Max" + std::to_string(2 * i + 1), "Mustermann");
 				Judoboard::Judoka* blue  = new Judoboard::Judoka("Max" + std::to_string(2 * i + 2), "Mustermann");
-				Judoboard::Match* match  = new Judoboard::Match(white, blue, &tournament1, (i % 2) + 1);
+				auto match = std::make_shared<Judoboard::Match>(white, blue, &tournament1, (i % 2) + 1);
 				tournament1.AddMatch(match);
 			}
 			for (auto table : tournament1.GetMatchTables())
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 			{
 				Judoboard::Judoka* white = new Judoboard::Judoka("Max" + std::to_string(2 * i + 1), "Mustermann");
 				Judoboard::Judoka* blue  = new Judoboard::Judoka("Max" + std::to_string(2 * i + 2), "Mustermann");
-				Judoboard::Match* match  = new Judoboard::Match(white, blue, &tournament2, (i % 2) + 1);
+				auto match = std::make_shared<Judoboard::Match>(white, blue, &tournament2, (i % 2) + 1);
 				tournament2.AddMatch(match);
 			}
 			for (auto table : tournament2.GetMatchTables())
@@ -197,22 +197,22 @@ int main(int argc, char** argv)
 		mat->SetFullscreen();
 		ZED::Core::Pause(5000);
 
-		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
-		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
-		app.GetDatabase().AddClub(new Judoboard::Club("Senne"));
+		app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Altenhagen"));
+		app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Brackwede"));
+		app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Senne"));
 
 		srand(ZED::Core::CurrentTimestamp());
 		auto j1 = CreateRandomJudoka(&app.GetDatabase());
 		auto j2 = CreateRandomJudoka(&app.GetDatabase());
-		Judoboard::Match match(&j1, &j2, nullptr, mat->GetMatID());
-		Judoboard::RuleSet rules("ScreenTest", 1, 3*60, 20, 10, false, false);
-		Judoboard::AgeGroup age_group("U18", 15, 18, &rules);
-		match.SetRuleSet(&rules);
-		Judoboard::RoundRobin* table = new Judoboard::RoundRobin(new Judoboard::Weightclass(10, 100));
-		table->SetAgeGroup(&age_group);
-		match.SetMatchTable(table);
+		auto match = std::make_shared<Judoboard::Match>(&j1, &j2, nullptr, mat->GetMatID());
+		auto rules = std::make_shared<Judoboard::RuleSet>("ScreenTest", 1, 3*60, 20, 10, false, false);
+		auto age_group = std::make_shared<Judoboard::AgeGroup>("U18", 15, 18, rules);
+		match->SetRuleSet(rules);
+		Judoboard::RoundRobin* table = new Judoboard::RoundRobin(std::make_shared<Judoboard::Weightclass>(10, 100));
+		table->SetAgeGroup(age_group);
+		match->SetMatchTable(table->GetSharedFromThis());
 
-		mat->StartMatch(&match);
+		mat->StartMatch(match);
 		ZED::Core::Pause(500);
 
 		mat->Hajime();
@@ -274,17 +274,17 @@ int main(int argc, char** argv)
 		auto tourney = new Judoboard::Tournament("Demo Tournament");
 		tourney->EnableAutoSave(false);
 
-		auto rule_set  = Judoboard::RuleSet("Demo", 180, 60, 20, 10);
-		auto age_group = Judoboard::AgeGroup("U18", 0, 100, &rule_set);
+		auto rule_set  = std::make_shared<Judoboard::RuleSet>("Demo", 180, 60, 20, 10);
+		auto age_group = std::make_shared<Judoboard::AgeGroup>("U18", 0, 100, rule_set);
 
-		auto m1 = new Judoboard::RoundRobin(new Judoboard::Weightclass(0, 120));
+		auto m1 = std::make_shared<Judoboard::RoundRobin>(std::make_shared<Judoboard::Weightclass>(0, 120));
 		m1->SetMatID(1);
-		m1->SetAgeGroup(&age_group);
+		m1->SetAgeGroup(age_group);
 		tourney->AddMatchTable(m1);
 
-		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen"));
-		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede"));
-		app.GetDatabase().AddClub(new Judoboard::Club("Senne"));
+		app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Altenhagen"));
+		app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Brackwede"));
+		app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Senne"));
 
 		for (int i = 0; i < 5; i++)
 			tourney->AddParticipant(new Judoboard::Judoka(CreateRandomJudoka(&app.GetDatabase())));
@@ -505,37 +505,37 @@ int main(int argc, char** argv)
 #ifdef _DEBUG
 	if (app.GetDatabase().GetNumJudoka() < 5)
 	{
-		auto inter = new Judoboard::Association("International", nullptr);
+		auto inter = std::make_shared<Judoboard::Association>("International", nullptr);
 
-		auto de = new Judoboard::Association("Deutschland", inter);
+		auto de = std::make_shared<Judoboard::Association>("Deutschland", inter);
 
-		auto dn = new Judoboard::Association("Deutschland-Nord", de);
-		auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+		auto dn = std::make_shared<Judoboard::Association>("Deutschland-Nord", de);
+		auto ds = std::make_shared<Judoboard::Association>(u8"Deutschland-S\u00fcd", de);
 
-		auto nord  = new Judoboard::Association("Nord", dn);
-		auto west  = new Judoboard::Association("West", dn);
-		auto nost  = new Judoboard::Association("Nordost", dn);
-		auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
-		auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+		auto nord  = std::make_shared<Judoboard::Association>("Nord", dn);
+		auto west  = std::make_shared<Judoboard::Association>("West", dn);
+		auto nost  = std::make_shared<Judoboard::Association>("Nordost", dn);
+		auto sued  = std::make_shared<Judoboard::Association>(u8"S\u00fcd", ds);
+		auto swest = std::make_shared<Judoboard::Association>(u8"S\u00fcdwest", ds);
 
-		auto nieder  = new Judoboard::Association("Niedersachsen", nord);
-		auto hamburg = new Judoboard::Association("Hamburg", nord);
-		auto berlin  = new Judoboard::Association("Berlin", nost);
-		auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+		auto nieder  = std::make_shared<Judoboard::Association>("Niedersachsen", nord);
+		auto hamburg = std::make_shared<Judoboard::Association>("Hamburg", nord);
+		auto berlin  = std::make_shared<Judoboard::Association>("Berlin", nost);
+		auto nrw     = std::make_shared<Judoboard::Association>("Nordrhein-Westfalen", west);
 
 		app.GetDatabase().AddAssociation(nieder);
 		app.GetDatabase().AddAssociation(hamburg);
 		app.GetDatabase().AddAssociation(berlin);
 		app.GetDatabase().AddAssociation(nrw);
 
-		auto detmold = new Judoboard::Association("Detmold", nrw);
+		auto detmold = std::make_shared<Judoboard::Association>("Detmold", nrw);
 
-		auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+		auto biegue = std::make_shared<Judoboard::Association>(u8"Bielefeld/G\u00fctersloh", detmold);
 
 
-		app.GetDatabase().AddClub(new Judoboard::Club("Altenhagen", biegue));
-		app.GetDatabase().AddClub(new Judoboard::Club("Brackwede", biegue));
-		app.GetDatabase().AddClub(new Judoboard::Club("Senne", biegue));
+		app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Altenhagen", biegue));
+		app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Brackwede", biegue));
+		app.GetDatabase().AddClub(std::make_shared<Judoboard::Club>("Senne", biegue));
 
 		ZED::Log::Debug("Adding debug judoka");
 

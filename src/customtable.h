@@ -11,7 +11,6 @@ namespace Judoboard
 
 	public:
 		CustomTable(const ITournament* Tournament = nullptr);
-		CustomTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent = nullptr) : MatchTable(Yaml, Tournament, Parent) {}
 
 		static std::string GetHTMLForm();
 

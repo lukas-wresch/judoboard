@@ -310,7 +310,7 @@ TEST(RoundRobin, ExportImport)
 	Judoka j1(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 	Judoka j2(GetFakeFirstname(), GetFakeLastname(), 50, Gender::Male);
 
-	auto w = new RoundRobin(Weight(10), Weight(100));
+	auto w = std::make_shared<RoundRobin>(Weight(10), Weight(100));
 
 	w->SetScheduleIndex(rand());
 
@@ -326,7 +326,8 @@ TEST(RoundRobin, ExportImport)
 		YAML::Emitter yaml;
 		*w >> yaml;
 
-		RoundRobin group2(YAML::Load(yaml.c_str()), &t);
+		RoundRobin group2(nullptr, &t);
+		group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 		EXPECT_EQ(group2.GetSchedule().size(), w->GetSchedule().size());
 		EXPECT_EQ(group2.ToHTML(),  w->ToHTML());

@@ -12,18 +12,18 @@ TEST(AgeGroup, MatchTableTakeRuleSet)
 		Tournament t("deleteMe");
 		t.EnableAutoSave(false);
 
-		auto r = new RuleSet(GetRandomName(), rand(), rand(), rand(), rand());
-		AgeGroup a(GetRandomName(), rand(), rand(), r);
+		auto r = std::make_shared<RuleSet>(GetRandomName(), rand(), rand(), rand(), rand());
+		auto a = std::make_shared<AgeGroup>(GetRandomName(), rand(), rand(), r);
 
-		Match* match = new Match(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), &t, 1);
+		auto match = std::make_shared<Match>(new Judoka(GetRandomName(), GetRandomName()), new Judoka(GetRandomName(), GetRandomName()), &t, 1);
 		t.AddMatch(match);
 
 		ASSERT_EQ(t.GetMatchTables().size(), 1);
 
-		t.GetMatchTables()[0]->SetAgeGroup(&a);
+		t.GetMatchTables()[0]->SetAgeGroup(a);
 
 		ASSERT_TRUE(t.GetMatchTables()[0]->GetAgeGroup());
-		EXPECT_EQ(*t.GetMatchTables()[0]->GetAgeGroup(), a);
+		EXPECT_EQ(*t.GetMatchTables()[0]->GetAgeGroup(), *a);
 		EXPECT_EQ(t.GetMatchTables()[0]->GetRuleSet(),  *r);
 		EXPECT_EQ(t.GetMatchTables()[0]->GetSchedule()[0]->GetRuleSet(), *r);
 	}
@@ -38,7 +38,7 @@ TEST(AgeGroup, ExportImport)
 	for (int i = 0; i < 1000 * 5; i++)
 	{
 		Database d;
-		auto r = new RuleSet(GetRandomName(), rand(), rand(), rand(), rand());
+		auto r = std::make_shared<RuleSet>(GetRandomName(), rand(), rand(), rand(), rand());
 		d.AddRuleSet(r);
 		AgeGroup a(GetRandomName(), rand(), rand(), r);
 

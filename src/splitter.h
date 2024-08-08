@@ -11,7 +11,7 @@ namespace Judoboard
 	class Splitter : public IFilter
 	{
 	public:
-		Splitter(const IFilter& pSource, size_t Divisor, size_t Remainder, const MatchTable* Parent = nullptr);
+		Splitter(std::shared_ptr<const IFilter> pSource, size_t Divisor, size_t Remainder, const MatchTable* Parent = nullptr);
 		Splitter(const YAML::Node& Yaml, const MatchTable* Parent);
 
 		virtual Type GetType() const override { return Type::Splitter; }
@@ -29,7 +29,7 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	private:
-		const IFilter& m_pSource;
+		std::shared_ptr<const IFilter> m_pSource;
 		size_t m_Divisor   = 1;//Split in how many ways?
 		size_t m_Remainder = 0;//Take which part?
 	};

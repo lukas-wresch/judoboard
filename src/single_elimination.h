@@ -12,11 +12,7 @@ namespace Judoboard
 		friend class Tournament;
 
 	public:
-		SingleElimination(IFilter* Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
-		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
-		SingleElimination(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent = nullptr);
-		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
-			: SingleElimination(new Weightclass(Weightclass_, this), Tournament) {}
+		virtual void LoadYaml(const YAML::Node& Yaml) override;
 
 		void operator =(const SingleElimination& rhs) = delete;
 		void operator =(SingleElimination&& rhs) noexcept {
@@ -40,7 +36,7 @@ namespace Judoboard
 			m_FifthPlaceMatches = std::move(rhs.m_FifthPlaceMatches);
 
 			for (auto match : GetSchedule())
-				match->SetMatchTable(this);
+				match->SetMatchTable(shared_from_this());
 		}
 
 		static std::string GetHTMLForm();
@@ -53,13 +49,6 @@ namespace Judoboard
 		}
 
 		virtual void DeleteSchedule() override {
-			if (!IsSubMatchTable())
-			{
-				for (auto match : m_ThirdPlaceMatches)
-					delete match;
-				for (auto match : m_FifthPlaceMatches)
-					delete match;
-			}
 			m_ThirdPlaceMatches.clear();
 			m_FifthPlaceMatches.clear();
 			MatchTable::DeleteSchedule();
@@ -67,7 +56,7 @@ namespace Judoboard
 
 		virtual bool DeleteMatch(const UUID& UUID) override;
 
-		virtual const std::vector<Match*> GetSchedule() const override;
+		virtual const std::vector<std::shared_ptr<Match>> GetSchedule() const override;
 
 		virtual Results CalculateResults() const override;
 		virtual size_t ResultsCount() const override {
@@ -79,7 +68,7 @@ namespace Judoboard
 		}
 		virtual void GenerateSchedule() override;
 
-		virtual bool AddMatch(Match* NewMatch) override;
+		virtual bool AddMatch(std::shared_ptr<Match> NewMatch) override;
 
 		bool IsThirdPlaceMatch() const { return m_ThirdPlaceMatch; }
 		bool IsFifthPlaceMatch() const { return m_FifthPlaceMatch; }
@@ -96,10 +85,18 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	protected:
+		SingleElimination(const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
+		SingleElimination(std::shared_ptr<IFilter> Filter, const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
+		SingleElimination(Weight MinWeight, Weight MaxWeight, const ITournament* Tournament = nullptr);
+		SingleElimination(const MD5::Weightclass& Weightclass_, const ITournament* Tournament = nullptr)
+			: SingleElimination(Tournament) {
+			SetFilter(std::make_shared<Weightclass>(Weightclass_, this));
+		}
+
 		std::string RenderMatch(const Match& Match, const std::string& Style = "") const;
 
-		std::vector<Match*> m_ThirdPlaceMatches;
-		std::vector<Match*> m_FifthPlaceMatches;
+		std::vector<std::shared_ptr<Match>> m_ThirdPlaceMatches;
+		std::vector<std::shared_ptr<Match>> m_FifthPlaceMatches;
 
 		bool m_ThirdPlaceMatch = false;
 		bool m_FifthPlaceMatch = false;

@@ -20,7 +20,7 @@ TEST(LoserBracket, Count16)
 		t->AddParticipant(j[i]);
 	}
 
-	LoserBracket* group = new LoserBracket(0, 200);
+	auto group = std::make_shared<LoserBracket>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -73,7 +73,7 @@ TEST(LoserBracket, Count16_Final)
 		t->AddParticipant(j[i]);
 	}
 
-	LoserBracket* group = new LoserBracket(0, 200);
+	auto group = std::make_shared<LoserBracket>(0, 200);
 	group->SetMatID(1);
 	group->IsFinalMatch(true);
 	t->AddMatchTable(group);
@@ -127,7 +127,7 @@ TEST(LoserBracket, Count16_Final_3rd)
 		t->AddParticipant(j[i]);
 	}
 
-	LoserBracket* group = new LoserBracket(0, 200);
+	auto group = std::make_shared<LoserBracket>(0, 200);
 	group->SetMatID(1);
 	group->IsFinalMatch(true);
 	group->IsThirdPlaceMatch(true);
@@ -180,7 +180,7 @@ TEST(LoserBracket, Count32)
 		t->AddParticipant(j[i]);
 	}
 
-	LoserBracket* group = new LoserBracket(0, 200);
+	auto group = std::make_shared<LoserBracket>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -247,7 +247,7 @@ TEST(LoserBracket, Count32_Final)
 		t->AddParticipant(j[i]);
 	}
 
-	LoserBracket* group = new LoserBracket(0, 200);
+	auto group = std::make_shared<LoserBracket>(0, 200);
 	group->SetMatID(1);
 	group->IsFinalMatch(true);
 	t->AddMatchTable(group);
@@ -315,7 +315,7 @@ TEST(LoserBracket, Count32_Final_3rd)
 		t->AddParticipant(j[i]);
 	}
 
-	LoserBracket* group = new LoserBracket(0, 200);
+	auto group = std::make_shared<LoserBracket>(0, 200);
 	group->SetMatID(1);
 	group->IsFinalMatch(true);
 	group->IsThirdPlaceMatch(true);
@@ -384,7 +384,7 @@ TEST(LoserBracket, Count64)
 		t->AddParticipant(j[i]);
 	}
 
-	LoserBracket* group = new LoserBracket(0, 200);
+	auto group = std::make_shared<LoserBracket>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -485,7 +485,7 @@ TEST(DoubleElimination, Count6)
 		t->AddParticipant(j[i]);
 	}
 
-	DoubleElimination* group = new DoubleElimination(0, 200);
+	auto group = std::make_shared<DoubleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -550,7 +550,7 @@ TEST(DoubleElimination, Count6_2)
 		t->AddParticipant(j[i]);
 	}
 
-	DoubleElimination* group = new DoubleElimination(0, 200);
+	auto group = std::make_shared<DoubleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -621,7 +621,7 @@ TEST(DoubleElimination, Count6_Example)
 		t->AddParticipant(j[i]);
 	}
 
-	DoubleElimination* group = new DoubleElimination(0, 200);
+	auto group = std::make_shared<DoubleElimination>(0, 200);
 	group->IsThirdPlaceMatch(true);
 	group->IsFifthPlaceMatch(true);
 	group->SetMatID(1);
@@ -792,7 +792,7 @@ TEST(DoubleElimination, Count7)
 		t->AddParticipant(j[i]);
 	}
 
-	DoubleElimination* group = new DoubleElimination(0, 200);
+	auto group = std::make_shared<DoubleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -855,7 +855,7 @@ TEST(DoubleElimination, Count7_With3rd)
 		t->AddParticipant(j[i]);
 	}
 
-	DoubleElimination* group = new DoubleElimination(0, 200);
+	auto group = std::make_shared<DoubleElimination>(0, 200);
 	group->IsThirdPlaceMatch(true);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
@@ -926,7 +926,7 @@ TEST(DoubleElimination, Count7_Example)
 		t->AddParticipant(j[i]);
 	}
 
-	DoubleElimination* group = new DoubleElimination(0, 200);
+	auto group = std::make_shared<DoubleElimination>(0, 200);
 	group->IsThirdPlaceMatch(true);
 	group->IsFifthPlaceMatch(true);
 	group->SetMatID(1);
@@ -1090,7 +1090,7 @@ TEST(DoubleElimination, Count11_Example)
 	j[10] = new Judoka("Luft", "", 50);
 	j[11] = new Judoka("Kathrin", "", 50);
 
-	DoubleElimination* group = new DoubleElimination(0, 200);
+	auto group = std::make_shared<DoubleElimination>(0, 200);
 	group->IsThirdPlaceMatch(true);
 	group->IsFifthPlaceMatch(true);
 	group->SetMatID(1);
@@ -1394,7 +1394,7 @@ TEST(DoubleElimination, Count20_Example)
 	j[19] = new Judoka("Sophia", "", 50);
 	j[20] = new Judoka("Wurst", "", 50);
 
-	DoubleElimination* group = new DoubleElimination(0, 200);
+	auto group = std::make_shared<DoubleElimination>(0, 200);
 	group->IsThirdPlaceMatch(true);
 	group->IsFifthPlaceMatch(true);
 	group->SetMatID(1);
@@ -1919,7 +1919,7 @@ TEST(DoubleElimination, Count8)
 		t->AddParticipant(j[i]);
 	}
 
-	DoubleElimination* group = new DoubleElimination(0, 200);
+	auto group = std::make_shared<DoubleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -1959,7 +1959,7 @@ TEST(DoubleElimination, Count16)
 		t->AddParticipant(j[i]);
 	}
 
-	DoubleElimination* group = new DoubleElimination(0, 200);
+	auto group = std::make_shared<DoubleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -2029,7 +2029,7 @@ TEST(DoubleElimination, Count32)
 		t->AddParticipant(j[i]);
 	}
 
-	DoubleElimination* group = new DoubleElimination(0, 200);
+	auto group = std::make_shared<DoubleElimination>(0, 200);
 	group->SetMatID(1);
 	t->AddMatchTable(group);
 
@@ -2128,7 +2128,7 @@ TEST(DoubleElimination, ExportImport)
 
 		Tournament t;
 		t.SetName("deleteMe");
-		DoubleElimination* group = new DoubleElimination(0, 200);
+		auto group = std::make_shared<DoubleElimination>(0, 200);
 
 		for (int i = 1; i <= count; ++i)
 		{
@@ -2152,14 +2152,15 @@ TEST(DoubleElimination, ExportImport)
 		YAML::Emitter yaml;
 		*group >> yaml;
 
-		DoubleElimination group2(YAML::Load(yaml.c_str()), &t);
+		DoubleElimination group2(nullptr, &t);
+		group2.LoadYaml(YAML::Load(yaml.c_str()));
 
 		EXPECT_EQ(group->GetSchedule().size(), group2.GetSchedule().size());
 		EXPECT_EQ(group->ToHTML(), group2.ToHTML());
 
 		//Pointers should point to the same object
-		EXPECT_EQ((void*)group->GetSchedule()[0], (void*)group->GetWinnerBracket().GetSchedule()[0]);
-		EXPECT_EQ((void*)group2.GetSchedule()[0], (void*)group2.GetWinnerBracket().GetSchedule()[0]);
+		EXPECT_EQ((void*)group->GetSchedule()[0].get(), (void*)group->GetWinnerBracket().GetSchedule()[0].get());
+		EXPECT_EQ((void*)group2.GetSchedule()[0].get(), (void*)group2.GetWinnerBracket().GetSchedule()[0].get());
 
 		t.Save();
 		ZED::Core::RemoveFile("tournaments/deleteMe.yml");

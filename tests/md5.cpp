@@ -476,7 +476,7 @@ TEST(MD5, ImportIntoTournament)
 
 		auto table = tour.FindMatchTableByDescription("Jugend u10 w -20,7 kg");
 		ASSERT_TRUE(table);
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("20,7"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMaxWeight(), Weight("20,7"));
 		auto results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 1);
@@ -485,7 +485,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 w -26,7 kg");
 		ASSERT_TRUE(table);
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("26,7"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMaxWeight(), Weight("26,7"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -495,7 +495,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 w -30,7 kg");
 		ASSERT_TRUE(table);
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("30,7"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMaxWeight(), Weight("30,7"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -505,7 +505,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -23,7 kg");
 		ASSERT_TRUE(table);
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("23,7"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMaxWeight(), Weight("23,7"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -515,7 +515,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -25,4 kg");
 		ASSERT_TRUE(table);
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("25,4"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMaxWeight(), Weight("25,4"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -525,7 +525,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -26,3 kg");
 		ASSERT_TRUE(table);
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("26,3"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMaxWeight(), Weight("26,3"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 3);
@@ -535,7 +535,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -28,9 kg");
 		ASSERT_TRUE(table);
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("28,9"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMaxWeight(), Weight("28,9"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 4);
@@ -546,7 +546,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -31,3 kg");
 		ASSERT_TRUE(table);
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("31,3"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMaxWeight(), Weight("31,3"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 4);
@@ -557,7 +557,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -33,7 kg");
 		ASSERT_TRUE(table);
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("33,7"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMaxWeight(), Weight("33,7"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 4);
@@ -568,7 +568,7 @@ TEST(MD5, ImportIntoTournament)
 
 		table = tour.FindMatchTableByDescription("Jugend u10 m -39 kg");
 		ASSERT_TRUE(table);
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("39"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMaxWeight(), Weight("39"));
 		results = table->CalculateResults();
 
 		ASSERT_EQ(results.GetSize(), 1);
@@ -951,14 +951,14 @@ TEST(MD5, ImportTestTurnierIntoTournament)
 
 		auto table = tour.FindMatchTableByDescription("Jugend u15 m -37 kg");
 		ASSERT_TRUE(table);
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMinWeight(), Weight("10"));
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("37"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMinWeight(), Weight("10"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMaxWeight(), Weight("37"));
 
 
 		table = tour.FindMatchTableByDescription("Jugend u15 m -40 kg");
 		ASSERT_TRUE(table);
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMinWeight(), Weight("10"));
-		EXPECT_EQ(((Weightclass*)table->GetFilter())->GetMaxWeight(), Weight("40"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMinWeight(), Weight("10"));
+		EXPECT_EQ(std::dynamic_pointer_cast<Weightclass>(table->GetFilter())->GetMaxWeight(), Weight("40"));
 	}
 
 	ZED::Core::RemoveFile("tournaments/Testturnier.yml");
@@ -2411,8 +2411,8 @@ TEST(MD5, ExportStructureData)
 	initialize();
 
 	auto j = new Judoka("first", "last");
-	auto in = new Association("International", nullptr);
-	auto club = new Club("club", in);
+	auto in = std::make_shared<Association>("International", nullptr);
+	auto club = std::make_shared<Club>("club", in);
 
 	j->SetClub(club);
 
@@ -2441,37 +2441,37 @@ TEST(MD5, ExportCompletedTournament)
 	ZED::Core::RemoveFile("tournaments/demo-file.yml");
 	Tournament tour("demo-file");
 
-	auto inter = new Judoboard::Association("International", nullptr);
+	auto inter = std::make_shared<Judoboard::Association>("International", nullptr);
 
-	auto de = new Judoboard::Association("Deutschland", inter);
+	auto de = std::make_shared<Judoboard::Association>("Deutschland", inter);
 
-	auto dn = new Judoboard::Association("Deutschland-Nord", de);
-	auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+	auto dn = std::make_shared<Judoboard::Association>("Deutschland-Nord", de);
+	auto ds = std::make_shared<Judoboard::Association>(u8"Deutschland-S\u00fcd", de);
 
-	auto nord  = new Judoboard::Association("Nord", dn);
-	auto west  = new Judoboard::Association("West", dn);
-	auto nost  = new Judoboard::Association("Nordost", dn);
-	auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
-	auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+	auto nord  = std::make_shared<Judoboard::Association>("Nord", dn);
+	auto west  = std::make_shared<Judoboard::Association>("West", dn);
+	auto nost  = std::make_shared<Judoboard::Association>("Nordost", dn);
+	auto sued  = std::make_shared<Judoboard::Association>(u8"S\u00fcd", ds);
+	auto swest = std::make_shared<Judoboard::Association>(u8"S\u00fcdwest", ds);
 
-	auto nieder  = new Judoboard::Association("Niedersachsen", nord);
-	auto hamburg = new Judoboard::Association("Hamburg", nord);
-	auto berlin  = new Judoboard::Association("Berlin", nost);
-	auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+	auto nieder  = std::make_shared<Judoboard::Association>("Niedersachsen", nord);
+	auto hamburg = std::make_shared<Judoboard::Association>("Hamburg", nord);
+	auto berlin  = std::make_shared<Judoboard::Association>("Berlin", nost);
+	auto nrw     = std::make_shared<Judoboard::Association>("Nordrhein-Westfalen", west);
 
-	auto detmold = new Judoboard::Association("Detmold", nrw);
+	auto detmold = std::make_shared<Judoboard::Association>("Detmold", nrw);
 
-	auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+	auto biegue = std::make_shared<Judoboard::Association>(u8"Bielefeld/G\u00fctersloh", detmold);
 
 	tour.SetOrganizer(biegue);
 
-	std::vector<Club*> clubs;
-	clubs.push_back(new Judoboard::Club("Altenhagen", biegue));
-	clubs.push_back(new Judoboard::Club("Brackwede", biegue));
-	clubs.push_back(new Judoboard::Club("Senne", biegue));
+	std::vector<std::shared_ptr<Club>> clubs;
+	clubs.push_back(std::make_shared<Judoboard::Club>("Altenhagen", biegue));
+	clubs.push_back(std::make_shared<Judoboard::Club>("Brackwede", biegue));
+	clubs.push_back(std::make_shared<Judoboard::Club>("Senne", biegue));
 
-	auto age_group1 = new AgeGroup("U11",  8,  10, nullptr);
-	auto age_group2 = new AgeGroup("U15", 12,  14, nullptr);
+	auto age_group1 = std::make_shared<AgeGroup>("U11",  8,  10, nullptr);
+	auto age_group2 = std::make_shared<AgeGroup>("U15", 12,  14, nullptr);
 	tour.AddAgeGroup(age_group1);
 	tour.AddAgeGroup(age_group2);
 
@@ -2791,9 +2791,9 @@ TEST(MD5, ExportPool)
 		t->AddParticipant(j[i]);
 	}
 
-	Pool* group1 = new Pool(50, 90);
-	Pool* group2 = new Pool(100, 140);
-	Pool* group3 = new Pool(150, 190);
+	auto group1 = std::make_shared<Pool>(50, 90);
+	auto group2 = std::make_shared<Pool>(100, 140);
+	auto group3 = std::make_shared<Pool>(150, 190);
 
 	group1->SetMatID(1);
 	group1->IsThirdPlaceMatch(true);
@@ -3042,37 +3042,37 @@ TEST(MD5, ExportSingleElimination16)
 	Tournament* t = new Tournament("deleteMe");
 	t->EnableAutoSave(false);
 
-	auto inter = new Judoboard::Association("International", nullptr);
+	auto inter = std::make_shared<Judoboard::Association>("International", nullptr);
 
-	auto de = new Judoboard::Association("Deutschland", inter);
+	auto de = std::make_shared<Judoboard::Association>("Deutschland", inter);
 
-	auto dn = new Judoboard::Association("Deutschland-Nord", de);
-	auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+	auto dn = std::make_shared<Judoboard::Association>("Deutschland-Nord", de);
+	auto ds = std::make_shared<Judoboard::Association>(u8"Deutschland-S\u00fcd", de);
 
-	auto nord  = new Judoboard::Association("Nord", dn);
-	auto west  = new Judoboard::Association("West", dn);
-	auto nost  = new Judoboard::Association("Nordost", dn);
-	auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
-	auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+	auto nord  = std::make_shared<Judoboard::Association>("Nord", dn);
+	auto west  = std::make_shared<Judoboard::Association>("West", dn);
+	auto nost  = std::make_shared<Judoboard::Association>("Nordost", dn);
+	auto sued  = std::make_shared<Judoboard::Association>(u8"S\u00fcd", ds);
+	auto swest = std::make_shared<Judoboard::Association>(u8"S\u00fcdwest", ds);
 
-	auto nieder  = new Judoboard::Association("Niedersachsen", nord);
-	auto hamburg = new Judoboard::Association("Hamburg", nord);
-	auto berlin  = new Judoboard::Association("Berlin", nost);
-	auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+	auto nieder  = std::make_shared<Judoboard::Association>("Niedersachsen", nord);
+	auto hamburg = std::make_shared<Judoboard::Association>("Hamburg", nord);
+	auto berlin  = std::make_shared<Judoboard::Association>("Berlin", nost);
+	auto nrw     = std::make_shared<Judoboard::Association>("Nordrhein-Westfalen", west);
 
-	auto detmold = new Judoboard::Association("Detmold", nrw);
+	auto detmold = std::make_shared<Judoboard::Association>("Detmold", nrw);
 
-	auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+	auto biegue = std::make_shared<Judoboard::Association>(u8"Bielefeld/G\u00fctersloh", detmold);
 
 	t->SetOrganizer(biegue);
 
-	std::vector<Club*> clubs;
-	clubs.push_back(new Judoboard::Club("Altenhagen", biegue));
-	clubs.push_back(new Judoboard::Club("Brackwede", biegue));
-	clubs.push_back(new Judoboard::Club("Senne", biegue));
+	std::vector<std::shared_ptr<Club>> clubs;
+	clubs.push_back(std::make_shared<Judoboard::Club>("Altenhagen", biegue));
+	clubs.push_back(std::make_shared<Judoboard::Club>("Brackwede", biegue));
+	clubs.push_back(std::make_shared<Judoboard::Club>("Senne", biegue));
 
 
-	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr);
+	auto age = std::make_shared<AgeGroup>("Youth", 1, 99, nullptr);
 	t->AddAgeGroup(age);
 
 	Judoka* j[17];
@@ -3085,7 +3085,7 @@ TEST(MD5, ExportSingleElimination16)
 		t->AddParticipant(j[i]);
 	}
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	group->SetAgeGroup(age);
 	t->AddMatchTable(group);
@@ -3154,37 +3154,37 @@ TEST(MD5, ExportSingleElimination16_3rd_5th)
 	Tournament* t = new Tournament("deleteMe");
 	t->EnableAutoSave(false);
 
-	auto inter = new Judoboard::Association("International", nullptr);
+	auto inter = std::make_shared<Judoboard::Association>("International", nullptr);
 
-	auto de = new Judoboard::Association("Deutschland", inter);
+	auto de = std::make_shared<Judoboard::Association>("Deutschland", inter);
 
-	auto dn = new Judoboard::Association("Deutschland-Nord", de);
-	auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+	auto dn = std::make_shared<Judoboard::Association>("Deutschland-Nord", de);
+	auto ds = std::make_shared<Judoboard::Association>(u8"Deutschland-S\u00fcd", de);
 
-	auto nord  = new Judoboard::Association("Nord", dn);
-	auto west  = new Judoboard::Association("West", dn);
-	auto nost  = new Judoboard::Association("Nordost", dn);
-	auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
-	auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+	auto nord  = std::make_shared<Judoboard::Association>("Nord", dn);
+	auto west  = std::make_shared<Judoboard::Association>("West", dn);
+	auto nost  = std::make_shared<Judoboard::Association>("Nordost", dn);
+	auto sued  = std::make_shared<Judoboard::Association>(u8"S\u00fcd", ds);
+	auto swest = std::make_shared<Judoboard::Association>(u8"S\u00fcdwest", ds);
 
-	auto nieder  = new Judoboard::Association("Niedersachsen", nord);
-	auto hamburg = new Judoboard::Association("Hamburg", nord);
-	auto berlin  = new Judoboard::Association("Berlin", nost);
-	auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+	auto nieder  = std::make_shared<Judoboard::Association>("Niedersachsen", nord);
+	auto hamburg = std::make_shared<Judoboard::Association>("Hamburg", nord);
+	auto berlin  = std::make_shared<Judoboard::Association>("Berlin", nost);
+	auto nrw     = std::make_shared<Judoboard::Association>("Nordrhein-Westfalen", west);
 
-	auto detmold = new Judoboard::Association("Detmold", nrw);
+	auto detmold = std::make_shared<Judoboard::Association>("Detmold", nrw);
 
-	auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+	auto biegue = std::make_shared<Judoboard::Association>(u8"Bielefeld/G\u00fctersloh", detmold);
 
 	t->SetOrganizer(biegue);
 
-	std::vector<Club*> clubs;
-	clubs.push_back(new Judoboard::Club("Altenhagen", biegue));
-	clubs.push_back(new Judoboard::Club("Brackwede", biegue));
-	clubs.push_back(new Judoboard::Club("Senne", biegue));
+	std::vector<std::shared_ptr<Club>> clubs;
+	clubs.push_back(std::make_shared<Judoboard::Club>("Altenhagen", biegue));
+	clubs.push_back(std::make_shared<Judoboard::Club>("Brackwede", biegue));
+	clubs.push_back(std::make_shared<Judoboard::Club>("Senne", biegue));
 
 
-	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr);
+	auto age = std::make_shared<AgeGroup>("Youth", 1, 99, nullptr);
 	t->AddAgeGroup(age);
 
 	Judoka* j[17];
@@ -3197,7 +3197,7 @@ TEST(MD5, ExportSingleElimination16_3rd_5th)
 		t->AddParticipant(j[i]);
 	}
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	group->SetAgeGroup(age);
 	group->IsThirdPlaceMatch(true);
@@ -3267,37 +3267,37 @@ TEST(MD5, ExportSingleElimination32)
 	Tournament* t = new Tournament("deleteMe");
 	t->EnableAutoSave(false);
 
-	auto inter = new Judoboard::Association("International", nullptr);
+	auto inter = std::make_shared<Judoboard::Association>("International", nullptr);
 
-	auto de = new Judoboard::Association("Deutschland", inter);
+	auto de = std::make_shared<Judoboard::Association>("Deutschland", inter);
 
-	auto dn = new Judoboard::Association("Deutschland-Nord", de);
-	auto ds = new Judoboard::Association(u8"Deutschland-S\u00fcd", de);
+	auto dn = std::make_shared<Judoboard::Association>("Deutschland-Nord", de);
+	auto ds = std::make_shared<Judoboard::Association>(u8"Deutschland-S\u00fcd", de);
 
-	auto nord  = new Judoboard::Association("Nord", dn);
-	auto west  = new Judoboard::Association("West", dn);
-	auto nost  = new Judoboard::Association("Nordost", dn);
-	auto sued  = new Judoboard::Association(u8"S\u00fcd", ds);
-	auto swest = new Judoboard::Association(u8"S\u00fcdwest", ds);
+	auto nord  = std::make_shared<Judoboard::Association>("Nord", dn);
+	auto west  = std::make_shared<Judoboard::Association>("West", dn);
+	auto nost  = std::make_shared<Judoboard::Association>("Nordost", dn);
+	auto sued  = std::make_shared<Judoboard::Association>(u8"S\u00fcd", ds);
+	auto swest = std::make_shared<Judoboard::Association>(u8"S\u00fcdwest", ds);
 
-	auto nieder  = new Judoboard::Association("Niedersachsen", nord);
-	auto hamburg = new Judoboard::Association("Hamburg", nord);
-	auto berlin  = new Judoboard::Association("Berlin", nost);
-	auto nrw     = new Judoboard::Association("Nordrhein-Westfalen", west);
+	auto nieder  = std::make_shared<Judoboard::Association>("Niedersachsen", nord);
+	auto hamburg = std::make_shared<Judoboard::Association>("Hamburg", nord);
+	auto berlin  = std::make_shared<Judoboard::Association>("Berlin", nost);
+	auto nrw     = std::make_shared<Judoboard::Association>("Nordrhein-Westfalen", west);
 
-	auto detmold = new Judoboard::Association("Detmold", nrw);
+	auto detmold = std::make_shared<Judoboard::Association>("Detmold", nrw);
 
-	auto biegue = new Judoboard::Association(u8"Bielefeld/G\u00fctersloh", detmold);
+	auto biegue = std::make_shared<Judoboard::Association>(u8"Bielefeld/G\u00fctersloh", detmold);
 
 	t->SetOrganizer(biegue);
 
-	std::vector<Club*> clubs;
-	clubs.push_back(new Judoboard::Club("Altenhagen", biegue));
-	clubs.push_back(new Judoboard::Club("Brackwede", biegue));
-	clubs.push_back(new Judoboard::Club("Senne", biegue));
+	std::vector<std::shared_ptr<Club>> clubs;
+	clubs.push_back(std::make_shared<Judoboard::Club>("Altenhagen", biegue));
+	clubs.push_back(std::make_shared<Judoboard::Club>("Brackwede", biegue));
+	clubs.push_back(std::make_shared<Judoboard::Club>("Senne", biegue));
 
 
-	AgeGroup* age = new AgeGroup("Youth", 1, 99, nullptr);
+	auto age = std::make_shared<AgeGroup>("Youth", 1, 99, nullptr);
 	t->AddAgeGroup(age);
 
 	Judoka* j[33];
@@ -3310,7 +3310,7 @@ TEST(MD5, ExportSingleElimination32)
 		t->AddParticipant(j[i]);
 	}
 
-	SingleElimination* group = new SingleElimination(0, 200);
+	auto group = std::make_shared<SingleElimination>(0, 200);
 	group->SetMatID(1);
 	group->SetAgeGroup(age);
 	t->AddMatchTable(group);
@@ -3512,8 +3512,8 @@ TEST(MD7, ImportKEM_U13_2024_05_05)
 		EXPECT_EQ(table->GetParticipants().size(), 6);
 		EXPECT_EQ(table->GetSchedule().size(),     4 + 2 + 1 + 2 + 2 + 1 + 1);
 		EXPECT_EQ(table->GetType(), MatchTable::Type::DoubleElimination);
-		EXPECT_TRUE( ((DoubleElimination*)table)->IsThirdPlaceMatch() );
-		EXPECT_TRUE( ((DoubleElimination*)table)->IsFifthPlaceMatch() );
+		EXPECT_TRUE( std::dynamic_pointer_cast<DoubleElimination>(table)->IsThirdPlaceMatch() );
+		EXPECT_TRUE( std::dynamic_pointer_cast<DoubleElimination>(table)->IsFifthPlaceMatch() );
 
 
 		table = tour.FindMatchTableByDescription(u8"m\u00e4nnliche Jugend U13 -46 kg");

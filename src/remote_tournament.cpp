@@ -14,13 +14,13 @@ RemoteTournament::RemoteTournament(const std::string& Host, uint16_t Port) : m_H
 
 
 
-std::vector<const Match*> RemoteTournament::GetNextMatches(int32_t MatID) const
+std::vector<std::shared_ptr<const Match>> RemoteTournament::GetNextMatches(int32_t MatID) const
 {
 	if (Timer::GetTimestamp() - m_NextMatches_Timestamp < 5000)
 		return m_NextMatches;//Return cached value
 
 	auto response = Request2Master("/ajax/master/get_next_matches?id=" + std::to_string(MatID));
-	std::vector<const Match*> ret;
+	std::vector<std::shared_ptr<const Match>> ret;
 
 	if (response.length() == 0)
 	{
@@ -41,9 +41,9 @@ std::vector<const Match*> RemoteTournament::GetNextMatches(int32_t MatID) const
 		UUID id(node["uuid"].as<std::string>());
 
 		if (!IsMatchInCache(id))
-			m_MatchCache.push_back(new Match(node, nullptr, (RemoteTournament*)this));
+			m_MatchCache.push_back(std::make_shared<Match>(node, nullptr, (RemoteTournament*)this));
 
-		const Match* match = new Match(node, nullptr, (RemoteTournament*)this);
+		auto match = std::make_shared<Match>(node, nullptr, (RemoteTournament*)this);
 		ret.emplace_back(match);
 	}
 
@@ -56,7 +56,7 @@ std::vector<const Match*> RemoteTournament::GetNextMatches(int32_t MatID) const
 
 
 
-Match* RemoteTournament::GetNextOngoingMatch(int32_t MatID)
+std::shared_ptr<Match> RemoteTournament::GetNextOngoingMatch(int32_t MatID)
 {
 	auto matches = GetNextMatches(MatID);
 	for (auto match : matches)
@@ -65,7 +65,7 @@ Match* RemoteTournament::GetNextOngoingMatch(int32_t MatID)
 			continue;
 
 		if (MatID < 0 || match->GetMatID() == MatID)
-			return (Match*)match;
+			return std::const_pointer_cast<Match>(match);
 	}
 
 	return nullptr;
@@ -85,7 +85,7 @@ bool RemoteTournament::IsMatchInCache(const UUID& UUID) const
 
 
 
-Match* RemoteTournament::FindInCache(const UUID& UUID) const
+std::shared_ptr<Match> RemoteTournament::FindInCache(const UUID& UUID) const
 {
 	auto guard = m_Mutex.LockReadForScope();
 
@@ -97,7 +97,7 @@ Match* RemoteTournament::FindInCache(const UUID& UUID) const
 
 
 
-MatchTable* RemoteTournament::FindMatchTableInCache(const UUID& UUID) const
+std::shared_ptr<MatchTable> RemoteTournament::FindMatchTableInCache(const UUID& UUID) const
 {
 	auto guard = m_Mutex.LockReadForScope();
 
@@ -109,7 +109,7 @@ MatchTable* RemoteTournament::FindMatchTableInCache(const UUID& UUID) const
 
 
 
-bool RemoteTournament::AddMatch(Match* NewMatch)
+bool RemoteTournament::AddMatch(std::shared_ptr<Match> NewMatch)
 {
 	if (!NewMatch)
 	{
@@ -194,7 +194,7 @@ const Judoka* RemoteTournament::FindParticipant(const UUID& UUID) const
 
 
 
-MatchTable* RemoteTournament::FindMatchTable(const UUID& ID)
+std::shared_ptr<MatchTable> RemoteTournament::FindMatchTable(const UUID& ID)
 {
 	auto response = Request2Master("/ajax/master/find_match_table?uuid=" + (std::string)ID);
 
@@ -211,7 +211,7 @@ MatchTable* RemoteTournament::FindMatchTable(const UUID& ID)
 
 	auto guard = m_Mutex.LockWriteForScope();
 
-	MatchTable* table = MatchTable::CreateMatchTable(yaml, this);
+	auto table = MatchTable::CreateMatchTable(yaml, this);
 	m_MatchTables.push_back(table);
 
 	return table;
@@ -219,7 +219,7 @@ MatchTable* RemoteTournament::FindMatchTable(const UUID& ID)
 
 
 
-const MatchTable* RemoteTournament::FindMatchTable(const UUID& ID) const
+std::shared_ptr<const MatchTable> RemoteTournament::FindMatchTable(const UUID& ID) const
 {
 	auto response = Request2Master("/ajax/master/find_match_table?uuid=" + (std::string)ID);
 
@@ -236,7 +236,7 @@ const MatchTable* RemoteTournament::FindMatchTable(const UUID& ID) const
 
 	auto guard = m_Mutex.LockWriteForScope();
 
-	MatchTable* table = MatchTable::CreateMatchTable(yaml, this);
+	auto table = MatchTable::CreateMatchTable(yaml, this);
 	m_MatchTables.push_back(table);
 
 	return table;
@@ -244,7 +244,7 @@ const MatchTable* RemoteTournament::FindMatchTable(const UUID& ID) const
 
 
 
-const RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID) const
+std::shared_ptr<const RuleSet> RemoteTournament::FindRuleSet(const UUID& UUID) const
 {
 	auto response = Request2Master("/ajax/master/find_ruleset?uuid=" + (std::string)UUID);
 
@@ -259,7 +259,7 @@ const RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID) const
 	if (!yaml)
 		return nullptr;
 
-	RuleSet* rule_set = new RuleSet(yaml);
+	auto rule_set = std::make_shared<RuleSet>(yaml);
 	m_StandingData.AddRuleSet(rule_set);//Add to cache
 
 	return rule_set;
@@ -267,7 +267,7 @@ const RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID) const
 
 
 
-RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID)
+std::shared_ptr<RuleSet> RemoteTournament::FindRuleSet(const UUID& UUID)
 {
 	auto response = Request2Master("/ajax/master/find_ruleset?uuid=" + (std::string)UUID);
 
@@ -282,7 +282,7 @@ RuleSet* RemoteTournament::FindRuleSet(const UUID& UUID)
 	if (!yaml)
 		return nullptr;
 
-	RuleSet* rule_set = new RuleSet(yaml);
+	auto rule_set = std::make_shared<RuleSet>(yaml);
 	m_StandingData.AddRuleSet(rule_set);//Add to cache
 
 	return rule_set;

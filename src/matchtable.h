@@ -135,7 +135,7 @@ namespace Judoboard
 
 
 
-	class MatchTable : public ID
+	class MatchTable : public ID, public std::enable_shared_from_this<MatchTable>
 	{
 		friend class Tournament;
 		friend class Pool;
@@ -282,13 +282,15 @@ namespace Judoboard
 		MatchTable(const MatchTable&) = delete;
 
 		//Factory method
-		static MatchTable* CreateMatchTable(const YAML::Node& Yaml, const ITournament* Tournament);
+		template<typename T>
+		static std::shared_ptr<T> CreateMatchTable(const ITournament* Tournament = nullptr, const MatchTable* Parent = nullptr);
+		template<typename T>
+		static std::shared_ptr<T> CreateMatchTable(Weight MinWeight, Weight MaxWeight);
+		static std::shared_ptr<MatchTable> CreateMatchTable(const YAML::Node& Yaml, const ITournament* Tournament);
 
-		virtual ~MatchTable() {
-			if (!IsSubMatchTable())
-				for (auto match : m_Schedule)
-					delete match;
-		}
+		virtual ~MatchTable() {}
+
+		virtual void LoadYaml(const YAML::Node& Yaml);
 
 		virtual Type GetType() const { return Type::Unknown; }
 		virtual bool IsEditable() const { return true; }
@@ -301,9 +303,9 @@ namespace Judoboard
 		virtual Results CalculateResults() const = 0;
 		virtual size_t  ResultsCount() const = 0;//Returns the number of results that this match table will output
 
-		virtual bool AddMatch(Match* NewMatch);//Add a match manually to the match table. Use only for manual cases
+		virtual bool AddMatch(std::shared_ptr<Match> NewMatch);//Add a match manually to the match table. Use only for manual cases
 
-		virtual const std::vector<Match*> GetSchedule() const { return m_Schedule; }
+		virtual const std::vector<std::shared_ptr<Match>> GetSchedule() const { return m_Schedule; }
 		virtual uint32_t GetRecommendedNumMatchesBeforeBreak() const { return m_RecommendedNumMatches_Before_Break; }
 
 		virtual const std::string ToHTML() const = 0;
@@ -314,11 +316,11 @@ namespace Judoboard
 		virtual bool DeleteMatch(const UUID& UUID);
 
 		//Basics
-		const Match* GetMatch(size_t Index) const { if (Index >= m_Schedule.size()) return nullptr; return m_Schedule[Index]; }
+		std::shared_ptr<const Match> GetMatch(size_t Index) const { if (Index >= m_Schedule.size()) return nullptr; return m_Schedule[Index]; }
 
 		virtual std::string GetDescription() const;
 
-		const std::vector<const Match*> FindMatches(const Judoka& Fighter1, const Judoka& Fighter2) const;//Returns all matches where Fighter1 and Fighter2 fight against each other
+		const std::vector<std::shared_ptr<const Match>> FindMatches(const Judoka& Fighter1, const Judoka& Fighter2) const;//Returns all matches where Fighter1 and Fighter2 fight against each other
 
 		bool IsIncluded(const Judoka& Fighter) const;
 		size_t GetNumberOfMatches() const { return m_Schedule.size(); }
@@ -326,37 +328,46 @@ namespace Judoboard
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& Name) { m_Name = Name; }
 
-		virtual Color GetColor() const { return m_Color; }
+		Color GetColor() const { return m_Color; }
 		void  SetColor(Color NewColor) { m_Color = NewColor; }
+
+		auto GetSharedFromThis() { return shared_from_this(); }
+		auto GetSharedFromThis() const { return shared_from_this(); }
 
 		bool HasConcluded() const;
 
-		virtual Match* FindMatch(const UUID& UUID) const;
-		size_t  FindMatchIndex(const UUID& UUID) const;
+		virtual std::shared_ptr<Match> FindMatch(const UUID& UUID) const;
+		size_t FindMatchIndex(const UUID& UUID) const;
 		const Judoka* FindParticipant(const UUID& UUID) const;
 
 		bool IsElgiable(const Judoka& Fighter) const;
 
 		const std::vector<const Judoka*> GetParticipants() const;
 
-		const IFilter* GetFilter() const { return m_Filter; }
-		IFilter* GetFilter() { return m_Filter; }
-		void SetFilter(IFilter* NewFilter) { m_Filter = NewFilter; }
+		std::shared_ptr<const IFilter> GetFilter() const { return m_Filter; }
+		std::shared_ptr<IFilter> GetFilter() { return m_Filter; }
+		void SetFilter(std::shared_ptr<IFilter> NewFilter) {
+			m_Filter = NewFilter;
+			if (!m_Tournament)
+				m_Tournament = m_Filter->GetTournament();
+		}
 		const ITournament* GetTournament() const { return m_Tournament; }
+
+		virtual void GenerateSchedule() = 0;
 
 		void AutoGenerateSchedule(bool Enable = true) { m_RegenerateSchedule = Enable; }
 		bool IsAutoGenerateSchedule() const { return m_RegenerateSchedule; }
 
-		virtual const MatchTable* FindMatchTable(const UUID& ID) const { return nullptr; }
+		virtual std::shared_ptr<const MatchTable> FindMatchTable(const UUID& ID) const { return nullptr; }
 
 		//Rule sets
 		const RuleSet& GetRuleSet() const;
-		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
-		const RuleSet* GetOwnRuleSet() const { return m_Rules; }
+		void SetRuleSet(std::shared_ptr<const RuleSet> NewRuleSet) { m_Rules = NewRuleSet; }
+		std::shared_ptr<const RuleSet> GetOwnRuleSet() const { return m_Rules; }
 
 		//Age groups
-		const AgeGroup* GetAgeGroup() const;
-		void SetAgeGroup(const AgeGroup* NewAgeGroup);
+		std::shared_ptr<const AgeGroup> GetAgeGroup() const;
+		void SetAgeGroup(std::shared_ptr<const AgeGroup> NewAgeGroup);
 
 		//Scheduler
 		int32_t GetScheduleIndex() const { return m_ScheduleIndex; }
@@ -373,9 +384,9 @@ namespace Judoboard
 		void IsBestOfThree(bool Enable) { m_BestOfThree = Enable; GenerateSchedule(); }
 
 		//Sub match tables
-		bool IsSubMatchTable() const { return m_Parent; }
+		bool IsSubMatchTable() const { return (bool)m_Parent; }
 		auto GetParent() const { return m_Parent; }
-		void SetParent(const MatchTable* NewParent) { m_Parent = NewParent; }
+		void SetParent(std::shared_ptr<const MatchTable> NewParent) { m_Parent = NewParent; }
 
 		//Serialization
 		virtual void operator >> (YAML::Emitter& Yaml) const;
@@ -386,31 +397,20 @@ namespace Judoboard
 		virtual void OnLotteryPerformed();//Called when a lottery draw was performed
 
 	protected:
-		MatchTable(IFilter* Filter, const ITournament* Tournament, const MatchTable* Parent = nullptr)
-			: m_Filter(Filter), m_Tournament(Tournament), m_Parent(Parent) {
-			if (m_Filter && !m_Filter->GetParent())
-				m_Filter->SetParent(this);
-		}
-		MatchTable(const YAML::Node& Yaml, const ITournament* Tournament, const MatchTable* Parent);
-
-		virtual void GenerateSchedule() = 0;
+		MatchTable(const ITournament* Tournament, const MatchTable* Parent = nullptr)
+			: m_Tournament(Tournament), m_Parent(Parent) {}
 
 		static std::string GetHTMLForm();
 
 		const std::string GetHTMLTop() const;
 
-		Match* AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosition);
-		Match* CreateAutoMatch(const DependentJudoka& White, const DependentJudoka& Blue);
-		Match* AddMatchForWinners(Match* Match1, Match* Match2);
+		std::shared_ptr<Match> AddAutoMatch(size_t WhiteStartPosition, size_t BlueStartPosition);
+		std::shared_ptr<Match> CreateAutoMatch(const DependentJudoka& White, const DependentJudoka& Blue);
+		std::shared_ptr<Match> AddMatchForWinners(std::shared_ptr<Match> Match1, std::shared_ptr<Match> Match2);
 
 		void AddMatchesForBestOfThree();
 
 		virtual void DeleteSchedule() {
-			if (!IsSubMatchTable())
-			{
-				for (auto match : m_Schedule)
-					delete match;
-			}
 			m_Schedule.clear();
 		}
 
@@ -422,28 +422,28 @@ namespace Judoboard
 
 		const std::string ResultsToHTML() const;
 
-		std::vector<Match*>& SetSchedule() const { return m_Schedule; }
-		void SetSchedule(std::vector<Match*>&& NewSchedule) const { m_Schedule = std::move(NewSchedule); }
+		std::vector<std::shared_ptr<Match>>& SetSchedule() const { return m_Schedule; }
+		void SetSchedule(std::vector<std::shared_ptr<Match>>&& NewSchedule) const { m_Schedule = std::move(NewSchedule); }
 
 
 		uint32_t m_RecommendedNumMatches_Before_Break = 1;//Set when GenerateSchedule() is called
 
 	private:
-		const RuleSet* m_Rules = nullptr;//Custom rule set for the matches (if available)
+		std::shared_ptr<const RuleSet> m_Rules;//Custom rule set for the matches (if available)
 
 		std::string m_Name;
 
-		IFilter* m_Filter = nullptr;
+		std::shared_ptr<IFilter> m_Filter;
 
 		const ITournament* m_Tournament = nullptr;
 
-		mutable std::vector<Match*> m_Schedule;//Set when GenerateSchedule() is called
+		mutable std::vector<std::shared_ptr<Match>> m_Schedule;//Set when GenerateSchedule() is called
 
 		int32_t m_ScheduleIndex = -1;//Index when this entry should be in the schedule
 		uint32_t m_MatID = 0;
 		Color m_Color;
 
-		const MatchTable* m_Parent = nullptr;//Is this a match table that is purely used by another match table?
+		std::shared_ptr<const MatchTable> m_Parent;//Is this a match table that is purely used by another match table?
 
 		bool m_BestOfThree = false;
 

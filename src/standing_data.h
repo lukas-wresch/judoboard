@@ -54,78 +54,78 @@ namespace Judoboard
 		//Clubs
 		[[nodiscard]]
 		auto& GetAllClubs() const { return m_Clubs; }
-		Club* AddClub(const MD5::Club& NewClub);
-		bool  AddClub(Club* NewClub);
+		std::shared_ptr<Club> AddClub(const MD5::Club& NewClub);
+		bool AddClub(std::shared_ptr<Club> NewClub);
 
 		[[nodiscard]]
-		Club* FindClub(const UUID& UUID);
+		std::shared_ptr<Club> FindClub(const UUID& UUID);
 		[[nodiscard]]
-		const Club* FindClub(const UUID& UUID) const;
+		std::shared_ptr<const Club> FindClub(const UUID& UUID) const;
 		[[nodiscard]]
-		Club* FindClubByName(const std::string& Name);
+		std::shared_ptr<Club> FindClubByName(const std::string& Name);
 		[[nodiscard]]
-		const Club* FindClubByName(const std::string& Name) const;
+		std::shared_ptr<const Club> FindClubByName(const std::string& Name) const;
 
 		bool DeleteClub(const UUID& UUID);
 
 		//Associations
 		[[nodiscard]]
 		auto& GetAllAssociations() const { return m_Associations; }
-		bool AddAssociation(Association* NewAssociation);
+		bool AddAssociation(std::shared_ptr<Association> NewAssociation);
 		[[nodiscard]]
-		Association* FindAssociation(const UUID& UUID);
+		std::shared_ptr<Association> FindAssociation(const UUID& UUID);
 		[[nodiscard]]
-		const Association* FindAssociation(const UUID& UUID) const;
+		std::shared_ptr<const Association> FindAssociation(const UUID& UUID) const;
 		[[nodiscard]]
-		const Association* FindAssociationByName(const std::string& Name) const;
+		std::shared_ptr<const Association> FindAssociationByName(const std::string& Name) const;
 		bool DeleteAssociation(const UUID& UUID);
-		bool AssociationHasChildren(const Association* Association) const;
+		bool AssociationHasChildren(std::shared_ptr<const Association> Association) const;
 
 		//Rule sets
-		bool AddRuleSet(RuleSet* NewRuleSet);
+		bool AddRuleSet(std::shared_ptr<RuleSet> NewRuleSet);
 		[[nodiscard]]
 
 		[[nodiscard]]
-		RuleSet* FindRuleSetByName(const std::string& RuleSetName);
+		std::shared_ptr<RuleSet> FindRuleSetByName(const std::string& RuleSetName);
 		[[nodiscard]]
-		const RuleSet* FindRuleSetByName(const std::string& RuleSetName) const;
+		std::shared_ptr<const RuleSet> FindRuleSetByName(const std::string& RuleSetName) const;
 		[[nodiscard]]
-		RuleSet* FindRuleSet(const UUID& UUID);
+		std::shared_ptr<RuleSet> FindRuleSet(const UUID& UUID);
 		[[nodiscard]]
-		const RuleSet* FindRuleSet(const UUID& UUID) const;
+		std::shared_ptr<const RuleSet> FindRuleSet(const UUID& UUID) const;
 
-		std::vector<RuleSet*>& GetRuleSets() { return m_RuleSets; }
+		std::vector<std::shared_ptr<RuleSet>>& GetRuleSets() { return m_RuleSets; }
 		[[nodiscard]]
-		const std::vector<RuleSet*>& GetRuleSets() const { return m_RuleSets; }
+		const std::vector<std::shared_ptr<RuleSet>>& GetRuleSets() const { return m_RuleSets; }
 
 		[[nodiscard]]
 		bool DeleteRuleSet(const UUID& UUID);
 
 		//Age groups
-		bool AddAgeGroup(AgeGroup* NewAgeGroup);
+		bool AddAgeGroup(std::shared_ptr<AgeGroup> NewAgeGroup);
 		[[nodiscard]]
-		AgeGroup* FindAgeGroupByName(const std::string& AgeGroupName);
+		std::shared_ptr<AgeGroup> FindAgeGroupByName(const std::string& AgeGroupName);
 		[[nodiscard]]
-		const AgeGroup* FindAgeGroupByName(const std::string& AgeGroupName) const;
+		std::shared_ptr<const AgeGroup> FindAgeGroupByName(const std::string& AgeGroupName) const;
 		[[nodiscard]]
-		AgeGroup* FindAgeGroup(const UUID& UUID);
+		std::shared_ptr<AgeGroup> FindAgeGroup(const UUID& UUID);
 		[[nodiscard]]
-		const AgeGroup* FindAgeGroup(const UUID& UUID) const;
+		std::shared_ptr<const AgeGroup> FindAgeGroup(const UUID& UUID) const;
 
 		bool RemoveAgeGroup(const UUID& UUID);
 		[[nodiscard]]
-		std::vector<AgeGroup*>& GetAgeGroups() { return m_AgeGroups; }
+		std::vector<std::shared_ptr<AgeGroup>>& GetAgeGroups() { return m_AgeGroups; }
 		[[nodiscard]]
-		const std::vector<AgeGroup*>& GetAgeGroups() const { return m_AgeGroups; }
+		const std::vector<std::shared_ptr<AgeGroup>>& GetAgeGroups() const { return m_AgeGroups; }
 
 	protected:
 		std::vector<Judoka*> m_Judokas;
 
-		std::vector<Club*> m_Clubs;
-		std::vector<Association*> m_Associations;
+		std::vector<std::shared_ptr<Club>> m_Clubs;
+		std::vector<std::shared_ptr<Association>> m_Associations;
 
-		std::vector<RuleSet*> m_RuleSets;
-		std::vector<AgeGroup*> m_AgeGroups;
+		std::vector<std::shared_ptr<RuleSet>>  m_RuleSets;
+		std::vector<std::shared_ptr<AgeGroup>> m_AgeGroups;
 
 	private:
 		uint32_t m_Year = 0;//Relative year for calculating the age groups. Set to 0 to use the current year

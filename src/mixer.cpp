@@ -6,13 +6,15 @@ using namespace Judoboard;
 
 
 
-Mixer::Mixer(const IFilter& pSource1, const IFilter& pSource2, const MatchTable* Parent) :
+Mixer::Mixer(std::shared_ptr<const IFilter> pSource1, std::shared_ptr<const IFilter> pSource2, const MatchTable* Parent) :
 	IFilter(Parent)
 {
-	m_pSources.push_back(&pSource1);
-	m_pSources.push_back(&pSource2);
+	assert(pSource1);
+	assert(pSource2);
+	m_pSources.push_back(pSource1);
+	m_pSources.push_back(pSource2);
 	Recalculate();
-	assert(pSource1.GetTournament() == pSource2.GetTournament());
+	assert(pSource1->GetTournament() == pSource2->GetTournament());
 }
 
 

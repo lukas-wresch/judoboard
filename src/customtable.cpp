@@ -12,7 +12,7 @@ using namespace Judoboard;
 
 
 
-CustomTable::CustomTable(const ITournament* Tournament) : MatchTable(nullptr, Tournament)
+CustomTable::CustomTable(const ITournament* Tournament) : MatchTable(Tournament)
 {
 	SetName(Localizer::Translate("Friendly Match"));
 }

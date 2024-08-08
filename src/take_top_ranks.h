@@ -11,7 +11,7 @@ namespace Judoboard
 	class TakeTopRanks : public IFilter
 	{
 	public:
-		TakeTopRanks(const MatchTable& pSource, size_t NumRanks, const MatchTable* Parent = nullptr);
+		TakeTopRanks(std::shared_ptr<const MatchTable> pSource, size_t NumRanks, const MatchTable* Parent = nullptr);
 		TakeTopRanks(const YAML::Node& Yaml, const MatchTable* Parent);
 
 		virtual Type GetType() const override { return Type::TakeTopRanks; }
@@ -29,7 +29,7 @@ namespace Judoboard
 		virtual void ToString(YAML::Emitter& Yaml) const override;
 
 	private:
-		const MatchTable& m_pSource;
+		std::shared_ptr<const MatchTable> m_pSource;
 		size_t m_NumRanks;//Take this number of judoka from the top
 	};
 }
