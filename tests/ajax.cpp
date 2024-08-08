@@ -1757,7 +1757,7 @@ TEST(Ajax, EditAssociation)
 		app.GetDatabase().AddAssociation(nrw);
 
 
-		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID(), "name=Niedersachen 2&shortname=NS&parent=" + (std::string)de->GetUUID())), "ok");
+		EXPECT_TRUE(app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID(), "name=Niedersachen 2&shortname=NS&parent=" + (std::string)de->GetUUID())));
 
 		EXPECT_EQ(nieder->GetName(), "Niedersachen 2");
 		EXPECT_EQ(nieder->GetShortName(), "NS");

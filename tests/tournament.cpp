@@ -1908,7 +1908,7 @@ TEST(Tournament, PruneUnusedClubs)
 		Judoka* j4 = new Judoka("Firstname4", "Lastname4", 61, Gender::Male);
 
 		Club* c1 = new Club("Club 1");
-		Club* c2 = new Club("Club 1");
+		Club* c2 = new Club("Club 2");
 
 		Tournament* tourney = new Tournament("deleteMe");
 		tourney->Reset();
