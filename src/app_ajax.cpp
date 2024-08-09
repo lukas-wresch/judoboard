@@ -3766,8 +3766,11 @@ Error Application::Ajax_DeleteClub(const HttpServer::Request& Request)
 		if (!m_Database.DeleteAssociation(id))
 			return Error(Error::Type::OperationFailed);
 
-		if (GetTournament())
-			GetTournament()->RemoveAssociation(id);
+		/*if (GetTournament())
+		{
+			if (!GetTournament()->RemoveAssociation(id))
+				return Error(Error::Type::OperationFailed);
+		}*/
 
 		return Error::Type::NoError;
 	}
@@ -3782,8 +3785,8 @@ Error Application::Ajax_DeleteClub(const HttpServer::Request& Request)
 		if (!m_Database.DeleteClub(id))
 			return Error(Error::Type::OperationFailed);
 
-		if (GetTournament())
-			GetTournament()->RemoveClub(id);
+		/*if (GetTournament())
+			GetTournament()->RemoveClub(id);*/
 
 		return Error::Type::NoError;
 	}

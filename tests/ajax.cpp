@@ -1726,7 +1726,7 @@ TEST(Ajax, DeleteAssociation)
 
 
 		EXPECT_EQ(app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)de->GetUUID())), Error(Error::Type::OperationFailed));
-		EXPECT_EQ((std::string)app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID())), "ok");
+		EXPECT_TRUE(app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID())));
 
 		EXPECT_TRUE(app.GetDatabase().FindAssociation(de->GetUUID()));
 		EXPECT_FALSE(app.GetDatabase().FindAssociation(nieder->GetUUID()));
