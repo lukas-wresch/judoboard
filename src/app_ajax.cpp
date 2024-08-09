@@ -3266,6 +3266,7 @@ Error Application::Ajax_UpdateMat(const HttpServer::Request& Request)
 
 Error Application::Ajax_AddJudoka(const HttpServer::Request& Request)
 {
+	bool to_tournament = HttpServer::DecodeURLEncoded(Request.m_Query, "to_tournament") == "true";
 	auto firstname = HttpServer::DecodeURLEncoded(Request.m_Body, "firstname");
 	auto lastname  = HttpServer::DecodeURLEncoded(Request.m_Body, "lastname");
 	auto weight    = HttpServer::DecodeURLEncoded(Request.m_Body, "weight");
@@ -3286,10 +3287,30 @@ Error Application::Ajax_AddJudoka(const HttpServer::Request& Request)
 
 	new_judoka.SetClub(GetDatabase().FindClub(clubID));
 
-	auto guard = LockWriteForScope();
+	if (to_tournament)
+	{
+		auto guard = LockReadForScope();
+		auto tournament = GetTournament();
 
-	m_Database.AddJudoka(std::move(new_judoka));
-	m_Database.Save();
+		auto club = tournament->FindClub(clubID);//Take club of the tourament if the club is already in the tournament
+		if (club)
+			new_judoka.SetClub(club);
+
+		if (!tournament)
+			return Error::Type::TournamentNotOpen;
+
+		if (!tournament->AddParticipant(new Judoka(new_judoka)))
+			return Error::Type::OperationFailed;
+	}
+
+	else
+	{
+		auto guard = LockWriteForScope();
+
+		if (!m_Database.AddJudoka(std::move(new_judoka)))
+			return Error::Type::OperationFailed;
+		m_Database.Save();
+	}
 	
 	return Error();//OK
 }
@@ -3745,8 +3766,11 @@ Error Application::Ajax_DeleteClub(const HttpServer::Request& Request)
 		if (!m_Database.DeleteAssociation(id))
 			return Error(Error::Type::OperationFailed);
 
-		if (GetTournament())
-			GetTournament()->RemoveAssociation(id);
+		/*if (GetTournament())
+		{
+			if (!GetTournament()->RemoveAssociation(id))
+				return Error(Error::Type::OperationFailed);
+		}*/
 
 		return Error::Type::NoError;
 	}
@@ -3761,8 +3785,8 @@ Error Application::Ajax_DeleteClub(const HttpServer::Request& Request)
 		if (!m_Database.DeleteClub(id))
 			return Error(Error::Type::OperationFailed);
 
-		if (GetTournament())
-			GetTournament()->RemoveClub(id);
+		/*if (GetTournament())
+			GetTournament()->RemoveClub(id);*/
 
 		return Error::Type::NoError;
 	}
@@ -3775,13 +3799,14 @@ Error Application::Ajax_DeleteClub(const HttpServer::Request& Request)
 std::string Application::Ajax_ListClubs(const HttpServer::Request& Request)
 {
 	bool all = HttpServer::DecodeURLEncoded(Request.m_Query, "all") == "true";
+	bool tournament_only = HttpServer::DecodeURLEncoded(Request.m_Query, "tournament_only") == "true";
 
 	YAML::Emitter ret;
 	ret << YAML::BeginSeq;
 
 	auto guard = LockReadForScope();
 
-	if (all && GetTournament())
+	if ((all || tournament_only) && GetTournament())
 	{
 		Tournament* tour = (Tournament*)GetTournament();//TODO: could be remote tournament
 
@@ -3794,10 +3819,13 @@ std::string Application::Ajax_ListClubs(const HttpServer::Request& Request)
 		tour->UnlockRead();
 	}
 
-	for (auto club : m_Database.GetAllClubs())
+	if (all || !tournament_only)
 	{
-		if (club)
-			*club >> ret;
+		for (auto club : m_Database.GetAllClubs())
+		{
+			if (club)
+				*club >> ret;
+		}
 	}
 
 	ret << YAML::EndSeq;

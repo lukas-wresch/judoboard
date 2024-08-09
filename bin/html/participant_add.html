@@ -16,6 +16,8 @@
   </tr>
 </table>
 
+<button class="add" id="add_new_judoka" onclick="navigate('judoka_add.html?to_tournament=1')"></button>
+
 <form style="display: inline;" action="/upload/dm4" method="post" id="upload_form" enctype="multipart/form-data">
     <input id="file" name="file" type="file" accept="text/*.*" onchange="document.getElementById('upload_form').submit();" hidden/>
     <button class="add" id="add" onclick="document.getElementById('file').click(); return false;">Upload DM4 File</button>
@@ -68,12 +70,15 @@ function Update()
 {
   AjaxCallback('ajax/judoka/search?all=true&name=' + utf8Encode(document.getElementById("name").value), function(response) {
     console.log(response);
-    let res = YAML.parse(response);
+    const res = YAML.parse(response);
 
     let table = document.getElementById("judokas");
 
     while (table.rows.length > 1)
       table.deleteRow(table.rows.length-1);
+
+    if (document.getElementById("name").value == "")
+      return;
 
     let no = 0;
     for (const judoka of res)
@@ -117,19 +122,19 @@ function Update()
       {
         if (judoka.age_groups.length > 1)
         {
-          var select = document.createElement("select");
+          let select = document.createElement("select");
           select.style.width = "2.0cm";
           select.style.fontSize = "14pt";
           select.id = "select_" + judoka.uuid;
 
-          var option = document.createElement("option");
+          let option = document.createElement("option");
           option.value = 0;
           option.text  = "None";
           select.appendChild(option);
 
           for (const age_group of judoka.age_groups)
           {
-            var option = document.createElement("option");
+            let option = document.createElement("option");
             option.value = age_group.uuid;
             option.text  = age_group.name;
 
@@ -160,5 +165,6 @@ document.getElementById("club").innerHTML = translate('club');
 document.getElementById("weight").innerHTML = translate('weight');
 document.getElementById("birthyear").innerHTML = translate('birthyear');
 document.getElementById("options").innerHTML = translate('options');
+document.getElementById("add_new_judoka").innerHTML = translate('new_judoka');
 
 </script>

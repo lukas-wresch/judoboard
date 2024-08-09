@@ -1033,6 +1033,7 @@ TEST(Ajax, Judoka_Add)
 		auto judokas = app.GetDatabase().GetAllJudokas();
 
 		ASSERT_EQ(judokas.size(), 1);
+		EXPECT_EQ(app.GetTournament()->GetParticipants().size(), 0);
 		auto judoka = judokas[0];
 
 		EXPECT_EQ(judoka->GetFirstname(), "first");
@@ -1041,6 +1042,28 @@ TEST(Ajax, Judoka_Add)
 		EXPECT_EQ(judoka->GetGender(),  Gender::Male);
 		EXPECT_EQ(judoka->GetBirthyear(), 2000);
 		EXPECT_EQ(judoka->GetNumber(), "A123");
+
+
+		auto c = new Club("Club 1");
+		c->SetShortName("c");
+		app.GetTournament()->GetDatabase().AddClub(c);
+
+
+		EXPECT_TRUE(app.Ajax_AddJudoka(HttpServer::Request("to_tournament=true", "firstname=first2&lastname=last2&weight=10&gender=0&birthyear=2000&number=A123&club=" + (std::string)c->GetUUID())));
+
+		EXPECT_EQ(app.GetDatabase().GetAllJudokas().size(),      1);
+		ASSERT_EQ(app.GetTournament()->GetParticipants().size(), 1);
+
+		judoka = app.GetTournament()->GetParticipants()[0];
+
+		EXPECT_EQ(judoka->GetFirstname(), "first2");
+		EXPECT_EQ(judoka->GetLastname(),  "last2");
+		EXPECT_EQ(judoka->GetWeight(),  Weight(10));
+		EXPECT_EQ(judoka->GetGender(),  Gender::Male);
+		EXPECT_EQ(judoka->GetBirthyear(), 2000);
+		EXPECT_EQ(judoka->GetNumber(), "A123");
+		ASSERT_TRUE(judoka->GetClub());
+		EXPECT_EQ(*judoka->GetClub(), *c);
 	}
 }
 
@@ -1703,7 +1726,7 @@ TEST(Ajax, DeleteAssociation)
 
 
 		EXPECT_EQ(app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)de->GetUUID())), Error(Error::Type::OperationFailed));
-		EXPECT_EQ((std::string)app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID())), "ok");
+		EXPECT_TRUE(app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID())));
 
 		EXPECT_TRUE(app.GetDatabase().FindAssociation(de->GetUUID()));
 		EXPECT_FALSE(app.GetDatabase().FindAssociation(nieder->GetUUID()));
@@ -1743,7 +1766,7 @@ TEST(Ajax, EditAssociation)
 		app.GetDatabase().AddAssociation(nrw);
 
 
-		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID(), "name=Niedersachen 2&shortname=NS&parent=" + (std::string)de->GetUUID())), "ok");
+		EXPECT_TRUE(app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID(), "name=Niedersachen 2&shortname=NS&parent=" + (std::string)de->GetUUID())));
 
 		EXPECT_EQ(nieder->GetName(), "Niedersachen 2");
 		EXPECT_EQ(nieder->GetShortName(), "NS");
@@ -1809,6 +1832,43 @@ TEST(Ajax, Clubs_List_All)
 		ASSERT_EQ(yaml.size(), 1);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
 		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c");
+	}
+}
+
+
+
+TEST(Ajax, Clubs_List_Tournament)
+{
+	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Application app;
+
+		auto c1 = new Club("Club 1");
+		c1->SetShortName("c1");
+		auto c2 = new Club("Club 2");
+		c2->SetShortName("c2");
+
+		auto t = new Tournament("deleteMe");
+		t->EnableAutoSave(false);
+
+		app.AddTournament(t);
+
+		auto j = new Judoka("first", "last");
+		j->SetClub(c1);
+		t->AddParticipant(j);
+
+		app.GetDatabase().AddClub(c2);
+
+		auto yaml = YAML::Load(app.Ajax_ListClubs(HttpServer::Request("tournament_only=true")));
+
+		ASSERT_EQ(yaml.size(), 1);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
+		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c1");
+
+		yaml = YAML::Load(app.Ajax_ListClubs(HttpServer::Request("all=true")));
+		ASSERT_EQ(yaml.size(), 2);
 	}
 }
 
