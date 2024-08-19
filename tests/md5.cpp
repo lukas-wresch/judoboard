@@ -1466,6 +1466,10 @@ TEST(MD5, ConvertToMD5)
 
 		MD5 file(tour_temp);//Convert back to MD5
 
+		EXPECT_EQ(file1.GetNumAssociations(), 158);
+		EXPECT_EQ(tour_temp.GetDatabase().GetAllAssociations().size(), 7);
+		EXPECT_EQ(file.GetNumAssociations(),  7);
+
 		//ASSERT_EQ(file.GetLottery().size(), file1.GetLottery().size());
 		for (int i = 0; i < file.GetLottery().size(); ++i)
 		{
