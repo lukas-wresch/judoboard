@@ -57,7 +57,7 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		else
 			new_club = new Club(*club);
 
-		assert(m_StandingData.AddClub(new_club));
+		m_StandingData.AddClub(new_club);
 		club->pUserData = new_club;
 	}
 
