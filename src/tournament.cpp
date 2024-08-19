@@ -57,7 +57,8 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		else
 			new_club = new Club(*club);
 
-		m_StandingData.AddClub(new_club);
+		if (!m_StandingData.AddClub(new_club))
+			ZED::Log::Error("Could not add club during import!");
 		club->pUserData = new_club;
 	}
 

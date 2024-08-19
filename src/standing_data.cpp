@@ -279,9 +279,9 @@ bool StandingData::AddClub(Club* NewClub)
 			NewClub->SetParent(prev_added);
 		else
 		{
-			auto prev_added = FindAssociationByName(parent->GetName());
-			if (prev_added)
-				NewClub->SetParent(prev_added);
+			auto prev_added2 = FindAssociationByName(parent->GetName());
+			if (prev_added2)
+				NewClub->SetParent(prev_added2);
 			else
 				ret = AddAssociation(const_cast<Association*>(NewClub->GetParent()));
 		}
@@ -368,6 +368,8 @@ bool StandingData::AddAssociation(Association* NewAssociation)
 	if (FindAssociationByName(NewAssociation->GetName()))
 		return false;
 
+	bool ret = true;
+
 	auto parent = NewAssociation->GetParent();
 	if (parent)
 	{
@@ -376,11 +378,11 @@ bool StandingData::AddAssociation(Association* NewAssociation)
 			NewAssociation->SetParent(prev_added);
 		else
 		{
-			auto prev_added = FindAssociationByName(parent->GetName());
-			if (prev_added)
+			auto prev_added2 = FindAssociationByName(parent->GetName());
+			if (prev_added2)
 				NewAssociation->SetParent(prev_added);
 			else//Add recursively
-				assert(AddAssociation(const_cast<Association*>(NewAssociation->GetParent())));
+				ret = AddAssociation(const_cast<Association*>(NewAssociation->GetParent()));
 		}
 	}	
 
@@ -389,7 +391,7 @@ bool StandingData::AddAssociation(Association* NewAssociation)
 	//std::sort would normally order the vector by memory address :-(
 	std::sort(m_Associations.begin(), m_Associations.end(), [](auto a, auto b) { return *a < *b; });
 
-	return true;
+	return ret;
 }
 
 
