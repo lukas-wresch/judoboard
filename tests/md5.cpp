@@ -1479,6 +1479,8 @@ TEST(MD5, ConvertToMD5)
 			EXPECT_EQ(file.GetLottery()[i].StartNo, file1_lot);
 		}
 
+		file.Dump();
+
 		ASSERT_TRUE(file.GetOrganizer());
 		ASSERT_TRUE(file1.GetOrganizer());
 		EXPECT_EQ(file.GetOrganizer()->Description, file1.GetOrganizer()->Description);
