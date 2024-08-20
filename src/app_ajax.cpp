@@ -2777,9 +2777,9 @@ Error Application::Ajax_SkipBreak(const HttpServer::Request& Request)
 	auto white = match->GetFighter(Fighter::White);
 	auto blue  = match->GetFighter(Fighter::Blue);
 
-	if (white && white->NeedsBreak())
+	if (white)
 		((Judoka*)white)->SkipBreak();
-	if (blue && blue->NeedsBreak())
+	if (blue)
 		((Judoka*)blue)->SkipBreak();
 
 	return Error();//OK

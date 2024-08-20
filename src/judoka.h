@@ -138,7 +138,8 @@ namespace Judoboard
 		//Skips the current break
 		void SkipBreak() {
 			assert(NeedsBreak());
-			m_LastMatch_Timestamp = Timer::GetTimestamp() - m_RequiredBreakTime*1000;
+			if (NeedsBreak())
+				m_LastMatch_Timestamp = Timer::GetTimestamp() - m_RequiredBreakTime*1000;
 			assert(!NeedsBreak());
 		}
 
