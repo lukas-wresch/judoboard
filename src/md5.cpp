@@ -1424,6 +1424,9 @@ void MD5::Dump() const
 		ZED::Log::Info(line);
 	}
 
+	std::string line = std::string("\nOrganizer ID: ") + std::to_string(m_AssociationID);
+	ZED::Log::Info(line);
+
 
 	//Dump relation
 	ZED::Log::Info("\n\n--- Club -> Association ---");

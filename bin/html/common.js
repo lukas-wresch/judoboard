@@ -5,6 +5,8 @@ var lang_en = {
     add_match: [ "Add Match", "Kampf hinzuf&uuml;gen" ],
     add_matchtable: [ "Add Match Table", "Kampfliste hinzuf&uuml;gen" ],
     add_participant:  [ "Add Participant", "Teilnehmer  hinzuf&uuml;gen" ],
+    add_to_tournament: [ "Add to Tournament", "Zum Turnier hinzuf&uuml;gen" ],
+    added_to_database: [ "added to database", "zu Stammdaten hinzugef&uuml;gt" ],
     age_group:  [ "Age group", "Altersklasse" ],
     age_groups: [ "Age groups", "Altersklassen" ],
     all:   [ "All", "Alle" ],
