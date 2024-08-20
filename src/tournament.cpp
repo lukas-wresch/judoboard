@@ -1840,6 +1840,55 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 
 
 
+bool Tournament::OnUpdateAgeGroup(const UUID& UUID)
+{
+	if (IsReadonly())
+		return false;
+	if (GetStatus() == Status::Concluded)
+		return false;
+
+	auto age_group = FindAgeGroup(UUID);
+
+	if (!age_group)
+		return false;
+
+	auto guard = LockWriteForScope();
+
+	bool need_to_rebuild = false;
+
+	for (auto table : GetMatchTables())
+	{
+		if (!table->GetAgeGroup() || *table->GetAgeGroup() != *age_group)
+			continue;
+
+		if (table->GetStatus() == Status::Scheduled)//Can safely recalculate the match table
+		{
+			auto old_match_count = table->GetSchedule().size();
+
+			auto participants = table->GetParticipants();
+			for (auto judoka : participants)
+				if (judoka && judoka->GetWeight() != 0 && !table->IsElgiable(*judoka))//No longer eligable?
+					table->RemoveParticipant(judoka);
+
+			for (auto judoka : m_StandingData.GetAllJudokas())
+			{
+				if (judoka && table->IsElgiable(*judoka))
+					table->AddParticipant(judoka);
+			}
+
+			table->GenerateSchedule();
+			need_to_rebuild = true;//Only rebuild schedule in this case
+		}
+	}
+
+	if (need_to_rebuild)
+		BuildSchedule();
+
+	return true;
+}
+
+
+
 bool Tournament::RemoveMatchTable(const UUID& UUID)
 {
 	if (IsReadonly())

@@ -4036,6 +4036,10 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 	if (!rule)
 		ZED::Log::Warn("Could not find rule set.");
 
+	const bool recalculate = age_group->GetMinAge() != min_age ||
+							 age_group->GetMaxAge() != max_age ||
+							 age_group->GetGender() != gender;
+
 	age_group->SetName(name);
 	age_group->SetMinAge(min_age);
 	age_group->SetMaxAge(max_age);
@@ -4043,6 +4047,10 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 	age_group->SetRuleSet(rule);
 
 	GetTournament()->AddRuleSet(rule);
+
+	if (recalculate)
+		if (!GetTournament()->OnUpdateAgeGroup(*age_group))
+			return Error::Type::OperationFailed;
 
 	return Error::Type::NoError;
 }

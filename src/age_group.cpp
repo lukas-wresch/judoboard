@@ -58,7 +58,7 @@ bool AgeGroup::IsElgiable(const Judoka& Fighter, const StandingData& StandingDat
 		if (m_Gender != Fighter.GetGender())
 			return false;
 
-	uint32_t age = StandingData.GetYear() - Fighter.GetBirthyear();
+	int age = StandingData.GetYear() - Fighter.GetBirthyear();
 
 	if (m_MinAge == 0 && m_MaxAge == 0)//No restriction at all
 		return true;
