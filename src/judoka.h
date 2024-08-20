@@ -135,6 +135,11 @@ namespace Judoboard
 		bool NeedsBreak()  const {
 			return GetLengthOfBreak() < m_RequiredBreakTime;
 		}
+		//Skips the current break
+		void SkipBreak() {
+			m_LastMatch_Timestamp = Timer::GetTimestamp() - m_RequiredBreakTime*1000;
+			assert(!NeedsBreak());
+		}
 
 		void operator >> (YAML::Emitter& Yaml) const;
 		void ToString(YAML::Emitter& Yaml) const;

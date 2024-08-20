@@ -424,6 +424,37 @@ TEST(Match, BreakTime)
 
 
 
+TEST(Match, SkipBreakTime)
+{
+	initialize();
+
+	Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j3(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j4(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+
+	RuleSet* rules = new RuleSet("test", 30, 30, 20, 10, false, false, false, 60);
+	Match m1(&j1, &j2, nullptr, 1);
+	Match m2(&j2, &j1, nullptr, 1);
+
+	m1.SetRuleSet(rules);
+	m2.SetRuleSet(rules);
+
+	m1.StartMatch();
+	m1.EndMatch();
+
+	EXPECT_TRUE(j1.NeedsBreak());
+	EXPECT_TRUE(j2.NeedsBreak());
+
+	j1.SkipBreak();
+	j2.SkipBreak();
+
+	EXPECT_FALSE(j1.NeedsBreak());
+	EXPECT_FALSE(j2.NeedsBreak());
+}
+
+
+
 TEST(Match, MatchTimeOnlyForWinner)
 {
 	initialize();
