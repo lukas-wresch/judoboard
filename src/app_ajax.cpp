@@ -2777,10 +2777,10 @@ Error Application::Ajax_SkipBreak(const HttpServer::Request& Request)
 	auto white = match->GetFighter(Fighter::White);
 	auto blue  = match->GetFighter(Fighter::Blue);
 
-	if (white)
+	if (white && white->NeedsBreak())
 		((Judoka*)white)->SkipBreak();
-	if (blue)
-		((Judoka*)blue)->SkipBreak();	
+	if (blue && blue->NeedsBreak())
+		((Judoka*)blue)->SkipBreak();
 
 	return Error();//OK
 }
