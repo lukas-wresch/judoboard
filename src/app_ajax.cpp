@@ -4021,11 +4021,14 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 
 	auto guard = LockWriteForScope();
 
-	auto age_group = GetDatabase().FindAgeGroup(id);
+	auto age_group = GetTournament()->FindAgeGroup(id);
+
+	bool from_tournament = true;
 
 	if (!age_group)
 	{
-		age_group = GetTournament()->FindAgeGroup(id);
+		age_group = GetDatabase().FindAgeGroup(id);
+		from_tournament = false;
 
 		if (!age_group)
 			return Error::Type::InvalidID;
@@ -4046,9 +4049,10 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 	age_group->SetGender(gender);
 	age_group->SetRuleSet(rule);
 
-	GetTournament()->AddRuleSet(rule);
+	if (from_tournament)
+		GetTournament()->AddRuleSet(rule);
 
-	if (recalculate)
+	if (from_tournament && recalculate)
 		if (!GetTournament()->OnUpdateAgeGroup(*age_group))
 			return Error::Type::OperationFailed;
 
