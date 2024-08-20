@@ -118,6 +118,7 @@ namespace Judoboard
 		Error Ajax_AddMatch(const HttpServer::Request& Request);
 		Error Ajax_SetMatOfMatch(const HttpServer::Request& Request);
 		Error Ajax_EditMatch(const HttpServer::Request& Request);
+		Error Ajax_SkipBreak(const HttpServer::Request& Request);
 		Error Ajax_ReviseMatch(const HttpServer::Request& Request);
 
 		//Tournaments

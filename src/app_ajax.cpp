@@ -511,6 +511,14 @@ void Application::SetupHttpServer()
 		return Ajax_EditMatch(Request);
 	});
 
+	m_Server.RegisterResource("/ajax/match/skip_break", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		return Ajax_SkipBreak(Request);
+	});
+
 	m_Server.RegisterResource("/ajax/match/revise", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
@@ -2746,6 +2754,33 @@ Error Application::Ajax_EditMatch(const HttpServer::Request& Request)
 
 	match->SetMatID(matID);
 	match->SetRuleSet(ruleSet);
+
+	return Error();//OK
+}
+
+
+
+Error Application::Ajax_SkipBreak(const HttpServer::Request& Request)
+{
+	UUID matchID = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+	auto guard = LockReadForScope();
+
+	auto tournament = GetTournament();
+	if (!tournament)
+		return Error::Type::TournamentNotOpen;
+
+	auto match = tournament->FindMatch(matchID);
+	if (!match)
+		return Error::Type::ItemNotFound;
+
+	auto white = match->GetFighter(Fighter::White);
+	auto blue  = match->GetFighter(Fighter::Blue);
+
+	if (white)
+		((Judoka*)white)->SkipBreak();
+	if (blue)
+		((Judoka*)blue)->SkipBreak();	
 
 	return Error();//OK
 }

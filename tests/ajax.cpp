@@ -2237,6 +2237,49 @@ TEST(Ajax, RemoveDisqualification)
 
 
 
+TEST(Ajax, SkipBreak)
+{
+	initialize();
+
+	Application app;
+
+	auto mat = app.StartLocalMat();
+
+	Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j3(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j4(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+
+	RuleSet* rules = new RuleSet("test", 30, 30, 20, 10, false, false, false, 60);
+	Match* m1 = new Match(&j1, &j2, nullptr, 1);
+	Match* m2 = new Match(&j2, &j1, nullptr, 1);
+
+	m1->SetRuleSet(rules);
+	m2->SetRuleSet(rules);
+
+	app.GetTournament()->AddMatch(m1);
+	app.GetTournament()->AddMatch(m2);
+
+	m1->StartMatch();
+	m1->EndMatch();
+
+	EXPECT_TRUE(j1.NeedsBreak());
+	EXPECT_TRUE(j2.NeedsBreak());
+
+	EXPECT_FALSE(mat->StartMatch(m2));
+
+	EXPECT_TRUE(app.Ajax_SkipBreak(HttpServer::Request("id=" + (std::string)m2->GetUUID())));
+
+	EXPECT_FALSE(j1.NeedsBreak());
+	EXPECT_FALSE(j2.NeedsBreak());
+
+	EXPECT_TRUE(mat->StartMatch(m2));
+	mat->AddIppon(Fighter::White);
+	EXPECT_TRUE(mat->EndMatch());
+}
+
+
+
 TEST(Ajax, Match_Add)
 {
 	initialize();
