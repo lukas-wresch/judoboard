@@ -854,8 +854,8 @@ bool Tournament::AddMatch(Match* NewMatch)
 		NewMatch->SetMatID(1);//Use mat ID 1 as the default
 
 	//Do we have the rule set already?
-	if (!m_StandingData.FindRuleSet(NewMatch->GetRuleSet().GetUUID()))
-		m_StandingData.AddRuleSet(new RuleSet(NewMatch->GetRuleSet()));//Copy rule set
+	if (NewMatch->GetOwnRuleSet())
+		m_StandingData.AddRuleSet((RuleSet*)NewMatch->GetOwnRuleSet());
 
 	auto dependencies = NewMatch->GetDependentMatches();//Does this match depend on any other match?
 
