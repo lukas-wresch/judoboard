@@ -61,6 +61,7 @@ void Localizer::Initialize(Language NewLanguage)
 			s_de["Operation failed"]       = u8"Vorgang fehlgeschlagen";
 			s_de["Invalid format"]         = u8"Ung\u00fcrltiges Format";
 			s_de["Invalid input"]          = u8"Ung\u00fcrltige Eingabe";
+			s_de["License insufficient for this feature"] = u8"Lizenz unzureichend f\u00fcr diesen Vorgang";
 
 			s_de["Running"] = u8"am K\u00e4mpfen";
 

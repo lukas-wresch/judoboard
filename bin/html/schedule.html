@@ -269,7 +269,7 @@ function Update_Masterschedule()
     let mat_count = res.highest_mat_id;
 
     let row = table.insertRow(-1);
-    for (var j=0; j < mat_count; j++)
+    for (let j=0; j < mat_count; j++)
     {
       let option = document.createElement("option");
       option.value = j+1;

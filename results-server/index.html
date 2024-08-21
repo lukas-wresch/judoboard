@@ -9,9 +9,8 @@
 <body>
 <div style="font-size: 25pt; margin-top: 4mm;">Judoboard</div>
 
-<button class="neutral" style="width: 2.5cm; height: 0.9cm;" onclick="Update(0);">&Uuml;bersicht</button>
-<button class="neutral" style="width: 2.5cm; height: 0.9cm;" onclick="Update(1);">Matte 1</button>
-<button class="neutral" style="width: 2.5cm; height: 0.9cm;" onclick="Update(2);">Matte 2</button>
+<div id="mats">
+</div>
 
 <div id="content">
 </div>
@@ -21,13 +20,30 @@
 
 function Update(mat)
 {
+  if (counter%5 == 0)
+  {
+    AjaxCallback("get_mats.php", function(response) {
+      const resp = JSON.parse(response);
+
+      //console.log(resp);
+      document.getElementById("mats").innerHTML = '<button class="neutral" style="width: 3.5cm; height: 0.9cm;" onclick="Update(0);">&Uuml;bersicht</button>';
+      
+      for (const mat of resp)
+      {
+        document.getElementById("mats").innerHTML += '<button class="neutral" style="width: 3.5cm; height: 0.9cm;" onclick="Update(' + mat.id + ');">' + mat.name + '</button>';
+      }
+    });
+  }
+
   AjaxCallback("get.php?mat=" + mat, function(response) {
     document.getElementById("content").innerHTML = response;
   });
 
   window.clearTimeout(timer);
   timer = window.setTimeout(Update, 30*1000, mat);
+  counter++;
 }
+
 
 function Update_Table(id)
 {
@@ -40,6 +56,7 @@ function Update_Table(id)
 }
 
 var timer;
+var counter = 0;
 Update(0);
 
 </script>
