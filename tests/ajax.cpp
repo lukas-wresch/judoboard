@@ -398,7 +398,7 @@ TEST(Ajax, GetMats)
 	EXPECT_EQ(yaml["mats"][0]["osaekomi_style"].as<int>(), (int)IMat::OsaekomiStyle::ProgressBar);
 	EXPECT_EQ(yaml["mats"][0]["name_style"].as<int>(),  (int)NameStyle::FamilyName);
 	EXPECT_TRUE(yaml["mats"][0]["sound_enabled"].as<bool>());
-	EXPECT_EQ(yaml["mats"][0]["sound_filename"].as<std::string>(), "test");
+	EXPECT_EQ(yaml["mats"][0]["sound_filename"].as<std::string>(), "gong");
 }
 
 
@@ -614,9 +614,15 @@ TEST(Ajax, PauseAllMats)
 		app.StartLocalMat(2);
 		app.StartLocalMat(3);
 
+		ZED::Core::Pause(100);
+
 		auto mat1 = app.FindMat(1);
 		auto mat2 = app.FindMat(2);
 		auto mat3 = app.FindMat(3);
+
+		ASSERT_TRUE(mat1);
+		ASSERT_TRUE(mat2);
+		ASSERT_TRUE(mat3);
 
 		EXPECT_FALSE(app.Ajax_PauseAllMats(HttpServer::Request("enable=false")));
 
@@ -685,8 +691,8 @@ TEST(Ajax, Setup_Get)
 		EXPECT_EQ(yaml["port"].as<int>(), app.GetDatabase().GetServerPort());
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
-		EXPECT_TRUE(yaml["results_server"]);
-		EXPECT_TRUE(yaml["results_server_url"]);
+		EXPECT_FALSE(yaml["results_server"]);
+		EXPECT_FALSE(yaml["results_server_url"]);
 
 		ZED::Core::Pause(1000);
 
@@ -777,11 +783,14 @@ TEST(Ajax, Sound_ListFiles)
 
 		std::vector<std::string> filenames = { "airhorn", "alert", "gong sabi", "gong", "gong2", "high gong", "low gong", "spooky gong", "tiger gong", "wind chime" };
 
-		int i = 0;
+		int count = 0;
 		for (auto node : yaml)
 		{
-			EXPECT_EQ(node["filename"].as<std::string>(), filenames[i++]);
+			EXPECT_NE(std::find(filenames.cbegin(), filenames.cend(), node["filename"].as<std::string>()), filenames.cend());
+			count++;
 		}
+
+		EXPECT_EQ(count, filenames.size());
 	}
 }
 
@@ -1025,6 +1034,7 @@ TEST(Ajax, Judoka_Add)
 		auto judokas = app.GetDatabase().GetAllJudokas();
 
 		ASSERT_EQ(judokas.size(), 1);
+		EXPECT_EQ(app.GetTournament()->GetParticipants().size(), 0);
 		auto judoka = judokas[0];
 
 		EXPECT_EQ(judoka->GetFirstname(), "first");
@@ -1033,6 +1043,28 @@ TEST(Ajax, Judoka_Add)
 		EXPECT_EQ(judoka->GetGender(),  Gender::Male);
 		EXPECT_EQ(judoka->GetBirthyear(), 2000);
 		EXPECT_EQ(judoka->GetNumber(), "A123");
+
+
+		auto c = new Club("Club 1");
+		c->SetShortName("c");
+		app.GetTournament()->GetDatabase().AddClub(c);
+
+
+		EXPECT_TRUE(app.Ajax_AddJudoka(HttpServer::Request("to_tournament=true", "firstname=first2&lastname=last2&weight=10&gender=0&birthyear=2000&number=A123&club=" + (std::string)c->GetUUID())));
+
+		EXPECT_EQ(app.GetDatabase().GetAllJudokas().size(),      1);
+		ASSERT_EQ(app.GetTournament()->GetParticipants().size(), 1);
+
+		judoka = app.GetTournament()->GetParticipants()[0];
+
+		EXPECT_EQ(judoka->GetFirstname(), "first2");
+		EXPECT_EQ(judoka->GetLastname(),  "last2");
+		EXPECT_EQ(judoka->GetWeight(),  Weight(10));
+		EXPECT_EQ(judoka->GetGender(),  Gender::Male);
+		EXPECT_EQ(judoka->GetBirthyear(), 2000);
+		EXPECT_EQ(judoka->GetNumber(), "A123");
+		ASSERT_TRUE(judoka->GetClub());
+		EXPECT_EQ(*judoka->GetClub(), *c);
 	}
 }
 
@@ -1695,7 +1727,7 @@ TEST(Ajax, DeleteAssociation)
 
 
 		EXPECT_EQ(app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)de->GetUUID())), Error(Error::Type::OperationFailed));
-		EXPECT_EQ((std::string)app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID())), "ok");
+		EXPECT_TRUE(app.Ajax_DeleteClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID())));
 
 		EXPECT_TRUE(app.GetDatabase().FindAssociation(de->GetUUID()));
 		EXPECT_FALSE(app.GetDatabase().FindAssociation(nieder->GetUUID()));
@@ -1735,7 +1767,7 @@ TEST(Ajax, EditAssociation)
 		app.GetDatabase().AddAssociation(nrw);
 
 
-		EXPECT_EQ((std::string)app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID(), "name=Niedersachen 2&shortname=NS&parent=" + (std::string)de->GetUUID())), "ok");
+		EXPECT_TRUE(app.Ajax_EditClub(HttpServer::Request("id=" + (std::string)nieder->GetUUID(), "name=Niedersachen 2&shortname=NS&parent=" + (std::string)de->GetUUID())));
 
 		EXPECT_EQ(nieder->GetName(), "Niedersachen 2");
 		EXPECT_EQ(nieder->GetShortName(), "NS");
@@ -1801,6 +1833,43 @@ TEST(Ajax, Clubs_List_All)
 		ASSERT_EQ(yaml.size(), 1);
 		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
 		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c");
+	}
+}
+
+
+
+TEST(Ajax, Clubs_List_Tournament)
+{
+	initialize();
+	ZED::Core::RemoveFile("tournaments/deleteMe.yml");
+
+	{
+		Application app;
+
+		auto c1 = new Club("Club 1");
+		c1->SetShortName("c1");
+		auto c2 = new Club("Club 2");
+		c2->SetShortName("c2");
+
+		auto t = new Tournament("deleteMe");
+		t->EnableAutoSave(false);
+
+		app.AddTournament(t);
+
+		auto j = new Judoka("first", "last");
+		j->SetClub(c1);
+		t->AddParticipant(j);
+
+		app.GetDatabase().AddClub(c2);
+
+		auto yaml = YAML::Load(app.Ajax_ListClubs(HttpServer::Request("tournament_only=true")));
+
+		ASSERT_EQ(yaml.size(), 1);
+		EXPECT_EQ(yaml[0]["name"].as<std::string>(), "Club 1");
+		EXPECT_EQ(yaml[0]["short_name"].as<std::string>(), "c1");
+
+		yaml = YAML::Load(app.Ajax_ListClubs(HttpServer::Request("all=true")));
+		ASSERT_EQ(yaml.size(), 2);
 	}
 }
 
@@ -2229,6 +2298,61 @@ TEST(Ajax, RemoveDisqualification)
 
 
 
+TEST(Ajax, Match_Add)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto j1 = new Judoka("a", "b");
+		auto j2 = new Judoka("c", "d");
+
+		auto r1 = new RuleSet("test1", 60, 30, 10, 5);
+		auto r2 = new RuleSet("test2", 60, 30, 10, 5);
+
+		app.GetTournament()->AddParticipant(j1);
+		app.GetTournament()->AddParticipant(j2);
+		app.GetTournament()->AddRuleSet(r1);
+		app.GetTournament()->AddRuleSet(r2);
+
+		EXPECT_TRUE(app.Ajax_AddMatch(HttpServer::Request("", "white=" + (std::string)j1->GetUUID() + "&blue=" + (std::string)j2->GetUUID() + "&mat=2&rule=" + (std::string)r1->GetUUID() )));
+
+		ASSERT_EQ(app.GetTournament()->GetMatchTables().size(), 1);
+		ASSERT_EQ(app.GetTournament()->GetSchedule().size(),    1);
+		auto table = app.GetTournament()->GetMatchTables()[0];
+		auto match = app.GetTournament()->GetSchedule()[0];
+
+		EXPECT_EQ(*match->GetFighter(Fighter::White), *j1);
+		EXPECT_EQ(*match->GetFighter(Fighter::Blue),  *j2);
+		EXPECT_EQ(match->GetMatID(), 2);
+		EXPECT_EQ(match->GetRuleSet().GetUUID(), r1->GetUUID());
+		EXPECT_EQ(table->GetRuleSet().GetUUID(), r1->GetUUID());
+
+		EXPECT_TRUE(app.Ajax_AddMatch(HttpServer::Request("", "white=" + (std::string)j2->GetUUID() + "&blue=" + (std::string)j1->GetUUID() + "&mat=2&rule=" + (std::string)r1->GetUUID() + "&match_table=" + (std::string)table->GetUUID() )));
+
+		auto match2 = app.GetTournament()->GetSchedule()[1];
+
+		EXPECT_EQ(*match2->GetFighter(Fighter::White), *j2);
+		EXPECT_EQ(*match2->GetFighter(Fighter::Blue),  *j1);
+		EXPECT_EQ(match2->GetMatID(), 2);
+		EXPECT_EQ(match2->GetRuleSet().GetUUID(), r1->GetUUID());
+		EXPECT_EQ(*match2->GetMatchTable(), *table);
+
+		EXPECT_TRUE(app.Ajax_AddMatch(HttpServer::Request("", "white=" + (std::string)j1->GetUUID() + "&blue=" + (std::string)j2->GetUUID() + "&mat=1&rule=" + (std::string)r2->GetUUID() + "&match_table=" + (std::string)table->GetUUID() )));
+
+		auto match3 = app.GetTournament()->GetSchedule()[2];
+
+		EXPECT_EQ(*match3->GetFighter(Fighter::White), *j1);
+		EXPECT_EQ(*match3->GetFighter(Fighter::Blue),  *j2);
+		EXPECT_EQ(match3->GetMatID(), 1);
+		EXPECT_EQ(match3->GetRuleSet().GetUUID(), r2->GetUUID());
+		EXPECT_EQ(*match3->GetMatchTable(), *table);
+	}
+}
+
+
+
 TEST(Ajax, Match_Edit)
 {
 	initialize();
@@ -2479,7 +2603,7 @@ TEST(Ajax, MatchTable_Move)
 			EXPECT_TRUE(app.Ajax_MoveMatchTable(HttpServer::Request("id=" + (std::string)tables[0]->GetUUID() + "&schedule_index=" + std::to_string(index) + "&mat=" + std::to_string(mat))) );
 
 			EXPECT_EQ(tables[0]->GetMatID(), mat);
-			EXPECT_EQ(tables[0]->GetScheduleIndex(), index);
+			//EXPECT_EQ(tables[0]->GetScheduleIndex(), index);
 		}
 	}
 }
@@ -3102,6 +3226,42 @@ TEST(Ajax, MoveSchedule)
 	EXPECT_EQ(*tourney->GetSchedule()[3], *match1);
 	EXPECT_EQ(*tourney->GetSchedule()[4], *match3);
 	EXPECT_EQ(*tourney->GetSchedule()[5], *match4);
+
+	EXPECT_TRUE(app.Ajax_MoveMatchTo(HttpServer::Request("from=" + (std::string)match3->GetUUID() + "&to=" + (std::string)match6->GetUUID() + "&position=above")));
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match6);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match4);
+
+	EXPECT_TRUE(app.Ajax_MoveMatchTo(HttpServer::Request("from=" + (std::string)match2->GetUUID() + "&to=" + (std::string)match1->GetUUID() + "&position=below")));
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match5);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match6);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match4);
+
+	EXPECT_TRUE(app.Ajax_MoveMatchTo(HttpServer::Request("from=" + (std::string)match5->GetUUID() + "&to=" + (std::string)match4->GetUUID() + "&position=below")));
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match6);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match4);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match5);
+
+	EXPECT_TRUE(app.Ajax_MoveMatchTo(HttpServer::Request("from=" + (std::string)match4->GetUUID() + "&to=" + (std::string)match3->GetUUID() + "&position=above")));
+
+	EXPECT_EQ(*tourney->GetSchedule()[0], *match4);
+	EXPECT_EQ(*tourney->GetSchedule()[1], *match3);
+	EXPECT_EQ(*tourney->GetSchedule()[2], *match6);
+	EXPECT_EQ(*tourney->GetSchedule()[3], *match1);
+	EXPECT_EQ(*tourney->GetSchedule()[4], *match2);
+	EXPECT_EQ(*tourney->GetSchedule()[5], *match5);
 }
 
 

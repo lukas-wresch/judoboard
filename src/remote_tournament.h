@@ -14,15 +14,23 @@ namespace Judoboard
 
 		virtual bool IsLocal() const { return false; }
 
-		virtual std::vector<Match> GetNextMatches(int32_t MatID) const override;
-		virtual Match* GetNextMatch(int32_t MatID = -1) const override {
+		virtual Match* GetNextMatch(int32_t MatID = -1) override {
 			auto ret = GetNextMatches(MatID);
 			if (ret.empty())
 				return nullptr;
-			return FindInCache(ret[0].GetUUID());
+			return FindInCache(ret[0]->GetUUID());
 		}
+		virtual const Match* GetNextMatch(int32_t MatID = -1) const override {
+			auto ret = GetNextMatches(MatID);
+			if (ret.empty())
+				return nullptr;
+			return FindInCache(ret[0]->GetUUID());
+		}
+		virtual std::vector<const Match*> GetNextMatches(int32_t MatID) const override;
 
 		virtual bool AddMatch(Match* NewMatch) override;
+
+		virtual Match* GetNextOngoingMatch(int32_t MatID) override;
 
 		//Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const override;
@@ -38,7 +46,7 @@ namespace Judoboard
 		virtual RuleSet* FindRuleSet(const UUID& UUID) override;
 
 		//Events
-		virtual void OnMatchStarted(const Match& Match) const { assert(false); }
+		virtual void OnMatchStarted(const Match& Match) const override {}
 		virtual void OnMatchConcluded(const Match& Match) const override;
 
 	private:
@@ -55,7 +63,7 @@ namespace Judoboard
 
 		mutable std::vector<Match*> m_MatchCache;
 
-		mutable std::vector<Match> m_NextMatches;
+		mutable std::vector<const Match*> m_NextMatches;
 		mutable uint32_t m_NextMatches_Timestamp = 0;//Timestamp when m_NextMatches was received
 
 		mutable std::vector<MatchTable*> m_MatchTables;

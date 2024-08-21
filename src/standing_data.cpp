@@ -202,6 +202,8 @@ bool StandingData::AddJudoka(Judoka* NewJudoka)
 	if (!NewJudoka)
 		return false;
 
+	AddClub((Club*)NewJudoka->GetClub());
+
 	m_Judokas.emplace_back(NewJudoka);
 
 	std::sort(m_Judokas.begin(), m_Judokas.end(), [](const Judoka* a, const Judoka* b)
@@ -264,11 +266,29 @@ bool StandingData::AddClub(Club* NewClub)
 
 	if (FindClub(NewClub->GetUUID()))
 		return false;
+	if (FindClubByName(NewClub->GetName()))
+		return false;
 
-	AddAssociation(const_cast<Association*>(NewClub->GetParent()));
+	bool ret = true;
+
+	auto parent = NewClub->GetParent();
+	if (parent)
+	{
+		auto prev_added = FindAssociation(*parent);
+		if (prev_added)
+			NewClub->SetParent(prev_added);
+		else
+		{
+			auto prev_added2 = FindAssociationByName(parent->GetName());
+			if (prev_added2)
+				NewClub->SetParent(prev_added2);
+			else
+				ret = AddAssociation(const_cast<Association*>(NewClub->GetParent()));
+		}
+	}
 
 	m_Clubs.emplace_back(NewClub);
-	return true;
+	return ret;
 }
 
 
@@ -348,15 +368,30 @@ bool StandingData::AddAssociation(Association* NewAssociation)
 	if (FindAssociationByName(NewAssociation->GetName()))
 		return false;
 
-	//Add recursively
-	AddAssociation(const_cast<Association*>(NewAssociation->GetParent()));
+	bool ret = true;
+
+	auto parent = NewAssociation->GetParent();
+	if (parent)
+	{
+		auto prev_added = FindAssociation(*parent);
+		if (prev_added)
+			NewAssociation->SetParent(prev_added);
+		else
+		{
+			auto prev_added2 = FindAssociationByName(parent->GetName());
+			if (prev_added2)
+				NewAssociation->SetParent(prev_added);
+			else//Add recursively
+				ret = AddAssociation(const_cast<Association*>(NewAssociation->GetParent()));
+		}
+	}	
 
 	m_Associations.emplace_back(NewAssociation);
 
 	//std::sort would normally order the vector by memory address :-(
 	std::sort(m_Associations.begin(), m_Associations.end(), [](auto a, auto b) { return *a < *b; });
 
-	return true;
+	return ret;
 }
 
 

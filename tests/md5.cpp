@@ -1466,6 +1466,10 @@ TEST(MD5, ConvertToMD5)
 
 		MD5 file(tour_temp);//Convert back to MD5
 
+		EXPECT_EQ(file1.GetNumAssociations(), 158);
+		EXPECT_EQ(tour_temp.GetDatabase().GetAllAssociations().size(), 7);
+		EXPECT_EQ(file.GetNumAssociations(),  7);
+
 		//ASSERT_EQ(file.GetLottery().size(), file1.GetLottery().size());
 		for (int i = 0; i < file.GetLottery().size(); ++i)
 		{
@@ -1478,6 +1482,8 @@ TEST(MD5, ConvertToMD5)
 
 			EXPECT_EQ(file.GetLottery()[i].StartNo, file1_lot);
 		}
+
+		file.Dump();
 
 		ASSERT_TRUE(file.GetOrganizer());
 		ASSERT_TRUE(file1.GetOrganizer());
@@ -3400,6 +3406,10 @@ TEST(MD7, ImportKEM_U13_2024_05_05)
 
 		Database db;
 		Tournament tour(file, &db);
+
+		ASSERT_TRUE(tour.GetOrganizer());
+		for (auto club : tour.GetDatabase().GetAllClubs())
+			EXPECT_TRUE(club->IsChildOf(*tour.GetOrganizer()));
 
 		auto table = tour.FindMatchTableByDescription("weibliche Jugend U13 -10 kg");
 		ASSERT_TRUE(table);

@@ -78,12 +78,33 @@ namespace Judoboard
 				return ret;
 			}
 
+			static Tag WinnerBracket() {
+				Tag ret;
+				ret.winner_bracket = true;
+				return ret;
+			}
+
+			static Tag LoserBracket() {
+				Tag ret;
+				ret.loser_bracket = true;
+				return ret;
+			}
+
+			static Tag InPreparation() {
+				Tag ret;
+				ret.in_preparation = true;
+				return ret;
+			}
+
 			bool IsNormal() const { return value == 0; }
+			void Remove(const Tag& rhs) {
+				value &= ~rhs.value;
+			}
 
 			bool operator ==(const Tag& rhs) const {
 				return value == rhs.value;
 			}
-			Tag operator &(const Tag& rhs) const {
+			Tag operator &&(const Tag& rhs) const {
 				Tag ret;
 				ret.value = this->value | rhs.value;
 				return ret;
@@ -96,13 +117,13 @@ namespace Judoboard
 				struct
 				{
 					bool finals : 1;
-					bool semi : 1;
-					bool third : 1;
-					bool fifth : 1;
-					bool reserved1 : 1;
-					bool reserved2 : 1;
-					bool reserved3 : 1;
-					bool reserved4 : 1;
+					bool semi   : 1;
+					bool third  : 1;
+					bool fifth  : 1;
+					bool winner_bracket : 1;//Match belongs to the winner bracket
+					bool loser_bracket  : 1;//Match belongs to the loser bracket
+					bool in_preparation : 1;//Match has been marked as 'in preparation'
+					bool reserved : 1;
 				};
 			};
 		};
@@ -125,6 +146,7 @@ namespace Judoboard
 		const MatchLog& GetLog() const { return m_Log; }
 
 		void StartMatch();
+		void StopMatch();
 		void EndMatch();
 
 		const MatchTable* GetMatchTable() const { return m_Table; }
@@ -190,6 +212,7 @@ namespace Judoboard
 		}
 
 		const RuleSet& GetRuleSet() const;
+		const RuleSet* GetOwnRuleSet() const { return m_Rules; }
 		void SetRuleSet(const RuleSet* NewRuleSet) { m_Rules = NewRuleSet; }
 
 		uint32_t GetCurrentBreaktime() const;
@@ -200,6 +223,8 @@ namespace Judoboard
 
 		Tag  GetTag() const { return m_Tag; }
 		void SetTag(Tag NewTag) { m_Tag = NewTag; }
+		void AddTag(Tag NewTag) const { m_Tag = m_Tag && NewTag; }
+		void RemoveTag(Tag RemovalTag) const { m_Tag.Remove(RemovalTag); }
 
 		//Serialize
 		void ToString(YAML::Emitter& Yaml) const;
@@ -240,6 +265,6 @@ namespace Judoboard
 
 		uint32_t m_MatID = 0;
 
-		Tag m_Tag;
+		mutable Tag m_Tag;
 	};
 }

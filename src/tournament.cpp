@@ -56,8 +56,9 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 			new_club = pDatabase->FindClubByName(club->Name);
 		else
 			new_club = new Club(*club);
-		
-		m_StandingData.AddClub(new_club);
+
+		if (!m_StandingData.AddClub(new_club))
+			ZED::Log::Error("Could not add club during import!");
 		club->pUserData = new_club;
 	}
 
@@ -160,10 +161,11 @@ Tournament::Tournament(const MD5& File, Database* pDatabase)
 		if (new_judoka)
 		{
 			judoka->pUserData = new_judoka;
-			m_StandingData.AddJudoka(new_judoka);
 
 			if (judoka->Club)//Connect to club
 				new_judoka->SetClub((Club*)judoka->Club->pUserData);
+
+			m_StandingData.AddJudoka(new_judoka);
 
 			if (judoka->Weightclass)
 			{
@@ -903,6 +905,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 		new_match_table->SetFilter(new Fixed);
 		new_match_table->AddMatch(NewMatch);
 		new_match_table->SetMatID(NewMatch->GetMatID());
+		new_match_table->SetRuleSet(NewMatch->GetOwnRuleSet());
 		AddMatchTable(new_match_table);
 
 #ifdef _DEBUG
@@ -921,7 +924,7 @@ bool Tournament::AddMatch(Match* NewMatch)
 
 
 
-Match* Tournament::GetNextMatch(int32_t MatID) const
+Match* Tournament::GetNextMatch(int32_t MatID)
 {
 	auto guard = LockReadForScope();
 
@@ -933,6 +936,47 @@ Match* Tournament::GetNextMatch(int32_t MatID) const
 
 		if (MatID < 0 || match->GetMatID() == MatID)
 			return match;
+	}
+
+	return nullptr;
+}
+
+
+
+const Match* Tournament::GetNextMatch(int32_t MatID) const
+{
+	auto guard = LockReadForScope();
+
+	auto schedule = GetSchedule();
+	for (auto match : schedule)
+	{
+		if (!match || match->HasConcluded() || match->IsRunning())
+			continue;
+
+		if (MatID < 0 || match->GetMatID() == MatID)
+			return match;
+	}
+
+	return nullptr;
+}
+
+
+
+Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex)
+{
+	auto guard = LockReadForScope();
+
+	auto schedule = GetSchedule();
+	for (; StartIndex < schedule.size(); StartIndex++)
+	{
+		if (schedule[StartIndex]->HasConcluded() || schedule[StartIndex]->IsRunning())
+			continue;
+
+		if (MatID < 0 || schedule[StartIndex]->GetMatID() == MatID)
+		{
+			StartIndex++;
+			return schedule[StartIndex-1];
+		}
 	}
 
 	return nullptr;
@@ -955,6 +999,32 @@ const Match* Tournament::GetNextMatch(int32_t MatID, uint32_t& StartIndex) const
 			StartIndex++;
 			return schedule[StartIndex-1];
 		}
+	}
+
+	return nullptr;
+}
+
+
+
+const Match* Tournament::GetNextMatch(const UUID& MatchID, int32_t MatID) const
+{
+	auto guard = LockReadForScope();
+
+	auto schedule = GetSchedule();
+	bool return_next = false;
+	for (auto match : schedule)
+	{
+		if (!match || match->HasConcluded())
+			continue;
+
+		if (return_next)
+		{
+			if (MatID < 0 || match->GetMatID() == MatID)
+				return match;
+		}
+
+		else if (match->GetUUID() == MatchID)
+			return_next = true;
 	}
 
 	return nullptr;
@@ -1206,19 +1276,61 @@ bool Tournament::MoveMatchDown(const UUID& MatchID, uint32_t MatID)
 
 
 
-std::vector<Match> Tournament::GetNextMatches(int32_t MatID) const
+bool Tournament::MoveMatchTo(const UUID& From, const UUID& To, bool Above)
 {
-	std::vector<Match> ret;
+	if (IsReadonly())
+		return false;
+
+	size_t from_match_index = SIZE_MAX;
+	size_t to_match_index   = SIZE_MAX;
+
+	auto guard = LockWriteForScope();
+
+	auto schedule = GetSchedule();
+	assert(schedule.size() == m_Schedule.size());
+	for (size_t index = 0; index < schedule.size(); index++)
+	{
+		if (schedule[index]->GetUUID() == From)
+			from_match_index = index;
+		else if (schedule[index]->GetUUID() == To)
+			to_match_index = index;
+	}
+
+	if (from_match_index >= schedule.size() || to_match_index >= schedule.size())
+		return false;
+
+	if (!Above)
+		to_match_index++;
+
+	auto element = std::move(m_Schedule[from_match_index]);
+
+	m_Schedule.erase(m_Schedule.begin() + from_match_index);
+
+	if (to_match_index > from_match_index)
+		to_match_index--;//The index changed, due to the above deletion
+
+	m_Schedule.insert(m_Schedule.begin() + to_match_index, std::move(element));
+
+	ScheduleSave();
+
+	return true;
+}
+
+
+
+std::vector<const Match*> Tournament::GetNextMatches(int32_t MatID) const
+{
+	std::vector<const Match*> ret;
 
 	auto guard = LockReadForScope();
 
-	uint32_t id = 0;
+	uint32_t index = 0;
 	for (int i = 0; i < 3; i++)
 	{
-		auto nextMatch = GetNextMatch(MatID, id);
+		auto nextMatch = GetNextMatch(MatID, index);
 
 		if (nextMatch)
-			ret.push_back(*nextMatch);
+			ret.push_back(nextMatch);
 	}
 
 	return ret;
@@ -1255,13 +1367,15 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		}
 	}
 
+	bool club_already_added = true;
+	if (Judoka->GetClub())
+		club_already_added = m_StandingData.FindClub(*Judoka->GetClub());
+
 	if (!m_StandingData.AddJudoka(Judoka))
 	{
 		ZED::Log::Warn("Could not add judoka!");
 		return false;
 	}
-
-	const bool club_added = m_StandingData.AddClub((Club*)Judoka->GetClub());
 
 	FindAgeGroupForJudoka(*Judoka);
 
@@ -1275,7 +1389,7 @@ bool Tournament::AddParticipant(Judoka* Judoka)
 		}
 	}
 
-	if (club_added)//New club got added
+	if (!club_already_added)//New club got added
 		PerformLottery();//Redo lottery
 
 	if (added)
@@ -1566,25 +1680,36 @@ void Tournament::AddMatchTable(MatchTable* NewMatchTable)
 	}
 #endif
 
-	OnUpdateMatchTable(*NewMatchTable);
+	if (NewMatchTable->GetType() != MatchTable::Type::Custom)
+		OnUpdateMatchTable(*NewMatchTable);
 }
 
 
 
 void Tournament::OnMatchStarted(const Match& Match) const
 {
-	ScheduleSave();
+	Match.AddTag(Match::Tag::InPreparation());
+
+	auto next_match = GetNextMatch(Match.GetUUID(), Match.GetMatID());
+	if (next_match)
+		next_match->AddTag(Match::Tag::InPreparation());
+
 	if (m_Application)
 		m_Application->RequestPushToResultsServer();
+
+	ScheduleSave();
 }
 
 
 
 void Tournament::OnMatchConcluded(const Match& Match) const
 {
-	ScheduleSave();
+	Match.RemoveTag(Match::Tag::InPreparation());
+
 	if (m_Application)
 		m_Application->RequestPushToResultsServer();
+
+	ScheduleSave();
 }
 
 
@@ -1668,6 +1793,7 @@ bool Tournament::OnUpdateMatchTable(const UUID& UUID)
 			need_to_rebuild = true;//Only rebuild schedule in this case
 	}
 
+	//Do we need to sort our match tables?
 	//Sort
 	std::sort(m_MatchTables.begin(), m_MatchTables.end(), [](auto a, auto b) {
 		//Sort by filter
@@ -1726,8 +1852,8 @@ bool Tournament::RemoveMatchTable(const UUID& UUID)
 	if (!matchTable)
 		return false;
 
-	if (matchTable->GetStatus() != Status::Scheduled)//Can safely delete the match table
-		return false;
+	if (matchTable->GetStatus() == Status::Running)
+		return false;//Can't safely delete the match table
 
 	//Remove match table
 	for (auto table = m_MatchTables.begin(); table != m_MatchTables.end(); ++table)

@@ -16,11 +16,18 @@ TEST(Database, JudokaTest)
 		Judoka j1("Firstname", "Lastname", 50, Gender::Male);
 		Judoka j2("Firstname2", "Lastname2", 60, Gender::Female);
 
+		Club* c = new Club("Club");
+
+		j2.SetClub(c);
+
 		d.AddJudoka(&j1);
 		d.AddJudoka(&j2);
 
 		EXPECT_EQ(d.FindJudoka(j1.GetUUID())->GetWeight(), Weight(50));
 		EXPECT_EQ(d.FindJudoka(j2.GetUUID())->GetWeight(), Weight(60));
+
+		ASSERT_EQ(d.GetAllClubs().size(), 1);
+		EXPECT_EQ(d.GetAllClubs()[0]->GetName(), "Club");
 
 		EXPECT_TRUE(d.Save("temp.yml"));
 		EXPECT_TRUE(d.Save("temp2.yml"));

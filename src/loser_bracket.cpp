@@ -223,6 +223,9 @@ void LoserBracket::GenerateSchedule()
 	}
 
 	
+	if (IsFinalMatch() && GetSchedule().size() >= 1)
+		GetSchedule()[GetSchedule().size() - 1]->SetTag(Match::Tag::Finals());
+
 	//Add additional match for 3rd place
 	if (IsThirdPlaceMatch() && GetSchedule().size() >= 2)
 	{
@@ -238,6 +241,8 @@ void LoserBracket::GenerateSchedule()
 		auto third_place = CreateAutoMatch(nullptr, nullptr);
 		third_place->SetDependency(Fighter::White, DependencyType::TakeLoser, match1);
 		third_place->SetDependency(Fighter::Blue,  DependencyType::TakeLoser, match2);
+
+		third_place->SetTag(Match::Tag::Third() && Match::Tag::Finals());
 	}
 
 
