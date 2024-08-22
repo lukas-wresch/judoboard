@@ -43,6 +43,8 @@ Error::operator std::string () const
 			return Localizer::Translate("Invalid format");
 		case Type::InvalidInput:
 			return Localizer::Translate("Invalid input");
+		case Type::LicenseInsufficient:
+			return Localizer::Translate("License insufficient for this feature");
 	}
 
 	return Localizer::Translate("Unknown error");

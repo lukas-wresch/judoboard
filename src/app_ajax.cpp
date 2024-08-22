@@ -4968,6 +4968,8 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 
 	Localizer::SetLanguage((Language)language);
 	
+	auto ret = Error::Type::NoError;
+
 	auto guard = LockWriteForScope();
 
 	if (mat_count >= 0)
@@ -4979,11 +4981,20 @@ Error Application::Ajax_SetSetup(const HttpServer::Request& Request)
 	GetDatabase().SetTimerStyle((Mat::TimerStyle)timerStyle);
 	GetDatabase().SetNameStyle((NameStyle)nameStyle);
 	GetDatabase().SetNameStyle((NameStyle)nameStyle);
-	GetDatabase().IsResultsServer(results_server);
-	GetDatabase().SetResultsServer(results_server_url);
-  GetDatabase().Save();
 
-	return Error::Type::NoError;
+	if (License::GetLicenseType() == License::Type::Standard || License::GetLicenseType() == License::Type::Professionel)
+	{
+		GetDatabase().IsResultsServer(results_server);
+		GetDatabase().SetResultsServer(results_server_url);
+	}
+	else if (results_server)
+	{
+		GetDatabase().IsResultsServer(false);
+		ret = Error::Type::LicenseInsufficient;
+	}
+
+	GetDatabase().Save();
+	return ret;
 }
 
 

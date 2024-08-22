@@ -749,55 +749,60 @@ void Application::Run()
 
 			if (m_Database.IsResultsServer())
 			{
-				auto time_since_last_update = (Timer::GetTimestamp() - m_ResultsServer_LastUpdate) / 1000;
-				if (time_since_last_update >= 60 ||
-					(m_RequestResultsServer && time_since_last_update >= 10) )
+				if (License::GetLicenseType() == License::Type::Standard || License::GetLicenseType() == License::Type::Professionel)
 				{
-					auto endpoint = m_Database.GetResultsServer();
-					auto data = GetTournament()->Schedule2ResultsServer();
-
-					auto guard = LockReadForScope();
-					for (auto mat : GetMats())
+					auto time_since_last_update = (Timer::GetTimestamp() - m_ResultsServer_LastUpdate) / 1000;
+					if (time_since_last_update >= 60 ||
+						(m_RequestResultsServer && time_since_last_update >= 10))
 					{
-						if (mat)
-						{
-							data["mats"].push_back({ "id",   mat->GetMatID(),
-													 "name", mat->GetName()});
-						}
-					}
+						auto endpoint = m_Database.GetResultsServer();
+						auto data = GetTournament()->Schedule2ResultsServer();
 
-					auto index = endpoint.find_first_of('/', 0);
-					if (index != std::string::npos)
-					{
-						auto host = endpoint.substr(0, index);
-						auto path = endpoint.substr(index);
-
-						FILE* file = nullptr;
-						fopen_s(&file, "results.json", "w");
-						if (file)
+						auto guard = LockReadForScope();
+						for (auto mat : GetMats())
 						{
-							fprintf(file, "%s", data.dump().c_str());
-							fclose(file);
+							if (mat)
+							{
+								nlohmann::json mat_json;
+								mat_json["id"] = mat->GetMatID();
+								mat_json["name"] = mat->GetName();
+								data["mats"].push_back(mat_json);
+							}
 						}
+
+						auto index = endpoint.find_first_of('/', 0);
+						if (index != std::string::npos)
+						{
+							auto host = endpoint.substr(0, index);
+							auto path = endpoint.substr(index);
+
+							FILE* file = nullptr;
+							fopen_s(&file, "results.json", "w");
+							if (file)
+							{
+								fprintf(file, "%s", data.dump().c_str());
+								fclose(file);
+							}
 
 #ifdef _WIN32
-						std::string command = endpoint + " -k -d " + "@results.json";
-						ShellExecuteA(NULL, "open", "curl.exe", command.c_str(), NULL, SW_HIDE);
+							std::string command = endpoint + " -k -d " + "@results.json";
+							ShellExecuteA(NULL, "open", "curl.exe", command.c_str(), NULL, SW_HIDE);
 #else
-						std::string command = "curl.exe " + endpoint + " -k -d " + "@results.json";
-						system(command.c_str());
+							std::string command = "curl.exe " + endpoint + " -k -d " + "@results.json";
+							system(command.c_str());
 #endif
 
-						/*std::thread([data, host, path]() {
-							ZED::HttpClient client(host);
-							client.POST(path, data);
-							auto response = client.RecvResponse();
-							assert(response.header == "ok");
-						}).detach();*/
+							/*std::thread([data, host, path]() {
+								ZED::HttpClient client(host);
+								client.POST(path, data);
+								auto response = client.RecvResponse();
+								assert(response.header == "ok");
+							}).detach();*/
 
-						m_ResultsServer_LastUpdate = Timer::GetTimestamp();
-						m_RequestResultsServer = false;
-						ZED::Log::Info("Pushed update to results server");
+							m_ResultsServer_LastUpdate = Timer::GetTimestamp();
+							m_RequestResultsServer = false;
+							ZED::Log::Info("Pushed update to results server");
+						}
 					}
 				}
 			}

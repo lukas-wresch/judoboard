@@ -218,9 +218,9 @@ void Match::operator >>(nlohmann::json& Json) const
 	}
 
 	if (m_Table)
-		Json["match_table"] = m_Table->GetDescription();
-	else
-		Json["match_table"] = "- - -";
+		Json["match_table"] = m_Table->GetUUID();
+	//else
+		//Json["match_table"] = "- - -";
 
 	if (!m_Tag.IsNormal())
 		Json["tag"] = (uint32_t)m_Tag.value;

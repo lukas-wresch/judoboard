@@ -835,7 +835,7 @@ TEST(Ajax, Setup_Set)
 	{
 		Application app;
 		
-		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=1234&language=0&mat_count=5&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=0&results_server=true&results_server_url=abc")), "ok");
+		EXPECT_TRUE(app.Ajax_SetSetup(HttpServer::Request("", "port=1234&language=0&mat_count=5&ipponStyle=1&osaekomiStyle=1&timerStyle=2&nameStyle=0&results_server=false&results_server_url=abc")));
 
 		auto yaml = YAML::Load(app.Ajax_GetSetup(false));
 
@@ -848,10 +848,11 @@ TEST(Ajax, Setup_Set)
 		EXPECT_EQ(yaml["name_style"].as<int>(),  0);
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
-		//EXPECT_EQ(yaml["results_server"].as<bool>(), true);
+		//EXPECT_EQ(yaml["results_server"].as<bool>(), false);
 		//EXPECT_EQ(yaml["results_server_url"].as<std::string>(), "abc");
 
-		EXPECT_EQ(app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&mat_count=8&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=1&results_server=false&results_server_url=def")), "ok");
+		EXPECT_FALSE(app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&mat_count=8&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=1&results_server=true&results_server_url=def")));
+		EXPECT_TRUE( app.Ajax_SetSetup(HttpServer::Request("", "port=567&language=1&mat_count=8&ipponStyle=0&osaekomiStyle=0&timerStyle=1&nameStyle=1&results_server=false")));
 
 		yaml = YAML::Load(app.Ajax_GetSetup(true));
 
@@ -865,12 +866,12 @@ TEST(Ajax, Setup_Set)
 		EXPECT_LE(yaml["uptime"].as<uint32_t>(), 100u);
 		EXPECT_EQ(yaml["version"].as<std::string>(), Application::Version);
 		EXPECT_EQ(yaml["results_server"].as<bool>(), false);
-		EXPECT_EQ(yaml["results_server_url"].as<std::string>(), "def");
+		//EXPECT_EQ(yaml["results_server_url"].as<std::string>(), "def");
 		EXPECT_EQ(yaml["license_valid"].as<bool>(), false);
 		EXPECT_EQ(yaml["license_expired"].as<bool>(), false);
 		EXPECT_TRUE(yaml["license_expiration_date"]);
-		//EXPECT_TRUE(yaml["license_expiration_type"]);
-		//EXPECT_TRUE(yaml["license_expiration_id"]);
+		EXPECT_TRUE(yaml["license_type"]);
+		EXPECT_TRUE(yaml["license_id"]);
 	}
 }
 
