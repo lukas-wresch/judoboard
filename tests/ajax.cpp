@@ -34,13 +34,13 @@ TEST(Ajax, AgeGroup_Edit)
 		Application app;
 
 		auto r = app.GetDatabase().GetRuleSets()[0];
-		app.Ajax_AddAgeGroup(HttpServer::Request("", "name=test&min_age=3&max_age=5&gender=0&rule=" + (std::string)r->GetUUID()));
+		EXPECT_TRUE(app.Ajax_AddAgeGroup(HttpServer::Request("", "name=test&min_age=3&max_age=5&gender=0&rule=" + (std::string)r->GetUUID())));
 
 		auto& age_groups = app.GetDatabase().GetAgeGroups();
 		ASSERT_EQ(age_groups.size(), 7);
 		auto a = age_groups[6];
 
-		app.Ajax_EditAgeGroup(HttpServer::Request("id=" + (std::string)a->GetUUID(), "name=test2&min_age=6&max_age=10&gender=1&rule=" + (std::string)r->GetUUID()));
+		EXPECT_TRUE(app.Ajax_EditAgeGroup(HttpServer::Request("id=" + (std::string)a->GetUUID(), "name=test2&min_age=6&max_age=10&gender=1&rule=" + (std::string)r->GetUUID())));
 
 		EXPECT_EQ(age_groups[6]->GetName(), "test2");
 		EXPECT_EQ(age_groups[6]->GetMinAge(), 6);
@@ -72,6 +72,38 @@ TEST(Ajax, AgeGroup_Edit)
 		EXPECT_EQ(a2->GetMaxAge(), 20);
 		EXPECT_EQ(a2->GetGender(), Gender::Male);
 		EXPECT_FALSE(a2->GetRuleSet());
+	}
+}
+
+
+
+TEST(Ajax, AgeGroup_Edit2)
+{
+	initialize();
+
+	{
+		Application app;
+
+		auto r = app.GetDatabase().GetRuleSets()[0];
+		EXPECT_TRUE(app.Ajax_AddAgeGroup(HttpServer::Request("", "name=test&min_age=3&max_age=5&gender=0&rule=" + (std::string)r->GetUUID())));
+
+		auto& age_groups = app.GetDatabase().GetAgeGroups();
+		ASSERT_EQ(age_groups.size(), 7);
+		auto a = age_groups[6];
+
+		auto table = new RoundRobin(10, 100);
+		table->SetAgeGroup(a);
+		app.GetTournament()->AddMatchTable(table);
+
+		auto j = new Judoka("first", "last", 50, Gender::Male, 2000);
+		app.GetTournament()->GetDatabase().SetYear(2004);
+		app.GetTournament()->AddParticipant(j);
+
+		EXPECT_EQ(table->GetParticipants().size(), 1);
+
+		EXPECT_TRUE(app.Ajax_EditAgeGroup(HttpServer::Request("id=" + (std::string)a->GetUUID(), "name=test2&min_age=6&max_age=10&gender=1&rule=" + (std::string)r->GetUUID())));
+
+		EXPECT_EQ(table->GetParticipants().size(), 0);
 	}
 }
 

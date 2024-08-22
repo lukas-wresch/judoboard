@@ -4021,11 +4021,14 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 
 	auto guard = LockWriteForScope();
 
-	auto age_group = GetDatabase().FindAgeGroup(id);
+	auto age_group = GetTournament()->FindAgeGroup(id);
+
+	bool from_tournament = true;
 
 	if (!age_group)
 	{
-		age_group = GetTournament()->FindAgeGroup(id);
+		age_group = GetDatabase().FindAgeGroup(id);
+		from_tournament = false;
 
 		if (!age_group)
 			return Error::Type::InvalidID;
@@ -4036,13 +4039,22 @@ Error Application::Ajax_EditAgeGroup(const HttpServer::Request& Request)
 	if (!rule)
 		ZED::Log::Warn("Could not find rule set.");
 
+	const bool recalculate = age_group->GetMinAge() != min_age ||
+							 age_group->GetMaxAge() != max_age ||
+							 age_group->GetGender() != gender;
+
 	age_group->SetName(name);
 	age_group->SetMinAge(min_age);
 	age_group->SetMaxAge(max_age);
 	age_group->SetGender(gender);
 	age_group->SetRuleSet(rule);
 
-	GetTournament()->AddRuleSet(rule);
+	if (from_tournament)
+		GetTournament()->AddRuleSet(rule);
+
+	if (from_tournament && recalculate)
+		if (!GetTournament()->OnUpdateAgeGroup(*age_group))
+			return Error::Type::OperationFailed;
 
 	return Error::Type::NoError;
 }

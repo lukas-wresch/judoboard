@@ -147,6 +147,7 @@ namespace Judoboard
 		virtual void OnMatchConcluded(const Match& Match) const = 0;
 		virtual bool OnUpdateParticipant(const UUID& UUID) { assert(false); return false; }//Calling this function we recalculate the given judoka
 		virtual bool OnUpdateMatchTable(const UUID& UUID)  { assert(false); return false; }//Calling this function we recalculate the given match table
+		virtual bool OnUpdateAgeGroup(const UUID& UUID)  { assert(false); return false; }
 
 		//Serialization
 		virtual const std::string Schedule2String(bool ImportantOnly, int Mat = -1) const { assert(false); return ""; }

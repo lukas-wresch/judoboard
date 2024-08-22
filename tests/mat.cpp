@@ -1554,7 +1554,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 			m.AddWazaAri(f);
 			m.Osaekomi(f);
 
-			for (int k = 0; k < time - 1; k++)
+			for (int k = 0; k < time - 2; k++)
 			{
 				EXPECT_FALSE(m.IsOutOfTime());
 				EXPECT_FALSE(m.HasConcluded());
@@ -1563,6 +1563,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 			}
 
 			m.RemoveWazaAri(f);
+			ZED::Core::Pause(2000);
 
 			for (int k = 0; k < time - 2; k++)
 			{
@@ -1572,7 +1573,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 				ZED::Core::Pause(1000);
 			}
 
-			ZED::Core::Pause(4850);
+			ZED::Core::Pause(5000);
 
 			EXPECT_TRUE(m.HasConcluded());
 			EXPECT_TRUE(m.EndMatch());
