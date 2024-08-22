@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jaricom.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jcapimin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jcapistd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jcarith.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jccoefct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jccolor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jcdctmgr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jchuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jcinit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jcmainct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jcmarker.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jcmaster.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jcomapi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jcparam.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jcprepct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jcsample.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jctrans.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdapimin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdapistd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdarith.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdatadst.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdatasrc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdcoefct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdcolor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jddctmgr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdhuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdinput.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdmainct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdmarker.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdmaster.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdmerge.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdpostct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdsample.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdtrans.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jerror.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jfdctflt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jfdctfst.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jfdctint.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jidctflt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jidctfst.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jidctint.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jmemmgr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jmemnobs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jquant1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jquant2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jutils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jdct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jerror.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jinclude.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jmemsys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jmorecfg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jpegint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jpeglib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\jversion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{56D611B6-1D42-3802-B023-A973C50D954B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{DE7CEF15-72FC-345B-94BF-D1F91E8BF28B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\png.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngerror.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngget.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngmem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngpread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngrio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngrtran.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngrutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngset.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngtrans.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngwio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngwrite.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngwtran.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngwutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\png.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngconf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngdebug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pnginfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pnglibconf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngpriv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\pngstruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{56D611B6-1D42-3802-B023-A973C50D954B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{DE7CEF15-72FC-345B-94BF-D1F91E8BF28B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

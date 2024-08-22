@@ -1,14 +1,25 @@
 mkdir bin/tournaments
 
-#Compile yaml-cpp
+#Compile dependencies
 mkdir dep
 cd dep
+
+#Compile yaml-cpp
 git clone https://github.com/jbeder/yaml-cpp.git
 cd yaml-cpp
 mkdir build
 cmake .
 make
-cd ../..
+cd ..
+
+#Compile PDF-Writer
+git clone https://github.com/galkahana/PDF-Writer.git
+cd PDF-Writer
+cmake .
+make
+cd ..
+
+cd ..
 
 #Compile ZED
 cd ZED

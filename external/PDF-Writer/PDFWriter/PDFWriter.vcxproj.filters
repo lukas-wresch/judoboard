@@ -1,0 +1,1182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\AbstractContentContext.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\AbstractWrittenFont.cpp">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ANSIFontWriter.cpp">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Ascii7Encoding.cpp">
+      <Filter>Infrastructure\Encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ArrayOfInputStreamsStream.cpp">
+      <Filter>PDF Embedding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CatalogInformation.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFANSIFontWriter.cpp">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFDescendentFontWriter.cpp">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFEmbeddedFontWriter.cpp">
+      <Filter>Text\CFF</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFFileInput.cpp">
+      <Filter>Text\CFF</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFPrimitiveReader.cpp">
+      <Filter>Text\CFF</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFPrimitiveWriter.cpp">
+      <Filter>Text\CFF</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType1Interpreter.cpp">
+      <Filter>Text\Type1</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType1Tracer.cpp">
+      <Filter>Text\Type1</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType2Flattener.cpp">
+      <Filter>Text\CFF</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType2Interpreter.cpp">
+      <Filter>Text\CFF</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType2Tracer.cpp">
+      <Filter>Text\CFF</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CIDFontWriter.cpp">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CMYKRGBColor.cpp">
+      <Filter>Infrastructure\Basics</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DecryptionHelper.cpp">
+      <Filter>XCryption</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DescendentFontWriter.cpp">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DictionaryContext.cpp">
+      <Filter>Objects Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DocumentContext.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EncryptionHelper.cpp">
+      <Filter>XCryption</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EncryptionOptions.cpp">
+      <Filter>XCryption</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ExtGStateRegistry.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FontDescriptorWriter.cpp">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeFaceWrapper.cpp">
+      <Filter>Text\FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeOpenTypeWrapper.cpp">
+      <Filter>Text\FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeType1Wrapper.cpp">
+      <Filter>Text\FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeWrapper.cpp">
+      <Filter>Text\FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\GraphicState.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\GraphicStateStack.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IndirectObjectsReferenceRegistry.cpp">
+      <Filter>Objects Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InfoDictionary.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputAESDecodeStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputAscii85DecodeStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputAsciiHexDecodeStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputBufferedStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputByteArrayStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputCharStringDecodeStream.cpp">
+      <Filter>Text\Type1</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputDCTDecodeStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputFile.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputFileStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputFlateDecodeStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputLZWDecodeStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputLimitedStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputOffsetStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputRC4XcodeStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputPFBDecodeStream.cpp">
+      <Filter>Text\Type1</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputPredictorPNGOptimumStream.cpp">
+      <Filter>PDF Embedding\PredictionFilters</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputPredictorTIFFSubStream.cpp">
+      <Filter>PDF Embedding\PredictionFilters</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputStreamSkipperStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputStringBufferStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputStringStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\JPEGImageHandler.cpp">
+      <Filter>Images\JPG</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\JPEGImageInformation.cpp">
+      <Filter>Images\JPG</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\JPEGImageParser.cpp">
+      <Filter>Images\JPG</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\LayeredGlyphsDrawingContext.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\LinearGradientShadingPatternWritingTask.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Log.cpp">
+      <Filter>Infrastructure\Trace and Log</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\MD5Generator.cpp">
+      <Filter>Infrastructure\Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RC4.cpp">
+      <Filter>Infrastructure\Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ObjectsContext.cpp">
+      <Filter>Objects Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OpenTypeFileInput.cpp">
+      <Filter>Text\OpenType</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OpenTypePrimitiveReader.cpp">
+      <Filter>Text\OpenType</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputAESEncodeStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputBufferedStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFile.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFileStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFlateDecodeStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFlateEncodeStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputRC4XcodeStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputStreamTraits.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputStringBufferStream.cpp">
+      <Filter>Infrastructure\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PageContentContext.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PageTree.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PaintedGlyphsDrawingContext.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ParsedPrimitiveHelper.cpp">
+      <Filter>PDF Embedding\Parsed objects Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFArray.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFBoolean.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFCosArray.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFCosDict.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDate.cpp">
+      <Filter>Objects Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDictionary.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDocEncoding.cpp">
+      <Filter>Infrastructure\Encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDocumentCopyingContext.cpp">
+      <Filter>PDF Embedding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDocumentHandler.cpp">
+      <Filter>PDF Embedding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFFormXObject.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFTiledPattern.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TiledPatternContentContext.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFHexString.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFImageXObject.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFIndirectObjectReference.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFInteger.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFLiteralString.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFMatrix.cpp">
+      <Filter>Objects Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFModifiedPage.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFName.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFNull.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFObject.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFObjectParser.cpp">
+      <Filter>PDF Embedding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFPage.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFPageInput.cpp">
+      <Filter>PDF Embedding\Parsed objects Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDictionaryIterator.cpp">
+      <Filter>PDF Embedding\Parsed objects Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFArrayIterator.cpp">
+      <Filter>PDF Embedding\Parsed objects Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFPageMergingHelper.cpp">
+      <Filter>PDF Embedding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParser.cpp">
+      <Filter>PDF Embedding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParserTokenizer.cpp">
+      <Filter>PDF Embedding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParsingOptions.cpp">
+      <Filter>PDF Embedding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParsingPath.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFReal.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFRectangle.cpp">
+      <Filter>Objects Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFStream.cpp">
+      <Filter>Objects Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFStreamInput.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFSymbol.cpp">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFTextString.cpp">
+      <Filter>Objects Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFUsedFont.cpp">
+      <Filter>Text</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFWriter.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PFMFileReader.cpp">
+      <Filter>Text\FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PNGImageHandler.cpp">
+      <Filter>Images\PNG</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PrimitiveObjectsWriter.cpp">
+      <Filter>Objects Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PSBool.cpp">
+      <Filter>Text\Type1</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RadialGradientShadingPatternWritingTask.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RefCountObject.cpp">
+      <Filter>Infrastructure\Patterns</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ResourcesDictionary.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ShadingWriter.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SimpleGlyphsDrawingContext.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SimpleStringTokenizer.cpp">
+      <Filter>PDF Embedding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\StandardEncoding.cpp">
+      <Filter>Infrastructure\Encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\StateReader.cpp">
+      <Filter>State Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\StateWriter.cpp">
+      <Filter>State Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SweepGradientShadingPatternWritingTask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TIFFImageHandler.cpp">
+      <Filter>Images\TIFF</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TiffUsageParameters.cpp">
+      <Filter>Images\TIFF</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Timer.cpp">
+      <Filter>Infrastructure\Timers</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TimersRegistry.cpp">
+      <Filter>Infrastructure\Timers</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Trace.cpp">
+      <Filter>Infrastructure\Trace and Log</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrailerInformation.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypeANSIFontWriter.cpp">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypeDescendentFontWriter.cpp">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypeEmbeddedFontWriter.cpp">
+      <Filter>Text\TrueType</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypePrimitiveWriter.cpp">
+      <Filter>Text\TrueType</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type1Input.cpp">
+      <Filter>Text\Type1</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type1ToCFFEmbeddedFontWriter.cpp">
+      <Filter>Text\Type1</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type1ToType2Converter.cpp">
+      <Filter>Text\Type1</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type2CharStringWriter.cpp">
+      <Filter>Text\Type1</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\UnicodeString.cpp">
+      <Filter>Infrastructure\Encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\UppercaseSequance.cpp">
+      <Filter>Objects Context Level</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\UsedFontsRepository.cpp">
+      <Filter>Text</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WinAnsiEncoding.cpp">
+      <Filter>Infrastructure\Encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WrittenFontCFF.cpp">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WrittenFontTrueType.cpp">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\XCryptionCommon.cpp">
+      <Filter>XCryption</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\XObjectContentContext.cpp">
+      <Filter>Document Context Level</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\AbstractContentContext.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\AbstractWrittenFont.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\AdapterIByteReaderWithPositionToIReadPositionProvider.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ANSIFontWriter.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Ascii7Encoding.h">
+      <Filter>Infrastructure\Encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ArrayOfInputStreamsStream.h">
+      <Filter>PDF Embedding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\BetweenIncluding.h">
+      <Filter>Infrastructure\Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\BoxingBase.h">
+      <Filter>Infrastructure\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CatalogInformation.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFANSIFontWriter.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFDescendentFontWriter.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFEmbeddedFontWriter.h">
+      <Filter>Text\CFF</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFFileInput.h">
+      <Filter>Text\CFF</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFPrimitiveReader.h">
+      <Filter>Text\CFF</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFPrimitiveWriter.h">
+      <Filter>Text\CFF</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringDefinitions.h">
+      <Filter>Text\CFF</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType1Interpreter.h">
+      <Filter>Text\Type1</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType1Tracer.h">
+      <Filter>Text\Type1</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType2Flattener.h">
+      <Filter>Text\CFF</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType2Interpreter.h">
+      <Filter>Text\CFF</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType2Tracer.h">
+      <Filter>Text\CFF</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CIDFontWriter.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CMYKRGBColor.h">
+      <Filter>Infrastructure\Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ContainerIterator.h">
+      <Filter>Infrastructure\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DecryptionHelper.h">
+      <Filter>XCryption</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Deletable.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DescendentFontWriter.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DictionaryContext.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DictOperand.h">
+      <Filter>Text\CFF</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DocumentContext.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DocumentContextExtenderAdapter.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EFontStretch.h">
+      <Filter>Text\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EHummusImageType.h">
+      <Filter>Infrastructure\Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EncryptionHelper.h">
+      <Filter>XCryption</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EncryptionOptions.h">
+      <Filter>XCryption</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EPDFVersion.h">
+      <Filter>Infrastructure\Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EStatusCode.h">
+      <Filter>Infrastructure\Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ETokenSeparator.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ExtGStateRegistry.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FontDescriptorWriter.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeFaceWrapper.h">
+      <Filter>Text\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeOpenTypeWrapper.h">
+      <Filter>Text\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeType1Wrapper.h">
+      <Filter>Text\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeWrapper.h">
+      <Filter>Text\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FSType.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\GlyphUnicodeMapping.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\GraphicState.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\GraphicStateStack.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IANSIFontWriterHelper.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IByteReader.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IByteReaderWithPosition.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IByteWriter.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IByteWriterWithPosition.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IContentContextListener.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IDeletable.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IDescendentFontWriter.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IDocumentContextExtender.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IFontDescriptorHelper.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IFormEndWritingTask.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ITiledPatternEndWritingTask.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IFreeTypeFaceExtender.h">
+      <Filter>Text\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IndirectObjectsReferenceRegistry.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InfoDictionary.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputAESDecodeStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputAscii85DecodeStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputAsciiHexDecodeStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputBufferedStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputByteArrayStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputCharStringDecodeStream.h">
+      <Filter>Text\Type1</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputDCTDecodeStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputFile.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputFileStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputFlateDecodeStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputLZWDecodeStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputLimitedStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputOffsetStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputRC4XcodeStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputPFBDecodeStream.h">
+      <Filter>Text\Type1</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputPredictorPNGOptimumStream.h">
+      <Filter>PDF Embedding\PredictionFilters</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputPredictorTIFFSubStream.h">
+      <Filter>PDF Embedding\PredictionFilters</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputStreamSkipperStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputStringBufferStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputStringStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IOBasicTypes.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IObjectEndWritingTask.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IObjectsContextExtender.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IPageEndWritingTask.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IPDFParserExtender.h">
+      <Filter>PDF Embedding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IReadPositionProvider.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IResourceWritingTask.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IType1InterpreterImplementation.h">
+      <Filter>Text\Type1</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IType2InterpreterImplementation.h">
+      <Filter>Text\CFF</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IWrittenFont.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\JPEGImageHandler.h">
+      <Filter>Images\JPG</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\JPEGImageInformation.h">
+      <Filter>Images\JPG</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\JPEGImageParser.h">
+      <Filter>Images\JPG</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\LayeredGlyphsDrawingContext.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\LinearGradientShadingPatternWritingTask.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Log.h">
+      <Filter>Infrastructure\Trace and Log</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\MapIterator.h">
+      <Filter>Infrastructure\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\MD5Generator.h">
+      <Filter>Infrastructure\Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RC4.h">
+      <Filter>Infrastructure\Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\MyStringBuf.h">
+      <Filter>Infrastructure\Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ObjectsBasicTypes.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ObjectsContext.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ObjectsContextExtenderAdapter.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OpenTypeFileInput.h">
+      <Filter>Text\OpenType</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OpenTypePrimitiveReader.h">
+      <Filter>Text\OpenType</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputAESEncodeStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputBufferedStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFile.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFileStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFlateDecodeStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFlateEncodeStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputRC4XcodeStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputStreamTraits.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputStringBufferStream.h">
+      <Filter>Infrastructure\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PageContentContext.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PageTree.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PaintedGlyphsDrawingContext.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ParsedPrimitiveHelper.h">
+      <Filter>PDF Embedding\Parsed objects Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFArray.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFBoolean.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFCosArray.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFCosDict.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDate.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDictionary.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDocEncoding.h">
+      <Filter>Infrastructure\Encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDocumentCopyingContext.h">
+      <Filter>PDF Embedding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDocumentHandler.h">
+      <Filter>PDF Embedding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFEmbedParameterTypes.h">
+      <Filter>PDF Embedding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFFormXObject.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFTiledPattern.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TiledPatternContentContext.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFHexString.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFImageXObject.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFIndirectObjectReference.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFInteger.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFLiteralString.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFMatrix.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFModifiedPage.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFName.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFNull.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFObject.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFObjectCast.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFObjectParser.h">
+      <Filter>PDF Embedding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFPage.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFPageInput.h">
+      <Filter>PDF Embedding\Parsed objects Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDictionaryIterator.h">
+      <Filter>PDF Embedding\Parsed objects Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFArrayIterator.h">
+      <Filter>PDF Embedding\Parsed objects Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFPageMergingHelper.h">
+      <Filter>PDF Embedding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParser.h">
+      <Filter>PDF Embedding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParserTokenizer.h">
+      <Filter>PDF Embedding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParsingOptions.h">
+      <Filter>PDF Embedding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParsingPath.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFReal.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFRectangle.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFStream.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFStreamInput.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFSymbol.h">
+      <Filter>PDF Embedding\Parsed Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFTextString.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFUsedFont.h">
+      <Filter>Text</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFWriter.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PFMFileReader.h">
+      <Filter>Text\FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PNGImageHandler.h">
+      <Filter>Images\PNG</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PrimitiveObjectsWriter.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ProcsetResourcesConstants.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PSBool.h">
+      <Filter>Text\Type1</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RadialGradientShadingPatternWritingTask.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RefCountObject.h">
+      <Filter>Infrastructure\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RefCountPtr.h">
+      <Filter>Infrastructure\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ResourcesDictionary.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SafeBufferMacrosDefs.h">
+      <Filter>Infrastructure\Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SimpleGlyphsDrawingContext.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SimpleStringTokenizer.h">
+      <Filter>PDF Embedding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Singleton.h">
+      <Filter>Infrastructure\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SingleValueContainerIterator.h">
+      <Filter>Infrastructure\Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ShadingWriter.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\StandardEncoding.h">
+      <Filter>Infrastructure\Encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\StateReader.h">
+      <Filter>State Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\StateWriter.h">
+      <Filter>State Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SweepGradientShadingPatternWritingTask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TIFFImageHandler.h">
+      <Filter>Images\TIFF</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TiffUsageParameters.h">
+      <Filter>Images\TIFF</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Timer.h">
+      <Filter>Infrastructure\Timers</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TimersRegistry.h">
+      <Filter>Infrastructure\Timers</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Trace.h">
+      <Filter>Infrastructure\Trace and Log</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrailerInformation.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypeANSIFontWriter.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypeDescendentFontWriter.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypeEmbeddedFontWriter.h">
+      <Filter>Text\TrueType</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypePrimitiveWriter.h">
+      <Filter>Text\TrueType</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type1Input.h">
+      <Filter>Text\Type1</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type1ToCFFEmbeddedFontWriter.h">
+      <Filter>Text\Type1</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type1ToType2Converter.h">
+      <Filter>Text\Type1</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type2CharStringWriter.h">
+      <Filter>Text\Type1</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\UnicodeString.h">
+      <Filter>Infrastructure\Encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\UppercaseSequance.h">
+      <Filter>Objects Context Level</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\UsedFontsRepository.h">
+      <Filter>Text</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WinAnsiEncoding.h">
+      <Filter>Infrastructure\Encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WrittenFontCFF.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WrittenFontRepresentation.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WrittenFontTrueType.h">
+      <Filter>Text\PDF Font Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\XCryptionCommon.h">
+      <Filter>XCryption</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\XObjectContentContext.h">
+      <Filter>Document Context Level</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Document Context Level">
+      <UniqueIdentifier>{9F79CD0B-F11E-3160-AAAE-5AA96E9198C2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{56D611B6-1D42-3802-B023-A973C50D954B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Images">
+      <UniqueIdentifier>{9352A704-043E-35FE-A2D0-A82A214DF2CA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Images\JPG">
+      <UniqueIdentifier>{981EEFA3-04E9-34CD-B423-9F557CD9C6E3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Images\PNG">
+      <UniqueIdentifier>{863087E0-AF50-326E-88BA-F7F53B05EF5A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Images\TIFF">
+      <UniqueIdentifier>{0490E914-F694-348F-8422-39F7D09A6D74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Infrastructure">
+      <UniqueIdentifier>{B179538E-96EC-356C-A9D9-FCA96294919F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Infrastructure\Basics">
+      <UniqueIdentifier>{76FDFB8F-E6AB-3259-93B8-5848A80D0B0D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Infrastructure\Encoding">
+      <UniqueIdentifier>{497FDE98-9B2E-3EF7-A15F-15D6E597152A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Infrastructure\Encryption">
+      <UniqueIdentifier>{6A003BC1-7086-36DB-95D4-D04B1AF3354F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Infrastructure\IO">
+      <UniqueIdentifier>{63589652-77FD-36A6-ACD1-3CE6EA065CC2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Infrastructure\Patterns">
+      <UniqueIdentifier>{7FC18A1B-8DE4-301A-91F3-118FFA82D2EA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Infrastructure\Timers">
+      <UniqueIdentifier>{9EF1A1A7-1EA6-3D63-A990-64B29DBE8953}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Infrastructure\Trace and Log">
+      <UniqueIdentifier>{A8691991-158A-35D4-B3A6-84E6DB81E949}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{5DB14098-7FB2-3627-AF75-6F59BB68B526}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects Context Level">
+      <UniqueIdentifier>{680E8952-313D-37B1-B3F7-AFE4BB1C5BAC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PDF Embedding">
+      <UniqueIdentifier>{D9CBAA59-F30E-3160-B0E7-488F81852EEC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PDF Embedding\Parsed Objects">
+      <UniqueIdentifier>{D5A18E8C-D3DD-3643-9B24-65AAB0635C97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PDF Embedding\Parsed objects Helpers">
+      <UniqueIdentifier>{230300D5-F815-3981-9CD2-814DB9CA353E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PDF Embedding\PredictionFilters">
+      <UniqueIdentifier>{42F6BA92-9BA2-3926-B85E-66F4BF27EF9F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{DE7CEF15-72FC-345B-94BF-D1F91E8BF28B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State Serialization">
+      <UniqueIdentifier>{CD615FF7-9024-3F2F-8AE9-D7FC74D524C0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text">
+      <UniqueIdentifier>{DD27E159-7DFF-304E-A03E-ABE181D935C7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text\CFF">
+      <UniqueIdentifier>{031A198C-186C-39E2-B14A-251944135ACB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text\FreeType">
+      <UniqueIdentifier>{EC4F9E4D-B18D-3D04-9C96-DD1245F87E74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text\OpenType">
+      <UniqueIdentifier>{AB50BB5D-47EF-3A49-9BAF-F6EF8C4E46CC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text\PDF Font Definitions">
+      <UniqueIdentifier>{A764918E-5F2E-3B0C-A4F8-CF0A3609B0D5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text\TrueType">
+      <UniqueIdentifier>{4FD9736F-371D-3A45-8645-DB8168AAC72D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text\Type1">
+      <UniqueIdentifier>{4D887490-A121-38C0-8C66-DCD02323D154}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XCryption">
+      <UniqueIdentifier>{CA0F38F7-44B4-3D85-807E-A3EE0005B74C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

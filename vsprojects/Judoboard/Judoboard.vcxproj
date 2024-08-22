@@ -149,7 +149,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>yaml-cpp\yaml-cppd.lib;license\License_Debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>yaml-cpp\yaml-cppd.lib;license\License_Debug.lib;PDF-Writer\PDFWriter\Debug\PDFWriter.lib;PDF-Writer\LibTiff\Debug\LibTiff.lib;PDF-Writer\LibJpeg\Debug\LibJpeg.lib;PDF-Writer\LibPng\Debug\LibPng.lib;PDF-Writer\FreeType\Debug\FreeType.lib;PDF-Writer\Zlib\Debug\Zlib.lib;PDF-Writer\LibAesgm\Debug\LibAesgm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -168,7 +168,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>yaml-cpp\yaml-cpp.lib;license\License.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>yaml-cpp\yaml-cpp.lib;license\License.lib;PDF-Writer\PDFWriter\Release\PDFWriter.lib;PDF-Writer\LibTiff\Release\LibTiff.lib;PDF-Writer\LibJpeg\Release\LibJpeg.lib;PDF-Writer\LibPng\Release\LibPng.lib;PDF-Writer\FreeType\Release\FreeType.lib;PDF-Writer\Zlib\Release\Zlib.lib;PDF-Writer\LibAesgm\Release\LibAesgm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -201,6 +201,7 @@
     <ClCompile Include="..\..\src\matchtable.cpp" />
     <ClCompile Include="..\..\src\md5.cpp" />
     <ClCompile Include="..\..\src\mixer.cpp" />
+    <ClCompile Include="..\..\src\pdf.cpp" />
     <ClCompile Include="..\..\src\pool.cpp" />
     <ClCompile Include="..\..\src\remote_mat.cpp" />
     <ClCompile Include="..\..\src\remote_tournament.cpp" />
@@ -254,6 +255,7 @@
     <ClInclude Include="..\..\src\matchtable.h" />
     <ClInclude Include="..\..\src\md5.h" />
     <ClInclude Include="..\..\src\mixer.h" />
+    <ClInclude Include="..\..\src\pdf.h" />
     <ClInclude Include="..\..\src\pool.h" />
     <ClInclude Include="..\..\src\remote_mat.h" />
     <ClInclude Include="..\..\src\remote_tournament.h" />
@@ -314,7 +316,6 @@
     <None Include="..\..\bin\html\tournament_settings.html" />
     <None Include="..\..\compile.bat" />
     <None Include="..\..\compile.sh" />
-    <None Include="..\..\compile64.bat" />
     <None Include="..\..\dependencies.sh" />
     <None Include="..\..\package.bat" />
     <None Include="..\..\README.md" />

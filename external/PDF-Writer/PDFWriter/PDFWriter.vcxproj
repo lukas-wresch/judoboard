@@ -1,0 +1,675 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{181CDF29-278F-3520-B531-D83F7279F5AC}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>PDFWriter</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PDFWriter.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PDFWriter</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PDFWriter.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PDFWriter</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">PDFWriter.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">PDFWriter</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">PDFWriter.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">PDFWriter</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\Workspace\Judoboard\external\PDF-Writer\Zlib;E:\Workspace\Judoboard\external\PDF-Writer\FreeType\include;E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm;E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg;E:\Workspace\Judoboard\external\PDF-Writer\LibTiff;E:\Workspace\Judoboard\external\PDF-Writer\LibPng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;FT2_BUILD_LIBRARY=1;FT_CONFIG_OPTION_SYSTEM_ZLIB=1;_CRT_SECURE_NO_DEPRECATE=1;AVOID_WIN32_FILEIO=1;CHECK_JPEG_YCBCR_SUBSAMPLING=1;DEFAULT_EXTRASAMPLE_AS_ALPHA=1;STRIPCHOP_DEFAULT=TIFF_STRIPCHOP;STRIP_SIZE_DEFAULT=8192;PIXARLOG_SUPPORT=1;ZIP_SUPPORT=1;LOGLUV_SUPPORT=1;NEXT_SUPPORT=1;THUNDER_SUPPORT=1;LZW_SUPPORT=1;PACKBITS_SUPPORT=1;CCITT_SUPPORT=1;TIF_PLATFORM_CONSOLE=1;FILLODER_LSB2MSB=1;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;FT2_BUILD_LIBRARY=1;FT_CONFIG_OPTION_SYSTEM_ZLIB=1;_CRT_SECURE_NO_DEPRECATE=1;AVOID_WIN32_FILEIO=1;CHECK_JPEG_YCBCR_SUBSAMPLING=1;DEFAULT_EXTRASAMPLE_AS_ALPHA=1;STRIPCHOP_DEFAULT=TIFF_STRIPCHOP;STRIP_SIZE_DEFAULT=8192;PIXARLOG_SUPPORT=1;ZIP_SUPPORT=1;LOGLUV_SUPPORT=1;NEXT_SUPPORT=1;THUNDER_SUPPORT=1;LZW_SUPPORT=1;PACKBITS_SUPPORT=1;CCITT_SUPPORT=1;TIF_PLATFORM_CONSOLE=1;FILLODER_LSB2MSB=1;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Workspace\Judoboard\external\PDF-Writer\Zlib;E:\Workspace\Judoboard\external\PDF-Writer\FreeType\include;E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm;E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg;E:\Workspace\Judoboard\external\PDF-Writer\LibTiff;E:\Workspace\Judoboard\external\PDF-Writer\LibPng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Workspace\Judoboard\external\PDF-Writer\Zlib;E:\Workspace\Judoboard\external\PDF-Writer\FreeType\include;E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm;E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg;E:\Workspace\Judoboard\external\PDF-Writer\LibTiff;E:\Workspace\Judoboard\external\PDF-Writer\LibPng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\Workspace\Judoboard\external\PDF-Writer\Zlib;E:\Workspace\Judoboard\external\PDF-Writer\FreeType\include;E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm;E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg;E:\Workspace\Judoboard\external\PDF-Writer\LibTiff;E:\Workspace\Judoboard\external\PDF-Writer\LibPng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;FT2_BUILD_LIBRARY=1;FT_CONFIG_OPTION_SYSTEM_ZLIB=1;_CRT_SECURE_NO_DEPRECATE=1;AVOID_WIN32_FILEIO=1;CHECK_JPEG_YCBCR_SUBSAMPLING=1;DEFAULT_EXTRASAMPLE_AS_ALPHA=1;STRIPCHOP_DEFAULT=TIFF_STRIPCHOP;STRIP_SIZE_DEFAULT=8192;PIXARLOG_SUPPORT=1;ZIP_SUPPORT=1;LOGLUV_SUPPORT=1;NEXT_SUPPORT=1;THUNDER_SUPPORT=1;LZW_SUPPORT=1;PACKBITS_SUPPORT=1;CCITT_SUPPORT=1;TIF_PLATFORM_CONSOLE=1;FILLODER_LSB2MSB=1;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;FT2_BUILD_LIBRARY=1;FT_CONFIG_OPTION_SYSTEM_ZLIB=1;_CRT_SECURE_NO_DEPRECATE=1;AVOID_WIN32_FILEIO=1;CHECK_JPEG_YCBCR_SUBSAMPLING=1;DEFAULT_EXTRASAMPLE_AS_ALPHA=1;STRIPCHOP_DEFAULT=TIFF_STRIPCHOP;STRIP_SIZE_DEFAULT=8192;PIXARLOG_SUPPORT=1;ZIP_SUPPORT=1;LOGLUV_SUPPORT=1;NEXT_SUPPORT=1;THUNDER_SUPPORT=1;LZW_SUPPORT=1;PACKBITS_SUPPORT=1;CCITT_SUPPORT=1;TIF_PLATFORM_CONSOLE=1;FILLODER_LSB2MSB=1;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Workspace\Judoboard\external\PDF-Writer\Zlib;E:\Workspace\Judoboard\external\PDF-Writer\FreeType\include;E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm;E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg;E:\Workspace\Judoboard\external\PDF-Writer\LibTiff;E:\Workspace\Judoboard\external\PDF-Writer\LibPng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Workspace\Judoboard\external\PDF-Writer\Zlib;E:\Workspace\Judoboard\external\PDF-Writer\FreeType\include;E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm;E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg;E:\Workspace\Judoboard\external\PDF-Writer\LibTiff;E:\Workspace\Judoboard\external\PDF-Writer\LibPng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\Workspace\Judoboard\external\PDF-Writer\Zlib;E:\Workspace\Judoboard\external\PDF-Writer\FreeType\include;E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm;E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg;E:\Workspace\Judoboard\external\PDF-Writer\LibTiff;E:\Workspace\Judoboard\external\PDF-Writer\LibPng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;FT2_BUILD_LIBRARY=1;FT_CONFIG_OPTION_SYSTEM_ZLIB=1;_CRT_SECURE_NO_DEPRECATE=1;AVOID_WIN32_FILEIO=1;CHECK_JPEG_YCBCR_SUBSAMPLING=1;DEFAULT_EXTRASAMPLE_AS_ALPHA=1;STRIPCHOP_DEFAULT=TIFF_STRIPCHOP;STRIP_SIZE_DEFAULT=8192;PIXARLOG_SUPPORT=1;ZIP_SUPPORT=1;LOGLUV_SUPPORT=1;NEXT_SUPPORT=1;THUNDER_SUPPORT=1;LZW_SUPPORT=1;PACKBITS_SUPPORT=1;CCITT_SUPPORT=1;TIF_PLATFORM_CONSOLE=1;FILLODER_LSB2MSB=1;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;FT2_BUILD_LIBRARY=1;FT_CONFIG_OPTION_SYSTEM_ZLIB=1;_CRT_SECURE_NO_DEPRECATE=1;AVOID_WIN32_FILEIO=1;CHECK_JPEG_YCBCR_SUBSAMPLING=1;DEFAULT_EXTRASAMPLE_AS_ALPHA=1;STRIPCHOP_DEFAULT=TIFF_STRIPCHOP;STRIP_SIZE_DEFAULT=8192;PIXARLOG_SUPPORT=1;ZIP_SUPPORT=1;LOGLUV_SUPPORT=1;NEXT_SUPPORT=1;THUNDER_SUPPORT=1;LZW_SUPPORT=1;PACKBITS_SUPPORT=1;CCITT_SUPPORT=1;TIF_PLATFORM_CONSOLE=1;FILLODER_LSB2MSB=1;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Workspace\Judoboard\external\PDF-Writer\Zlib;E:\Workspace\Judoboard\external\PDF-Writer\FreeType\include;E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm;E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg;E:\Workspace\Judoboard\external\PDF-Writer\LibTiff;E:\Workspace\Judoboard\external\PDF-Writer\LibPng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Workspace\Judoboard\external\PDF-Writer\Zlib;E:\Workspace\Judoboard\external\PDF-Writer\FreeType\include;E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm;E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg;E:\Workspace\Judoboard\external\PDF-Writer\LibTiff;E:\Workspace\Judoboard\external\PDF-Writer\LibPng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\Workspace\Judoboard\external\PDF-Writer\Zlib;E:\Workspace\Judoboard\external\PDF-Writer\FreeType\include;E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm;E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg;E:\Workspace\Judoboard\external\PDF-Writer\LibTiff;E:\Workspace\Judoboard\external\PDF-Writer\LibPng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;FT2_BUILD_LIBRARY=1;FT_CONFIG_OPTION_SYSTEM_ZLIB=1;_CRT_SECURE_NO_DEPRECATE=1;AVOID_WIN32_FILEIO=1;CHECK_JPEG_YCBCR_SUBSAMPLING=1;DEFAULT_EXTRASAMPLE_AS_ALPHA=1;STRIPCHOP_DEFAULT=TIFF_STRIPCHOP;STRIP_SIZE_DEFAULT=8192;PIXARLOG_SUPPORT=1;ZIP_SUPPORT=1;LOGLUV_SUPPORT=1;NEXT_SUPPORT=1;THUNDER_SUPPORT=1;LZW_SUPPORT=1;PACKBITS_SUPPORT=1;CCITT_SUPPORT=1;TIF_PLATFORM_CONSOLE=1;FILLODER_LSB2MSB=1;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;FT2_BUILD_LIBRARY=1;FT_CONFIG_OPTION_SYSTEM_ZLIB=1;_CRT_SECURE_NO_DEPRECATE=1;AVOID_WIN32_FILEIO=1;CHECK_JPEG_YCBCR_SUBSAMPLING=1;DEFAULT_EXTRASAMPLE_AS_ALPHA=1;STRIPCHOP_DEFAULT=TIFF_STRIPCHOP;STRIP_SIZE_DEFAULT=8192;PIXARLOG_SUPPORT=1;ZIP_SUPPORT=1;LOGLUV_SUPPORT=1;NEXT_SUPPORT=1;THUNDER_SUPPORT=1;LZW_SUPPORT=1;PACKBITS_SUPPORT=1;CCITT_SUPPORT=1;TIF_PLATFORM_CONSOLE=1;FILLODER_LSB2MSB=1;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Workspace\Judoboard\external\PDF-Writer\Zlib;E:\Workspace\Judoboard\external\PDF-Writer\FreeType\include;E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm;E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg;E:\Workspace\Judoboard\external\PDF-Writer\LibTiff;E:\Workspace\Judoboard\external\PDF-Writer\LibPng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Workspace\Judoboard\external\PDF-Writer\Zlib;E:\Workspace\Judoboard\external\PDF-Writer\FreeType\include;E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm;E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg;E:\Workspace\Judoboard\external\PDF-Writer\LibTiff;E:\Workspace\Judoboard\external\PDF-Writer\LibPng;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule E:/Workspace/Judoboard/external/PDF-Writer/PDFWriter/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SE:/Workspace/Judoboard/external/PDF-Writer -BE:/Workspace/Judoboard/external/PDF-Writer --check-stamp-file E:/Workspace/Judoboard/external/PDF-Writer/PDFWriter/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule E:/Workspace/Judoboard/external/PDF-Writer/PDFWriter/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SE:/Workspace/Judoboard/external/PDF-Writer -BE:/Workspace/Judoboard/external/PDF-Writer --check-stamp-file E:/Workspace/Judoboard/external/PDF-Writer/PDFWriter/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule E:/Workspace/Judoboard/external/PDF-Writer/PDFWriter/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SE:/Workspace/Judoboard/external/PDF-Writer -BE:/Workspace/Judoboard/external/PDF-Writer --check-stamp-file E:/Workspace/Judoboard/external/PDF-Writer/PDFWriter/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule E:/Workspace/Judoboard/external/PDF-Writer/PDFWriter/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SE:/Workspace/Judoboard/external/PDF-Writer -BE:/Workspace/Judoboard/external/PDF-Writer --check-stamp-file E:/Workspace/Judoboard/external/PDF-Writer/PDFWriter/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\AbstractContentContext.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\AbstractWrittenFont.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ANSIFontWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Ascii7Encoding.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ArrayOfInputStreamsStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CatalogInformation.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFANSIFontWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFDescendentFontWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFEmbeddedFontWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFFileInput.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFPrimitiveReader.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFPrimitiveWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType1Interpreter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType1Tracer.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType2Flattener.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType2Interpreter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType2Tracer.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CIDFontWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CMYKRGBColor.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DecryptionHelper.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DescendentFontWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DictionaryContext.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DocumentContext.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EncryptionHelper.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EncryptionOptions.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ExtGStateRegistry.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FontDescriptorWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeFaceWrapper.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeOpenTypeWrapper.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeType1Wrapper.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeWrapper.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\GraphicState.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\GraphicStateStack.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IndirectObjectsReferenceRegistry.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InfoDictionary.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputAESDecodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputAscii85DecodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputAsciiHexDecodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputBufferedStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputByteArrayStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputCharStringDecodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputDCTDecodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputFile.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputFileStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputFlateDecodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputLZWDecodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputLimitedStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputOffsetStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputRC4XcodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputPFBDecodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputPredictorPNGOptimumStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputPredictorTIFFSubStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputStreamSkipperStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputStringBufferStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputStringStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\JPEGImageHandler.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\JPEGImageInformation.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\JPEGImageParser.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\LayeredGlyphsDrawingContext.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\LinearGradientShadingPatternWritingTask.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Log.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\MD5Generator.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RC4.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ObjectsContext.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OpenTypeFileInput.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OpenTypePrimitiveReader.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputAESEncodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputBufferedStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFile.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFileStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFlateDecodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFlateEncodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputRC4XcodeStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputStreamTraits.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputStringBufferStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PageContentContext.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PageTree.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PaintedGlyphsDrawingContext.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ParsedPrimitiveHelper.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFArray.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFBoolean.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFCosArray.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFCosDict.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDate.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDictionary.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDocEncoding.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDocumentCopyingContext.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDocumentHandler.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFFormXObject.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFTiledPattern.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TiledPatternContentContext.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFHexString.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFImageXObject.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFIndirectObjectReference.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFInteger.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFLiteralString.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFMatrix.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFModifiedPage.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFName.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFNull.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFObject.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFObjectParser.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFPage.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFPageInput.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDictionaryIterator.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFArrayIterator.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFPageMergingHelper.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParser.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParserTokenizer.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParsingOptions.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParsingPath.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFReal.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFRectangle.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFStream.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFStreamInput.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFSymbol.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFTextString.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFUsedFont.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PFMFileReader.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PNGImageHandler.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PrimitiveObjectsWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PSBool.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RadialGradientShadingPatternWritingTask.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RefCountObject.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ResourcesDictionary.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ShadingWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SimpleGlyphsDrawingContext.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SimpleStringTokenizer.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\StandardEncoding.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\StateReader.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\StateWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SweepGradientShadingPatternWritingTask.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TIFFImageHandler.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TiffUsageParameters.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Timer.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TimersRegistry.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Trace.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrailerInformation.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypeANSIFontWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypeDescendentFontWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypeEmbeddedFontWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypePrimitiveWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type1Input.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type1ToCFFEmbeddedFontWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type1ToType2Converter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type2CharStringWriter.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\UnicodeString.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\UppercaseSequance.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\UsedFontsRepository.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WinAnsiEncoding.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WrittenFontCFF.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WrittenFontTrueType.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\XCryptionCommon.cpp" />
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\XObjectContentContext.cpp" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\AbstractContentContext.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\AbstractWrittenFont.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\AdapterIByteReaderWithPositionToIReadPositionProvider.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ANSIFontWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Ascii7Encoding.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ArrayOfInputStreamsStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\BetweenIncluding.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\BoxingBase.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CatalogInformation.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFANSIFontWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFDescendentFontWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFEmbeddedFontWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFFileInput.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFPrimitiveReader.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CFFPrimitiveWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringDefinitions.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType1Interpreter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType1Tracer.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType2Flattener.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType2Interpreter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CharStringType2Tracer.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CIDFontWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\CMYKRGBColor.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ContainerIterator.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DecryptionHelper.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Deletable.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DescendentFontWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DictionaryContext.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DictOperand.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DocumentContext.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\DocumentContextExtenderAdapter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EFontStretch.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EHummusImageType.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EncryptionHelper.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EncryptionOptions.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EPDFVersion.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\EStatusCode.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ETokenSeparator.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ExtGStateRegistry.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FontDescriptorWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeFaceWrapper.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeOpenTypeWrapper.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeType1Wrapper.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FreeTypeWrapper.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\FSType.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\GlyphUnicodeMapping.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\GraphicState.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\GraphicStateStack.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IANSIFontWriterHelper.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IByteReader.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IByteReaderWithPosition.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IByteWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IByteWriterWithPosition.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IContentContextListener.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IDeletable.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IDescendentFontWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IDocumentContextExtender.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IFontDescriptorHelper.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IFormEndWritingTask.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ITiledPatternEndWritingTask.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IFreeTypeFaceExtender.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IndirectObjectsReferenceRegistry.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InfoDictionary.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputAESDecodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputAscii85DecodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputAsciiHexDecodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputBufferedStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputByteArrayStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputCharStringDecodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputDCTDecodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputFile.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputFileStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputFlateDecodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputLZWDecodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputLimitedStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputOffsetStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputRC4XcodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputPFBDecodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputPredictorPNGOptimumStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputPredictorTIFFSubStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputStreamSkipperStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputStringBufferStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\InputStringStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IOBasicTypes.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IObjectEndWritingTask.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IObjectsContextExtender.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IPageEndWritingTask.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IPDFParserExtender.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IReadPositionProvider.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IResourceWritingTask.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IType1InterpreterImplementation.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IType2InterpreterImplementation.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\IWrittenFont.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\JPEGImageHandler.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\JPEGImageInformation.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\JPEGImageParser.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\LayeredGlyphsDrawingContext.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\LinearGradientShadingPatternWritingTask.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Log.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\MapIterator.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\MD5Generator.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RC4.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\MyStringBuf.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ObjectsBasicTypes.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ObjectsContext.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ObjectsContextExtenderAdapter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OpenTypeFileInput.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OpenTypePrimitiveReader.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputAESEncodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputBufferedStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFile.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFileStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFlateDecodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputFlateEncodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputRC4XcodeStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputStreamTraits.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\OutputStringBufferStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PageContentContext.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PageTree.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PaintedGlyphsDrawingContext.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ParsedPrimitiveHelper.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFArray.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFBoolean.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFCosArray.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFCosDict.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDate.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDictionary.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDocEncoding.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDocumentCopyingContext.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDocumentHandler.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFEmbedParameterTypes.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFFormXObject.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFTiledPattern.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TiledPatternContentContext.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFHexString.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFImageXObject.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFIndirectObjectReference.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFInteger.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFLiteralString.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFMatrix.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFModifiedPage.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFName.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFNull.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFObject.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFObjectCast.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFObjectParser.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFPage.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFPageInput.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFDictionaryIterator.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFArrayIterator.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFPageMergingHelper.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParser.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParserTokenizer.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParsingOptions.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFParsingPath.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFReal.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFRectangle.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFStream.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFStreamInput.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFSymbol.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFTextString.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFUsedFont.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PDFWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PFMFileReader.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PNGImageHandler.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PrimitiveObjectsWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ProcsetResourcesConstants.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\PSBool.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RadialGradientShadingPatternWritingTask.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RefCountObject.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\RefCountPtr.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ResourcesDictionary.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SafeBufferMacrosDefs.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SimpleGlyphsDrawingContext.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SimpleStringTokenizer.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Singleton.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SingleValueContainerIterator.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\ShadingWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\StandardEncoding.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\StateReader.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\StateWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\SweepGradientShadingPatternWritingTask.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TIFFImageHandler.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TiffUsageParameters.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Timer.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TimersRegistry.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Trace.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrailerInformation.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypeANSIFontWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypeDescendentFontWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypeEmbeddedFontWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\TrueTypePrimitiveWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type1Input.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type1ToCFFEmbeddedFontWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type1ToType2Converter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\Type2CharStringWriter.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\UnicodeString.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\UppercaseSequance.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\UsedFontsRepository.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WinAnsiEncoding.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WrittenFontCFF.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WrittenFontRepresentation.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\WrittenFontTrueType.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\XCryptionCommon.h" />
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\PDFWriter\XObjectContentContext.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="E:\Workspace\Judoboard\external\PDF-Writer\ZERO_CHECK.vcxproj">
+      <Project>{5DA11E6B-ED8C-3A2B-B71F-8A88F5287325}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="E:\Workspace\Judoboard\external\PDF-Writer\FreeType\FreeType.vcxproj">
+      <Project>{39ADD551-9675-327F-95DF-B3872FBE7A47}</Project>
+      <Name>FreeType</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\LibAesgm.vcxproj">
+      <Project>{990B7B4A-EB58-35FB-9A58-3C01C23F66F7}</Project>
+      <Name>LibAesgm</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Workspace\Judoboard\external\PDF-Writer\LibJpeg\LibJpeg.vcxproj">
+      <Project>{A6AEFE6D-9507-373E-B548-0FE5231B629A}</Project>
+      <Name>LibJpeg</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Workspace\Judoboard\external\PDF-Writer\LibPng\LibPng.vcxproj">
+      <Project>{C216878A-5CB3-374F-8875-5FDAC78D181C}</Project>
+      <Name>LibPng</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Workspace\Judoboard\external\PDF-Writer\LibTiff\LibTiff.vcxproj">
+      <Project>{C865A142-4F9E-3B9D-A16B-7FCD259F74C1}</Project>
+      <Name>LibTiff</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Workspace\Judoboard\external\PDF-Writer\Zlib\Zlib.vcxproj">
+      <Project>{F4CA22DE-9684-35AD-860D-D3F03999142A}</Project>
+      <Name>Zlib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

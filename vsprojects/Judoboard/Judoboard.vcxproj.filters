@@ -156,6 +156,9 @@
     <ClCompile Include="..\..\src\loser_bracket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\pdf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\window.h">
@@ -299,6 +302,9 @@
     <ClInclude Include="..\..\external\license\license.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\pdf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\compile.sh">
@@ -398,9 +404,6 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\package.bat">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\compile64.bat">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\.github\workflows\build.yml">
