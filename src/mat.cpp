@@ -1674,10 +1674,15 @@ void Mat::NextState(State NextState) const
 			m_Graphics["following_match"].StopAllAnimations()
 				.AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0, [](auto& g) { return g.m_a > 0.0; }));
 
-			//Setup rectangle for age group
-			if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetAgeGroup())
+			//Setup rectangle for age group or rule set name
+			if (m_pMatch)
 			{
-				auto name = m_pMatch->GetMatchTable()->GetAgeGroup()->GetName();
+				std::string name;
+				if (m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetAgeGroup())
+					name = m_pMatch->GetMatchTable()->GetAgeGroup()->GetName();
+				else
+					name = m_pMatch->GetRuleSet().GetName();
+
 				int pos_y = (int)(300.0 * m_ScalingFactor);
 
 				m_Graphics["age_group_rect_text"].UpdateTexture(renderer, name, ZED::Color(0, 0, 0), ZED::FontSize::Gigantic)

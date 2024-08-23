@@ -460,41 +460,6 @@ void Application::SetupHttpServer()
 		return ret.c_str();
 	});
 
-
-	m_Server.RegisterResource("/ajax/match/add", [this](auto& Request) -> std::string {
-		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
-		if (!error)
-			return error;
-
-		UUID whiteID = HttpServer::DecodeURLEncoded(Request.m_Body, "white");
-		UUID blueID  = HttpServer::DecodeURLEncoded(Request.m_Body, "blue");
-		int  matID   = ZED::Core::ToInt(HttpServer::DecodeURLEncoded(Request.m_Body, "mat"));
-
-		auto guard = LockReadForScope();
-
-		if (!GetTournament())
-			return Error(Error::Type::TournamentNotOpen);
-
-		auto white = GetTournament()->GetDatabase().FindJudoka(whiteID);
-		if (!white)
-			white = m_Database.FindJudoka(whiteID);
-
-		auto blue = GetTournament()->GetDatabase().FindJudoka(blueID);
-		if (!blue)
-			blue = m_Database.FindJudoka(blueID);
-
-		if (!white || !blue)//Judokas exist?
-			return std::string("Judoka not found in database");
-
-		if (matID <= 0)//Illegal mat?
-			matID = FindDefaultMatID();//Use the default
-
-		if (!GetTournament()->AddMatch(Match(white, blue, GetTournament(), matID)))
-			return Error(Error::Type::OperationFailed);
-
-		return Error();//OK
-	});
-
 	m_Server.RegisterResource("/ajax/match/set_mat", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)
