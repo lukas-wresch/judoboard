@@ -2634,7 +2634,8 @@ nlohmann::json Tournament::Schedule2ResultsServer() const
 
 bool Tournament::CreateResultsPDF() const
 {
-	if (License::GetLicenseType() != License::Type::Standard || License::GetLicenseType() != License::Type::Professionel)
+	//At least standard required
+	if (!License::LicenseAtLeast(License::Type::Standard))
 		return false;
 
 	PDF pdf("results.pdf");

@@ -45,12 +45,13 @@
 <button class="add" style="margin-top: 0.8cm;" onclick="return AddTournament()" id="add">New Tournament</button>
 <button class="add" style="margin-top: 0.8cm;" onclick="return UpdateTournament()" id="update">Save Tournament</button>
 <br/>
-<button class="neutral" style="margin-top: 0.8cm;" onclick="return DownloadTournament()" id="download">Download Tournament</button>
-<button class="neutral" style="margin-top: 0.8cm;" onclick="return ExportTournament()"   id="export">Export to MD5</button>
+<button class="neutral" style="margin-top: 1.3cm;" onclick="return DownloadTournament()" id="download">Download Tournament</button>
+<button class="neutral" style="margin-top: 1.3cm;" onclick="return ExportTournament()"   id="export"></button>
+<button class="neutral" style="margin-top: 1.3cm;" onclick="return ExportTournamentPDF()"   id="export_pdf"></button>
 <br/>
-<button class="remove"  style="margin-top: 0.8cm;" onclick="return SwapTournament()"   id="swap">Swap Fighters</button>
-<button class="remove"  style="margin-top: 0.8cm;" onclick="return EmptyTournament()"  id="empty">Delete Match Results</button>
-<button class="remove"  style="margin-top: 0.8cm;" onclick="return DeleteTournament()" id="delete">Delete Tournament</button>
+<button class="remove"  style="margin-top: 1.3cm;" onclick="return SwapTournament()"   id="swap">Swap Fighters</button>
+<button class="remove"  style="margin-top: 1.3cm;" onclick="return EmptyTournament()"  id="empty">Delete Match Results</button>
+<button class="remove"  style="margin-top: 1.3cm;" onclick="return DeleteTournament()" id="delete">Delete Tournament</button>
 
 </form>
 
@@ -156,6 +157,13 @@ function ExportTournament()
 }
 
 
+function ExportTournamentPDF()
+{
+  window.location.href ='ajax/tournament/export-pdf?id='+id;
+  return false;
+}
+
+
 function GetTournament(id)
 {
   AjaxCallback("ajax/tournament/get?id="+id, function(response) {
@@ -225,5 +233,8 @@ document.getElementById("label_readonly").innerHTML = translate('readonly');
 document.getElementById("readonly_enabled").innerHTML = translate('enabled');
 document.getElementById("readonly_disabled").innerHTML = translate('disabled');
 document.getElementById("label_description").innerHTML = translate('description');
+
+document.getElementById("export").innerHTML = translate('export_to_md5');
+document.getElementById("export_pdf").innerHTML = translate('export_results_to_pdf');
 
 </script>

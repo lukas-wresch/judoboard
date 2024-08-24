@@ -2139,6 +2139,28 @@ void Application::SetupHttpServer()
 	}, HttpServer::ResourceType::Binary);
 
 
+	m_Server.RegisterResource("/ajax/tournament/export-pdf", [this](auto& Request) -> std::string {
+		auto error = CheckPermission(Request, Account::AccessLevel::Admin);
+		if (!error)
+			return error;
+
+		UUID id = HttpServer::DecodeURLEncoded(Request.m_Query, "id");
+
+		auto guard = LockReadForScope();
+
+		auto tournament = FindTournament(id);
+		if (!tournament)
+			return std::string("Could not find tournament");
+
+		if (!tournament->CreateResultsPDF())
+			return std::string("Creating PDF file failed");
+
+		Request.m_ResponseHeader = std::string("Content-Disposition: attachment; filename=") + "results.pdf";
+
+		return HttpServer::LoadFile("results.pdf");
+	}, HttpServer::ResourceType::Binary);
+
+
 	m_Server.RegisterResource("/ajax/tournament/list", [this](auto& Request) -> std::string {
 		auto error = CheckPermission(Request, Account::AccessLevel::Moderator);
 		if (!error)

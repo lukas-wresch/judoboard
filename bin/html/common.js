@@ -56,6 +56,8 @@ var lang_en = {
     empty_tournament_confirm:  [ "Are you sure you want to delete all match results of this tournament?", unescape("Willst du wirklich alle Ergebnisse dieses Turnieres l%F6schen?") ],
     enabled:   [ "Enabled", "Aktiviert" ],
     event:   [ "Event", "Ereigniss" ],
+    export_results_to_pdf:  [ "Export Results", "Ergebnisse exportieren" ],
+    export_to_md5:  [ "Export to MD5", "Zu MD5 exportieren" ],
     fifth_place:  [ "Fifth Place", "Platz 5" ],
     finals:  [ "Finals", "Finale" ],
     female:  [ "Female", "Weiblich" ],
