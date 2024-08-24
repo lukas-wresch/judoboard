@@ -14,6 +14,7 @@
 #include "double_elimination.h"
 #include "fixed.h"
 #include "weightclass_generator.h"
+#include "pdf.h"
 
 
 
@@ -2627,6 +2628,81 @@ nlohmann::json Tournament::Schedule2ResultsServer() const
 	}
 
 	return ret;
+}
+
+
+
+bool Tournament::CreateResultsPDF() const
+{
+	if (License::GetLicenseType() != License::Type::Standard || License::GetLicenseType() != License::Type::Professionel)
+		return false;
+
+	PDF pdf("results.pdf");
+	pdf.Print("Ergebnisliste - " + GetName(), 20);
+
+	auto guard = LockReadForScope();
+
+	for (auto age_group : GetAgeGroups())
+	{
+		pdf.Print(age_group->GetName(), 20);
+
+		for (auto table : GetMatchTables())
+		{
+			if (!table->GetAgeGroup() || *table->GetAgeGroup() != *age_group)
+				continue;
+
+			std::vector<std::vector<std::string>> data;
+			auto results = table->CalculateResults();
+			if (results.GetSize() == 0)
+				continue;
+
+			int no = 1;
+			for (const auto& rank : results)
+			{
+				std::vector<std::string> row;
+
+				row.push_back(std::to_string(no++) + ".");
+				if (rank.Judoka)
+				{
+					row.push_back(rank.Judoka->GetName(NameStyle::GivenName));
+
+					if (rank.Judoka->GetClub())
+						row.push_back(rank.Judoka->GetClub()->GetName());
+					else
+						row.push_back("---");
+
+					if (rank.Judoka->GetBirthyear() != 0)
+						row.push_back(std::to_string(rank.Judoka->GetBirthyear()));
+					else
+						row.push_back("---");
+
+					if (rank.Judoka->GetClub() && rank.Judoka->GetClub()->GetParent())
+						row.push_back(rank.Judoka->GetClub()->GetParent()->GetShortName());
+					else
+						row.push_back("---");
+				}
+				else
+				{
+					row.push_back("---");
+					row.push_back("---");
+					row.push_back("---");
+					row.push_back("---");
+				}
+
+				data.push_back(row);
+			}
+
+			if (pdf.GetCursorHeight() < results.GetSize() * 30 + 50)
+				pdf.EndPage();
+
+			pdf.Print(table->GetDescription(), 12, true);
+
+			pdf.CreateTable(data);
+			pdf.Newline();
+		}
+	}
+
+	return true;
 }
 
 

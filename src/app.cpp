@@ -283,6 +283,8 @@ bool Application::OpenTournament(const UUID& UUID)
 	m_Database.SetLastTournamentName(m_CurrentTournament->GetName());
 	ZED::Log::Info("Opened tournament " + m_CurrentTournament->GetName());
 
+	tournament->CreateResultsPDF();//DEBUG
+
 	return true;
 }
 
