@@ -53,7 +53,8 @@
 </div>
 
 <button id="save" class="add" style="margin-top: 1cm;" onclick="return SaveMatch();">Save</button>
-<button id="revise" class="neutral" style="display: none; margin-top: 1cm;" onclick="return ReviseMatch();">Revise</button>
+<button id="revise" class="neutral" style="display: none; margin-top: 1cm;" onclick="return ReviseMatch();"></button>
+<button id="skip_break" class="neutral" style="display: none; margin-top: 1cm;" onclick="return SkipBreak();"></button>
 <div id="div_delete" style="display: none; margin-top: 5mm;">
   <button id="delete" class="remove" onclick="return DeleteMatch();">Delete Match</button>
 </div>
@@ -110,6 +111,7 @@ function GetMatch()
     if (res.state == 0)
     {
       document.getElementById("status").innerHTML = translate('scheduled');
+      $('#skip_break').show();
       $('#div_delete').show();
     }
     else if (res.state == 1)
@@ -166,6 +168,20 @@ function SaveMatch()
   AjaxPost('ajax/match/edit?id='+id, params, function() {
     goBack();
   });
+
+  return false;
+}
+
+
+
+function SkipBreak()
+{
+  if (confirm(translate('skip_break_confirm')))
+  {
+    AjaxCallback('ajax/match/skip_break?id='+id, function() {
+      goBack();
+    });
+  }
 
   return false;
 }
@@ -322,6 +338,7 @@ document.getElementById("label_score").innerHTML  = translate('score');
 document.getElementById("label_time").innerHTML   = translate('time');
 document.getElementById("save").innerHTML         = translate('save');
 document.getElementById("revise").innerHTML       = translate('revise');
+document.getElementById("skip_break").innerHTML   = translate('skip_break');
 document.getElementById("delete").innerHTML       = translate('delete_match');
 
 document.getElementById("matchlog").innerHTML     = translate('match_log');
