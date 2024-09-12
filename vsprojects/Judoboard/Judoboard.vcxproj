@@ -185,6 +185,7 @@
     <ClCompile Include="..\..\src\dmf.cpp" />
     <ClCompile Include="..\..\src\double_elimination.cpp" />
     <ClCompile Include="..\..\src\error.cpp" />
+    <ClCompile Include="..\..\src\eula.cpp" />
     <ClCompile Include="..\..\src\filter.cpp" />
     <ClCompile Include="..\..\src\fixed.cpp" />
     <ClCompile Include="..\..\src\fuser.cpp" />
@@ -237,6 +238,7 @@
     <ClInclude Include="..\..\src\dmf.h" />
     <ClInclude Include="..\..\src\double_elimination.h" />
     <ClInclude Include="..\..\src\error.h" />
+    <ClInclude Include="..\..\src\eula.h" />
     <ClInclude Include="..\..\src\filter.h" />
     <ClInclude Include="..\..\src\fixed.h" />
     <ClInclude Include="..\..\src\fuser.h" />

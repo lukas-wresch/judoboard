@@ -156,6 +156,9 @@
     <ClCompile Include="..\..\src\loser_bracket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\eula.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\window.h">
@@ -297,6 +300,9 @@
       <Filter>HttpServer</Filter>
     </ClInclude>
     <ClInclude Include="..\..\external\license\license.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\eula.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

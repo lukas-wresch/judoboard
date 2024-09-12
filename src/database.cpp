@@ -86,6 +86,8 @@ bool Database::Load(const std::string& Filename)
 		Localizer::SetLanguage((Language)yaml["language"].as<int>());
 	if (yaml["port"])
 		SetServerPort(yaml["port"].as<int>());
+	if (yaml["eula"])
+		SetEULAAccepted(yaml["eula"].as<bool>());
 
 	if (yaml["ippon_style"])
 		SetIpponStyle((Mat::IpponStyle)yaml["ippon_style"].as<int>());
@@ -140,6 +142,7 @@ bool Database::Save(const std::string& Filename) const
 	yaml << YAML::Key << "last_tournament_name" << YAML::Value << m_CurrentTournament;
 	yaml << YAML::Key << "language" << YAML::Value << (int)Localizer::GetLanguage();
 	yaml << YAML::Key << "port" << YAML::Value << GetServerPort();
+	yaml << YAML::Key << "eula" << YAML::Value << IsEULAAccepted();
 
 	yaml << YAML::Key << "ippon_style" << YAML::Value << (int)GetIpponStyle();
 	yaml << YAML::Key << "osaekomi_style" << YAML::Value << (int)GetOsaekomiStyle();

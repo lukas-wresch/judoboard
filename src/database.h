@@ -36,6 +36,9 @@ namespace Judoboard
 		auto GetServerPort() const { return m_Port; }
 		void SetServerPort(uint16_t NewPort) { m_Port = NewPort; }
 
+		auto IsEULAAccepted() const { return m_EULA_Accepted; }
+		void SetEULAAccepted(bool Accepted) { m_EULA_Accepted = Accepted; }
+
 		//Judoka
 		Judoka* UpdateOrAdd(const JudokaData& NewJudoka, bool ParseOnly, std::string& Output);
 
@@ -78,6 +81,8 @@ namespace Judoboard
 	private:
 		mutable std::string m_Filename;
 		bool m_AutoSave = true;
+
+		bool m_EULA_Accepted = false;
 
 		std::string m_CurrentTournament;//Name of tournament that is currently open
 		uint16_t m_Port = 8080;//Port of the webserver
