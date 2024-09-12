@@ -202,7 +202,7 @@ namespace Judoboard
 		virtual const std::string Schedule2String(bool ImportantOnly, int Mat = -1) const override;
 		virtual const std::string MasterSchedule2String() const override;
 		virtual nlohmann::json Schedule2ResultsServer() const override;
-		bool CreateResultsPDF() const;
+		bool CreateResultsPDF(bool IncludeCustom, bool IncludeParticipants) const;
 
 		void OrganizeMasterSchedule();
 		virtual void BuildSchedule();
