@@ -41,6 +41,10 @@ namespace Judoboard
 		IMPORT static Type  GetLicenseType();
 		IMPORT static char* GetLicenseExpiration();
 
+		static bool LicenseAtLeast(Type RequiredType) {
+			return (int)GetLicenseType() >= (int)RequiredType;
+		}
+
 		IMPORT static void Sign(const char* UserID, Type Type, const char* Expiration, const char* Name);
 	};
 }

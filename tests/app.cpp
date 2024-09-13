@@ -190,13 +190,13 @@ TEST(App, Tournaments_OpenLastTournament)
 		t->AddMatch(new Match(nullptr, nullptr, t));
 
 		EXPECT_TRUE(app.AddTournament(t));
-		t->Save();
+		EXPECT_TRUE(t->Save());
 	}
 
 	{
 		Application app;
 
-		app.LoadDataFromDisk();
+		EXPECT_TRUE(app.LoadDataFromDisk());
 
 		EXPECT_TRUE(app.FindTournamentByName("deleteMe"));
 		ASSERT_TRUE(app.GetTournament());
@@ -208,7 +208,7 @@ TEST(App, Tournaments_OpenLastTournament)
 	{
 		Application app;
 
-		app.LoadDataFromDisk();
+		EXPECT_TRUE(app.LoadDataFromDisk());
 
 		EXPECT_TRUE(app.FindTournamentByName("deleteMe"));
 		ASSERT_TRUE(app.GetTournament());

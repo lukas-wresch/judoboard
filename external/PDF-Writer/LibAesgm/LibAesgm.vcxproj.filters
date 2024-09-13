@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\aescrypt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\aeskey.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\aes_modes.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\aes_ni.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\aestab.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\aescpp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\aes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\aes_ni.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\aesopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\aestab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\aes_via_ace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\brg_endian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\brg_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Workspace\Judoboard\external\PDF-Writer\LibAesgm\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{56D611B6-1D42-3802-B023-A973C50D954B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{DE7CEF15-72FC-345B-94BF-D1F91E8BF28B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

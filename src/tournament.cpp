@@ -14,6 +14,7 @@
 #include "double_elimination.h"
 #include "fixed.h"
 #include "weightclass_generator.h"
+#include "pdf.h"
 
 
 
@@ -2676,6 +2677,121 @@ nlohmann::json Tournament::Schedule2ResultsServer() const
 	}
 
 	return ret;
+}
+
+
+
+bool Tournament::CreateResultsPDF(bool IncludeCustom, bool IncludeParticipants) const
+{
+	//At least standard required
+	if (!License::LicenseAtLeast(License::Type::Standard))
+		return false;
+
+	PDF pdf("results.pdf");
+	pdf.Print("Ergebnisliste - " + GetName(), 20);
+
+	auto add_judoka = [](std::vector<std::string>& row, const Judoka* j)
+	{
+		if (j)
+		{
+			row.push_back(j->GetName(NameStyle::GivenName));
+
+			if (j->GetClub())
+				row.push_back(j->GetClub()->GetName());
+			else
+				row.push_back("---");
+
+			if (j->GetBirthyear() != 0)
+				row.push_back(std::to_string(j->GetBirthyear()));
+			else
+				row.push_back("---");
+
+			if (j->GetClub() && j->GetClub()->GetParent())
+				row.push_back(j->GetClub()->GetParent()->GetShortName());
+			else
+				row.push_back("---");
+		}
+		else
+		{
+			row.push_back("---");
+			row.push_back("---");
+			row.push_back("---");
+			row.push_back("---");
+		}
+	};
+
+
+	auto guard = LockReadForScope();
+
+	auto export_table = [&](const MatchTable* Table) {
+		if (!IncludeCustom && Table->GetType() == MatchTable::Type::Custom)
+			return;
+
+		std::vector<std::vector<std::string>> data;
+		auto results = Table->CalculateResults();
+		if (results.GetSize() == 0)
+			return;
+
+		int no = 1;
+		for (const auto& rank : results)
+		{
+			std::vector<std::string> row;
+
+			row.push_back(std::to_string(no++) + ".");
+			add_judoka(row, rank.Judoka);
+
+			data.push_back(row);
+		}
+
+		//Add participants that don't appear in the results
+		if (IncludeParticipants)
+		{
+			for (auto judoka : Table->GetParticipants())
+			{
+				if (!results.Contains(*judoka))
+				{
+					std::vector<std::string> row;
+
+					row.push_back("");//No rank number
+					add_judoka(row, judoka);
+
+					data.push_back(row);
+				}
+			}
+		}
+
+		if (pdf.GetCursorHeight() < results.GetSize() * 30 + 50)
+			pdf.EndPage();
+
+		pdf.Print(Table->GetDescription(), 12, true);
+
+		pdf.CreateTable(data);
+		pdf.Newline();
+	};
+
+
+	//all match tables ordered by age group
+	for (auto age_group : GetAgeGroups())
+	{
+		pdf.Print(age_group->GetName(), 20);
+
+		for (auto table : GetMatchTables())
+		{
+			if (!table->GetAgeGroup() || *table->GetAgeGroup() != *age_group)
+				continue;
+
+			export_table(table);
+		}
+	}
+
+	//all tables without an age group
+	for (auto table : GetMatchTables())
+	{
+		if (!table->GetAgeGroup())
+			export_table(table);
+	}
+
+	return true;
 }
 
 
