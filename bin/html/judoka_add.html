@@ -3,25 +3,25 @@
 <form>
 
 <div>
-    <label style="width:200px;float:left;margin-top:4px;" id="label_firstname">Given name</label>
+    <label style="width:200px;float:left;margin-top:4px;" id="label_firstname"></label>
     <input style="margin-bottom:20px;" type="text" id="firstname" value="" size="40" maxlength="64"/>
 </div>
 
 <div>
-    <label style="width:200px;float:left;margin-top:4px;" id="label_lastname">Family name</label>
+    <label style="width:200px;float:left;margin-top:4px;" id="label_lastname"></label>
     <input style="margin-bottom:20px;" type="text" id="lastname" value="" size="40" maxlength="64"/>
 </div>
 
 <div>
-    <label style="width:200px;float:left;margin-top:4px;" id="label_weight">Weight</label>
+    <label style="width:200px;float:left;margin-top:4px;" id="label_weight"></label>
     <input style="margin-bottom:20px;" type="text" id="weight" value="" min="10" max="500" />
 </div>
 
 <div>
-  <label style="width:200px;float:left;margin-top:5px;" id="label_gender">Gender</label>
+  <label style="width:200px;float:left;margin-top:5px;" id="label_gender"></label>
   <select style="margin-bottom:20px;" id="gender">
-    <option selected value="0" id="male">Male</option>
-    <option value="1" id="female">Female</option>
+    <option selected value="0" id="male"></option>
+    <option value="1" id="female"></option>
   </select>
 </div>
 
@@ -67,13 +67,23 @@ function AddJudoka()
     club:      document.getElementById("clubs").value,
   });
 
-  AjaxPost('ajax/judoka/add', params, function() {
-    $("#note").text(document.getElementById("firstname").value + " " + document.getElementById("lastname").value + " added to database.");
-    $("#note").show(1000).delay(3000).hide(2000);
+  if (to_tournament)
+  {
+    AjaxPost('ajax/judoka/add?to_tournament=true', params, function() {
+      goBack();
+    });
+  }
 
-    document.getElementById("firstname").value = "";
-    document.getElementById("lastname").value  = "";
-  });
+  else
+  {
+    AjaxPost('ajax/judoka/add', params, function() {
+      document.getElementById("note").innerHTML = document.getElementById("firstname").value + " " + document.getElementById("lastname").value + " " + translate('added_to_database');
+      $("#note").show(1000).delay(3000).hide(2000);
+
+      document.getElementById("firstname").value = "";
+      document.getElementById("lastname").value  = "";
+    });
+  }
 
   return false;
 }
@@ -170,19 +180,23 @@ function DeleteJudoka()
 
 
 var id = URLDecode(URL, "id");
+var to_tournament = URLDecode(URL, "to_tournament");
 
 if (id)
 {
-    document.getElementById("add").style.display  = "none";
-    document.getElementById("headline").innerHTML = translate('edit_judoka');
-    GetJudoka(id);
+  document.getElementById("add").style.display  = "none";
+  document.getElementById("headline").innerHTML = translate('edit_judoka');
+  GetJudoka(id);
 }
 else
 {
-    document.getElementById("headline").innerHTML = translate('new_judoka');
-    document.getElementById("import").style.display = "none";
-    document.getElementById("update").style.display = "none";
-    document.getElementById("delete").style.display = "none";
+  document.getElementById("headline").innerHTML = translate('new_judoka');
+  document.getElementById("import").style.display = "none";
+  document.getElementById("update").style.display = "none";
+  document.getElementById("delete").style.display = "none";
+  if (to_tournament)
+    GetClubs(undefined, "tournament_only=true");
+  else
     GetClubs();
 }
 
@@ -201,5 +215,11 @@ document.getElementById("add").innerHTML     = translate('new_judoka');
 document.getElementById("update").innerHTML  = translate('save');
 document.getElementById("import").innerHTML  = translate('import');
 document.getElementById("delete").innerHTML  = translate('delete');
+
+if (to_tournament)
+{
+  document.getElementById("add").innerHTML = translate('add_to_tournament');
+  document.getElementById("add").style.width = '6cm';
+}
 
 </script>

@@ -19,10 +19,21 @@ jobs:
       run: ./compile.sh
     - name: run tests
       run: ./run_tests.sh
+
+  test2:
+    name: Unit Tests on Ubuntu (Debug)
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: chmod u+x *.sh && ./dependencies.sh && XDG_RUNTIME_DIR=. && sudo apt-get install gdb
+    - name: make
+      run: ./compile.sh
     - name: debug tests
       run: cd bin && gdb ./judoboard_test_debug --eval-command=r bt && cd ..
       
-  test2:
+  test3:
     name: Unit Tests on Raspberry Pi 4
     runs-on: self-hosted
 
@@ -34,11 +45,22 @@ jobs:
       run: ./compile.sh
     - name: run tests
       run: ./run_tests.sh
+
+  test4:
+    name: Unit Tests on Raspberry Pi 4 (Debug)
+    runs-on: self-hosted
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: chmod u+x *.sh
+    - name: make
+      run: ./compile.sh
     - name: debug tests
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: cd bin && gdb ./judoboard_test_debug --eval-command=r bt && cd ..
       
-  test3:
+  test5:
     name: Unit Tests on Windows
     runs-on: windows-latest
     steps:

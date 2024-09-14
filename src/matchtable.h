@@ -218,6 +218,13 @@ namespace Judoboard
 			}
 
 
+			bool Contains(const Judoka& Judoka) {
+				for (size_t i = 0; i < m_Results.size(); ++i)
+					if (m_Results[i].Judoka && *m_Results[i].Judoka == Judoka)
+						return true;
+				return false;
+			}
+
 			void Add(const Judoka* Judoka, const MatchTable* Table) {
 				m_Results.emplace_back(Judoka, Table);
 			}
@@ -414,7 +421,11 @@ namespace Judoboard
 			m_Schedule.clear();
 		}
 
-		void SetTournament(const ITournament* Tournament) { m_Tournament = Tournament; }
+		void SetTournament(const ITournament* Tournament) {
+			m_Tournament = Tournament;
+			for (auto match : m_Schedule)
+				match->SetTournament(Tournament);
+		}
 
 		const std::string ResultsToHTML() const;
 

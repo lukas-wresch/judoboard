@@ -5,46 +5,9 @@ body {
   height: 100%;
 }
 
-.slideout-menu {
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  z-index: 0;
-  width: 200px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  display: none;
-}
-
-.slideout-panel {
-  position: relative;
-  z-index: 1;
-  will-change: transform;
-}
-
-.slideout-open,
-.slideout-open body,
-.slideout-open .slideout-panel {
-  overflow-x: hidden;
-}
-
-.slideout-open .slideout-menu {
-  display: block;
-}
-
-
-
-
 body,
 .panel {
   background-color: #fff;
-}
-
-.menu {
-  background-color: #1D1F20;
-  background-image: linear-gradient(145deg, #1D1F20, #404348);
 }
 
 a {
@@ -56,126 +19,6 @@ a:hover {
   color: #0c0;
   text-decoration: underline;
 }
-
-.menu a {
-  color: #fff;
-}
-
-.menu a:hover {
-  text-decoration: underline;
-}
-
-.menu-header {
-  border-bottom: 1px solid #2a2d2f;
-  padding: 20px;
-  background-size: 32px;
-}
-
-.menu-header-title {
-  font-weight: 400;
-  letter-spacing: 0.5px;
-  margin: 0;
-}
-
-.menu-section {
-  margin: 25px 0;
-}
-
-.menu-section-title {
-  text-transform: uppercase;
-  color: #B5FFBd;
-  font-weight: 200;
-  font-size: 13px;
-  letter-spacing: 1px;
-  padding: 0 20px;
-  margin:0;
-}
-
-.menu-section-list {
-  padding:0;
-  margin: 10px 0;
-  list-style:none;
-}
-
-.menu-section-list a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  text-decoration: none;
-}
-
-.menu-section-list a {
-  display: block;
-  padding: 10px 20px;
-}
-
-.panel {
-  text-align: left;
-  padding-top: 5px;
-  min-height: 99vh;
-}
-
-
-
-/**
- * Header
- */
-.panel-header {
-  width: 82%;
-  margin: 0px 0px 50px 90px;
-  padding-top: 0px;
-  padding-bottom: 0px;
-  font-size: 20px;
-}
-
-
-
-.fixed-header {
-  position: left;
-  width: 82%;
-  height: 50px;
-  backface-visibility: hidden;
-  z-index: 2;
-  background-color: red;
-}
-
-
-
-.title {
-  font-size: 3.2em;
-  line-height: 1em;
-  margin: 0 0 15px;
-  color: #4B5;
-  font-weight: 400;
-}
-
-/**
- * hamburger
- */
-.btn-hamburger {
-  border: none;
-  position: absolute;
-  float: left;
-  top: 12px;
-  left: 12px;
-  outline:none;
-  background: url('/menu.png') no-repeat left;
-  width: 50px;
-  height: 50px;
-}
-
-
-
-.main-section {
-  width: 80%;
-  margin: 5px 120px 0px 20px;
-  padding-top: 0px;
-  padding-bottom: 0px;
-  //font-size: 20px;
-}
-
-
-
-
-
 
 
 .score
@@ -389,4 +232,22 @@ a:hover {
 }
 .switch-input:checked + .switch-label .toggle-off {
   display: none;
+}
+
+
+
+.nice table {
+    //width: 100%;
+    //border-collapse: collapse;
+}
+.nice th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+.nice th {
+    background-color: #f2f2f2;
+    text-align: left;
+}
+.nice tr:nth-child(even) {
+    background-color: #f9f9f9;
 }

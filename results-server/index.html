@@ -9,21 +9,55 @@
 <body>
 <div style="font-size: 25pt; margin-top: 4mm;">Judoboard</div>
 
+<div id="mats">
+</div>
+
 <div id="content">
 </div>
 
 </body>
 <script>
 
-function Update()
+function Update(mat)
 {
-  AjaxCallback("get.php", function(response) {
+  if (counter%5 == 0)
+  {
+    AjaxCallback("get_mats.php", function(response) {
+      const resp = JSON.parse(response);
+
+      //console.log(resp);
+      document.getElementById("mats").innerHTML = '<button class="neutral" style="width: 3.5cm; height: 0.9cm;" onclick="Update(0);">&Uuml;bersicht</button>';
+      
+      for (const mat of resp)
+      {
+        document.getElementById("mats").innerHTML += '<button class="neutral" style="width: 3.5cm; height: 0.9cm;" onclick="Update(' + mat.id + ');">' + mat.name + '</button>';
+      }
+    });
+  }
+
+  AjaxCallback("get.php?mat=" + mat, function(response) {
     document.getElementById("content").innerHTML = response;
   });
+
+  window.clearTimeout(timer);
+  timer = window.setTimeout(Update, 30*1000, mat);
+  counter++;
 }
 
-Update();
-window.setInterval(Update, 30*1000);
+
+function Update_Table(id)
+{
+  AjaxCallback("get_table.php?id=" + id, function(response) {
+    document.getElementById("content").innerHTML = response;
+  });
+
+  window.clearTimeout(timer);
+  timer = window.setTimeout(Update_Table, 45*1000, id);
+}
+
+var timer;
+var counter = 0;
+Update(0);
 
 </script>
 </html>

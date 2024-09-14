@@ -18,7 +18,8 @@ namespace Judoboard
 			TournamentNotOpen,
 			OperationFailed,
 			InvalidFormat,
-			InvalidInput
+			InvalidInput,
+			LicenseInsufficient
 		};
 		
 		Error() = default;

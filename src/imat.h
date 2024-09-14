@@ -128,6 +128,8 @@ namespace Judoboard
 		virtual bool StartMatch(Match* NewMatch, bool UseForce = false) = 0;//Creates a new match. Both judoka are copied to the mat. Returns false when a match is still progressing and hence a new match can not be started
 		virtual bool HasConcluded() const = 0;//Returns true if and only if the match has finished and hence EndMatch() can be called
 		virtual bool EndMatch() = 0;//Closes the match that is currently on the mat and resets the scoreboard
+		virtual bool CanStopMatch() const = 0;//Can the match be stopped?
+		virtual bool StopMatch() = 0;//Stop the match. This only succeeds if the match has barely started
 
 		virtual uint32_t GetTime2Display() const = 0;//Returns the match time as it should be displayed in milliseconds
 

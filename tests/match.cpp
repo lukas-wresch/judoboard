@@ -104,7 +104,14 @@ TEST(Match, ExportImport)
 		RuleSet rule_set("test", rand(), rand(), rand(), rand());
 		Tournament tourney;
 
-		Match* match = new Match(&j1, &j2, &tourney, matid);
+		Match* match = nullptr;
+		if (rand()%2 == 0)
+			match = new Match(&j1, &j2, &tourney, matid);
+		else
+			match = new Match(DependentJudoka(&j1), DependentJudoka(&j2), &tourney, matid);
+
+		EXPECT_TRUE(match->GetTournament());
+		EXPECT_EQ(match->GetMatID(), matid);
 		match->SetRuleSet(&rule_set);
 		tourney.AddMatch(match);//Also copies the rule set inside the tournament's database
 
@@ -417,6 +424,37 @@ TEST(Match, BreakTime)
 
 
 
+TEST(Match, SkipBreakTime)
+{
+	initialize();
+
+	Judoka j1(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j2(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j3(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+	Judoka j4(GetRandomName(), GetRandomName(), rand() % 200, (Gender)(rand() % 2));
+
+	RuleSet* rules = new RuleSet("test", 30, 30, 20, 10, false, false, false, 60);
+	Match m1(&j1, &j2, nullptr, 1);
+	Match m2(&j2, &j1, nullptr, 1);
+
+	m1.SetRuleSet(rules);
+	m2.SetRuleSet(rules);
+
+	m1.StartMatch();
+	m1.EndMatch();
+
+	EXPECT_TRUE(j1.NeedsBreak());
+	EXPECT_TRUE(j2.NeedsBreak());
+
+	j1.SkipBreak();
+	j2.SkipBreak();
+
+	EXPECT_FALSE(j1.NeedsBreak());
+	EXPECT_FALSE(j2.NeedsBreak());
+}
+
+
+
 TEST(Match, MatchTimeOnlyForWinner)
 {
 	initialize();
@@ -438,9 +476,19 @@ TEST(Match, MatchTimeOnlyForWinner)
 		tourney.AddMatchTable(r);
 
 		ASSERT_EQ(r->GetSchedule().size(), 1);
+
 		EXPECT_TRUE(mat.StartMatch(r->GetSchedule()[0]));
+		EXPECT_EQ(r->GetSchedule()[0]->GetLog().GetNumEvent(), 1);
+
+		EXPECT_TRUE(mat.StopMatch());
+		EXPECT_EQ(r->GetSchedule()[0]->GetLog().GetNumEvent(), 2);
+
+		EXPECT_TRUE(mat.StartMatch(r->GetSchedule()[0]));
+		EXPECT_EQ(r->GetSchedule()[0]->GetLog().GetNumEvent(), 3);
 
 		mat.Hajime();
+
+		EXPECT_FALSE(mat.StopMatch());
 
 		ZED::Core::Pause(3005);
 

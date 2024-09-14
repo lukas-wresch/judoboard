@@ -83,16 +83,21 @@ namespace Judoboard
 
 		bool AddMatch(Match* NewMatch);
 		//bool AddMatch(Match&& NewMatch) { return AddMatch(new Match(NewMatch)); }
-		virtual Match* GetNextMatch(int32_t MatID = -1) const override;//Returns the next match for a given mat if available, otherwise null pointer is returned
-		const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual Match* GetNextMatch(int32_t MatID = -1) override;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual const Match* GetNextMatch(int32_t MatID = -1) const override;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		virtual std::vector<const Match*> GetNextMatches(int32_t MatID) const override;
 		virtual Match* GetNextOngoingMatch(int32_t MatID) override;//Returns the next match that has already started for a given mat if available, otherwise null pointer is returned
+
 		bool ReviseMatch(const UUID& MatchID, IMat& Mat);
 
-		virtual bool RemoveMatch(const UUID& MatchID) override;
-		virtual bool MoveMatchUp(const UUID&  MatchID, uint32_t MatID = 0) override;
-		virtual bool MoveMatchDown(const UUID&  MatchID, uint32_t MatID = 0) override;
+		Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex);//Returns the next match for a given mat if available, otherwise null pointer is returned
+		const Match* GetNextMatch(int32_t MatID, uint32_t& StartIndex) const;//Returns the next match for a given mat if available, otherwise null pointer is returned
+		const Match* GetNextMatch(const UUID& MatchID, int32_t MatID) const;//Returns the next match in the schedule after a give match in a speified mat. Set MatID=-1 to select any mat
 
-		virtual std::vector<Match> GetNextMatches(int32_t MatID) const override;
+		virtual bool RemoveMatch(const UUID& MatchID) override;
+		virtual bool MoveMatchUp(const UUID& MatchID, uint32_t MatID = 0) override;
+		virtual bool MoveMatchDown(const UUID& MatchID, uint32_t MatID = 0) override;
+		virtual bool MoveMatchTo(const UUID& From, const UUID& To, bool Above) override;
 
 		//Participant / Judoka
 		virtual bool IsParticipant(const Judoka& Judoka) const override { return m_StandingData.FindJudoka(Judoka.GetUUID()); }
@@ -192,11 +197,13 @@ namespace Judoboard
 		virtual void OnMatchConcluded(const Match& Match) const override;
 		virtual bool OnUpdateParticipant(const UUID& UUID) override;//Calling this function we recalculate the given judoka
 		virtual bool OnUpdateMatchTable(const UUID& UUID) override;//Calling this function we recalculate the given match table
+		virtual bool OnUpdateAgeGroup(const UUID& UUID) override;
 
 		//Serialization
 		virtual const std::string Schedule2String(bool ImportantOnly, int Mat = -1) const override;
 		virtual const std::string MasterSchedule2String() const override;
 		virtual nlohmann::json Schedule2ResultsServer() const override;
+		bool CreateResultsPDF(bool IncludeCustom, bool IncludeParticipants) const;
 
 		void OrganizeMasterSchedule();
 		virtual void BuildSchedule();

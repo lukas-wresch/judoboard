@@ -385,6 +385,49 @@ bool Mat::EndMatch()
 
 
 
+bool Mat::CanStopMatch() const
+{
+	auto guard = m_mutex.LockReadForScope();
+
+	if (!AreFightersOnMat())
+		return false;
+	if (IsHajime())
+		return false;
+	if (m_HajimeTimer.GetElapsedTime() > 0)
+		return false;
+	if (IsGoldenScore())
+		return false;
+	if (HasConcluded())
+		return false;//No need to call stop match
+	return true;
+}
+
+
+
+bool Mat::StopMatch()
+{
+	if (!CanStopMatch())
+		return false;
+
+	auto guard = m_mutex.LockWriteForScope();
+
+	if (m_pMatch)
+	{
+		AddEvent(MatchLog::NeutralEvent::StopMatch);
+		m_pMatch->StopMatch();
+	}
+
+	//Reset mat
+	NextState(State::TransitionToWaiting);
+
+	Reset();
+
+	ZED::Log::Info("Match stopped");
+	return true;
+}
+
+
+
 bool Mat::HasConcluded() const
 {
 	auto guard = m_mutex.LockReadForScope();
@@ -453,7 +496,7 @@ uint32_t Mat::GetTime2Display() const
 		const auto match_time = m_pMatch->GetRuleSet().GetMatchTime();
 
 		if (match_time > 0)//If match time is not infinite
-			return (match_time*1000 - m_HajimeTimer).GetElapsedTime();
+			return (match_time*1000 - m_HajimeTimer).GetElapsedTime();//Calculate remaining time
 	}
 
 	return m_HajimeTimer.GetElapsedTime();//Infinite match (and default if m_pMatch is nullptr)
@@ -540,11 +583,13 @@ void Mat::ToString(YAML::Emitter& Yaml) const
 	Yaml << YAML::Key << "is_hajime"   << YAML::Value << IsHajime();
 	Yaml << YAML::Key << "is_osaekomi" << YAML::Value << IsOsaekomi();
 
-	const auto result = GetResult();
 	Yaml << YAML::Key << "was_mate_recent"      << YAML::Value << WasMateRecent();
 	Yaml << YAML::Key << "are_fighters_on_mat"  << YAML::Value << AreFightersOnMat();
 	Yaml << YAML::Key << "can_next_match_start" << YAML::Value << CanNextMatchStart();
 	Yaml << YAML::Key << "has_concluded"        << YAML::Value << HasConcluded();
+	Yaml << YAML::Key << "can_stop"             << YAML::Value << CanStopMatch();
+
+	const auto result = GetResult();
 	Yaml << YAML::Key << "winner"               << YAML::Value << (int)result.m_Winner;
 	Yaml << YAML::Key << "is_out_of_time"       << YAML::Value << IsOutOfTime();
 	Yaml << YAML::Key << "no_winner_yet"        << YAML::Value << (result.m_Winner == Winner::Draw);
@@ -616,6 +661,9 @@ void Mat::Hajime()
 			m_Graphics["osaekomi_text"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -15.0));
 			m_Graphics["osaekomi_bar_border"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -50.0));
 			m_Graphics["osaekomi_bar"].AddAnimation(Animation::CreateLinear(0.0, 0.0, -25.0));
+
+			if (IsDoingAnimation())//We are still transitioning
+				m_Graphics["timer"].ChangeSpeed(2.0);
 		}
 	}
 
@@ -756,7 +804,7 @@ void Mat::AddWazaAri(Fighter Whom)
 			Mate();
 	}
 
-	ZED::Log::Debug("Wazaari");
+	ZED::Log::Info("Wazaari");
 }
 
 
@@ -839,7 +887,7 @@ void Mat::AddYuko(Fighter Whom)
 			Mate();
 	}
 
-	ZED::Log::Debug("Yuko");
+	ZED::Log::Info("Yuko");
 }
 
 
@@ -876,7 +924,7 @@ void Mat::AddKoka(Fighter Whom)
 			Mate();
 	}
 
-	ZED::Log::Debug("Koka");
+	ZED::Log::Info("Koka");
 }
 
 
@@ -955,7 +1003,7 @@ void Mat::SetAsDraw(bool Enable)
 		}
 	}
 
-	ZED::Log::Debug("Draw");
+	ZED::Log::Info("Draw");
 }
 
 
@@ -975,7 +1023,7 @@ void Mat::AddShido(Fighter Whom)
 			AddHansokuMake(Whom, false);//Add indirect hansokumake
 	}
 
-	ZED::Log::Debug("Shido");
+	ZED::Log::Info("Shido");
 }
 
 
@@ -1243,13 +1291,13 @@ void Mat::PlaySoundFile() const
 	if (!m_AudioDevice.IsValid() || m_AudioDevice.GetDeviceIndex() != GetAudioDeviceID())
 		m_AudioDevice = ZED::SoundDevice(GetAudioDeviceID());
 
-	assert(m_AudioDevice.IsValid());
-	assert(m_Application);
+	//assert(m_AudioDevice.IsValid());
+	//assert(m_Application);
 	if (m_Application)
 	{
 		auto sound = m_Application->GetSound(GetSoundFilename());
-		assert(sound);
-		assert(sound->IsValid());
+		//assert(sound);
+		//assert(sound->IsValid());
 		if (sound)
 			m_AudioDevice.Play(*sound);
 	}
@@ -1626,10 +1674,15 @@ void Mat::NextState(State NextState) const
 			m_Graphics["following_match"].StopAllAnimations()
 				.AddAnimation(Animation::CreateLinear(0.0, 0.0, -40.0, [](auto& g) { return g.m_a > 0.0; }));
 
-			//Setup rectangle for age group
-			if (m_pMatch && m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetAgeGroup())
+			//Setup rectangle for age group or rule set name
+			if (m_pMatch)
 			{
-				auto name = m_pMatch->GetMatchTable()->GetAgeGroup()->GetName();
+				std::string name;
+				if (m_pMatch->GetMatchTable() && m_pMatch->GetMatchTable()->GetAgeGroup())
+					name = m_pMatch->GetMatchTable()->GetAgeGroup()->GetName();
+				else
+					name = m_pMatch->GetRuleSet().GetName();
+
 				int pos_y = (int)(300.0 * m_ScalingFactor);
 
 				m_Graphics["age_group_rect_text"].UpdateTexture(renderer, name, ZED::Color(0, 0, 0), ZED::FontSize::Gigantic)
@@ -2692,7 +2745,10 @@ bool Mat::Mainloop()
 			if (nextMatches.size() == 0 && m_State == State::Waiting)
 				NextState(State::StartUp);
 
-			m_NextMatches = std::move(nextMatches);
+			//Copy over match data
+			m_NextMatches.clear();
+			for (auto match : nextMatches)
+				m_NextMatches.emplace_back(*match);
 		}
 	}
 

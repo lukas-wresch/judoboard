@@ -214,9 +214,23 @@ TEST(Mat, CorrectWinner)
 			match.SetMatID(1);
 			match.SetRuleSet(new RuleSet("Test", 2, 0, 30, 20, true, true, true, 0));
 
+			m.SetAudio(false, "", 0);
+
+			EXPECT_FALSE(m.CanStopMatch());
 			EXPECT_TRUE(m.StartMatch(&match));
 			EXPECT_TRUE(m.AreFightersOnMat());
+
+			EXPECT_TRUE(m.CanStopMatch());
+			EXPECT_TRUE(m.StopMatch());
+			EXPECT_FALSE(m.AreFightersOnMat());
+			EXPECT_TRUE(m.StartMatch(&match));
+			EXPECT_TRUE(m.AreFightersOnMat());
+			EXPECT_TRUE(m.CanStopMatch());
+
 			m.Hajime();
+
+			EXPECT_FALSE(m.CanStopMatch());
+			EXPECT_FALSE(m.StopMatch());
 					
 			if (i == 0)
 				m.AddIppon(f);
@@ -1540,7 +1554,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 			m.AddWazaAri(f);
 			m.Osaekomi(f);
 
-			for (int k = 0; k < time - 1; k++)
+			for (int k = 0; k < time - 2; k++)
 			{
 				EXPECT_FALSE(m.IsOutOfTime());
 				EXPECT_FALSE(m.HasConcluded());
@@ -1549,6 +1563,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 			}
 
 			m.RemoveWazaAri(f);
+			ZED::Core::Pause(2000);
 
 			for (int k = 0; k < time - 2; k++)
 			{
@@ -1558,7 +1573,7 @@ TEST(Mat, OsaekomiWithWazaAriRemoved)
 				ZED::Core::Pause(1000);
 			}
 
-			ZED::Core::Pause(4850);
+			ZED::Core::Pause(5000);
 
 			EXPECT_TRUE(m.HasConcluded());
 			EXPECT_TRUE(m.EndMatch());
