@@ -79,6 +79,9 @@ void Localizer::Initialize(Language NewLanguage)
 			s_de["Youth"]    = "Jugendliche";
 			s_de["Adults"]   = "Erwachsene";
 			s_de["Seniors"]  = "Senioren";
+
+			s_de["Accept"]  = "Akzeptieren";
+			s_de["Decline"] = "Ablehnen";
 			
 			break;
 		}

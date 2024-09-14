@@ -3,8 +3,11 @@
 
 
 
-class EULA
-{	
-public:
-	static bool Display(HINSTANCE hInstance);
-};
+namespace Judoboard
+{
+	class EULA
+	{
+	public:
+		static bool Display(HINSTANCE hInstance);
+	};
+}

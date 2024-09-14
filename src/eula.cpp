@@ -1,5 +1,7 @@
 #include <vector>
+#include <string>
 #include "eula.h"
+#include "localizer.h"
 
 
 
@@ -8,11 +10,30 @@
 #define IDCANCEL 2
 
 
+using namespace Judoboard;
+
+
+
+std::wstring ConvertToUTF16(const std::string& AsciiString)
+{
+    //Get the length of the resulting wide string
+    int wideStringLength = MultiByteToWideChar(CP_ACP, 0, AsciiString.c_str(), -1, nullptr, 0);
+
+    //Allocate memory for the wide string
+    std::wstring wideString(wideStringLength, L'\0');
+
+    //Convert ASCII to wide string (UTF-16)
+    MultiByteToWideChar(CP_ACP, 0, AsciiString.c_str(), -1, &wideString[0], wideStringLength);
+
+    return wideString;
+}
+
+
 
 LRESULT CALLBACK EulaWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HWND hEulaTextBox, hAcceptButton, hDeclineButton;
-    bool* eula_accepted = (bool*)GetWindowLongPtr(hWnd, GWLP_USERDATA); // Retrieve EULA state
+    bool* eula_accepted = (bool*)GetWindowLongPtr(hWnd, GWLP_USERDATA);//Retrieve EULA state
 
     switch (message)
     {
@@ -43,32 +64,35 @@ LRESULT CALLBACK EulaWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
         else
         {
             MessageBox(hWnd, L"EULA.txt not found!", L"Error", MB_OK | MB_ICONERROR);
-            PostQuitMessage(0);//Quit if EULA not found
+            DestroyWindow(hWnd);//Quit if EULA not found
             return -1;
         }
 
+        auto accept  = ConvertToUTF16(Localizer::Translate("Accept"));
+        auto decline = ConvertToUTF16(Localizer::Translate("Decline"));
+
         //Create the "Accept" button
-        hAcceptButton = CreateWindow(L"BUTTON", L"Accept", WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+        hAcceptButton = CreateWindow(L"BUTTON", accept.c_str(), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
             80, 390, 100, 35, hWnd, (HMENU)IDOK, GetModuleHandle(NULL), NULL);
 
         //Create the "Decline" button
-        hDeclineButton = CreateWindow(L"BUTTON", L"Decline", WS_CHILD | WS_VISIBLE,
+        hDeclineButton = CreateWindow(L"BUTTON", decline.c_str(), WS_CHILD | WS_VISIBLE,
             640-80-100-10, 390, 100, 35, hWnd, (HMENU)IDCANCEL, GetModuleHandle(NULL), NULL);
         return 0;
     }
 
     case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK)  // Accept button clicked
+        if (LOWORD(wParam) == IDOK)//Accept button clicked
         {
             if (eula_accepted)
                 *eula_accepted = true;
-            PostQuitMessage(0);
+            DestroyWindow(hWnd);
         }
-        else if (LOWORD(wParam) == IDCANCEL)  // Decline button clicked
+        else if (LOWORD(wParam) == IDCANCEL)//Decline button clicked
         {
             if (eula_accepted)
                 *eula_accepted = false;
-            PostQuitMessage(0);
+            DestroyWindow(hWnd);
         }
         break;
 

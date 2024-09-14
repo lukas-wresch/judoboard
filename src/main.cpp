@@ -381,6 +381,8 @@ int main(int argc, char** argv)
 	ZED::Log::Info("Initializing application");
 	Judoboard::Application app;
 
+	Judoboard::Localizer::SetLanguage(Judoboard::Language::German);
+
 	const bool data_loaded = app.LoadDataFromDisk();
 
 
@@ -389,7 +391,7 @@ int main(int argc, char** argv)
 #ifdef _WIN32
 	if (!app.GetDatabase().IsEULAAccepted())
 	{
-		if (EULA::Display(hInstance))
+		if (Judoboard::EULA::Display(hInstance))
 			app.GetDatabase().SetEULAAccepted(true);
 		else
 			return 0;
