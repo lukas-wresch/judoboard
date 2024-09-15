@@ -7,8 +7,8 @@ TEST(RemoteMat, SalveMatGetCorrectID)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	master.StartLocalMat(1);
 
@@ -34,8 +34,8 @@ TEST(RemoteMat, OpenAndClose)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -76,8 +76,8 @@ TEST(RemoteMat, QuickClose)
 	{
 		Application master;
 		Application slave;
-		ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-		ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+		ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+		ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 		ASSERT_TRUE(master.GetHttpServer().IsRunning());
 		ASSERT_TRUE( slave.GetHttpServer().IsRunning());
@@ -99,8 +99,8 @@ TEST(RemoteMat, SlaveOpensMatTwice)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(2));
@@ -127,8 +127,8 @@ TEST(RemoteMat, ForcedCloseDuringMatch)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 
@@ -210,8 +210,8 @@ TEST(RemoteMat, StartMatch)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -258,8 +258,8 @@ TEST(RemoteMat, SendRuleSet)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -294,8 +294,8 @@ TEST(RemoteMat, SendMatchTable)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -325,8 +325,8 @@ TEST(RemoteMat, SendHajime)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -361,8 +361,8 @@ TEST(RemoteMat, CorrectWinner)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -429,8 +429,8 @@ TEST(RemoteMat, ForceClose)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -456,8 +456,8 @@ TEST(RemoteMat, RemoveIpponShouldRecoverPreviousWazaari)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -503,8 +503,8 @@ TEST(RemoteMat, RemoveWazariShouldRemoveIppon)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -550,8 +550,8 @@ TEST(RemoteMat, Scores)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -597,8 +597,8 @@ TEST(RemoteMat, Shido)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -670,8 +670,8 @@ TEST(RemoteMat, ShidoDoesntEndGoldenScore)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -723,8 +723,8 @@ TEST(RemoteMat, ScoreEndsGoldenScore)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -779,8 +779,8 @@ TEST(RemoteMat, ShidosResultInIndirectHansokumake)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -824,8 +824,8 @@ TEST(RemoteMat, HansokumakeResultsInDirectHansokumake)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -871,8 +871,8 @@ TEST(RemoteMat, DirectHansokumakeDoesNotConcludeMatch)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -911,8 +911,8 @@ TEST(RemoteMat, DirectHansokumakeAndDisqDoesConcludeMatch)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -948,8 +948,8 @@ TEST(RemoteMat, Gachi)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -983,8 +983,8 @@ TEST(RemoteMat, GachiResultsInMate)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1022,8 +1022,8 @@ TEST(RemoteMat, DoubleIppon)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1073,8 +1073,8 @@ TEST(RemoteMat, DoubleIpponFightersKeepWazaari)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1124,8 +1124,8 @@ TEST(RemoteMat, DoubleIpponDuringGoldenScore)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1177,8 +1177,8 @@ TEST(RemoteMat, DoubleIpponDuringGoldenScoreFightersKeepWazaari)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1240,8 +1240,8 @@ TEST(RemoteMat, IpponResultsInMate)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1277,8 +1277,8 @@ TEST(RemoteMat, HansokumakeResultsInMate)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1316,8 +1316,8 @@ TEST(RemoteMat, ThirdShidoIsHansokumake)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1357,8 +1357,8 @@ TEST(RemoteMat, DoubleHansokumake)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1418,8 +1418,8 @@ TEST(RemoteMat, DoubleGachi)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1466,8 +1466,8 @@ TEST(RemoteMat, Hansokumake)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1517,8 +1517,8 @@ TEST(RemoteMat, MedicalExaminiations)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1593,8 +1593,8 @@ TEST(RemoteMat, MatchTime)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1645,8 +1645,8 @@ TEST(RemoteMat, GoldenScoreTime)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1703,8 +1703,8 @@ TEST(RemoteMat, OsaekomiTime)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1756,8 +1756,8 @@ TEST(RemoteMat, OsaekomiWithWazaAriTime)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1810,8 +1810,8 @@ TEST(RemoteMat, OsaekomiUkeGainsIppon)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1858,8 +1858,8 @@ TEST(RemoteMat, OsaekomiToriGivesUp)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1906,8 +1906,8 @@ TEST(RemoteMat, OsaekomiWithWazaAriRemoved)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -1971,8 +1971,8 @@ TEST(RemoteMat, OsaekomiTillEndDuringGoldenScore)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2010,7 +2010,7 @@ TEST(RemoteMat, OsaekomiTillEndDuringGoldenScore)
 
 			m->Osaekomi(f);
 
-			for (int k = 0; k < 2*time - 1; k++)
+			for (int k = 0; k < 2*time - 2; k++)
 			{
 				EXPECT_FALSE(m->IsOutOfTime());
 				EXPECT_FALSE(m->HasConcluded());
@@ -2018,7 +2018,7 @@ TEST(RemoteMat, OsaekomiTillEndDuringGoldenScore)
 				ZED::Core::Pause(1000);
 			}
 
-			ZED::Core::Pause(2000);
+			ZED::Core::Pause(3500);
 			EXPECT_TRUE(m->HasConcluded());
 			EXPECT_TRUE(m->EndMatch());
 		}
@@ -2032,8 +2032,8 @@ TEST(RemoteMat, Sonomama)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2103,8 +2103,8 @@ TEST(RemoteMat, Tokeda)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2204,8 +2204,8 @@ TEST(RemoteMat, OsaekomiSwitch)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2279,8 +2279,8 @@ TEST(RemoteMat, MatchContinuesDuringOsaekomi)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2309,7 +2309,7 @@ TEST(RemoteMat, MatchContinuesDuringOsaekomi)
 		m->Osaekomi(f);
 		ZED::Core::Pause(100);
 
-		for (int k = 0; k < 9; k++)
+		for (int k = 0; k < 8; k++)
 		{
 			EXPECT_FALSE(m->IsOutOfTime());
 			EXPECT_FALSE(m->HasConcluded());
@@ -2317,8 +2317,8 @@ TEST(RemoteMat, MatchContinuesDuringOsaekomi)
 			ZED::Core::Pause(1000);
 		}
 
-		ZED::Core::Pause(2000);
-		EXPECT_TRUE(m->GetScoreboard(f).m_Ippon == 1);
+		ZED::Core::Pause(3500);
+		EXPECT_EQ(m->GetScoreboard(f).m_Ippon, 1);
 		EXPECT_TRUE(m->IsOutOfTime());
 		EXPECT_TRUE(m->HasConcluded());
 		EXPECT_TRUE(m->EndMatch());
@@ -2332,8 +2332,8 @@ TEST(RemoteMat, Yuko)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2385,8 +2385,8 @@ TEST(RemoteMat, Yuko2)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2444,8 +2444,8 @@ TEST(RemoteMat, ShidoForToriDuringOsaekomi)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2500,8 +2500,8 @@ TEST(RemoteMat, MateDuringSonomama)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2558,8 +2558,8 @@ TEST(RemoteMat, HansokumakeDuringOsaekomi)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2619,8 +2619,8 @@ TEST(RemoteMat, Koka)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2669,8 +2669,8 @@ TEST(RemoteMat, Koka2)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2720,8 +2720,8 @@ TEST(RemoteMat, WazariAwaseteIppon)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2782,8 +2782,8 @@ TEST(RemoteMat, GoldenScore)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2836,8 +2836,8 @@ TEST(RemoteMat, GoldenScore2)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2885,8 +2885,8 @@ TEST(RemoteMat, GoldenScoreResetTime)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2932,8 +2932,8 @@ TEST(RemoteMat, GoldenScoreKeepsShidosAndMedicalExaminations)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -2988,8 +2988,8 @@ TEST(RemoteMat, Draw)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -3034,8 +3034,8 @@ TEST(RemoteMat, Draw2)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -3087,8 +3087,8 @@ TEST(RemoteMat, Hantei)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
@@ -3138,8 +3138,8 @@ TEST(RemoteMat, BreakTime)
 	initialize();
 	Application master;
 	Application slave;
-	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 10000));
-	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 10000));
+	ASSERT_TRUE(master.StartHttpServer(8080 + rand() % 50000));
+	ASSERT_TRUE(slave.StartHttpServer( 8080 + rand() % 50000));
 
 	ASSERT_TRUE(slave.ConnectToMaster("127.0.0.1", master.GetPort()));
 	ASSERT_TRUE(slave.StartLocalMat(1));
