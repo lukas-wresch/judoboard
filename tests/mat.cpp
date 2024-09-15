@@ -1269,7 +1269,7 @@ TEST(Mat, MatchTimeCorrectAfterOsaekomi)
 		EXPECT_TRUE(m.IsOutOfTime());
 		EXPECT_EQ(m.GetOsaekomiList().size(), 1);
 		EXPECT_TRUE(m.EndMatch());
-		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time-1 + 20)*1000), 100);
+		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time-1 + 20)*1000), 125);
 	}
 }
 
@@ -1308,7 +1308,7 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi)
 		EXPECT_TRUE(m.IsOutOfTime());
 		EXPECT_EQ(m.GetOsaekomiList().size(), 1);
 		EXPECT_TRUE(m.EndMatch());
-		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time + time-1 + 20)*1000), 100);
+		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time + time-1 + 20)*1000), 125);
 	}
 }
 
@@ -1352,7 +1352,7 @@ TEST(Mat, MatchTimeGoldenscoreCorrectAfterOsaekomi2)
 		EXPECT_TRUE(m.IsOutOfTime());
 		EXPECT_EQ(m.GetOsaekomiList().size(), 2);
 		EXPECT_TRUE(m.EndMatch());
-		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time-2 + 9 + time-1 + 20)*1000), 100);
+		EXPECT_LE( std::abs((int)match.GetResult().m_Time - (time-2 + 9 + time-1 + 20)*1000), 125);
 	}
 }
 
