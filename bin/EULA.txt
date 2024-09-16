@@ -1,0 +1,37 @@
+END USER LICENSE AGREEMENT (EULA)
+
+IMPORTANT: PLEASE READ THIS AGREEMENT CAREFULLY BEFORE USING THIS SOFTWARE.
+
+This End User License Agreement ("Agreement") is a legal contract between you (either an individual or a single entity) and Wresch Enterprise ("Licensor") for the software product Judoboard ("Software").
+
+1. **License Grant**:
+   Licensor grants you a non-exclusive, non-transferable license to use the Software solely for your purposes.
+
+2. **License Duration**:
+   This license is valid for a period determined by the time of purchase. At the end of the license term, your right to use the Software will expire unless you renew the license.
+
+3. **Renewal**:
+   To continue using the Software after the expiration of the license term, you must purchase a renewal license. Licensor will provide information on renewal options and pricing before the license expires. Failure to renew will result in the termination of your license.
+
+4. **Permitted Uses**:
+   You may install and use the Software on multiple computers or devices. You may make backup copies of the Software.
+
+5. **Prohibited Uses**:
+   You may not distribute, sell, lease, or sublicense the Software. You may not reverse engineer, decompile, or disassemble the Software.
+
+6. **Ownership**:
+   The Software is licensed, not sold. All rights, title, and interest in and to the Software, including all intellectual property rights, are owned by Licensor.
+
+7. **Support and Updates**:
+   Licensor is not obligated to provide any support, updates, or enhancements to the Software unless you have a valid support agreement or the license includes such provisions.
+
+8. **Termination**:
+   This Agreement will terminate automatically upon expiration of the license term if you do not renew. This Agreement will also terminate if you fail to comply with any of its terms. Upon termination, you must destroy all copies of the Software.
+
+9. **Liability and Warranties**:
+   The Software is provided "as is" without warranties of any kind. Licensor is not liable for any damages arising from the use of the Software.
+
+10. **Governing Law**:
+    This Agreement will be governed by and construed in accordance with the laws of Germany.
+
+By using the Software, you agree to be bound by the terms of this Agreement.

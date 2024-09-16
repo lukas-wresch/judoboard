@@ -6,6 +6,7 @@
 #include "weightclass.h"
 #include "round_robin.h"
 #include "standing_data.h"
+#include "eula.h"
 #include "../ZED/include/log.h"
 #include "../ZED/include/http_client.h"
 
@@ -380,7 +381,27 @@ int main(int argc, char** argv)
 	ZED::Log::Info("Initializing application");
 	Judoboard::Application app;
 
-	if (!app.LoadDataFromDisk())
+	Judoboard::Localizer::SetLanguage(Judoboard::Language::German);
+
+	const bool data_loaded = app.LoadDataFromDisk();
+
+
+	//EULA check
+
+#ifdef _WIN32
+	if (!app.GetDatabase().IsEULAAccepted())
+	{
+		if (Judoboard::EULA::Display(hInstance))
+			app.GetDatabase().SetEULAAccepted(true);
+		else
+			return 0;
+	}
+#endif
+
+
+	//Select port and start http server
+
+	if (!data_loaded)
 	{
 		ZED::Log::Error("Could not load application data from disk");
 		if (port <= 0)//Port not set via command line
@@ -391,6 +412,8 @@ int main(int argc, char** argv)
 
 	app.StartHttpServer(port);
 
+
+	//License check
 
 	Judoboard::License::Check(&app);
 
@@ -468,7 +491,7 @@ int main(int argc, char** argv)
 	}
 
 
-	if (slave)
+	if (slave)//Slave mode
 	{
 		if (!app.ConnectToMaster(master_ip, master_port))
 		{
@@ -487,7 +510,7 @@ int main(int argc, char** argv)
 				mat->SetFullscreen(mat->IsFullscreen(), i%monitors.size());
 		}
 	}
-	else
+	else//Master mode
 	{
 		auto monitors = Judoboard::Window::EnumerateMonitors();
 

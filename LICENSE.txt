@@ -1,0 +1,9 @@
+Copyright (C) 2024
+
+This software is not freely available for commercial use without a separate, paid license.
+For non-commercial purposes, this software can be used under the following conditions:
+
+- You may view, use, and modify the source code for personal and non-commercial purposes.
+- Any commercial use is prohibited unless a commercial license has been purchased.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
