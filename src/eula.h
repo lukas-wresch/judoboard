@@ -10,6 +10,8 @@ namespace Judoboard
 	class EULA
 	{
 	public:
+#ifdef _WIN32
 		static bool Display(HINSTANCE hInstance);
+#endif
 	};
 }
